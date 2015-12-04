@@ -13,13 +13,16 @@
     <!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
     <!-- endbuild -->
+    <link rel="stylesheet" href="bower_components/cornerstone/dist/cornerstone.css"> <!-- @todo: add to grunt process queue -->
   </head>
-  <body>
+  <body ng-app="osimiswebviewerApp" ng-controller="MainCtrl as ctrl">
     <!--[if lte IE 8]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
     <!-- Add your site or application content here -->
+    <wv-image-viewport wv-image-id="ctrl.imageId"></wv-image-viewport>
+    <wv-serie-viewport wv-serie-id="ctrl.serieId" wv-image-index="ctrl.imageIndex"></wv-serie-viewport>
 
     <!-- build:js(.) scripts/vendor.js -->
     <!-- bower:js -->
@@ -31,7 +34,14 @@
     <!-- endbower -->
     <!-- endbuild -->
 
+    <script src="scripts/orthanc-image-loader.js"></script> <!-- @todo: add to grunt process queue -->
+
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
+    <script src="scripts/app.js"></script>
+    <script src="scripts/controllers/main.js"></script>
+    <script src="scripts/directives/wv-image-viewport.js"></script>
+    <script src="scripts/directives/wv-serie-viewport.js"></script>
+    <script src="scripts/services/orthanc.js"></script>
     <!-- endbuild -->
 </body>
 </html>
