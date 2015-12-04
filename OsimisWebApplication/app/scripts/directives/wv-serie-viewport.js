@@ -8,7 +8,7 @@
  */
 angular.module('osimiswebviewerApp')
 .directive('wvSerieViewport', function() {
-  return {
+return {
     scope: {
       'wvSerieId': '=',
       'wvImageIndex': '=?'
@@ -77,5 +77,5 @@ angular.module('osimiswebviewerApp')
       });
 
     }
-  };
+};
 });

@@ -8,21 +8,21 @@
  */
 angular.module('osimiswebviewerApp')
 .directive('wvImageViewport', function() {
-  return {
-    scope: {
-      wvImageId: '='
-    },
-    template: '<div class="cornerstone-enabled-image"\
-                oncontextmenu="return false"\
-                unselectable="on"\
-                onselectstart="return false;"\
-                onmousedown="return false;"\
-              >\
-                  <div oncontextmenu="return false" />\
-              </div>',
-    restrict: 'E',
-    replace: false,
-    link: function postLink(scope, parentElement, attrs) {
+return {
+  scope: {
+    wvImageId: '='
+  },
+  template: '<div class="cornerstone-enabled-image"\
+              oncontextmenu="return false"\
+              unselectable="on"\
+              onselectstart="return false;"\
+              onmousedown="return false;"\
+            >\
+                <div oncontextmenu="return false" />\
+            </div>',
+  restrict: 'E',
+  replace: false,
+  link: function postLink(scope, parentElement, attrs) {
       var _isLoaded = false;
       
       var jqElement = parentElement.children().children();
@@ -87,6 +87,6 @@ angular.module('osimiswebviewerApp')
           });
         });
       }
-    }
-  };
+  }
+};
 });
