@@ -24,6 +24,7 @@
 #include <boost/filesystem.hpp>
 
 #include "../Orthanc/Core/OrthancException.h"
+#include "../Orthanc/Core/Toolbox.h"
 #include "ViewerToolbox.h"
 #include "ViewerPrefetchPolicy.h"
 #include "DecodedImageAdapter.h"
@@ -227,20 +228,17 @@ static int32_t ServeWebViewer(OrthancPluginRestOutput* output,
 
   const std::string path = std::string(WEB_VIEWER_PATH) + std::string(request->groups[0]);
   const char* mime = OrthancPlugins::GetMimeType(path);
-
+  
   std::string s;
-  if (OrthancPlugins::ReadFile(s, path))
-  {
-    const char* resource = s.size() ? s.c_str() : NULL;
-    OrthancPluginAnswerBuffer(context_, output, resource, s.size(), mime);
+  try {
+    Orthanc::Toolbox::ReadFile(s, path);
   }
-  else
-  {
+  catch (Orthanc::OrthancException&) {
     std::string s = "Inexistent file in served folder: " + path;
     OrthancPluginLogError(context_, s.c_str());
     OrthancPluginSendHttpStatusCode(context_, output, 404);
   }
-
+  
   return 0;
 }
 #endif
