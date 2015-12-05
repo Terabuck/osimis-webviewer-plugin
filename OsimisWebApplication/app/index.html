@@ -21,8 +21,36 @@
     <![endif]-->
 
     <!-- Add your site or application content here -->
+    <wv-toolbar>
+        <wv-toolbar-play-serie wv-model="ctrl.toolbar.play"></wv-toolbar-play-serie>
+    </wv-toolbar>
+
     <wv-image-viewport wv-image-id="ctrl.imageId"></wv-image-viewport>
-    <wv-serie-viewport wv-serie-id="ctrl.serieId" wv-image-index="ctrl.imageIndex"></wv-serie-viewport>
+    
+    <p style="text-align: center;">
+        <wv-serie-viewport wv-height="'50000'"
+            wv-serie-id="ctrl.serieId" wv-image-index="ctrl.imageIndex"
+            wv-play="ctrl.toolbar.play" 
+            wv-on-instance-changed="ctrl.actualInstance = $id"
+            style="color: red"
+        >
+            image: {{ctrl.actualInstance}}
+            <wv-overlay wv-instance-id="ctrl.actualInstance"></wv-overlay>
+            <!-- @todo use nested specialized directive insteda of passing by controller -->
+        </wv-serie-viewport>
+    </p>
+    <p style="text-align: center;">
+        <wv-serie-viewport wv-height="'50000'"
+            wv-serie-id="'7d102e10-d12c3835-aba16eed-fe8375b0-a4c55f35'" wv-image-index="ctrl.imageIndex"
+            wv-play="ctrl.toolbar.play" 
+            wv-on-instance-changed="ctrl.actualInstance = $id"
+            style="color: yellow"
+        >
+            image: {{ctrl.actualInstance}}
+            <wv-overlay wv-instance-id="ctrl.actualInstance"></wv-overlay>
+            <!-- @todo use nested specialized directive insteda of passing by controller -->
+        </wv-serie-viewport>
+    </p>
 
     <!-- build:js(.) scripts/vendor.js -->
     <!-- bower:js -->
@@ -31,6 +59,9 @@
     <script src="bower_components/cornerstone/dist/cornerstone.js"></script>
     <script src="bower_components/jpgjs/jpg.js"></script>
     <script src="bower_components/hamsterjs/hamster.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="bower_components/lodash/lodash.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -39,9 +70,12 @@
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="scripts/app.js"></script>
     <script src="scripts/controllers/main.js"></script>
+    <script src="scripts/directives/wv-toolbar.js"></script>
     <script src="scripts/directives/wv-image-viewport.js"></script>
     <script src="scripts/directives/wv-serie-viewport.js"></script>
     <script src="scripts/services/orthanc.js"></script>
+    <script src="scripts/directives/wv-toolbar-play-serie.js"></script>
+    <script src="scripts/directives/wv-overlay.js"></script>
     <!-- endbuild -->
 </body>
 </html>
