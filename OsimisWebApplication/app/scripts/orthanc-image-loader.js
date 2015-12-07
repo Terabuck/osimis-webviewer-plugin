@@ -111,6 +111,8 @@
   function getOrthancImage(imageId) {
     var result = null;
 
+    // @todo use angular orthanc service
+    // and refactor the whole image loader as application configuration
     $.ajax({
       type: 'GET',
       url: _webViewerApiUri + '/instances/' + compression + '-' + imageId,
@@ -125,7 +127,8 @@
           image.render = cornerstone.renderGrayscaleImage;
 
         // @todo prototype
-        image.getPixelData = function() {
+        // @todo check memory overhead of memoize
+        image.getPixelData = _.memoize(function() {
           if (image.Orthanc.Compression == 'Deflate')
             return getPixelDataDeflate(this);
 
@@ -134,7 +137,7 @@
 
           // Unknown compression
           return null;
-        }
+        });
 
         result = image;
       },
