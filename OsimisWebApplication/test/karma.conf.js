@@ -28,6 +28,8 @@ module.exports = function(config) {
       'bower_components/jpgjs/jpg.js',
       'bower_components/hamsterjs/hamster.js',
       'bower_components/angular-resource/angular-resource.js',
+      'bower_components/bootstrap/dist/js/bootstrap.js',
+      'bower_components/lodash/lodash.js',
       'bower_components/angular-mocks/angular-mocks.js',
       // endbower
       "app/scripts/**/*.js",

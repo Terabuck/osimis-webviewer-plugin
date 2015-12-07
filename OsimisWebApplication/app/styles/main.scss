@@ -1,4 +1,5 @@
 // bower:scss
+@import "font-awesome/scss/font-awesome.scss";
 // endbower
 
 .browsehappy {
@@ -12,3 +13,12 @@ body {
   padding: 0;
 }
 
+wv-serie-viewport {
+  display: inline-block;
+}
+wv-image-viewport {
+  display: inline-block;
+}
+wv-toolbar {
+  display: inline-block;
+}
