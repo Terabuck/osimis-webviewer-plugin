@@ -120,13 +120,16 @@ _.invert(_.mapValues(tags, function(tag) {
 .directive('wvOverlay', ['orthanc', 'orthancTags', function(orthanc, orthancTags) {
   return {
     scope: {
+      wvSerieId: '=',
       wvInstanceId: '='
     },
-    template: '<div>{{PatientName}} - {{StudyDescription}}<br/>Age: {{PatientAge}}<br/> Weight: {{PatientWeight}}<br/>{{InstanceNumber}}</div>',
+    template: '<div>{{PatientName}} - {{StudyDescription}}<br/>Age: {{PatientAge}}<br/> Weight: {{PatientWeight}}<br/>{{InstanceNumber}}/{{InstanceCount}}</div>',
     restrict: 'E',
     link: function postLink(scope, element, attrs) {
-      _loadTags(scope.wvInstanceId, undefined);
-      scope.$watch('wvInstanceId', _loadTags);
+      _loadSerieData(scope.wvSerieId, undefined);
+      _loadInstanceTags(scope.wvInstanceId, undefined);
+      scope.$watch('wvSerieId', _loadSerieData);
+      scope.$watch('wvInstanceId', _loadInstanceTags);
 
       var tagsCopiedToScope = [
         'InstanceNumber',
@@ -137,7 +140,18 @@ _.invert(_.mapValues(tags, function(tag) {
         'StudyDescription'
       ];
 
-      function _loadTags(wvInstanceId, old) {
+      function _loadSerieData(wvSerieId, old) {
+        if (wvSerieId == old) return;
+
+        orthanc
+        .serie.countInstances({id: wvSerieId})
+        .$promise
+        .then(function(value) {
+          scope.InstanceCount = value.InstanceCount;
+        });
+      }
+
+      function _loadInstanceTags(wvInstanceId, old) {
         if (wvInstanceId == old || wvInstanceId === null || wvInstanceId == undefined)
           return;
 
