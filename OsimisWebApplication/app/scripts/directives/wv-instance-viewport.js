@@ -2,15 +2,15 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvImageViewport
+ * @name osimiswebviewerApp.directive:wvInstanceViewport
  * @description
- * # wvImageViewport
+ * # wvInstanceViewport
  */
 angular.module('osimiswebviewerApp')
-.directive('wvImageViewport', ['orthanc', function(orthanc) {
+.directive('wvInstanceViewport', ['orthanc', function(orthanc) {
 return {
   scope: {
-    wvImageId: '=',
+    wvInstanceId: '=',
     wvWidth: '=?', // default: auto ( fit to max(parent.width,image.width) )
     wvHeight: '=?', // default: auto ( fit to width*(1/ratio) )
     wvAutoResize: '=?', // resize on each image change - default: true
@@ -45,10 +45,10 @@ return {
 
       cornerstone.enable(domElement);
       
-      if (scope.wvImageId !== null && scope.wvImageId != undefined) {
-        _displayImage(scope.wvImageId)
+      if (scope.wvInstanceId !== null && scope.wvInstanceId != undefined) {
+        _displayImage(scope.wvInstanceId)
       }
-      scope.$watch('wvImageId', _displayImage);
+      scope.$watch('wvInstanceId', _displayImage);
 
       scope.$watchGroup(['wvWidth', 'wvHeight'], _resize);
 
@@ -56,15 +56,15 @@ return {
         scope.wvAutoResize = true;
       }
 
-      function _displayImage(wvImageId, old) {
-        if (wvImageId == old) return;
+      function _displayImage(wvInstanceId, old) {
+        if (wvInstanceId == old) return;
 
-        if (wvImageId === null || wvImageId == undefined) {
+        if (wvInstanceId === null || wvInstanceId == undefined) {
           return;
         }
 
         var imagePromise = cornerstone
-        .loadAndCacheImage(wvImageId)
+        .loadAndCacheImage(wvInstanceId)
         .then(function(image) {
           _image = image;
 
@@ -80,7 +80,7 @@ return {
           .$promise
           .then(function(tags) {
             scope.$broadcast('instance-data', tags);
-            
+
             if (!csViewport) csViewport = cornerstone.getViewport(domElement);
             scope.$broadcast('viewport-data', csViewport);
           });

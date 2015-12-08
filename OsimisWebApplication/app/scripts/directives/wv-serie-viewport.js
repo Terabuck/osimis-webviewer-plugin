@@ -11,24 +11,24 @@ angular.module('osimiswebviewerApp')
 return {
     scope: {
       'wvSerieId': '=',
-      'wvImageIndex': '=?',
+      'wvInstanceIndex': '=?',
       'wvWidth': '=?',
       'wvHeight': '=?',
       'wvPlay': '=?',
       'wvOnInstanceChanged': '&?'
     },
     transclude: true,
-    template: '<div><wv-image-viewport wv-image-id="imageId" wv-auto-resize="autoResize" wv-width="wvWidth" wv-height="wvHeight" wv-on-instance-changed="wvOnInstanceChanged({$id: $id})"><ng-transclude/></wv-image-viewport></div>',
+    template: '<div><wv-instance-viewport wv-instance-id="instanceId" wv-auto-resize="autoResize" wv-width="wvWidth" wv-height="wvHeight" wv-on-instance-changed="wvOnInstanceChanged({$id: $id})"><ng-transclude/></wv-instance-viewport></div>',
     restrict: 'E',
     link: function postLink(scope, element, attrs) {
-      if (scope.wvImageIndex === null  || typeof scope.wvImageIndex === 'undefined') {
-        scope.wvImageIndex = 0;
+      if (scope.wvInstanceIndex === null  || typeof scope.wvInstanceIndex === 'undefined') {
+        scope.wvInstanceIndex = 0;
       }
 
-      scope.imageId = null;
+      scope.instanceId = null;
       scope.autoResize = false;
 
-      var _unwatchWvImageIndex = null;
+      var _unwatchWvInstanceIndex = null;
       
       var instances = [];
       
@@ -37,8 +37,8 @@ return {
       scope.$watch('wvSerieId', function(wvSerieId, old) {
         if (wvSerieId == old) return;
 
-        _unwatchWvImageIndex();
-        scope.wvImageIndex = 0;
+        _unwatchWvInstanceIndex();
+        scope.wvInstanceIndex = 0;
         _setSerie(wvSerieId);
       });
       _setSerie(scope.wvSerieId);
@@ -53,11 +53,11 @@ return {
         }
         else if (play == true) {
           playPromise = $interval(function() {
-            ++scope.wvImageIndex;
+            ++scope.wvInstanceIndex;
 
             // reload at end
-            if (scope.wvImageIndex >= instances.length - 1) {
-              scope.wvImageIndex = 0;
+            if (scope.wvInstanceIndex >= instances.length - 1) {
+              scope.wvInstanceIndex = 0;
             }
           }, speed);
         }
@@ -72,13 +72,13 @@ return {
           if (volume.Instances.length != 0) { // @todo why volume ?
             instances = volume.Instances;
 
-            if (scope.wvImageIndex >= instances.length) {
-              scope.wvImageIndex = instances.length - 1;
+            if (scope.wvInstanceIndex >= instances.length) {
+              scope.wvInstanceIndex = instances.length - 1;
             }
 
             var tmpAutoResize = scope.autoResize;
             scope.autoResize = true; // auto resize the first image
-            scope.imageId = instances[scope.wvImageIndex];
+            scope.instanceId = instances[scope.wvInstanceIndex];
             $timeout(function() { // reset autoResize param
               scope.autoResize = tmpAutoResize;
             });
@@ -87,18 +87,18 @@ return {
           }
           
           // keep the index safe from overflow
-          _unwatchWvImageIndex = scope.$watch('wvImageIndex', function(wvImageIndex, old) {
-            if (wvImageIndex == old) return;
+          _unwatchWvInstanceIndex = scope.$watch('wvInstanceIndex', function(wvInstanceIndex, old) {
+            if (wvInstanceIndex == old) return;
 
             // @todo refactor duplicate code but avoid recursive $watch call ! 
-            if (wvImageIndex === null || typeof wvImageIndex === 'undefined') {
-              wvImageIndex = 0;
+            if (wvInstanceIndex === null || typeof wvInstanceIndex === 'undefined') {
+              wvInstanceIndex = 0;
             }
-            else if (wvImageIndex >= instances.length) {
-              wvImageIndex = instances.length - 1;
+            else if (wvInstanceIndex >= instances.length) {
+              wvInstanceIndex = instances.length - 1;
             }
 
-            scope.imageId = instances[wvImageIndex];
+            scope.instanceId = instances[wvInstanceIndex];
           });
         });
       }
@@ -111,15 +111,15 @@ return {
         // @todo calibrate the required speed and accuracy for the enduser
         scope.$apply(function() {
           if (deltaX > 0) {
-            scope.wvImageIndex++;
-            if (scope.wvImageIndex >= instances.length) {
-              scope.wvImageIndex = instances.length - 1;
+            scope.wvInstanceIndex++;
+            if (scope.wvInstanceIndex >= instances.length) {
+              scope.wvInstanceIndex = instances.length - 1;
             }
           }
           else if (deltaX < 0) {
-            scope.wvImageIndex--;
-            if (scope.wvImageIndex < 0) {
-              scope.wvImageIndex = 0;
+            scope.wvInstanceIndex--;
+            if (scope.wvInstanceIndex < 0) {
+              scope.wvInstanceIndex = 0;
             }
           }
         });
