@@ -18,14 +18,13 @@ angular.module('osimiswebviewerApp')
     this.overlayData = {};
 
     // Model: list series
-    // orthanc
-    // .serie.query()
-    // .$promise
-    // .then(function(hoho) {
-    //   console.log(self.hoho);
-    //   self.hoho = hoho;
-    //   console.log(self.hoho);
-    // });
+    orthanc
+    .serie.query()
+    .$promise
+    .then(function(series) {
+      console.log('Available series ids:');
+      console.table(_.without(series, ['$promise', '$resolved']), ['id']);
+    });
     
     // Model: get serie & list images (instances)
     orthanc

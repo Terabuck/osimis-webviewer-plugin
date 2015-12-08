@@ -28,24 +28,5 @@ angular.module('osimiswebviewerApp')
         getTags: { method: 'GET', url: _orthancApiUri + '/instances/:id/tags', cache: cache }
       })
     };
-
-    // function _findSerieById() {
-    //   $.ajax({ // @todo use angular ajax
-    //     type: 'GET',
-    //     url: _orthancApiUri + '/series/' + self.serieId,
-    //     dataType: 'json',
-    //     cache: false,
-    //     async: false,
-    //     success: function(volume) {
-    //       instances = volume.Instances;
-    //       if (volume.Instances.length > self.imageIndex) {
-    //         self.imageId = instances[self.imageIndex];
-    //       }
-    //     }
-    //   });
-    // }
-
-    function _findImageById() {
-      
-    }
+    
 }]);

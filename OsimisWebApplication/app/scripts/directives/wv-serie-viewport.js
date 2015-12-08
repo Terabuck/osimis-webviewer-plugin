@@ -100,20 +100,11 @@ return {
         });
       }
       
+      // @todo check if used
       function _onSerieChanged(volume) {
         scope.$data = volume;
         if (scope.wvOnSerieChanged) {
-          scope.wvOnSerieChanged({ // @todo make sure REST API don't change
-            //$data: {
-              //ID: volume.ID,
-              //Instances: volume.Instances,
-              //IsStable: volume.IsStable,
-              //LastUpdate: volume.LastUpdate,
-              //MainDicomTags: volume.MainDicomTags,
-              //ParentStudy: volume.ParentStudy,
-              //Status: volume.status,
-              //Type: volume.Type,
-            //},
+          scope.wvOnSerieChanged({
             $tags: volume.MainDicomTags
           });
         }

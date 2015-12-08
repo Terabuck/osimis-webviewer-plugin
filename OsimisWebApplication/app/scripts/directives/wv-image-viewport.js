@@ -14,7 +14,6 @@ return {
     wvWidth: '=?', // default: auto ( fit to max(parent.width,image.width) )
     wvHeight: '=?', // default: auto ( fit to width*(1/ratio) )
     wvAutoResize: '=?', // resize on each image change - default: true
-    // wvOnResized: '&?'
     wvOnInstanceChanged: '&?'
   },
   transclude: true,
@@ -142,13 +141,6 @@ return {
         }
         
         cornerstone.resize(domElement, true); // resize viewport
-
-        // if (scope.wvOnResized) {
-        //   scope.wvOnResized({
-        //     $width: width,
-        //     $height: height
-        //   });
-        // }
       }
       
       function _onLoaded() {
