@@ -18,7 +18,7 @@ return {
       'wvOnInstanceChanged': '&?'
     },
     transclude: true,
-    template: '<div><wv-image-viewport wv-image-id="imageId" wv-auto-resize="autoResize" wv-width="wvWidth" wv-height="wvHeight" wv-on-instance-changed="wvOnInstanceChanged({$id: $id})"><ng-transclude /></wv-image-viewport></div>',
+    template: '<div><wv-image-viewport wv-image-id="imageId" wv-auto-resize="autoResize" wv-width="wvWidth" wv-height="wvHeight" wv-on-instance-changed="wvOnInstanceChanged({$id: $id})"><ng-transclude/></wv-image-viewport></div>',
     restrict: 'E',
     link: function postLink(scope, element, attrs) {
       if (scope.wvImageIndex === null  || typeof scope.wvImageIndex === 'undefined') {
@@ -32,6 +32,8 @@ return {
       
       var instances = [];
       
+      scope.$broadcast('evt', ['serie']);
+
       scope.$watch('wvSerieId', function(wvSerieId, old) {
         if (wvSerieId == old) return;
 
@@ -79,9 +81,12 @@ return {
             scope.imageId = instances[scope.wvImageIndex];
             $timeout(function() { // reset autoResize param
               scope.autoResize = tmpAutoResize;
-            })
-          }
+            });
 
+            scope.$broadcast('serie-loaded', volume.MainDicomTags, volume.Instances.length);
+          }
+          
+          // keep the index safe from overflow
           _unwatchWvImageIndex = scope.$watch('wvImageIndex', function(wvImageIndex, old) {
             if (wvImageIndex == old) return;
 

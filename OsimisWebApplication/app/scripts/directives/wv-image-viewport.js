@@ -7,7 +7,7 @@
  * # wvImageViewport
  */
 angular.module('osimiswebviewerApp')
-.directive('wvImageViewport', function() {
+.directive('wvImageViewport', ['orthanc', function(orthanc) {
 return {
   scope: {
     wvImageId: '=',
@@ -25,14 +25,15 @@ return {
                 onmousedown="return false;"\
               >\
                   <div oncontextmenu="return false" />\
-                  <ng-transclude style="display: inline-block; position: absolute; top: 0; right: 0; bottom: 0; left: 0;"\
-                    oncontextmenu="return false"\
-                    unselectable="on"\
-                    onselectstart="return false;"\
-                    onmousedown="return false;"\
-                  />\
+                  <ng-transclude/>\
               </div>\
             </div>',
+                  // <ng-transclude style="display: inline-block; position: absolute; top: 0; right: 0; bottom: 0; left: 0;"\
+                  //   oncontextmenu="return false"\
+                  //   unselectable="on"\
+                  //   onselectstart="return false;"\
+                  //   onmousedown="return false;"\
+                  // />\
   restrict: 'E',
   replace: false,
   link: function postLink(scope, parentElement, attrs) {
@@ -54,7 +55,7 @@ return {
       if (scope.wvAutoResize === null || scope.wvAutoResize == undefined) {
         scope.wvAutoResize = true;
       }
-      
+
       function _displayImage(wvImageId, old) {
         if (wvImageId == old) return;
 
@@ -72,12 +73,20 @@ return {
           if (scope.wvAutoResize == true) {
             _resize([scope.wvWidth, scope.wvHeight]);
           }
+  
+          // load instance data
+          orthanc
+          .instance.getTags({id: _image.imageId})
+          .$promise
+          .then(function(tags) {
+            scope.$broadcast('instance-loaded', tags);
+          });
 
           if (!_isLoaded) {
             _onLoaded();
             _isLoaded = true;
           }
-  
+
           // @todo: document the feature
           if (scope.wvOnInstanceChanged) {
             scope.wvOnInstanceChanged({
@@ -183,4 +192,4 @@ return {
       }
   }
 };
-});
+}]);
