@@ -83,7 +83,7 @@ return {
               scope.autoResize = tmpAutoResize;
             });
 
-            scope.$broadcast('serie-loaded', volume.MainDicomTags, volume.Instances.length);
+            scope.$broadcast('serie-data', volume.MainDicomTags, volume.Instances.length);
           }
           
           // keep the index safe from overflow

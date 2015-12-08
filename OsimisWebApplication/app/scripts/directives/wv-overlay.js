@@ -21,8 +21,8 @@ angular.module('osimiswebviewerApp')
                       StudyDate: {{$instance.StudyDate}}\
                   </div>\
                   <div class="wv-overlay-bottomright">\
-                      zoom: {{$render.zoom}}<br/>\
-                      ww/wc: {{$render.ww}}/{{$render.wc}}\
+                      zoom: {{$viewport.scale|number:2}}<br/>\
+                      ww/wc: {{$viewport.voi.windowWidth|number:0}}/{{$viewport.voi.windowCenter|number:0}}\
                   </div>\
                   <div class="wv-overlay-bottomleft">\
                       {{$instance.InstanceNumber}}<span ng-show="$serie">/{{$serie.InstanceCount}}</span><br/>\
@@ -30,12 +30,15 @@ angular.module('osimiswebviewerApp')
               </div>',
     restrict: 'E',
     link: function postLink(scope, element, attrs) {
-      scope.$on('instance-loaded', function(evt, tags) {
+      scope.$on('instance-data', function(evt, tags) {
         scope.$instance = tags;
       });
-      scope.$on('serie-loaded', function(evt, tags, instanceCount) {
+      scope.$on('serie-data', function(evt, tags, instanceCount) {
         scope.$serie = tags;
         scope.$serie.InstanceCount = instanceCount;
+      });
+      scope.$on('viewport-data', function(evt, viewport) {
+        scope.$viewport = viewport;
       });
     }
   };

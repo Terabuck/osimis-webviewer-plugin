@@ -79,7 +79,10 @@ return {
           .instance.getTags({id: _image.imageId})
           .$promise
           .then(function(tags) {
-            scope.$broadcast('instance-loaded', tags);
+            scope.$broadcast('instance-data', tags);
+            
+            if (!csViewport) csViewport = cornerstone.getViewport(domElement);
+            scope.$broadcast('viewport-data', csViewport);
           });
 
           if (!_isLoaded) {
@@ -160,33 +163,33 @@ return {
           var mouseButton = e.which;
           
           $(document).mousemove(function(e) {
-            var deltaX = e.pageX - lastX; 
-            var deltaY = e.pageY - lastY;
-            lastX = e.pageX;
-            lastY = e.pageY;
+            scope.$apply(function() {
+              var deltaX = e.pageX - lastX; 
+              var deltaY = e.pageY - lastY;
+              lastX = e.pageX;
+              lastY = e.pageY;
+              
+              var csViewport = cornerstone.getViewport(domElement);
+              if (mouseButton == 1) { // left-click + move -> windowing
+                csViewport.voi.windowWidth += (deltaX / csViewport.scale);
+                csViewport.voi.windowCenter += (deltaY / csViewport.scale);
+              }
+              else if (mouseButton == 2) { // middle-click + move -> moving
+                csViewport.translation.x += (deltaX / csViewport.scale);
+                csViewport.translation.y += (deltaY / csViewport.scale);
+              }
+              else if (mouseButton == 3) { // right-click + move -> scaling
+                csViewport.scale += (deltaY / 100);
+              }
+              cornerstone.setViewport(domElement, csViewport);
+              
+              scope.$broadcast('viewport-data', csViewport);
+            });
             
-            if (mouseButton == 1) { // ?
-              var csViewport = cornerstone.getViewport(domElement);
-              csViewport.voi.windowWidth += (deltaX / csViewport.scale);
-              csViewport.voi.windowCenter += (deltaY / csViewport.scale);
-              cornerstone.setViewport(domElement, csViewport);
-            }
-            else if (mouseButton == 2) { // move
-              var csViewport = cornerstone.getViewport(domElement);
-              csViewport.translation.x += (deltaX / csViewport.scale);
-              csViewport.translation.y += (deltaY / csViewport.scale);
-              cornerstone.setViewport(domElement, csViewport);
-            }
-            else if (mouseButton == 3) { // scale
-              var csViewport = cornerstone.getViewport(domElement);
-              csViewport.scale += (deltaY / 100);
-              cornerstone.setViewport(domElement, csViewport);
-            }
-          });
-          
-          $(document).mouseup(function(e) {
-            $(document).unbind('mousemove');
-            $(document).unbind('mouseup');
+            $(document).mouseup(function(e) {
+              $(document).unbind('mousemove');
+              $(document).unbind('mouseup');
+            });
           });
         });
       }
