@@ -122,17 +122,19 @@ _.invert(_.mapValues(tags, function(tag) {
     scope: {
       wvInstanceId: '='
     },
-    template: '<div>{{PatientName}} {{PatientAge}} {{PatientWeight}}</div>',
+    template: '<div>{{PatientName}} - {{StudyDescription}}<br/>Age: {{PatientAge}}<br/> Weight: {{PatientWeight}}<br/>{{InstanceNumber}}</div>',
     restrict: 'E',
     link: function postLink(scope, element, attrs) {
       _loadTags(scope.wvInstanceId, undefined);
       scope.$watch('wvInstanceId', _loadTags);
 
       var tagsCopiedToScope = [
+        'InstanceNumber',
         'PatientName',
         'PatientID',
         'PatientAge',
-        'PatientWeight'
+        'PatientWeight',
+        'StudyDescription'
       ];
 
       function _loadTags(wvInstanceId, old) {
