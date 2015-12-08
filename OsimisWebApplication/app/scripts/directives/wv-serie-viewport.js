@@ -15,7 +15,6 @@ return {
       'wvWidth': '=?',
       'wvHeight': '=?',
       'wvPlay': '=?',
-      'wvOnSerieChanged': '&?',
       'wvOnInstanceChanged': '&?'
     },
     transclude: true,
@@ -80,7 +79,6 @@ return {
             scope.imageId = instances[scope.wvImageIndex];
             $timeout(function() { // reset autoResize param
               scope.autoResize = tmpAutoResize;
-              _onSerieChanged(volume);
             })
           }
 
@@ -98,16 +96,6 @@ return {
             scope.imageId = instances[wvImageIndex];
           });
         });
-      }
-      
-      // @todo check if used
-      function _onSerieChanged(volume) {
-        scope.$data = volume;
-        if (scope.wvOnSerieChanged) {
-          scope.wvOnSerieChanged({
-            $tags: volume.MainDicomTags
-          });
-        }
       }
       
       // Hamster = cross browser mousewheel library
