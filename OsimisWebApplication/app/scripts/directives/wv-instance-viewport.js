@@ -124,12 +124,17 @@ return {
 
         var ratio = _image.width/_image.height;
         if (wvWidth === 'auto' && wvHeight === 'auto') {
-          // auto size width & width based on parent width
+          // auto size width & height based on instance width & height
           var maxWidth = parentElement.parent().width();
-          width = _image.width < maxWidth ? _image.width : maxWidth;
-          height = width * (1/ratio);
-          jqElement.width(Math.round(width));
-          jqElement.height(Math.round(height));
+          jqElement.width(_image.width);
+          jqElement.height(_image.height);
+
+          // // auto size width & width based on parent width
+          // var maxWidth = parentElement.parent().width();
+          // width = _image.width < maxWidth ? _image.width : maxWidth;
+          // height = width * (1/ratio);
+          // jqElement.width(Math.round(width));
+          // jqElement.height(Math.round(height));
         }
         else if (wvWidth !== 'auto' && wvHeight === 'auto') {
           // resize width & fit height based on wvWidth param
