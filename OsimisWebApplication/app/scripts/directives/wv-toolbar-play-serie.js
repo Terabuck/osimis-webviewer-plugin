@@ -16,24 +16,26 @@ angular.module('osimiswebviewerApp')
       template: '<button type="button" class="btn btn-sm btn-default" ng-click="wvModel = !wvModel"><span class="fa"></span></button>',
       restrict: 'E',
       link: function postLink(scope, element, attrs, toolbarCtrl) {
+        var iconElement = element.children().children();
+        
         scope.wvModel = !!scope.wvModel;
         if (!scope.wvModel) { // @todo refactor
-          element.children().children().addClass('fa-play');
+          iconElement.addClass('fa-play');
         }
         else {
-          element.children().children().addClass('fa-pause');
+          iconElement.addClass('fa-pause');
         }
 
         scope.$watch('wvModel', function(wvModel, old) {
           if (wvModel == old) return;
 
-          if (wvModel) {
-            element.children().children().removeClass('fa-pause');
-            element.children().children().addClass('fa-play');
+          if (!wvModel) {
+            iconElement.removeClass('fa-pause');
+            iconElement.addClass('fa-play');
           }
           else {
-            element.children().children().removeClass('fa-play');
-            element.children().children().addClass('fa-pause');
+            iconElement.removeClass('fa-play');
+            iconElement.addClass('fa-pause');
           }
         });
       }
