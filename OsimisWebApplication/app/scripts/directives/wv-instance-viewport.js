@@ -13,8 +13,7 @@ return {
     wvInstanceId: '=',
     wvWidth: '=?', // default: auto ( fit to max(parent.width,image.width) )
     wvHeight: '=?', // default: auto ( fit to width*(1/ratio) )
-    wvAutoResize: '=?', // resize on each image change - default: true
-    wvOnInstanceChanged: '&?'
+    wvAutoResize: '=?' // resize on each image change - default: true
   },
   transclude: true,
   template: '<div style="position: relative">\
@@ -28,12 +27,6 @@ return {
                   <ng-transclude/>\
               </div>\
             </div>',
-                  // <ng-transclude style="display: inline-block; position: absolute; top: 0; right: 0; bottom: 0; left: 0;"\
-                  //   oncontextmenu="return false"\
-                  //   unselectable="on"\
-                  //   onselectstart="return false;"\
-                  //   onmousedown="return false;"\
-                  // />\
   restrict: 'E',
   replace: false,
   link: function postLink(scope, parentElement, attrs) {
@@ -90,12 +83,6 @@ return {
             _isLoaded = true;
           }
 
-          // @todo: document the feature
-          if (scope.wvOnInstanceChanged) {
-            scope.wvOnInstanceChanged({
-              $id: image.imageId
-            });
-          }
         });
         
         return imagePromise;

@@ -14,11 +14,10 @@ return {
       'wvInstanceIndex': '=?',
       'wvWidth': '=?',
       'wvHeight': '=?',
-      'wvPlay': '=?',
-      'wvOnInstanceChanged': '&?'
+      'wvPlay': '=?'
     },
     transclude: true,
-    template: '<div><wv-instance-viewport wv-instance-id="instanceId" wv-auto-resize="autoResize" wv-width="wvWidth" wv-height="wvHeight" wv-on-instance-changed="wvOnInstanceChanged({$id: $id})"><ng-transclude/></wv-instance-viewport></div>',
+    template: '<div><wv-instance-viewport wv-instance-id="instanceId" wv-auto-resize="autoResize" wv-width="wvWidth" wv-height="wvHeight"><ng-transclude/></wv-instance-viewport></div>',
     restrict: 'E',
     link: function postLink(scope, element, attrs) {
       if (scope.wvInstanceIndex === null  || typeof scope.wvInstanceIndex === 'undefined') {
