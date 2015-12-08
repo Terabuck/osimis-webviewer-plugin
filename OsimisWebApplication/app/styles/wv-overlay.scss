@@ -11,24 +11,33 @@
 
 .wv-overlay-topleft {
     position: absolute;
-    top: 2rem;
-    left: 2rem;
+    top: 0rem;
+    left: 0rem;
 }
 
 .wv-overlay-topright {
     position: absolute;
-    top: 2rem;
-    right: 2rem;
+    top: 0rem;
+    right: 0rem;
 }
 
 .wv-overlay-bottomright {
     position: absolute;
-    bottom: 2rem;
-    right: 2rem;
+    bottom: 0rem;
+    right: 0rem;
 }
 
 .wv-overlay-bottomleft {
     position: absolute;
-    bottom: 2rem;
-    left: 2rem;
+    bottom: 0rem;
+    left: 0rem;
+}
+
+.wv-overlay-topleft, .wv-overlay-topright, .wv-overlay-bottomright, .wv-overlay-bottomleft {
+    padding: 2rem;
+    transition: color 500ms, background-color 500ms;
+    background-color: rgba(0, 0, 0, 0.66);
+}
+.wv-overlay-topleft:hover, .wv-overlay-topright:hover, .wv-overlay-bottomright:hover, .wv-overlay-bottomleft:hover {
+    background-color: rgba(0, 0, 0, 0.9);
 }
