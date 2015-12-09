@@ -7,6 +7,14 @@
  * # wvInstanceViewport
  */
 angular.module('osimiswebviewerApp')
+.directive('wvViewportSize', [function() {
+return {
+  'restrict': 'A',
+  link: function postLink(scope, element) {
+    element.addClass('wv-viewport-size');
+  }
+}
+}])
 .directive('wvInstanceViewport', ['orthanc', function(orthanc) {
 return {
   scope: {
@@ -35,6 +43,7 @@ return {
       var jqElement = parentElement.children().children();
       var domElement = jqElement[0];
       var _image = null;
+      var _onWindowResize = null;
 
       cornerstone.enable(domElement);
       
@@ -45,7 +54,7 @@ return {
 
       scope.$watchGroup(['wvWidth', 'wvHeight'], _resize);
 
-      if (scope.wvAutoResize === null || scope.wvAutoResize == undefined) {
+      if (scope.wvAutoResize === null || scope.wvAutoResize == undefined) { // @todo document that wvAutoResize concern recizing image **on scroll**
         scope.wvAutoResize = true;
       }
 
@@ -95,6 +104,12 @@ return {
           return;
         }
 
+        // reset window resizing event when resizing mode change
+        if (_onWindowResize) {
+          $(window).off('resize', _onWindowResize);
+          _onWindowResize = null;
+        }
+
         var wvWidth = newValues[0];
         var wvHeight = newValues[1];
         var width, height;
@@ -115,6 +130,7 @@ return {
           var maxWidth = parentElement.parent().width();
           jqElement.width(_image.width);
           jqElement.height(_image.height);
+          cornerstone.resize(domElement, false); // center viewport but don't scale it
 
           // // auto size width & width based on parent width
           // var maxWidth = parentElement.parent().width();
@@ -130,6 +146,7 @@ return {
           height = width * (1/ratio);
           jqElement.width(Math.round(width));
           jqElement.height(Math.round(height));
+          cornerstone.resize(domElement, false); // center viewport but don't scale it
         }
         else if (wvWidth === 'auto' && wvHeight !== 'auto') {
           // resize height && fit width based on wvHeightParam
@@ -138,13 +155,44 @@ return {
           width = height * ratio;
           jqElement.width(Math.round(width));
           jqElement.height(Math.round(height));
+          cornerstone.resize(domElement, false); // center viewport but don't scale it
+        }
+        else if (wvWidth === 'parent' && wvHeight === 'parent') { // @todo allow to use only one parent and not both
+          var parentContainer = parentElement.closest('[wv-viewport-size]');
+
+          if (!parentContainer.length) {
+            return;
+          }
+
+          // adapt size when window resizes
+          _onWindowResize = _.debounce(function() {
+            var parentWidth = parentContainer.width();
+            var parentHeight = parentContainer.height();
+            jqElement.width(parentWidth);
+            jqElement.height(parentHeight);
+            cornerstone.resize(domElement, false); // center viewport but don't scale it
+          }, 10);
+          $(window).on('resize', _onWindowResize);
+          scope.$on('$destroy', function() {
+            if (_onWindowResize) {
+              $(window).off('resize', _onWindowResize);
+              _onWindowResize = null;
+            }
+          });
+
+          _onWindowResize();
         }
         else {
           jqElement.width(Math.round(wvWidth));
           jqElement.height(Math.round(wvHeight));
+          cornerstone.resize(domElement, false); // center viewport but don't scale it
         }
         
-        cornerstone.resize(domElement, true); // resize viewport
+        // scale the image back to 1.0
+        var csViewport = cornerstone.getViewport(domElement);
+        csViewport.scale = 1;
+        cornerstone.setViewport(domElement, csViewport);
+        scope.$broadcast('viewport-data', csViewport);
       }
       
       function _onLoaded() {
