@@ -13,24 +13,28 @@
     position: absolute;
     top: 0rem;
     left: 0rem;
+    text-align: left;
 }
 
 .wv-overlay-topright {
     position: absolute;
     top: 0rem;
     right: 0rem;
+    text-align: right;
 }
 
 .wv-overlay-bottomright {
     position: absolute;
     bottom: 0rem;
     right: 0rem;
+    text-align: right;
 }
 
 .wv-overlay-bottomleft {
     position: absolute;
     bottom: 0rem;
     left: 0rem;
+    text-align: left;
 }
 
 .wv-overlay-topleft, .wv-overlay-topright, .wv-overlay-bottomright, .wv-overlay-bottomleft {
