@@ -170,7 +170,7 @@ return {
             var parentHeight = parentContainer.height();
             jqElement.width(parentWidth);
             jqElement.height(parentHeight);
-            cornerstone.resize(domElement, false); // center viewport but don't scale it
+            cornerstone.resize(domElement, true); // center viewport AND scale it
           }, 10);
           $(window).on('resize', _onWindowResize);
           scope.$on('$destroy', function() {
