@@ -10,7 +10,8 @@ angular.module('osimiswebviewerApp')
 .directive('wvOverlay', [function() {
   return {
     scope: false,
-    template: '<div class="wv-overlay">\
+    transclude: 'true',
+    template: '<div class="wv-overlay"><ng-transclude>\
                 <div class="wv-overlay-topleft">\
                     {{$instance.PatientName}}<br/>\
                     {{$instance.PatientID}}\
@@ -35,7 +36,7 @@ angular.module('osimiswebviewerApp')
                     {{$instance.InstanceNumber}}<span ng-show="$serie">/{{$serie.InstanceCount}}</span><br/>\
                   </div>\
                 </div>\
-              </div>',
+              </ng-transclude></div>',
     restrict: 'E',
     link: function postLink(scope, element, attrs) {
       scope.$on('instance-data', function(evt, tags) {
