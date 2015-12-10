@@ -28,7 +28,7 @@ angular.module('osimiswebviewerApp')
                     {{$instance.InstanceNumber}}<span ng-show="$serie">/{{$serie.InstanceCount}}</span><br/>\
                 </div>\
                 -->\
-                <<div style="position: absolute; bottom:0; left:0; height: 2px; background-color: red;" ng-style="{\
+                <div style="position: absolute; bottom:0; left:0; height: 2px; background-color: red;" ng-style="{\
                   width: nbWidth\
                 }">\
                   <div style="position: absolute; left: 0px; top:calc(-1em - 5px); height: 1em; color: red; font-size: 0.8em;">\
@@ -37,7 +37,7 @@ angular.module('osimiswebviewerApp')
                 </div>\
               </div>',
     restrict: 'E',
-    link: function postLink(scope, element, attrs, ctrl, transclude) {
+    link: function postLink(scope, element, attrs) {
       scope.$on('instance-data', function(evt, tags) {
         scope.$instance = tags;
         if (scope.$serie && scope.$serie.InstanceCount && scope.$instance && scope.$instance.InstanceNumber)
