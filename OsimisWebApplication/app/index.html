@@ -24,9 +24,16 @@
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
+    <div style="height: 100%">
+        <row class="row" style="height: 100%; margin: 0; padding: 0;">
+            <div style="width: 200px; height: 100%; float: left; display: inline-block;">
+                <!-- @todo: use fixed size -->
+                <wv-serie-list wv-study-id="'52e28c1f-35e8e518-d1ec6490-aa61885e-1fe5ff3f'"></wv-serie-list>
             </div>
+            <div style="height: 100%; width: calc(100% - 200px); display: inline-block;">
                 <wv-multi-viewport></wv-multi-viewport>
             </div>
+        </row>
     </div>
 
     <!-- build:js(.) scripts/vendor.js -->
@@ -52,6 +59,7 @@
     <script src="scripts/services/orthanc.js"></script>
     <script src="scripts/directives/wv-toolbar-play-serie.js"></script>
     <script src="scripts/directives/wv-overlay.js"></script>
+    <script src="scripts/directives/wv-serie-list.js"></script>
     <script src="scripts/directives/wv-multi-viewport.js"></script>
     <!-- endbuild -->
 </body>

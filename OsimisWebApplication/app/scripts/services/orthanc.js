@@ -32,6 +32,9 @@ angular.module('osimiswebviewerApp')
         id: '@id'
       }, {
         getTags: { method: 'GET', url: _orthancApiUri + '/instances/:id/simplified-tags', cache: cache }
+      }),
+      study: $resource(_orthancApiUri + '/studies/:id', {
+        id: '@id'
       })
     };
 
