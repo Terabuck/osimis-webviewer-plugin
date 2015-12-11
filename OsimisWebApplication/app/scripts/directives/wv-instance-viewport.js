@@ -52,7 +52,7 @@ return {
       }
       scope.$watch('wvInstanceId', _displayImage);
 
-      scope.$watchGroup(['wvWidth', 'wvHeight'], _resize);
+      scope.$watchGroup(['wvWidth', 'wvHeight'], _processResizeArgs);
 
       if (scope.wvAutoResize === null || scope.wvAutoResize == undefined) { // @todo document that wvAutoResize concern recizing image **on scroll**
         scope.wvAutoResize = true;
@@ -73,7 +73,7 @@ return {
           var csViewport = cornerstone.getViewport(domElement);
           cornerstone.displayImage(domElement, _image, csViewport);
           if (scope.wvAutoResize == true) {
-            _resize([scope.wvWidth, scope.wvHeight]);
+            _processResizeArgs([scope.wvWidth, scope.wvHeight]);
           }
   
           // load instance data
@@ -97,7 +97,7 @@ return {
         return imagePromise;
       }
 
-      function _resize(newValues, old) {
+      function _processResizeArgs(newValues, old) {
         if (newValues == old) return;
         
         if (!_image) {
@@ -126,36 +126,21 @@ return {
 
         var ratio = _image.width/_image.height;
         if (wvWidth === 'auto' && wvHeight === 'auto') {
-          // auto size width & height based on instance width & height
-          var maxWidth = parentElement.parent().width();
-          jqElement.width(_image.width);
-          jqElement.height(_image.height);
-          cornerstone.resize(domElement, false); // center viewport but don't scale it
-
-          // // auto size width & width based on parent width
-          // var maxWidth = parentElement.parent().width();
-          // width = _image.width < maxWidth ? _image.width : maxWidth;
-          // height = width * (1/ratio);
-          // jqElement.width(Math.round(width));
-          // jqElement.height(Math.round(height));
+          // auto size width & height based on image width & height
+          width = _image.width;
+          height = _image.height;
         }
         else if (wvWidth !== 'auto' && wvHeight === 'auto') {
           // resize width & fit height based on wvWidth param
           var maxWidth = wvWidth;
           width = _image.width < maxWidth ? _image.width : maxWidth;
-          height = width * (1/ratio);
-          jqElement.width(Math.round(width));
-          jqElement.height(Math.round(height));
-          cornerstone.resize(domElement, false); // center viewport but don't scale it
+          height = Math.round(width * (1/ratio));
         }
         else if (wvWidth === 'auto' && wvHeight !== 'auto') {
           // resize height && fit width based on wvHeightParam
           var maxHeight = wvHeight;
           height = _image.height < maxHeight ? _image.height : maxHeight;
-          width = height * ratio;
-          jqElement.width(Math.round(width));
-          jqElement.height(Math.round(height));
-          cornerstone.resize(domElement, false); // center viewport but don't scale it
+          width = Math.round(height * ratio);
         }
         else if (wvWidth === 'parent' && wvHeight === 'parent') { // @todo allow to use only one parent and not both
           var parentContainer = parentElement.closest('[wv-viewport-size]');
@@ -164,13 +149,15 @@ return {
             return;
           }
 
+          width = parentContainer.width();
+          height = parentContainer.height();
+
           // adapt size when window resizes
           _onWindowResize = _.debounce(function() {
-            var parentWidth = parentContainer.width();
-            var parentHeight = parentContainer.height();
-            jqElement.width(parentWidth);
-            jqElement.height(parentHeight);
-            cornerstone.resize(domElement, true); // center viewport AND scale it
+            // @note may induce bug if DOM structure changes before resizing (cf. parentContainer is cached)
+            width = parentContainer.width();
+            height = parentContainer.height();
+            _resize(width, height);
           }, 10);
           $(window).on('resize', _onWindowResize);
           scope.$on('$destroy', function() {
@@ -179,22 +166,37 @@ return {
               _onWindowResize = null;
             }
           });
-
-          _onWindowResize();
         }
         else {
-          jqElement.width(Math.round(wvWidth));
-          jqElement.height(Math.round(wvHeight));
-          cornerstone.resize(domElement, false); // center viewport but don't scale it
+          // @todo: document "you need to omit 'px'"
+          width = wvWidth;
+          height = wvHeight;
         }
-        
-        // scale the image back to 1.0
-        var csViewport = cornerstone.getViewport(domElement);
-        csViewport.scale = 1;
-        cornerstone.setViewport(domElement, csViewport);
-        scope.$broadcast('viewport-data', csViewport);
+
+        _resize(width, height);
       }
       
+      function _resize(width, height) {
+        var csViewport;
+
+        jqElement.width(width);
+        jqElement.height(height);
+
+        var fitToWindow = _image.width > width || _image.height > height;
+        if (fitToWindow) {
+          cornerstone.resize(domElement, true);
+          csViewport = cornerstone.getViewport(domElement);
+        }
+        else {
+          cornerstone.resize(domElement, false);
+          csViewport = cornerstone.getViewport(domElement);
+          csViewport.scale = 1.0;
+          cornerstone.setViewport(domElement, csViewport);
+        }
+        
+        scope.$broadcast('viewport-data', csViewport);
+      }
+
       function _onLoaded() {
         // @todo $apply ? (not required now)
         jqElement.mousedown(function(e) {
