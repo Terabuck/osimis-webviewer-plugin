@@ -15,7 +15,7 @@ return {
   template: '\
     <ul style="padding: 0; list-style: none;">\
       <li ng-repeat="id in serieIds" wv-viewport-size style="padding: 0">\
-        <wv-serie-viewport wv-serie-id="id" wv-width="\'200\'" wv-height="\'200\'" wv-auto-resize="false">\
+        <wv-serie-viewport wv-viewport-draggable wv-serie-id="id" wv-width="\'200\'" wv-height="\'200\'" wv-auto-resize="false">\
           <wv-overlay>\
             <div style="position: absolute; bottom:0; left:0; right:0; color: white; background-color: rgba(0,0,0,0.75);text-align: center;padding: 0.5em;">{{$instance.StudyDescription}}</div>\
           </wv-overlay>\
