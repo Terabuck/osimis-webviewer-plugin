@@ -36,7 +36,9 @@ return {
       scope.$watch('wvSerieId', function(wvSerieId, old) {
         if (wvSerieId == old) return;
 
-        _unwatchWvInstanceIndex();
+        if (_unwatchWvInstanceIndex) {
+          _unwatchWvInstanceIndex();
+        }
         scope.wvInstanceIndex = 0;
         _setSerie(wvSerieId);
       });
@@ -63,6 +65,8 @@ return {
       });
 
       function _setSerie(wvSerieId) {
+        if (wvSerieId == undefined) return;
+
         scope
         orthanc
         .serie.get({id: wvSerieId})

@@ -45,6 +45,7 @@ return {
       scope.$watch('wvInstanceId', _displayImage);
 
       scope.$watchGroup(['wvWidth', 'wvHeight'], _processResizeArgs);
+      _processResizeArgs([scope.wvWidth, scope.wvHeight], [undefined, undefined]);
 
       if (scope.wvAutoResize === null || scope.wvAutoResize == undefined) { // @todo document that wvAutoResize concern recizing image **on scroll**
         scope.wvAutoResize = true;
@@ -52,6 +53,7 @@ return {
 
       scope.$on('viewport-command', function(evt, strategy) {
         var csViewport = cornerstone.getViewport(domElement);
+        if (!csViewport) return;
       	csViewport = strategy.execute(csViewport);
         cornerstone.setViewport(domElement, csViewport);
         scope.$broadcast('viewport-data', csViewport); // @todo is this necessary ?
@@ -100,12 +102,6 @@ return {
       }
 
       function _processResizeArgs(newValues, old) {
-        if (newValues == old) return;
-        
-        if (!_image) {
-          return;
-        }
-
         // reset window resizing event when resizing mode change
         if (_onWindowResize) {
           $(window).off('resize', _onWindowResize);
@@ -126,21 +122,25 @@ return {
           wvHeight = 'auto';
         }
 
-        var ratio = _image.width/_image.height;
         if (wvWidth === 'auto' && wvHeight === 'auto') {
+          if (!_image) return;
           // auto size width & height based on image width & height
           width = _image.width;
           height = _image.height;
         }
         else if (wvWidth !== 'auto' && wvHeight === 'auto') {
           // resize width & fit height based on wvWidth param
+          if (!_image) return;
           var maxWidth = wvWidth;
+          var ratio = _image.width/_image.height;
           width = _image.width < maxWidth ? _image.width : maxWidth;
           height = Math.round(width * (1/ratio));
         }
         else if (wvWidth === 'auto' && wvHeight !== 'auto') {
           // resize height && fit width based on wvHeightParam
+          if (!_image) return;
           var maxHeight = wvHeight;
+          var ratio = _image.width/_image.height;
           height = _image.height < maxHeight ? _image.height : maxHeight;
           width = Math.round(height * ratio);
         }
@@ -183,6 +183,8 @@ return {
 
         jqElement.width(width);
         jqElement.height(height);
+
+        if (!_image) return;
 
         var fitToWindow = _image.width > width || _image.height > height;
         if (fitToWindow) {
