@@ -30,6 +30,9 @@ module.exports = function(config) {
       'bower_components/angular-resource/angular-resource.js',
       'bower_components/bootstrap/dist/js/bootstrap.js',
       'bower_components/lodash/lodash.js',
+      'bower_components/jquery-ui/jquery-ui.js',
+      'bower_components/angular-dragdrop/src/angular-dragdrop.js',
+      'bower_components/jqueryui-touch-punch/jquery.ui.touch-punch.min.js',
       'bower_components/angular-mocks/angular-mocks.js',
       // endbower
       "app/scripts/**/*.js",

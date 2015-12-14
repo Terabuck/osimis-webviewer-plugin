@@ -9,7 +9,9 @@
     "angular-resource": "1.5.0-rc.0",
     "bootstrap": "~3.3.6",
     "font-awesome": "fontawesome#~4.5.0",
-    "lodash": "~3.10.1"
+    "lodash": "~3.10.1",
+    "angular-dragdrop": "~1.0.12",
+    "jqueryui-touch-punch": "*"
   },
   "devDependencies": {
     "angular-mocks": "1.5.0-rc.0"
