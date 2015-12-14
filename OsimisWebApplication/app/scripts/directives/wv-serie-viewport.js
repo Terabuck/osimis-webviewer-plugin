@@ -17,7 +17,7 @@ return {
       'wvPlay': '=?'
     },
     transclude: true,
-    template: '<div><wv-viewport wv-instance-id="instanceId" wv-auto-resize="autoResize" wv-width="wvWidth" wv-height="wvHeight"><ng-transclude/></wv-instance-viewport></div>',
+    template: '<div><wv-viewport wv-instance-id="instanceId" wv-auto-resize="autoResize" wv-auto-windowing="autoWindowing" wv-width="wvWidth" wv-height="wvHeight"><ng-transclude/></wv-instance-viewport></div>',
     restrict: 'E',
     link: function postLink(scope, element, attrs) {
       if (scope.wvInstanceIndex === null  || typeof scope.wvInstanceIndex === 'undefined') {
@@ -26,6 +26,7 @@ return {
 
       scope.instanceId = null;
       scope.autoResize = false;
+      scope.autoWindowing = false;
 
       var _unwatchWvInstanceIndex = null;
       
@@ -80,10 +81,13 @@ return {
             }
 
             var tmpAutoResize = scope.autoResize;
+            var tmpAutoWindowing = scope.autoWindowing;
             scope.autoResize = true; // auto resize the first image
+            scope.autoWindowing = true; // auto window the first image
             scope.instanceId = instances[scope.wvInstanceIndex];
             $timeout(function() { // reset autoResize param
               scope.autoResize = tmpAutoResize;
+              scope.autoWindowing = tmpAutoWindowing;
             });
 
             scope.$broadcast('serie-data', volume.MainDicomTags, volume.Instances.length);

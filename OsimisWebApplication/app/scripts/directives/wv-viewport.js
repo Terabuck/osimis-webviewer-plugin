@@ -14,6 +14,7 @@ return {
     wvWidth: '=?', // default: auto ( fit to max(parent.width,image.width) )
     wvHeight: '=?', // default: auto ( fit to width*(1/ratio) )
     wvAutoResize: '=?', // resize on each image change - default: true
+    wvAutoWindowing: '=?'
   },
   transclude: true,
   template: '<div style="position: relative">\
@@ -50,6 +51,9 @@ return {
       if (scope.wvAutoResize === null || scope.wvAutoResize == undefined) { // @todo document that wvAutoResize concern recizing image **on scroll**
         scope.wvAutoResize = true;
       }
+      if (scope.wvAutoWindowing === null || scope.wvAutoWindowing == undefined) {
+        scope.wvAutoWindowing = true;
+      }
 
       scope.$on('viewport-command', function(evt, strategy) {
         var csViewport = cornerstone.getViewport(domElement);
@@ -82,11 +86,12 @@ return {
           .instance.getTags({id: _image.imageId})
           .$promise
           .then(function(tags) {
-            // @todo just once on first load ?
             var csViewport = cornerstone.getViewport(domElement);
-            csViewport.voi.windowCenter = tags.WindowCenter; // @todo once on first load
-            csViewport.voi.windowWidth = tags.WindowWidth;
-            cornerstone.setViewport(domElement, csViewport);
+            if (scope.wvAutoWindowing == true) {
+              csViewport.voi.windowCenter = tags.WindowCenter; // @todo once on first load
+              csViewport.voi.windowWidth = tags.WindowWidth;
+              cornerstone.setViewport(domElement, csViewport);
+            }
 
             scope.$broadcast('instance-data', tags);
             scope.$broadcast('viewport-data', csViewport); // @todo is this necessary ?
