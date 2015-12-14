@@ -2,26 +2,18 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvInstanceViewport
+ * @name osimiswebviewerApp.directive:wvViewport
  * @description
- * # wvInstanceViewport
+ * # wvViewport
  */
 angular.module('osimiswebviewerApp')
-.directive('wvViewportSize', [function() {
-return {
-  'restrict': 'A',
-  link: function postLink(scope, element) {
-    element.addClass('wv-viewport-size');
-  }
-}
-}])
-.directive('wvInstanceViewport', ['orthanc', function(orthanc) {
+.directive('wvViewport', ['orthanc', function(orthanc) {
 return {
   scope: {
     wvInstanceId: '=',
     wvWidth: '=?', // default: auto ( fit to max(parent.width,image.width) )
     wvHeight: '=?', // default: auto ( fit to width*(1/ratio) )
-    wvAutoResize: '=?' // resize on each image change - default: true
+    wvAutoResize: '=?', // resize on each image change - default: true
   },
   transclude: true,
   template: '<div style="position: relative">\
@@ -58,6 +50,13 @@ return {
         scope.wvAutoResize = true;
       }
 
+      scope.$on('viewport-command', function(evt, strategy) {
+        var csViewport = cornerstone.getViewport(domElement);
+      	csViewport = strategy.execute(csViewport);
+        cornerstone.setViewport(domElement, csViewport);
+        scope.$broadcast('viewport-data', csViewport); // @todo is this necessary ?
+      });
+
       function _displayImage(wvInstanceId, old) {
         if (wvInstanceId == old) return;
 
@@ -81,14 +80,17 @@ return {
           .instance.getTags({id: _image.imageId})
           .$promise
           .then(function(tags) {
-            scope.$broadcast('instance-data', tags);
+            // @todo just once on first load ?
+            var csViewport = cornerstone.getViewport(domElement);
+            csViewport.voi.windowCenter = tags.WindowCenter; // @todo once on first load
+            csViewport.voi.windowWidth = tags.WindowWidth;
+            cornerstone.setViewport(domElement, csViewport);
 
-            if (!csViewport) csViewport = cornerstone.getViewport(domElement);
-            scope.$broadcast('viewport-data', csViewport);
+            scope.$broadcast('instance-data', tags);
+            scope.$broadcast('viewport-data', csViewport); // @todo is this necessary ?
           });
 
           if (!_isLoaded) {
-            _onLoaded();
             _isLoaded = true;
           }
 
@@ -195,45 +197,6 @@ return {
         }
         
         scope.$broadcast('viewport-data', csViewport);
-      }
-
-      function _onLoaded() {
-        // @todo $apply ? (not required now)
-        jqElement.mousedown(function(e) {
-          var lastX = e.pageX;
-          var lastY = e.pageY;
-          var mouseButton = e.which;
-          
-          $(document).mousemove(function(e) {
-            scope.$apply(function() {
-              var deltaX = e.pageX - lastX; 
-              var deltaY = e.pageY - lastY;
-              lastX = e.pageX;
-              lastY = e.pageY;
-              
-              var csViewport = cornerstone.getViewport(domElement);
-              if (mouseButton == 1) { // left-click + move -> windowing
-                csViewport.voi.windowWidth += (deltaX / csViewport.scale);
-                csViewport.voi.windowCenter += (deltaY / csViewport.scale);
-              }
-              else if (mouseButton == 2) { // middle-click + move -> moving
-                csViewport.translation.x += (deltaX / csViewport.scale);
-                csViewport.translation.y += (deltaY / csViewport.scale);
-              }
-              else if (mouseButton == 3) { // right-click + move -> scaling
-                csViewport.scale += (deltaY / 100);
-              }
-              cornerstone.setViewport(domElement, csViewport);
-              
-              scope.$broadcast('viewport-data', csViewport);
-            });
-            
-            $(document).mouseup(function(e) {
-              $(document).unbind('mousemove');
-              $(document).unbind('mouseup');
-            });
-          });
-        });
       }
   }
 };
