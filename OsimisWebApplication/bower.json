@@ -12,7 +12,8 @@
     "lodash": "~3.10.1",
     "angular-dragdrop": "~1.0.12",
     "jqueryui-touch-punch": "*",
-    "angular-strap": "~2.3.6"
+    "angular-strap": "~2.3.6",
+    "angular-sanitize": "~1.4.8"
   },
   "devDependencies": {
     "angular-mocks": "1.5.0-rc.0"

@@ -35,6 +35,7 @@ module.exports = function(config) {
       'bower_components/jqueryui-touch-punch/jquery.ui.touch-punch.min.js',
       'bower_components/angular-strap/dist/angular-strap.js',
       'bower_components/angular-strap/dist/angular-strap.tpl.js',
+      'bower_components/angular-sanitize/angular-sanitize.js',
       'bower_components/angular-mocks/angular-mocks.js',
       // endbower
       "app/scripts/**/*.js",
