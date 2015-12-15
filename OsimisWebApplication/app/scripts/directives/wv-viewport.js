@@ -63,6 +63,10 @@ return {
         scope.$broadcast('viewport-data', csViewport); // @todo is this necessary ?
       });
 
+      scope.$on('tool-command', function(evt, strategy) {
+        strategy.execute(domElement, cornerstoneTools);
+      });
+
       function _displayImage(wvInstanceId, old) {
         if (wvInstanceId == old) return;
 

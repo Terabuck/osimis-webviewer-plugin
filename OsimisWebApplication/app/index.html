@@ -28,15 +28,16 @@
         <div class="row" style="height: 100%; margin: 0; padding: 0;">
             <div style="width: 200px; height: 100%; float: left; display: inline-block;">
                 <!-- @todo: use fixed size -->
-                <wv-serie-list wv-study-id="'52e28c1f-35e8e518-d1ec6490-aa61885e-1fe5ff3f'"></wv-serie-list>
+                <wv-serie-list wv-study-id="'27f7126f-4f66fb14-03f4081b-f9341db2-53925988'"></wv-serie-list>
             </div>
             <div style="height: 100%; width: calc(100% - 200px); display: inline-block;">
                 <wv-toolbar style="height: 50px; margin: 0; padding: 7px;">
                     <wv-toolbar-multi-viewport-layout wv-layout="obj.layout"></wv-toolbar-multi-viewport-layout>
                     <wv-toolbar-invert wv-invert="obj.invert"></wv-toolbar-invert>
+                    <wv-toolbar-lengthmesure wv-enable="obj.lengthmesure"></wv-toolbar-lengthmesure>
                 </wv-toolbar>
                 <div style="height: calc(100% - 64px + 7px)">
-                    <wv-multi-viewport wv-layout="obj.layout" wv-viewport-invert="obj.invert"></wv-multi-viewport>
+                    <wv-multi-viewport wv-layout="obj.layout" wv-viewport-invert="obj.invert" wv-viewport-lengthmesure="obj.lengthmesure"></wv-multi-viewport>
                 </div>
             </div>
         </div>
@@ -82,6 +83,8 @@
     <script src="scripts/directives/wv-toolbar-multi-viewport-layout.js"></script>
     <script src="scripts/directives/wv-toolbar-invert.js"></script>
     <script src="scripts/directives/wv-viewport-invert.js"></script>
+    <script src="scripts/directives/wv-toolbar-lengthmesure.js"></script>
+    <script src="scripts/directives/wv-viewport-lengthmesure.js"></script>
     <!-- endbuild -->
 </body>
 </html>
