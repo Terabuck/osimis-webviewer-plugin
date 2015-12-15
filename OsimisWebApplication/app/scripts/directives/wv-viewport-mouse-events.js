@@ -16,7 +16,6 @@ return {
    */
   scope: false,
   restrict: 'A',
-  priority: -1000,
   link: function postLink(scope, parentElement, attrs, ctrl) {
     var jqElement = parentElement;
 
