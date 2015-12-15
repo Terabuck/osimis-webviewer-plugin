@@ -13,7 +13,7 @@ return {
     wvStudyId: '='
   },
   template: '\
-    <ul style="padding: 0; list-style: none; height: 100%; overflow-y: auto;">\
+    <ul style="padding: 0; list-style: none;">\
       <li ng-repeat="id in serieIds" wv-viewport-size style="padding: 0">\
         <wv-serie-viewport wv-viewport-draggable wv-serie-id="id" wv-width="\'200\'" wv-height="\'200\'" wv-auto-resize="false">\
           <wv-overlay>\
@@ -31,6 +31,8 @@ return {
     scope.serieIds = [];
     
     function _setStudy(wvStudyId, old) {
+      if (wvStudyId == undefined) return; 
+      
       orthanc
       .study.get({
         id: scope.wvStudyId
