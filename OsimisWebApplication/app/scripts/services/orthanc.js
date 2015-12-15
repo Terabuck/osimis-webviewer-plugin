@@ -19,15 +19,11 @@ angular.module('osimiswebviewerApp')
       serie: $resource(_orthancApiUri + '/series/:id', {
         id: '@id'
       }, {
-        get: { method: 'GET', cache: cache},
-        // countInstances: { url: _orthancApiUri + '/series/:id', method: 'GET', cache: cache, transformResponse: function(response) {
-        //   // @todo optimize
-        //   return {
-        //     InstanceCount: angular.fromJson(response).Instances.length
-        //   };
-        // }}
+        get: { method: 'GET', cache: cache },
+        // ordered instances
+        listInstances: { method: 'GET', url: _orthancApiUri + '/series/:id/ordered-slices', cache: cache }
       }),
-      instance: $resource(_orthancApiUri + '/instances/:compression-:id', {
+      instance: $resource(_orthancApiUri + '/instances/:compression-:id', { // @todo cache ?
         compression: 'jpeg95', 
         id: '@id'
       }, {

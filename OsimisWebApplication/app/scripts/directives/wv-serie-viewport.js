@@ -7,7 +7,7 @@
  * # wvSerieViewport
  */
 angular.module('osimiswebviewerApp')
-.directive('wvSerieViewport', ['$timeout', '$interval', 'orthanc', function($timeout, $interval, orthanc) {
+.directive('wvSerieViewport', ['$q', '$timeout', '$interval', 'orthanc', function($q, $timeout, $interval, orthanc) {
 return {
     scope: {
       'wvSerieId': '=',
@@ -66,13 +66,18 @@ return {
       function _setSerie(wvSerieId) {
         if (wvSerieId == undefined) return;
 
-        scope
-        orthanc
-        .serie.get({id: wvSerieId})
-        .$promise
-        .then(function(volume) {
-          if (volume.Instances.length != 0) { // @todo why volume ?
-            instances = volume.Instances;
+        $q.all({
+        instances: orthanc
+          .serie.listInstances({id: wvSerieId})
+          .$promise,
+        volume: orthanc
+          .serie.get({id: wvSerieId})
+          .$promise
+        })
+        .then(function(args) {
+          var volume = args.volume; // @todo why volume ?
+          if (args.instances.SlicesShort.length != 0) {
+            instances = args.instances.SlicesShort.reverse().map(function(v) { return v[0]; });
 
             if (scope.wvInstanceIndex >= instances.length) {
               scope.wvInstanceIndex = instances.length - 1;
