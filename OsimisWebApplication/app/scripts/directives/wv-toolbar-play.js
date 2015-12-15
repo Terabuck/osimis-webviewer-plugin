@@ -2,34 +2,33 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvToolbarPlaySerie
+ * @name osimiswebviewerApp.directive:wvToolbarPlay
  * @description
- * # wvToolbarPlaySerie
+ * # wvToolbarPlay
  */
 angular.module('osimiswebviewerApp')
-  .directive('wvToolbarPlaySerie', function () {
+  .directive('wvToolbarPlay', function () {
     return {
       scope: {
-      	wvModel: '='
+      	wvEnable: '='
       },
-      require: '^wvToolbar',
-      template: '<button type="button" class="btn btn-sm btn-default" ng-click="wvModel = !wvModel"><span class="fa"></span></button>',
+      template: '<button type="button" class="btn btn-sm btn-default" ng-model="wvEnable" bs-checkbox><span class="fa"></span></button>',
       restrict: 'E',
-      link: function postLink(scope, element, attrs, toolbarCtrl) {
+      link: function postLink(scope, element, attrs) {
         var iconElement = element.children().children();
         
-        scope.wvModel = !!scope.wvModel;
-        if (!scope.wvModel) { // @todo refactor
+        scope.wvEnable = !!scope.wvEnable;
+        if (!scope.wvEnable) { // @todo refactor
           iconElement.addClass('fa-play');
         }
         else {
           iconElement.addClass('fa-pause');
         }
 
-        scope.$watch('wvModel', function(wvModel, old) {
-          if (wvModel == old) return;
+        scope.$watch('wvEnable', function(wvEnable, old) {
+          if (wvEnable == old) return;
 
-          if (!wvModel) {
+          if (!wvEnable) {
             iconElement.removeClass('fa-pause');
             iconElement.addClass('fa-play');
           }

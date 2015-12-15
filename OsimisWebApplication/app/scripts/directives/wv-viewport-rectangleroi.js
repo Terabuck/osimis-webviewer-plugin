@@ -2,29 +2,29 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvViewportLengthmesure
+ * @name osimiswebviewerApp.directive:wvViewportRectangleroi
  * @description
- * # wvViewportLengthmesure
+ * # wvViewportRectangleroi
  */
 angular.module('osimiswebviewerApp')
-  .directive('wvViewportLengthmesure', function () {
+  .directive('wvViewportRectangleroi', function () {
     return {
       scope: false,
       restrict: 'A',
       link: function postLink(scope, element, attrs) {
         var elementScope = angular.element(element).isolateScope();
 
-        scope.$watch(attrs.wvViewportLengthmesure, function(activate) {
+        scope.$watch(attrs.wvViewportRectangleroi, function(activate) {
           if (activate == undefined) return;
 
           elementScope.$broadcast('tool-command', {
             execute: function(domElement, tools) {
               if (this.activate) {
                 cornerstoneTools.mouseInput.enable(domElement);
-                tools.length.activate(domElement, true);
+                tools.rectangleRoi.activate(domElement, true);
               }
               else {
-                tools.length.deactivate(domElement);
+                tools.rectangleRoi.deactivate(domElement);
                 cornerstoneTools.mouseInput.disable(domElement);
               }
             },

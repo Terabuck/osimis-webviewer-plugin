@@ -36,13 +36,21 @@
                     <wv-toolbar-invert wv-invert="obj.invert"></wv-toolbar-invert>
                     <wv-toolbar-lengthmesure wv-enable="obj.lengthmesure"></wv-toolbar-lengthmesure>
                     <wv-toolbar-anglemeasure wv-enable="obj.anglemeasure"></wv-toolbar-anglemeasure>
+                    <wv-toolbar-pixelprobe wv-enable="obj.pixelprobe"></wv-toolbar-pixelprobe>
+                    <wv-toolbar-ellipticalroi wv-enable="obj.ellipticalroi"></wv-toolbar-ellipticalroi>
+                    <wv-toolbar-rectangleroi wv-enable="obj.rectangleroi"></wv-toolbar-rectangleroi>
+                    <wv-toolbar-play wv-enable="obj.play"></wv-toolbar-play>
                 </wv-toolbar>
                 <div style="height: calc(100% - 64px + 7px)">
                     <wv-multi-viewport wv-layout="obj.layout"
                         wv-viewport-invert="obj.invert"
                         wv-viewport-lengthmesure="obj.lengthmesure"
                         wv-viewport-anglemeasure="obj.anglemeasure"
-                    ></wv-multi-viewport>
+                        wv-viewport-pixelprobe="obj.pixelprobe"
+                        wv-viewport-ellipticalroi="obj.ellipticalroi"
+                        wv-viewport-rectangleroi="obj.rectangleroi"
+                        wv-viewport-play="obj.play"
+                   ></wv-multi-viewport>
                 </div>
             </div>
         </div>
@@ -79,7 +87,7 @@
     <script src="scripts/directives/wv-viewport-mouse-events.js"></script>
     <script src="scripts/directives/wv-serie-viewport.js"></script>
     <script src="scripts/services/orthanc.js"></script>
-    <script src="scripts/directives/wv-toolbar-play-serie.js"></script>
+    <script src="scripts/directives/wv-toolbar-play.js"></script>
     <script src="scripts/directives/wv-overlay.js"></script>
     <script src="scripts/directives/wv-serie-list.js"></script>
     <script src="scripts/directives/wv-multi-viewport.js"></script>
@@ -92,6 +100,13 @@
     <script src="scripts/directives/wv-viewport-lengthmesure.js"></script>
     <script src="scripts/directives/wv-toolbar-anglemeasure.js"></script>
     <script src="scripts/directives/wv-viewport-anglemeasure.js"></script>
+    <script src="scripts/directives/wv-viewport-pixelprobe.js"></script>
+    <script src="scripts/directives/wv-toolbar-pixelprobe.js"></script>
+    <script src="scripts/directives/wv-toolbar-ellipticalroi.js"></script>
+    <script src="scripts/directives/wv-viewport-ellipticalroi.js"></script>
+    <script src="scripts/directives/wv-viewport-rectangleroi.js"></script>
+    <script src="scripts/directives/wv-toolbar-rectangleroi.js"></script>
+    <script src="scripts/directives/wv-viewport-play.js"></script>
     <!-- endbuild -->
 </body>
 </html>

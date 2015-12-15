@@ -24,8 +24,8 @@ angular.module('osimiswebviewerApp')
                 tools.angle.activate(domElement, true);
               }
               else {
+                tools.angle.deactivate(domElement);
                 cornerstoneTools.mouseInput.disable(domElement);
-                tools.angle.activate(domElement, false);
               }
             },
             activate: activate

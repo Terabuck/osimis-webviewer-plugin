@@ -13,8 +13,7 @@ return {
       'wvSerieId': '=',
       'wvInstanceIndex': '=?',
       'wvWidth': '=?',
-      'wvHeight': '=?',
-      'wvPlay': '=?'
+      'wvHeight': '=?'
     },
     transclude: true,
     template: '<div><wv-viewport wv-instance-id="instanceId" wv-auto-resize="autoResize" wv-auto-windowing="autoWindowing" wv-width="wvWidth" wv-height="wvHeight"><ng-transclude/></wv-instance-viewport></div>',
@@ -45,16 +44,15 @@ return {
       });
       _setSerie(scope.wvSerieId);
       
-      var playPromise = null;
-      scope.$watch('wvPlay', function(play, old) {
-        var speed = 1000/30;
-        if (play == old) return;
-        
-        if (play == false && playPromise) {
-          $interval.cancel(playPromise);
+      var _playPromise = null;
+      scope.$on('play-command', function(evt, strategy) {
+        var speed = 1000;
+        var activate = strategy.execute();
+        if (activate == false && _playPromise) {
+          $interval.cancel(_playPromise);
         }
-        else if (play == true) {
-          playPromise = $interval(function() {
+        else if (activate == true) {
+          _playPromise = $interval(function() {
             ++scope.wvInstanceIndex;
 
             // reload at end
@@ -112,7 +110,10 @@ return {
       
       // Hamster = cross browser mousewheel library
       Hamster(element[0]).wheel(function(event, delta, deltaX, deltaY) {
-        scope.wvPlay = false;
+        if (_playPromise) {
+          $interval.cancel(_playPromise);
+          _playPromise = null;
+        }
         
         if (deltaX < 0 && deltaX < deltaY
          || deltaX > 0 && deltaX > deltaY
