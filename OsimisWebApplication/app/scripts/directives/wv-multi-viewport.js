@@ -35,7 +35,7 @@ return {
     scope.rowHeight = 100 / scope.wvLayout.y + '%';
     scope.cellClasses = ['col-sm-' + 12/scope.wvLayout.x];
     
-    scope.viewports = []; // [[{serieId: …, instanceIndex: …}]];
+    scope.viewports = []; // [[{serieId: …, instanceIndex: …, orientation: …}]];
     scope.$watch('wvLayout', function(wvLayout, old) {
       for (var i=0; i<wvLayout.y; ++i) {
         if (!scope.viewports[i]) scope.viewports[i] = [];

@@ -93,6 +93,11 @@ return {
               cornerstone.setViewport(domElement, csViewport);
             }
 
+            // @todo http://dicomiseasy.blogspot.be/2013/06/getting-oriented-using-image-plane.html
+            // var orientationValues = tags.ImageOrientationPatient.split('\\');
+            // var orientationVector1 = orientationValues.slice(0, 3);
+            // var orientationVector2 = orientationValues.slice(3);
+
             scope.$broadcast('instance-data', tags);
             scope.$broadcast('viewport-data', csViewport); // @todo is this necessary ?
           });

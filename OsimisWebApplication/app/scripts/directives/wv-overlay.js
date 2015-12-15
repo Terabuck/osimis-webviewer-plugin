@@ -18,7 +18,8 @@ angular.module('osimiswebviewerApp')
                 </div>\
                 <div class="wv-overlay-topright">\
                     {{$instance.StudyDescription}}<br/>\
-                    {{$instance.StudyDate}}\
+                    {{$instance.StudyDate}}<br/>\
+                    #{{$instance.SeriesNumber}} - {{$instance.SeriesDescription}}<br/>\
                 </div>\
                 <!--\
                 <div class="wv-overlay-bottomright">\
