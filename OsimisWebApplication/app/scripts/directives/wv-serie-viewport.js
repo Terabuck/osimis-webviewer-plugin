@@ -114,24 +114,32 @@ return {
       Hamster(element[0]).wheel(function(event, delta, deltaX, deltaY) {
         scope.wvPlay = false;
         
-        // @todo put some velocity
-        // @todo calibrate the required speed and accuracy for the enduser
-        scope.$apply(function() {
-          if (deltaX > 0) {
-            scope.wvInstanceIndex++;
-            if (scope.wvInstanceIndex >= instances.length) {
-              scope.wvInstanceIndex = instances.length - 1;
+        if (deltaX < 0 && deltaX < deltaY
+         || deltaX > 0 && deltaX > deltaY
+        ) {
+          // @todo put some velocity
+          // @todo calibrate the required speed and accuracy for the enduser
+          scope.$apply(function() {
+            if (deltaX > 0) {
+              scope.wvInstanceIndex++;
+              if (scope.wvInstanceIndex >= instances.length) {
+                scope.wvInstanceIndex = instances.length - 1;
+              }
             }
-          }
-          else if (deltaX < 0) {
-            scope.wvInstanceIndex--;
-            if (scope.wvInstanceIndex < 0) {
-              scope.wvInstanceIndex = 0;
+            else if (deltaX < 0) {
+              scope.wvInstanceIndex--;
+              if (scope.wvInstanceIndex < 0) {
+                scope.wvInstanceIndex = 0;
+              }
             }
-          }
-        });
-
-        event.preventDefault();
+          });
+          event.preventDefault();
+        }
+        else if (deltaX < 0 && deltaX > deltaY
+              || deltaX > 0 && deltaX < deltaY
+        ) {
+          //event.preventDefault();
+        }
       });
 
     }

@@ -18,13 +18,13 @@ return {
   },
   transclude: true,
   template: '<div style="position: relative">\
-                <div class="cornerstone-enabled-image"\
+              <div class="cornerstone-enabled-image"\
                 oncontextmenu="return false"\
                 unselectable="on"\
                 onselectstart="return false;"\
                 onmousedown="return false;"\
               >\
-                  <div oncontextmenu="return false" />\
+                  <div/>\
                   <ng-transclude/>\
               </div>\
             </div>',

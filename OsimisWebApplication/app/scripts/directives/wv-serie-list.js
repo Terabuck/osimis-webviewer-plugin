@@ -13,7 +13,7 @@ return {
     wvStudyId: '='
   },
   template: '\
-    <ul style="padding: 0; list-style: none;">\
+    <ul style="padding: 0; list-style: none; height: 100%; overflow-y: auto;">\
       <li ng-repeat="id in serieIds" wv-viewport-size style="padding: 0">\
         <wv-serie-viewport wv-viewport-draggable wv-serie-id="id" wv-width="\'200\'" wv-height="\'200\'" wv-auto-resize="false">\
           <wv-overlay>\
@@ -25,6 +25,8 @@ return {
   ',
   restrict: 'E',
   link: function postLink(scope, element, attrs) {
+    // @todo make sure there is enough space left for the overlay bar in html
+    
     scope.$watch('wvStudyId', _setStudy);
     scope.serieIds = [];
     
