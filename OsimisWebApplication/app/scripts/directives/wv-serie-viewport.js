@@ -46,7 +46,7 @@ return {
       
       var _playPromise = null;
       scope.$on('play-command', function(evt, strategy) {
-        var speed = 1000;
+        var speed = 100; // @todo adapt speed depending on the instance size & distance
         var activate = strategy.execute();
         if (activate == false && _playPromise) {
           $interval.cancel(_playPromise);
@@ -93,7 +93,7 @@ return {
               scope.autoWindowing = tmpAutoWindowing;
             });
 
-            scope.$broadcast('serie-data', volume.MainDicomTags, volume.Instances.length);
+            scope.$broadcast('serie-data', volume.MainDicomTags, instances.length);
           }
           
           // keep the index safe from overflow
@@ -101,14 +101,15 @@ return {
             if (wvInstanceIndex == old) return;
 
             // @todo refactor duplicate code but avoid recursive $watch call ! 
-            if (wvInstanceIndex === null || typeof wvInstanceIndex === 'undefined') {
-              wvInstanceIndex = 0;
+            if (wvInstanceIndex === null || typeof wvInstanceIndex === 'undefined' || wvInstanceIndex < 0) {
+              scope.wvInstanceIndex = 0;
             }
             else if (wvInstanceIndex >= instances.length) {
-              wvInstanceIndex = instances.length - 1;
+              scope.wvInstanceIndex = instances.length - 1;
             }
-
-            scope.instanceId = instances[wvInstanceIndex];
+            else {
+              scope.instanceId = instances[wvInstanceIndex];
+            }
           });
         });
       }

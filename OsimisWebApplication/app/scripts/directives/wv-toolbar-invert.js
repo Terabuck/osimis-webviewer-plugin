@@ -10,9 +10,9 @@ angular.module('osimiswebviewerApp')
   .directive('wvToolbarInvert', function () {
     return {
       scope: {
-        wvInvert: '='
+        wvEnable: '='
       },
-      template: '<button type="button" class="btn btn-sm btn-default" ng-model="wvInvert" bs-checkbox><span class="fa fa-adjust"></span></button>',
+      template: '<button type="button" class="btn btn-sm btn-default" ng-model="wvEnable" bs-checkbox><span class="fa fa-adjust"></span></button>',
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
       }

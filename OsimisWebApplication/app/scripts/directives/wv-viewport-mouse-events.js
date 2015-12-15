@@ -29,7 +29,7 @@ return {
       var mouseButton = e.which;
       
       $(document).mousemove(function(e) {
-        elementScope.$apply(function() {
+        elementScope.$apply(function() {  // @todo necessary ?
           var deltaX = e.pageX - lastX; 
           var deltaY = e.pageY - lastY;
           lastX = e.pageX;
@@ -77,6 +77,7 @@ return {
         });
         
         $(document).mouseup(function(e) {
+          // @todo make safer
           $(document).unbind('mousemove');
           $(document).unbind('mouseup');
         });
