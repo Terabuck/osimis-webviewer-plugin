@@ -17,17 +17,7 @@ return {
     wvAutoWindowing: '=?'
   },
   transclude: true,
-  template: '<div style="position: relative">\
-              <div class="cornerstone-enabled-image"\
-                oncontextmenu="return false"\
-                unselectable="on"\
-                onselectstart="return false;"\
-                onmousedown="return false;"\
-              >\
-                  <div/>\
-                  <ng-transclude/>\
-              </div>\
-            </div>',
+  templateUrl: 'scripts/directives/wv-viewport.tpl.html',
   restrict: 'E',
   replace: false,
   link: function postLink(scope, parentElement, attrs) {

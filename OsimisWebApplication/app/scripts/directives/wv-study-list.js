@@ -12,10 +12,7 @@ angular.module('osimiswebviewerApp')
       scope: {
         wvSelectedStudy: '='
       },
-      template: '\
-        <button type="button" class="btn btn-default" ng-model="wvSelectedStudy" placeholder="Study.." bs-options="study.value as study.label for study in studies" bs-select>\
-        </button>\
-      ',
+      template: '<button type="button" class="btn btn-default" ng-model="wvSelectedStudy" placeholder="Study.." bs-options="study.value as study.label for study in studies" bs-select></button>',
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
         scope.studies = [];

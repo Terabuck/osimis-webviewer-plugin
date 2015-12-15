@@ -16,7 +16,7 @@ return {
       'wvHeight': '=?'
     },
     transclude: true,
-    template: '<div><wv-viewport wv-instance-id="instanceId" wv-auto-resize="autoResize" wv-auto-windowing="autoWindowing" wv-width="wvWidth" wv-height="wvHeight"><ng-transclude/></wv-instance-viewport></div>',
+    templateUrl: 'scripts/directives/wv-serie-viewport.tpl.html',
     restrict: 'E',
     link: function postLink(scope, element, attrs) {
       if (scope.wvInstanceIndex === null  || typeof scope.wvInstanceIndex === 'undefined') {
