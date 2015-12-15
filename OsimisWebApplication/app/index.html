@@ -35,9 +35,14 @@
                     <wv-toolbar-multi-viewport-layout wv-layout="obj.layout"></wv-toolbar-multi-viewport-layout>
                     <wv-toolbar-invert wv-invert="obj.invert"></wv-toolbar-invert>
                     <wv-toolbar-lengthmesure wv-enable="obj.lengthmesure"></wv-toolbar-lengthmesure>
+                    <wv-toolbar-anglemeasure wv-enable="obj.anglemeasure"></wv-toolbar-anglemeasure>
                 </wv-toolbar>
                 <div style="height: calc(100% - 64px + 7px)">
-                    <wv-multi-viewport wv-layout="obj.layout" wv-viewport-invert="obj.invert" wv-viewport-lengthmesure="obj.lengthmesure"></wv-multi-viewport>
+                    <wv-multi-viewport wv-layout="obj.layout"
+                        wv-viewport-invert="obj.invert"
+                        wv-viewport-lengthmesure="obj.lengthmesure"
+                        wv-viewport-anglemeasure="obj.anglemeasure"
+                    ></wv-multi-viewport>
                 </div>
             </div>
         </div>
@@ -85,6 +90,8 @@
     <script src="scripts/directives/wv-viewport-invert.js"></script>
     <script src="scripts/directives/wv-toolbar-lengthmesure.js"></script>
     <script src="scripts/directives/wv-viewport-lengthmesure.js"></script>
+    <script src="scripts/directives/wv-toolbar-anglemeasure.js"></script>
+    <script src="scripts/directives/wv-viewport-anglemeasure.js"></script>
     <!-- endbuild -->
 </body>
 </html>
