@@ -2,12 +2,12 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvViewportStackscroll
+ * @name osimiswebviewerApp.directive:wvToolStackscroll
  * @description
- * # wvViewportStackscroll
+ * # wvToolStackscroll
  */
 angular.module('osimiswebviewerApp')
-.directive('wvViewportStackscroll', function () {
+.directive('wvToolStackscroll', function () {
 return {
   scope: false,
   restrict: 'A',
@@ -53,8 +53,8 @@ return {
       
     };
 
-    scope.$watch(attrs.wvViewportStackscroll, function(wvViewportStackscroll) {
-      if (wvViewportStackscroll) element.on('mousedown', handler);
+    scope.$watch(attrs.wvToolStackscroll, function(wvToolStackscroll) {
+      if (wvToolStackscroll) element.on('mousedown', handler);
       else element.off('mousedown', handler);
     });
   }

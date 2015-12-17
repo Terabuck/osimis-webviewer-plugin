@@ -2,29 +2,29 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvViewportZoom
+ * @name osimiswebviewerApp.directive:wvToolLengthmesure
  * @description
- * # wvViewportZoom
+ * # wvToolLengthmesure
  */
 angular.module('osimiswebviewerApp')
-  .directive('wvViewportZoom', function () {
+  .directive('wvToolLengthmesure', function () {
     return {
       scope: false,
       restrict: 'A',
       link: function postLink(scope, element, attrs) {
         var elementScope = angular.element(element).isolateScope();
 
-        scope.$watch(attrs.wvViewportZoom, function(activate) {
+        scope.$watch(attrs.wvToolLengthmesure, function(activate) {
           if (activate == undefined) return;
 
           elementScope.$broadcast('tool-command', {
             execute: function(domElement, tools) {
               if (this.activate) {
                 cornerstoneTools.mouseInput.enable(domElement);
-                tools.zoom.activate(domElement, 0b1 & 0b001); // left & right mouse
+                tools.length.activate(domElement, true);
               }
               else {
-                tools.zoom.deactivate(domElement);
+                tools.length.deactivate(domElement);
                 cornerstoneTools.mouseInput.disable(domElement);
               }
             },

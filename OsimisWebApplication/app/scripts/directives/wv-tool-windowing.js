@@ -2,29 +2,30 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvViewportPixelprobe
+ * @name osimiswebviewerApp.directive:wvToolWindowing
  * @description
- * # wvViewportPixelprobe
+ * # wvToolWindowing
  */
 angular.module('osimiswebviewerApp')
-  .directive('wvViewportPixelprobe', function () {
+  .directive('wvToolWindowing', function () {
     return {
       scope: false,
       restrict: 'A',
       link: function postLink(scope, element, attrs) {
         var elementScope = angular.element(element).isolateScope();
-
-        scope.$watch(attrs.wvViewportPixelprobe, function(activate) {
+      
+        scope.$watch(attrs.wvToolWindowing, function(activate) {
           if (activate == undefined) return;
 
+	      	// @todo remove ? this is the default behavior..
           elementScope.$broadcast('tool-command', {
             execute: function(domElement, tools) {
               if (this.activate) {
                 cornerstoneTools.mouseInput.enable(domElement);
-                tools.probe.activate(domElement, true);
+                tools.wwwc.activate(domElement, 0b1); // left clic
               }
               else {
-                tools.probe.deactivate(domElement);
+                tools.wwwc.deactivate(domElement);
                 cornerstoneTools.mouseInput.disable(domElement);
               }
             },

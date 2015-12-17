@@ -2,30 +2,29 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvViewportWindowing
+ * @name osimiswebviewerApp.directive:wvToolRectangleroi
  * @description
- * # wvViewportWindowing
+ * # wvToolRectangleroi
  */
 angular.module('osimiswebviewerApp')
-  .directive('wvViewportWindowing', function () {
+  .directive('wvToolRectangleroi', function () {
     return {
       scope: false,
       restrict: 'A',
       link: function postLink(scope, element, attrs) {
         var elementScope = angular.element(element).isolateScope();
-      
-        scope.$watch(attrs.wvViewportWindowing, function(activate) {
+
+        scope.$watch(attrs.wvToolRectangleroi, function(activate) {
           if (activate == undefined) return;
 
-	      	// @todo remove ? this is the default behavior..
           elementScope.$broadcast('tool-command', {
             execute: function(domElement, tools) {
               if (this.activate) {
                 cornerstoneTools.mouseInput.enable(domElement);
-                tools.wwwc.activate(domElement, 0b1); // left clic
+                tools.rectangleRoi.activate(domElement, true);
               }
               else {
-                tools.wwwc.deactivate(domElement);
+                tools.rectangleRoi.deactivate(domElement);
                 cornerstoneTools.mouseInput.disable(domElement);
               }
             },

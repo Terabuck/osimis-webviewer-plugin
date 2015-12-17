@@ -2,29 +2,29 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvViewportEllipticalroi
+ * @name osimiswebviewerApp.directive:wvToolPan
  * @description
- * # wvViewportEllipticalroi
+ * # wvToolPan
  */
 angular.module('osimiswebviewerApp')
-  .directive('wvViewportEllipticalroi', function () {
+  .directive('wvToolPan', function () {
     return {
       scope: false,
       restrict: 'A',
       link: function postLink(scope, element, attrs) {
         var elementScope = angular.element(element).isolateScope();
-
-        scope.$watch(attrs.wvViewportEllipticalroi, function(activate) {
+      
+        scope.$watch(attrs.wvToolPan, function(activate) {
           if (activate == undefined) return;
 
           elementScope.$broadcast('tool-command', {
             execute: function(domElement, tools) {
               if (this.activate) {
                 cornerstoneTools.mouseInput.enable(domElement);
-                tools.ellipticalRoi.activate(domElement, true);
+                tools.pan.activate(domElement, 0b1 & 0b01); // left & middle mouse
               }
               else {
-                tools.ellipticalRoi.deactivate(domElement);
+                tools.pan.deactivate(domElement);
                 cornerstoneTools.mouseInput.disable(domElement);
               }
             },
