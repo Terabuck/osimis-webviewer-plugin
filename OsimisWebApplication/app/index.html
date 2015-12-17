@@ -25,7 +25,7 @@
     <![endif]-->
     <div style="height: 100%" ng-init="obj = {layout: {x:1, y:1}}">
         <div class="row" style="height: 100%; margin: 0; padding: 0;">
-            <div style="overflow-y: auto; overflow-x: hidden; width: 200px; height: 100%; float: left; display: inline-block;">
+            <div ng-init="studyId = '27f7126f-4f66fb14-03f4081b-f9341db2-53925988'" style="overflow-y: auto; overflow-x: hidden; width: 200px; height: 100%; float: left; display: inline-block;">
                 <wv-study-list wv-selected-study="studyId"></wv-study-list>
                 <wv-serie-list wv-study-id="studyId"></wv-serie-list>
             </div>
@@ -45,18 +45,22 @@
                     <wv-toolbar-play wv-enable="obj.play"></wv-toolbar-play>
                 </wv-toolbar>
                 <div style="height: calc(100% - 30px); margin-top: -6px;">
-                    <wv-multi-viewport wv-layout="obj.layout"
-                        wv-viewport-windowing="obj.windowing"
-                        wv-viewport-zoom="obj.zoom"
-                        wv-viewport-pan="obj.pan"
-                        wv-viewport-invert="obj.invert"
-                        wv-viewport-lengthmesure="obj.lengthmesure"
-                        wv-viewport-anglemeasure="obj.anglemeasure"
-                        wv-viewport-pixelprobe="obj.pixelprobe"
-                        wv-viewport-ellipticalroi="obj.ellipticalroi"
-                        wv-viewport-rectangleroi="obj.rectangleroi"
-                        wv-viewport-play="obj.play"
-                   ></wv-multi-viewport>
+                    <wv-splitpane wv-layout="obj.layout">
+                        <wv-serie-viewport wv-viewport-droppable wv-viewport-mouse-events wv-width="'parent'" wv-height="'parent'" wv-serie-id="viewport.serieId" wv-instance-index="viewport.instanceIndex"
+                            wv-viewport-windowing="obj.windowing"
+                            wv-viewport-zoom="obj.zoom"
+                            wv-viewport-pan="obj.pan"
+                            wv-viewport-invert="obj.invert"
+                            wv-viewport-lengthmesure="obj.lengthmesure"
+                            wv-viewport-anglemeasure="obj.anglemeasure"
+                            wv-viewport-pixelprobe="obj.pixelprobe"
+                            wv-viewport-ellipticalroi="obj.ellipticalroi"
+                            wv-viewport-rectangleroi="obj.rectangleroi"
+                            wv-viewport-play="obj.play"
+                        >
+                            <wv-overlay></wv-overlay>
+                        </wv-serie-viewport>
+                    </wv-splitpane>
                 </div>
             </div>
         </div>
@@ -97,7 +101,6 @@
     <script src="scripts/directives/wv-toolbar-play.js"></script>
     <script src="scripts/directives/wv-overlay.js"></script>
     <script src="scripts/directives/wv-serie-list.js"></script>
-    <script src="scripts/directives/wv-multi-viewport.js"></script>
     <script src="scripts/directives/wv-viewport-draggable.js"></script>
     <script src="scripts/directives/wv-viewport-droppable.js"></script>
     <script src="scripts/directives/wv-toolbar-multi-viewport-layout.js"></script>
@@ -123,6 +126,7 @@
     <script src="scripts/directives/wv-viewport-pan.js"></script>
     <script src="scripts/directives/wv-viewport-stackscroll.js"></script>
     <script src="scripts/directives/wv-study-list.js"></script>
+    <script src="scripts/directives/wv-splitpane.js"></script>
     <!-- endbuild -->
 </body>
 </html>
