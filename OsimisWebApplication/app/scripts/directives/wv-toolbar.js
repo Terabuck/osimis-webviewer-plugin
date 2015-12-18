@@ -15,23 +15,31 @@ angular.module('osimiswebviewerApp')
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
       },
-      controller: function($scope) {
-        $scope.buttons = {};
+      controller: ['$timeout', '$scope', function($timeout, $scope) {
+        $scope.activeButton = null;
 
-        this.register = function(name, value) {
-          $scope.buttons[name] = value;
+        this.set = function(name) {
+          var previousActive = $scope.activeButton;
+          var newActive = name;
+
+          if (previousActive == newActive) return;
+
+          if (previousActive !== null) {
+            $scope.$broadcast('toolbar.deactivated', previousActive);
+          }
+
+          $scope.activeButton = newActive;
+
+          if (newActive !== null) {
+            $timeout(function() {
+              $scope.$broadcast('toolbar.activated', newActive);              
+            });
+          }
         }
-        this.disable = function() {
-          $scope.buttons.forEach(function(v) {
-            v = !v;
-          })
+
+        this.get = function() {
+          return $scope.activeButton;
         }
-        this.set = function(name, value) {
-          $scope.buttons[name] = value;
-        }
-        this.onChange = function(name, fn) {
-          $scope.$watch('buttons.'+name, fn);
-        }
-      }
+      }]
     };
   });

@@ -46,6 +46,8 @@ return {
       
       var _playPromise = null;
       scope.$on('play-command', function(evt, strategy) {
+        // @todo: !!!!! give wvInstanceIndex instead of doing the logic here
+
         var speed = 100; // @todo adapt speed depending on the instance size & distance
         var activate = strategy.execute();
         if (activate == false && _playPromise) {

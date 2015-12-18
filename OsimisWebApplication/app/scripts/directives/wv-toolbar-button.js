@@ -20,18 +20,26 @@ angular.module('osimiswebviewerApp')
       link: function postLink(scope, element, attrs, ctrls) {
         var buttonCtrl = ctrls[0];
         var toolbarCtrl = ctrls[1];
-        scope.wvModel = !!scope.wvModel;
+        scope.wvModel = false;
 
-        toolbarCtrl.register(scope.wvName, scope.wvModel);
-        toolbarCtrl.onChange(scope.wvName, function(v) {
-            scope.wvModel = v;
-          });
-        scope.$watch('wvModel', function(v) {
-          toolbarCtrl.set(scope.wvName, v);
+        scope.$on('toolbar.deactivated', function(evt, buttonName) {
+          if (buttonName == scope.wvName)
+            scope.wvModel = false;
         });
+        scope.$on('toolbar.activated', function(evt, buttonName) {
+          if (buttonName == scope.wvName)
+            scope.wvModel = true;
+          // else scope.wvModel = false;
+        });
+
         scope.click = function() {
-          toolbarCtrl.set(scope.wvName, !scope.wvModel);
-        }
+          var previousValue = scope.wvModel;
+
+          if (previousValue == false)
+            toolbarCtrl.set(scope.wvName);
+          else if (toolbarCtrl.get() == scope.wvName)
+            toolbarCtrl.set(null);
+        };
       },
       controller: function() {
 
