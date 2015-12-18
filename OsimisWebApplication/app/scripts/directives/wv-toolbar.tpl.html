@@ -1,5 +1,20 @@
 <div class="wv-toolbar btn-toolbar" role="toolbar">
-  <div class="btn-group" role="group">
-    <ng-transclude/>
-  </div>
+	<div
+		class="btn-group" role="group"
+		ng-transclude
+		ng-init="opts = $parent.opts"
+	>
+	    <wv-toolbar-button wv-name="windowing" wv-model="opts.windowing" wv-icon="fa fa-sun-o"></wv-toolbar-button>
+	    <wv-toolbar-button wv-name="zoom" wv-model="opts.zoom" wv-icon="fa fa-search"></wv-toolbar-button>
+	    <wv-toolbar-button wv-name="pan" wv-model="opts.pan" wv-icon="fa fa-arrows"></wv-toolbar-button>
+	    <!-- <wv-toolbar-button wv-name="stackscroll" wv-model="opts.stackscroll" wv-icon="fa fa-bars"></wv-toolbar-button> -->
+	    <wv-toolbar-button wv-name="invert" wv-model="opts.invert" wv-icon="fa fa-adjust"></wv-toolbar-button>
+	    <wv-toolbar-button wv-name="lengthmeasure" wv-model="opts.lengthmeasure" wv-icon="fa fa-arrows-v"></wv-toolbar-button>
+	    <wv-toolbar-button wv-name="anglemeasure" wv-model="opts.anglemeasure" wv-icon="fa fa-angle-left"></wv-toolbar-button>
+	    <wv-toolbar-button wv-name="pixelprobe" wv-model="opts.pixelprobe" wv-icon="fa fa-dot-circle-o"></wv-toolbar-button>
+	    <wv-toolbar-button wv-name="ellipticalroi" wv-model="opts.ellipticalroi" wv-icon="fa fa-circle-o"></wv-toolbar-button>
+	    <wv-toolbar-button wv-name="rectangleroi" wv-model="opts.rectangleroi" wv-icon="fa fa-square-o"></wv-toolbar-button>
+	    <wv-toolbar-multi-viewport-layout wv-layout="opts.layout"></wv-toolbar-multi-viewport-layout>
+	    <wv-toolbar-play wv-enable="opts.play"></wv-toolbar-play>
+	</div>
  </div>
