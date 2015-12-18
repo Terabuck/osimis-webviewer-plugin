@@ -20,9 +20,6 @@
     <!-- endbuild -->
   </head>
   <body ng-app="osimiswebviewerApp">
-    <!--[if lte IE 8]>
-      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-    <![endif]-->
     <div
         class="wv-container" 
         ng-init="opts = {}; studyId = '27f7126f-4f66fb14-03f4081b-f9341db2-53925988'"
@@ -33,22 +30,7 @@
         </div>
         <div class="wv-main">
             <wv-toolbar wv-settings="opts"></wv-toolbar>
-            <wv-splitpane wv-layout="opts.layout">
-                <wv-serie-viewport wv-viewport-droppable wv-viewport-mouse-events wv-width="'parent'" wv-height="'parent'" wv-serie-id="randomSerieId"
-                    wv-tool-windowing="opts.windowing"
-                    wv-tool-zoom="opts.zoom"
-                    wv-tool-pan="opts.pan"
-                    wv-viewport-invert="opts.invert"
-                    wv-tool-lengthmeasure="opts.lengthmeasure"
-                    wv-tool-anglemeasure="opts.anglemeasure"
-                    wv-tool-pixelprobe="opts.pixelprobe"
-                    wv-tool-ellipticalroi="opts.ellipticalroi"
-                    wv-tool-rectangleroi="opts.rectangleroi"
-                    wv-viewport-play="opts.play"
-                >
-                    <wv-overlay></wv-overlay>
-                </wv-serie-viewport>
-            </wv-splitpane>
+            <wv-splitpane wv-layout="opts.layout" wv-settings="opts"></wv-splitpane>
         </div>
     </div>
 

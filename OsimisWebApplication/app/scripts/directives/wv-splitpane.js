@@ -10,7 +10,8 @@ angular.module('osimiswebviewerApp')
   .directive('wvSplitpane', function () {
     return {
       scope: {
-        wvLayout: '=?'
+        wvLayout: '=?',
+        wvSettings: '=?'
       },
       templateUrl: 'scripts/directives/wv-splitpane.tpl.html',
       restrict: 'E',
