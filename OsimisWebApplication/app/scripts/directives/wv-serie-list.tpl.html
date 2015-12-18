@@ -1,11 +1,19 @@
-<ul style="margin: 0; padding: 0; list-style: none;">
-  <li ng-repeat="id in serieIds" wv-viewport-size style="padding: 0">
-    <wv-serie-viewport wv-viewport-draggable wv-serie-id="id" wv-width="'200'" wv-height="'200'" wv-auto-resize="false">
-      <wv-overlay>
-        <div style="position: absolute; bottom:0; left:0; right:0; color: white; background-color: rgba(0,0,0,0.75);text-align: center;padding: 0.5em;">
-        	{{$instance.SeriesDescription}}
-    	</div>
-      </wv-overlay>
-    </wv-serie-viewport>
-  </li>
+<ul class="wv-serie-list">
+  	<li
+  		ng-repeat="id in serieIds"
+  		class="wv-serie-list-item"
+  		wv-viewport-size
+	>
+	    <wv-serie-viewport
+	    	wv-viewport-draggable
+	    	wv-serie-id="id"
+	    	wv-width="'150'"
+	    	wv-height="'150'"
+	    	wv-auto-resize="false"
+    	>
+		    <wv-overlay class="wv-serie-list-overlay">
+	        	{{$instance.SeriesDescription}}
+		    </wv-overlay>
+	    </wv-serie-viewport>
+  	</li>
 </ul>

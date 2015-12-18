@@ -1,5 +1,6 @@
 .wv-overlay {
     position: absolute;
+    
 
     top: 0;
     right: 0;
@@ -45,4 +46,21 @@
 
 .wv-overlay-topleft:hover, .wv-overlay-topright:hover, .wv-overlay-bottomright:hover, .wv-overlay-bottomleft:hover {
     background-color: rgba(0, 0, 0, 0.9);
+}
+
+.wv-overlay-scrollbar {
+    position: absolute;
+    bottom:0;
+    left:0;
+    height: 2px;
+    background-color: red;   
+}
+
+.wv-overlay-scrollbar-text {
+    position: absolute;
+    top:calc(-1em - 5px);
+    left: 0px;
+    height: 1em;
+    color: red;
+    font-size: 0.8em;
 }

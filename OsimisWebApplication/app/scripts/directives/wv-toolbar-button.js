@@ -22,6 +22,8 @@ angular.module('osimiswebviewerApp')
         var toolbarCtrl = ctrls[1];
         scope.wvModel = false;
 
+        // @todo send external changes to toolbar ctrl
+
         scope.$on('toolbar.deactivated', function(evt, buttonName) {
           if (buttonName == scope.wvName)
             scope.wvModel = false;

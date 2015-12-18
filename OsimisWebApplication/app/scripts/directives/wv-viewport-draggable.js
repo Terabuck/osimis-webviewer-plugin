@@ -17,7 +17,7 @@ angular.module('osimiswebviewerApp')
       var elementScope = angular.element(element).isolateScope();
 
       // @todo style
-      var clone = $('<div style="width: 200px; height: 200px; background-color: rgba(255,255,255,0.25);"></div>');
+      var clone = $('<div class="wv-draggable-clone"></div>');
       element.draggable({
         helper: function() {
           return clone;

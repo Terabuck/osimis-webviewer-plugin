@@ -29,3 +29,67 @@ wv-toolbar {
 }
 
 @import "wv-overlay.scss";
+
+.wv-container {
+  height: 100%;
+}
+.wv-menu {
+  display: inline-block;
+  float: left;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 200px;
+  height: 100%;
+}
+
+.wv-main {
+  display: inline-block;
+  height: 100%;
+  width: calc(100% - 200px);
+}
+
+wv-toolbar ~ wv-splitpane {
+  display: block;
+  height: calc(100% - 30px);
+  margin-top: -5px;
+}
+.wv-toolbar {
+  height: 30px;
+  margin: 0;
+  padding: 0px;
+}
+.wv-splitpane {
+  height: 100%;
+}
+.wv-splitpane-cell {
+  display: inline-block;
+  float: left;
+  height: 100%;
+}
+
+.wv-serie-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wv-serie-list-item {
+  padding: 0;
+  text-align: center;
+}
+.wv-serie-list-overlay {
+  position: absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  color: white;
+  background-color: rgba(0,0,0,0.75);
+  text-align: center;
+  padding: 0.5em;
+}
+
+.wv-draggable-clone {
+  width: 150px;
+  height: 150px;
+  background-color: rgba(255,255,255,0.25);
+}
