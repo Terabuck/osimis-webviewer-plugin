@@ -2,14 +2,12 @@
   	<li
   		ng-repeat="id in serieIds"
   		class="wv-serie-list-item"
-  		wv-viewport-size
 	>
 	    <wv-serie-viewport
 	    	wv-viewport-draggable
 	    	wv-serie-id="id"
 	    	wv-width="'150'"
 	    	wv-height="'150'"
-	    	wv-auto-resize="false"
     	>
 		    <wv-overlay class="wv-serie-list-overlay">
 	        	{{$instance.SeriesDescription}}

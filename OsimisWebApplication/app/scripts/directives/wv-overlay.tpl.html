@@ -3,11 +3,12 @@
         {{$instance.PatientName}}<br/>
         {{$instance.PatientID}}
     </div>
-    <div class="wv-overlay-topright">
+    <div class="wv-overlay-topright" ng-show="{{$instance.SeriesNumber !== undefined &amp;&amp; $instance.SeriesDescription !== undefined}} ">
         {{$instance.StudyDescription}}<br/>
         {{$instance.StudyDate}}<br/>
         #{{$instance.SeriesNumber}} - {{$instance.SeriesDescription}}<br/>
     </div>
+    <!-- @todo: doc commands -->
     <!--
     <div class="wv-overlay-bottomright">
         zoom: {{$viewport.scale|number:2}}<br/>

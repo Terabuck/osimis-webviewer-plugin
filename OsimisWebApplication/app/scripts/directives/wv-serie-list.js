@@ -18,7 +18,7 @@ return {
     // @todo make sure there is enough space left for the overlay bar in html
     
     scope.$watch('wvStudyId', _setStudy);
-    scope.serieIds = [];
+    scope.serieIds = []; // @todo allow user defined specific set
     
     function _setStudy(wvStudyId, old) {
       if (wvStudyId == undefined) return; 

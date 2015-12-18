@@ -82,6 +82,7 @@ return {
           .then(function(tags) {
             var csViewport = cornerstone.getViewport(domElement);
             if (scope.wvAutoWindowing == true) {
+              // @todo check if exists
               csViewport.voi.windowCenter = tags.WindowCenter; // @todo once on first load
               csViewport.voi.windowWidth = tags.WindowWidth;
               cornerstone.setViewport(domElement, csViewport);

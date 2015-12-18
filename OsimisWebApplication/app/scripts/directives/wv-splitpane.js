@@ -13,6 +13,7 @@ angular.module('osimiswebviewerApp')
         wvLayout: '=?',
         wvSettings: '=?'
       },
+      // @todo add template path angular constant
       templateUrl: 'scripts/directives/wv-splitpane.tpl.html',
       restrict: 'E',
       transclude: true,
