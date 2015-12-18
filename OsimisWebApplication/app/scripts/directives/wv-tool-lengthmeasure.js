@@ -2,19 +2,19 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvToolLengthmesure
+ * @name osimiswebviewerApp.directive:wvToolLengthmeasure
  * @description
- * # wvToolLengthmesure
+ * # wvToolLengthmeasure
  */
 angular.module('osimiswebviewerApp')
-  .directive('wvToolLengthmesure', function () {
+  .directive('wvToolLengthmeasure', function () {
     return {
       scope: false,
       restrict: 'A',
       link: function postLink(scope, element, attrs) {
         var elementScope = angular.element(element).isolateScope();
 
-        scope.$watch(attrs.wvToolLengthmesure, function(activate) {
+        scope.$watch(attrs.wvToolLengthmeasure, function(activate) {
           if (activate == undefined) return;
 
           elementScope.$broadcast('tool-command', {

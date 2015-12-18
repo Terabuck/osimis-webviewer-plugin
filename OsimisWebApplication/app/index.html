@@ -31,16 +31,16 @@
             </div>
             <div style="height: 100%; width: calc(100% - 200px); display: inline-block;">
                 <wv-toolbar style="height: 30px; margin: 0; padding: 0px;">
-                    <wv-toolbar-windowing wv-enable="obj.windowing"></wv-toolbar-windowing>
-                    <wv-toolbar-zoom wv-enable="obj.zoom"></wv-toolbar-zoom>
-                    <wv-toolbar-pan wv-enable="obj.pan"></wv-toolbar-pan>
-                    <wv-toolbar-stackscroll wv-enable="obj.stackscroll"></wv-toolbar-stackscroll>
-                    <wv-toolbar-invert wv-enable="obj.invert"></wv-toolbar-invert>
-                    <wv-toolbar-lengthmesure wv-enable="obj.lengthmesure"></wv-toolbar-lengthmesure>
-                    <wv-toolbar-anglemeasure wv-enable="obj.anglemeasure"></wv-toolbar-anglemeasure>
-                    <wv-toolbar-pixelprobe wv-enable="obj.pixelprobe"></wv-toolbar-pixelprobe>
-                    <wv-toolbar-ellipticalroi wv-enable="obj.ellipticalroi"></wv-toolbar-ellipticalroi>
-                    <wv-toolbar-rectangleroi wv-enable="obj.rectangleroi"></wv-toolbar-rectangleroi>
+                    <wv-toolbar-button wv-name="windowing" wv-model="obj.windowing" wv-icon="fa fa-sun-o"></wv-toolbar-button>
+                    <wv-toolbar-button wv-name="zoom" wv-model="obj.zoom" wv-icon="fa fa-search"></wv-toolbar-button>
+                    <wv-toolbar-button wv-name="pan" wv-model="obj.pan" wv-icon="fa fa-arrows"></wv-toolbar-button>
+                    <wv-toolbar-button wv-name="stackscroll" wv-model="obj.stackscroll" wv-icon="fa fa-bars"></wv-toolbar-button>
+                    <wv-toolbar-button wv-name="invert" wv-model="obj.invert" wv-icon="fa fa-adjust"></wv-toolbar-button>
+                    <wv-toolbar-button wv-name="lengthmeasure" wv-model="obj.lengthmeasure" wv-icon="fa fa-arrows-v"></wv-toolbar-button>
+                    <wv-toolbar-button wv-name="anglemeasure" wv-model="obj.anglemeasure" wv-icon="fa fa-angle-left"></wv-toolbar-button>
+                    <wv-toolbar-button wv-name="pixelprobe" wv-model="obj.pixelprobe" wv-icon="fa fa-dot-circle-o"></wv-toolbar-button>
+                    <wv-toolbar-button wv-name="ellipticalroi" wv-model="obj.ellipticalroi" wv-icon="fa fa-circle-o"></wv-toolbar-button>
+                    <wv-toolbar-button wv-name="rectangleroi" wv-model="obj.rectangleroi" wv-icon="fa fa-square-o"></wv-toolbar-button>
                     <wv-toolbar-multi-viewport-layout wv-layout="obj.layout"></wv-toolbar-multi-viewport-layout>
                     <wv-toolbar-play wv-enable="obj.play"></wv-toolbar-play>
                 </wv-toolbar>
@@ -51,7 +51,7 @@
                             wv-tool-zoom="obj.zoom"
                             wv-tool-pan="obj.pan"
                             wv-viewport-invert="obj.invert"
-                            wv-tool-lengthmesure="obj.lengthmesure"
+                            wv-tool-lengthmeasure="obj.lengthmeasure"
                             wv-tool-anglemeasure="obj.anglemeasure"
                             wv-tool-pixelprobe="obj.pixelprobe"
                             wv-tool-ellipticalroi="obj.ellipticalroi"
@@ -104,29 +104,20 @@
     <script src="scripts/directives/wv-viewport-draggable.js"></script>
     <script src="scripts/directives/wv-viewport-droppable.js"></script>
     <script src="scripts/directives/wv-toolbar-multi-viewport-layout.js"></script>
-    <script src="scripts/directives/wv-toolbar-invert.js"></script>
     <script src="scripts/directives/wv-viewport-invert.js"></script>
-    <script src="scripts/directives/wv-toolbar-lengthmesure.js"></script>
-    <script src="scripts/directives/wv-tool-lengthmesure.js"></script>
-    <script src="scripts/directives/wv-toolbar-anglemeasure.js"></script>
+    <script src="scripts/directives/wv-tool-lengthmeasure.js"></script>
     <script src="scripts/directives/wv-tool-anglemeasure.js"></script>
     <script src="scripts/directives/wv-tool-pixelprobe.js"></script>
-    <script src="scripts/directives/wv-toolbar-pixelprobe.js"></script>
-    <script src="scripts/directives/wv-toolbar-ellipticalroi.js"></script>
     <script src="scripts/directives/wv-tool-ellipticalroi.js"></script>
     <script src="scripts/directives/wv-tool-rectangleroi.js"></script>
-    <script src="scripts/directives/wv-toolbar-rectangleroi.js"></script>
     <script src="scripts/directives/wv-viewport-play.js"></script>
-    <script src="scripts/directives/wv-toolbar-windowing.js"></script>
-    <script src="scripts/directives/wv-toolbar-zoom.js"></script>
-    <script src="scripts/directives/wv-toolbar-pan.js"></script>
-    <script src="scripts/directives/wv-toolbar-stackscroll.js"></script>
     <script src="scripts/directives/wv-tool-windowing.js"></script>
     <script src="scripts/directives/wv-tool-zoom.js"></script>
     <script src="scripts/directives/wv-tool-pan.js"></script>
     <script src="scripts/directives/wv-tool-stackscroll.js"></script>
     <script src="scripts/directives/wv-study-list.js"></script>
     <script src="scripts/directives/wv-splitpane.js"></script>
+    <script src="scripts/directives/wv-toolbar-button.js"></script>
     <!-- endbuild -->
 </body>
 </html>
