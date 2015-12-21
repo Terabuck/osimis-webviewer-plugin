@@ -9,13 +9,15 @@
 
 // @require jqueryui
 angular.module('osimiswebviewerApp')
-.directive('wvViewportDraggable', function () {
+.directive('wvViewportDraggable', function($parse) {
   return {
     scope: false,
     restrict: 'A',
     link: function postLink(scope, element, attrs) {
-      var elementScope = angular.element(element).isolateScope();
+      var serieScope = scope; // @todo use directive communication w/ angular require instead 'coz this directive is dependant
 
+      var GetSerieId = $parse(attrs.wvViewportSerie); // method taking a scope as the param
+      
       // @todo style
       var clone = $('<div class="wv-draggable-clone"></div>');
       element.draggable({
@@ -24,7 +26,7 @@ angular.module('osimiswebviewerApp')
         },
         start: function(evt, ui) {
           var draggedElement = ui.helper;
-          draggedElement.data('serie-id', elementScope.wvSerieId);
+          draggedElement.data('serie-id', GetSerieId(serieScope));
         },
         zIndex: 100
       });

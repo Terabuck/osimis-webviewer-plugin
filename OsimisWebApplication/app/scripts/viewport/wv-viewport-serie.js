@@ -7,11 +7,17 @@
  * # wvViewportSerie
  */
 angular.module('osimiswebviewerApp')
-.directive('wvViewportSerie', ['$q', '$timeout', '$interval', 'orthancApiService', function($q, $timeout, $interval, orthancApiService) {
+.directive('wvViewportSerie', ['$parse', '$q', '$timeout', '$interval', 'orthancApiService', function($parse, $q, $timeout, $interval, orthancApiService) {
 return {
     scope: false,
     restrict: 'A',
-    link: function postLink(scope, element, attrs) {
+    require: 'wvViewportSerie',
+    controller: function() {
+
+    },
+    link: function postLink(scope, element, attrs, ctrl) {
+      var elementScope = angular.element(element).isolateScope(); // @todo require ctrl instead
+      
       // @todo auto resize
       // @todo auto windowing
       // @todo play command & stop on instance index update
@@ -19,12 +25,32 @@ return {
       var _instanceIds = [];
       var _instanceIndex = 0;
       
-      scope.$on('serie:ShowNextInstance', function(args) {
+      var GetSerieId; // method taking a scope as the param
+      var SetSerieId;
+      if (!attrs.wvViewportSerie) {
+        var _isolatedSerieId = $parse(attrs.wvViewportSerie)(scope);
+        GetSerieId = function(scope) { return _isolatedSerieId; };
+        SetSerieId = function(scope, val) { _isolatedSerieId = val; };
+      }
+      else {
+        GetSerieId = $parse(attrs.wvViewportSerie);
+        SetSerieId = GetSerieId.assign;
+      }
+
+      ctrl.setSerie = function(args) {
+        var id = args.id;
+        SetSerieId(scope, id);
+      };
+
+      scope.$on('serie:SetSerie', function(evt, args) {
+        ctrl.setSerie(args);
+      });
+      scope.$on('serie:ShowNextInstance', function(evt, args) {
         var restartWhenSerieEnd = args.restartWhenSerieEnd;
         _showNextInstance(restartWhenSerieEnd);
       });
 
-      scope.$watch(attrs.wvViewportSerie, function(serieId, old) {
+      scope.$watch(GetSerieId, function(serieId, old) {
         if (!serieId) return; // @todo hide viewport ?
 
         var orderedInstancePromise = orthancApiService
@@ -49,7 +75,7 @@ return {
           _instanceIndex = 0;
           _instanceIds = instances.SlicesShort.reverse().map(function(v) { return v[0]; });
 
-          scope.$broadcast('viewport:SetInstance', {
+          elementScope.$broadcast('viewport:SetInstance', {
             id: _instanceIds[_instanceIndex],
             adaptWindowing: true,
             adaptSize: true
@@ -57,7 +83,7 @@ return {
           
           // @note transmit data to overlay
           if (firstLoad) scope.$emit('serie:SerieLoaded');
-          scope.$broadcast('serie:SerieChanged', volume.MainDicomTags, _instanceIds.length); // @todo rename serie:DataReceived
+          elementScope.$broadcast('serie:SerieChanged', volume.MainDicomTags, _instanceIds.length); // @todo rename serie:DataReceived
         });
       });
       
@@ -93,7 +119,7 @@ return {
           _instanceIndex = restartWhenSerieEnd ? 0 : _instanceIds.length - 1;
         }
 
-        scope.$broadcast('viewport:SetInstance', {
+        elementScope.$broadcast('viewport:SetInstance', {
           id: _instanceIds[_instanceIndex],
           adaptWindowing: false,
           adaptSize: false
@@ -107,7 +133,7 @@ return {
           _instanceIndex = 0;
         }
 
-        scope.$broadcast('viewport:SetInstance', {
+        elementScope.$broadcast('viewport:SetInstance', {
           id: _instanceIds[_instanceIndex],
           adaptWindowing: false,
           adaptSize: false

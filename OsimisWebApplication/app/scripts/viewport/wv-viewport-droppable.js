@@ -13,17 +13,15 @@ angular.module('osimiswebviewerApp')
     return {
       scope: false,
       restrict: 'A',
-      link: function postLink(scope, element, attrs) {
-        var elementScope = angular.element(element).isolateScope();
-        
+      require: 'wvViewportSerie',
+      link: function postLink(scope, element, attrs, serieViewportCtrl) {
         element.droppable({
           accept: '[wv-viewport-draggable]',
           drop: function(evt, ui) {
             var droppedElement = $(ui.helper);
             var serieId = droppedElement.data('serie-id');
-            elementScope.$apply(function() {
-              // @todo use more generic way than direct access to elementScope.wvSerieId
-              elementScope.wvSerieId = serieId;
+            scope.$apply(function() {
+              serieViewportCtrl.setSerie({id: serieId});
             });
           }
         });

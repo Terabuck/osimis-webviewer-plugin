@@ -18,10 +18,7 @@ body {
   background-color: black;
 }
 
-wv-serie-viewport {
-  display: inline-block;
-}
-wv-instance-viewport {
+wv-viewport { // make sure the element is sized when using with drag & drop
   display: inline-block;
 }
 wv-toolbar {
