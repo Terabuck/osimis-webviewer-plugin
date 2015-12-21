@@ -2,11 +2,11 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvToolPixelprobe
+ * @name webviewer.directive:wvToolPixelprobe
  * @description
  * # wvToolPixelprobe
  */
-angular.module('osimiswebviewerApp')
+angular.module('webviewer')
   .directive('wvToolPixelprobe', function($parse) {
     return {
       scope: false,

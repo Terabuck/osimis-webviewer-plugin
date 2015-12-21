@@ -13,4 +13,4 @@ var _webViewerApiUri = 'http://localhost:8042/web-viewer';
  * Main module of the application.
  */
 angular
-  .module('osimiswebviewerApp', ['ngResource', 'ngSanitize', 'mgcrea.ngStrap', 'ngRangeFilter']);
+  .module('webviewer', ['ngResource', 'ngSanitize', 'mgcrea.ngStrap', 'ngRangeFilter']);

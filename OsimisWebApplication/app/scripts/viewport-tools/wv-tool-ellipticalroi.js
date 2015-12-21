@@ -2,11 +2,11 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvToolEllipticalroi
+ * @name webviewer.directive:wvToolEllipticalroi
  * @description
  * # wvToolEllipticalroi
  */
-angular.module('osimiswebviewerApp')
+angular.module('webviewer')
   .directive('wvToolEllipticalroi', function($parse) {
     return {
       scope: false,

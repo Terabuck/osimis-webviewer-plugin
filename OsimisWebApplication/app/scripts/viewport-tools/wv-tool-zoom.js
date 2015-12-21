@@ -2,11 +2,11 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvToolZoom
+ * @name webviewer.directive:wvToolZoom
  * @description
  * # wvToolZoom
  */
-angular.module('osimiswebviewerApp')
+angular.module('webviewer')
   .directive('wvToolZoom', function($parse) {
     return {
       scope: false,

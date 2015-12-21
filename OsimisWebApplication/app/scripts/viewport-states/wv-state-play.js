@@ -2,11 +2,11 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvStatePlay
+ * @name webviewer.directive:wvStatePlay
  * @description
  * # wvStatePlay
  */
-angular.module('osimiswebviewerApp')
+angular.module('webviewer')
   .directive('wvStatePlay', function ($parse, $interval) {
     return {
       scope: false,

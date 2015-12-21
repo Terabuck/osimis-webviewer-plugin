@@ -2,12 +2,12 @@
 
 /**
  * @ngdoc service
- * @name osimiswebviewerApp.orthanc
+ * @name webviewer.orthanc
  * @description
  * # orthanc
- * Service in the osimiswebviewerApp.
+ * Service in the webviewer.
  */
-angular.module('osimiswebviewerApp')
+angular.module('webviewer')
 .factory('orthancApiService', ['$resource', '$cacheFactory', function($resource, $cacheFactory) {
     var _orthancApiUri = 'http://localhost:8042';
     var _webViewerApiUri = 'http://localhost:8042/web-viewer';

@@ -2,11 +2,11 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvViewportMouseEvents
+ * @name webviewer.directive:wvViewportMouseEvents
  * @description
  * # wvViewportMouseEvents
  */
-angular.module('osimiswebviewerApp')
+angular.module('webviewer')
 .directive('wvViewportMouseEvents', function () {
 return {
   /** scope:

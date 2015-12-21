@@ -2,11 +2,11 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvSerielist
+ * @name webviewer.directive:wvSerielist
  * @description
  * # wvSerielist
  */
-angular.module('osimiswebviewerApp')
+angular.module('webviewer')
 .directive('wvSerielist', ['orthancApiService', function(orthancApiService) {
 return {
   scope: {

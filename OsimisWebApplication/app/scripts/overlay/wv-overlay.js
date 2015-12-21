@@ -2,11 +2,11 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvOverlay
+ * @name webviewer.directive:wvOverlay
  * @description
  * # wvOverlay
  */
-angular.module('osimiswebviewerApp')
+angular.module('webviewer')
 .directive('wvOverlay', [function() {
   return {
     scope: true,

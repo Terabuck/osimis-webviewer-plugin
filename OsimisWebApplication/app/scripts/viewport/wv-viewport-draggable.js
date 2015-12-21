@@ -2,13 +2,13 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvViewportDraggable
+ * @name webviewer.directive:wvViewportDraggable
  * @description
  * # wvViewportDraggable
  */
 
 // @require jqueryui
-angular.module('osimiswebviewerApp')
+angular.module('webviewer')
 .directive('wvViewportDraggable', function($parse) {
   return {
     scope: false,

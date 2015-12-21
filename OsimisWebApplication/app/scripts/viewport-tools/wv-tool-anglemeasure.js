@@ -2,11 +2,11 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvToolAnglemeasure
+ * @name webviewer.directive:wvToolAnglemeasure
  * @description
  * # wvToolAnglemeasure
  */
-angular.module('osimiswebviewerApp')
+angular.module('webviewer')
   .directive('wvToolAnglemeasure', function($parse) {
     return {
       scope: false,

@@ -2,11 +2,11 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvStudylist
+ * @name webviewer.directive:wvStudylist
  * @description
  * # wvStudylist
  */
-angular.module('osimiswebviewerApp')
+angular.module('webviewer')
   .directive('wvStudylist', ['orthancApiService', function (orthancApiService) {
     return {
       scope: {

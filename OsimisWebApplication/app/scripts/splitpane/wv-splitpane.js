@@ -2,11 +2,11 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvSplitpane
+ * @name webviewer.directive:wvSplitpane
  * @description
  * # wvSplitpane
  */
-angular.module('osimiswebviewerApp')
+angular.module('webviewer')
   .directive('wvSplitpane', function () {
     return {
       scope: {

@@ -2,11 +2,11 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvToolRectangleroi
+ * @name webviewer.directive:wvToolRectangleroi
  * @description
  * # wvToolRectangleroi
  */
-angular.module('osimiswebviewerApp')
+angular.module('webviewer')
   .directive('wvToolRectangleroi', function($parse) {
     return {
       scope: false,

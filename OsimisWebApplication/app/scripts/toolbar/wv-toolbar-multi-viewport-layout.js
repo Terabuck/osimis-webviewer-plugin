@@ -2,11 +2,11 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvToolbarMultiViewportLayout
+ * @name webviewer.directive:wvToolbarMultiViewportLayout
  * @description
  * # wvToolbarMultiViewportLayout
  */
-angular.module('osimiswebviewerApp')
+angular.module('webviewer')
   .directive('wvToolbarMultiViewportLayout', function () {
     return {
       scope: {

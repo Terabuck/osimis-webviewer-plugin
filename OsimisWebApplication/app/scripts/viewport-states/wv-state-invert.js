@@ -2,11 +2,11 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvStateInvert
+ * @name webviewer.directive:wvStateInvert
  * @description
  * # wvStateInvert
  */
-angular.module('osimiswebviewerApp')
+angular.module('webviewer')
   .directive('wvStateInvert', function ($parse) {
     return {
       scope: false,

@@ -2,11 +2,11 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvViewportSerie
+ * @name webviewer.directive:wvViewportSerie
  * @description
  * # wvViewportSerie
  */
-angular.module('osimiswebviewerApp')
+angular.module('webviewer')
 .directive('wvViewportSerie', ['$parse', '$q', '$timeout', '$interval', 'orthancApiService', function($parse, $q, $timeout, $interval, orthancApiService) {
 return {
     scope: false,

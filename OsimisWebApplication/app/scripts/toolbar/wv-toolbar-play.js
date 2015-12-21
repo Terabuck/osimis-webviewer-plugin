@@ -2,11 +2,11 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvToolbarPlay
+ * @name webviewer.directive:wvToolbarPlay
  * @description
  * # wvToolbarPlay
  */
-angular.module('osimiswebviewerApp')
+angular.module('webviewer')
   .directive('wvToolbarPlay', function () {
     return {
       scope: {

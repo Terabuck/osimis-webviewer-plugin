@@ -2,13 +2,13 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvViewportDroppable
+ * @name webviewer.directive:wvViewportDroppable
  * @description
  * # wvViewportDroppable
  */
 
 // require droppable
-angular.module('osimiswebviewerApp')
+angular.module('webviewer')
   .directive('wvViewportDroppable', function () {
     return {
       scope: false,
