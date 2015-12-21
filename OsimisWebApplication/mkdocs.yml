@@ -1,0 +1,11 @@
+site_name: Osimis Web Viewer Components
+theme: readthedocs
+pages:
+- Home: index.md
+- User Guide: 
+  - viewport - Show an Instance: user-guide/wv-viewport.md
+  - serie-viewport - Show a Serie: user-guide/wv-serie-viewport.md
+  - overlay - Display an Overlay: user-guide/wv-overlay.md
+  - toolbar - Manipulate the viewport: user-guide/wv-toolbar.md
+  - serielist - drag & drop series: user-guide/wv-serielist.md
+  - splitpane - manipulate multiple viewports: user-guide/wv-splitpane.md
