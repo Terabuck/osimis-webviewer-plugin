@@ -43,6 +43,8 @@ return {
       });
 
       scope.$on('viewport:ActivateTool', function(evt, args) {
+        if (!_image) return;
+        
         var name = args.tool;
         var args = args.arguments;
 
@@ -52,6 +54,8 @@ return {
         tool.activate.apply(tool, [domElement].concat(args));
       });
       scope.$on('viewport:DeactivateTool', function(evt, args) {
+        if (!_image) return;
+
         var name = args.tool;
 
         var tool = cornerstoneTools[name];
@@ -74,14 +78,14 @@ return {
           var firstLoading = !_image ? true : false;
           _image = image;
 
-          var csViewport = cornerstone.getViewport(domElement);
-          cornerstone.displayImage(domElement, _image, csViewport);
+          var viewport = cornerstone.getViewport(domElement);
+          cornerstone.displayImage(domElement, _image, viewport);
   
           if (_adaptWindowingOnNextChange) {
-            var csViewport = cornerstone.getViewport(domElement);
-            csViewport.voi.windowCenter = tags.WindowCenter;
-            csViewport.voi.windowWidth = tags.WindowWidth;
-            cornerstone.setViewport(domElement, csViewport);
+            var viewport = cornerstone.getViewport(domElement);
+            viewport.voi.windowCenter = tags.WindowCenter;
+            viewport.voi.windowWidth = tags.WindowWidth;
+            cornerstone.setViewport(domElement, viewport);
             _adaptWindowingOnNextChange = false;
           }
 
@@ -98,7 +102,7 @@ return {
           // @note transmit informations to overlay
           if (firstLoading) scope.$emit('viewport:ViewportLoaded');
           scope.$broadcast('viewport:InstanceChanged', tags); // @todo -> viewport:InstanceChanged
-          scope.$broadcast('viewport:ViewportChanged', csViewport); 
+          scope.$broadcast('viewport:ViewportChanged', viewport); 
         });
 
       });
@@ -167,8 +171,8 @@ return {
             // @note may induce bug if DOM structure changes before resizing (cf. parentContainer is cached)
             width = parentContainer.width();
             height = parentContainer.height();
-            _resize(width, height);
-            scope.$broadcast('viewport:ViewportChanged', csViewport);
+            var viewport = _resize(width, height);
+            if (viewport) scope.$broadcast('viewport:ViewportChanged', viewport);
           }, 10);
           $(window).on('resize', _onWindowResize);
           scope.$on('$destroy', function() {
@@ -188,7 +192,7 @@ return {
       }
       
       function _resize(width, height) {
-        var csViewport;
+        var viewport;
 
         jqElement.width(width);
         jqElement.height(height);
@@ -198,14 +202,16 @@ return {
         var fitToWindow = _image.width > width || _image.height > height;
         if (fitToWindow) {
           cornerstone.resize(domElement, true);
-          csViewport = cornerstone.getViewport(domElement);
+          viewport = cornerstone.getViewport(domElement);
         }
         else {
           cornerstone.resize(domElement, false);
-          csViewport = cornerstone.getViewport(domElement);
-          csViewport.scale = 1.0;
-          cornerstone.setViewport(domElement, csViewport);
+          viewport = cornerstone.getViewport(domElement);
+          viewport.scale = 1.0;
+          cornerstone.setViewport(domElement, viewport);
         }
+
+        return viewport;
       }
   }
 };
