@@ -32,6 +32,33 @@ return {
         _adaptSizeOnNextChange = args.adaptSize || false;
         scope.wvInstance = args.id;
       });
+
+      scope.$on('viewport:SetViewport', function(evt, strategy) {
+        var viewport = cornerstone.getViewport(domElement);
+        if (!viewport) return;
+        viewport = strategy.execute(viewport);
+        cornerstone.setViewport(domElement, viewport);
+
+        scope.$broadcast('viewport:ViewportChanged', viewport);
+      });
+
+      scope.$on('viewport:ActivateTool', function(evt, args) {
+        var name = args.tool;
+        var args = args.arguments;
+
+        var tool = cornerstoneTools[name];
+
+        cornerstoneTools.mouseInput.enable(domElement);
+        tool.activate.apply(tool, [domElement].concat(args));
+      });
+      scope.$on('viewport:DeactivateTool', function(evt, args) {
+        var name = args.tool;
+
+        var tool = cornerstoneTools[name];
+
+        tool.deactivate(domElement);
+        cornerstoneTools.mouseInput.disable(domElement);
+      });
       
       scope.$watch('wvInstance', function(instanceId) {
         if (typeof instanceId === 'undefined' || instanceId === null) return;
@@ -43,7 +70,8 @@ return {
         .then(function(args) {
           var image = args.image;
           var tags = args.tags;
-
+          
+          var firstLoading = !_image ? true : false;
           _image = image;
 
           var csViewport = cornerstone.getViewport(domElement);
@@ -68,6 +96,7 @@ return {
           // var orientationVector2 = orientationValues.slice(3);
           
           // @note transmit informations to overlay
+          if (firstLoading) scope.$emit('viewport:ViewportLoaded');
           scope.$broadcast('viewport:InstanceChanged', tags); // @todo -> viewport:InstanceChanged
           scope.$broadcast('viewport:ViewportChanged', csViewport); 
         });

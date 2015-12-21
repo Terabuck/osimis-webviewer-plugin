@@ -7,11 +7,12 @@
  * # wvToolStackscroll
  */
 angular.module('osimiswebviewerApp')
-.directive('wvToolStackscroll', function () {
+.directive('wvToolStackscroll', function($parse) {
 return {
   scope: false,
   restrict: 'A',
   link: function postLink(scope, element, attrs) {
+    // @ TODO !
     var elementScope = angular.element(element).isolateScope();
     
     var handler = function(e) {

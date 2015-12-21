@@ -19,6 +19,11 @@ return {
       var _instanceIds = [];
       var _instanceIndex = 0;
       
+      scope.$on('serie:ShowNextInstance', function(args) {
+        var restartWhenSerieEnd = args.restartWhenSerieEnd;
+        _showNextInstance(restartWhenSerieEnd);
+      });
+
       scope.$watch(attrs.wvViewportSerie, function(serieId, old) {
         if (!serieId) return; // @todo hide viewport ?
 
@@ -38,6 +43,8 @@ return {
           var instances = args.instances;
 
           if (!instances || !instances.SlicesShort || instances.SlicesShort.length == 0) return;
+
+          var firstLoad = !_instanceIds || _instanceIds.length === 0;
           
           _instanceIndex = 0;
           _instanceIds = instances.SlicesShort.reverse().map(function(v) { return v[0]; });
@@ -49,6 +56,7 @@ return {
           });
           
           // @note transmit data to overlay
+          if (firstLoad) scope.$emit('serie:SerieLoaded');
           scope.$broadcast('serie:SerieChanged', volume.MainDicomTags, _instanceIds.length); // @todo rename serie:DataReceived
         });
       });
@@ -61,25 +69,13 @@ return {
           // @todo calibrate the required speed and accuracy for the enduser
 
           if (deltaX > 0) {
-            _instanceIndex++;
+            _showNextInstance(false);
+            scope.$apply();
           }
           else if (deltaX < 0) {
-            _instanceIndex--;
+            _showPreviousInstance();
+            scope.$apply();
           }
-
-          if (_instanceIndex >= _instanceIds.length) {
-            _instanceIndex = _instanceIds.length - 1;
-          }
-          else if (_instanceIndex < 0) {
-            _instanceIndex = 0;
-          }
-
-          scope.$broadcast('viewport:SetInstance', {
-            id: _instanceIds[_instanceIndex],
-            adaptWindowing: false,
-            adaptSize: false
-          });
-          scope.$apply();
 
           event.preventDefault();
         }
@@ -89,6 +85,34 @@ return {
           // @note allow normal scrolling of the window in vertical
         }
       });
+
+      function _showNextInstance(restartWhenSerieEnd) {
+        _instanceIndex++;
+
+        if (_instanceIndex >= _instanceIds.length) {
+          _instanceIndex = restartWhenSerieEnd ? 0 : _instanceIds.length - 1;
+        }
+
+        scope.$broadcast('viewport:SetInstance', {
+          id: _instanceIds[_instanceIndex],
+          adaptWindowing: false,
+          adaptSize: false
+        });
+      }
+
+      function _showPreviousInstance() {
+        _instanceIndex--;
+
+        if (_instanceIndex < 0) {
+          _instanceIndex = 0;
+        }
+
+        scope.$broadcast('viewport:SetInstance', {
+          id: _instanceIds[_instanceIndex],
+          adaptWindowing: false,
+          adaptSize: false
+        });
+      }
 
     }
 };

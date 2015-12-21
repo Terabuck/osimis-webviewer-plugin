@@ -21,7 +21,7 @@ return {
 
     // @todo wait for onloaded ?
 
-    var elementScope = angular.element(parentElement).isolateScope();
+    var elementScope = angular.element(parentElement).isolateScope(); // @todo DO THAT BETTER BOY!
 
     jqElement.mousedown(function(e) {
       var lastX = e.pageX;
@@ -47,7 +47,7 @@ return {
               deltaY: deltaY
             };
 
-            elementScope.$broadcast('viewport-command', strategy);
+            elementScope.$broadcast('viewport:SetViewport', strategy);
           }
           else if (mouseButton == 2) { // middle-click + move -> moving
             var strategy = {
@@ -61,7 +61,7 @@ return {
               deltaY: deltaY
             };
 
-            elementScope.$broadcast('viewport-command', strategy);
+            elementScope.$broadcast('viewport:SetViewport', strategy);
           }
           else if (mouseButton == 3) { // right-click + move -> scaling
             var strategy = {
@@ -72,7 +72,7 @@ return {
               deltaY: deltaY
             };
 
-            elementScope.$broadcast('viewport-command', strategy);
+            elementScope.$broadcast('viewport:SetViewport', strategy);
           }
         });
         

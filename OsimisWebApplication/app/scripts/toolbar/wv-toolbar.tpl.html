@@ -2,19 +2,19 @@
 	<div
 		class="btn-group" role="group"
 		ng-transclude
-		ng-init="opts = $parent.opts"
+		ng-init="wvItems = wvItems || $parent.wvItems"
 	>
-	    <wv-toolbar-button wv-name="windowing" wv-model="opts.windowing" wv-icon="fa fa-sun-o"></wv-toolbar-button>
-	    <wv-toolbar-button wv-name="zoom" wv-model="opts.zoom" wv-icon="fa fa-search"></wv-toolbar-button>
-	    <wv-toolbar-button wv-name="pan" wv-model="opts.pan" wv-icon="fa fa-arrows"></wv-toolbar-button>
-	    <!-- <wv-toolbar-button wv-name="stackscroll" wv-model="opts.stackscroll" wv-icon="fa fa-bars"></wv-toolbar-button> -->
-	    <wv-toolbar-button wv-name="invert" wv-model="opts.invert" wv-icon="fa fa-adjust"></wv-toolbar-button>
-	    <wv-toolbar-button wv-name="lengthmeasure" wv-model="opts.lengthmeasure" wv-icon="fa fa-arrows-v"></wv-toolbar-button>
-	    <wv-toolbar-button wv-name="anglemeasure" wv-model="opts.anglemeasure" wv-icon="fa fa-angle-left"></wv-toolbar-button>
-	    <wv-toolbar-button wv-name="pixelprobe" wv-model="opts.pixelprobe" wv-icon="fa fa-dot-circle-o"></wv-toolbar-button>
-	    <wv-toolbar-button wv-name="ellipticalroi" wv-model="opts.ellipticalroi" wv-icon="fa fa-circle-o"></wv-toolbar-button>
-	    <wv-toolbar-button wv-name="rectangleroi" wv-model="opts.rectangleroi" wv-icon="fa fa-square-o"></wv-toolbar-button>
-	    <wv-toolbar-multi-viewport-layout wv-layout="opts.layout"></wv-toolbar-multi-viewport-layout>
-	    <wv-toolbar-play wv-enable="opts.play"></wv-toolbar-play>
+	    <wv-toolbar-button wv-name="windowing" wv-model="wvItems.windowing" wv-icon="fa fa-sun-o" ng-if="wvItems.hasOwnProperty('windowing')"></wv-toolbar-button>
+	    <wv-toolbar-button wv-name="zoom" wv-model="wvItems.zoom" wv-icon="fa fa-search" ng-if="wvItems.hasOwnProperty('zoom')"></wv-toolbar-button>
+	    <wv-toolbar-button wv-name="pan" wv-model="wvItems.pan" wv-icon="fa fa-arrows" ng-if="wvItems.hasOwnProperty('pan')"></wv-toolbar-button>
+	    <!-- <wv-toolbar-button wv-name="stackscroll" wv-model="wvItems.stackscroll" wv-icon="fa fa-bars" ng-if="wvItems.hasOwnProperty('stackscroll')"></wv-toolbar-button> -->
+	    <wv-toolbar-button wv-name="invert" wv-model="wvItems.invert" wv-icon="fa fa-adjust" ng-if="wvItems.hasOwnProperty('invert')"></wv-toolbar-button>
+	    <wv-toolbar-button wv-name="lengthmeasure" wv-model="wvItems.lengthmeasure" wv-icon="fa fa-arrows-v" ng-if="wvItems.hasOwnProperty('lengthmeasure')"></wv-toolbar-button>
+	    <wv-toolbar-button wv-name="anglemeasure" wv-model="wvItems.anglemeasure" wv-icon="fa fa-angle-left" ng-if="wvItems.hasOwnProperty('anglemeasure')"></wv-toolbar-button>
+	    <wv-toolbar-button wv-name="pixelprobe" wv-model="wvItems.pixelprobe" wv-icon="fa fa-dot-circle-o" ng-if="wvItems.hasOwnProperty('pixelprobe')"></wv-toolbar-button>
+	    <wv-toolbar-button wv-name="ellipticalroi" wv-model="wvItems.ellipticalroi" wv-icon="fa fa-circle-o" ng-if="wvItems.hasOwnProperty('ellipticalroi')"></wv-toolbar-button>
+	    <wv-toolbar-button wv-name="rectangleroi" wv-model="wvItems.rectangleroi" wv-icon="fa fa-square-o" ng-if="wvItems.hasOwnProperty('rectangleroi')"></wv-toolbar-button>
+	    <wv-toolbar-multi-viewport-layout wv-layout="wvItems.layout" ng-if="wvItems.hasOwnProperty('layout')"></wv-toolbar-multi-viewport-layout>
+	    <wv-toolbar-play wv-enable="wvItems.play" ng-if="wvItems.hasOwnProperty('play')"></wv-toolbar-play>
 	</div>
  </div>

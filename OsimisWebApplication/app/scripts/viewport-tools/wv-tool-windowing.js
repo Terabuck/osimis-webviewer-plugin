@@ -7,31 +7,36 @@
  * # wvToolWindowing
  */
 angular.module('osimiswebviewerApp')
-  .directive('wvToolWindowing', function () {
+  .directive('wvToolWindowing', function($parse) {
     return {
       scope: false,
       restrict: 'A',
       link: function postLink(scope, element, attrs) {
-        var elementScope = angular.element(element).isolateScope();
-      
-        scope.$watch(attrs.wvToolWindowing, function(activate) {
-          if (activate == undefined) return;
+        var elementScope = angular.element(element).isolateScope() || scope;
+        var IsActivated = $parse(attrs.wvToolWindowing); // method taking a scope as the param
 
-	      	// @todo remove ? this is the default behavior..
-          elementScope.$broadcast('tool-command', {
-            execute: function(domElement, tools) {
-              if (this.activate) {
-                cornerstoneTools.mouseInput.enable(domElement);
-                tools.wwwc.activate(domElement, 0b1); // left clic
-              }
-              else {
-                tools.wwwc.deactivate(domElement);
-                cornerstoneTools.mouseInput.disable(domElement);
-              }
-            },
-            activate: activate
-          });
+        scope.$on('viewport:ViewportLoaded', function() {
+          _trigger(IsActivated(scope));
         });
+
+        scope.$watch(IsActivated, _trigger);
+
+        function _trigger(activate) {
+          if (typeof activate === 'undefined') return;
+          
+          if (activate) {
+            elementScope.$broadcast('viewport:ActivateTool', {
+              tool: 'wwwc',
+              arguments: [0b1] // left mouse
+            });
+          }
+          else {
+            elementScope.$broadcast('viewport:DeactivateTool', {
+              tool: 'wwwc'
+            });
+          }
+        }
+
       }
     };
   });

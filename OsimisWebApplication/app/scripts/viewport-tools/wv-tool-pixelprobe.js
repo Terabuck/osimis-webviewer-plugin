@@ -7,30 +7,35 @@
  * # wvToolPixelprobe
  */
 angular.module('osimiswebviewerApp')
-  .directive('wvToolPixelprobe', function () {
+  .directive('wvToolPixelprobe', function($parse) {
     return {
       scope: false,
       restrict: 'A',
       link: function postLink(scope, element, attrs) {
-        var elementScope = angular.element(element).isolateScope();
+        var elementScope = angular.element(element).isolateScope() || scope;
+        var IsActivated = $parse(attrs.wvToolPixelprobe); // method taking a scope as the param
 
-        scope.$watch(attrs.wvToolPixelprobe, function(activate) {
-          if (activate == undefined) return;
-
-          elementScope.$broadcast('tool-command', {
-            execute: function(domElement, tools) {
-              if (this.activate) {
-                cornerstoneTools.mouseInput.enable(domElement);
-                tools.probe.activate(domElement, true);
-              }
-              else {
-                tools.probe.deactivate(domElement);
-                cornerstoneTools.mouseInput.disable(domElement);
-              }
-            },
-            activate: activate
-          });
+        scope.$on('viewport:ViewportLoaded', function() {
+          _trigger(IsActivated(scope));
         });
+
+        scope.$watch(IsActivated, _trigger);
+
+        function _trigger(activate) {
+          if (typeof activate === 'undefined') return;
+          
+          if (activate) {
+            elementScope.$broadcast('viewport:ActivateTool', {
+              tool: 'probe',
+              arguments: [true]
+            });
+          }
+          else {
+            elementScope.$broadcast('viewport:DeactivateTool', {
+              tool: 'probe'
+            });
+          }
+        }
       }
     };
   });

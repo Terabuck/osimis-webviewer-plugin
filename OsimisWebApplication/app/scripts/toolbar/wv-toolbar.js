@@ -10,7 +10,7 @@ angular.module('osimiswebviewerApp')
   .directive('wvToolbar', function () {
     return {
       scope: {
-        wvSettings: '=?opts'
+        wvItems: '='
       },
       templateUrl: 'scripts/toolbar/wv-toolbar.tpl.html',
       transclude: true,
@@ -19,7 +19,22 @@ angular.module('osimiswebviewerApp')
       },
       controller: ['$timeout', '$scope', function($timeout, $scope) {
         $scope.activeButton = null;
-        if ($scope.opts == undefined) $scope.opts = {};
+        if ($scope.wvItems == undefined || !_.size($scope.wvItems)) $scope.wvItems = {
+          windowing: false,
+          zoom: false,
+          pan: false,
+          invert: false,
+          lengthmeasure: false,
+          anglemeasure: false,
+          pixelprobe: false,
+          ellipticalroi: false,
+          rectangleroi: false,
+          layout: {
+            x: 1,
+            y: 1
+          },
+          play: false
+        };
 
         this.set = function(name) {
           var previousActive = $scope.activeButton;

@@ -7,30 +7,35 @@
  * # wvToolLengthmeasure
  */
 angular.module('osimiswebviewerApp')
-  .directive('wvToolLengthmeasure', function () {
+  .directive('wvToolLengthmeasure', function($parse) {
     return {
       scope: false,
       restrict: 'A',
       link: function postLink(scope, element, attrs) {
-        var elementScope = angular.element(element).isolateScope();
+        var elementScope = angular.element(element).isolateScope() || scope;
+        var IsActivated = $parse(attrs.wvToolLengthmeasure); // method taking a scope as the param
 
-        scope.$watch(attrs.wvToolLengthmeasure, function(activate) {
-          if (activate == undefined) return;
-
-          elementScope.$broadcast('tool-command', {
-            execute: function(domElement, tools) {
-              if (this.activate) {
-                cornerstoneTools.mouseInput.enable(domElement);
-                tools.length.activate(domElement, true);
-              }
-              else {
-                tools.length.deactivate(domElement);
-                cornerstoneTools.mouseInput.disable(domElement);
-              }
-            },
-            activate: activate
-          });
+        scope.$on('viewport:ViewportLoaded', function() {
+          _trigger(IsActivated(scope));
         });
+
+        scope.$watch(IsActivated, _trigger);
+
+        function _trigger(activate) {
+          if (typeof activate === 'undefined') return;
+          
+          if (activate) {
+            elementScope.$broadcast('viewport:ActivateTool', {
+              tool: 'length',
+              arguments: [true]
+            });
+          }
+          else {
+            elementScope.$broadcast('viewport:DeactivateTool', {
+              tool: 'length'
+            });
+          }
+        }
       }
     };
   });
