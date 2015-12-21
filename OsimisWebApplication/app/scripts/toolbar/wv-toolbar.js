@@ -12,7 +12,7 @@ angular.module('osimiswebviewerApp')
       scope: {
         wvSettings: '=?opts'
       },
-      templateUrl: 'scripts/directives/wv-toolbar.tpl.html',
+      templateUrl: 'scripts/toolbar/wv-toolbar.tpl.html',
       transclude: true,
       restrict: 'E',
       link: function postLink(scope, element, attrs) {

@@ -11,7 +11,7 @@ angular.module('osimiswebviewerApp')
   return {
     scope: false,
     transclude: 'true',
-    templateUrl: 'scripts/directives/wv-overlay.tpl.html',
+    templateUrl: 'scripts/overlay/wv-overlay.tpl.html',
     restrict: 'E',
     link: function postLink(scope, element, attrs) {
       scope.$on('instance-data', function(evt, tags) {

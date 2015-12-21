@@ -7,7 +7,7 @@
  * # wvSerieViewport
  */
 angular.module('osimiswebviewerApp')
-.directive('wvSerieViewport', ['$q', '$timeout', '$interval', 'orthanc', function($q, $timeout, $interval, orthanc) {
+.directive('wvSerieViewport', ['$q', '$timeout', '$interval', 'orthancApiService', function($q, $timeout, $interval, orthancApiService) {
 return {
     scope: {
       'wvSerieId': '=',
@@ -16,7 +16,7 @@ return {
       'wvHeight': '=?'
     },
     transclude: true,
-    templateUrl: 'scripts/directives/wv-serie-viewport.tpl.html',
+    templateUrl: 'scripts/viewport/wv-serie-viewport.tpl.html',
     restrict: 'E',
     link: function postLink(scope, element, attrs) {
       if (scope.wvInstanceIndex === null  || typeof scope.wvInstanceIndex === 'undefined') {
@@ -69,10 +69,10 @@ return {
         if (wvSerieId == undefined) return;
 
         $q.all({
-        instances: orthanc
+        instances: orthancApiService
           .serie.listInstances({id: wvSerieId})
           .$promise,
-        volume: orthanc
+        volume: orthancApiService
           .serie.get({id: wvSerieId})
           .$promise
         })

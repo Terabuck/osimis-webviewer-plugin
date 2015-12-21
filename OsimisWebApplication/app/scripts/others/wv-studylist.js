@@ -2,12 +2,12 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvStudyList
+ * @name osimiswebviewerApp.directive:wvStudylist
  * @description
- * # wvStudyList
+ * # wvStudylist
  */
 angular.module('osimiswebviewerApp')
-  .directive('wvStudyList', ['orthanc', function (orthanc) {
+  .directive('wvStudylist', ['orthancApiService', function (orthancApiService) {
     return {
       scope: {
         wvSelectedStudy: '='
@@ -17,7 +17,7 @@ angular.module('osimiswebviewerApp')
       link: function postLink(scope, element, attrs) {
         scope.studies = [];
 
-        orthanc
+        orthancApiService
         .study.query()
         .$promise
         .then(function(studies) {
@@ -29,7 +29,7 @@ angular.module('osimiswebviewerApp')
           });
           
           scope.studies.forEach(function(v) {
-            orthanc
+            orthancApiService
             .study.get({id: v.value})
             .$promise
             .then(function(study) {

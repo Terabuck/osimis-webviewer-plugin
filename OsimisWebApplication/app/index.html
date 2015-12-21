@@ -25,8 +25,8 @@
         ng-init="opts = {}; studyId = '27f7126f-4f66fb14-03f4081b-f9341db2-53925988'"
     >
         <div class="wv-menu">
-            <wv-study-list wv-selected-study="studyId"></wv-study-list>
-            <wv-serie-list wv-study-id="studyId"></wv-serie-list>
+            <wv-studylist wv-selected-study="studyId"></wv-studylist>
+            <wv-serielist wv-study-id="studyId"></wv-serielist>
         </div>
         <div class="wv-main">
             <wv-toolbar wv-settings="opts"></wv-toolbar>
@@ -57,36 +57,36 @@
     <!-- endbower -->
     <!-- endbuild -->
 
-    <script src="scripts/orthanc-image-loader.js"></script> <!-- @todo: add to grunt process queue -->
-    <script src="bower_components/ng-range-filter/src/ngRangeFilter.js"></script>
+    <script src="bower_components/ng-range-filter/src/ngRangeFilter.js"></script> <!-- @todo: add to grunt process queue -->
 
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="scripts/app.js"></script>
-    <script src="scripts/directives/wv-toolbar.js"></script>
-    <script src="scripts/directives/wv-viewport.js"></script>
-    <script src="scripts/directives/wv-viewport-mouse-events.js"></script>
-    <script src="scripts/directives/wv-serie-viewport.js"></script>
-    <script src="scripts/services/orthanc.js"></script>
-    <script src="scripts/directives/wv-toolbar-play.js"></script>
-    <script src="scripts/directives/wv-overlay.js"></script>
-    <script src="scripts/directives/wv-serie-list.js"></script>
-    <script src="scripts/directives/wv-viewport-draggable.js"></script>
-    <script src="scripts/directives/wv-viewport-droppable.js"></script>
-    <script src="scripts/directives/wv-toolbar-multi-viewport-layout.js"></script>
-    <script src="scripts/directives/wv-viewport-invert.js"></script>
-    <script src="scripts/directives/wv-tool-lengthmeasure.js"></script>
-    <script src="scripts/directives/wv-tool-anglemeasure.js"></script>
-    <script src="scripts/directives/wv-tool-pixelprobe.js"></script>
-    <script src="scripts/directives/wv-tool-ellipticalroi.js"></script>
-    <script src="scripts/directives/wv-tool-rectangleroi.js"></script>
-    <script src="scripts/directives/wv-viewport-play.js"></script>
-    <script src="scripts/directives/wv-tool-windowing.js"></script>
-    <script src="scripts/directives/wv-tool-zoom.js"></script>
-    <script src="scripts/directives/wv-tool-pan.js"></script>
-    <script src="scripts/directives/wv-tool-stackscroll.js"></script>
-    <script src="scripts/directives/wv-study-list.js"></script>
-    <script src="scripts/directives/wv-splitpane.js"></script>
-    <script src="scripts/directives/wv-toolbar-button.js"></script>
+    <script src="scripts/orthanc/orthanc-api-service.js"></script>
+    <script src="scripts/orthanc/orthanc-image-loader.js"></script>
+    <script src="scripts/viewport/wv-viewport.js"></script>
+    <script src="scripts/viewport/wv-serie-viewport.js"></script>
+    <script src="scripts/viewport/wv-viewport-mouse-events.js"></script>
+    <script src="scripts/overlay/wv-overlay.js"></script>
+    <script src="scripts/serielist/wv-serielist.js"></script>
+    <script src="scripts/viewport/wv-viewport-draggable.js"></script>
+    <script src="scripts/viewport/wv-viewport-droppable.js"></script>
+    <script src="scripts/viewport-states/wv-state-invert.js"></script>
+    <script src="scripts/viewport-states/wv-state-play.js"></script>
+    <script src="scripts/viewport-tools/wv-tool-lengthmeasure.js"></script>
+    <script src="scripts/viewport-tools/wv-tool-anglemeasure.js"></script>
+    <script src="scripts/viewport-tools/wv-tool-pixelprobe.js"></script>
+    <script src="scripts/viewport-tools/wv-tool-ellipticalroi.js"></script>
+    <script src="scripts/viewport-tools/wv-tool-rectangleroi.js"></script>
+    <script src="scripts/viewport-tools/wv-tool-windowing.js"></script>
+    <script src="scripts/viewport-tools/wv-tool-zoom.js"></script>
+    <script src="scripts/viewport-tools/wv-tool-pan.js"></script>
+    <script src="scripts/viewport-tools/wv-tool-stackscroll.js"></script>
+    <script src="scripts/splitpane/wv-splitpane.js"></script>
+    <script src="scripts/toolbar/wv-toolbar.js"></script>
+    <script src="scripts/toolbar/wv-toolbar-button.js"></script>
+    <script src="scripts/toolbar/wv-toolbar-multi-viewport-layout.js"></script>
+    <script src="scripts/toolbar/wv-toolbar-play.js"></script>
+    <script src="scripts/others/wv-studylist.js"></script>
     <!-- endbuild -->
 </body>
 </html>

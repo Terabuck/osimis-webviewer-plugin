@@ -7,7 +7,7 @@
  * # wvViewport
  */
 angular.module('osimiswebviewerApp')
-.directive('wvViewport', ['orthanc', function(orthanc) {
+.directive('wvViewport', ['orthancApiService', function(orthancApiService) {
 return {
   scope: {
     wvInstanceId: '=',
@@ -17,7 +17,7 @@ return {
     wvAutoWindowing: '=?'
   },
   transclude: true,
-  templateUrl: 'scripts/directives/wv-viewport.tpl.html',
+  templateUrl: 'scripts/viewport/wv-viewport.tpl.html',
   restrict: 'E',
   replace: false,
   link: function postLink(scope, parentElement, attrs) {
@@ -76,7 +76,7 @@ return {
           }
   
           // load instance data
-          orthanc
+          orthancApiService
           .instance.getTags({id: _image.imageId})
           .$promise
           .then(function(tags) {

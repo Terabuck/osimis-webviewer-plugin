@@ -8,7 +8,7 @@
  * Service in the osimiswebviewerApp.
  */
 angular.module('osimiswebviewerApp')
-.factory('orthanc', ['$resource', '$cacheFactory', function($resource, $cacheFactory) {
+.factory('orthancApiService', ['$resource', '$cacheFactory', function($resource, $cacheFactory) {
     var _orthancApiUri = 'http://localhost:8042';
     var _webViewerApiUri = 'http://localhost:8042/web-viewer';
     var _compression = 'jpeg95';

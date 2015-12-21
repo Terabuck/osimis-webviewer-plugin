@@ -2,19 +2,19 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvViewportPlay
+ * @name osimiswebviewerApp.directive:wvStatePlay
  * @description
- * # wvViewportPlay
+ * # wvStatePlay
  */
 angular.module('osimiswebviewerApp')
-  .directive('wvViewportPlay', function () {
+  .directive('wvStatePlay', function () {
     return {
       scope: false,
       restrict: 'A',
       link: function postLink(scope, element, attrs) {
         var elementScope = angular.element(element).isolateScope();
 
-        scope.$watch(attrs.wvViewportPlay, function(activate) {
+        scope.$watch(attrs.wvStatePlay, function(activate) {
           if (activate == undefined) return;
 
           elementScope.$broadcast('play-command', {

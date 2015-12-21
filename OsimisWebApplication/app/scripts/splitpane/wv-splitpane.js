@@ -14,7 +14,7 @@ angular.module('osimiswebviewerApp')
         wvSettings: '=?'
       },
       // @todo add template path angular constant
-      templateUrl: 'scripts/directives/wv-splitpane.tpl.html',
+      templateUrl: 'scripts/splitpane/wv-splitpane.tpl.html',
       restrict: 'E',
       transclude: true,
       link: function postLink(scope, element, attrs) {

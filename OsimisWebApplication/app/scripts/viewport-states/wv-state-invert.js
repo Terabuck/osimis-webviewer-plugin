@@ -2,12 +2,12 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvViewportInvert
+ * @name osimiswebviewerApp.directive:wvStateInvert
  * @description
- * # wvViewportInvert
+ * # wvStateInvert
  */
 angular.module('osimiswebviewerApp')
-  .directive('wvViewportInvert', function () {
+  .directive('wvStateInvert', function () {
     return {
       scope: false,
       restrict: 'A',
@@ -15,14 +15,14 @@ angular.module('osimiswebviewerApp')
         var elementScope = angular.element(element).isolateScope();
       
         /*
-        var getter = $parse(attrs.wvViewportInvert);
+        var getter = $parse(attrs.wvStateInvert);
         var setter = getter.assign;
         
         var value = getter(scope);
         if (value === null || value == undefined) setter(scope, false);
         */
 
-        scope.$watch(attrs.wvViewportInvert, function(invert) {
+        scope.$watch(attrs.wvStateInvert, function(invert) {
           if (invert == undefined) return;
           elementScope.$broadcast('viewport-command', {
             execute: function(viewport) {

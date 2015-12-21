@@ -2,17 +2,17 @@
 
 /**
  * @ngdoc directive
- * @name osimiswebviewerApp.directive:wvSerieList
+ * @name osimiswebviewerApp.directive:wvSerielist
  * @description
- * # wvSerieList
+ * # wvSerielist
  */
 angular.module('osimiswebviewerApp')
-.directive('wvSerieList', ['orthanc', function(orthanc) {
+.directive('wvSerielist', ['orthancApiService', function(orthancApiService) {
 return {
   scope: {
     wvStudyId: '='
   },
-  templateUrl: 'scripts/directives/wv-serie-list.tpl.html',
+  templateUrl: 'scripts/serielist/wv-serielist.tpl.html',
   restrict: 'E',
   link: function postLink(scope, element, attrs) {
     // @todo make sure there is enough space left for the overlay bar in html
@@ -23,7 +23,7 @@ return {
     function _setStudy(wvStudyId, old) {
       if (wvStudyId == undefined) return; 
       
-      orthanc
+      orthancApiService
       .study.get({
         id: scope.wvStudyId
        })
