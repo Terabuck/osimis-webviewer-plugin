@@ -7,105 +7,79 @@
  * # wvViewport
  */
 angular.module('osimiswebviewerApp')
-.directive('wvViewport', ['orthancApiService', function(orthancApiService) {
+.directive('wvViewport', ['$q', 'orthancApiService', function($q, orthancApiService) {
 return {
   scope: {
-    wvInstanceId: '=',
+    wvInstance: '=?',
     wvWidth: '=?', // default: auto ( fit to max(parent.width,image.width) )
     wvHeight: '=?', // default: auto ( fit to width*(1/ratio) )
-    wvAutoResize: '=?', // resize on each image change - default: true
-    wvAutoWindowing: '=?'
   },
   transclude: true,
   templateUrl: 'scripts/viewport/wv-viewport.tpl.html',
   restrict: 'E',
   replace: false,
   link: function postLink(scope, parentElement, attrs) {
-      var _isLoaded = false;
-      
       var jqElement = parentElement.children().children();
       var domElement = jqElement[0];
-      var _image = null;
-      var _onWindowResize = null;
-
       cornerstone.enable(domElement);
+
+      var _image = null;
+      var _adaptWindowingOnNextChange = false;
+      var _adaptSizeOnNextChange = false;
+
+      scope.$on('viewport:SetInstance', function(evt, args) {
+        _adaptWindowingOnNextChange = args.adaptWindowing || false;
+        _adaptSizeOnNextChange = args.adaptSize || false;
+        scope.wvInstance = args.id;
+      });
       
-      if (scope.wvInstanceId !== null && scope.wvInstanceId != undefined) {
-        _displayImage(scope.wvInstanceId)
-      }
-      scope.$watch('wvInstanceId', _displayImage);
+      scope.$watch('wvInstance', function(instanceId) {
+        if (typeof instanceId === 'undefined' || instanceId === null) return;
 
-      scope.$watchGroup(['wvWidth', 'wvHeight'], _processResizeArgs);
-      _processResizeArgs([scope.wvWidth, scope.wvHeight], [undefined, undefined]);
+        var promise = $q.all({
+          image: cornerstone.loadAndCacheImage(instanceId),
+          tags: orthancApiService.instance.getTags({id: instanceId}).$promise
+        })
+        .then(function(args) {
+          var image = args.image;
+          var tags = args.tags;
 
-      if (scope.wvAutoResize === null || scope.wvAutoResize == undefined) { // @todo document that wvAutoResize concern recizing image **on scroll**
-        scope.wvAutoResize = true;
-      }
-      if (scope.wvAutoWindowing === null || scope.wvAutoWindowing == undefined) {
-        scope.wvAutoWindowing = true;
-      }
-
-      scope.$on('viewport-command', function(evt, strategy) {
-        var csViewport = cornerstone.getViewport(domElement);
-        if (!csViewport) return;
-      	csViewport = strategy.execute(csViewport);
-        cornerstone.setViewport(domElement, csViewport);
-        scope.$broadcast('viewport-data', csViewport); // @todo is this necessary ?
-      });
-
-      scope.$on('tool-command', function(evt, strategy) {
-        strategy.execute(domElement, cornerstoneTools);
-      });
-
-      function _displayImage(wvInstanceId, old) {
-        if (wvInstanceId == old) return;
-
-        if (wvInstanceId === null || wvInstanceId == undefined) {
-          return;
-        }
-
-        var imagePromise = cornerstone
-        .loadAndCacheImage(wvInstanceId)
-        .then(function(image) {
           _image = image;
 
           var csViewport = cornerstone.getViewport(domElement);
           cornerstone.displayImage(domElement, _image, csViewport);
-          if (scope.wvAutoResize == true) {
-            _processResizeArgs([scope.wvWidth, scope.wvHeight]);
-          }
   
-          // load instance data
-          orthancApiService
-          .instance.getTags({id: _image.imageId})
-          .$promise
-          .then(function(tags) {
+          if (_adaptWindowingOnNextChange) {
             var csViewport = cornerstone.getViewport(domElement);
-            if (scope.wvAutoWindowing == true) {
-              // @todo check if exists
-              csViewport.voi.windowCenter = tags.WindowCenter; // @todo once on first load
-              csViewport.voi.windowWidth = tags.WindowWidth;
-              cornerstone.setViewport(domElement, csViewport);
-            }
-
-            // @todo http://dicomiseasy.blogspot.be/2013/06/getting-oriented-using-image-plane.html
-            // var orientationValues = tags.ImageOrientationPatient.split('\\');
-            // var orientationVector1 = orientationValues.slice(0, 3);
-            // var orientationVector2 = orientationValues.slice(3);
-
-            scope.$broadcast('instance-data', tags);
-            scope.$broadcast('viewport-data', csViewport); // @todo is this necessary ?
-          });
-
-          if (!_isLoaded) {
-            _isLoaded = true;
+            csViewport.voi.windowCenter = tags.WindowCenter;
+            csViewport.voi.windowWidth = tags.WindowWidth;
+            cornerstone.setViewport(domElement, csViewport);
+            _adaptWindowingOnNextChange = false;
           }
 
-        });
-        
-        return imagePromise;
-      }
+          if (_adaptSizeOnNextChange) {
+            _processResizeArgs([scope.wvWidth, scope.wvHeight]);
+            _adaptSizeOnNextChange = false;
+          }
 
+          // @todo check http://dicomiseasy.blogspot.be/2013/06/getting-oriented-using-image-plane.html
+          // var orientationValues = tags.ImageOrientationPatient.split('\\');
+          // var orientationVector1 = orientationValues.slice(0, 3);
+          // var orientationVector2 = orientationValues.slice(3);
+          
+          // @note transmit informations to overlay
+          scope.$broadcast('viewport:InstanceChanged', tags); // @todo -> viewport:InstanceChanged
+          scope.$broadcast('viewport:ViewportChanged', csViewport); 
+        });
+
+      });
+
+      scope.$watchGroup(['wvWidth', 'wvHeight'], _processResizeArgs);
+      _processResizeArgs([scope.wvWidth, scope.wvHeight], [undefined, undefined]);
+
+      // @todo listen to tools & states plugins (don't forget to somehow plug viewportChanged event)
+
+      var _onWindowResize = null;
       function _processResizeArgs(newValues, old) {
         // reset window resizing event when resizing mode change
         if (_onWindowResize) {
@@ -165,6 +139,7 @@ return {
             width = parentContainer.width();
             height = parentContainer.height();
             _resize(width, height);
+            scope.$broadcast('viewport:ViewportChanged', csViewport);
           }, 10);
           $(window).on('resize', _onWindowResize);
           scope.$on('$destroy', function() {
@@ -202,8 +177,6 @@ return {
           csViewport.scale = 1.0;
           cornerstone.setViewport(domElement, csViewport);
         }
-        
-        scope.$broadcast('viewport-data', csViewport);
       }
   }
 };
