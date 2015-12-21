@@ -10,22 +10,22 @@ angular.module('osimiswebviewerApp')
 .directive('wvSerielist', ['orthancApiService', function(orthancApiService) {
 return {
   scope: {
-    wvStudyId: '='
+    wvStudy: '='
   },
   templateUrl: 'scripts/serielist/wv-serielist.tpl.html',
   restrict: 'E',
   link: function postLink(scope, element, attrs) {
     // @todo make sure there is enough space left for the overlay bar in html
     
-    scope.$watch('wvStudyId', _setStudy);
+    scope.$watch('wvStudy', _setStudy);
     scope.serieIds = []; // @todo allow user defined specific set
     
-    function _setStudy(wvStudyId, old) {
-      if (wvStudyId == undefined) return; 
+    function _setStudy(wvStudy, old) {
+      if (wvStudy == undefined) return; 
       
       orthancApiService
       .study.get({
-        id: scope.wvStudyId
+        id: scope.wvStudy
        })
       .$promise
       .then(function(study) {

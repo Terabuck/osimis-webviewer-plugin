@@ -3,11 +3,8 @@
   		ng-repeat="id in serieIds"
   		class="wv-serie-list-item"
 	>
-	    <wv-serie-viewport
+	    <wv-viewport wv-viewport-serie="id" wv-width="'150'" wv-height="'150'"
 	    	wv-viewport-draggable
-	    	wv-serie-id="id"
-	    	wv-width="'150'"
-	    	wv-height="'150'"
     	>
 		    <wv-overlay class="wv-serie-list-overlay">
 	        	{{$instance.SeriesDescription}}
