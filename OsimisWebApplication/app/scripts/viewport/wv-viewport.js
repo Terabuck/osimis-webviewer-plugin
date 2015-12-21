@@ -13,6 +13,7 @@ return {
     wvInstance: '=?',
     wvWidth: '=?', // default: auto ( fit to max(parent.width,image.width) )
     wvHeight: '=?', // default: auto ( fit to width*(1/ratio) )
+    wvEnableOverlay: '=?'
   },
   transclude: true,
   templateUrl: 'scripts/viewport/wv-viewport.tpl.html',
@@ -26,6 +27,8 @@ return {
       var _image = null;
       var _adaptWindowingOnNextChange = false;
       var _adaptSizeOnNextChange = false;
+
+      if (typeof scope.wvEnableOverlay === 'undefined') scope.wvEnableOverlay = true;
 
       scope.$on('viewport:SetInstance', function(evt, args) {
         _adaptWindowingOnNextChange = args.adaptWindowing || false;
