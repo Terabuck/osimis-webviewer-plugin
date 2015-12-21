@@ -15,7 +15,7 @@ angular.module('webviewer')
         wvModel: '=',
         wvIcon: '@',
       },
-      template: '<button type="button" ng-class="{btn: true, \'btn-sm\': true, \'btn-default\': true, active: wvModel}" ng-click="click()"><span ng-class="wvIcon"></span></button>',
+      template: '<button type="button" ng-class="{btn: true, \'btn-sm\': true, \'btn-default\': true, \'wv-button\': true, active: wvModel}" ng-click="click()"><span ng-class="wvIcon"></span></button>',
       restrict: 'E',
       link: function postLink(scope, element, attrs, ctrls) {
         var buttonCtrl = ctrls[0];

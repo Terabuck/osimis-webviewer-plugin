@@ -14,7 +14,7 @@ angular.module('webviewer')
       },
 
       template: '\
-        <button type="button" class="btn btn-sm btn-default" bs-select bs-options="item.value as item.label for item in items" ng-model="wvLayout" html="1" placeholder="<span class=&quot;fa fa-th-large&quot;></span>" icon-checkmark="fa fa-th-large">\
+        <button type="button" class="btn btn-sm btn-default wv-button" bs-select bs-options="item.value as item.label for item in items" ng-model="wvLayout" html="1" placeholder="<span class=&quot;fa fa-th-large&quot;></span>" icon-checkmark="fa fa-th-large">\
         </button>',
       restrict: 'E',
       link: function postLink(scope, element, attrs) {

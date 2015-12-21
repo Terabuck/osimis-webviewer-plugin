@@ -12,7 +12,7 @@ angular.module('webviewer')
       scope: {
       	wvEnable: '='
       },
-      template: '<button type="button" class="btn btn-sm btn-default" ng-model="wvEnable" bs-checkbox><span class="fa"></span></button>',
+      template: '<button type="button" class="btn btn-sm btn-default wv-button" ng-model="wvEnable" bs-checkbox><span class="fa"></span></button>',
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
         var iconElement = element.children().children();
