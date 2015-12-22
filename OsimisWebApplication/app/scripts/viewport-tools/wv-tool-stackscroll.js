@@ -26,7 +26,7 @@ return {
         lastX = e.pageX;
         lastY = e.pageY;
 
-        elementScope.$apply(function() {
+        elementScope.$apply(function() {
           if (mouseButton == 1 && deltaX > 0) {
             elementScope.wvInstanceIndex++;
 

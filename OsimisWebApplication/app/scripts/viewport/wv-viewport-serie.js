@@ -29,7 +29,7 @@ return {
       var SetSerieId;
       if (!attrs.wvViewportSerie) {
         var _isolatedSerieId = $parse(attrs.wvViewportSerie)(scope);
-        GetSerieId = function(scope) { return _isolatedSerieId; };
+        GetSerieId = function(scope) { return _isolatedSerieId; };
         SetSerieId = function(scope, val) { _isolatedSerieId = val; };
       }
       else {

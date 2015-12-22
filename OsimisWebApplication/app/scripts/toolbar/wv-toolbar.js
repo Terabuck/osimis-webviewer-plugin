@@ -49,7 +49,7 @@ angular.module('webviewer')
 
           $scope.activeButton = newActive;
 
-          if (newActive !== null) {
+          if (newActive !== null) {
             $timeout(function() {
               $scope.$broadcast('toolbar.activated', newActive);              
             });

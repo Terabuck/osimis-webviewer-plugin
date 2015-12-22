@@ -63,7 +63,7 @@ return {
         scope.$broadcast('viewport:ViewportChanged', viewport);
       });
 
-      scope.$on('viewport:ActivateTool', function(evt, args) {
+      scope.$on('viewport:ActivateTool', function(evt, args) {
         if (!_image) return;
         
         var name = args.tool;
@@ -110,7 +110,7 @@ return {
             _adaptWindowingOnNextChange = false;
           }
 
-          if (_adaptSizeOnNextChange) {
+          if (_adaptSizeOnNextChange) {
             _processResizeArgs([scope.wvWidth, scope.wvHeight]);
             _adaptSizeOnNextChange = false;
           }

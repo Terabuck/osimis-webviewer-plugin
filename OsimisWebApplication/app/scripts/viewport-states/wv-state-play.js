@@ -30,7 +30,7 @@ angular.module('webviewer')
           if (activate) {
             if (_interval) return;
 
-            _interval = $interval(function() {
+            _interval = $interval(function() {
               serieScope.$broadcast('serie:ShowNextInstance', {
                 restartWhenSerieEnd: true
               });

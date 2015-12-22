@@ -29,7 +29,7 @@ return {
       var mouseButton = e.which;
       
       $(document).mousemove(function(e) {
-        elementScope.$apply(function() {  // @todo necessary ?
+        elementScope.$apply(function() {  // @todo necessary ?
           var deltaX = e.pageX - lastX; 
           var deltaY = e.pageY - lastY;
           lastX = e.pageX;
