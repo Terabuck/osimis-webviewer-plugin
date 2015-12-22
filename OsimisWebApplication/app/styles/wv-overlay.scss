@@ -1,7 +1,6 @@
 .wv-overlay {
     position: absolute;
     
-
     top: 0;
     right: 0;
     bottom: 0;
@@ -52,15 +51,18 @@
     position: absolute;
     bottom:0;
     left:0;
-    height: 2px;
-    background-color: red;   
+    height: 4px;
+    background-color: red;
+    will-change: right;
+    transform-origin: 0% 50%;
 }
 
 .wv-overlay-scrollbar-text {
     position: absolute;
-    top:calc(-1em - 5px);
-    left: 0px;
+    bottom: calc(1em + 5px);
+    left: 5px;
     height: 1em;
     color: red;
     font-size: 0.8em;
+    font-family: helvetica;
 }

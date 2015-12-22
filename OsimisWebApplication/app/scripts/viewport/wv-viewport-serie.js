@@ -89,30 +89,30 @@ return {
       
       // Hamster = cross browser mousewheel library
       Hamster(element[0]).wheel(function(event, delta, deltaX, deltaY) {
-        if (deltaX < 0 && deltaX < deltaY
-         || deltaX > 0 && deltaX > deltaY
-        ) {
-          // @todo calibrate the required speed and accuracy for the enduser
-
-          if (deltaX > 0) {
-            _showNextInstance(false);
-            scope.$apply();
-          }
-          else if (deltaX < 0) {
-            _showPreviousInstance();
-            scope.$apply();
-          }
+        if (deltaX < 0 && deltaX < deltaY) {
+          scope.$apply(_showPreviousInstance);
 
           event.preventDefault();
         }
+        else if (deltaX > 0 && deltaX > deltaY) {
+          // @todo calibrate the required speed and accuracy for the enduser
+
+          scope.$apply(_showNextInstance);
+
+          event.preventDefault();
+        }
+        /*
         else if (deltaX < 0 && deltaX > deltaY
               || deltaX > 0 && deltaX < deltaY
         ) {
           // @note allow normal scrolling of the window in vertical
         }
+        */
       });
 
       function _showNextInstance(restartWhenSerieEnd) {
+        if (typeof restartWhenSerieEnd !== true) restartWhenSerieEnd = false;
+        
         _instanceIndex++;
 
         if (_instanceIndex >= _instanceIds.length) {

@@ -6,8 +6,10 @@
 	    <wv-viewport wv-viewport-serie="id" wv-width="'150'" wv-height="'150'"
 	    	wv-viewport-draggable
     	>
-		    <wv-overlay class="wv-serie-list-overlay">
-	        	{{$parent.$instance.SeriesDescription}}
+		    <wv-overlay>
+		    	<div class="wv-serie-list-overlay">
+	        		{{$parent.$instance.SeriesDescription}}
+	        	</div>
 		    </wv-overlay>
 	    </wv-serie-viewport>
   	</li>

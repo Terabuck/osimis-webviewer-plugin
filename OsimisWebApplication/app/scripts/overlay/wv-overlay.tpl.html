@@ -3,26 +3,22 @@
         {{$instance.PatientName}}<br/>
         {{$instance.PatientID}}
     </div>
-    <div class="wv-overlay-topright" ng-show="{{$instance.SeriesNumber !== undefined &amp;&amp; $instance.SeriesDescription !== undefined}} ">
+    <div class="wv-overlay-topright" ng-show="showTopRight">
         {{$instance.StudyDescription}}<br/>
         {{$instance.StudyDate}}<br/>
         #{{$instance.SeriesNumber}} - {{$instance.SeriesDescription}}<br/>
     </div>
-    <!-- @todo: doc commands -->
-    <!--
-    <div class="wv-overlay-bottomright">
-        zoom: {{$viewport.scale|number:2}}<br/>
-        ww/wc: {{$viewport.voi.windowWidth|number:0}}/{{$viewport.voi.windowCenter|number:0}}
+    
+    <div class="wv-overlay-bottomright" ng-show="showBottomRight">
+        zoom: {{$viewport.scale}}<br/>
+        ww/wc: {{$viewport.voi.windowWidth}}/{{$viewport.voi.windowCenter}}
     </div>
-    <div class="wv-overlay-bottomleft">
+    
+    <div class="wv-overlay-scrollbar-text">
         {{$instance.InstanceNumber}}<span ng-show="$serie">/{{$serie.InstanceCount}}</span><br/>
     </div>
-    -->
     <div class="wv-overlay-scrollbar" ng-style="{
-      width: nbWidth
+        right: scaleX
     }">
-      <div class="wv-overlay-scrollbar-text">
-        {{$instance.InstanceNumber}}<span ng-show="$serie">/{{$serie.InstanceCount}}</span><br/>
-      </div>
     </div>
 </div>

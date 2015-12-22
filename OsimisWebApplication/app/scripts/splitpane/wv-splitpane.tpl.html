@@ -12,6 +12,7 @@
             <wv-viewport wv-viewport-serie="randomSerieId" wv-width="'parent'" wv-height="'parent'"
                 wv-viewport-droppable
                 wv-viewport-mouse-events
+                wv-enable-overlay="wvSettings.hasOwnProperty('overlay') == false || wvSettings.overlay"
 
                 wv-tool-windowing="wvSettings.windowing"
                 wv-tool-zoom="wvSettings.zoom"
@@ -23,9 +24,7 @@
                 wv-tool-rectangleroi="wvSettings.rectangleroi"
                 wv-state-invert="wvSettings.invert"
                 wv-state-play="wvSettings.play"
-            >
-                <wv-overlay></wv-overlay>
-            </wv-serie-viewport>
+            ></wv-viewport>
         </div>
     </div>
 </div>

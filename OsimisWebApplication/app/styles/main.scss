@@ -22,7 +22,7 @@ wv-viewport { // make sure the element is sized when using with drag & drop
   display: inline-block;
 }
 wv-toolbar {
-  display: inline-block;
+  display: block;
 }
 
 @import "wv-overlay.scss";
@@ -37,21 +37,30 @@ wv-toolbar {
   border-radius: 0; 
   font-size: 1.5rem;height: 4rem;
 }
+.wv-studylist {
+  min-width: 100%;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 .wv-container {
   height: 100%;
+  overflow: hidden;
 }
 .wv-menu {
-  display: inline-block;
+  display: block;
   float: left;
   overflow-y: auto;
   overflow-x: hidden;
-  width: 200px;
   height: 100%;
+  text-align: center;
+  width: 200px;
 }
 
 .wv-main {
-  display: inline-block;
+  display: block;
+  float: left;
   height: 100%;
   width: calc(100% - 200px);
 }
@@ -60,12 +69,12 @@ wv-toolbar ~ wv-splitpane,
 wv-toolbar ~ wv-serie-viewport,
 wv-toolbar ~ .after-toolbar {
   display: block;
-  height: calc(100% - 30px);
-  margin-top: -5px;
+  height: calc(100% - 40px);
+  //margin-top: -5px;
 }
 
 .wv-toolbar {
-  height: 30px;
+  height: 40px;
   margin: 0;
   padding: 0px;
 }
@@ -93,7 +102,7 @@ wv-toolbar ~ .after-toolbar {
   bottom:0;
   left:0;
   right:0;
-  color: white;
+  color: #CCC;
   background-color: rgba(0,0,0,0.75);
   text-align: center;
   padding: 0.5em;

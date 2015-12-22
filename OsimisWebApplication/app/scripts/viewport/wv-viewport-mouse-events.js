@@ -22,7 +22,7 @@ return {
     // @todo wait for onloaded ?
 
     var elementScope = angular.element(parentElement).isolateScope(); // @todo DO THAT BETTER BOY!
-
+    
     jqElement.mousedown(function(e) {
       var lastX = e.pageX;
       var lastY = e.pageY;

@@ -33,7 +33,8 @@ angular.module('webviewer')
             x: 1,
             y: 1
           },
-          play: false
+          play: false,
+          overlay: true
         };
 
         this.set = function(name) {

@@ -20,7 +20,7 @@ return {
   restrict: 'E',
   replace: false,
   link: function postLink(scope, parentElement, attrs) {
-      var jqElement = parentElement.children().children();
+      var jqElement = parentElement.children('.wv-cornerstone-enabled-image');
       var domElement = jqElement[0];
       cornerstone.enable(domElement);
 
@@ -83,9 +83,9 @@ return {
 
           var viewport = cornerstone.getViewport(domElement);
           cornerstone.displayImage(domElement, _image, viewport);
+          viewport = cornerstone.getViewport(domElement);
   
           if (_adaptWindowingOnNextChange) {
-            var viewport = cornerstone.getViewport(domElement);
             viewport.voi.windowCenter = tags.WindowCenter;
             viewport.voi.windowWidth = tags.WindowWidth;
             cornerstone.setViewport(domElement, viewport);
@@ -103,8 +103,11 @@ return {
           // var orientationVector2 = orientationValues.slice(3);
           
           // @note transmit informations to overlay
-          if (firstLoading) scope.$emit('viewport:ViewportLoaded');
-          scope.$broadcast('viewport:InstanceChanged', tags); // @todo -> viewport:InstanceChanged
+          if (firstLoading) {
+            if (!_adaptSizeOnNextChange) _processResizeArgs([scope.wvWidth, scope.wvHeight]);
+            scope.$emit('viewport:ViewportLoaded');
+          }
+          scope.$broadcast('viewport:InstanceChanged', tags);
           scope.$broadcast('viewport:ViewportChanged', viewport); 
         });
 
