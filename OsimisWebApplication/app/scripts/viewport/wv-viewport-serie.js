@@ -7,7 +7,7 @@
  * # wvViewportSerie
  */
 angular.module('webviewer')
-.directive('wvViewportSerie', ['$parse', '$q', '$timeout', '$interval', 'orthancApiService', function($parse, $q, $timeout, $interval, orthancApiService) {
+.directive('wvViewportSerie', ['$parse', '$q', 'orthancApiService', function($parse, $q, orthancApiService) {
 return {
     scope: false,
     restrict: 'A',

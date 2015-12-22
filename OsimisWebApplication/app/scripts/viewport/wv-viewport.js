@@ -23,6 +23,24 @@ return {
       var jqElement = parentElement.children('.wv-cornerstone-enabled-image');
       var domElement = jqElement[0];
       cornerstone.enable(domElement);
+      
+      var _viewportChanged = 0;
+      jqElement.on('CornerstoneImageRendered', function(evt, args) { // args.viewport & args.renderTimeInMs
+        _viewportChanged++;
+        scope.$evalAsync(function() {}); // trigger a new digest if needed
+      });
+      scope.$watch(function() {
+        // this $watch is an important optimization to ensure
+        // the event isn't triggered multiple times by digest.
+        //
+        // @note It would be better to simply ensure only one call of cornerstone.setViewport is
+        // called by digest
+        return _viewportChanged;
+      }, function(_viewportChanged) {
+        if (!_viewportChanged) return; // discard initial events
+        var viewport = cornerstone.getViewport(domElement);
+        scope.$broadcast('viewport:ViewportChanged', viewport);
+      });
 
       var _image = null;
       var _adaptWindowingOnNextChange = false;
@@ -108,7 +126,6 @@ return {
             scope.$emit('viewport:ViewportLoaded');
           }
           scope.$broadcast('viewport:InstanceChanged', tags);
-          scope.$broadcast('viewport:ViewportChanged', viewport); 
         });
 
       });
@@ -178,7 +195,6 @@ return {
             width = parentContainer.width();
             height = parentContainer.height();
             var viewport = _resize(width, height);
-            if (viewport) scope.$broadcast('viewport:ViewportChanged', viewport);
           }, 10);
           $(window).on('resize', _onWindowResize);
           scope.$on('$destroy', function() {
