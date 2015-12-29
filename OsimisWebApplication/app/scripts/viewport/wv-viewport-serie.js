@@ -24,6 +24,8 @@ return {
 
       var _instanceIds = [];
       var _instanceIndex = 0;
+      var _tags = null;
+      var _instanceCount = null;
       
       var GetSerieId; // method taking a scope as the param
       var SetSerieId;
@@ -42,6 +44,9 @@ return {
         SetSerieId(scope, id);
       };
 
+      scope.$on('serie:GetSerieData', function(evt, fn) {
+        fn(_tags, _instanceCount);
+      });
       scope.$on('serie:SetSerie', function(evt, args) {
         ctrl.setSerie(args);
       });
@@ -74,6 +79,8 @@ return {
           
           _instanceIndex = 0;
           _instanceIds = instances.SlicesShort.reverse().map(function(v) { return v[0]; });
+          _tags = volume.MainDicomTags;
+          _instanceCount = _instanceIds.length;
 
           elementScope.$broadcast('viewport:SetInstance', {
             id: _instanceIds[_instanceIndex],
@@ -83,7 +90,7 @@ return {
           
           // @note transmit data to overlay
           if (firstLoad) scope.$emit('serie:SerieLoaded');
-          elementScope.$broadcast('serie:SerieChanged', volume.MainDicomTags, _instanceIds.length); // @todo rename serie:DataReceived
+          elementScope.$broadcast('serie:SerieChanged', _tags, _instanceCount);
         });
       });
       

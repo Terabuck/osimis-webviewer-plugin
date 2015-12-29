@@ -15,25 +15,20 @@ return {
   link: function postLink(scope, element, attrs) {
     scope.scrollbarDistanceFromRight = '0%';
 
-    scope.$on('viewport:InstanceChanged', function(evt, tags) {
-      requestAnimationFrame(function() {
-        if (!scope.$serie) return;
-        
-        var eq = Math.ceil(100 * scope.$instance.InstanceNumber / scope.$instanceCount);
-        scope.scrollbarDistanceFromRight = 100 - eq + '%';
-        scope.$digest();
-      });
+    scope.$watchGroup(['$instance.InstanceNumber', '$instanceCount'], _setScrollbarDimension);
+    scope.$evalAsync(function() {
+      _setScrollbarDimension();
     });
 
-    scope.$on('serie:SerieChanged', function(evt, tags, instanceCount) {
+    function _setScrollbarDimension() {
       requestAnimationFrame(function() {
-        if (!scope.$instance) return;
+        if (!scope.$instance || typeof scope.$instanceCount === 'undefined') return;
 
         var eq = Math.ceil(100 * scope.$instance.InstanceNumber / scope.$instanceCount);
         scope.scrollbarDistanceFromRight = 100 - eq + '%';
         scope.$digest();
       });
-    });
+    }
   }
 };
 });

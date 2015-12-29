@@ -43,17 +43,25 @@ return {
       });
 
       var _image = null;
+      var _tags = null;
       var _adaptWindowingOnNextChange = false;
       var _adaptSizeOnNextChange = false;
 
       if (typeof scope.wvEnableOverlay === 'undefined') scope.wvEnableOverlay = true;
 
+      scope.$on('viewport:GetInstanceData', function(evt, fn) {
+        fn(_tags);
+      });
       scope.$on('viewport:SetInstance', function(evt, args) {
         _adaptWindowingOnNextChange = args.adaptWindowing || false;
         _adaptSizeOnNextChange = args.adaptSize || false;
         scope.wvInstance = args.id;
       });
 
+      scope.$on('viewport:GetViewportData', function(evt, fn) {
+        var viewport = cornerstone.getViewport(domElement);
+        fn(viewport);
+      });
       scope.$on('viewport:SetViewport', function(evt, strategy) {
         var viewport = cornerstone.getViewport(domElement);
         if (!viewport) return;
@@ -98,6 +106,7 @@ return {
           
           var firstLoading = !_image ? true : false;
           _image = image;
+          _tags = tags;
 
           var viewport = cornerstone.getViewport(domElement);
           cornerstone.displayImage(domElement, _image, viewport);
