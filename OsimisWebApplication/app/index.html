@@ -5,6 +5,7 @@
     <title></title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
+    <base href="/web-viewer/app/index.html">
     
     <!-- build:css(.) styles/vendor.css -->
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
@@ -17,14 +18,24 @@
     <!-- endbuild -->
   </head>
   <body ng-app="webviewer">
-    <div ng-controller="MultiViewportDemo" class="wv-container">
-        <div class="wv-menu">
-            <wv-studylist wv-selected-study="studyId"></wv-studylist>
-            <wv-serielist wv-study="studyId"></wv-serielist>
-        </div>
-        <div class="wv-main">
-            <wv-toolbar wv-items="toolbar"></wv-toolbar>
-            <wv-splitpane wv-layout="toolbar.layout" wv-settings="toolbar"></wv-splitpane>
+    <div ng-controller="OsimisWebViewer" class="wv-container">
+        <wv-toolbar wv-items="toolbar"></wv-toolbar>
+        <div style="height: calc(100% - 40px)" wv-size-tag>
+            <wv-viewport wv-viewport-serie="serieId" wv-width="'tag'" wv-height="'tag'"
+                wv-viewport-mouse-events
+                wv-enable-overlay="toolbar.overlay"
+
+                wv-tool-windowing="toolbar.windowing"
+                wv-tool-zoom="toolbar.zoom"
+                wv-tool-pan="toolbar.pan"
+                wv-tool-lengthmeasure="toolbar.lengthmeasure"
+                wv-tool-anglemeasure="toolbar.anglemeasure"
+                wv-tool-pixelprobe="toolbar.pixelprobe"
+                wv-tool-ellipticalroi="toolbar.ellipticalroi"
+                wv-tool-rectangleroi="toolbar.rectangleroi"
+                wv-state-invert="toolbar.invert"
+                wv-state-play="toolbar.play"
+            ></wv-viewport>
         </div>
     </div>
 
@@ -82,10 +93,26 @@
 
     <script>
         angular.module('webviewer')
-        .controller('MultiViewportDemo', function($scope) {
-            $scope.toolbar = {};
-            $scope.studyId = '27f7126f-4f66fb14-03f4081b-f9341db2-53925988';
-        });
+        .config(function($locationProvider) {
+            $locationProvider.html5Mode(true);
+        })
+        .controller('OsimisWebViewer', function($scope, $location) {
+            $scope.toolbar = {
+                windowing: false,
+                zoom: false,
+                pan: false,
+                invert: false,
+                lengthmeasure: false,
+                anglemeasure: false,
+                pixelprobe: false,
+                ellipticalroi: false,
+                rectangleroi: false,
+                play: false,
+                overlay: true
+            };
+            $scope.serieId = $location.search().series;
+        })
+        ;
     </script>
 </body>
 </html>

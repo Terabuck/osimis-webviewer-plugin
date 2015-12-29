@@ -1,3 +1,12 @@
+Compile HTML Web Viewer (required for standalone build)
+=======================================================
+First, install npm (https://docs.npmjs.com/getting-started/installing-node)
+# npm install -g grunt
+# npm install -g bower
+# cd OsimisWebApplication
+# npm install
+# grunt build
+
 Generic Linux (static linking)
 ==============================
 

@@ -73,12 +73,12 @@ if (STANDALONE_BUILD)
     -DORTHANC_STANDALONE=1
     )
   set(EMBEDDED_RESOURCES
-    WEB_VIEWER  ${CMAKE_SOURCE_DIR}/WebApplication
+    WEB_VIEWER  ${CMAKE_SOURCE_DIR}/OsimisWebApplication/dist
     )
 else()
   add_definitions(
     -DORTHANC_STANDALONE=0
-    -DWEB_VIEWER_PATH="${CMAKE_SOURCE_DIR}/WebApplication/"
+    -DWEB_VIEWER_PATH="${CMAKE_SOURCE_DIR}/OsimisWebApplication/dist/"
     )
 endif()
 
