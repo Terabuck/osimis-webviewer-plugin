@@ -1,10 +1,16 @@
 <!doctype html>
 <html>
   <head>
+    <!-- build:css(.) styles/vendor.css -->
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css">
     <link rel="stylesheet" href="bower_components/cornerstone/dist/cornerstone.css">
+    <!-- endbuild -->
+
+    <!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild -->
+    <!-- build:js(.) scripts/vendor.js -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/cornerstone/dist/cornerstone.js"></script>
@@ -23,7 +29,9 @@
     <script src="bower_components/hammerjs/hammer.js"></script>
     <script src="bower_components/cornerstoneTools/dist/cornerstoneTools.js"></script>
     <script src="bower_components/ng-range-filter/src/ngRangeFilter.js"></script>
+    <!-- endbuild -->
 
+    <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="scripts/app.js"></script>
     <script src="scripts/orthanc/orthanc-api-service.js"></script>
     <script src="scripts/orthanc/orthanc-image-loader.js"></script>
@@ -52,6 +60,8 @@
     <script src="scripts/toolbar/wv-toolbar-multi-viewport-layout.js"></script>
     <script src="scripts/toolbar/wv-toolbar-play.js"></script>
     <script src="scripts/others/wv-studylist.js"></script>
+    <!-- endbuild -->
+    
     <style>
         html{
             text-align: center;
