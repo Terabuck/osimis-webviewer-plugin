@@ -109,7 +109,7 @@ while i < len(SOURCES):
                 continue
 
             for f in files:
-                if f.find('~') == -1 and f.find('.') == -1:  # Ignore Emacs backup files and OSX invisible files
+                if f.find('~', 0, 1) == -1 and f.find('.', 0, 1) == -1:  # Ignore Emacs backup files and OSX invisible files
                     if base == '.':
                         r = f
                     else:
