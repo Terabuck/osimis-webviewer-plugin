@@ -5,4 +5,6 @@ OsimisWebApplication/bower_components
 OsimisWebApplication/node_modules
 OsimisWebApplication/.sass-cache
 OsimisWebApplication/.tmp
+OsimisWebApplication/dist
+OsimisWebApplication/site
 Build
