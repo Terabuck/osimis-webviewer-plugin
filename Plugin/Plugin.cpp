@@ -269,7 +269,7 @@ static RETURN_TYPE ServeEmbeddedFolder(OrthancPluginRestOutput* output,
 
     return RETURN_SUCCESS;
   }
-  catch (std::runtime_error&)
+  catch (Orthanc::OrthancException& e)
   {
     std::string s = "Unknown static resource in plugin: " + std::string(request->groups[0]);
     OrthancPluginLogError(context_, s.c_str());
