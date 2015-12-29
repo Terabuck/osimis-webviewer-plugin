@@ -6,10 +6,10 @@
         <div
             ng-repeat="j in x | range track by $index"
         	class="wv-splitpane-cell" ng-style="{width: rowWidth}"
-        	wv-viewport-size
+        	wv-size-tag
         	ng-transclude
     	>
-            <wv-viewport wv-viewport-serie="randomSerieId" wv-width="'parent'" wv-height="'parent'"
+            <wv-viewport wv-viewport-serie="randomSerieId" wv-width="'tag'" wv-height="'tag'"
                 wv-viewport-droppable
                 wv-viewport-mouse-events
                 wv-enable-overlay="!wvSettings || wvSettings.hasOwnProperty('overlay') == false || wvSettings.overlay"

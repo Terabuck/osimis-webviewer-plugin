@@ -179,21 +179,21 @@ return {
           height = _image.height < maxHeight ? _image.height : maxHeight;
           width = Math.round(height * ratio);
         }
-        else if (wvWidth === 'parent' && wvHeight === 'parent') { // @todo allow to use only one parent and not both
-          var parentContainer = parentElement.closest('[wv-viewport-size]');
+        else if (wvWidth === 'tag' && wvHeight === 'tag') { // @todo allow to use only one parent and not both
+          var tagContainer = parentElement.closest('[wv-size-tag]');
 
-          if (!parentContainer.length) {
+          if (!tagContainer.length) {
             return;
           }
 
-          width = parentContainer.width();
-          height = parentContainer.height();
+          width = tagContainer.width();
+          height = tagContainer.height();
 
           // adapt size when window resizes
           _onWindowResize = _.debounce(function() {
-            // @note may induce bug if DOM structure changes before resizing (cf. parentContainer is cached)
-            width = parentContainer.width();
-            height = parentContainer.height();
+            // @note may induce bug if DOM structure changes before resizing (cf. tagContainer is cached)
+            width = tagContainer.width();
+            height = tagContainer.height();
             var viewport = _resize(width, height);
           }, 10);
           $(window).on('resize', _onWindowResize);
