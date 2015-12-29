@@ -27,7 +27,7 @@ angular.module('webviewer')
           if (activate) {
             elementScope.$broadcast('viewport:ActivateTool', {
               tool: 'pan',
-              arguments: [0b1 & 0b01] // left & middle mouse
+              arguments: [0x1 & 0x2] // left & middle mouse
             });
           }
           else {

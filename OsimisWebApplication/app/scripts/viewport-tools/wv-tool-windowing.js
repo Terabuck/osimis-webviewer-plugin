@@ -27,7 +27,7 @@ angular.module('webviewer')
           if (activate) {
             elementScope.$broadcast('viewport:ActivateTool', {
               tool: 'wwwc',
-              arguments: [0b1] // left mouse
+              arguments: [0x1] // left mouse
             });
           }
           else {
