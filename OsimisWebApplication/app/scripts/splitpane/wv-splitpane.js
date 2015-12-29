@@ -19,25 +19,27 @@ angular.module('webviewer')
       transclude: true,
       link: function postLink(scope, element, attrs) {
         if (scope.wvLayout == undefined) {
-          scope.wvLayout = {
+          scope.wvLayout = scope.wvSettings && scope.wvSettings.layout || {
             x: 1,
             y: 1
           }
         }
-        scope.x = [scope.wvLayout.x];
-        scope.y = [scope.wvLayout.y];
 
-        scope.rowHeight = 100 / scope.wvLayout.y + '%';
-        scope.rowWidth = 100 / scope.wvLayout.x + '%';
-        // scope.cellClasses = ['col-sm-' + 12/scope.wvLayout.x];
-        scope.$watch('wvLayout', function(wvLayout, old) {
-          scope.x = [wvLayout.x];
-          scope.y = [wvLayout.y];
-          scope.rowHeight = 100 / scope.wvLayout.y + '%';
-          scope.rowWidth = 100 / scope.wvLayout.x + '%';
+        _updateLayout(scope.wvLayout);
+        
+        scope.$watch('wvSettings.layout', _updateLayout, true);
+        scope.$watch('wvLayout', _updateLayout, true);
+
+        function _updateLayout(layout, old) {
+          if (!layout) return;
+          
+          scope.x = [layout.x];
+          scope.y = [layout.y];
+          scope.rowHeight = 100 / layout.y + '%';
+          scope.rowWidth = 100 / layout.x + '%';
 
           $(window).resize();
-        }, true);
+        }
       }
     };
   });
