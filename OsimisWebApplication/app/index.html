@@ -20,17 +20,14 @@
     <!-- endbuild -->
   </head>
   <body ng-app="webviewer">
-    <div
-        class="wv-container" 
-        ng-init="opts = {}; studyId = '27f7126f-4f66fb14-03f4081b-f9341db2-53925988'"
-    >
+    <div ng-controller="MultiViewportDemo" class="wv-container">
         <div class="wv-menu">
             <wv-studylist wv-selected-study="studyId"></wv-studylist>
-            <wv-serielist wv-study-id="studyId"></wv-serielist>
+            <wv-serielist wv-study="studyId"></wv-serielist>
         </div>
         <div class="wv-main">
-            <wv-toolbar wv-settings="opts"></wv-toolbar>
-            <wv-splitpane wv-layout="opts.layout" wv-settings="opts"></wv-splitpane>
+            <wv-toolbar wv-items="toolbar"></wv-toolbar>
+            <wv-splitpane wv-layout="toolbar.layout" wv-settings="toolbar"></wv-splitpane>
         </div>
     </div>
 
@@ -53,7 +50,7 @@
     <script src="bower_components/cornerstoneMath/dist/cornerstoneMath.js"></script>
     <script src="bower_components/hammerjs/hammer.js"></script>
     <script src="bower_components/cornerstoneTools/dist/cornerstoneTools.js"></script>
-    <script src="bower_components/ng-range-filter/index.js"></script>
+    <!-- <script src="bower_components/ng-range-filter/index.js"></script> -->
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -64,12 +61,13 @@
     <script src="scripts/orthanc/orthanc-api-service.js"></script>
     <script src="scripts/orthanc/orthanc-image-loader.js"></script>
     <script src="scripts/viewport/wv-viewport.js"></script>
-    <script src="scripts/viewport/wv-serie-viewport.js"></script>
+    <script src="scripts/viewport/wv-viewport-serie.js"></script>
     <script src="scripts/viewport/wv-viewport-mouse-events.js"></script>
-    <script src="scripts/overlay/wv-overlay.js"></script>
-    <script src="scripts/serielist/wv-serielist.js"></script>
     <script src="scripts/viewport/wv-viewport-draggable.js"></script>
     <script src="scripts/viewport/wv-viewport-droppable.js"></script>
+    <script src="scripts/overlay/wv-overlay.js"></script>
+    <script src="scripts/overlay/wv-overlay-scrollbar.js"></script>
+    <script src="scripts/serielist/wv-serielist.js"></script>
     <script src="scripts/viewport-states/wv-state-invert.js"></script>
     <script src="scripts/viewport-states/wv-state-play.js"></script>
     <script src="scripts/viewport-tools/wv-tool-lengthmeasure.js"></script>
@@ -87,7 +85,14 @@
     <script src="scripts/toolbar/wv-toolbar-multi-viewport-layout.js"></script>
     <script src="scripts/toolbar/wv-toolbar-play.js"></script>
     <script src="scripts/others/wv-studylist.js"></script>
-    <script src="scripts/directives/wv-overlay-scrollbar.js"></script>
     <!-- endbuild -->
+
+    <script>
+        angular.module('webviewer')
+        .controller('MultiViewportDemo', function($scope) {
+            $scope.toolbar = {};
+            $scope.studyId = '27f7126f-4f66fb14-03f4081b-f9341db2-53925988';
+        });
+    </script>
 </body>
 </html>
