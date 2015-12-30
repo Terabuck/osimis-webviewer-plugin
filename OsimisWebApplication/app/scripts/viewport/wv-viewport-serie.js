@@ -114,7 +114,7 @@ return {
       });
 
       function _showNextInstance(restartWhenSerieEnd) {
-        if (typeof restartWhenSerieEnd !== true) restartWhenSerieEnd = false;
+        if (restartWhenSerieEnd !== true) restartWhenSerieEnd = false;
         
         _instanceIndex++;
 
