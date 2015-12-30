@@ -33,10 +33,6 @@ module.exports = function (grunt) {
 
     // Watches files for changes and runs tasks based on the changed files
     watch: {
-      bower: {
-        files: ['bower.json'],
-        tasks: ['wiredep']
-      },
       js: {
         files: ['<%= yeoman.app %>/scripts/{,*/}*.js'],
         tasks: ['newer:jshint:all', 'newer:jscs:all'],
@@ -197,34 +193,6 @@ module.exports = function (grunt) {
         }]
       }
     },
-
-    // Automatically inject Bower components into the app
-    wiredep: {
-      app: {
-        src: ['<%= yeoman.app %>/index.html'],
-        ignorePath:  /\.\.\//
-      },
-      test: {
-        devDependencies: true,
-        src: '<%= karma.unit.configFile %>',
-        ignorePath:  /\.\.\//,
-        fileTypes:{
-          js: {
-            block: /(([\s\t]*)\/{2}\s*?bower:\s*?(\S*))(\n|\r|.)*?(\/{2}\s*endbower)/gi,
-              detect: {
-                js: /'(.*\.js)'/gi
-              },
-              replace: {
-                js: '\'{{filePath}}\','
-              }
-            }
-          }
-      },
-      sass: {
-        src: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
-        ignorePath: /(\.\.\/){1,2}bower_components\//
-      }
-    }, 
 
     // Compiles Sass to CSS and generates necessary files if requested
     compass: {
@@ -438,7 +406,6 @@ module.exports = function (grunt) {
 
     grunt.task.run([
       'clean:server',
-      'wiredep',
       'concurrent:server',
       'postcss:server',
       'connect:serve',
@@ -453,7 +420,6 @@ module.exports = function (grunt) {
 
   grunt.registerTask('test', [
     'clean:server',
-    'wiredep',
     'concurrent:test',
     'postcss',
     'connect:test',
@@ -462,7 +428,6 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', [
     'clean:dist',
-    'wiredep',
     'useminPrepare',
     'concurrent:dist',
     'postcss',

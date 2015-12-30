@@ -39,7 +39,7 @@ module.exports = function(config) {
       'bower_components/cornerstoneMath/dist/cornerstoneMath.js',
       'bower_components/hammerjs/hammer.js',
       'bower_components/cornerstoneTools/dist/cornerstoneTools.js',
-      'bower_components/ng-range-filter/index.js',
+      'bower_components/ng-range-filter/src/ngRangeFilter.js',
       'bower_components/angular-mocks/angular-mocks.js',
       // endbower
       "app/scripts/**/*.js",
