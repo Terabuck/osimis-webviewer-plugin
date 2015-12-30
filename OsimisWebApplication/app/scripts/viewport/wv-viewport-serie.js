@@ -18,10 +18,6 @@ return {
     link: function postLink(scope, element, attrs, ctrl) {
       var elementScope = angular.element(element).isolateScope(); // @todo require ctrl instead
       
-      // @todo auto resize
-      // @todo auto windowing
-      // @todo play command & stop on instance index update
-
       var _instanceIds = [];
       var _instanceIndex = 0;
       var _tags = null;
