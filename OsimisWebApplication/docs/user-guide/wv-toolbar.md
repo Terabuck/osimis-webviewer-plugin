@@ -27,7 +27,6 @@ __Note that the *ng-init="toolbar = {}"* is optional in this case. It is recomme
 ## Configure the toolbar
 
 > - (attr) wv-items: object
->       + windowing: boolean
 >       + zoom: boolean
 >       + pan: boolean
 >       + invert: boolean

@@ -25,7 +25,6 @@ A basic example showing the creation of a 2x2 splitpane.
 ## Configure the viewports
 
 > - (attr) wv-settings: object (__see the toolbar doc section__ or the wv-toolbar.js source file for more details)
->       + windowing: boolean
 >       + zoom: boolean
 >       + pan: boolean
 >       + invert: boolean

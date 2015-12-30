@@ -20,7 +20,6 @@ angular.module('webviewer')
       controller: ['$timeout', '$scope', function($timeout, $scope) {
         $scope.activeButton = null;
         if ($scope.wvItems == undefined || !_.size($scope.wvItems)) $scope.wvItems = {
-          windowing: false,
           zoom: false,
           pan: false,
           invert: false,

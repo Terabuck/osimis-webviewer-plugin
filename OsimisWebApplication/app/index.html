@@ -25,7 +25,6 @@
                 wv-viewport-mouse-events
                 wv-enable-overlay="toolbar.overlay"
 
-                wv-tool-windowing="toolbar.windowing"
                 wv-tool-zoom="toolbar.zoom"
                 wv-tool-pan="toolbar.pan"
                 wv-tool-lengthmeasure="toolbar.lengthmeasure"
@@ -79,7 +78,6 @@
     <script src="scripts/viewport-tools/wv-tool-pixelprobe.js"></script>
     <script src="scripts/viewport-tools/wv-tool-ellipticalroi.js"></script>
     <script src="scripts/viewport-tools/wv-tool-rectangleroi.js"></script>
-    <script src="scripts/viewport-tools/wv-tool-windowing.js"></script>
     <script src="scripts/viewport-tools/wv-tool-zoom.js"></script>
     <script src="scripts/viewport-tools/wv-tool-pan.js"></script>
     <script src="scripts/viewport-tools/wv-tool-stackscroll.js"></script>
@@ -98,7 +96,6 @@
         })
         .controller('OsimisWebViewer', function($scope, $location) {
             $scope.toolbar = {
-                windowing: false,
                 zoom: false,
                 pan: false,
                 invert: false,

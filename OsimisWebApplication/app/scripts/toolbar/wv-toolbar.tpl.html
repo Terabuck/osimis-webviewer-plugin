@@ -4,7 +4,6 @@
 		ng-transclude
 		ng-init="wvItems = wvItems || $parent.wvItems"
 	>
-	    <wv-toolbar-button wv-name="windowing" wv-model="wvItems.windowing" wv-icon="fa fa-sun-o" ng-if="wvItems.hasOwnProperty('windowing')"></wv-toolbar-button>
 	    <wv-toolbar-button wv-name="zoom" wv-model="wvItems.zoom" wv-icon="fa fa-search" ng-if="wvItems.hasOwnProperty('zoom')"></wv-toolbar-button>
 	    <wv-toolbar-button wv-name="pan" wv-model="wvItems.pan" wv-icon="fa fa-arrows" ng-if="wvItems.hasOwnProperty('pan')"></wv-toolbar-button>
 	    <!-- <wv-toolbar-button wv-name="stackscroll" wv-model="wvItems.stackscroll" wv-icon="fa fa-bars" ng-if="wvItems.hasOwnProperty('stackscroll')"></wv-toolbar-button> -->
