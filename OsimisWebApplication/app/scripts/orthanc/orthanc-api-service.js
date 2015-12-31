@@ -8,28 +8,25 @@
  * Service in the webviewer.
  */
 angular.module('webviewer')
-.factory('orthancApiService', ['$resource', '$cacheFactory', function($resource, $cacheFactory) {
-    var _orthancApiUri = 'http://localhost:8042';
-    var _webViewerApiUri = 'http://localhost:8042/web-viewer';
-    var _compression = 'jpeg95';
-  
-    var cache = $cacheFactory('orthanc');
+.factory('orthancApiService', ['$resource', '$cacheFactory', 'wvConfig', function($resource, $cacheFactory, wvConfig) { // refactor to wvApiService
+    var cache = $cacheFactory('osimis-webviewer');
 
     return {
-      serie: $resource(_orthancApiUri + '/series/:id', {
+      serie: $resource(wvConfig.orthancApiURL + '/series/:id', {
         id: '@id'
       }, {
         get: { method: 'GET', cache: cache },
         // ordered instances
-        listInstances: { method: 'GET', url: _orthancApiUri + '/series/:id/ordered-slices', cache: cache }
+        listInstances: { method: 'GET', url: wvConfig.orthancApiURL + '/series/:id/ordered-slices', cache: cache }
       }),
-      instance: $resource(_orthancApiUri + '/instances/:compression-:id', { // @todo cache ?
-        compression: 'jpeg95', 
+      instance: $resource(wvConfig.orthancApiURL + '/instances/:compression-:id', { // @todo cache ?
+        compression: wvConfig.defaultCompression, 
         id: '@id'
       }, {
-        getTags: { method: 'GET', url: _orthancApiUri + '/instances/:id/simplified-tags', cache: cache }
+        getTags: { method: 'GET', url: wvConfig.orthancApiURL + '/instances/:id/simplified-tags', cache: cache },
+        getImage: { method: 'GET', url: wvConfig.webviewerApiURL + '/instances/:compression-:id'}
       }),
-      study: $resource(_orthancApiUri + '/studies/:id', {
+      study: $resource(wvConfig.orthancApiURL + '/studies/:id', {
         id: '@id'
       })
     };

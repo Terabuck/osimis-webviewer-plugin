@@ -1,28 +1,28 @@
-(function (cornerstone) {
-  'use strict';
+'use strict';
 
-  // @todo: refactor
-  var compression = 'jpeg95';
-  var _orthancApiUri = 'http://localhost:8042';
-  var _webViewerApiUri = 'http://localhost:8042/web-viewer';
+angular.module('webviewer')
+.run(function(orthancApiService) {
 
-  function PrintRange(pixels)
-  {
-    var a = Infinity;
-    var b = -Infinity;
+  // register our imageLoader plugin with cornerstone
+  cornerstone.registerImageLoader('', function(instanceId) {
+    return orthancApiService
+    .instance.getImage({id: instanceId})
+    .$promise
+    .then(function(image) {
+      image.imageId = instanceId;
+      if (image.color)
+        image.render = cornerstone.renderColorImage;
+      else
+        image.render = cornerstone.renderGrayscaleImage;
 
-    for (var i = 0, length = pixels.length; i < length; i++) {
-      if (pixels[i] < a)
-        a = pixels[i];
-      if (pixels[i] > b)
-        b = pixels[i];
-    }    
+      // @todo check memory overhead of memoize
+      image.getPixelData = _.memoize(_getPixelData);
 
-    console.log(a + ' ' + b);
-  }
+      return image;
+    });
+  });
 
-  function ChangeDynamics(pixels, source1, target1, source2, target2)
-  {
+  function _changeDynamics(pixels, source1, target1, source2, target2) {
     var scale = (target2 - target1) / (source2 - source1);
     var offset = (target1) - scale * source1;
 
@@ -31,8 +31,28 @@
     }    
   }
 
+  // http://stackoverflow.com/a/11058858/881731
+  function _str2ab(str) {
+    var buf = new ArrayBuffer(str.length);
+    var pixels = new Uint8Array(buf);
+    for (var i = 0, strLen=str.length; i<strLen; i++) {
+      pixels[i] = str.charCodeAt(i);
+    }
+    return pixels;
+  }
 
-  function getPixelDataDeflate(image) {
+  function _getPixelData() {
+    switch (this.Orthanc.Compression) {
+      case 'Deflate':
+        return _getPixelDataDeflate(this);
+      case 'Jpeg':
+        return _getPixelDataJpeg(this);
+      default:
+        throw new Error('unknown compression');
+    }
+  }
+  
+  function _getPixelDataDeflate(image) {
     // Decompresses the base64 buffer that was compressed with Deflate
     var s = pako.inflate(window.atob(image.Orthanc.PixelData));
     var pixels = null;
@@ -62,20 +82,9 @@
     return pixels;
   }
 
-
-  // http://stackoverflow.com/a/11058858/881731
-  function str2ab(str) {
-    var buf = new ArrayBuffer(str.length);
-    var pixels = new Uint8Array(buf);
-    for (var i = 0, strLen=str.length; i<strLen; i++) {
-      pixels[i] = str.charCodeAt(i);
-    }
-    return pixels;
-  }
-
-  function getPixelDataJpeg(image) {
+  function _getPixelDataJpeg(image) {
     var jpegReader = new JpegImage();
-    var jpeg = str2ab(window.atob(image.Orthanc.PixelData));
+    var jpeg = _str2ab(window.atob(image.Orthanc.PixelData));
     jpegReader.parse(jpeg);
     var s = jpegReader.getData(image.width, image.height);
     var pixels = null;
@@ -100,58 +109,9 @@
       }
 
       if (image.Orthanc.Stretched) {
-        ChangeDynamics(pixels, 0, image.Orthanc.StretchLow, 255, image.Orthanc.StretchHigh);
+        _changeDynamics(pixels, 0, image.Orthanc.StretchLow, 255, image.Orthanc.StretchHigh);
       }
     }
 
     return pixels;
-  }
-  
-
-  function getOrthancImage(imageId) {
-    var result = null;
-
-    // @todo use angular orthanc service
-    // and refactor the whole image loader as application configuration
-    $.ajax({
-      type: 'GET',
-      url: _webViewerApiUri + '/instances/' + compression + '-' + imageId,
-      dataType: 'json',
-      cache: true,
-      async: false,
-      success: function(image) {
-        image.imageId = imageId;
-        if (image.color)
-          image.render = cornerstone.renderColorImage;
-        else
-          image.render = cornerstone.renderGrayscaleImage;
-
-        // @todo prototype
-        // @todo check memory overhead of memoize
-        image.getPixelData = _.memoize(function() {
-          if (image.Orthanc.Compression == 'Deflate')
-            return getPixelDataDeflate(this);
-
-          if (image.Orthanc.Compression == 'Jpeg')
-            return getPixelDataJpeg(this);
-
-          // Unknown compression
-          return null;
-        });
-
-        result = image;
-      },
-      error: function() {
-        return null;
-      }
-    });
-    
-    var deferred = $.Deferred();
-    deferred.resolve(result);
-    return deferred;
-  }
-
-  // register our imageLoader plugin with cornerstone
-  cornerstone.registerImageLoader('', getOrthancImage);
-
-}(cornerstone));
+  }});
