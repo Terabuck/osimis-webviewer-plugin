@@ -52,30 +52,50 @@ return {
       });
 
       var nextTimeout = null;
+      var playing = false;
       scope.$on('serie:Play', function(evt, args) {
-        // @note very approximative algorithm to automaticaly set speed
-        var mmPerSeconds = 25;
-        function processNextIteration() {
-          elementScope.$broadcast('viewport:GetInstanceData', function(tags) {
-            if (!tags) return;
-            
-            var size = +tags.SliceThickness + (+tags.SpacingBetweenSlices || 0); // @todo calculate SpacingBetweenSlices using positions and orientation...
-            var fps = mmPerSeconds / size;
-            var speed_ms = Math.round(1000 / fps);
+        if (playing) return;
+        playing = true;
 
+        var speed = args && args.speed;
+
+        if (speed) {
+          function processNextIteration1() {
             nextTimeout = $timeout(function() {
               _showNextInstance(true);
-              scope.$evalAsync(processNextIteration);
-            }, speed_ms);
-          });
+              if (playing)
+                scope.$evalAsync(processNextIteration1);
+            }, speed);
+          }
+          processNextIteration1();
         }
-        processNextIteration();
+        else {
+          // @note very approximative algorithm to automaticaly set speed
+          var mmPerSeconds = 25;
+          function processNextIteration2() {
+            elementScope.$broadcast('viewport:GetInstanceData', function(tags) {
+              if (!tags) return;
+
+              var size = +tags.SliceThickness + (+tags.SpacingBetweenSlices || 0); // @todo calculate SpacingBetweenSlices using positions and orientation...
+              var fps = mmPerSeconds / size;
+              speed = Math.round(1000 / fps);
+
+              nextTimeout = $timeout(function() {
+                _showNextInstance(true);
+                if (playing)
+                  scope.$evalAsync(processNextIteration2);
+              }, speed);
+            });
+          }
+          processNextIteration2();
+        }
       });
       scope.$on('serie:Pause', function(evt, args) {
         if (nextTimeout) {
           $timeout.cancel(nextTimeout);
           nextTimeout = null;
         }
+        playing = false;
       });
 
       scope.$watch(GetSerieId, function(serieId, old) {
