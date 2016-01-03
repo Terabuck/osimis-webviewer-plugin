@@ -16,7 +16,7 @@ angular
   var defaultPath = _getScriptServerURL();
   var _config = {
     orthancApiURL: defaultPath,
-    webviewerApiURL: defaultPath,
+    webviewerApiURL: defaultPath + '/web-viewer',
     defaultCompression: 'jpeg95'
   };
 

@@ -19,7 +19,7 @@ angular.module('webviewer')
         // ordered instances
         listInstances: { method: 'GET', url: wvConfig.orthancApiURL + '/series/:id/ordered-slices', cache: cache }
       }),
-      instance: $resource(wvConfig.orthancApiURL + '/instances/:compression-:id', { // @todo cache ?
+      instance: $resource(wvConfig.webviewerApiURL + '/instances/:compression-:id', { // @todo cache ?
         compression: wvConfig.defaultCompression, 
         id: '@id'
       }, {
