@@ -78,7 +78,7 @@ if (STANDALONE_BUILD)
 else()
   add_definitions(
     -DORTHANC_STANDALONE=0
-    -DWEB_VIEWER_PATH="${CMAKE_SOURCE_DIR}/WebApplication/"
+    -DWEB_VIEWER_PATH="${CMAKE_SOURCE_DIR}/OsimisWebApplication/"
     )
 endif()
 
