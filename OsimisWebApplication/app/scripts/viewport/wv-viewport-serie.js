@@ -7,7 +7,7 @@
  * # wvViewportSerie
  */
 angular.module('webviewer')
-.directive('wvViewportSerie', ['$parse', '$q', 'orthancApiService', function($parse, $q, orthancApiService) {
+.directive('wvViewportSerie', ['$timeout', '$parse', '$q', 'orthancApiService', function($timeout, $parse, $q, orthancApiService) {
 return {
     scope: false,
     restrict: 'A',
@@ -51,6 +51,33 @@ return {
         _showNextInstance(restartWhenSerieEnd);
       });
 
+      var nextTimeout = null;
+      scope.$on('serie:Play', function(evt, args) {
+        // @note very approximative algorithm to automaticaly set speed
+        var mmPerSeconds = 25;
+        function processNextIteration() {
+          elementScope.$broadcast('viewport:GetInstanceData', function(tags) {
+            if (!tags) return;
+            
+            var size = +tags.SliceThickness + (+tags.SpacingBetweenSlices || 0); // @todo calculate SpacingBetweenSlices using positions and orientation...
+            var fps = mmPerSeconds / size;
+            var speed_ms = Math.round(1000 / fps);
+
+            nextTimeout = $timeout(function() {
+              _showNextInstance(true);
+              scope.$evalAsync(processNextIteration);
+            }, speed_ms);
+          });
+        }
+        processNextIteration();
+      });
+      scope.$on('serie:Pause', function(evt, args) {
+        if (nextTimeout) {
+          $timeout.cancel(nextTimeout);
+          nextTimeout = null;
+        }
+      });
+
       scope.$watch(GetSerieId, function(serieId, old) {
         if (!serieId) return; // @todo hide viewport ?
 
@@ -84,8 +111,9 @@ return {
             adaptSize: true
           });
           
-          // @note transmit data to overlay
           if (firstLoad) scope.$emit('serie:SerieLoaded');
+
+          // @note transmit data to overlay
           elementScope.$broadcast('serie:SerieChanged', _tags, _instanceCount);
         });
       });
