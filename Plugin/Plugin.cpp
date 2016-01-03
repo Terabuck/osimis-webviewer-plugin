@@ -226,20 +226,38 @@ static int32_t ServeWebViewer(OrthancPluginRestOutput* output,
     return 0;
   }
 
-  const std::string path = std::string(WEB_VIEWER_PATH) + std::string(request->groups[0]);
+  std::string path = std::string(WEB_VIEWER_PATH);
+  if (boost::filesystem::exists(path + ".tmp/" + request->groups[0])) {
+    path += std::string(".tmp/") + request->groups[0];
+  }
+  else if (boost::filesystem::exists(path + "app/" + request->groups[0])) {
+    path += std::string("app/") + request->groups[0];
+  }
+  else if (std::string(request->groups[0]).find("bower_components/") == 0 && boost::filesystem::exists(path + request->groups[0])) {
+    path += request->groups[0];
+  }
+  else {
+    std::string s = "Inexistent file in served folder: " + path;
+    OrthancPluginLogError(context_, s.c_str());
+    OrthancPluginSendHttpStatusCode(context_, output, 404);
+    return RETURN_SUCCESS;
+  }
+
   const char* mime = OrthancPlugins::GetMimeType(path);
   
   std::string s;
   try {
     Orthanc::Toolbox::ReadFile(s, path);
+    const char* resource = s.size() ? s.c_str() : NULL;
+    OrthancPluginAnswerBuffer(context_, output, resource, s.size(), mime);
+    return RETURN_SUCCESS;
   }
   catch (Orthanc::OrthancException&) {
-    std::string s = "Inexistent file in served folder: " + path;
+    std::string s = "Unknown error when serving path: " + path;
     OrthancPluginLogError(context_, s.c_str());
-    OrthancPluginSendHttpStatusCode(context_, output, 404);
+    OrthancPluginSendHttpStatusCode(context_, output, 500);
+    return RETURN_SUCCESS;
   }
-  
-  return 0;
 }
 #endif
 
