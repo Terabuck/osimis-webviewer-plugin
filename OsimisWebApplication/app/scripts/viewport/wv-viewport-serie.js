@@ -140,6 +140,26 @@ return {
 
           // @note transmit data to overlay
           elementScope.$broadcast('serie:SerieChanged', _tags, _instanceCount);
+
+          // @note preload every instance images.
+          // @todo refactor
+          $timeout(function() {
+            // wait 250ms that main image is shown
+            (function _preloadImage(index) {
+              if (index + 1 > _instanceCount) return;
+
+              var id = _instanceIds[index];
+
+              cornerstone
+              .loadAndCacheImage(id)
+              .then(function() {
+                // load tags once image loaded
+                orthancApiService.instance.getTags({id: id});
+                // load next image
+                _preloadImage(index + 1);
+              });
+            })(0);
+          }, 1000);
         });
       });
       
