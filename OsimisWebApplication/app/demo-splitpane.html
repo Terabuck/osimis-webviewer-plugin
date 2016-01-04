@@ -40,6 +40,7 @@
     <script src="scripts/viewport/wv-viewport-mouse-events.js"></script>
     <script src="scripts/viewport/wv-viewport-draggable.js"></script>
     <script src="scripts/viewport/wv-viewport-droppable.js"></script>
+    <script src="scripts/viewport/wv-scroll-on-wheel.js"></script>
     <script src="scripts/viewport/wv-scroll-on-over.js"></script>
     <script src="scripts/overlay/wv-overlay.js"></script>
     <script src="scripts/overlay/wv-overlay-scrollbar.js"></script>
@@ -108,7 +109,7 @@
     }">
         <wv-splitpane wv-layout="{x: 2, y: 1}">
             <wv-viewport wv-viewport-serie="series[$parent.$x]" wv-width="'tag'" wv-height="'tag'"
-                wv-viewport-mouse-events
+                wv-viewport-mouse-events wv-scroll-on-wheel="true"
                 wv-enable-overlay="$parent.$x != 0"
             ></wv-viewport>
         </wv-splitpane>

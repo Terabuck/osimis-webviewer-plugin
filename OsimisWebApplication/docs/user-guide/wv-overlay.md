@@ -83,7 +83,7 @@ Web Viewer Components use angular events to broadcast their informations to the 
 
 ```html
 <!-- usefull costumized overlay -->
-<wv-viewport wv-width="width" wv-height="height" wv-viewport-serie="serieId" wv-viewport-mouse-events>
+<wv-viewport wv-width="width" wv-height="height" wv-viewport-serie="serieId" wv-viewport-mouse-events wv-scroll-on-wheel="true">
     <style>
     #bottomright2 {
         position: absolute;
@@ -112,7 +112,7 @@ Web Viewer Components use angular events to broadcast their informations to the 
 </wv-viewport>
 
 <!-- Note: the viewport default overlay can be shown this way as well -->
-<wv-viewport wv-width="width" wv-height="height" wv-viewport-serie="serieId">
+<wv-viewport wv-width="width" wv-height="height" wv-viewport-serie="serieId" wv-scroll-on-wheel="true">
     <wv-overlay></wv-overlay>
 </wv-viewport>
 ```

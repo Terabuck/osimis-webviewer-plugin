@@ -56,7 +56,7 @@ The following example show how to disable the drag & drop and to use the specifi
 }">
     <wv-splitpane wv-layout="{x: 2, y: 1}">
         <wv-viewport wv-viewport-serie="series[$parent.$x]" wv-width="'tag'" wv-height="'tag'"
-            wv-viewport-mouse-events
+            wv-viewport-mouse-events wv-scroll-on-wheel="true"
             wv-enable-overlay="$parent.$x != 0"
         ></wv-viewport>
     </wv-splitpane>

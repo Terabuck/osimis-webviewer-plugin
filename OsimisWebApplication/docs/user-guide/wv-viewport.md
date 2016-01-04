@@ -106,19 +106,20 @@ The viewport can obtain the following basic controls when **wv-viewport-mouse-ev
 ## Scroll through a serie
 
 > - (attr) wv-viewport-serie: string (id)
+> - (attr) wv-scroll-on-wheel: boolean (enabled)
 
-**wv-viewport-serie** enable to scroll through a serie's instances using the mouse horizontal scrolling.
+**wv-viewport-serie** enable to scroll through a serie's instances using the mouse horizontal scrolling with the **wv-scroll-on-wheel** attribute set to true.
 
 _Note: the **wv-instance** parameter is no longer needed._
 
 ```html
-<wv-viewport wv-viewport-serie="id"></wv-viewport>
+<wv-viewport wv-viewport-serie="id" wv-scroll-on-wheel="true"></wv-viewport>
 ```
 
 Standard controls can be used as well.
 
 ```html
-<wv-viewport wv-viewport-serie="id" wv-viewport-mouse-events></wv-viewport>
+<wv-viewport wv-viewport-serie="id" wv-viewport-mouse-events wv-scroll-on-wheel="true"></wv-viewport>
 ```
 
 _Notice **wv-viewport-serie** isn't written using the same nomenclature as **wv-instance**. Unlike **wv-instance**, **wv-viewport-serie** is not a **wv-viewport** parameter but rather an extension of **wv-viewport**._

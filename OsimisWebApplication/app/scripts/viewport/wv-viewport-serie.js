@@ -39,6 +39,8 @@ return {
         var id = args.id;
         SetSerieId(scope, id);
       };
+      ctrl.showNextInstance = _showNextInstance;
+      ctrl.showPreviousInstance = _showPreviousInstance;
 
       scope.$on('serie:GetSerieData', function(evt, fn) {
         fn(_tags, _instanceCount);
@@ -49,6 +51,9 @@ return {
       scope.$on('serie:ShowNextInstance', function(evt, args) {
         var restartWhenSerieEnd = args.restartWhenSerieEnd;
         _showNextInstance(restartWhenSerieEnd);
+      });
+      scope.$on('serie:ShowPreviousInstance', function(evt, args) {
+        _showPreviousInstance();
       });
 
       var nextTimeout = null;
@@ -138,29 +143,6 @@ return {
         });
       });
       
-      // Hamster = cross browser mousewheel library
-      Hamster(element[0]).wheel(function(event, delta, deltaX, deltaY) {
-        if (deltaX < 0 && deltaX < deltaY) {
-          scope.$apply(_showPreviousInstance);
-
-          event.preventDefault();
-        }
-        else if (deltaX > 0 && deltaX > deltaY) {
-          // @todo calibrate the required speed and accuracy for the enduser
-
-          scope.$apply(_showNextInstance);
-
-          event.preventDefault();
-        }
-        /*
-        else if (deltaX < 0 && deltaX > deltaY
-              || deltaX > 0 && deltaX < deltaY
-        ) {
-          // @note allow normal scrolling of the window in vertical
-        }
-        */
-      });
-
       function _showNextInstance(restartWhenSerieEnd) {
         if (restartWhenSerieEnd !== true) restartWhenSerieEnd = false;
         

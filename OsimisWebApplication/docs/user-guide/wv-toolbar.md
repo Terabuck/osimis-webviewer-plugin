@@ -79,7 +79,7 @@ enableOverlay = true;
         <button ng-click="enableOverlay = !enableOverlay" style="height: 40px; margin: 0;">toggle last overlay</button>
         <wv-splitpane wv-layout="layout" style="height: calc(100% - 40px); display:block;">
             <wv-viewport wv-viewport-serie wv-width="'tag'" wv-height="'tag'"
-                wv-viewport-mouse-events wv-viewport-droppable
+                wv-viewport-mouse-events wv-scroll-on-wheel="true" wv-viewport-droppable
                 wv-enable-overlay="($parent.$y == layout.y - 1 &amp;&amp; $parent.$x == layout.x - 1) ? enableOverlay : true"
             ></wv-viewport>
         </wv-splitpane>

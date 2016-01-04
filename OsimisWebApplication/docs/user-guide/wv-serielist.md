@@ -30,7 +30,7 @@ _The **wv-serielist** lists **wv-viewport** with **wv-viewport-draggable** attri
     </div>
     <div class="wv-main" style="background-color: orange" wv-size-tag>
         <wv-viewport wv-width="'tag'" wv-height="'tag'" 
-            wv-viewport-serie wv-viewport-droppable
+            wv-viewport-serie wv-scroll-on-wheel="true" wv-viewport-droppable
         ></wv-viewport>
     </div>
 </div>

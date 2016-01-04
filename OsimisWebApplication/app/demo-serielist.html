@@ -40,6 +40,7 @@
     <script src="scripts/viewport/wv-viewport-mouse-events.js"></script>
     <script src="scripts/viewport/wv-viewport-draggable.js"></script>
     <script src="scripts/viewport/wv-viewport-droppable.js"></script>
+    <script src="scripts/viewport/wv-scroll-on-wheel.js"></script>
     <script src="scripts/viewport/wv-scroll-on-over.js"></script>
     <script src="scripts/overlay/wv-overlay.js"></script>
     <script src="scripts/overlay/wv-overlay-scrollbar.js"></script>
@@ -90,7 +91,7 @@
 <body ng-app="webviewer" ng-controller="DemoSerielist">
     
     <!-- show a standard serielist -->
-    <wv-serielist wv-study="studyId"></wv-serielist>
+    <wv-serielist wv-study="studyId" wv-scroll-on-wheel="true"></wv-serielist>
 
     <hr />
 
@@ -101,7 +102,7 @@
         </div>
         <div class="wv-main" style="background-color: orange" wv-size-tag>
             <wv-viewport wv-width="'tag'" wv-height="'tag'" 
-                wv-viewport-serie wv-viewport-droppable
+                wv-viewport-serie wv-scroll-on-wheel="true" wv-viewport-droppable
             ></wv-viewport>
         </div>
     </div>
