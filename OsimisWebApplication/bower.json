@@ -1,6 +1,70 @@
 {
-  "name": "osimiswebviewer",
-  "version": "0.0.0",
+  "name": "osimis-webviewer",
+  "description": "Orthanc & component based viewer",
+  "version": "0.1.0",
+  "main": [
+    "app/app.js"
+    "app/orthanc/orthanc-api-service.js"
+    "app/orthanc/orthanc-image-loader.js"
+    "app/others/wv-studylist.js"
+    "app/overlay/wv-overlay-scrollbar.js"
+    "app/overlay/wv-overlay-scrollbar.tpl.html"
+    "app/overlay/wv-overlay.js"
+    "app/overlay/wv-overlay.tpl.html"
+    "app/serielist/wv-serielist.js"
+    "app/serielist/wv-serielist.tpl.html"
+    "app/splitpane/wv-splitpane.js"
+    "app/splitpane/wv-splitpane.tpl.html"
+    "app/toolbar/wv-toolbar-button.js"
+    "app/toolbar/wv-toolbar-multi-viewport-layout.js"
+    "app/toolbar/wv-toolbar-play.js"
+    "app/toolbar/wv-toolbar.js"
+    "app/toolbar/wv-toolbar.tpl.html"
+    "app/viewport/wv-scroll-on-over.js"
+    "app/viewport/wv-scroll-on-wheel.js"
+    "app/viewport/wv-viewport-draggable.js"
+    "app/viewport/wv-viewport-droppable.js"
+    "app/viewport/wv-viewport-mouse-events.js"
+    "app/viewport/wv-viewport-serie.js"
+    "app/viewport/wv-viewport.js"
+    "app/viewport/wv-viewport.tpl.html"
+    "app/viewport-states/wv-state-invert.js"
+    "app/viewport-states/wv-state-play.js"
+    "app/viewport-tools/wv-tool-anglemeasure.js"
+    "app/viewport-tools/wv-tool-ellipticalroi.js"
+    "app/viewport-tools/wv-tool-lengthmeasure.js"
+    "app/viewport-tools/wv-tool-pan.js"
+    "app/viewport-tools/wv-tool-pixelprobe.js"
+    "app/viewport-tools/wv-tool-rectangleroi.js"
+    "app/viewport-tools/wv-tool-stackscroll.js"
+    "app/viewport-tools/wv-tool-zoom.js"
+  ],
+  "moduleType": [
+    "globals"
+  ],
+  "authors": [
+    "Osimis"
+  ],
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "dist",
+    "docs",
+    "Gruntfile.js",
+    "mkdocs.yml",
+    "node_modules",
+    "npm-debug.log",
+    "OrthancStorage",
+    "package.json",
+    "README.md",
+    "site"
+    "test"
+  ],
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/osimis/osimis-webviewer.git"
+  },
   "dependencies": {
     "angular": "1.5.0-rc.0",
     "angular-resource": "1.5.0-rc.0",
