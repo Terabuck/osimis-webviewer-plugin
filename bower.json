@@ -1,7 +1,7 @@
 {
   "name": "osimis-webviewer",
   "description": "Orthanc & component based viewer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": [
     "dist/webviewer.components.js",
     "dist/webviewer.components.css"
@@ -16,13 +16,22 @@
     "**/.*",
     "app",
     "bower_components",
+    "dist/scripts/vendor.js",
+    "dist/styles/vendor.css",
     "node_modules",
     ".gitignore",
     "Gruntfile.js",
     "mkdocs.yml",
     "npm-debug.log",
     "package.json",
-    "README.md"
+    "README.md",
+    "demo-overlay.html",
+    "demo-serielist.html",
+    "demo-splitpane.html",
+    "demo-toolbar.html",
+    "demo.html",
+    "index.html",
+    "robot.txt"
   ],
   "private": false,
   "repository": {
