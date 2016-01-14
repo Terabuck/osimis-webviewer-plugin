@@ -10,7 +10,8 @@ angular.module('webviewer')
 .directive('wvSerielist', ['orthancApiService', function(orthancApiService) {
 return {
   scope: {
-    wvStudy: '='
+    wvStudy: '=',
+    wvCssClassPrefix: '@?'
   },
   templateUrl: 'scripts/serielist/wv-serielist.tpl.html',
   restrict: 'E',
@@ -19,6 +20,7 @@ return {
     
     scope.$watch('wvStudy', _setStudy);
     scope.serieIds = []; // @todo allow user defined specific set
+    scope.wvCssClassPrefix = scope.wvCssClassPrefix || 'wv-serielist-';
     
     function _setStudy(wvStudy, old) {
       if (wvStudy == undefined) return; 

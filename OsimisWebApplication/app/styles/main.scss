@@ -26,6 +26,7 @@ wv-toolbar {
 }
 
 @import "wv-overlay.scss";
+@import "wv-serielist.scss";
 
 .wv-button {
   background-color: black; 
@@ -85,27 +86,6 @@ wv-toolbar ~ .after-toolbar {
   display: inline-block;
   float: left;
   height: 100%;
-}
-
-.wv-serie-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.wv-serie-list-item {
-  padding: 0;
-  text-align: center;
-}
-.wv-serie-list-overlay {
-  position: absolute;
-  bottom:0;
-  left:0;
-  right:0;
-  color: #CCC;
-  background-color: rgba(0,0,0,0.75);
-  text-align: center;
-  padding: 0.5em;
 }
 
 .wv-draggable-clone {

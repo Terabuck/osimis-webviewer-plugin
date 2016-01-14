@@ -1,13 +1,13 @@
-<ul class="wv-serie-list">
+<ul class="{{wvCssClassPrefix}}list">
   	<li
   		ng-repeat="id in serieIds"
-  		class="wv-serie-list-item"
+  		class="{{wvCssClassPrefix}}item"
 	>
 	    <wv-viewport wv-viewport-serie="id" wv-width="'150'" wv-height="'150'"
 	    	wv-viewport-draggable wv-scroll-on-over="true"
     	>
 		    <wv-overlay>
-		    	<div class="wv-serie-list-overlay">
+		    	<div class="{{$parent.wvCssClassPrefix}}overlay">
 	        		{{$instance.SeriesDescription}}
 	        	</div>
 		    </wv-overlay>
