@@ -125,6 +125,16 @@ module.exports = function (grunt) {
           ]
         }]
       },
+      distDebug: {
+        files: [{
+          dot: true,
+          src: [
+            '.tmp',
+            'dist-debug/{,*/}*',
+            '!dist-debug/.git{,*/}*'
+          ]
+        }]
+      },
       server: '.tmp'
     },
 
@@ -176,6 +186,11 @@ module.exports = function (grunt) {
       dist: {
         options: {
           generatedImagesDir: '<%= yeoman.dist %>/images/generated'
+        }
+      },
+      distDebug: {
+        options: {
+          generatedImagesDir: 'dist-debug/images/generated'
         }
       },
       server: {
@@ -335,6 +350,28 @@ module.exports = function (grunt) {
         cwd: '<%= yeoman.app %>/styles',
         dest: '.tmp/styles/',
         src: '{,*/}*.css'
+      },
+      distDebug: {
+        files: [{
+          expand: true,
+          dot: true,
+          cwd: '<%= yeoman.app %>',
+          dest: 'dist-debug',
+          src: [
+            'scripts/{,*/}*.*',
+            'images/{,*/}*.{webp}',
+            'fonts/{,*/}*.*'
+          ]
+        }, {
+          expand: true,
+          cwd: '.tmp/',
+          dest: 'dist-debug/',
+          src: ['{,*/}*.*']
+        }, {
+          expand: true,
+          cwd: 'bower_components/',
+          dest: 'dist-debug/bower_components/'
+        }]
       }
     },
 
@@ -348,6 +385,9 @@ module.exports = function (grunt) {
       ],
       dist: [
         'compass:dist'
+      ],
+      distDebug: [
+        'compass:distDebug'
       ]
     },
 
@@ -403,6 +443,16 @@ module.exports = function (grunt) {
     'filerev',
     'usemin',
     'htmlmin'
+  ]);
+
+  grunt.registerTask('build-debug', [
+    'clean:distDebug',
+    'useminPrepare',
+    'concurrent:distDebug',
+    'postcss',
+    'ngtemplates',
+    'ngAnnotate',
+    'copy:distDebug',
   ]);
 
   grunt.registerTask('default', [
