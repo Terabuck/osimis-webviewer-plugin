@@ -35,10 +35,5 @@
   },
   "engines": {
     "node": ">=0.10.0"
-  },
-  "scripts": {
-    "api": "./../Build/Orthanc ../Build/orthanc.json ",
-    "run": "grunt serve;",
-    "test": "grunt test"
   }
 }

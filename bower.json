@@ -1,0 +1,55 @@
+{
+  "name": "osimis-webviewer",
+  "description": "Orthanc & component based viewer",
+  "version": "0.1.0",
+  "main": [
+    "dist/main.js"
+  ],
+  "moduleType": [
+    "globals"
+  ],
+  "authors": [
+    "Osimis"
+  ],
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "dist",
+    "docs",
+    "Gruntfile.js",
+    "mkdocs.yml",
+    "node_modules",
+    "npm-debug.log",
+    "OrthancStorage",
+    "package.json",
+    "README.md",
+    "site",
+    "test"
+  ],
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/osimis/osimis-webviewer.git"
+  },
+  "dependencies": {
+    "angular": "1.5.0-rc.0",
+    "angular-resource": "1.5.0-rc.0",
+    "angular-sanitize": "1.5.0-rc.0",
+    "cornerstone": "~0.8.4",
+    "jpgjs": "notmasteryet/jpgjs",
+    "hamsterjs": "~1.1.0",
+    "bootstrap": "~3.3.6",
+    "font-awesome": "fontawesome#~4.5.0",
+    "lodash": "~3.10.1",
+    "angular-dragdrop": "~1.0.12",
+    "jqueryui-touch-punch": "*",
+    "angular-strap": "~2.3.6",
+    "cornerstoneTools": "~0.7.7",
+    "ng-range-filter": "~0.1.0"
+  },
+  "devDependencies": {
+    "angular-mocks": "1.5.0-rc.0"
+  },
+  "appPath": "app",
+  "moduleName": "webviewer"
+}

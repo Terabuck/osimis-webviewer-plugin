@@ -1,8 +1,0 @@
-.DS_Store
-ThirdPartyDownloads
-OrthancStorage
-OsimisWebApplication/bower_components
-OsimisWebApplication/node_modules
-OsimisWebApplication/.sass-cache
-OsimisWebApplication/.tmp
-Build
