@@ -14,18 +14,15 @@
   ],
   "ignore": [
     "**/.*",
+    "app",
     "bower_components",
-    "dist",
-    "docs",
+    "node_modules",
+    ".gitignore",
     "Gruntfile.js",
     "mkdocs.yml",
-    "node_modules",
     "npm-debug.log",
-    "OrthancStorage",
     "package.json",
-    "README.md",
-    "site",
-    "test"
+    "README.md"
   ],
   "private": false,
   "repository": {
