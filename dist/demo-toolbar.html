@@ -1,0 +1,28 @@
+<!doctype html> <html> <head> <link rel="stylesheet" href="styles/vendor.css"> <link rel="stylesheet" href="styles/webviewer.components.css"> <link rel="stylesheet" href="styles/webviewer.main.css"> <script src="scripts/vendor.js"></script> <script src="scripts/webviewer.components.js"></script> <style>html {
+            text-align: center;
+            padding: 4rem;
+        }
+        hr {
+            width: 75%;
+            border: 1px solid #333;
+            margin: 4rem auto;
+        }
+        p {
+            color: white;
+            font-size: 1.5rem;
+        }</style> <script>angular.module('webviewer')
+    .config(function (wvConfigProvider) {
+        wvConfigProvider.setApiURL('http://localhost:8042/');
+    })
+    .controller('DemoSplitpane', function($scope) {
+        $scope.studyId = '27f7126f-4f66fb14-03f4081b-f9341db2-53925988';
+    });</script> </head> <body ng-app="webviewer" ng-controller="DemoSplitpane"> <!-- show a splitpane connected to a default toolbar --> <div class="wv-container"> <div class="wv-menu"> <wv-serielist wv-study="studyId"></wv-serielist> </div> <div class="wv-main" ng-init="toolbarItems = {}"> <wv-toolbar wv-items="toolbarItems"></wv-toolbar> <wv-splitpane wv-settings="toolbarItems"></wv-splitpane> </div> </div> <hr> <!-- configure the toolbar --> <div class="wv-container"> <div class="wv-menu"> <wv-serielist wv-study="studyId"></wv-serielist> </div> <div class="wv-main" ng-init="toolbarItems2 = {
+                invert: true,
+                layout: {x: 1, y: 2}
+            }"> <wv-toolbar wv-items="toolbarItems2"></wv-toolbar> <wv-splitpane wv-settings="toolbarItems2"></wv-splitpane> </div> </div> <hr> <!-- user defined play button --> <div class="wv-container" ng-init="
+    layout = {
+        x: 2,
+        y: 2
+    };
+    enableOverlay = true;
+    "> <div class="wv-menu"> <wv-serielist wv-study="studyId"></wv-serielist> </div> <div class="wv-main"> <button ng-click="enableOverlay = !enableOverlay" style="height: 40px; margin: 0">toggle last overlay</button> <wv-splitpane wv-layout="layout" style="height: calc(100% - 40px); display:block"> <wv-viewport wv-viewport-serie wv-width="'tag'" wv-height="'tag'" wv-viewport-mouse-events wv-scroll-on-wheel="true" wv-viewport-droppable wv-enable-overlay="($parent.$y == layout.y - 1 &amp;&amp; $parent.$x == layout.x - 1) ? enableOverlay : true"></wv-viewport> </wv-splitpane> </div> </div> <br><br> </body> </html>

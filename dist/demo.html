@@ -1,0 +1,7 @@
+<!doctype html> <html> <head> <meta charset="utf-8"> <title></title> <meta name="description" content=""> <meta name="viewport" content="width=device-width"> <link rel="stylesheet" href="styles/vendor.css"> <link rel="stylesheet" href="styles/webviewer.components.css"> <link rel="stylesheet" href="styles/webviewer.main.css"> </head> <body ng-app="webviewer"> <div ng-controller="MultiViewportDemo" class="wv-container"> <div class="wv-menu"> <wv-studylist wv-selected-study="studyId"></wv-studylist> <wv-serielist wv-study="studyId"></wv-serielist> </div> <div class="wv-main"> <wv-toolbar wv-items="toolbar"></wv-toolbar> <wv-splitpane wv-layout="toolbar.layout" wv-settings="toolbar"></wv-splitpane> </div> </div> <script src="scripts/vendor.js"></script> <script src="scripts/webviewer.components.js"></script> <script>angular.module('webviewer')
+        .config(function (wvConfigProvider) {
+            wvConfigProvider.setApiURL('http://localhost:8042/');
+        })
+        .controller('MultiViewportDemo', function($scope) {
+            $scope.toolbar = {};
+        });</script> </body> </html>
