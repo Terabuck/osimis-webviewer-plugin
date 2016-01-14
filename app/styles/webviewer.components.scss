@@ -1,22 +1,5 @@
-// bower:scss
-@import "font-awesome/scss/font-awesome.scss";
-// endbower
-
-.browsehappy {
-  margin: 0.2em 0;
-  background: #ccc;
-  color: #000;
-  padding: 0.2em 0;
-}
-
-html {
-  height: 100%;
-}
-body {
-  padding: 0;
-  height: 100%;
-  background-color: black;
-}
+@import "wv-overlay.scss";
+@import "wv-serielist.scss";
 
 wv-viewport { // make sure the element is sized when using with drag & drop
   display: inline-block;
@@ -24,9 +7,6 @@ wv-viewport { // make sure the element is sized when using with drag & drop
 wv-toolbar {
   display: block;
 }
-
-@import "wv-overlay.scss";
-@import "wv-serielist.scss";
 
 .wv-button {
   background-color: black; 

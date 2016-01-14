@@ -253,7 +253,7 @@ module.exports = function (grunt) {
         options: {
           module: 'webviewer',
           htmlmin: '<%= htmlmin.dist.options %>',
-          usemin: 'scripts/scripts.js'
+          usemin: 'scripts/webviewer.components.js'
         },
         cwd: '<%= yeoman.app %>',
         src: 'scripts/{,*/}*.html',
