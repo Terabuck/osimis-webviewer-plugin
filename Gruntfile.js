@@ -18,6 +18,8 @@ module.exports = function (grunt) {
     ngtemplates: 'grunt-angular-templates',
   });
 
+  grunt.loadNpmTasks('grunt-git');
+  
   // Configurable paths for the application
   var appConfig = {
     app: require('./bower.json').appPath || 'app',
