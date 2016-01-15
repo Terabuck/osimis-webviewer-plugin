@@ -1,7 +1,7 @@
 site_name: Osimis Web Viewer Components
 theme: readthedocs
-docs_dir: docs_md
-site_dir: docs_html
+docs_dir: docs
+site_dir: dist/docs
 pages:
 - Home: index.md
 - User Guide: 
