@@ -16,6 +16,7 @@ module.exports = function (grunt) {
   require('jit-grunt')(grunt, {
     useminPrepare: 'grunt-usemin',
     ngtemplates: 'grunt-angular-templates',
+    buildcontrol: 'grunt-build-control'
   });
 
   grunt.loadNpmTasks('grunt-git');
@@ -26,11 +27,14 @@ module.exports = function (grunt) {
     dist: 'dist'
   };
 
+
   // Define the configuration for all the tasks
   grunt.initConfig({
 
     // Project settings
     yeoman: appConfig,
+
+    version: '???',
 
     // Watches files for changes and runs tasks based on the changed files
     watch: {
@@ -301,6 +305,15 @@ module.exports = function (grunt) {
         cwd: '<%= yeoman.app %>/styles',
         dest: '.tmp/styles/',
         src: '{,*/}*.css'
+      },
+      deploy: {
+        expand: true,
+        cwd: './',
+        dest: 'dist',
+        src: [
+          'README.md',
+          'bower.json'
+        ]
       }
     },
 
@@ -313,8 +326,68 @@ module.exports = function (grunt) {
         'compass:dist'
       ]
     },
-  });
 
+    mkdocs: {
+      deploy: {
+        src: '.',
+        options: {
+          'clean': true
+        }
+      }
+    },
+
+    version: {
+      deploy: {
+        src: ['package.json', 'bower.json', 'app/scripts/app.js']
+      }
+    },
+
+    gitadd: {
+      deploy: {
+        files: {
+          src: ['package.json', 'bower.json', 'app/scripts/app.js']
+        }
+      }
+    },
+
+    gitcommit: {
+      deploy: {
+        options: {
+          message: 'New version: v<%= version %>',
+          noVerify: true
+        },
+        files: {
+          src: ['package.json', 'bower.json', 'app/scripts/app.js']
+        }
+      }
+    },
+
+    gitpush: {
+      self: {},
+      deploy: {
+        branch: 'dist',
+        tags: true
+      }
+    },
+
+    // Create automatic git/bower tags with builded source
+    buildcontrol: {
+      options: {
+        commit: true,
+        push: true,
+        message: 'New version: v<%= version %> (from %sourceBranch%#%sourceCommit%)'
+      },
+      dist: {
+        options: {
+          dir: 'dist',
+          remote: '../',
+          branch: 'dist',
+          tag: 'v<%= version %>'
+        }
+      }
+    },
+
+  });
 
   grunt.registerTask('serve', 'Compile then start a connect web server', function (target) {
     if (target === 'dist') {
@@ -353,4 +426,35 @@ module.exports = function (grunt) {
   grunt.registerTask('default', [
     'build'
   ]);
+
+  grunt.registerTask('reloadVersion', '', function() {
+    delete require.cache[require.resolve('./bower.json')];
+    
+    var pkg = require('./bower.json');
+    grunt.config('version', pkg.version);
+  });
+
+  grunt.registerTask('deploy', 'Deploy a built version on the dist branch.', function(version_type) {
+    if (version_type !== 'patch' && version_type !== 'minor' && version_type !== 'major') {
+      grunt.log.error('Argument [' + version_type + '] invalid.');
+      grunt.log.error('Argument should be patch, minor or major.');
+      grunt.log.error('Eg.: $ grunt deploy:minor');
+      return false;
+    }
+
+    var tasklist = [
+      'version:deploy:' + version_type,
+      'reloadVersion',
+      'build',
+      'mkdocs',
+      'copy:deploy',
+      'gitadd:deploy',
+      'gitcommit:deploy',
+      'gitpush:self',
+      'buildcontrol:dist',
+      'gitpush:deploy'
+    ];
+
+    grunt.task.run(tasklist);
+  });
 };
