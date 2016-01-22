@@ -24,9 +24,9 @@ module.exports = function (grunt) {
   // Configurable paths for the application
   var appConfig = {
     app: require('./bower.json').appPath || 'app',
-    dist: 'dist'
+    dist: 'dist',
+    devSyncPath: grunt.option('path') || '.tmp/devsync.js'
   };
-
 
   // Define the configuration for all the tasks
   grunt.initConfig({
@@ -60,6 +60,12 @@ module.exports = function (grunt) {
           '.tmp/styles/{,*/}*.css',
           '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
         ]
+      },
+      devsync: {
+        files: [
+          '<%= yeoman.app %>/scripts/**/*'
+        ],
+        tasks: ['concat:devsync']
       }
     },
 
@@ -232,9 +238,19 @@ module.exports = function (grunt) {
     //     }
     //   }
     // },
-    // concat: {
-    //   dist: {}
-    // },
+
+    concat: {
+      devsync: {
+        options: {
+          sourceMap: true,
+        },
+        src: [
+          '<%= yeoman.app %>/**/*.js',
+          '.tmp/templateCache.js'
+        ],
+        dest: '<%= yeoman.devSyncPath %>',
+      }
+    },
 
     htmlmin: {
       dist: {
@@ -407,6 +423,8 @@ module.exports = function (grunt) {
     grunt.log.warn('The `server` task has been deprecated. Use `grunt serve` to start a server.');
     grunt.task.run(['serve:' + target]);
   });
+
+  grunt.registerTask('devsync',  ['concat:devsync', 'watch:devsync']);
 
   grunt.registerTask('build', [
     'clean:dist',
