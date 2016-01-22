@@ -55,6 +55,24 @@ return {
       scope.$on('serie:ShowPreviousInstance', function(evt, args) {
         _showPreviousInstance();
       });
+      scope.$on('serie:GoToSerieIndex', function(evt, args) {
+        var index = args.index;
+
+        if (index < 0) {
+          index = 0;
+        }
+        else if (index + 1 > _instanceCount) {
+          return;
+        }
+
+        _instanceIndex = index;
+        
+        elementScope.$broadcast('viewport:SetInstance', {
+          id: _instanceIds[_instanceIndex],
+          adaptWindowing: false,
+          adaptSize: false
+        });
+      });
 
       var nextTimeout = null;
       var playing = false;
