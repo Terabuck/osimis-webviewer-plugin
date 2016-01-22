@@ -30,24 +30,9 @@
     "grunt-version": "^1.0.0",
     "grunt-wiredep": "^2.0.0",
     "jit-grunt": "^0.9.1",
-    "pre-git": "^3.3.0",
     "time-grunt": "^1.0.0"
   },
   "engines": {
     "node": ">=0.10.0"
-  },
-  "config": {
-    "pre-git": {
-      "commit-msg": "conventional",
-      "pre-commit": [],
-      "pre-push": [],
-      "post-commit": [],
-      "post-merge": [
-        "npm install"
-      ]
-    }
-  },
-  "scripts": {
-    "commit": "commit-wizard"
   }
 }
