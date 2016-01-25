@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>The serielist - Osimis Web Viewer Components</title>
+  
+
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/highlight.css">
+
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "The serielist";
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js"></script>
+  <script src="../../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../../js/highlight.pack.js"></script>
+  <script src="../../js/theme.js"></script> 
+
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Osimis Web Viewer Components</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../..">Home</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <ul class="subnav">
+    <li><span>User Guide</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../wv-viewport/">The viewport</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../wv-overlay/">The overlay</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 current">
+        <a class="current" href="./">The serielist</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#the-serielist">The serielist</a></li>
+                
+                    <li><a class="toctree-l4" href="#show-a-basic-serielist">Show a basic serielist</a></li>
+                
+                    <li><a class="toctree-l4" href="#drop-serielist-items-into-viewports">Drop serielist items into viewports</a></li>
+                
+            
+            </ul>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../wv-splitpane/">The splitpane</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../wv-toolbar/">The toolbar</a>
+        
+    </li>
+
+        
+    </ul>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Osimis Web Viewer Components</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>User Guide &raquo;</li>
+        
+      
+    
+    <li>The serielist</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="the-serielist">The serielist</h1>
+<p>The <strong>wv-serielist</strong> shows a vertical list of serie populated from a study. It provides a simple way to drag &amp; drop series into viewports.</p>
+<h2 id="show-a-basic-serielist">Show a basic serielist</h2>
+<blockquote>
+<ul>
+<li>wv-serielist</li>
+<li>(attr) wv-study-id: string (id)</li>
+</ul>
+</blockquote>
+<p>Showing a <strong>wv-serielist</strong> is pretty straight forward.</p>
+<pre><code class="html">&lt;wv-serielist wv-study=&quot;studyId&quot;&gt;&lt;/wv-serielist&gt;
+</code></pre>
+
+<h2 id="drop-serielist-items-into-viewports">Drop serielist items into viewports</h2>
+<blockquote>
+<ul>
+<li>wv-viewport</li>
+<li>(attr) wv-viewport-droppable: void</li>
+<li>(attr) wv-viewport-draggable: void</li>
+</ul>
+</blockquote>
+<p><strong>wv-viewport-droppable</strong> attribute allows the <strong>wv-viewport</strong> to react to dropped <strong>wv-viewport</strong>.
+<em>The <strong>wv-serielist</strong> lists <strong>wv-viewport</strong> with <strong>wv-viewport-draggable</strong> attribute to allow the viewports to be drag &amp; dropped.</em></p>
+<pre><code class="html">&lt;div class=&quot;wv-container&quot;&gt;
+    &lt;div class=&quot;wv-menu&quot;&gt;
+        &lt;wv-serielist wv-study=&quot;studyId&quot;&gt;&lt;/wv-serielist&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;wv-main&quot; style=&quot;background-color: orange&quot; wv-size-tag&gt;
+        &lt;wv-viewport wv-width=&quot;'tag'&quot; wv-height=&quot;'tag'&quot; 
+            wv-viewport-serie wv-scroll-on-wheel=&quot;true&quot; wv-viewport-droppable
+        &gt;&lt;/wv-viewport&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>There are several things to notice in this example :</p>
+<ol>
+<li>Neither <strong>wv-viewport-serie</strong> value nor <strong>wv-instance</strong> are defined. Those are not required in this case.</li>
+<li>Since no instance is provided to the viewport, it is <em>imperative</em> to define <strong>wv-width</strong> and <strong>wv-height</strong>. When not defined, the dropzone size will be 0px x 0px and will be unusable.</li>
+<li>The webviewer contains css classes <em>.wv-container</em>, <em>.wv-menu</em> and <em>.wv-main</em> which may be used to set up a simple layout.</li>
+</ol>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../wv-splitpane/" class="btn btn-neutral float-right" title="The splitpane"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../wv-overlay/" class="btn btn-neutral" title="The overlay"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../wv-overlay/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../wv-splitpane/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+
+</body>
+</html>

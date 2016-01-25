@@ -1,0 +1,44 @@
+<!doctype html> <html> <head> <link rel="stylesheet" href="styles/vendor.css"> <link rel="stylesheet" href="styles/main.css"> <script src="scripts/vendor.js"></script> <script src="scripts/webviewer.components.js"></script> <style>html{
+            text-align: center;
+            padding: 4rem;
+        }
+        hr {
+            width: 75%;
+            border: 1px solid #333;
+            margin: 4rem auto;
+        }
+        p {
+            color: white;
+            font-size: 1.5rem;
+        }</style> <script>angular.module('webviewer')
+    .config(function (wvConfigProvider) {
+        wvConfigProvider.setApiURL('http://localhost:8042/');
+    })
+    .controller('DemoOverlay', function($scope) {
+        $scope.width = '500px';
+        $scope.height = '200px';
+        $scope.instanceId = '53054cf3-f4116047-879b72cf-eb6842bc-3f5eabc7';
+        $scope.serieId = 'dc0216d2-a406a5ad-31ef7a78-113ae9d9-29939f9e';
+    });</script> </head> <body ng-app="webviewer" ng-controller="DemoOverlay"> <!-- default overlay --> <wv-viewport wv-width="width" wv-height="height" wv-instance="instanceId"></wv-viewport> <hr> <!-- useless customized overlay --> <wv-viewport wv-width="width" wv-height="height" wv-instance="instanceId"> <style>#topleft {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+
+            background-color: yellow;
+            color: black;
+        }
+        #bottomright {
+            position: absolute;
+            bottom: 3px;
+            right: 3px;
+
+            background-color: orange;
+            color: white;
+        }</style> <div id="topleft"> Heee! </div> <div id="bottomright"> Oooooh! </div> </wv-viewport> <hr> <!-- usefull costumized overlay --> <p>Note: test with the horizontal scrolling &amp; the different mouse clicks.</p> <wv-viewport wv-width="width" wv-height="height" wv-viewport-serie="serieId" wv-viewport-mouse-events wv-scroll-on-wheel="true"> <style>#bottomright2 {
+            position: absolute;
+            bottom: 3px;
+            right: 3px;
+
+            background-color: orange;
+            color: white;
+        }</style> <wv-overlay> <div class="wv-overlay-topright"> {{$instance.PatientName}} </div> <div id="bottomright2"> wwwc: {{$viewport.voi.windowWidth}}/{{$viewport.voi.windowCenter}}<br> zoom: {{$viewport.scale}} </div> <!-- one of a kind scrollbar --> <wv-overlay-scrollbar></wv-overlay-scrollbar> </wv-overlay> </wv-viewport> </body> </html>
