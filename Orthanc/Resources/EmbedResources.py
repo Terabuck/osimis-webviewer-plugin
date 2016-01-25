@@ -102,14 +102,15 @@ while i < len(SOURCES):
         for root, dirs, files in os.walk(pathName):
             base = os.path.relpath(root, pathName)
 
-            # Fix issue #24 (Build fails on OSX when directory has .DS_Store files):
-            # Ignore folders whose name starts with a dot (".")
-            if base.find('/.') != -1:
-                print('Ignoring folder: %s' % root)
+            # Ignore docs folders && docs whose name starts with a dot (".")
+            if base.find('/.') != -1 or base.startswith('docs'):
+                print('Ignoring folder: {0}'.format(root))
                 continue
 
             for f in files:
-                if f.find('~') == -1:  # Ignore Emacs backup files
+                # Ignore Emacs backup files
+                # Fix issue #24 (Build fails on OSX when directory has .DS_Store files):
+                if f.find('~') == -1 and not f.startswith('.') and f != "README.md":
                     if base == '.':
                         r = f
                     else:
