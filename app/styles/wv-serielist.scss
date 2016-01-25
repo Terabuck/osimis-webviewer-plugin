@@ -1,4 +1,4 @@
-.wv-serielist-list {
+.wv-serielist {
   margin: 0;
   padding: 0;
   list-style: none;
@@ -7,6 +7,9 @@
 .wv-serielist-item {
   padding: 0;
   text-align: center;
+  
+  width: 150px;
+  height: 150px;
 }
 
 .wv-serielist-overlay {
