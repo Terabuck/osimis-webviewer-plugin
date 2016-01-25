@@ -354,7 +354,7 @@ module.exports = function (grunt) {
         src: [
           'README.md',
           'bower.json',
-          'config.js'
+          'app/config.js'
         ]
       }
     },
