@@ -69,6 +69,7 @@
     <!-- build:js({.tmp,app}) scripts/webviewer.main.js -->
     <!-- endbuild -->
 
+    <script src="config.js"></script>
     
     <style>
         html {
@@ -88,7 +89,7 @@
     <script>
     angular.module('webviewer')
     .config(function (wvConfigProvider) {
-        // wvConfigProvider.setApiURL('http://localhost:8042/');
+        wvConfigProvider.setApiURL(window.orthancUrl);
     })
     .controller('DemoSerielist', function($scope) {
         $scope.studyId = '27f7126f-4f66fb14-03f4081b-f9341db2-53925988';

@@ -65,6 +65,7 @@
     <!-- build:js({.tmp,app}) scripts/webviewer.main.js -->
     <!-- endbuild -->
 
+    <script src="config.js"></script>
     
     <style>
         html{
@@ -84,7 +85,7 @@
     <script>
     angular.module('webviewer')
     .config(function (wvConfigProvider) {
-        // wvConfigProvider.setApiURL('http://localhost:8042/');
+        wvConfigProvider.setApiURL(window.orthancUrl);
     })
     .controller('DemoOverlay', function($scope) {
         $scope.width = '500px';

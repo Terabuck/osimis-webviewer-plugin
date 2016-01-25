@@ -86,10 +86,12 @@
     <!-- build:js({.tmp,app}) scripts/webviewer.main.js -->
     <!-- endbuild -->
 
+    <script src="config.js"></script>
+
     <script>
         angular.module('webviewer')
         .config(function (wvConfigProvider) {
-            // wvConfigProvider.setApiURL('http://localhost:8042/');
+            wvConfigProvider.setApiURL(window.orthancUrl);
         })
         .controller('MultiViewportDemo', function($scope) {
             $scope.toolbar = {};

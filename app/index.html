@@ -95,9 +95,13 @@
     <!-- build:js({.tmp,app}) scripts/webviewer.main.js -->
     <!-- endbuild -->
 
+    <script src="config.js"></script>
+
     <script>
         angular.module('webviewer')
-        .config(function($locationProvider) {
+        .config(function($locationProvider, wvConfigProvider) {
+            wvConfigProvider.setApiURL(window.orthancUrl);
+            
             $locationProvider.html5Mode({
                 enabled: true,
                 requireBase: false

@@ -353,7 +353,8 @@ module.exports = function (grunt) {
         dest: 'dist',
         src: [
           'README.md',
-          'bower.json'
+          'bower.json',
+          'config.js'
         ]
       }
     },
