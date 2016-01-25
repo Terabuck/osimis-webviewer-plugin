@@ -43,19 +43,27 @@ return {
       });
 
       var _image = null;
-      var _tags = null;
       var _adaptWindowingOnNextChange = false;
       var _adaptSizeOnNextChange = false;
 
       if (typeof scope.wvEnableOverlay === 'undefined') scope.wvEnableOverlay = true;
 
+      scope.wvInstance = scope.wvInstance || {};
+      scope.$watch('wvInstance', function(wvInstance) {
+        if (typeof wvInstance !== 'object') {
+          scope.wvInstance = {
+            id: wvInstance
+          };
+        }
+      });
+
       scope.$on('viewport:GetInstanceData', function(evt, fn) {
-        fn(_tags);
+        fn(scope.wvInstance.tags);
       });
       scope.$on('viewport:SetInstance', function(evt, args) {
         _adaptWindowingOnNextChange = args.adaptWindowing || false;
         _adaptSizeOnNextChange = args.adaptSize || false;
-        scope.wvInstance = args.id;
+        scope.wvInstance.id = args.id;
       });
 
       scope.$on('viewport:GetViewportData', function(evt, fn) {
@@ -93,7 +101,7 @@ return {
         cornerstoneTools.mouseInput.disable(domElement);
       });
       
-      scope.$watch('wvInstance', function(instanceId) {
+      scope.$watch('wvInstance.id', function(instanceId) {
         if (typeof instanceId === 'undefined' || instanceId === null) return;
 
         var promise = $q.all({
@@ -106,7 +114,7 @@ return {
           
           var firstLoading = !_image ? true : false;
           _image = image;
-          _tags = tags;
+          scope.wvInstance.tags = tags;
 
           var viewport = cornerstone.getViewport(domElement);
           cornerstone.displayImage(domElement, _image, viewport);
