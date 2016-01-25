@@ -1,0 +1,8 @@
+Build/
+ThirdPartyDownloads/
+.gitignore
+AUTHORS
+NEWS
+WebApplication/docs/
+
+CMakeLists.txt.user
