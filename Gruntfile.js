@@ -25,7 +25,8 @@ module.exports = function (grunt) {
   var appConfig = {
     app: require('./bower.json').appPath || 'app',
     dist: 'dist',
-    devSyncPath: grunt.option('path') || '.tmp/devsync.js'
+    devSyncJsPath: grunt.option('js') || '.tmp/devsync.js',
+    devSyncCssPath: grunt.option('css') || '.tmp/devsync.css'
   };
 
   // Define the configuration for all the tasks
@@ -63,10 +64,17 @@ module.exports = function (grunt) {
       },
       devsync: {
         files: [
+          '<%= yeoman.app %>/styles/{,*/}*.{scss,sass}',
           '<%= yeoman.app %>/scripts/**/*'
         ],
-        tasks: ['concat:devsync']
-      }
+        tasks: ['compass:server', 'postcss:server', 'ngtemplates:devsync', 'concat:devsync', 'concat:devsyncCss']
+      },
+      // devsyncCss: {
+      //   files: [
+      //     '.tmp/styles/{,*/}*.css'
+      //   ],
+      //   tasks: ['concat:devsyncCss']
+      // }
     },
 
     // The actual grunt server settings
@@ -248,7 +256,16 @@ module.exports = function (grunt) {
           '<%= yeoman.app %>/**/*.js',
           '.tmp/templateCache.js'
         ],
-        dest: '<%= yeoman.devSyncPath %>',
+        dest: '<%= yeoman.devSyncJsPath %>',
+      },
+      devsyncCss: {
+        options: {
+          sourceMap: true,
+        },
+        src: [
+          '.tmp/styles/webviewer.components.css'
+        ],
+        dest: '<%= yeoman.devSyncCssPath %>',
       }
     },
 
@@ -275,6 +292,14 @@ module.exports = function (grunt) {
           module: 'webviewer',
           htmlmin: '<%= htmlmin.dist.options %>',
           usemin: 'scripts/webviewer.components.js'
+        },
+        cwd: '<%= yeoman.app %>',
+        src: 'scripts/{,*/}*.html',
+        dest: '.tmp/templateCache.js'
+      },
+      devsync: {
+        options: {
+          module: 'webviewer'
         },
         cwd: '<%= yeoman.app %>',
         src: 'scripts/{,*/}*.html',
@@ -424,14 +449,14 @@ module.exports = function (grunt) {
     grunt.task.run(['serve:' + target]);
   });
 
-  grunt.registerTask('devsync',  ['concat:devsync', 'watch:devsync']);
+  grunt.registerTask('devsync',  ['ngtemplates:devsync', 'compass:server', 'postcss:server', 'concat:devsync', 'concat:devsyncCss', 'watch:devsync']);
 
   grunt.registerTask('build', [
     'clean:dist',
     'useminPrepare',
     'concurrent:dist',
     'postcss',
-    'ngtemplates',
+    'ngtemplates:dist',
     'concat',
     'ngAnnotate',
     'copy:dist',
