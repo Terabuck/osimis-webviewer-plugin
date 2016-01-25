@@ -332,7 +332,8 @@ module.exports = function (grunt) {
             '*.{ico,png,txt}',
             '*.html',
             'images/{,*/}*.{webp}',
-            'fonts/{,*/}*.*'
+            'fonts/{,*/}*.*',
+            'config.js'
           ]
         }, {
           expand: true,
@@ -353,8 +354,7 @@ module.exports = function (grunt) {
         dest: 'dist',
         src: [
           'README.md',
-          'bower.json',
-          'app/config.js'
+          'bower.json'
         ]
       }
     },
