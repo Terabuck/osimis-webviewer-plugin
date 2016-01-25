@@ -1,4 +1,4 @@
-<!doctype html> <html> <head> <link rel="stylesheet" href="styles/vendor.css"> <link rel="stylesheet" href="styles/main.css"> <script src="scripts/vendor.js"></script> <script src="scripts/webviewer.components.js"></script> <style>html{
+<!doctype html> <html> <head> <link rel="stylesheet" href="styles/vendor.css"> <link rel="stylesheet" href="styles/main.css"> <script src="scripts/vendor.js"></script> <script src="scripts/webviewer.components.js"></script> <script src="config.js"></script> <style>html{
             text-align: center;
             padding: 4rem;
         }
@@ -12,7 +12,7 @@
             font-size: 1.5rem;
         }</style> <script>angular.module('webviewer')
     .config(function (wvConfigProvider) {
-        wvConfigProvider.setApiURL('http://localhost:8042/');
+        wvConfigProvider.setApiURL(window.orthancUrl);
     })
     .controller('DemoOverlay', function($scope) {
         $scope.width = '500px';
