@@ -45,6 +45,9 @@ return {
       scope.$on('serie:GetSerieData', function(evt, fn) {
         fn(_tags, _instanceCount);
       });
+      scope.$on('serie:GetSerieId', function(evt, fn) {
+        fn(GetSerieId(scope));
+      })
       scope.$on('serie:SetSerie', function(evt, args) {
         ctrl.setSerie(args);
       });
