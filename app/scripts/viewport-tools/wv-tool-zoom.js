@@ -27,7 +27,7 @@ angular.module('webviewer')
           if (activate) {
             elementScope.$broadcast('viewport:ActivateTool', {
               tool: 'zoom',
-              arguments: [0x1 & 0x4] // left & right mouse
+              arguments: [0x1] // left & right mouse
             });
           }
           else {

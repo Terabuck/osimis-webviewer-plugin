@@ -15,15 +15,34 @@ return {
     wvHeight: '=?', // default: auto ( fit to width*(1/ratio) )
     wvEnableOverlay: '=?'
   },
+  require: 'wvViewport',
   transclude: true,
   templateUrl: 'scripts/viewport/wv-viewport.tpl.html',
   restrict: 'E',
   replace: false,
-  link: function postLink(scope, parentElement, attrs) {
+  controller: function($scope) {
+    var _domElement = undefined;
+    this.setDomElement = function(dom) {
+      _domElement = dom;
+    }
+    this.setViewport = function(strategy) {
+      try {
+        var viewport = cornerstone.getViewport(_domElement);        
+      } catch(ex) {
+        return;
+      }
+      if (!viewport) return;
+      viewport = strategy.execute(viewport);
+      cornerstone.setViewport(_domElement, viewport);
+
+      $scope.$broadcast('viewport:ViewportChanged', viewport);
+    };
+  },
+  link: function postLink(scope, parentElement, attrs, ctrl) {
       var jqElement = parentElement.children('.wv-cornerstone-enabled-image');
       var domElement = jqElement[0];
       cornerstone.enable(domElement);
-      
+      ctrl.setDomElement(domElement);
       var _viewportChanged = 0;
       jqElement.on('CornerstoneImageRendered', function(evt, args) { // args.viewport & args.renderTimeInMs
         _viewportChanged++;
@@ -71,12 +90,7 @@ return {
         fn(viewport);
       });
       scope.$on('viewport:SetViewport', function(evt, strategy) {
-        var viewport = cornerstone.getViewport(domElement);
-        if (!viewport) return;
-        viewport = strategy.execute(viewport);
-        cornerstone.setViewport(domElement, viewport);
-
-        scope.$broadcast('viewport:ViewportChanged', viewport);
+        ctrl.setViewport(strategy);
       });
 
       scope.$on('viewport:ActivateTool', function(evt, args) {
@@ -99,6 +113,20 @@ return {
 
         tool.deactivate(domElement);
         cornerstoneTools.mouseInput.disable(domElement);
+      });
+  
+      domElement.ctrl = ctrl;
+      scope.$on('viewport:ListenDomEvent', function(evt, args) {
+        var evt = args.evt;
+        var fn = args.fn;
+        
+        jqElement.on(evt, fn);
+      });
+      scope.$on('viewport:UnlistenDomEvent', function(evt, args) {
+        var evt = args.evt;
+        var fn = args.fn;
+
+        jqElement.off(evt, fn);
       });
       
       scope.$watch('wvInstance.id', function(instanceId) {
