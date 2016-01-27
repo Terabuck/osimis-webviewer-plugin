@@ -21,16 +21,18 @@ angular.module('webviewer')
         .study.query()
         .$promise
         .then(function(studies) {
-          scope.studies = studies.map(function(v) {
+          scope.studies = studies.map(function(studyId) {
             return {
               label: '?',
-              value: v
+              value: {
+                id: studyId
+              }
             };
           });
           
           scope.studies.forEach(function(v) {
             orthancApiService
-            .study.get({id: v.value})
+            .study.get({id: v.value.id})
             .$promise
             .then(function(study) {
               v.label = study.MainDicomTags.StudyDescription;

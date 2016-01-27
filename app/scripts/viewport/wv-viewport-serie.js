@@ -48,9 +48,6 @@ return {
       scope.$on('serie:GetSerieId', function(evt, fn) {
         fn(ctrl.id);
       })
-      scope.$on('serie:SetSerie', function(evt, args) {
-        ctrl.setSerie(args);
-      });
       scope.$on('serie:ShowNextInstance', function(evt, args) {
         var restartWhenSerieEnd = args.restartWhenSerieEnd;
         _showNextInstance(restartWhenSerieEnd);

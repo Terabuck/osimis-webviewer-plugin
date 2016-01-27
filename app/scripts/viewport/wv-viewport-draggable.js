@@ -13,11 +13,12 @@ angular.module('webviewer')
   return {
     scope: false,
     restrict: 'A',
-    link: function postLink(scope, element, attrs) {
+    require: '?wvViewportSerie',
+    link: function postLink(scope, element, attrs, serieCtrl) {
       var serieScope = scope; // @todo use directive communication w/ angular require instead 'coz this directive is dependant
 
-      if (attrs.wvViewportSerie) { // @todo use more generic method
-        var GetSerieId = $parse(attrs.wvViewportSerie); // method taking a scope as the param
+      if (serieCtrl) { // @todo use more generic method
+        var GetSerieId = function() { return serieCtrl.id; }; // method taking a scope as the param
       }
       else {
         var GetSerieId = function() {

@@ -21,15 +21,15 @@ return {
     
     _setDefaultCssClasses();
 
-    scope.$watch('wvStudy', _setStudy);
+    scope.$watch('wvStudy.id', _setStudy);
     scope.serieIds = []; // @todo allow user defined specific set
 
-    function _setStudy(wvStudy, old) {
-      if (!wvStudy) return; 
+    function _setStudy(id, old) {
+      if (!id) return; 
       
       orthancApiService
       .study.get({
-        id: scope.wvStudy
+        id: id
        })
       .$promise
       .then(function(study) {
