@@ -1,28 +1,13 @@
 @import "wv-overlay.scss";
 @import "wv-serielist.scss";
+@import "wv-toolbar.scss";
+@import "wv-studylist.scss";
 
 wv-viewport { // make sure the element is sized when using with drag & drop
   display: inline-block;
 }
 wv-toolbar {
   display: block;
-}
-
-.wv-button {
-  background-color: black; 
-  background-image: none; 
-  text-shadow: none; 
-  color: #EEE; 
-  border: none; 
-  border-bottom: 1px solid white; 
-  border-radius: 0; 
-  font-size: 1.5rem;height: 4rem;
-}
-.wv-studylist {
-  min-width: 100%;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .wv-container {
@@ -54,11 +39,6 @@ wv-toolbar ~ .after-toolbar {
   //margin-top: -5px;
 }
 
-.wv-toolbar {
-  height: 40px;
-  margin: 0;
-  padding: 0px;
-}
 .wv-splitpane {
   height: 100%;
 }

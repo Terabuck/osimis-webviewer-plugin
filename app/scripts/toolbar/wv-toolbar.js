@@ -18,8 +18,29 @@ angular.module('webviewer')
       link: function postLink(scope, element, attrs) {
       },
       controller: ['$timeout', '$scope', function($timeout, $scope) {
+        $scope.activeTool = "windowing";
+        $scope.activeStates = {};
+        $scope.splitpaneConfig = {x: 1, y: 1};
+
+        $scope.$watch("activeTool", function(newTool, oldTool) {
+          if ($scope.wvItems.hasOwnProperty(oldTool)) {
+            $scope.wvItems[oldTool] = false;
+          }
+
+          $scope.wvItems[newTool] = true;
+        });
+
+        $scope.$watchCollection("activeStates", function(states) {
+          _.forEach(states, function(value, state) {
+            if (!$scope.wvItems.hasOwnProperty(state)) return;
+
+            $scope.wvItems[state] = value;
+          });
+        });
+        
         $scope.activeButton = null;
         if ($scope.wvItems == undefined || !_.size($scope.wvItems)) $scope.wvItems = {
+          windowing: true,
           zoom: false,
           pan: false,
           invert: false,

@@ -4,16 +4,34 @@
 		ng-transclude
 		ng-init="wvItems = wvItems || $parent.wvItems"
 	>
-	    <wv-toolbar-button wv-name="zoom" wv-model="wvItems.zoom" wv-icon="fa fa-search" ng-if="wvItems.hasOwnProperty('zoom')"></wv-toolbar-button>
-	    <wv-toolbar-button wv-name="pan" wv-model="wvItems.pan" wv-icon="fa fa-arrows" ng-if="wvItems.hasOwnProperty('pan')"></wv-toolbar-button>
-	    <!-- <wv-toolbar-button wv-name="stackscroll" wv-model="wvItems.stackscroll" wv-icon="fa fa-bars" ng-if="wvItems.hasOwnProperty('stackscroll')"></wv-toolbar-button> -->
-	    <wv-toolbar-button wv-name="invert" wv-model="wvItems.invert" wv-icon="fa fa-adjust" ng-if="wvItems.hasOwnProperty('invert')"></wv-toolbar-button>
-	    <wv-toolbar-button wv-name="lengthmeasure" wv-model="wvItems.lengthmeasure" wv-icon="fa fa-arrows-v" ng-if="wvItems.hasOwnProperty('lengthmeasure')"></wv-toolbar-button>
-	    <wv-toolbar-button wv-name="anglemeasure" wv-model="wvItems.anglemeasure" wv-icon="fa fa-angle-left" ng-if="wvItems.hasOwnProperty('anglemeasure')"></wv-toolbar-button>
-	    <wv-toolbar-button wv-name="pixelprobe" wv-model="wvItems.pixelprobe" wv-icon="fa fa-dot-circle-o" ng-if="wvItems.hasOwnProperty('pixelprobe')"></wv-toolbar-button>
-	    <wv-toolbar-button wv-name="ellipticalroi" wv-model="wvItems.ellipticalroi" wv-icon="fa fa-circle-o" ng-if="wvItems.hasOwnProperty('ellipticalroi')"></wv-toolbar-button>
-	    <wv-toolbar-button wv-name="rectangleroi" wv-model="wvItems.rectangleroi" wv-icon="fa fa-square-o" ng-if="wvItems.hasOwnProperty('rectangleroi')"></wv-toolbar-button>
-	    <wv-toolbar-multi-viewport-layout wv-layout="wvItems.layout" ng-if="wvItems.hasOwnProperty('layout')"></wv-toolbar-multi-viewport-layout>
-	    <wv-toolbar-play wv-enable="wvItems.play" ng-if="wvItems.hasOwnProperty('play')"></wv-toolbar-play>
+    <div class="wv-toolbar-settings">
+      <!-- splitpane -->
+      <wv-toolbar-setting wv-name="layout" wv-icon="fa fa-th-large" wv-choices="{
+        '1x1': {x: 1, y: 1},
+        '2x1': {x: 2, y: 1},
+        '1x2': {x: 1, y: 2},
+        '2x2': {x: 2, y: 2}
+      }"></wv-toolbar-setting>
+    </div>
+
+    <div class="wv-toolbar-states">
+      <!-- states -->
+      <wv-toolbar-state wv-name="invert" wv-icon="fa fa-adjust"></wv-toolbar-state>
+      <wv-toolbar-state wv-name="play" wv-icon-on="fa fa-pause" wv-icon-off="fa fa-play"></wv-toolbar-state>
+    </div>
+
+    <div class="wv-toolbar-tools">
+      <!-- tools -->
+      <wv-toolbar-tool wv-name="windowing" wv-icon="fa fa-sun-o"></wv-toolbar-tool>
+      <wv-toolbar-tool wv-name="zoom" wv-icon="fa fa-search"></wv-toolbar-tool>
+      <wv-toolbar-tool wv-name="pan" wv-icon="fa fa-arrows"></wv-toolbar-tool>
+      <wv-toolbar-tool wv-name="lengthmeasure" wv-icon="fa fa-arrows-v"></wv-toolbar-tool>
+      <wv-toolbar-tool wv-name="anglemeasure" wv-icon="fa fa-angle-left"></wv-toolbar-tool>
+      <wv-toolbar-tool wv-name="pixelprobe" wv-icon="fa fa-dot-circle-o"></wv-toolbar-tool>
+      <wv-toolbar-tool wv-name="ellipticalroi" wv-icon="fa fa-circle-o"></wv-toolbar-tool>
+      <wv-toolbar-tool wv-name="rectangleroi" wv-icon="fa fa-square-o"></wv-toolbar-tool>
+    </div>
+
+    <!-- <wv-toolbar-button wv-name="stackscroll" wv-model="wvItems.stackscroll" wv-icon="fa fa-bars" ng-if="wvItems.hasOwnProperty('stackscroll')"></wv-toolbar-button> -->
 	</div>
  </div>
