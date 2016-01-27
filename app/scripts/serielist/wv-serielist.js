@@ -25,7 +25,7 @@ return {
     scope.serieIds = []; // @todo allow user defined specific set
 
     function _setStudy(wvStudy, old) {
-      if (wvStudy == undefined) return; 
+      if (!wvStudy) return; 
       
       orthancApiService
       .study.get({

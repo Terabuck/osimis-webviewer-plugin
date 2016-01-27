@@ -92,7 +92,9 @@
         wvConfigProvider.setApiURL(window.orthancUrl);
     })
     .controller('DemoSplitpane', function($scope) {
-        $scope.studyId = '27f7126f-4f66fb14-03f4081b-f9341db2-53925988';
+        $scope.study = {
+            id: '27f7126f-4f66fb14-03f4081b-f9341db2-53925988'
+        };
     });
     </script>
 </head>
@@ -101,7 +103,7 @@
     <!-- show a splitpane connected to a default toolbar -->
     <div class="wv-container">
         <div class="wv-menu">
-            <wv-serielist wv-study="studyId"></wv-serielist>
+            <wv-serielist wv-study="study"></wv-serielist>
         </div>
         <div class="wv-main" ng-init="toolbarItems = {}">
             <wv-toolbar wv-items="toolbarItems"></wv-toolbar>
@@ -114,7 +116,7 @@
     <!-- configure the toolbar -->
     <div class="wv-container">
         <div class="wv-menu">
-            <wv-serielist wv-study="studyId"></wv-serielist>
+            <wv-serielist wv-study="study"></wv-serielist>
         </div>
         <div class="wv-main" ng-init="toolbarItems2 = {
                 invert: true,
@@ -136,7 +138,7 @@
     enableOverlay = true;
     ">
         <div class="wv-menu">
-            <wv-serielist wv-study="studyId"></wv-serielist>
+            <wv-serielist wv-study="study"></wv-serielist>
         </div>
         <div class="wv-main">
             <button ng-click="enableOverlay = !enableOverlay" style="height: 40px; margin: 0;">toggle last overlay</button>

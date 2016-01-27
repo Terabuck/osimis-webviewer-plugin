@@ -15,21 +15,10 @@
     <!-- build:css(.tmp) styles/webviewer.components.css -->
     <link rel="stylesheet" href="styles/webviewer.components.css">
     <!-- endbuild -->
+
     <!-- build:css(.tmp) styles/webviewer.main.css -->
     <link rel="stylesheet" href="styles/webviewer.main.css">
     <!-- endbuild -->
-  </head>
-  <body ng-app="webviewer">
-    <div ng-controller="MultiViewportDemo" class="wv-container">
-        <div class="wv-menu">
-            <wv-studylist wv-selected-study="studyId"></wv-studylist>
-            <wv-serielist wv-study="studyId"></wv-serielist>
-        </div>
-        <div class="wv-main">
-            <wv-toolbar wv-items="toolbar"></wv-toolbar>
-            <wv-splitpane wv-layout="toolbar.layout" wv-settings="toolbar"></wv-splitpane>
-        </div>
-    </div>
 
     <!-- build:js(.) scripts/vendor.js -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
@@ -85,6 +74,18 @@
     <!-- endbuild -->
     <!-- build:js({.tmp,app}) scripts/webviewer.main.js -->
     <!-- endbuild -->
+  </head>
+  <body ng-app="webviewer">
+    <div ng-controller="MultiViewportDemo" class="wv-container">
+        <div class="wv-menu">
+            <wv-studylist wv-selected-study="study"></wv-studylist>
+            <wv-serielist wv-study="study"></wv-serielist>
+        </div>
+        <div class="wv-main">
+            <wv-toolbar wv-items="toolbar"></wv-toolbar>
+            <wv-splitpane wv-layout="toolbar.layout" wv-settings="toolbar"></wv-splitpane>
+        </div>
+    </div>
 
     <script src="config.js"></script>
 
@@ -95,6 +96,9 @@
         })
         .controller('MultiViewportDemo', function($scope) {
             $scope.toolbar = {};
+            $scope.study = {
+                id: undefined
+            }
         });
     </script>
 </body>

@@ -92,21 +92,23 @@
         wvConfigProvider.setApiURL(window.orthancUrl);
     })
     .controller('DemoSerielist', function($scope) {
-        $scope.studyId = '27f7126f-4f66fb14-03f4081b-f9341db2-53925988';
+        $scope.study = {
+            id: '27f7126f-4f66fb14-03f4081b-f9341db2-53925988'
+        };
     });
     </script>
 </head>
 <body ng-app="webviewer" ng-controller="DemoSerielist">
     
     <!-- show a standard serielist -->
-    <wv-serielist wv-study="studyId" wv-scroll-on-wheel="true"></wv-serielist>
+    <wv-serielist wv-study="study" wv-scroll-on-wheel="true"></wv-serielist>
 
     <hr />
 
     <!-- drag & drop serie into a viewport -->
     <div class="wv-container">
         <div class="wv-menu">
-            <wv-serielist wv-study="studyId"></wv-serielist>
+            <wv-serielist wv-study="study"></wv-serielist>
         </div>
         <div class="wv-main" style="background-color: orange" wv-size-tag>
             <wv-viewport wv-width="'tag'" wv-height="'tag'" 
