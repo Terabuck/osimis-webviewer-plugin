@@ -17,9 +17,13 @@
     .controller('DemoOverlay', function($scope) {
         $scope.width = '500px';
         $scope.height = '200px';
-        $scope.instanceId = '53054cf3-f4116047-879b72cf-eb6842bc-3f5eabc7';
-        $scope.serieId = 'dc0216d2-a406a5ad-31ef7a78-113ae9d9-29939f9e';
-    });</script> </head> <body ng-app="webviewer" ng-controller="DemoOverlay"> <!-- default overlay --> <wv-viewport wv-width="width" wv-height="height" wv-instance="instanceId"></wv-viewport> <hr> <!-- useless customized overlay --> <wv-viewport wv-width="width" wv-height="height" wv-instance="instanceId"> <style>#topleft {
+        $scope.instance = {
+            id: '53054cf3-f4116047-879b72cf-eb6842bc-3f5eabc7'
+        };
+        $scope.serie = {
+            id: 'dc0216d2-a406a5ad-31ef7a78-113ae9d9-29939f9e'
+        };
+    });</script> </head> <body ng-app="webviewer" ng-controller="DemoOverlay"> <!-- default overlay --> <wv-viewport wv-width="width" wv-height="height" wv-instance="instance"></wv-viewport> <hr> <!-- useless customized overlay --> <wv-viewport wv-width="width" wv-height="height" wv-instance="instance"> <style>#topleft {
             position: absolute;
             top: 3px;
             left: 3px;
@@ -34,7 +38,7 @@
 
             background-color: orange;
             color: white;
-        }</style> <div id="topleft"> Heee! </div> <div id="bottomright"> Oooooh! </div> </wv-viewport> <hr> <!-- usefull costumized overlay --> <p>Note: test with the horizontal scrolling &amp; the different mouse clicks.</p> <wv-viewport wv-width="width" wv-height="height" wv-viewport-serie="serieId" wv-viewport-mouse-events wv-scroll-on-wheel="true"> <style>#bottomright2 {
+        }</style> <div id="topleft"> Heee! </div> <div id="bottomright"> Oooooh! </div> </wv-viewport> <hr> <!-- usefull costumized overlay --> <p>Note: test with the horizontal scrolling &amp; the different mouse clicks.</p> <wv-viewport wv-width="width" wv-height="height" wv-viewport-serie="serie" wv-viewport-mouse-events wv-scroll-on-wheel="true"> <style>#bottomright2 {
             position: absolute;
             bottom: 3px;
             right: 3px;
