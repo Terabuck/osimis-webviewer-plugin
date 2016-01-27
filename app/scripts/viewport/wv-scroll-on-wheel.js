@@ -28,14 +28,14 @@ angular.module('webviewer')
           if (activate) {
             // Hamster = cross browser mousewheel library
             Hamster(element[0]).wheel(function(event, delta, deltaX, deltaY) {
-              if (deltaX < 0 && deltaX < deltaY) {
+              if (deltaY < 0 || deltaX < 0) {
                 scope.$apply(function() {
                   serieCtrl.showPreviousInstance();
                 });
 
                 event.preventDefault();
               }
-              else if (deltaX > 0 && deltaX > deltaY) {
+              else if (deltaY > 0 || deltaX > 0) {
                 // @todo calibrate the required speed and accuracy for the enduser
                 scope.$apply(function() {
                   serieCtrl.showNextInstance(false);
