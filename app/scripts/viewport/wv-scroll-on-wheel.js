@@ -22,20 +22,22 @@ angular.module('webviewer')
 
         scope.$watch(IsActivated, _trigger);
 
+        // @todo unregister on scope $destroy
+
         function _trigger(activate, old) {
           if (typeof activate === 'undefined' || activate === old) return;
 
           if (activate) {
             // Hamster = cross browser mousewheel library
             Hamster(element[0]).wheel(function(event, delta, deltaX, deltaY) {
-              if (deltaY < 0 || deltaX < 0) {
+              if (deltaY < 0) {
                 scope.$apply(function() {
                   serieCtrl.showPreviousInstance();
                 });
 
                 event.preventDefault();
               }
-              else if (deltaY > 0 || deltaX > 0) {
+              else if (deltaY > 0) {
                 // @todo calibrate the required speed and accuracy for the enduser
                 scope.$apply(function() {
                   serieCtrl.showNextInstance(false);
@@ -43,13 +45,9 @@ angular.module('webviewer')
 
                 event.preventDefault();
               }
-              /*
-              else if (deltaX < 0 && deltaX > deltaY
-                    || deltaX > 0 && deltaX < deltaY
-              ) {
-                // @note allow normal scrolling of the window in vertical
-              }
-              */
+
+              // prevent horizontal page scrolling
+              event.preventDefault();
             });
             
           }
