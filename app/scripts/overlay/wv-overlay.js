@@ -10,7 +10,7 @@ angular.module('webviewer')
 .directive('wvOverlay', [function() {
   return {
     scope: {
-      'wvShowTimeline': '='
+      'wvShowTimeline': '=?'
     },
     transclude: 'true',
     templateUrl: 'scripts/overlay/wv-overlay.tpl.html',
