@@ -9,7 +9,9 @@
 angular.module('webviewer')
 .directive('wvOverlay', [function() {
   return {
-    scope: {},
+    scope: {
+      'wvShowTimeline': '='
+    },
     transclude: 'true',
     templateUrl: 'scripts/overlay/wv-overlay.tpl.html',
     restrict: 'E',
@@ -17,6 +19,7 @@ angular.module('webviewer')
       scope.showTopLeftArea = false;
       scope.showTopRightArea = false;
       scope.showBottomRightArea = false;
+      if (typeof scope.wvShowTimeline === 'undefined') scope.wvShowTimeline = true;
 
       var transcludeElement = element.children('.wv-overlay');
       transcludeFn(scope, function(clone) {
