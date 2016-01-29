@@ -26,8 +26,10 @@ angular.module('webviewer')
           if ($scope.wvItems.hasOwnProperty(oldTool)) {
             $scope.wvItems[oldTool] = false;
           }
-
-          $scope.wvItems[newTool] = true;
+          
+          $timeout(function() { // make sure activation comes after deactivation
+            $scope.wvItems[newTool] = true;
+          });
         });
 
         $scope.$watchCollection("activeStates", function(states) {
