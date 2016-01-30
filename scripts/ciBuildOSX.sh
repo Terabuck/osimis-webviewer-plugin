@@ -30,11 +30,16 @@ rm -rf build/
 mkdir -p build
 cd build
 buildDir=$(pwd)
-cmake .. -DALLOW_DOWNLOADS:BOOL=ON -DSTANDALONE_BUILD:BOOL=ON -DSTATIC_BUILD:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release
+cmake .. -DALLOW_DOWNLOADS:BOOL=ON -DSTANDALONE_BUILD:BOOL=ON -DSTATIC_BUILD:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -G "Xcode"
 
-make -j2
+#when building with make, CoreFoundation/CFBase.h is not found.  It works when building with Xcode
+#build the unit tests
+xcodebuild -project OrthancWebViewer.xcodeproj -target UnitTests -configuration Release
+#run them
+Release/UnitTests
 
-./UnitTests
+#build the dylib
+xcodebuild -project OrthancWebViewer.xcodeproj -target OrthancWebViewer -configuration Release
 
 #update web app files
 #cd $rootDir/src/web/private
@@ -48,7 +53,7 @@ make -j2
 #todo: change version number
 
 #copy artifacts to S3
-aws s3 cp libOrthancWebViewer.dylib s3://devreleases/osx/
+aws s3 cp Release/libOrthancWebViewer.dylib s3://devreleases/osx/
 
 #get back to startup dir and exit virtual env
 cd $startScriptDir
