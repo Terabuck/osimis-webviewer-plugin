@@ -14,11 +14,10 @@
   angular
   .module('webviewer', ['ngResource', 'ngSanitize', 'mgcrea.ngStrap', 'ngRangeFilter'])
   .provider('wvConfig', function() {
-    var defaultPath = _getScriptServerURL();
     var _config = {
       version: version,
-      orthancApiURL: defaultPath,
-      webviewerApiURL: defaultPath + '/web-viewer',
+      orthancApiURL: '/',
+      webviewerApiURL: '/web-viewer',
       defaultCompression: 'jpeg95'
     };
 
@@ -36,22 +35,4 @@
     };
   });
 
-  function _getScriptServerURL() { // based on https://github.com/QueueHammer/codecraftsman.js/blob/master/codecraftsman.js
-    var scriptPath = '';
-    try {
-      throw new Error();
-    }
-    catch(e) {
-      var stackLines = e.stack.split('\n');
-      var callerIndex = 0;
-      for(var i in stackLines){
-        if(!stackLines[i].match(/(?:resource|file|https?):\/\//)) continue;
-        callerIndex = Number(i) + 2;
-        break;
-      }
-      var pathParts = stackLines[callerIndex].match(/((?:resource|file|https?):\/\/(?:[\da-z\.:-])+)\/?.*\.js/);
-
-      return pathParts[1];
-    }
-  }
 })();
