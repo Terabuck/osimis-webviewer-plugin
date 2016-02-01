@@ -78,8 +78,8 @@ angular.module('webviewer')
         }
         else {
           scope.$viewport.scale = parseFloat(viewport.scale).toFixed(2);
-          scope.$viewport.voi.windowWidth = parseFloat(viewport.voi.windowWidth).toFixed(2);
-          scope.$viewport.voi.windowCenter = parseFloat(viewport.voi.windowCenter).toFixed(2);
+          scope.$viewport.voi.windowWidth = parseFloat(viewport.voi.windowWidth).toFixed(0);
+          scope.$viewport.voi.windowCenter = parseFloat(viewport.voi.windowCenter).toFixed(0);
           scope.showBottomRightArea = true;
         }
       }
