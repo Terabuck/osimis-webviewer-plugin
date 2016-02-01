@@ -3,4 +3,5 @@
 	html="1" placeholder="<span class=&quot;fa fa-th-large&quot;></span>"
 	icon-checkmark="fa fa-th-large"
 	bs-options="item.value as item.label for item in wvChoices" ng-model="wvItems[wvName]" bs-select
+	ng-if="wvItems.hasOwnProperty(wvName)"
 ></button>
