@@ -226,17 +226,8 @@ static int32_t ServeWebViewer(OrthancPluginRestOutput* output,
     return 0;
   }
 
-  std::string path = std::string(WEB_VIEWER_PATH);
-  if (boost::filesystem::exists(path + ".tmp/" + request->groups[0])) {
-    path += std::string(".tmp/") + request->groups[0];
-  }
-  else if (boost::filesystem::exists(path + "app/" + request->groups[0])) {
-    path += std::string("app/") + request->groups[0];
-  }
-  else if (std::string(request->groups[0]).find("bower_components/") == 0 && boost::filesystem::exists(path + request->groups[0])) {
-    path += request->groups[0];
-  }
-  else {
+  std::string path = std::string(WEB_VIEWER_PATH) + request->groups[0];
+  if (!boost::filesystem::exists(path)) {
     std::string s = "Inexistent file in served folder: " + path;
     OrthancPluginLogError(context_, s.c_str());
     OrthancPluginSendHttpStatusCode(context_, output, 404);
