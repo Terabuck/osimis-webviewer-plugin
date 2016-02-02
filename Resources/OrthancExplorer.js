@@ -12,7 +12,7 @@ $('#series').live('pagebeforecreate', function() {
   b.click(function() {
     if ($.mobile.pageData) {
       var series = $.mobile.pageData.uuid;
-      window.open('../web-viewer/app/orthanc.html?series=' + series);
+      window.open('../web-viewer/app/osimis-viewer.html?series=' + series);
     }
   });
 });
@@ -31,7 +31,7 @@ $('#study').live('pagebeforecreate', function() {
   b.click(function() {
     if ($.mobile.pageData) {
       var study = $.mobile.pageData.uuid;
-      window.open('../web-viewer/app/orthanc.html?study=' + study);
+      window.open('../web-viewer/app/osimis-viewer.html?study=' + study);
     }
   });
 });
