@@ -1,5 +1,6 @@
 #!/bin/bash
 # prerequisites: sudo apt-get install -y python3-venv
+set -e #to exit script at first command failure
 set -x #to debug the script
 
 scriptName=`basename $0`
