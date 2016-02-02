@@ -55,7 +55,7 @@ xcodebuild -project OsimisWebViewer.xcodeproj -target OsimisWebViewer -configura
 #todo: change version number
 
 #copy artifacts to S3
-mv Release/libOsimisWebViewer.dylib libOsimisWebViewer.$branch.dylib
+cp Release/libOsimisWebViewer.dylib Release/libOsimisWebViewer.$branch.dylib
 aws s3 cp Release/libOsimisWebViewer.$branch.dylib s3://devreleases/osx/
 
 #get back to startup dir and exit virtual env
