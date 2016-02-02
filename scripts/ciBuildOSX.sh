@@ -10,6 +10,7 @@ export PATH=$PATH:/usr/local/bin
 echo "path=$PATH"
 who=$(whoami)
 echo "running script as $who"
+branch=$1
 
 cd ..
 rootDir=$(pwd)
@@ -34,12 +35,12 @@ cmake .. -DALLOW_DOWNLOADS:BOOL=ON -DSTANDALONE_BUILD:BOOL=ON -DSTATIC_BUILD:BOO
 
 #when building with make, CoreFoundation/CFBase.h is not found.  It works when building with Xcode
 #build the unit tests
-xcodebuild -project OrthancWebViewer.xcodeproj -target UnitTests -configuration Release
+xcodebuild -project OsimisWebViewer.xcodeproj -target UnitTests -configuration Release
 #run them
 Release/UnitTests
 
 #build the dylib
-xcodebuild -project OrthancWebViewer.xcodeproj -target OrthancWebViewer -configuration Release
+xcodebuild -project OsimisWebViewer.xcodeproj -target OsimisWebViewer -configuration Release
 
 #update web app files
 #cd $rootDir/src/web/private
@@ -53,7 +54,8 @@ xcodebuild -project OrthancWebViewer.xcodeproj -target OrthancWebViewer -configu
 #todo: change version number
 
 #copy artifacts to S3
-aws s3 cp Release/libOrthancWebViewer.dylib s3://devreleases/osx/
+mv Release/libOsimisWebViewer.dylib libOsimisWebViewer.$branch.dylib
+aws s3 cp Release/libOsimisWebViewer.$branch.dylib s3://devreleases/osx/
 
 #get back to startup dir and exit virtual env
 cd $startScriptDir
