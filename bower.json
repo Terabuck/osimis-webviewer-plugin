@@ -3,8 +3,8 @@
   "description": "Orthanc & component based viewer",
   "version": "0.2.8",
   "main": [
-    "dist/webviewer.components.js",
-    "dist/webviewer.components.css"
+    "scripts/webviewer.components.js",
+    "scripts/webviewer.components.css"
   ],
   "moduleType": [
     "globals"
@@ -16,8 +16,8 @@
     "**/.*",
     "app",
     "bower_components",
-    "dist/scripts/vendor.js",
-    "dist/styles/vendor.css",
+    "scripts/scripts/vendor.js",
+    "scripts/styles/vendor.css",
     "node_modules",
     ".gitignore",
     "Gruntfile.js",
@@ -53,6 +53,11 @@
     "angular-strap": "~2.3.6",
     "cornerstoneTools": "~0.7.7",
     "ng-range-filter": "~0.1.0"
+  },
+  "overrides": {
+    "ng-range-filter": {
+      "main": "src/ngRangeFilter.js"
+    }
   },
   "devDependencies": {
     "angular-mocks": "1.5.0-rc.0"
