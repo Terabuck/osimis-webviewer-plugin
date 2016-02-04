@@ -12,7 +12,7 @@ angular.module('webviewer')
       scope: {
         wvItems: '='
       },
-      templateUrl: '/src/app/toolbar/wv-toolbar.tpl.html',
+      templateUrl: 'app/toolbar/wv-toolbar.tpl.html',
       transclude: true,
       restrict: 'E',
       link: function postLink(scope, element, attrs) {

@@ -10,7 +10,7 @@ angular.module('webviewer')
 .directive('wvOverlayScrollbar', function () {
 return {
   scope: true,
-  templateUrl: '/src/app/overlay/wv-overlay-scrollbar.tpl.html',
+  templateUrl: 'app/overlay/wv-overlay-scrollbar.tpl.html',
   restrict: 'E',
   link: function postLink(scope, element, attrs) {
     scope.scrollbarDistanceFromRight = '0%';

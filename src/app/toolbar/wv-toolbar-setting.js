@@ -10,7 +10,7 @@ angular.module('webviewer')
 .directive('wvToolbarSetting', function () {
 return {
   scope: true,
-  templateUrl: '/src/app/toolbar/wv-toolbar-setting.tpl.html',
+  templateUrl: 'app/toolbar/wv-toolbar-setting.tpl.html',
   restrict: 'E',
   link: function postLink(scope, element, attrs) {
     scope.wvName = attrs.wvName;

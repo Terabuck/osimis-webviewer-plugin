@@ -14,7 +14,7 @@ angular.module('webviewer')
         wvSettings: '=?'
       },
       // @todo add template path angular constant
-      templateUrl: '/src/app/splitpane/wv-splitpane.tpl.html',
+      templateUrl: 'app/splitpane/wv-splitpane.tpl.html',
       restrict: 'E',
       transclude: true,
       link: function postLink(scope, element, attrs) {

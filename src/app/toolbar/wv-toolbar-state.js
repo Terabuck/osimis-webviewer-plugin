@@ -11,7 +11,7 @@ angular.module('webviewer')
   return {
     require: ['^^wvToolbar'],
     scope: true,
-    templateUrl: '/src/app/toolbar/wv-toolbar-state.tpl.html',
+    templateUrl: 'app/toolbar/wv-toolbar-state.tpl.html',
     restrict: 'E',
     link: function postLink(scope, element, attrs) {
       scope.wvName = attrs.wvName;

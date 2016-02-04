@@ -13,7 +13,7 @@ angular.module('webviewer')
       'wvShowTimeline': '=?'
     },
     transclude: 'true',
-    templateUrl: '/src/app/overlay/wv-overlay.tpl.html',
+    templateUrl: 'app/overlay/wv-overlay.tpl.html',
     restrict: 'E',
     link: function postLink(scope, element, attrs, ctrl, transcludeFn) {
       scope.showTopLeftArea = false;

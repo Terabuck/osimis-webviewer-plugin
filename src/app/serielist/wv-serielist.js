@@ -13,7 +13,7 @@ return {
     wvStudy: '=',
     wvClassTmp: '=?wvClass'
   },
-  templateUrl: '/src/app/serielist/wv-serielist.tpl.html',
+  templateUrl: 'app/serielist/wv-serielist.tpl.html',
   restrict: 'E',
   transclude: true,
   link: function postLink(scope, element, attrs) {
