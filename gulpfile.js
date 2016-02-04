@@ -131,22 +131,7 @@ gulp.task('wiredep-scss', function() {
     log('Wiring the bower dependencies into the scss');
 
     var wiredep = require('wiredep').stream;
-    var options = _.cloneDeep(config.getWiredepDefaultOptions());
-
-    options.fileTypes = options.fileTypes || {};
-    options.fileTypes.scss = {
-      block: /(([ \t]*)\/\/\s*bower:*(\S*))(\n|\r|.)*?(\/\/\s*endbower)/gi,
-      detect: {
-        css: /@import\s['"](.+css)['"]/gi,
-        sass: /@import\s['"](.+sass)['"]/gi,
-        scss: /@import\s['"](.+scss)['"]/gi
-      },
-      replace: {
-        css: '@import "../..{{filePath}}";',
-        sass: '@import "../..{{filePath}}";',
-        scss: '@import "../..{{filePath}}";'
-      }
-    };
+    var options = config.getWiredepDefaultOptions();
 
     return gulp
         .src(config.scss)

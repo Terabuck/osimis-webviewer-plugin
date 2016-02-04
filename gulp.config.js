@@ -11,8 +11,7 @@ module.exports = function() {
     var bowerFiles = wiredep({devDependencies: true})['js'];
     var bower = {
         json: require('./bower.json'),
-        directory: './bower_components/',
-        ignorePath: '../..'
+        directory: './bower_components/'
     };
     var nodeModules = 'node_modules';
 
@@ -135,7 +134,22 @@ module.exports = function() {
         var options = {
             bowerJson: config.bower.json,
             directory: config.bower.directory,
-            ignorePath: config.bower.ignorePath
+            ignorePath: '..',
+            fileTypes: {
+                scss: {
+                  block: /(([ \t]*)\/\/\s*bower:*(\S*))(\n|\r|.)*?(\/\/\s*endbower)/gi,
+                  detect: {
+                    css: /@import\s['"](.+css)['"]/gi,
+                    sass: /@import\s['"](.+sass)['"]/gi,
+                    scss: /@import\s['"](.+scss)['"]/gi
+                  },
+                  replace: {
+                    css: '@import "..{{filePath}}";',
+                    sass: '@import "..{{filePath}}";',
+                    scss: '@import "..{{filePath}}";'
+                  }
+                }
+            }
         };
         return options;
     };
