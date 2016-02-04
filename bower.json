@@ -1,7 +1,7 @@
 {
   "name": "osimis-webviewer",
   "description": "Orthanc & component based viewer",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "main": [
     "scripts/webviewer.components.js",
     "scripts/webviewer.components.css"

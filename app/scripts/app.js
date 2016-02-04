@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  var version = '0.2.8';
+  var version = '0.2.9';
 
   /**
    * @ngdoc overview
