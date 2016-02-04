@@ -69,7 +69,10 @@
     },
     "overrides": {
         "bootstrap": {
-            "main": "dist/css/bootstrap.css",
+            "main": [
+                "dist/css/bootstrap.css",
+                "dist/css/bootstrap-theme.css"
+            ],
             "dist": "dist/js/bootstrap.js"
         },
         "ng-range-filter": {
