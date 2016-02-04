@@ -1,33 +1,68 @@
 {
     "name": "webViewer",
-    "version": "0.0.1",
-    "description": "webViewer",
-    "authors": [],
-    "license": "MIT",
-    "ignore": [
+      "description": "Orthanc & component based viewer",
+      "version": "0.3.0",
+      "main": [
+        "scripts/webviewer.components.js",
+        "scripts/webviewer.components.css"
+      ],
+      "moduleType": [
+        "globals"
+      ],
+      "authors": [
+        "Osimis"
+      ],
+      "ignore": [
         "**/.*",
-        "node_modules",
+        "app",
         "bower_components",
+        "scripts/scripts/vendor.js",
+        "scripts/styles/vendor.css",
+        "node_modules",
+        ".gitignore",
+        "Gruntfile.js",
+        "mkdocs.yml",
+        "npm-debug.log",
+        "package.json",
+        "README.md",
+        "demo-overlay.html",
+        "demo-serielist.html",
+        "demo-splitpane.html",
+        "demo-toolbar.html",
+        "demo.html",
+        "index.html",
+        "robot.txt",
         "test",
         "tests"
-    ],
+      ],
+      "private": false,
+      "repository": {
+        "type": "git",
+        "url": "https://bitbucket.org/osimis/osimis-webviewer.git"
+      },
     "devDependencies": {
         "angular-mocks": "1.5.0-rc.2",
         "sinon": "http://sinonjs.org/releases/sinon-1.12.1.js",
         "bardjs": "^0.1.4"
     },
     "dependencies": {
-        "jquery": "^2.1.4",
         "angular": "1.5.0-rc.2",
         "angular-animate": "1.5.0-rc.2",
         "angular-resource": "1.5.0-rc.2",
-        "angular-route": "1.5.0-rc.2",
         "angular-sanitize": "1.5.0-rc.2",
-        "bootstrap": "^3.3.5",
-        "extras.angular.plus": "^0.9.2",
         "font-awesome": "^4.3.0",
-        "moment": "^2.10.3",
-        "toastr": "^2.1.1"
+
+        "cornerstone": "~0.8.4",
+        "cornerstoneTools": "~0.7.7",
+        "jpgjs": "notmasteryet/jpgjs",
+        "hamsterjs": "~1.1.0",
+        "bootstrap": "~3.3.6",
+        "font-awesome": "fontawesome#~4.5.0",
+        "lodash": "~3.10.1",
+        "angular-dragdrop": "~1.0.12",
+        "angular-strap": "~2.3.6",
+        "jqueryui-touch-punch": "*",
+        "ng-range-filter": "~0.1.0"
     },
     "resolutions": {
         "angular": "1.5.0-rc.2"
@@ -36,6 +71,9 @@
         "bootstrap": {
             "main": "dist/css/bootstrap.css",
             "dist": "dist/js/bootstrap.js"
+        },
+        "ng-range-filter": {
+          "main": "src/ngRangeFilter.js"
         }
     }
 }
