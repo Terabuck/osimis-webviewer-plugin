@@ -15,6 +15,7 @@
     <!-- build:css styles/lib.css -->
     <!-- bower:css -->
     <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap-theme.css" />
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -62,39 +63,43 @@
     <!-- build:js js/app.js -->
     <!-- inject:js -->
     <script src="/src/app/webviewer.module.js"></script>
-    <script src="/src/app/admin/admin.module.js"></script>
-    <script src="/src/app/blocks/exception/exception.module.js"></script>
-    <script src="/src/app/blocks/logger/logger.module.js"></script>
-    <script src="/src/app/blocks/router/router.module.js"></script>
-    <script src="/src/app/core/core.module.js"></script>
-    <script src="/src/app/dashboard/dashboard.module.js"></script>
-    <script src="/src/app/layout/layout.module.js"></script>
-    <script src="/src/app/widgets/widgets.module.js"></script>
-    <script src="/src/app/admin/admin.controller.js"></script>
-    <script src="/src/app/admin/admin.route.js"></script>
-    <script src="/src/app/blocks/exception/exception-handler.provider.js"></script>
-    <script src="/src/app/blocks/exception/exception.js"></script>
-    <script src="/src/app/blocks/logger/logger.js"></script>
-    <script src="/src/app/blocks/router/router-helper.provider.js"></script>
-    <script src="/src/app/core/config.js"></script>
-    <script src="/src/app/core/constants.js"></script>
-    <script src="/src/app/core/core.route.js"></script>
-    <script src="/src/app/core/dataservice.js"></script>
-    <script src="/src/app/dashboard/dashboard.controller.js"></script>
-    <script src="/src/app/dashboard/dashboard.route.js"></script>
-    <script src="/src/app/layout/ht-sidebar.directive.js"></script>
-    <script src="/src/app/layout/ht-top-nav.directive.js"></script>
-    <script src="/src/app/layout/shell.controller.js"></script>
-    <script src="/src/app/layout/sidebar.controller.js"></script>
-    <script src="/src/app/widgets/ht-img-person.directive.js"></script>
-    <script src="/src/app/widgets/ht-widget-header.directive.js"></script>
+    <script src="/src/app/orthanc/orthanc-api-service.js"></script>
+    <script src="/src/app/orthanc/orthanc-image-loader.js"></script>
+    <script src="/src/app/others/wv-studylist.js"></script>
+    <script src="/src/app/overlay/wv-overlay-scrollbar.js"></script>
+    <script src="/src/app/overlay/wv-overlay.js"></script>
+    <script src="/src/app/serielist/wv-serielist.js"></script>
+    <script src="/src/app/splitpane/wv-splitpane.js"></script>
+    <script src="/src/app/toolbar/wv-toolbar-setting.js"></script>
+    <script src="/src/app/toolbar/wv-toolbar-state.js"></script>
+    <script src="/src/app/toolbar/wv-toolbar-tool.js"></script>
+    <script src="/src/app/toolbar/wv-toolbar.js"></script>
+    <script src="/src/app/viewport-states/wv-state-invert.js"></script>
+    <script src="/src/app/viewport-states/wv-state-play.js"></script>
+    <script src="/src/app/viewport-tools/wv-tool-anglemeasure.js"></script>
+    <script src="/src/app/viewport-tools/wv-tool-ellipticalroi.js"></script>
+    <script src="/src/app/viewport-tools/wv-tool-lengthmeasure.js"></script>
+    <script src="/src/app/viewport-tools/wv-tool-pan.js"></script>
+    <script src="/src/app/viewport-tools/wv-tool-pixelprobe.js"></script>
+    <script src="/src/app/viewport-tools/wv-tool-rectangleroi.js"></script>
+    <script src="/src/app/viewport-tools/wv-tool-stackscroll.js"></script>
+    <script src="/src/app/viewport-tools/wv-tool-zoom.js"></script>
+    <script src="/src/app/viewport/wv-scroll-on-over.js"></script>
+    <script src="/src/app/viewport/wv-scroll-on-wheel.js"></script>
+    <script src="/src/app/viewport/wv-viewport-draggable.js"></script>
+    <script src="/src/app/viewport/wv-viewport-droppable.js"></script>
+    <script src="/src/app/viewport/wv-viewport-mouse-events.js"></script>
+    <script src="/src/app/viewport/wv-viewport-serie.js"></script>
+    <script src="/src/app/viewport/wv-viewport.js"></script>
     <!-- endinject -->
 
     <!-- inject:templates:js -->
     <!-- endinject -->
     <!-- endbuild -->
 
+    <!-- build:js config.js -->
     <script src="/src/config.js"></script>
+    <!-- endbuild -->
 
     <script>
         angular.module('webviewer')
