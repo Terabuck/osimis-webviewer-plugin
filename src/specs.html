@@ -32,6 +32,9 @@
 <div id="mocha"></div>
 
     <!-- inject:testlibraries:js -->
+    <script src="/node_modules/mocha/mocha.js"></script>
+    <script src="/node_modules/chai/chai.js"></script>
+    <script src="/node_modules/sinon-chai/lib/sinon-chai.js"></script>
     <!-- endinject -->
 
     <script>
@@ -42,18 +45,79 @@
     </script>
 
     <!-- bower:js -->
+    <script src="../bower_components/jquery/dist/jquery.js"></script>
+    <script src="../bower_components/angular/angular.js"></script>
+    <script src="../bower_components/angular-animate/angular-animate.js"></script>
+    <script src="../bower_components/angular-resource/angular-resource.js"></script>
+    <script src="../bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="../bower_components/cornerstone/dist/cornerstone.js"></script>
+    <script src="../bower_components/cornerstoneMath/dist/cornerstoneMath.js"></script>
+    <script src="../bower_components/hammerjs/hammer.js"></script>
+    <script src="../bower_components/cornerstoneTools/dist/cornerstoneTools.js"></script>
+    <script src="../bower_components/jpgjs/jpg.js"></script>
+    <script src="../bower_components/hamsterjs/hamster.js"></script>
+    <script src="../bower_components/lodash/lodash.js"></script>
+    <script src="../bower_components/jquery-ui/jquery-ui.js"></script>
+    <script src="../bower_components/angular-dragdrop/src/angular-dragdrop.js"></script>
+    <script src="../bower_components/angular-strap/dist/angular-strap.js"></script>
+    <script src="../bower_components/angular-strap/dist/angular-strap.tpl.js"></script>
+    <script src="../bower_components/jqueryui-touch-punch/jquery.ui.touch-punch.min.js"></script>
+    <script src="../bower_components/ng-range-filter/src/ngRangeFilter.js"></script>
+    <script src="../bower_components/angular-mocks/angular-mocks.js"></script>
+    <script src="../bower_components/sinon/index.js"></script>
+    <script src="../bower_components/bardjs/dist/bard.js"></script>
+    <script src="../bower_components/bardjs/dist/bard-ngRouteTester.js"></script>
     <!-- endbower -->
 
     <!-- inject:js -->
+    <script src="/src/app/app.module.js"></script>
+    <script src="/src/app/admin/admin.module.js"></script>
+    <script src="/src/app/blocks/exception/exception.module.js"></script>
+    <script src="/src/app/blocks/logger/logger.module.js"></script>
+    <script src="/src/app/blocks/router/router.module.js"></script>
+    <script src="/src/app/core/core.module.js"></script>
+    <script src="/src/app/dashboard/dashboard.module.js"></script>
+    <script src="/src/app/layout/layout.module.js"></script>
+    <script src="/src/app/widgets/widgets.module.js"></script>
+    <script src="/src/app/admin/admin.controller.js"></script>
+    <script src="/src/app/admin/admin.route.js"></script>
+    <script src="/src/app/blocks/exception/exception-handler.provider.js"></script>
+    <script src="/src/app/blocks/exception/exception.js"></script>
+    <script src="/src/app/blocks/logger/logger.js"></script>
+    <script src="/src/app/blocks/router/router-helper.provider.js"></script>
+    <script src="/src/app/core/config.js"></script>
+    <script src="/src/app/core/constants.js"></script>
+    <script src="/src/app/core/core.route.js"></script>
+    <script src="/src/app/core/dataservice.js"></script>
+    <script src="/src/app/dashboard/dashboard.controller.js"></script>
+    <script src="/src/app/dashboard/dashboard.route.js"></script>
+    <script src="/src/app/layout/ht-sidebar.directive.js"></script>
+    <script src="/src/app/layout/ht-top-nav.directive.js"></script>
+    <script src="/src/app/layout/shell.controller.js"></script>
+    <script src="/src/app/layout/sidebar.controller.js"></script>
+    <script src="/src/app/widgets/ht-img-person.directive.js"></script>
+    <script src="/src/app/widgets/ht-widget-header.directive.js"></script>
     <!-- endinject -->
 
     <!-- inject:spechelpers:js -->
+    <script src="/src/test-helpers/bind-polyfill.js"></script>
+    <script src="/src/test-helpers/mock-data.js"></script>
     <!-- endinject -->
 
     <!-- inject:specs:js -->
+    <script src="/src/app/admin/admin.controller.spec.js"></script>
+    <script src="/src/app/admin/admin.route.spec.js"></script>
+    <script src="/src/app/blocks/exception/exception-handler.provider.spec.js"></script>
+    <script src="/src/app/core/core.route.spec.js"></script>
+    <script src="/src/app/dashboard/dashboard.controller.spec.js"></script>
+    <script src="/src/app/dashboard/dashboard.route.spec.js"></script>
+    <script src="/src/app/layout/ht-sidebar.directive.spec.js"></script>
+    <script src="/src/app/layout/shell.controller.spec.js"></script>
+    <script src="/src/app/layout/sidebar.controller.spec.js"></script>
     <!-- endinject -->
 
     <!-- inject:templates:js -->
+    <script src="/.tmp/templates.js"></script>
     <!-- endinject -->
 
     <script>

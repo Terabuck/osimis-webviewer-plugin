@@ -20,24 +20,37 @@
 
     <!-- build:css styles/app.css -->
     <!-- inject:css -->
+    <link rel="stylesheet" href="/.tmp/styles.css">
     <!-- endinject -->
     <!-- endbuild -->
 </head>
 <body>
-    <div>
-        <div ng-include="'app/layout/shell.html'"></div>
-        <div id="splash-page" ng-show="showSplash">
-            <div class="page-splash">
-                <div class="page-splash-message">
-                    webViewer
-                </div>
-                <div class="progress progress-striped active page-progress-bar">
-                    <div class="bar"></div>
-                </div>
-            </div>
+    <div ng-controller="MultiViewportDemo" class="wv-container">
+        <div class="wv-menu">
+            <wv-studylist wv-selected-study="study"></wv-studylist>
+            <wv-serielist wv-study="study"></wv-serielist>
+        </div>
+        <div class="wv-main">
+            <wv-toolbar wv-items="toolbar"></wv-toolbar>
+            <wv-splitpane wv-layout="toolbar.layout" wv-settings="toolbar"></wv-splitpane>
         </div>
     </div>
 
+    <script src="config.js"></script>
+
+    <script>
+        angular.module('webviewer')
+        .config(function (wvConfigProvider) {
+            wvConfigProvider.setApiURL(window.orthancUrl);
+        })
+        .controller('MultiViewportDemo', function($scope) {
+            $scope.toolbar = {};
+            $scope.study = {
+                id: undefined
+            }
+        });
+    </script>
+    
     <!-- build:js js/lib.js -->
     <!-- bower:js -->
     <script src="../bower_components/jquery/dist/jquery.js"></script>
