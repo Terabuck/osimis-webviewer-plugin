@@ -34,6 +34,7 @@ module.exports = function() {
         htmltemplates: clientApp + '**/*.html',
         images: client + 'images/**/*.*',
         index: client + 'index.html',
+        config: client + 'config.js',
         // app js, with no specs
         js: [
             clientApp + '**/*.module.js',
