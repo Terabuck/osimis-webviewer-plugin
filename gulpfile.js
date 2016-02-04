@@ -127,7 +127,38 @@ gulp.task('templatecache', ['clean-code'], function() {
  * Wire-up the bower dependencies
  * @return {Stream}
  */
-gulp.task('wiredep', function() {
+gulp.task('wiredep-scss', function() {
+    log('Wiring the bower dependencies into the scss');
+
+    var wiredep = require('wiredep').stream;
+    var options = _.cloneDeep(config.getWiredepDefaultOptions());
+
+    options.fileTypes = options.fileTypes || {};
+    options.fileTypes.scss = {
+      block: /(([ \t]*)\/\/\s*bower:*(\S*))(\n|\r|.)*?(\/\/\s*endbower)/gi,
+      detect: {
+        css: /@import\s['"](.+css)['"]/gi,
+        sass: /@import\s['"](.+sass)['"]/gi,
+        scss: /@import\s['"](.+scss)['"]/gi
+      },
+      replace: {
+        css: '@import "../..{{filePath}}";',
+        sass: '@import "../..{{filePath}}";',
+        scss: '@import "../..{{filePath}}";'
+      }
+    };
+
+    return gulp
+        .src(config.scss)
+        .pipe(wiredep(options))
+        .pipe(gulp.dest(config.scssDir));
+});
+
+/**
+ * Wire-up the bower dependencies
+ * @return {Stream}
+ */
+gulp.task('wiredep', ['wiredep-scss'], function() {
     log('Wiring the bower dependencies into the html');
 
     var wiredep = require('wiredep').stream;
