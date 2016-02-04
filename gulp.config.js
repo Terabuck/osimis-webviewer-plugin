@@ -41,7 +41,7 @@ module.exports = function() {
             '!' + clientApp + '**/*.spec.js'
         ],
         jsOrder: [
-            '**/app.module.js',
+            '**/webviewer.module.js',
             '**/*.module.js',
             '**/*.js'
         ],
@@ -80,7 +80,7 @@ module.exports = function() {
         templateCache: {
             file: 'templates.js',
             options: {
-                module: 'app.core',
+                module: 'webviewer',
                 root: 'app/',
                 standalone: false
             }
