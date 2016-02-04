@@ -17,7 +17,7 @@ return {
   },
   require: 'wvViewport',
   transclude: true,
-  templateUrl: 'scripts/viewport/wv-viewport.tpl.html',
+  templateUrl: '/src/app/viewport/wv-viewport.tpl.html',
   restrict: 'E',
   replace: false,
   controller: function($scope) {
