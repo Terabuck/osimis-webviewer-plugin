@@ -275,12 +275,12 @@ gulp.task('optimize', ['inject'], function() {
         .pipe($.uglify()) // another option is to override wiredep to use min files
         .pipe(jslibFilter.restore())
         // Take inventory of the file names for future rev numbers
-        .pipe($.rev())
+        // .pipe($.rev())
         // Apply the concat and file replacement with useref
         .pipe(assets.restore())
         .pipe($.useref())
         // Replace the file names in the html with rev numbers
-        .pipe($.revReplace())
+        // .pipe($.revReplace())
         .pipe(gulp.dest(config.build));
 });
 
