@@ -36,21 +36,6 @@
         </div>
     </div>
 
-    <script src="config.js"></script>
-
-    <script>
-        angular.module('webviewer')
-        .config(function (wvConfigProvider) {
-            wvConfigProvider.setApiURL(window.orthancUrl);
-        })
-        .controller('MultiViewportDemo', function($scope) {
-            $scope.toolbar = {};
-            $scope.study = {
-                id: undefined
-            }
-        });
-    </script>
-
     <!-- build:js js/lib.js -->
     <!-- bower:js -->
     <script src="../bower_components/jquery/dist/jquery.js"></script>
@@ -108,5 +93,20 @@
     <!-- inject:templates:js -->
     <!-- endinject -->
     <!-- endbuild -->
+
+    <script src="config.js"></script>
+
+    <script>
+        angular.module('webviewer')
+        .config(function (wvConfigProvider) {
+            wvConfigProvider.setApiURL(window.orthancUrl);
+        })
+        .controller('MultiViewportDemo', function($scope) {
+            $scope.toolbar = {};
+            $scope.study = {
+                id: undefined
+            }
+        });
+    </script>
 </body>
 </html>
