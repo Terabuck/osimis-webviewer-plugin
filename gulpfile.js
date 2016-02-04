@@ -247,7 +247,7 @@ gulp.task('build', ['optimize', 'images', 'fonts'], function() {
 gulp.task('optimize', ['inject'], function() {
     log('Optimizing the js, css, and html');
 
-    var assets = $.useref.assets({searchPath: './'});
+    var assets = $.useref.assets({searchPath: ['./', './src/']});
     // Filters are named for the gulp-useref path
     var cssFilter = $.filter('**/*.css');
     var jsAppFilter = $.filter('**/' + config.optimized.app);
