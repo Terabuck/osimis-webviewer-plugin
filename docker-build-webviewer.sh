@@ -37,6 +37,8 @@ cmake -DALLOW_DOWNLOADS:BOOL=ON \
 make -j$COUNT_CORES
 ./UnitTests
 cp -L libOsimisWebViewer.so /usr/share/orthanc/plugins/
+#remove the default orthanc web viewer to avoid 2 viewers to be available in the OrthancExplorer
+rm -f /usr/share/orthanc/plugins/libOrthancWebViewer.so
 
 # Remove the build directory to recover space
 cd /root/
