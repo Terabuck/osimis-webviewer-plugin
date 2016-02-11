@@ -268,7 +268,7 @@ gulp.task('optimize', ['inject'], function() {
         .pipe($.revReplace({
     		replaceInExtensions: ['.js', '.css', '.html', '.hbs', '.json'] // Replace also in bower.json
         }))
-        .pipe(gulp.dest(config.build));
+        .pipe(gulp.dest(config.build))
         // Write the rev-manifest.json - used by @osisync
         .pipe($.rev.manifest())
         .pipe(gulp.dest(config.build));
