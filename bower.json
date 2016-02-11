@@ -1,18 +1,18 @@
 {
     "name": "webViewer",
-      "description": "Orthanc & component based viewer",
-      "version": "0.3.0",
-      "main": [
+    "description": "Orthanc & component based viewer",
+    "version": "0.3.1",
+    "main": [
         "js/app.js",
         "styles/app.css"
-      ],
-      "moduleType": [
+    ],
+    "moduleType": [
         "globals"
-      ],
-      "authors": [
+    ],
+    "authors": [
         "Osimis"
-      ],
-      "ignore": [
+    ],
+    "ignore": [
         "**/.*",
         "app",
         "bower_components",
@@ -34,12 +34,12 @@
         "robot.txt",
         "test",
         "tests"
-      ],
-      "private": false,
-      "repository": {
+    ],
+    "private": false,
+    "repository": {
         "type": "git",
         "url": "https://bitbucket.org/osimis/osimis-webviewer.git"
-      },
+    },
     "devDependencies": {
         "angular-mocks": "1.5.0-rc.2",
         "sinon": "http://sinonjs.org/releases/sinon-1.12.1.js",
@@ -50,14 +50,12 @@
         "angular-animate": "1.5.0-rc.2",
         "angular-resource": "1.5.0-rc.2",
         "angular-sanitize": "1.5.0-rc.2",
-        "font-awesome": "^4.3.0",
-
+        "font-awesome": "fontawesome#~4.5.0",
         "cornerstone": "~0.8.4",
         "cornerstoneTools": "~0.7.7",
         "jpgjs": "notmasteryet/jpgjs",
         "hamsterjs": "~1.1.0",
         "bootstrap": "~3.3.6",
-        "font-awesome": "fontawesome#~4.5.0",
         "lodash": "~3.10.1",
         "angular-dragdrop": "~1.0.12",
         "angular-strap": "~2.3.6",
@@ -76,7 +74,7 @@
             "dist": "dist/js/bootstrap.js"
         },
         "ng-range-filter": {
-          "main": "src/ngRangeFilter.js"
+            "main": "src/ngRangeFilter.js"
         }
     }
 }
