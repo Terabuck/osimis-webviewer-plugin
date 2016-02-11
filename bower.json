@@ -3,8 +3,8 @@
       "description": "Orthanc & component based viewer",
       "version": "0.3.0",
       "main": [
-        "scripts/webviewer.components.js",
-        "scripts/webviewer.components.css"
+        "js/app.js",
+        "styles/app.css"
       ],
       "moduleType": [
         "globals"
