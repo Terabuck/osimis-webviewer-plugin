@@ -260,18 +260,18 @@ gulp.task('optimize', ['inject'], function() {
         .pipe($.uglify()) // another option is to override wiredep to use min files
         .pipe(jslibFilter.restore())
         // Take inventory of the file names for future rev numbers
-        .pipe($.rev())
+        // .pipe($.rev())
         // Apply the concat and file replacement with useref
         .pipe(assets.restore())
         .pipe($.useref())
         // Replace the file names in the html & bower.json with rev numbers
-        .pipe($.revReplace({
-    		replaceInExtensions: ['.js', '.css', '.html', '.hbs', '.json'] // Replace also in bower.json
-        }))
+      //   .pipe($.revReplace({
+    		// replaceInExtensions: ['.js', '.css', '.html', '.hbs', '.json'] // Replace also in bower.json
+      //   }))
         .pipe(gulp.dest(config.build))
         // Write the rev-manifest.json - used by @osisync
-        .pipe($.rev.manifest())
-        .pipe(gulp.dest(config.build));
+        // .pipe($.rev.manifest())
+        // .pipe(gulp.dest(config.build));
 });
 
 /**
