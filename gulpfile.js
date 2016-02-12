@@ -544,6 +544,7 @@ function startBrowserSync(isDev, specRunner) {
         logLevel: 'info',
         logPrefix: 'osimis',
         notify: true,
+        open: false,
         reloadDelay: 0 //1000
     } ;
     if (specRunner) {
