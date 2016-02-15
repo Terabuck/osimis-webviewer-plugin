@@ -32,7 +32,7 @@ module.exports = function() {
         html: client + '**/*.html',
         htmltemplates: clientApp + '**/*.html',
         images: client + 'images/**/*.*',
-        index: client + 'index.html',
+        index: client + 'osimis-viewer.html',
         config: client + 'config.js',
         // app js, with no specs
         js: [
