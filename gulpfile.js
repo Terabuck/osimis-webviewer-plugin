@@ -625,7 +625,8 @@ function startTests(singleRun, done) {
             child.kill();
         }
         if (karmaResult === 1) {
-            done('karma: tests failed with code ' + karmaResult);
+            log('karma: tests failed with code ' + karmaResult);
+            done();
         } else {
             done();
         }
