@@ -13,13 +13,13 @@ angular.module('webviewer')
       restrict: 'A',
       link: function postLink(scope, element, attrs) {
         var elementScope = angular.element(element).isolateScope() || scope;
-        var IsActivated = $parse(attrs.wvToolEllipticalroi); // method taking a scope as the param
+        var isActivated = $parse(attrs.wvToolEllipticalroi); // method taking a scope as the param
 
         scope.$on('viewport:ViewportLoaded', function() {
-          _trigger(IsActivated(scope));
+          _trigger(isActivated(scope));
         });
 
-        scope.$watch(IsActivated, _trigger);
+        scope.$watch(isActivated, _trigger);
 
         function _trigger(activate) {
           if (typeof activate === 'undefined') return;

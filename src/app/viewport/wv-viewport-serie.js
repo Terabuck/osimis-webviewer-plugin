@@ -7,7 +7,8 @@
  * # wvViewportSerie
  */
 angular.module('webviewer')
-.directive('wvViewportSerie', ['$timeout', '$parse', '$q', 'orthancApiService', function($timeout, $parse, $q, orthancApiService) {
+.directive('wvViewportSerie', ['$timeout', '$parse', '$q', 'orthancApiService',
+function($timeout, $parse, $q, orthancApiService) {
 return {
     scope: false,
     restrict: 'A',
@@ -47,7 +48,7 @@ return {
       });
       scope.$on('serie:GetSerieId', function(evt, fn) {
         fn(ctrl.id);
-      })
+      });
       scope.$on('serie:ShowNextInstance', function(evt, args) {
         var restartWhenSerieEnd = args.restartWhenSerieEnd;
         _showNextInstance(restartWhenSerieEnd);
@@ -76,41 +77,42 @@ return {
 
       var nextTimeout = null;
       var playing = false;
+      function processNextIterationConstantSpeed(speed) {
+        nextTimeout = $timeout(function() {
+          _showNextInstance(true);
+          if (playing)
+            scope.$evalAsync(processNextIterationConstantSpeed);
+        }, speed);
+      }
+      function processNextIterationCalculatedSpeed(mmPerSeconds) {
+        elementScope.$broadcast('viewport:GetInstanceData', function(tags) {
+          if (!tags) return;
+
+          // @todo calculate SpacingBetweenSlices using positions and orientation...
+          var size = +tags.SliceThickness + (+tags.SpacingBetweenSlices || 0); 
+          var fps = mmPerSeconds / size;
+          var speed = Math.round(1000 / fps);
+
+          nextTimeout = $timeout(function() {
+            _showNextInstance(true);
+            if (playing)
+              scope.$evalAsync(processNextIterationCalculatedSpeed);
+          }, speed);
+        });
+      }
       scope.$on('serie:Play', function(evt, args) {
         if (playing) return;
         playing = true;
 
-        var speed = args && args.speed;
 
-        if (speed) {
-          function processNextIteration1() {
-            nextTimeout = $timeout(function() {
-              _showNextInstance(true);
-              if (playing)
-                scope.$evalAsync(processNextIteration1);
-            }, speed);
-          }
-          processNextIteration1();
+        if (args && args.speed) {
+          var speed = args && args.speed;
+          processNextIterationConstantSpeed(speed);
         }
         else {
           // @note very approximative algorithm to automaticaly set speed
           var mmPerSeconds = 25;
-          function processNextIteration2() {
-            elementScope.$broadcast('viewport:GetInstanceData', function(tags) {
-              if (!tags) return;
-
-              var size = +tags.SliceThickness + (+tags.SpacingBetweenSlices || 0); // @todo calculate SpacingBetweenSlices using positions and orientation...
-              var fps = mmPerSeconds / size;
-              speed = Math.round(1000 / fps);
-
-              nextTimeout = $timeout(function() {
-                _showNextInstance(true);
-                if (playing)
-                  scope.$evalAsync(processNextIteration2);
-              }, speed);
-            });
-          }
-          processNextIteration2();
+          processNextIterationCalculatedSpeed(mmPerSeconds);
         }
       });
       scope.$on('serie:Pause', function(evt, args) {
@@ -141,7 +143,7 @@ return {
           var volume = args.volume; // @todo why volume ?
           var instances = args.instances;
 
-          if (!instances || !instances.SlicesShort || instances.SlicesShort.length == 0) return;
+          if (!instances || !instances.SlicesShort || instances.SlicesShort.length === 0) return;
 
           var firstLoad = !_instanceIds || _instanceIds.length === 0;
           
@@ -163,23 +165,23 @@ return {
 
           // @note preload every instance images.
           // @todo refactor
-          $timeout(function() {
-            // wait 250ms that main image is shown
-            (function _preloadImage(index) {
-              if (index + 1 > ctrl.instanceCount) return;
+          // $timeout(function() {
+          //   // wait 250ms that main image is shown
+          //   (function _preloadImage(index) {
+          //     if (index + 1 > ctrl.instanceCount) return;
 
-              var id = _instanceIds[index];
+          //     var id = _instanceIds[index];
 
-              cornerstone
-              .loadAndCacheImage(id)
-              .then(function() {
-                // load tags once image loaded
-                orthancApiService.instance.getTags({id: id});
-                // load next image
-                _preloadImage(index + 1);
-              });
-            })(0);
-          }, 1000);
+          //     cornerstone
+          //     .loadAndCacheImage(id)
+          //     .then(function() {
+          //       // load tags once image loaded
+          //       orthancApiService.instance.getTags({id: id});
+          //       // load next image
+          //       _preloadImage(index + 1);
+          //     });
+          //   })(0);
+          // }, 1000);
         });
       });
       

@@ -13,6 +13,11 @@
    */
   angular
   .module('webviewer', ['ngResource', 'ngSanitize', 'mgcrea.ngStrap', 'ngRangeFilter'])
+  .constant('$', window.$)
+  .constant('_', window._)
+  .constant('hamster', window.Hamster)
+  .constant('cornerstone', window.cornerstone)
+  .constant('cornerstoneTools', window.cornerstoneTools)
   .provider('wvConfig', function() {
     var _config = {
       version: version,
@@ -23,7 +28,7 @@
 
     this.setApiURL = function(url) {
       if (url.substr(-1) === '/') {
-        url = url.substr(0, url.length - 1);;
+        url = url.substr(0, url.length - 1);
       }
 
       _config.orthancApiURL = url;

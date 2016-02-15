@@ -7,7 +7,7 @@
  * # wvToolStackscroll
  */
 angular.module('webviewer')
-.directive('wvToolStackscroll', function($parse) {
+.directive('wvToolStackscroll', function($, _, $parse) {
 return {
   scope: false,
   restrict: 'A',
@@ -27,12 +27,12 @@ return {
         lastY = e.pageY;
 
         elementScope.$apply(function() {
-          if (mouseButton == 1 && deltaX > 0) {
+          if (mouseButton === 1 && deltaX > 0) {
             elementScope.wvInstanceIndex++;
 
             // elementScope.$broadcast('viewport-command', strategy);
           }
-          else if (mouseButton == 1 && deltaX < 0) {
+          else if (mouseButton === 1 && deltaX < 0) {
             elementScope.wvInstanceIndex--;
           }
         });

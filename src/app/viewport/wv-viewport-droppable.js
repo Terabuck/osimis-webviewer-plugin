@@ -9,7 +9,7 @@
 
 // require droppable
 angular.module('webviewer')
-  .directive('wvViewportDroppable', function () {
+  .directive('wvViewportDroppable', function ($) {
     return {
       scope: false,
       restrict: 'A',

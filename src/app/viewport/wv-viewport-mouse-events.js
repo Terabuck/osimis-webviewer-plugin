@@ -7,7 +7,7 @@
  * # wvViewportMouseEvents
  */
 angular.module('webviewer')
-.directive('wvViewportMouseEvents', function () {
+.directive('wvViewportMouseEvents', function ($) {
 return {
   /** scope:
    * wvValuesOfInterest = {windowWidth, windowCenter}
@@ -34,9 +34,10 @@ return {
           var deltaY = e.pageY - lastY;
           lastX = e.pageX;
           lastY = e.pageY;
+          var strategy;
           
-          if (mouseButton == 1) { // left-click + move -> windowing
-            var strategy = {
+          if (mouseButton === 1) { // left-click + move -> windowing
+            strategy = {
               execute: function (viewport) {
                 var scale = viewport.scale;
                 viewport.voi.windowWidth = +viewport.voi.windowWidth + (this.deltaX / scale);
@@ -49,8 +50,8 @@ return {
 
             elementScope.$broadcast('viewport:SetViewport', strategy);
           }
-          else if (mouseButton == 2) { // middle-click + move -> moving
-            var strategy = {
+          else if (mouseButton === 2) { // middle-click + move -> moving
+            strategy = {
               execute: function (viewport) {
                 var scale = viewport.scale;
                 viewport.translation.x = +viewport.translation.x + (this.deltaX / scale);
@@ -63,8 +64,8 @@ return {
 
             elementScope.$broadcast('viewport:SetViewport', strategy);
           }
-          else if (mouseButton == 3) { // right-click + move -> scaling
-            var strategy = {
+          else if (mouseButton === 3) { // right-click + move -> scaling
+            strategy = {
               execute: function (viewport) {
                 viewport.scale = +viewport.scale + (this.deltaY / 100);
                 return viewport;

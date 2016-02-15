@@ -8,7 +8,8 @@
  * Service in the webviewer.
  */
 angular.module('webviewer')
-.factory('orthancApiService', ['$resource', '$cacheFactory', 'wvConfig', function($resource, $cacheFactory, wvConfig) { // refactor to wvApiService
+.factory('orthancApiService', ['$resource', '$cacheFactory', 'wvConfig',
+function($resource, $cacheFactory, wvConfig) { // refactor to wvApiService
     var cache = $cacheFactory('osimis-webviewer');
 
     return {

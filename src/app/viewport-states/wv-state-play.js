@@ -13,13 +13,13 @@ angular.module('webviewer')
       restrict: 'A',
       link: function postLink(scope, element, attrs) {
         var serieScope = scope;
-        var IsActivated = $parse(attrs.wvStatePlay); // method taking a scope as the param
+        var isActivated = $parse(attrs.wvStatePlay); // method taking a scope as the param
 
         scope.$on('serie:SerieLoaded', function() {
-          _trigger(IsActivated(scope));
+          _trigger(isActivated(scope));
         });
 
-        scope.$watch(IsActivated, _trigger);
+        scope.$watch(isActivated, _trigger);
 
         function _trigger(activate) {
           if (typeof activate === 'undefined') return;

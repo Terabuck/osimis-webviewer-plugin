@@ -65,7 +65,8 @@ angular.module('webviewer')
           scope.showTopLeftArea = false;
         }
         else {
-          scope.showTopRightArea = typeof scope.$instance.SeriesNumber !== 'undefined' && typeof scope.$instance.SeriesDescription !== 'undefined';
+          scope.showTopRightArea = typeof scope.$instance.SeriesNumber !== 'undefined' &&
+            typeof scope.$instance.SeriesDescription !== 'undefined';
           scope.showTopLeftArea = true;
         }
       }

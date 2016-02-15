@@ -2,18 +2,24 @@
 
 angular.module('webviewer')
 .run(function(orthancApiService) {
+  var cornerstone = window.cornerstone;
+  var _ = window._;
+  var pako = window.pako;
+  var JpegImage = window.JpegImage;
 
   // register our imageLoader plugin with cornerstone
   cornerstone.registerImageLoader('', function(instanceId) {
     return orthancApiService
     .instance.getImage({id: instanceId})
     .$promise
-    .then(function(image) {
+    .then(function(image) {
       image.imageId = instanceId;
-      if (image.color)
+      if (image.color) {
         image.render = cornerstone.renderColorImage;
-      else
+      }
+      else {
         image.render = cornerstone.renderGrayscaleImage;
+      }
 
       // @todo check memory overhead of memoize
       image.getPixelData = _.memoize(_getPixelData);
@@ -41,7 +47,7 @@ angular.module('webviewer')
     return pixels;
   }
 
-  function _getPixelData() {
+  function _getPixelData() {
     switch (this.Orthanc.Compression) {
       case 'Deflate':
         return _getPixelDataDeflate(this);
@@ -56,22 +62,23 @@ angular.module('webviewer')
     // Decompresses the base64 buffer that was compressed with Deflate
     var s = pako.inflate(window.atob(image.Orthanc.PixelData));
     var pixels = null;
+    var buf, index, i;
 
     if (image.color) {
-      var buf = new ArrayBuffer(s.length / 3 * 4); // RGB32
+      buf = new ArrayBuffer(s.length / 3 * 4); // RGB32
       pixels = new Uint8Array(buf);
-      var index = 0;
-      for (var i = 0, length = s.length; i < length; i += 3) {
+      index = 0;
+      for (i = 0; i < s.length; i += 3) {
         pixels[index++] = s[i];
         pixels[index++] = s[i + 1];
         pixels[index++] = s[i + 2];
         pixels[index++] = 255;  // Alpha channel
       }
     } else {
-      var buf = new ArrayBuffer(s.length * 2); // int16_t
+      buf = new ArrayBuffer(s.length * 2); // int16_t
       pixels = new Int16Array(buf);
-      var index = 0;
-      for (var i = 0, length = s.length; i < length; i += 2) {
+      index = 0;
+      for (i = 0; i < s.length; i += 2) {
         var lower = s[i];
         var upper = s[i + 1];
         pixels[index] = lower + upper * 256;
@@ -88,22 +95,23 @@ angular.module('webviewer')
     jpegReader.parse(jpeg);
     var s = jpegReader.getData(image.width, image.height);
     var pixels = null;
+    var buf, index, i;
 
     if (image.color) {
-      var buf = new ArrayBuffer(s.length / 3 * 4); // RGB32
+      buf = new ArrayBuffer(s.length / 3 * 4); // RGB32
       pixels = new Uint8Array(buf);
-      var index = 0;
-      for (var i = 0, length = s.length; i < length; i += 3) {
+      index = 0;
+      for (i = 0; i < s.length; i += 3) {
         pixels[index++] = s[i];
         pixels[index++] = s[i + 1];
         pixels[index++] = s[i + 2];
         pixels[index++] = 255;  // Alpha channel
       }
     } else {
-      var buf = new ArrayBuffer(s.length * 2); // uint8_t
+      buf = new ArrayBuffer(s.length * 2); // uint8_t
       pixels = new Int16Array(buf);
-      var index = 0;
-      for (var i = 0, length = s.length; i < length; i++) {
+      index = 0;
+      for (i = 0; i < s.length; i++) {
         pixels[index] = s[i];
         index++;
       }
@@ -114,4 +122,5 @@ angular.module('webviewer')
     }
 
     return pixels;
-  }});
+  }
+});

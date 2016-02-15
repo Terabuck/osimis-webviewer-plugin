@@ -7,21 +7,21 @@
  * # wvToolPan
  */
 angular.module('webviewer')
-  .directive('wvToolPan', function($parse) {
+  .directive('wvToolPan', function($, $parse) {
     return {
       scope: false,
       restrict: 'A',
       link: function postLink(scope, element, attrs) {
         var elementScope = angular.element(element).isolateScope() || scope;
-        var IsActivated = $parse(attrs.wvToolPan); // method taking a scope as the param
+        var isActivated = $parse(attrs.wvToolPan); // method taking a scope as the param
         
         // @note cornerstoneTools.move is buggy
 
         scope.$on('viewport:ViewportLoaded', function() {
-          _trigger(IsActivated(scope));
+          _trigger(isActivated(scope));
         });
 
-        scope.$watch(IsActivated, _trigger);
+        scope.$watch(isActivated, _trigger);
 
         function _evtFn(e) {
           var lastX = e.pageX;
@@ -29,7 +29,7 @@ angular.module('webviewer')
           var mouseButton = e.which;
 
           var ctrl = this.ctrl;
-          e.stopImmediatePropagation()
+          e.stopImmediatePropagation();
 
           $(document).mousemove(function(e) {
             scope.$apply(function() {  // @todo necessary ?
@@ -38,7 +38,7 @@ angular.module('webviewer')
               lastX = e.pageX;
               lastY = e.pageY;
 
-              if (mouseButton == 1) { // left-click + move -> windowing
+              if (mouseButton === 1) { // left-click + move -> windowing
                 var strategy = {
                   execute: function (viewport) {
                     var scale = viewport.scale;

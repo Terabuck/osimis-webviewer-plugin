@@ -7,7 +7,7 @@
  * # wvViewport
  */
 angular.module('webviewer')
-.directive('wvViewport', ['$q', 'orthancApiService', function($q, orthancApiService) {
+.directive('wvViewport', function($, _, cornerstone, cornerstoneTools, $q, orthancApiService) {
 return {
   scope: {
     wvInstance: '=?',
@@ -21,16 +21,19 @@ return {
   restrict: 'E',
   replace: false,
   controller: function($scope) {
-    var _domElement = undefined;
+    var _domElement;
     this.setDomElement = function(dom) {
       _domElement = dom;
-    }
+    };
     this.setViewport = function(strategy) {
+      var viewport;
+
       try {
-        var viewport = cornerstone.getViewport(_domElement);        
+        viewport = cornerstone.getViewport(_domElement);        
       } catch(ex) {
         return;
       }
+
       if (!viewport) return;
       viewport = strategy.execute(viewport);
       cornerstone.setViewport(_domElement, viewport);
@@ -97,12 +100,12 @@ return {
         if (!_image) return;
         
         var name = args.tool;
-        var args = args.arguments;
+        var opts = args.arguments;
 
         var tool = cornerstoneTools[name];
 
         cornerstoneTools.mouseInput.enable(domElement);
-        tool.activate.apply(tool, [domElement].concat(args));
+        tool.activate.apply(tool, [domElement].concat(opts));
       });
       scope.$on('viewport:DeactivateTool', function(evt, args) {
         if (!_image) return;
@@ -116,13 +119,13 @@ return {
       });
   
       domElement.ctrl = ctrl;
-      scope.$on('viewport:ListenDomEvent', function(evt, args) {
+      scope.$on('viewport:ListenDomEvent', function(evt_, args) {
         var evt = args.evt;
         var fn = args.fn;
         
         jqElement.on(evt, fn);
       });
-      scope.$on('viewport:UnlistenDomEvent', function(evt, args) {
+      scope.$on('viewport:UnlistenDomEvent', function(evt_, args) {
         var evt = args.evt;
         var fn = args.fn;
 
@@ -191,16 +194,19 @@ return {
         var wvWidth = newValues[0];
         var wvHeight = newValues[1];
         var width, height;
+        var ratio;
 
         // @todo prevent recursive call (http://jsfiddle.net/ubdr3ou5/)
         // @todo check scope is the last argument
         
+        /* jshint -W116 */
         if (wvWidth === null || wvWidth == undefined) {
           wvWidth = 'auto';
         }
         if (wvHeight === null || wvHeight == undefined) {
           wvHeight = 'auto';
         }
+        /* jshint +W116 */
 
         if (wvWidth === 'auto' && wvHeight === 'auto') {
           if (!_image) return;
@@ -212,7 +218,7 @@ return {
           // resize width & fit height based on wvWidth param
           if (!_image) return;
           var maxWidth = wvWidth;
-          var ratio = _image.width/_image.height;
+          ratio = _image.width/_image.height;
           width = _image.width < maxWidth ? _image.width : maxWidth;
           height = Math.round(width * (1/ratio));
         }
@@ -220,7 +226,7 @@ return {
           // resize height && fit width based on wvHeightParam
           if (!_image) return;
           var maxHeight = wvHeight;
-          var ratio = _image.width/_image.height;
+          ratio = _image.width/_image.height;
           height = _image.height < maxHeight ? _image.height : maxHeight;
           width = Math.round(height * ratio);
         }
@@ -282,4 +288,4 @@ return {
       }
   }
 };
-}]);
+});
