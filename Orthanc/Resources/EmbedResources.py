@@ -116,7 +116,7 @@ while i < len(SOURCES):
                     else:
                         r = os.path.join(base, f)
 
-                    CheckNoUpcase(r)
+                    # CheckNoUpcase(r)
                     r = '/' + r.replace('\\', '/')
                     if r in content:
                         raise Exception("Twice the same filename (check case): " + r)
