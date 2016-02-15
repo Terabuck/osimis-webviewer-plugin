@@ -21,6 +21,7 @@ var port = process.env.PORT || config.defaultPort;
  * --debug    : Launch debugger with node-inspector.
  * --debug-brk: Launch debugger and break on 1st line with node-inspector.
  * --startServers: Will start servers for midway tests on the test task.
+ * --novet    : Disable jscs & jshint
  */
 
 /**
@@ -34,6 +35,8 @@ gulp.task('default', ['help']);
  * @return {Stream}
  */
 gulp.task('vet', function() {
+    if (args.novet) return;
+    
     log('Analyzing source with JSHint and JSCS');
 
     return gulp
@@ -268,7 +271,7 @@ gulp.task('optimize', ['inject'], function() {
       //   .pipe($.revReplace({
     		// replaceInExtensions: ['.js', '.css', '.html', '.hbs', '.json'] // Replace also in bower.json
       //   }))
-        .pipe(gulp.dest(config.build))
+        .pipe(gulp.dest(config.build));
         // Write the rev-manifest.json - used by @osisync
         // .pipe($.rev.manifest())
         // .pipe(gulp.dest(config.build));
