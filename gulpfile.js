@@ -22,6 +22,7 @@ var port = process.env.PORT || config.defaultPort;
  * --debug-brk: Launch debugger and break on 1st line with node-inspector.
  * --startServers: Will start servers for midway tests on the test task.
  * --novet    : Disable jscs & jshint
+ * --nojscs   : Disable jscs
  */
 
 /**
@@ -45,7 +46,7 @@ gulp.task('vet', function() {
         .pipe($.jshint())
         .pipe($.jshint.reporter('jshint-stylish', {verbose: true}))
         // .pipe($.jshint.reporter('fail'))
-        .pipe($.jscs());
+        .pipe($.if(!args.nojscs, $.jscs()));
 });
 
 /**
