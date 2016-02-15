@@ -3,6 +3,9 @@ ThirdPartyDownloads/
 .gitignore
 AUTHORS
 NEWS
-WebApplication/docs/
+subtrees/webViewer.git/_old/
+subtrees/webViewer.git/bower_components/
+subtrees/webViewer.git/build/
+subtrees/webViewer.git/node_modules/
 
 CMakeLists.txt.user

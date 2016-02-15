@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "init": "npm install",
-    "install": "bower install",
+    "install": "bower install --allow-root",
     "start": "node ./server.js",
     "test": "gulp test"
   },

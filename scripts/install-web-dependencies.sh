@@ -17,5 +17,5 @@ rvm use default
 
 gem install compass
 
-# install bower, grunt & grunt-cli
-npm install -g bower grunt grunt-cli
+# install bower & gulp
+npm install -g bower gulp
