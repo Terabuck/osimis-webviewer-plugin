@@ -68,6 +68,7 @@
     "minimist": "^1.1.0",
     "mocha": "^2.2.5",
     "node-notifier": "^4.0.3",
+    "osisync": "git+https://bitbucket.org/osimis/osisync.git",
     "phantomjs": "^1.9.17",
     "plato": "^1.2.0",
     "q": "^1.0.1",

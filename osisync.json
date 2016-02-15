@@ -1,0 +1,28 @@
+{
+  "name": "webViewer",
+  "prefix": "wv",
+  "ignore": [
+    "**/*.spec.js"
+  ],
+  "dev": {
+    "inject:js": [
+        "src/app/**/*.module.js",
+        "src/app/**/*.js"
+    ],
+    "inject:templates:js": [
+        ".tmp/templates.js"
+    ],
+    "inject:css": [
+        ".tmp/styles.css"
+    ]
+  },
+  "build": {
+    "js/app.js": [
+        "inject:js",
+        "inject:templates:js"
+    ],
+    "styles/app.css": [
+        "inject:css"
+    ]
+  }
+}

@@ -7,6 +7,7 @@ var gulp = require('gulp');
 var path = require('path');
 var _ = require('lodash');
 var $ = require('gulp-load-plugins')({lazy: true});
+var osisync = require('osisync').slave;
 
 var colors = $.util.colors;
 var envenv = $.util.env;
@@ -224,6 +225,65 @@ gulp.task('build', ['optimize', 'images', 'fonts'], function() {
     notify(msg);
 });
 
+// Just do the preprocess tasks required by dev mode
+gulp.task('osisync', ['styles', 'templatecache'], function() {
+    log('OsiSync: Watch and update changes and serve files');
+
+    gulp.watch([config.htmltemplates], ['templatecache']).on('change', changeEvent);
+    gulp.watch([config.scss], ['styles']).on('change', changeEvent);
+
+    // start server
+    var debugMode = '--debug';
+    var nodeOptions = getNodeOptions(true);
+
+    // @todo use standard express start instead of nodemon - no need to restart
+    nodeOptions.nodeArgs = [debugMode + '=7124']; // @todo use random port
+
+    if (args.verbose) {
+        console.log(nodeOptions);
+    }
+
+    return $.nodemon(nodeOptions)
+        .on('start', function () {
+            console.log('*** nodemon started');
+
+            // @todo should be in server.js with real ports
+            osisync.start({
+                host: 'localhost',
+                port: port
+            });
+        });
+});
+
+// Just do the preprocess tasks required by dev mode
+gulp.task('osisync', ['styles', 'templatecache'], function() {
+    log('OsiSync: Watch and update changes and serve files');
+
+    gulp.watch([config.htmltemplates], ['templatecache']).on('change', changeEvent);
+    gulp.watch([config.htmltemplates], ['templatecache']).on('change', changeEvent);
+
+    // start server
+    var debugMode = '--debug';
+    var nodeOptions = getNodeOptions(true);
+
+    // @todo use standard express start instead of nodemon - no need to restart
+    nodeOptions.nodeArgs = [debugMode + '=7124']; // @todo use random port
+
+    if (args.verbose) {
+        console.log(nodeOptions);
+    }
+
+    return $.nodemon(nodeOptions)
+        .on('start', function () {
+            console.log('*** nodemon started');
+
+            // @todo should be in server.js with real ports
+            osisync.start({
+                host: 'localhost',
+                port: port
+            });
+        });
+});
 /**
  * Optimize all files, move to a build folder,
  * and inject them into the new index.html
@@ -458,7 +518,7 @@ function serve(isDev, specRunner) {
     var debugMode = '--debug';
     var nodeOptions = getNodeOptions(isDev);
 
-    nodeOptions.nodeArgs = [debugMode + '=5858'];
+    nodeOptions.nodeArgs = [debugMode + '=7124'];
 
     if (args.verbose) {
         console.log(nodeOptions);
@@ -499,7 +559,7 @@ function getNodeOptions(isDev) {
 
 //function runNodeInspector() {
 //    log('Running node-inspector.');
-//    log('Browse to http://localhost:8080/debug?port=5858');
+//    log('Browse to http://localhost:8080/debug?port=7124');
 //    var exec = require('child_process').exec;
 //    exec('node-inspector');
 //}
