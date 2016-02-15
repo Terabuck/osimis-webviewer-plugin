@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "init": "npm install",
-    "install": "bower install",
+    "install": "bower install --allow-root",
     "start": "node ./server.js",
     "test": "gulp test"
   },
@@ -33,7 +33,6 @@
     "gulp-filter": "^2.0.2",
     "gulp-header": "^1.2.2",
     "gulp-if": "^1.2.5",
-    "gulp-imagemin": "^2.3.0",
     "gulp-inject": "^1.0.1",
     "gulp-jscs": "^2.0.0",
     "gulp-jshint": "^1.7.1",
