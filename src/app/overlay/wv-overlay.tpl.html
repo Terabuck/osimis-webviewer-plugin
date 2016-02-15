@@ -1,0 +1,18 @@
+<div class="wv-overlay">
+    <div class="wv-overlay-topleft" ng-if="showTopLeftArea">
+        {{$instance.PatientName}}<br/>
+        {{$instance.PatientID}}
+    </div>
+    <div class="wv-overlay-topright" ng-if="showTopRightArea">
+        {{$instance.StudyDescription}}<br/>
+        {{$instance.StudyDate}}<br/>
+        #{{$instance.SeriesNumber}} - {{$instance.SeriesDescription}}<br/>
+    </div>
+    
+    <div class="wv-overlay-bottomright" ng-if="showBottomRightArea">
+        zoom: {{$viewport.scale}}<br/>
+        ww/wc: {{$viewport.voi.windowWidth}}/{{$viewport.voi.windowCenter}}
+    </div>
+    
+    <wv-overlay-scrollbar ng-if="wvShowTimeline"></wv-overlay-scrollbar>
+</div>

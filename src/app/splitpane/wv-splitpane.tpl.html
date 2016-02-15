@@ -1,0 +1,30 @@
+<div class="wv-splitpane">
+    <div 
+        ng-repeat="$y in y | range track by $index"
+    	class="wv-splitpane-row" ng-style="{height: rowHeight}"
+	>
+        <div
+            ng-repeat="$x in x | range track by $index"
+        	class="wv-splitpane-cell" ng-style="{width: rowWidth}"
+        	wv-size-tag
+        	ng-transclude
+    	>
+            <wv-viewport wv-viewport-serie="{id: randomSerieId}" wv-width="'tag'" wv-height="'tag'"
+                wv-viewport-droppable
+                wv-viewport-mouse-events
+                wv-scroll-on-wheel="true"
+                wv-enable-overlay="!wvSettings || wvSettings.hasOwnProperty('overlay') == false || wvSettings.overlay"
+
+                wv-tool-zoom="wvSettings.zoom"
+                wv-tool-pan="wvSettings.pan"
+                wv-tool-lengthmeasure="wvSettings.lengthmeasure"
+                wv-tool-anglemeasure="wvSettings.anglemeasure"
+                wv-tool-pixelprobe="wvSettings.pixelprobe"
+                wv-tool-ellipticalroi="wvSettings.ellipticalroi"
+                wv-tool-rectangleroi="wvSettings.rectangleroi"
+                wv-state-invert="wvSettings.invert"
+                wv-state-play="wvSettings.play"
+            ></wv-viewport>
+        </div>
+    </div>
+</div>

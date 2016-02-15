@@ -1,0 +1,68 @@
+.wv-overlay {
+    position: absolute;
+    
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    color: orange;
+}
+
+.wv-overlay-topleft {
+    position: absolute;
+    top: 0rem;
+    left: 0rem;
+    text-align: left;
+}
+
+.wv-overlay-topright {
+    position: absolute;
+    top: 0rem;
+    right: 0rem;
+    text-align: right;
+}
+
+.wv-overlay-bottomright {
+    position: absolute;
+    bottom: 0rem;
+    right: 0rem;
+    text-align: right;
+}
+
+.wv-overlay-bottomleft {
+    position: absolute;
+    bottom: 0rem;
+    left: 0rem;
+    text-align: left;
+}
+
+.wv-overlay-topleft, .wv-overlay-topright, .wv-overlay-bottomright, .wv-overlay-bottomleft {
+    padding: 2rem;
+    transition: color 500ms, background-color 500ms;
+    background-color: rgba(0, 0, 0, 0.66);
+}
+
+.wv-overlay-topleft:hover, .wv-overlay-topright:hover, .wv-overlay-bottomright:hover, .wv-overlay-bottomleft:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.wv-overlay-scrollbar {
+    position: absolute;
+    bottom:0;
+    left:0;
+    height: 4px;
+    background-color: red;
+    will-change: right;
+    transform-origin: 0% 50%;
+}
+
+.wv-overlay-scrollbar-text {
+    position: absolute;
+    bottom: calc(1em + 5px);
+    left: 5px;
+    height: 1em;
+    color: red;
+    font-size: 0.8em;
+    font-family: helvetica;
+}
