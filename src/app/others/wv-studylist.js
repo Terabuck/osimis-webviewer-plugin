@@ -18,7 +18,7 @@ angular.module('webviewer')
         'bs-options="study.value as study.label for study in studies"',
         ' bs-select>',
         '</button>'
-      ].join(),
+      ].join(''),
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
         scope.studies = [];
