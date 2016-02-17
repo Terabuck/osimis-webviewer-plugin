@@ -21,8 +21,8 @@
   .provider('wvConfig', function() {
     var _config = {
       version: version,
-      orthancApiURL: '/',
-      webviewerApiURL: '/web-viewer',
+      orthancApiURL: '',
+      webviewerApiURL: 'web-viewer',
       defaultCompression: 'jpeg95'
     };
 
