@@ -41,8 +41,8 @@ angular.module('webviewer')
         _onViewportData(viewport);
       });
 
-      scope.$on('serie:SerieChanged', function(evt, tags, instanceCount) {
-        _onSerieData(tags, instanceCount);
+      scope.$on('SerieHasChanged', function(evt, serie) {
+        _onSerieData(serie.tags, serie.instanceCount);
         scope.$instance = {}; // instance should change automaticaly
       });
       scope.$on('viewport:InstanceChanged', function(evt, tags) {

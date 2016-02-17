@@ -13,26 +13,14 @@ angular.module('webviewer')
   return {
     scope: false,
     restrict: 'A',
-    require: '?wvViewportSerie',
     link: function postLink(scope, element, attrs, serieCtrl) {
-      // @todo use directive communication w/ angular require instead 'coz this directive is dependant
-      var serieScope = scope;
+      var _serie = null;
 
-      var getSerieId;
-      if (serieCtrl) { // @todo use more generic method
-        getSerieId = function() { return serieCtrl.id; }; // method taking a scope as the param
-      }
-      else {
-        getSerieId = function() {
-          var _id;
-          scope.$broadcast('serie:GetSerieId', function(id) {
-            _id = id;
-          });
-          return _id;
-        };
-      }
+      scope.$on('SerieHasChanged', function(evt, serie) {
+        _serie = serie;
+      });
 
-      // @todo style
+      // @todo style the clone handler
       var clone = $('<div class="wv-draggable-clone"></div>');
       element.draggable({
         helper: function() {
@@ -40,7 +28,7 @@ angular.module('webviewer')
         },
         start: function(evt, ui) {
           var draggedElement = ui.helper;
-          draggedElement.data('serie-id', getSerieId(serieScope));
+          draggedElement.data('serie-id', _serie.id);
           draggedElement.width(element.width());
           draggedElement.height(element.height());
         },

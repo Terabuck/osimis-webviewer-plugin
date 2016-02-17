@@ -78,14 +78,17 @@ return {
           };
         }
       });
-
-      scope.$on('viewport:GetInstanceData', function(evt, fn) {
-        fn(scope.wvInstance.tags);
-      });
-      scope.$on('viewport:SetInstance', function(evt, args) {
+  
+      //scope.$on('viewport:SetInstance', function(evt, args) {});
+      // @todo move in controller
+      ctrl.setInstance = function(args) {
         _adaptWindowingOnNextChange = args.adaptWindowing || false;
         _adaptSizeOnNextChange = args.adaptSize || false;
         scope.wvInstance.id = args.id;
+      };
+
+      scope.$on('viewport:GetInstanceData', function(evt, fn) {
+        fn(scope.wvInstance.tags);
       });
 
       scope.$on('viewport:GetViewportData', function(evt, fn) {
