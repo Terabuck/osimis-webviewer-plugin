@@ -79,5 +79,15 @@ namespace OrthancPlugins
 
     void Prefetch(int bundle,
                   const std::string& item);
+
+    ICacheFactory& GetFactory(int bundle);
+
+    void SetProperty(CacheProperty property,
+                     const std::string& value);
+
+    bool LookupProperty(std::string& target,
+                        CacheProperty property);
+
+    void Clear();
   };
 }

@@ -59,7 +59,7 @@ include(${CMAKE_SOURCE_DIR}/Resources/CMake/JavaScriptLibraries.cmake)
 
 # Check that the Orthanc SDK headers are available or download them
 if (STATIC_BUILD OR NOT USE_SYSTEM_ORTHANC_SDK)
-  include_directories(${ORTHANC_ROOT}/Sdk-0.9.4)
+  include_directories(${ORTHANC_ROOT}/Sdk-0.9.5)
 else ()
   CHECK_INCLUDE_FILE_CXX(orthanc/OrthancCPlugin.h HAVE_ORTHANC_H)
   if (NOT HAVE_ORTHANC_H)
@@ -152,10 +152,7 @@ set(CORE_SOURCES
   ${CMAKE_SOURCE_DIR}/Plugin/Cache/CacheManager.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Cache/CacheScheduler.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/ViewerToolbox.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/SeriesVolumeSorter.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/ViewerPrefetchPolicy.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/InstanceInformation.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/InstanceInformationAdapter.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/SeriesInformationAdapter.cpp
   )
 
@@ -166,8 +163,10 @@ add_library(OsimisWebViewer
   ${CMAKE_SOURCE_DIR}/Plugin/Plugin.cpp
 
   # The following files depend on GDCM
-  ${CMAKE_SOURCE_DIR}/Plugin/ParsedDicomImage.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/DecodedImageAdapter.cpp
+  ${CMAKE_SOURCE_DIR}/Orthanc/Plugins/Samples/GdcmDecoder/GdcmImageDecoder.cpp
+  ${CMAKE_SOURCE_DIR}/Orthanc/Plugins/Samples/GdcmDecoder/GdcmDecoderCache.cpp
+  ${CMAKE_SOURCE_DIR}/Orthanc/Plugins/Samples/GdcmDecoder/OrthancImageWrapper.cpp
   )
 
 
