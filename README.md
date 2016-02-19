@@ -32,3 +32,8 @@ For security reasons, you should protect your instance of Orthanc by changing th
 (note: Remove datas by default. Use the volume instruction when running docker image !)
 docker pull osimis/osimis:latest
 ```
+
+# Pulling changes from Fork origin
+To retrieve changes from original mercurial repo to git fork, uses
+- https://github.com/fingolfin/git-remote-hg 
+-> This is insanely awesome, thanks god !
