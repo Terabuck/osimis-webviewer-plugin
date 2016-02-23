@@ -36,7 +36,7 @@ cmake -DALLOW_DOWNLOADS:BOOL=ON \
     ..
 make -j$COUNT_CORES
 ./UnitTests
-cp -L libOrthancWebViewer.so /usr/share/orthanc/plugins/
+cp -L libOsimisWebViewer.so /usr/share/orthanc/plugins/
 
 # Remove the build directory to recover space
 cd /root/
