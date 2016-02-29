@@ -197,7 +197,7 @@
                 }
             })
             .then(function() {
-                if (doAutoScaleImage) {
+                if (doAutoScaleImage || resetConfig) {
                     _this.autoScaleImage();
                 }
                 
