@@ -12,7 +12,7 @@
    * Main module of the application.
    */
   angular
-  .module('webviewer', ['ngResource', 'ngSanitize', 'mgcrea.ngStrap', 'ngRangeFilter'])
+  .module('webviewer', ['ngResource', 'ngSanitize', 'mgcrea.ngStrap', 'ngRangeFilter', 'debounce'])
   .constant('$', window.$)
   .constant('_', window._)
   .constant('hamster', window.Hamster)
