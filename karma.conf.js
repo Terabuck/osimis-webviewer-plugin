@@ -28,6 +28,11 @@ module.exports = function(config) {
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
         reporters: ['mocha'/*, 'coverage'*/],
         
+        mochaReporter: {
+            output: 'full',
+            showDiff: 'unified'
+        },
+
         // coverageReporter: {
         //     dir: gulpConfig.karma.coverage.dir,
         //     reporters: gulpConfig.karma.coverage.reporters
@@ -42,7 +47,7 @@ module.exports = function(config) {
         // level of logging
         // possible values: config.LOG_DISABLE || config.LOG_ERROR ||
         // config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-        logLevel: config.LOG_WARN,
+        logLevel: config.LOG_INFO,
 
         // enable / disable watching file and executing tests whenever any file changes
         autoWatch: true,
