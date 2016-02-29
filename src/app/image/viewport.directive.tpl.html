@@ -5,7 +5,7 @@
   onmousedown="return false;"
   style="position: relative;"
 >
-  <ng-transclude>
-    <wv-overlay ng-if="wvEnableOverlay"></wv-overlay>
-  </ng-transclude>
+    <ng-transclude>
+        <wv-overlay wv-tags="vm.wvTags" wv-viewport="vm.wvViewport" ng-if="vm.wvEnableOverlay"></wv-overlay>
+    </ng-transclude>
 </div>

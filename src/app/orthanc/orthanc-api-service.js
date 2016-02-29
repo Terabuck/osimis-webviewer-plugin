@@ -20,12 +20,13 @@ function($resource, $cacheFactory, wvConfig) { // refactor to wvApiService
         // ordered instances
         listInstances: { method: 'GET', url: wvConfig.orthancApiURL + '/series/:id/ordered-slices', cache: cache }
       }),
-      instance: $resource(wvConfig.webviewerApiURL + '/instances/:compression-:id', { // @todo cache ?
+      instance: $resource(wvConfig.webviewerApiURL + '/instances/:compression-:id:frame', { // @todo cache ?
         compression: wvConfig.defaultCompression, 
-        id: '@id'
+        id: '@id',
+        frame: '_0'
       }, {
-        getTags: { method: 'GET', url: wvConfig.orthancApiURL + '/instances/:id/simplified-tags', cache: cache },
-        getImage: { method: 'GET', url: wvConfig.webviewerApiURL + '/instances/:compression-:id'}
+        getTags: { method: 'GET', url: wvConfig.orthancApiURL + '/instances/:id/simplified-tags:compression:frame', cache: cache, params: {id:'@id', frame:'', compression:''} },
+        getImage: { method: 'GET', url: wvConfig.webviewerApiURL + '/instances/:compression-:id:frame' }
       }),
       study: $resource(wvConfig.orthancApiURL + '/studies/:id', {
         id: '@id'
