@@ -6,7 +6,7 @@
         .factory('wvOrthancSerieAdapter', wvOrthancSerieAdapter);
 
     /* @ngInject */
-    function wvOrthancSerieAdapter(wvSerie) {
+    function wvOrthancSerieAdapter(WVSerieModel) {
         var service = {
             process: process
         };
@@ -44,13 +44,10 @@
             }
 
             var series = imagesBySerie.map(function(imageIds, serieIndex) {
-                var serie = wvSerie.create(
-                    orthancSerie.ID + ':' + serieIndex,
-                    imageIds,
-                    orthancSerie.MainDicomTags
-                );
+                var id = orthancSerie.ID + ':' + serieIndex;
+                var tags = orthancSerie.MainDicomTags;
 
-                return serie;
+                return new WVSerieModel(id, imageIds, tags);
             });
 
             return series;

@@ -7,7 +7,7 @@
  * # wvSerielist
  */
 angular.module('webviewer')
-.directive('wvSerielist', ['wvSerieRepository', function(wvSerieRepository) {
+.directive('wvSerielist', ['wvSerie', function(wvSerie) {
 return {
   scope: {
     wvStudy: '=',
@@ -28,7 +28,7 @@ return {
       if (!id) return; 
       // @todo handle IsStable === false
 
-      wvSerieRepository
+      wvSerie
         .listFromOrthancStudyId(id)
         .then(function(series) {
           scope.serieIds = series.map(function(serie) {

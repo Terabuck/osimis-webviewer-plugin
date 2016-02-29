@@ -6,7 +6,7 @@ describe('serie', function() {
         bard.appModule('webviewer');
         
         bard.inject(this, '$controller', '$q', '$rootScope', '$timeout', '$httpBackend',
-            'wvConfig', 'wvSerieRepository', 'wvOrthancSerieAdapter', 'wvSerie');
+            'wvConfig', 'wvSerie', 'wvOrthancSerieAdapter', 'wvSerie');
 
         _.forEach(orthanc.raw, function(data, path) {
           $httpBackend
@@ -22,7 +22,7 @@ describe('serie', function() {
       var orthancSerie = orthanc.series.with2SingleFrameInstances;
 
       // when
-      var serie = wvSerieRepository.listFromOrthancSerieId(orthancSerie.ID);
+      var serie = wvSerie.listFromOrthancSerieId(orthancSerie.ID);
 
       // then
       expect(serie.then).to.not.equal(undefined);
@@ -35,7 +35,7 @@ describe('serie', function() {
       var orthancStudy = orthanc.studies.withMultiFrameInstances; // 25 wv series in that data sheet
 
       // when
-      wvSerieRepository
+      wvSerie
       .listFromOrthancStudyId(orthancStudy.ID)
       .then(function(wvSeries) {
 
@@ -54,7 +54,7 @@ describe('serie', function() {
       var orthancSortedInstances = orthanc.sortedInstances.with2SingleFrameInstances;
 
       // when
-      wvSerieRepository
+      wvSerie
       .listFromOrthancSerieId(orthancSerie.ID)
       .then(function(wvSerie) {
 
