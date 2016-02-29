@@ -6,7 +6,7 @@
         .directive('wvViewport', wvViewport);
 
     /* @ngInject */
-    function wvViewport($, _, cornerstone, cornerstoneTools, $q, $parse, wvImageRepository) {
+    function wvViewport($, _, cornerstone, cornerstoneTools, $q, $parse, wvImage) {
         // Usage:
         //
         // Creates:
@@ -45,7 +45,7 @@
          */
         function link(scope, element, attrs, ctrls) {
             var enabledElement = element.children('.wv-cornerstone-enabled-image')[0];
-            var model = new ViewportViewModel($q, wvImageRepository, enabledElement);
+            var model = new ViewportViewModel($q, wvImage, enabledElement);
             var _resetConfigOnImageChange = false;
 
             scope.vm.wvEnableOverlay = !!scope.vm.wvEnableOverlay;
@@ -144,7 +144,7 @@
      *
      * @ngInject
      */
-    function Controller($scope, $element, cornerstone, wvImageRepository) {
+    function Controller($scope, $element, cornerstone, wvImage) {
         this.getImage = angular.noop;
         this.setImage = angular.noop;
         this.clearImage = angular.noop;

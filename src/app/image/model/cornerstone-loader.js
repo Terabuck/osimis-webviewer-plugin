@@ -15,7 +15,7 @@
     }
 
     /* @ngInject */
-    function wvCornerstoneLoader(_, pako, JpegImage, cornerstone, wvImageRepository) {
+    function wvCornerstoneLoader(_, pako, JpegImage, cornerstone, wvImage) {
 
         // @todo refactor into image repository
         // and create a factory instead
@@ -31,7 +31,7 @@
         //////////
 
         function getCompressedImage(id) {
-            return wvImageRepository
+            return wvImage
                 .getCompressedImage(id)
                 .then(function(image) {
                     image.imageId = id;

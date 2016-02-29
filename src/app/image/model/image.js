@@ -3,10 +3,10 @@
 
     angular
         .module('webviewer')
-        .factory('wvImageRepository', wvImageRepository);
+        .factory('wvImage', wvImage);
 
     /* @ngInject */
-    function wvImageRepository($http, $q, wvConfig, wvImageModel) {
+    function wvImage($http, $q, wvConfig, WVImageModel) {
         var service = {
             get: get,
             getCompressedImage: getCompressedImage
@@ -24,7 +24,7 @@
                 .get(wvConfig.orthancApiURL + '/instances/'+instanceId+'/simplified-tags')
 				.then(function(response) {
 				    var tags = response.data;
-                    return wvImageModel.create(id, tags);
+                    return new WVImageModel(id, tags);
 				});
         };
 
