@@ -346,6 +346,7 @@ gulp.task('test', ['vet', 'templatecache'], function(done) {
  *    gulp autotest --startServers
  */
 gulp.task('autotest', function(done) {
+    // @todo auto retrigger build-specs ?
     startTests(false /*singleRun*/ , done);
 });
 
@@ -595,7 +596,7 @@ function startTests(singleRun, done) {
     var child;
     var excludeFiles = [];
     var fork = require('child_process').fork;
-    var karma = require('karma').server;
+    var karma = require('karma');
     var serverSpecs = config.serverIntegrationSpecs;
 
     if (args.startServers) {
@@ -610,11 +611,12 @@ function startTests(singleRun, done) {
         }
     }
 
-    karma.start({
+    var karmaServer = new karma.Server({
         configFile: __dirname + '/karma.conf.js',
         exclude: excludeFiles,
         singleRun: !!singleRun
     }, karmaCompleted);
+    karmaServer.start();
 
     ////////////////
 
