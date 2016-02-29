@@ -3,24 +3,12 @@
 
     angular
         .module('webviewer')
-        .factory('wvSerie', wvSerie);
+        .factory('WVSerieModel', factory);
 
     /* @ngInject */
-    function wvSerie($timeout) {
-        var service = {
-            create: create,
-            class: SerieModel
-        };
+    function factory($timeout) {
 
-        ////////////////
-
-        function create(id, imageIds, tags) {
-        	return new SerieModel(id, imageIds, tags);
-        }
-
-        ////////////////
-
-        function SerieModel(id, imageIds, tags) {
+        function WVSerieModel(id, imageIds, tags) {
             this.id = id; // id == orthancId + ':' + subSerieIndex
             this.imageIds = imageIds;
             this.imageCount = imageIds.length;
@@ -32,11 +20,11 @@
             this._playTimeout = null;
         };
 
-        SerieModel.prototype.getCurrentImageId = function() {
+        WVSerieModel.prototype.getCurrentImageId = function() {
            return this.imageIds[this.currentIndex];
         };
 
-        SerieModel.prototype.goToNextImage = function(restartWhenSerieEnd) {
+        WVSerieModel.prototype.goToNextImage = function(restartWhenSerieEnd) {
             if (restartWhenSerieEnd !== true) restartWhenSerieEnd = false;
             
             this.currentIndex++;
@@ -48,7 +36,7 @@
             this.onCurrentImageIdChanged.trigger(this.getCurrentImageId());
         };
 
-        SerieModel.prototype.goToPreviousImage = function() {
+        WVSerieModel.prototype.goToPreviousImage = function() {
             this.currentIndex--;
 
             if (this.currentIndex < 0) {
@@ -58,7 +46,7 @@
             this.onCurrentImageIdChanged.trigger(this.getCurrentImageId());
         };
 
-        SerieModel.prototype.goToImage = function(newIndex) {
+        WVSerieModel.prototype.goToImage = function(newIndex) {
             if (newIndex < 0) {
               newIndex = 0;
             }
@@ -70,7 +58,7 @@
             this.onCurrentImageIdChanged.trigger(this.getCurrentImageId());
         };
 
-        SerieModel.prototype.play = function(speed) {
+        WVSerieModel.prototype.play = function(speed) {
             if (this.isPlaying) return;
 
             if (speed) {
@@ -82,7 +70,7 @@
             }
         };
 
-        SerieModel.prototype.pause = function() {
+        WVSerieModel.prototype.pause = function() {
             if (this._playTimeout) {
               $timeout.cancel(this._playTimeout);
               this._playTimeout = null;
@@ -91,7 +79,7 @@
             this.isPlaying = false;
         };
 
-        SerieModel.prototype.playAtSpeed = function(speed) {
+        WVSerieModel.prototype.playAtSpeed = function(speed) {
             var _this = this;
 
             this._playTimeout = $timeout(function() {
@@ -104,7 +92,7 @@
             this.isPlaying = true;
         };
 
-        SerieModel.prototype.playAtRate = function(rate) {
+        WVSerieModel.prototype.playAtRate = function(rate) {
             this.playAtSpeed(50);
             // @todo require instance datas
             // @note very approximative algorithm to automaticaly set speed
@@ -127,8 +115,7 @@
 
         ////////////////
 
-        return service;
+        return WVSerieModel;
     }
-
 
 })();

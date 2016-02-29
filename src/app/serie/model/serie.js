@@ -3,10 +3,10 @@
 
     angular
         .module('webviewer')
-        .factory('wvSerieRepository', wvSerieRepository);
+        .factory('wvSerie', wvSerie);
 
     /* @ngInject */
-    function wvSerieRepository($q, $http, wvConfig, wvOrthancSerieAdapter) {
+    function wvSerie($q, $http, wvConfig, wvOrthancSerieAdapter) {
         var service = {
             get: get,
             listFromOrthancSerieId: listFromOrthancSerieId,
