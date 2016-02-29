@@ -6,7 +6,7 @@
         .factory('wvSerieRepository', wvSerieRepository);
 
     /* @ngInject */
-    function wvSerieRepository($q, wvOrthancSerieAdapter, orthancApiService) {
+    function wvSerieRepository($q, $http, wvConfig, wvOrthancSerieAdapter) {
         var service = {
             get: get,
             listFromOrthancSerieId: listFromOrthancSerieId,
@@ -27,12 +27,8 @@
         }
 
         function listFromOrthancSerieId(id) {
-            var serieInfoPromise = orthancApiService
-              .serie.get({id: id})
-              .$promise;
-            var orderedInstancePromise = orthancApiService
-               .serie.listInstances({id: id})
-               .$promise;
+            var serieInfoPromise = $http.get(wvConfig.orthancApiURL + '/series/'+id);
+            var orderedInstancePromise = $http.get(wvConfig.orthancApiURL + '/series/'+id+'/ordered-slices');
 
             return $q
                 .all({
@@ -40,21 +36,17 @@
                   orthancOrderedInstances: orderedInstancePromise
                 })
                 .then(function(args) {
-                    var orthancSerie = args.orthancSerie;
-                    var orthancOrderedInstances = args.orthancOrderedInstances;
+                    var orthancSerie = args.orthancSerie.data;
+                    var orthancOrderedInstances = args.orthancOrderedInstances.data;
 
                     return wvOrthancSerieAdapter.process(orthancSerie, orthancOrderedInstances);
                 });
         }
 
         function listFromOrthancStudyId(id) {
-            return orthancApiService
-                .study
-                .get({
-                    id: id
-                })
-                .$promise
-                .then(function(orthancStudy) {
+            return $http.get(wvConfig.orthancApiURL + '/studies/'+id)
+                .then(function(response) {
+                    var orthancStudy = response.data;
                     var orthancSerieIds = orthancStudy.Series;
                     var wvSeriePromises = orthancSerieIds.map(function(orthancSerieId) {
                         return service.listFromOrthancSerieId(orthancSerieId);

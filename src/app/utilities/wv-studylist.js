@@ -7,7 +7,7 @@
  * # wvStudylist
  */
 angular.module('webviewer')
-  .directive('wvStudylist', ['orthancApiService', function (orthancApiService) {
+  .directive('wvStudylist', function ($http, wvConfig) {
     return {
       scope: {
         wvSelectedStudy: '='
@@ -22,29 +22,29 @@ angular.module('webviewer')
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
         scope.studies = [];
-
-        orthancApiService
-        .study.query()
-        .$promise
-        .then(function(studies) {
-          scope.studies = studies.map(function(studyId) {
-            return {
-              label: '?',
-              value: {
-                id: studyId
-              }
-            };
-          });
-          
-          scope.studies.forEach(function(v) {
-            orthancApiService
-            .study.get({id: v.value.id})
-            .$promise
-            .then(function(study) {
-              v.label = study.MainDicomTags.StudyDescription;
+        
+        $http
+        .get(wvConfig.orthancApiURL + '/studies/')
+        .then(function(response) {
+            var studyIds = response.data;
+            scope.studies = studyIds.map(function(studyId) {
+                return {
+                  label: '?',
+                  value: {
+                    id: studyId
+                  }
+                };
             });
-          });
+          
+        scope.studies.forEach(function(v) {
+            $http
+                .get(wvConfig.orthancApiURL + '/studies/'+v.value.id)
+                .then(function(response) {
+                    var study = response.data;
+                    v.label = study.MainDicomTags.StudyDescription;
+                });
+             });
         });
       }
     };
-  }]);
+  });
