@@ -9,10 +9,11 @@
         	wv-size-tag
         	ng-transclude
     	>
-            <wv-viewport wv-viewport-serie="{id: randomSerieId}" wv-width="'tag'" wv-height="'tag'"
-                wv-viewport-droppable
+            
+            <wv-viewport wv-serie-id="randomSerieId" wv-size="{width: '[wv-size-tag]', height:'[wv-size-tag]'}"
+                wv-droppable-serie-ext
                 wv-viewport-mouse-events
-                wv-scroll-on-wheel="true"
+                wv-scroll-on-wheel-serie-ext
                 wv-enable-overlay="!wvSettings || wvSettings.hasOwnProperty('overlay') == false || wvSettings.overlay"
 
                 wv-tool-zoom="wvSettings.zoom"
@@ -25,6 +26,7 @@
                 wv-state-invert="wvSettings.invert"
                 wv-state-play="wvSettings.play"
             ></wv-viewport>
+            
         </div>
     </div>
 </div>

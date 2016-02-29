@@ -7,13 +7,13 @@
  * # wvSerielist
  */
 angular.module('webviewer')
-.directive('wvSerielist', ['orthancApiService', function(orthancApiService) {
+.directive('wvSerielist', ['wvSerieRepository', function(wvSerieRepository) {
 return {
   scope: {
     wvStudy: '=',
     wvClassTmp: '=?wvClass'
   },
-  templateUrl: 'app/serielist/wv-serielist.tpl.html',
+  templateUrl: 'app/serie/wv-serielist.tpl.html',
   restrict: 'E',
   transclude: true,
   link: function postLink(scope, element, attrs) {
@@ -26,16 +26,16 @@ return {
 
     function _setStudy(id, old) {
       if (!id) return; 
+      // @todo handle IsStable === false
+
+      wvSerieRepository
+        .listFromOrthancStudyId(id)
+        .then(function(series) {
+          scope.serieIds = series.map(function(serie) {
+            return serie.id;
+          });
+        });
       
-      orthancApiService
-      .study.get({
-        id: id
-       })
-      .$promise
-      .then(function(study) {
-        // @todo handle IsStable === false
-        scope.serieIds = study.Series;
-      });
     }
 
     function _setDefaultCssClasses() {

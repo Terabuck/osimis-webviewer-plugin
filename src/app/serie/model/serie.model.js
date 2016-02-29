@@ -14,54 +14,60 @@
 
         ////////////////
 
-        function create(id, instanceIds, tags) {
-        	return new SerieModel(id, instanceIds, tags);
+        function create(id, imageIds, tags) {
+        	return new SerieModel(id, imageIds, tags);
         }
 
         ////////////////
 
-        function SerieModel(id, instanceIds, tags) {
-            this.id = id;
-            this.instanceIds = instanceIds;
-            this.instanceCount = instanceIds.length;
+        function SerieModel(id, imageIds, tags) {
+            this.id = id; // id == orthancId + ':' + subSerieIndex
+            this.imageIds = imageIds;
+            this.imageCount = imageIds.length;
+            this.currentIndex = 0;
             this.tags = tags;
+            this.onCurrentImageIdChanged = new osimis.Listener();
 
             this.isPlaying = false;
-            this._index = 0;
             this._playTimeout = null;
         };
 
-        SerieModel.prototype.getActualInstanceId = function() {
-           return this.instanceIds[this._index];
+        SerieModel.prototype.getCurrentImageId = function() {
+           return this.imageIds[this.currentIndex];
         };
 
-        SerieModel.prototype.goToNextInstance = function(restartWhenSerieEnd) {
+        SerieModel.prototype.goToNextImage = function(restartWhenSerieEnd) {
             if (restartWhenSerieEnd !== true) restartWhenSerieEnd = false;
             
-            this._index++;
+            this.currentIndex++;
 
-            if (this._index >= this.instanceCount) {
-              this._index = restartWhenSerieEnd ? 0 : this.instanceCount - 1;
+            if (this.currentIndex >= this.imageCount) {
+              this.currentIndex = restartWhenSerieEnd ? 0 : this.imageCount - 1;
             }
+
+            this.onCurrentImageIdChanged.trigger(this.getCurrentImageId());
         };
 
-        SerieModel.prototype.goToPreviousInstance = function() {
-            this._index--;
+        SerieModel.prototype.goToPreviousImage = function() {
+            this.currentIndex--;
 
-            if (this._index < 0) {
-              this._index = 0;
+            if (this.currentIndex < 0) {
+              this.currentIndex = 0;
             }
+
+            this.onCurrentImageIdChanged.trigger(this.getCurrentImageId());
         };
 
-        SerieModel.prototype.goToInstance = function(newIndex) {
+        SerieModel.prototype.goToImage = function(newIndex) {
             if (newIndex < 0) {
               newIndex = 0;
             }
-            else if (newIndex + 1 > this.instanceCount) {
+            else if (newIndex + 1 > this.imageCount) {
               return;
             }
 
-            this._index = newIndex;
+            this.currentIndex = newIndex;
+            this.onCurrentImageIdChanged.trigger(this.getCurrentImageId());
         };
 
         SerieModel.prototype.play = function(speed) {
@@ -89,7 +95,7 @@
             var _this = this;
 
             this._playTimeout = $timeout(function() {
-                _this.goToNextInstance(true);
+                _this.goToNextImage(true);
                 if (_this.isPlaying) {
                     _this.playAtSpeed(speed);
                 }
