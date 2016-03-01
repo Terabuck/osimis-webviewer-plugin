@@ -31,9 +31,15 @@
             var viewportController = ctrls.wvViewport;
 
             // bind view model -> viewport controller
-            viewmodel.onCurrentImageIdChanged(function(imageId, isNewSerie) {
+            viewmodel.onCurrentImageIdChanged(function(imageId, isNewSerie, setShownImageCallback) {
                 if (imageId) {
-                    viewportController.setImage(imageId, isNewSerie ? true : false);
+                    viewportController
+                        .setImage(imageId, isNewSerie ? true : false)
+                        .then(function() {
+                            if (setShownImageCallback) {
+                                setShownImageCallback(imageId);
+                            }
+                        });
                 }
                 else {
                     viewportController.clearImage();
@@ -99,8 +105,8 @@
 
             // bind to new serie
             if (newSerie) {
-                newSerie.onCurrentImageIdChanged(_this, function(imageId) {
-                    _this.onCurrentImageIdChanged.trigger(imageId);
+                newSerie.onCurrentImageIdChanged(_this, function(imageId, setShownImageCallback) {
+                    _this.onCurrentImageIdChanged.trigger(imageId, false, setShownImageCallback);
                 });
 
                 var firstImageIdInSerie = newSerie.getCurrentImageId();

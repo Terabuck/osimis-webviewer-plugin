@@ -20,22 +20,31 @@
             restrict: 'E',
             scope: {
             	wvImageCount: '=',
+            	wvShownImageIndex: '=',
             	wvImageIndex: '='
             }
         };
         return directive;
 
         function link(scope, element, attrs) {
-            scope.vm.scrollbarDistanceFromRight = '0%';
+            scope.vm.loadedScrollbarDistanceFromRight = '0%';
+            scope.vm.loadingScrollbarDistanceFromRight = '0%';
 
-            scope.$watchGroup(['vm.wvImageIndex', 'vm.wvImageCount'], _setScrollbarDimension);
+            scope.$watchGroup(['vm.wvShownImageIndex', 'vm.wvImageCount'], _setLoadedScrollbarDimension);
+            scope.$watchGroup(['vm.wvImageIndex', 'vm.wvImageCount'], _setLoadingScrollbarDimension);
             
-            function _setScrollbarDimension() {
+            function _setLoadedScrollbarDimension() {
               requestAnimationFrame(function() {
-                // if (!scope.vm.wvImageIndex || typeof scope.vm.wvImageCount === 'undefined') return;
+                var eq = Math.ceil(100 * (scope.vm.wvShownImageIndex+1) / scope.vm.wvImageCount);
+                scope.vm.loadedScrollbarDistanceFromRight = 100 - eq + '%';
+                scope.$digest();
+              });
+            }
 
+            function _setLoadingScrollbarDimension() {
+              requestAnimationFrame(function() {
                 var eq = Math.ceil(100 * (scope.vm.wvImageIndex+1) / scope.vm.wvImageCount);
-                scope.vm.scrollbarDistanceFromRight = 100 - eq + '%';
+                scope.vm.loadingScrollbarDistanceFromRight = 100 - eq + '%';
                 scope.$digest();
               });
             }

@@ -12,7 +12,8 @@
             this.id = id; // id == orthancId + ':' + subSerieIndex
             this.imageIds = imageIds;
             this.imageCount = imageIds.length;
-            this.currentIndex = 0;
+            this.currentIndex = 0; // real index of the image, waiting loading to be shown
+            this.currentShownIndex = 0; // index shown at the moment
             this.tags = tags;
             this.onCurrentImageIdChanged = new osimis.Listener();
 
@@ -20,6 +21,9 @@
             this._playTimeout = null;
         };
 
+        WVSerieModel.prototype.setShownImage = function(id) {
+            this.currentShownIndex = _.indexOf(this.imageIds, id);
+        };
         WVSerieModel.prototype.getCurrentImageId = function() {
            return this.imageIds[this.currentIndex];
         };
@@ -33,7 +37,7 @@
               this.currentIndex = restartWhenSerieEnd ? 0 : this.imageCount - 1;
             }
 
-            this.onCurrentImageIdChanged.trigger(this.getCurrentImageId());
+            this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
         };
 
         WVSerieModel.prototype.goToPreviousImage = function() {
@@ -43,7 +47,7 @@
               this.currentIndex = 0;
             }
 
-            this.onCurrentImageIdChanged.trigger(this.getCurrentImageId());
+            this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
         };
 
         WVSerieModel.prototype.goToImage = function(newIndex) {
@@ -55,7 +59,7 @@
             }
 
             this.currentIndex = newIndex;
-            this.onCurrentImageIdChanged.trigger(this.getCurrentImageId());
+            this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
         };
 
         WVSerieModel.prototype.play = function(speed) {

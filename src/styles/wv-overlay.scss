@@ -47,12 +47,22 @@
     background-color: rgba(0, 0, 0, 0.9);
 }
 
-.wv-overlay-scrollbar {
+.wv-overlay-scrollbar-loaded {
     position: absolute;
     bottom:0;
     left:0;
-    height: 4px;
+    height: 5px;
     background-color: red;
+    will-change: right;
+    transform-origin: 0% 50%;
+}
+
+.wv-overlay-scrollbar-loading {
+    position: absolute;
+    bottom:0;
+    left:0;
+    height: 5px;
+    background-color: #660000;
     will-change: right;
     transform-origin: 0% 50%;
 }

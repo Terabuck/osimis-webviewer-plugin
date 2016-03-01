@@ -2,8 +2,12 @@
 	<div class="wv-overlay-scrollbar-text">
 	    {{vm.wvImageIndex + 1}}/{{vm.wvImageCount}}<br/>
 	</div>
-	<div class="wv-overlay-scrollbar" ng-style="{
-	    right: vm.scrollbarDistanceFromRight
+	<div class="wv-overlay-scrollbar-loading" ng-style="{
+	    right: vm.loadingScrollbarDistanceFromRight
+	}">
+	</div>
+	<div class="wv-overlay-scrollbar-loaded" ng-style="{
+	    right: vm.loadedScrollbarDistanceFromRight
 	}">
 	</div>
 </div>
