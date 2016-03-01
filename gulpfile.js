@@ -523,7 +523,7 @@ function startBrowserSync(isDev, specRunner) {
     // If build: watches the files, builds, and restarts browser-sync.
     // If dev: watches scss, compiles it to css, browser-sync handles reload
     if (isDev) {
-        gulp.watch([config.scss], ['styles'])
+        gulp.watch([config.scssDir + '*.scss'], ['styles'])
             .on('change', changeEvent);
     } else {
         gulp.watch([config.scss, config.js, config.html], ['browserSyncReload'])
