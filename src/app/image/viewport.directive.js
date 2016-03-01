@@ -19,7 +19,10 @@
             templateUrl: 'app/image/viewport.directive.tpl.html',
             link: link,
             restrict: 'E',
-            require: ['wvViewport', '?wvSize'],
+            require: {
+                'wvViewport': 'wvViewport',
+                'wvSize': '?wvSize'
+            },
             scope: {
                 wvImageId: '=?',
                 // wvImage: '=?',
@@ -51,13 +54,13 @@
 
             // bind directive's sizing (via wv-size controller) to cornerstone
             {
-                var wvSizeCtrl = ctrls[1];
+                var wvSizeCtrl = ctrls.wvSize;
                 var unbindWvSize = _bindWvSizeController(wvSizeCtrl, model);
             }
 
             // bind directive's controller to cornerstone (via directive's attributes)
             {
-                var ctrl = ctrls[0];
+                var ctrl = ctrls.wvViewport;
                 ctrl.getImage = function() {
                     return model.getImageId();
                 };
@@ -130,6 +133,23 @@
                     unlistenWvSizeFn();
                 }
             }
+
+            // bind tools -> cornerstone
+            model.onImageChanged.once(function() {
+                _.forEach(ctrls, function(ctrl, ctrlName) {
+                    var ctrlIsTool = _.endsWith(ctrlName, 'ViewportTool');
+                    if (!ctrl) {
+                        return;
+                    }
+                    else if (ctrlIsTool) {
+                        ctrl.register(enabledElement);
+
+                        scope.$on('$destroy', function() {
+                            ctrl.unregister(enabledElement);
+                        });
+                    }
+                });
+            });
         }
 
         /**
@@ -170,7 +190,10 @@
             this._imageId = id;
             
             this._imageShownPromise = $q
-                .when(this._imageShownPromise) // make sure multiple setImage calls are always sequencials
+                // make sure multiple setImage calls are always sequencials
+                // @todo make the last setImage be taken into account
+                // @note serie model should have the responsibililty to handle which one is displayed
+                .when(this._imageShownPromise)
                 .then(function() {
                     return $q.all({
                         processedImage: cornerstone.loadImage('orthanc://' + id),
