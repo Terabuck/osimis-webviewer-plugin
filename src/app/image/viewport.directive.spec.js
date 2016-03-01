@@ -38,9 +38,8 @@ describe('viewport', function() {
         it('should draw the image', function() {
             $scope.imageId = '27b24a79-6ef843d4-1e014566-4cb06360-2b9eda28:0';
             
-            var directive = createDirective('<wv-viewport wv-image-id="imageId"></wv-viewport>');
-            var element = directive.element;
-            var enabledElement = directive.enabledElement; // dom element used by cornerstone
+            var element = osi.directive('<wv-viewport wv-image-id="imageId"></wv-viewport>');
+            var enabledElement = element.find('.wv-cornerstone-enabled-image')[0]; // dom element used by cornerstone
             
             // expect the directive to load the image once
             expect(cornerstone.loadImage).calledOnce;
@@ -74,9 +73,8 @@ describe('viewport', function() {
         it('should clear the image when wv-image-id is undefined', function() {
             $scope.imageId = '27b24a79-6ef843d4-1e014566-4cb06360-2b9eda28:0';
             
-            var directive = createDirective('<wv-viewport wv-image-id="imageId"></wv-viewport>');
-            var element = directive.element;
-            var enabledElement = directive.enabledElement; // dom element used by cornerstone
+            var element = osi.directive('<wv-viewport wv-image-id="imageId"></wv-viewport>');
+            var enabledElement = element.find('.wv-cornerstone-enabled-image')[0]; // dom element used by cornerstone
             
             // expect the directive to load the image once
             expect(cornerstone.loadImage).calledOnce;
@@ -108,9 +106,8 @@ describe('viewport', function() {
                 height: '168px'
 		    };
 		    
-            var directive = createDirective('<wv-viewport wv-image-id="imageId" wv-size="size"></wv-viewport>');
-            var element = directive.element;
-            var enabledElement = directive.enabledElement; // dom element used by cornerstone
+            var element = osi.directive('<wv-viewport wv-image-id="imageId" wv-size="size"></wv-viewport>');
+            var enabledElement = element.find('.wv-cornerstone-enabled-image')[0]; // dom element used by cornerstone
             
             expect(cornerstone.loadImage).calledOnce;
             expect(cornerstone.displayImage).calledOnce;
@@ -125,9 +122,8 @@ describe('viewport', function() {
 		        width: '336px',
                 height: '336px'
 		    };
-            var directive = createDirective('<wv-viewport wv-image-id="imageId" wv-size="size"></wv-viewport>');
-            var element = directive.element;
-            var enabledElement = directive.enabledElement; // dom element used by cornerstone
+            var element = osi.directive('<wv-viewport wv-image-id="imageId" wv-size="size"></wv-viewport>');
+            var enabledElement = element.find('.wv-cornerstone-enabled-image')[0]; // dom element used by cornerstone
             
             // expect the viewport to scale the image to 100%.
             var viewport = cornerstone.getViewport(enabledElement);
@@ -140,9 +136,8 @@ describe('viewport', function() {
 		        width: '84px',
                 height: '84px'
 		    };
-            var directive = createDirective('<wv-viewport wv-image-id="imageId" wv-size="size"></wv-viewport>');
-            var element = directive.element;
-            var enabledElement = directive.enabledElement; // dom element used by cornerstone
+            var element = osi.directive('<wv-viewport wv-image-id="imageId" wv-size="size"></wv-viewport>');
+            var enabledElement = element.find('.wv-cornerstone-enabled-image')[0]; // dom element used by cornerstone
 
             // expect the viewport to scale the image to 100%.
             var viewport = cornerstone.getViewport(enabledElement);
