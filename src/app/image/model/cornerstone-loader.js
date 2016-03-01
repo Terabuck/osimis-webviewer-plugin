@@ -21,7 +21,12 @@
         // and create a factory instead
 
         var service = {
-            getCompressedImage: getCompressedImage
+            /* @warning @note @todo
+             *
+             * this instruction caches every pixels.
+             * It is only usable in prototypal context.
+             */
+            getCompressedImage: _.memoize(getCompressedImage)
         };
 
         //////////
@@ -43,7 +48,13 @@
                         image.render = cornerstone.renderGrayscaleImage;
                     }
 
-                    // @todo check memory overhead of memoize
+                    /* @warning @note @todo
+                     *
+                     * getPixelData is called by cornerstone
+                     *
+                     * this instruction caches every pixels.
+                     * It is only usable in prototypal context.
+                     */
                     image.getPixelData = _.memoize(_getPixelData);
 
                     return image;
