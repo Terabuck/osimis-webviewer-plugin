@@ -49,6 +49,11 @@
             window.test = this.currentTest;
 
             window.$scope = window.$rootScope;
+
+            window.requestAnimationFrame = function(cb) { 
+                $timeout(cb, 0, false);
+            };
+            window.cancelAnimationFrame = angular.noop;
         });
     }
 
