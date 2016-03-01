@@ -10,8 +10,8 @@
     </div>
     
     <div class="wv-overlay-bottomright" ng-if="vm.showBottomRightArea()">
-        zoom: {{vm.wvViewport.scale}}<br/>
-        ww/wc: {{vm.wvViewport.voi.windowWidth}}/{{vm.wvViewport.voi.windowCenter}}
+        zoom: {{vm.wvViewport.scale|number:2}}<br/>
+        ww/wc: {{vm.wvViewport.voi.windowWidth|number:0}}/{{vm.wvViewport.voi.windowCenter|number:0}}
     </div>
     
     <wv-scrollbar-overlay-item wv-image-count="vm.wvSerie.imageCount" wv-image-index="vm.wvSerie.currentIndex" ng-if="vm.wvShowTimeline"></wv-scrollbar-overlay-item>
