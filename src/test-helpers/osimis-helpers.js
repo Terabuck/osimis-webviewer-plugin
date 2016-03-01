@@ -69,10 +69,13 @@
     function flush() {
         try {
             $timeout.flush(); // flush pending promises (& apply)
+            
+            // recursive flush till 'No deffered tasks to be flushed' exception
+            flush();
         }
         catch(e) {
             if (e.message === 'No deferred tasks to be flushed') {
-                // ignore
+                // done
             }
             else {
                 // rethrows error occuring during $digest
@@ -81,6 +84,9 @@
         }
         try {
             $httpBackend.flush(); // flush pending requests
+            
+            // recursive flush till 'No deffered tasks to be flushed' exception
+            flush();
         }
         catch(e) {
             if (e.message === 'No pending request to flush !') {
