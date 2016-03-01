@@ -52,28 +52,34 @@
                     return;
                 }
                 serie.pause();
-            })
+            });
             $element.off('mouseover', mouseoverEvt);
             $element.off('mouseout', mouseoutEvt);
         });
 
         function mouseoverEvt() {
-            _wvSerieIdViewModels.forEach(function(viewmodel) {
-                var serie = viewmodel.getSerie();
-                if (!serie) {
-                    return;
-                }
-                serie.play(1000/25); // 25fps
+            $scope.$apply(function() {
+                _wvSerieIdViewModels.forEach(function(viewmodel) {
+                    var serie = viewmodel.getSerie();
+                    if (!serie) {
+                        return;
+                    }
+                    
+                    serie.play(1000/25); // 25fps
+                });
             });
         }
         function mouseoutEvt() {
-            _wvSerieIdViewModels.forEach(function(viewmodel) {
-                var serie = viewmodel.getSerie();
-                if (!serie) {
-                    return;
-                }
-                serie.pause();
-                //  speed: 1000/25 // 25fps
+            $scope.$apply(function() {
+                _wvSerieIdViewModels.forEach(function(viewmodel) {
+                    var serie = viewmodel.getSerie();
+                    if (!serie) {
+                        return;
+                    }
+
+                    serie.pause();
+                    serie.goToImage(0);
+                });
             });
         }
     }
