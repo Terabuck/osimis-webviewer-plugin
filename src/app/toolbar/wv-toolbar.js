@@ -10,7 +10,8 @@ angular.module('webviewer')
   .directive('wvToolbar', function (_) {
     return {
       scope: {
-        wvItems: '='
+        wvItems: '=',
+        activeTool: '=?wvActiveTool'
       },
       templateUrl: 'app/toolbar/wv-toolbar.tpl.html',
       transclude: true,
@@ -18,7 +19,7 @@ angular.module('webviewer')
       link: function postLink(scope, element, attrs) {
       },
       controller: ['$timeout', '$scope', function($timeout, $scope) {
-        $scope.activeTool = 'windowing';
+        $scope.activeTool = $scope.activeTool || 'windowing';
         $scope.activeStates = {};
         $scope.splitpaneConfig = {x: 1, y: 1};
 
