@@ -14,7 +14,6 @@
      */
     function OsimisListener() {
     	var _listeners = [];
-        var _namespaces = {};
 
         // listen method
         // arguments: [namespace], callback
@@ -22,38 +21,64 @@
             var callback = arg2 || arg1; // callback is the last argument
             var namespace = arg2 && arg1; // namespace is the first argument - only if there is two args
 
+    		if (namespace) {
+    		    callback.namespace = namespace;
+    		}
+    		
     		_listeners.push(callback);
-            _namespaces[namespace] = _namespaces[namespace] || [];
-            _namespaces[namespace].push(callback);
     	};
 
     	// listen once method
+    	var _random = 0;
     	OsimisListener.once = function(callback) {
-    	    OsimisListener('.<_^_>. ]MONDOSHAWANS[ .<_^_>.', function() {
+    	    var random = _random++;
+    	    OsimisListener('.<_^_>. ]MONDOSHAWANS'+random+'[ .<_^_>.', function() {
     	        callback.apply(this, arguments);
-    	        OsimisListener.close('.<_^_>. ]MONDOSHAWANS[ .<_^_>.');
+    	        OsimisListener.close('.<_^_>. ]MONDOSHAWANS'+random+'[ .<_^_>.');
     	    });
     	};
 
         // unlisten method
         OsimisListener.close = function(namespace) {
-            if (!_namespaces.hasOwnProperty(namespace)) {
-                return;
+            if (!namespace) {
+                _listeners = []
             }
-            var namespaceListeners = _namespaces[namespace]
+            else {
+                _.remove(_listeners, function(listener) {
+                    return listener.namespace && listener.namespace === namespace;
+                });
+            }
 
-            window._.pullAll(_listeners, namespaceListeners);
-
-            _namespaces[namespace] = {};
-            delete _namespaces[namespace];
         }
+
+        // dont trigger for namespace during the wrappedCodeCallback
+        OsimisListener.ignore = function(namespace, wrappedCodeCallback) {
+            _listeners.forEach(function(listener) {
+                if (listener.namespace === namespace) {
+                    listener.ignore = true;
+                }
+            });
+            
+            wrappedCodeCallback();
+
+            _listeners.forEach(function(listener) {
+                if (listener.namespace === namespace) {
+                    listener.ignore = false;
+                }
+            });
+        };
 
         // trigger method
     	OsimisListener.trigger = function() {
     	    var args = Array.prototype.splice.call(arguments, 0);
-    		_listeners.forEach(function(listener) {
-    			listener.apply(null, args);
-    		});
+    	    
+    		_listeners
+    		    .filter(function(listener) {
+    		        return !listener.ignore;
+    		    })
+                .forEach(function(listener) {
+                    listener.apply(null, args);
+                });
     	};
 
         // return listen method (= functor)
