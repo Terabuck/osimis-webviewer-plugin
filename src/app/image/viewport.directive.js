@@ -3,7 +3,18 @@
 
     angular
         .module('webviewer')
-        .directive('wvViewport', wvViewport);
+        .directive('wvViewport', wvViewport)
+        .run(function(cornerstoneTools) {
+            var toolStateManager = cornerstoneTools.newImageIdSpecificToolStateManager();
+            toolStateManager.getStateByToolAndImageId = function(toolName, imageId) {
+                return this.toolState[imageId] && this.toolState[imageId][toolName];
+            };
+            toolStateManager.restoreStateByToolAndImageId = function(toolName, imageId, state) {
+                this.toolState[imageId] = this.toolState[imageId] || {};
+                this.toolState[imageId][toolName] = state;
+            };
+            cornerstoneTools.globalImageIdSpecificToolStateManager = toolStateManager;
+        });
 
     /* @ngInject */
     function wvViewport($, _, cornerstone, cornerstoneTools, $rootScope, $q, $parse, wvImage) {
@@ -133,23 +144,39 @@
                     unlistenWvSizeFn();
                 }
             }
-
-            // bind tools -> cornerstone
-            model.onImageChanged.once(function() {
+            
+            /** register tools
+             *
+             * Tool directiev spec:
+             * - name ends with ViewportTool
+             * 
+             * Tool controller interface:
+             * - void register(enabledElement, imageModel)
+             * - void unregister(enabledElement)
+             * - void setCurrentImage(imageModel)
+             * - void activate()
+             * - void deactivate()
+             */
+            model.onImageChanged.once(function(currentImage) {
+                _forEachViewportTool(function(toolCtrl) {
+                    toolCtrl.register(enabledElement, currentImage);
+                    model.onImageChanged(toolCtrl.setCurrentImage.bind(toolCtrl));
+                    scope.$on('$destroy', function() {
+                        toolCtrl.unregister(enabledElement);
+                    });
+                });
+            });
+            function _forEachViewportTool(callback) {
                 _.forEach(ctrls, function(ctrl, ctrlName) {
                     var ctrlIsTool = _.endsWith(ctrlName, 'ViewportTool');
                     if (!ctrl) {
                         return;
                     }
                     else if (ctrlIsTool) {
-                        ctrl.register(enabledElement);
-
-                        scope.$on('$destroy', function() {
-                            ctrl.unregister(enabledElement);
-                        });
+                        callback(ctrl, ctrlName);
                     }
                 });
-            });
+            }
         }
 
         /**
