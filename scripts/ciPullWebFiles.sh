@@ -22,6 +22,8 @@ buildDir="subtrees/webViewer.git/"
 buildRemote="webViewer"
 buildBranch="build_$currentBranch"
 
+cd ..
+
 git subtree pull --squash --prefix $buildDir $buildRemote $buildBranch
 
 cd $startScriptDir
