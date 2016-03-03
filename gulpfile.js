@@ -332,7 +332,7 @@ gulp.task('clean-code', function(done) {
 /**
  * Run specs once and exit
  * To start servers and run midway specs as well:
- *    gulp test --startServers
+ *    gulp test --startServers --killOnFail
  * @return {Stream}
  */
 gulp.task('test', ['vet', 'templatecache'], function(done) {
@@ -629,6 +629,9 @@ function startTests(singleRun, done) {
         if (karmaResult === 1) {
             log('karma: tests failed with code ' + karmaResult);
             done();
+            if (yargs.killOnFail) {
+                process.exit(karmaResult);
+            }
         } else {
             done();
         }
