@@ -23,10 +23,10 @@ set -x #to debug the script
 
 startScriptDir=$(pwd)
 
-currentBranch=$(git rev-parse --abbrev-ref HEAD)
+currentBranch=$1
 buildBranch="build_$currentBranch"
 
-source /etc/profile.d/rvm.sh
+source ~/.rvm/scripts/rvm
 
 cd $startScriptDir/../
 npm install --unsafe-perm # note unsafe indeed
