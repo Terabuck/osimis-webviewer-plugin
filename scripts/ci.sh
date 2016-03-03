@@ -18,7 +18,13 @@
 # # install bower, grunt & grunt-cli
 # sudo npm install -g bower gulp nodemon
 
-# ci url : http://jenkins.osidev.net:8080/
+# ci url
+#	http://jenkins.osidev.net:8080/
+# ci debug
+# 	ssh -i jenkins_master ubuntu@jenkins.osidev.net
+# 	sudo su jenkins
+# 	cd 
+# 	cd jobs/osimisWebViewerWebFiles_dev/workspace/scripts
 
 set -e #to exit script at first command failure
 set -x #to debug the script
@@ -36,6 +42,6 @@ npm install --unsafe-perm # note unsafe indeed
 gulp build
 npm cache clean
 
-cd $startScriptDir
-
 git subtree push --prefix $buildDir origin $buildBranch
+
+cd $startScriptDir
