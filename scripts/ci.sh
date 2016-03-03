@@ -43,6 +43,6 @@ npm install
 gulp build
 npm cache clean
 
-git subtree push --prefix $buildDir origin $buildBranch
+git subtree push --squash --prefix $buildDir origin $buildBranch
 
 cd $startScriptDir
