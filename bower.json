@@ -45,7 +45,9 @@
     "ng-debounce": "^0.1.7"
   },
   "resolutions": {
-    "angular": "1.5.0"
+    "angular": "1.5.0",
+    "cornerstone": "~0.9.0",
+    "jquery": "~2.1.1"
   },
   "overrides": {
     "bootstrap": {

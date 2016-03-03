@@ -26,6 +26,7 @@ set -x #to debug the script
 startScriptDir=$(pwd)
 
 currentBranch=$1
+buildDir="build/"
 buildBranch="build_$currentBranch"
 
 source ~/.rvm/scripts/rvm
@@ -36,3 +37,5 @@ gulp build
 npm cache clean
 
 cd $startScriptDir
+
+git subtree push --prefix $buildDir origin $buildBranch
