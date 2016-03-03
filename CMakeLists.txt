@@ -74,12 +74,12 @@ if (STANDALONE_BUILD)
     -DORTHANC_STANDALONE=1
     )
   set(EMBEDDED_RESOURCES
-    WEB_VIEWER  ${CMAKE_SOURCE_DIR}/subtrees/webViewer.git/build
+    WEB_VIEWER  ${CMAKE_SOURCE_DIR}/subtrees/webViewer.git
     )
 else()
   add_definitions(
     -DORTHANC_STANDALONE=0
-    -DWEB_VIEWER_PATH="${CMAKE_SOURCE_DIR}/subtrees/webViewer.git/build/"
+    -DWEB_VIEWER_PATH="${CMAKE_SOURCE_DIR}/subtrees/webViewer.git/"
     )
 endif()
 
