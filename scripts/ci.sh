@@ -38,7 +38,8 @@ buildBranch="build_$currentBranch"
 source ~/.rvm/scripts/rvm
 
 cd $startScriptDir/../
-npm install --unsafe-perm # note unsafe indeed
+npm cache clean # make sure install is fine
+npm install
 gulp build
 npm cache clean
 
