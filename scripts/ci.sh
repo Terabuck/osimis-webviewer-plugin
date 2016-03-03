@@ -18,6 +18,8 @@
 # # install bower, grunt & grunt-cli
 # sudo npm install -g bower gulp nodemon
 
+# ci url : http://jenkins.osidev.net:8080/
+
 set -e #to exit script at first command failure
 set -x #to debug the script
 
