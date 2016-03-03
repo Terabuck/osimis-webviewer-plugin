@@ -24,6 +24,10 @@ buildBranch="build_$currentBranch"
 
 cd ..
 
+currentBranchTmp = $(git rev-parse --abbrev-ref HEAD)
+git checkout $currentBranch
 git subtree pull --squash --prefix $buildDir $buildRemote $buildBranch
+git push
+git checkout $currentBranchTmp
 
 cd $startScriptDir
