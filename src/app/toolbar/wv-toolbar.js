@@ -7,10 +7,11 @@
  * # wvToolbar
  */
 angular.module('webviewer')
-  .directive('wvToolbar', function () {
+  .directive('wvToolbar', function (_) {
     return {
       scope: {
-        wvItems: '='
+        wvItems: '=',
+        activeTool: '=?wvActiveTool'
       },
       templateUrl: 'app/toolbar/wv-toolbar.tpl.html',
       transclude: true,
@@ -18,11 +19,11 @@ angular.module('webviewer')
       link: function postLink(scope, element, attrs) {
       },
       controller: ['$timeout', '$scope', function($timeout, $scope) {
-        $scope.activeTool = "windowing";
+        $scope.activeTool = $scope.activeTool || 'windowing';
         $scope.activeStates = {};
         $scope.splitpaneConfig = {x: 1, y: 1};
 
-        $scope.$watch("activeTool", function(newTool, oldTool) {
+        $scope.$watch('activeTool', function(newTool, oldTool) {
           if ($scope.wvItems.hasOwnProperty(oldTool)) {
             $scope.wvItems[oldTool] = false;
           }
@@ -32,7 +33,7 @@ angular.module('webviewer')
           });
         });
 
-        $scope.$watchCollection("activeStates", function(states) {
+        $scope.$watchCollection('activeStates', function(states) {
           _.forEach(states, function(value, state) {
             if (!$scope.wvItems.hasOwnProperty(state)) return;
 
@@ -41,6 +42,7 @@ angular.module('webviewer')
         });
         
         $scope.activeButton = null;
+        /* jshint -W116*/
         if ($scope.wvItems == undefined || !_.size($scope.wvItems)) $scope.wvItems = {
           windowing: true,
           zoom: false,
@@ -58,12 +60,15 @@ angular.module('webviewer')
           play: false,
           overlay: true
         };
+        /* jshint +W116*/
 
         this.set = function(name) {
           var previousActive = $scope.activeButton;
           var newActive = name;
 
+          /* jshint -W116*/
           if (previousActive == newActive) return;
+          /* jshint +W116*/
 
           if (previousActive !== null) {
             $scope.$broadcast('toolbar.deactivated', previousActive);
@@ -76,11 +81,11 @@ angular.module('webviewer')
               $scope.$broadcast('toolbar.activated', newActive);              
             });
           }
-        }
+        };
 
         this.get = function() {
           return $scope.activeButton;
-        }
+        };
       }]
     };
   });

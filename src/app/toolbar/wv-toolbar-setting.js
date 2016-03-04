@@ -7,7 +7,7 @@
  * # wvToolbarSetting
  */
 angular.module('webviewer')
-.directive('wvToolbarSetting', function () {
+.directive('wvToolbarSetting', function (_) {
 return {
   scope: true,
   templateUrl: 'app/toolbar/wv-toolbar-setting.tpl.html',

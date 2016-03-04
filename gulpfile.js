@@ -22,6 +22,8 @@ var port = process.env.PORT || config.defaultPort;
  * --debug    : Launch debugger with node-inspector.
  * --debug-brk: Launch debugger and break on 1st line with node-inspector.
  * --startServers: Will start servers for midway tests on the test task.
+ * --novet    : Disable jscs & jshint
+ * --nojscs   : Disable jscs
  */
 
 /**
@@ -35,6 +37,8 @@ gulp.task('default', ['help']);
  * @return {Stream}
  */
 gulp.task('vet', function() {
+    if (args.novet) return;
+    
     log('Analyzing source with JSHint and JSCS');
 
     return gulp
@@ -43,7 +47,7 @@ gulp.task('vet', function() {
         .pipe($.jshint())
         .pipe($.jshint.reporter('jshint-stylish', {verbose: true}))
         // .pipe($.jshint.reporter('fail'))
-        .pipe($.jscs());
+        .pipe($.if(!args.nojscs, $.jscs()));
 });
 
 /**
@@ -255,35 +259,6 @@ gulp.task('osisync', ['styles', 'templatecache'], function() {
         });
 });
 
-// Just do the preprocess tasks required by dev mode
-gulp.task('osisync', ['styles', 'templatecache'], function() {
-    log('OsiSync: Watch and update changes and serve files');
-
-    gulp.watch([config.htmltemplates], ['templatecache']).on('change', changeEvent);
-    gulp.watch([config.htmltemplates], ['templatecache']).on('change', changeEvent);
-
-    // start server
-    var debugMode = '--debug';
-    var nodeOptions = getNodeOptions(true);
-
-    // @todo use standard express start instead of nodemon - no need to restart
-    nodeOptions.nodeArgs = [debugMode + '=7124']; // @todo use random port
-
-    if (args.verbose) {
-        console.log(nodeOptions);
-    }
-
-    return $.nodemon(nodeOptions)
-        .on('start', function () {
-            console.log('*** nodemon started');
-
-            // @todo should be in server.js with real ports
-            osisync.start({
-                host: 'localhost',
-                port: port
-            });
-        });
-});
 /**
  * Optimize all files, move to a build folder,
  * and inject them into the new index.html
@@ -388,7 +363,7 @@ gulp.task('clean-code', function(done) {
 /**
  * Run specs once and exit
  * To start servers and run midway specs as well:
- *    gulp test --startServers
+ *    gulp test --startServers --killOnFail
  * @return {Stream}
  */
 gulp.task('test', ['vet', 'templatecache'], function(done) {
@@ -402,6 +377,7 @@ gulp.task('test', ['vet', 'templatecache'], function(done) {
  *    gulp autotest --startServers
  */
 gulp.task('autotest', function(done) {
+    // @todo auto retrigger build-specs ?
     startTests(false /*singleRun*/ , done);
 });
 
@@ -578,7 +554,7 @@ function startBrowserSync(isDev, specRunner) {
     // If build: watches the files, builds, and restarts browser-sync.
     // If dev: watches scss, compiles it to css, browser-sync handles reload
     if (isDev) {
-        gulp.watch([config.scss], ['styles'])
+        gulp.watch([config.scssDir + '*.scss'], ['styles'])
             .on('change', changeEvent);
     } else {
         gulp.watch([config.scss, config.js, config.html], ['browserSyncReload'])
@@ -651,7 +627,7 @@ function startTests(singleRun, done) {
     var child;
     var excludeFiles = [];
     var fork = require('child_process').fork;
-    var karma = require('karma').server;
+    var karma = require('karma');
     var serverSpecs = config.serverIntegrationSpecs;
 
     if (args.startServers) {
@@ -666,11 +642,12 @@ function startTests(singleRun, done) {
         }
     }
 
-    karma.start({
+    var karmaServer = new karma.Server({
         configFile: __dirname + '/karma.conf.js',
         exclude: excludeFiles,
         singleRun: !!singleRun
     }, karmaCompleted);
+    karmaServer.start();
 
     ////////////////
 
@@ -681,7 +658,11 @@ function startTests(singleRun, done) {
             child.kill();
         }
         if (karmaResult === 1) {
-            done('karma: tests failed with code ' + karmaResult);
+            log('karma: tests failed with code ' + karmaResult);
+            done();
+            if (yargs.killOnFail) {
+                process.exit(karmaResult);
+            }
         } else {
             done();
         }

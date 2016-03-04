@@ -1,0 +1,11 @@
+<div class="cornerstone-enabled-image wv-cornerstone-enabled-image"
+  oncontextmenu="return false"
+  unselectable="on"
+  onselectstart="return false;"
+  onmousedown="return false;"
+  style="position: relative;"
+>
+    <ng-transclude>
+        <wv-overlay wv-tags="vm.wvTags" wv-viewport="vm.wvViewport" ng-if="vm.wvEnableOverlay"></wv-overlay>
+    </ng-transclude>
+</div>

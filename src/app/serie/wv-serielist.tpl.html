@@ -1,0 +1,18 @@
+<ul class="{{wvClass.ul}}">
+  	<li
+  		ng-repeat="id in serieIds"
+  		class="{{wvClass.li}}"
+  		ng-transclude
+  		wv-size-tag
+	>
+	    <wv-viewport wv-serie-id="id" wv-tags="$tags" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}"
+	    	wv-draggable-serie-ext wv-scroll-on-over-serie-ext
+    	>
+		    <wv-overlay wv-tags="$tags">
+		    	<div class="wv-serielist-overlay">
+	        		{{$tags.SeriesDescription}}
+	        	</div>
+		    </wv-overlay>
+	    </wv-viewport>
+  	</li>
+</ul>

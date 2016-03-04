@@ -10,7 +10,6 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
-    <base href="/">
 
     <!-- build:css styles/lib.css -->
     <!-- bower:css -->
@@ -57,40 +56,47 @@
     <script src="/bower_components/angular-strap/dist/angular-strap.tpl.js"></script>
     <script src="/bower_components/jqueryui-touch-punch/jquery.ui.touch-punch.min.js"></script>
     <script src="/bower_components/ng-range-filter/src/ngRangeFilter.js"></script>
+    <script src="/bower_components/ng-debounce/angular-debounce.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
     <!-- build:js js/app.js -->
     <!-- inject:js -->
     <script src="/src/app/webviewer.module.js"></script>
-    <script src="/src/app/orthanc/orthanc-api-service.js"></script>
-    <script src="/src/app/orthanc/orthanc-image-loader.js"></script>
-    <script src="/src/app/others/wv-studylist.js"></script>
-    <script src="/src/app/overlay/wv-overlay-scrollbar.js"></script>
-    <script src="/src/app/overlay/wv-overlay.js"></script>
-    <script src="/src/app/serielist/wv-serielist.js"></script>
+    <script src="/src/app/image/model/cornerstone-loader.js"></script>
+    <script src="/src/app/image/model/image-model.js"></script>
+    <script src="/src/app/image/model/image.js"></script>
+    <script src="/src/app/image/plugins/angle-measure-viewport-tool.directive.js"></script>
+    <script src="/src/app/image/plugins/wv-state-invert.js"></script>
+    <script src="/src/app/image/plugins/wv-tool-ellipticalroi.js"></script>
+    <script src="/src/app/image/plugins/wv-tool-lengthmeasure.js"></script>
+    <script src="/src/app/image/plugins/wv-tool-pan.js"></script>
+    <script src="/src/app/image/plugins/wv-tool-pixelprobe.js"></script>
+    <script src="/src/app/image/plugins/wv-tool-rectangleroi.js"></script>
+    <script src="/src/app/image/plugins/wv-tool-stackscroll.js"></script>
+    <script src="/src/app/image/plugins/wv-tool-zoom.js"></script>
+    <script src="/src/app/image/plugins/wv-viewport-mouse-events.js"></script>
+    <script src="/src/app/image/viewport.directive.js"></script>
+    <script src="/src/app/overlay/overlay.directive.js"></script>
+    <script src="/src/app/overlay/scrollbar-overlay-item.directive.js"></script>
+    <script src="/src/app/serie/model/orthanc-serie-adapter.js"></script>
+    <script src="/src/app/serie/model/serie-model.js"></script>
+    <script src="/src/app/serie/model/serie.js"></script>
+    <script src="/src/app/serie/plugins/draggable-serie-ext.directive.js"></script>
+    <script src="/src/app/serie/plugins/droppable-serie-ext.directive.js"></script>
+    <script src="/src/app/serie/plugins/scroll-on-over-serie-ext.directive.js"></script>
+    <script src="/src/app/serie/plugins/scroll-on-wheel-serie-ext.directive.js"></script>
+    <script src="/src/app/serie/plugins/wv-state-play.js"></script>
+    <script src="/src/app/serie/serie-id.directive.js"></script>
+    <script src="/src/app/serie/wv-serielist.js"></script>
     <script src="/src/app/splitpane/wv-splitpane.js"></script>
     <script src="/src/app/toolbar/wv-toolbar-setting.js"></script>
     <script src="/src/app/toolbar/wv-toolbar-state.js"></script>
     <script src="/src/app/toolbar/wv-toolbar-tool.js"></script>
     <script src="/src/app/toolbar/wv-toolbar.js"></script>
-    <script src="/src/app/viewport-states/wv-state-invert.js"></script>
-    <script src="/src/app/viewport-states/wv-state-play.js"></script>
-    <script src="/src/app/viewport-tools/wv-tool-anglemeasure.js"></script>
-    <script src="/src/app/viewport-tools/wv-tool-ellipticalroi.js"></script>
-    <script src="/src/app/viewport-tools/wv-tool-lengthmeasure.js"></script>
-    <script src="/src/app/viewport-tools/wv-tool-pan.js"></script>
-    <script src="/src/app/viewport-tools/wv-tool-pixelprobe.js"></script>
-    <script src="/src/app/viewport-tools/wv-tool-rectangleroi.js"></script>
-    <script src="/src/app/viewport-tools/wv-tool-stackscroll.js"></script>
-    <script src="/src/app/viewport-tools/wv-tool-zoom.js"></script>
-    <script src="/src/app/viewport/wv-scroll-on-over.js"></script>
-    <script src="/src/app/viewport/wv-scroll-on-wheel.js"></script>
-    <script src="/src/app/viewport/wv-viewport-draggable.js"></script>
-    <script src="/src/app/viewport/wv-viewport-droppable.js"></script>
-    <script src="/src/app/viewport/wv-viewport-mouse-events.js"></script>
-    <script src="/src/app/viewport/wv-viewport-serie.js"></script>
-    <script src="/src/app/viewport/wv-viewport.js"></script>
+    <script src="/src/app/utilities/osimis-listener.js"></script>
+    <script src="/src/app/utilities/size.directive.js"></script>
+    <script src="/src/app/utilities/wv-studylist.js"></script>
     <!-- endinject -->
 
     <!-- inject:templates:js -->

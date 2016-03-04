@@ -26,12 +26,17 @@ module.exports = function(config) {
         // test results reporter to use
         // possible values: 'dots', 'progress', 'coverage'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress', 'coverage'],
-
-        coverageReporter: {
-            dir: gulpConfig.karma.coverage.dir,
-            reporters: gulpConfig.karma.coverage.reporters
+        reporters: ['mocha'/*, 'coverage'*/],
+        
+        mochaReporter: {
+            output: 'full',
+            showDiff: 'unified'
         },
+
+        // coverageReporter: {
+        //     dir: gulpConfig.karma.coverage.dir,
+        //     reporters: gulpConfig.karma.coverage.reporters
+        // },
 
         // web server port
         port: 9876,
@@ -50,7 +55,7 @@ module.exports = function(config) {
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
         //        browsers: ['Chrome', 'ChromeCanary', 'FirefoxAurora', 'Safari', 'PhantomJS'],
-        browsers: ['PhantomJS'],
+        browsers: ['PhantomJS2'],
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits

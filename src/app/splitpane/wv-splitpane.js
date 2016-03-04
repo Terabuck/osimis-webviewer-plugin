@@ -7,7 +7,7 @@
  * # wvSplitpane
  */
 angular.module('webviewer')
-  .directive('wvSplitpane', function () {
+  .directive('wvSplitpane', function ($) {
     return {
       scope: {
         wvLayout: '=?',
@@ -18,12 +18,14 @@ angular.module('webviewer')
       restrict: 'E',
       transclude: true,
       link: function postLink(scope, element, attrs) {
-        if (scope.wvLayout == undefined) {
+        /* jshint -W116 */
+        if (scope.wvLayout == undefined) { 
           scope.wvLayout = scope.wvSettings && scope.wvSettings.layout || {
             x: 1,
             y: 1
-          }
+          };
         }
+        /* jshint +W116 */
 
         _updateLayout(scope.wvLayout);
         
