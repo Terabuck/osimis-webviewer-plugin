@@ -43,4 +43,4 @@ cd /root/
 rm -rf /root/osimis-webviewer
 
 # Remove the Orthanc web-viewer to avoid conflicts with the Osimis web-viewer
-rm /user/share/orthanc/plugins/libOrthancWebViewer.so
+rm /usr/share/orthanc/plugins/libOrthancWebViewer.so
