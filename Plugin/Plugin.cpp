@@ -554,7 +554,7 @@ extern "C"
 
   ORTHANC_PLUGINS_API const char* OrthancPluginGetName()
   {
-    return "web-viewer";
+    return "osimis-web-viewer";
   }
 
 
