@@ -6,55 +6,61 @@
         .directive('wvSize', wvSize);
 
     /* @ngInject */
-    function wvSize() {
+    function wvSize($timeout, $parse, debounce) {
         /**
          * Generic directive to handle DOM element sizing via JS
          * Can be used by other directives
          */
         var directive = {
             controller: Controller,
-            link: link,
+            link: {
+                pre: preLink
+            },
             restrict: 'A',
             scope: false,
-            require: 'wvSize'
+            require: 'wvSize',
+            priority: 100
         };
         return directive;
+    
+        // postLink: make sure the element is watching its size only once it has been added to dom.
+        function preLink(scope, element, attrs, ctrl) {
+            if (!element.parent().length) return;
 
-        function link(scope, element, attrs, ctrl) {
+            var wvSize = $parse(attrs.wvSize);
+
+            scope.$watch(wvSize, function (wvSize, old) {
+                var width = wvSize.width;
+                var height = wvSize.height;
+
+                if (typeof width === 'undefined' || typeof height === 'undefined') {
+                    return;
+                }
+
+                ctrl.updateSize(width, height);
+            }, true);
+
+            var whenWindowResizedFn = debounce(function() {
+                scope.$apply(function() {
+                    var size = wvSize(scope);
+                    if (_isTag(size.width) || _isTag(size.height)) {
+                        // the tagged element may have been resized by window resize if its size is defined in %
+                        ctrl.updateSize(size.width, size.height);
+                    }
+                });
+            }, 10);
+            $(window).on('resize', whenWindowResizedFn);
+            scope.$on('$destroy', function() {
+                $(window).off('resize', whenWindowResizedFn);
+            });
         }
     }
 
     /* @ngInject */
-    function Controller(_, $parse, $scope, $attrs, $element, debounce) {
+    function Controller(_, $parse, $scope, $attrs, $element) {
         var wvSize = $parse($attrs.wvSize);
         
-        var _this = this;
         var _onUpdateListeners = [];
-
-        $scope.$watch(wvSize, function (wvSize, old) {
-            var width = wvSize.width;
-            var height = wvSize.height;
-            
-            if (typeof width === 'undefined' || typeof height === 'undefined') {
-                return;
-            }
-
-            _this.updateSize(width, height);
-        }, true);
-
-        var whenWindowResizedFn = debounce(function() {
-            $scope.$apply(function() {
-                var size = wvSize($scope);
-                if (_isTag(size.width) || _isTag(size.height)) {
-                    // the tagged element may have been resized by window resize if its size is defined in %
-                    _this.updateSize(size.width, size.height);
-                }
-            });
-        }, 10);
-        $(window).on('resize', whenWindowResizedFn);
-        $scope.$on('$destroy', function() {
-            $(window).off('resize', whenWindowResizedFn);
-        });
 
         this.onUpdate = function(fn) {
             _onUpdateListeners.push(fn);
@@ -79,11 +85,13 @@
             
             if (_isTag(width)) {
                 _tag = _tag || $element.closest('[wv-size-tag]');
+                if (!_tag.length) throw new Error('wv-size#updateSize: [wv-size-tag] not found');
                 // @note might cause reflow
                 width = _tag.width() + 'px';
             }
             if (_isTag(height)) {
                 _tag = _tag || $element.closest('[wv-size-tag]');
+                if (!_tag.length) throw new Error('wv-size#updateSize: [wv-size-tag] not found');
                 // @note might cause reflow
                 height = _tag.height() + 'px';
             }
@@ -111,22 +119,6 @@
             var width = wvSize($scope).width;
             this.updateSize(width, height);
         };
-
-        function _isSize(size) {
-            return _.isString(size) && size.match(/^[0-9]+\w+$/);
-        }
-
-        function _isScale(size) {
-            return _.isNumber(size);
-        }
-
-        function _isTag(size) {
-            return _.isString(size) && size === '[wv-size-tag]';
-        }
-
-        function _isInPixels(size) {
-            return _.isString(size) && size.match(/^[0-9]+(px)?$/);
-        }
 
         this.getWidthInPixel = function() {
             var width = wvSize($scope).width;
@@ -182,4 +174,21 @@
             });
         }
     }
+
+    function _isSize(size) {
+        return _.isString(size) && size.match(/^[0-9]+\w+$/);
+    }
+
+    function _isScale(size) {
+        return _.isNumber(size);
+    }
+
+    function _isTag(size) {
+        return _.isString(size) && size === '[wv-size-tag]';
+    }
+
+    function _isInPixels(size) {
+        return _.isString(size) && size.match(/^[0-9]+(px)?$/);
+    }
+
 })();
