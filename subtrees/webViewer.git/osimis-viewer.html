@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+        /* This helps the ng-show/ng-hide animations start at the right place. */
+        /* Since Angular has this but needs to load, this gives us the class early. */
+        .ng-hide { display: none!important; }
+    </style>
+    <title ng-bind="title">Osimis Web Viewer</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+
+    <link rel="stylesheet" href="styles/lib.css">
+
+    <link rel="stylesheet" href="styles/app.css">
+  </head>
+  <body ng-app="orthanc">
+    <div ng-controller="OsimisWebViewer" class="wv-container">
+        <wv-toolbar wv-items="toolbar" ng-if="minimize"></wv-toolbar>
+        <div style="height: calc(100% - 40px)" wv-size-tag ng-if="minimize">
+            <wv-viewport wv-serie-id="serieId" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}"
+                wv-viewport-mouse-events wv-scroll-on-wheel-serie-ext="true"
+                wv-enable-overlay="toolbar.overlay"
+
+                wv-angle-measure-viewport-tool="toolbar.anglemeasure"
+
+                wv-tool-zoom="toolbar.zoom"
+                wv-tool-pan="toolbar.pan"
+                wv-tool-lengthmeasure="toolbar.lengthmeasure"
+                wv-tool-pixelprobe="toolbar.pixelprobe"
+                wv-tool-ellipticalroi="toolbar.ellipticalroi"
+                wv-tool-rectangleroi="toolbar.rectangleroi"
+                wv-state-invert="toolbar.invert"
+                wv-state-play="toolbar.play"
+            ></wv-viewport>
+        </div>
+
+        <div class="wv-menu" ng-if="!minimize">
+            <wv-serielist wv-study="study"></wv-serielist>
+        </div>
+        <div class="wv-main" ng-if="!minimize">
+            <wv-toolbar wv-items="toolbar"></wv-toolbar>
+            <wv-splitpane wv-layout="toolbar.layout" wv-settings="toolbar"></wv-splitpane>
+        </div>
+    </div>
+
+    <script src="js/lib.js"></script>
+
+    <script src="js/app.js"></script>
+
+    <script src="config.js"></script>
+    
+    <script>
+        angular.module('orthanc', ['webviewer'])
+        .config(function($locationProvider, wvConfigProvider) {
+            wvConfigProvider.setApiURL(window.orthancUrl);
+            
+            $locationProvider.html5Mode({
+                enabled: true,
+                requireBase: false
+            });
+        })
+        .controller('OsimisWebViewer', function($scope, $location) {
+            $scope.toolbar = {
+                zoom: false,
+                pan: false,
+                invert: false,
+                lengthmeasure: false,
+                anglemeasure: false,
+                pixelprobe: false,
+                ellipticalroi: false,
+                rectangleroi: false,
+                play: false,
+                overlay: true
+            };
+
+            $scope.serieId = $location.search().series;
+
+            $scope.study = {
+                id: $location.search().study
+            };
+
+            $scope.minimize = !$scope.study.id;
+        })
+        ;
+    </script>
+</body>
+</html>
