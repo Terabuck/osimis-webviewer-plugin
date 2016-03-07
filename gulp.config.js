@@ -32,7 +32,10 @@ module.exports = function() {
         html: client + '**/*.html',
         htmltemplates: clientApp + '**/*.html',
         images: client + 'images/**/*.*',
-        index: client + 'index.html',
+        index: [
+            client + 'index.html',
+            client + 'plugin-entrypoint.html'
+        ],
         config: client + 'config.js',
         // app js, with no specs
         js: [
