@@ -151,18 +151,14 @@
              * - name ends with ViewportTool
              * 
              * Tool controller interface:
-             * - void register(enabledElement, imageModel)
-             * - void unregister(enabledElement)
-             * - void setCurrentImage(imageModel)
-             * - void activate()
-             * - void deactivate()
+             * - void register(ctrl)
+             * - void unregister(ctrl)
              */
             model.onImageChanged.once(function(currentImage) {
                 _forEachViewportTool(function(toolCtrl) {
-                    toolCtrl.register(enabledElement, currentImage);
-                    model.onImageChanged(toolCtrl.setCurrentImage.bind(toolCtrl));
+                    toolCtrl.register(model);
                     scope.$on('$destroy', function() {
-                        toolCtrl.unregister(enabledElement);
+                        toolCtrl.unregister(model);
                     });
                 });
             });
@@ -183,10 +179,13 @@
          * responsibility: manage cornerstone viewport
          */
         function ViewportViewModel(wvImageRepository, enabledElement) {
+            var _this = this;
+
             this._imageRepository = wvImageRepository;
             this._enabledElement = enabledElement;
 
             this._imageId = null;
+            this._image = null;
             this._viewportWidth = null;
             this._viewportHeight = null;
             this._imageShownPromise = null;
@@ -202,8 +201,21 @@
             cornerstone.disable(this._enabledElement);
         };
 
+        ViewportViewModel.prototype.getEnabledElement = function() {
+            return this._enabledElement;
+        };
+        ViewportViewModel.prototype.getViewport = function() {
+            return cornerstone.getViewport(this._enabledElement);
+        };
+        ViewportViewModel.prototype.setViewport = function(viewport) {
+            return cornerstone.setViewport(this._enabledElement, viewport);
+        };
+
         ViewportViewModel.prototype.getImageId = function() {
             return this._imageId;
+        };
+        ViewportViewModel.prototype.getImage = function() {
+            return this._image;
         };
         ViewportViewModel.prototype.setImage = function(id, resetConfig) {
             if (id == this._imageId && !resetConfig) {
@@ -261,9 +273,10 @@
                     });
                 })
                 .then(function(args) {
-                    var imageModel = args.imageModel;
-
-                    _this.onImageChanged.trigger(imageModel);
+                    var newImageModel = args.imageModel;
+                    var oldImageModel = _this._image;
+                    _this._image = newImageModel;
+                    _this.onImageChanged.trigger(newImageModel, oldImageModel);
                 });
 
             return this._imageShownPromise;

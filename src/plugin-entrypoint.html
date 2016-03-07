@@ -29,17 +29,18 @@
         <wv-toolbar wv-items="toolbar" ng-if="minimize"></wv-toolbar>
         <div style="height: calc(100% - 40px)" wv-size-tag ng-if="minimize">
             <wv-viewport wv-serie-id="serieId" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}"
-                wv-viewport-mouse-events wv-scroll-on-wheel-serie-ext="true"
+                wv-scroll-on-wheel-serie-ext="true"
                 wv-enable-overlay="toolbar.overlay"
 
+                wv-default-viewport-tool="toolbar.windowing"
                 wv-angle-measure-viewport-tool="toolbar.anglemeasure"
-
-                wv-tool-zoom="toolbar.zoom"
-                wv-tool-pan="toolbar.pan"
-                wv-tool-lengthmeasure="toolbar.lengthmeasure"
-                wv-tool-pixelprobe="toolbar.pixelprobe"
-                wv-tool-ellipticalroi="toolbar.ellipticalroi"
-                wv-tool-rectangleroi="toolbar.rectangleroi"
+                wv-length-measure-viewport-tool="toolbar.lengthmeasure"
+                wv-elliptical-roi-viewport-tool="toolbar.ellipticalroi"
+                wv-zoom-viewport-tool="toolbar.zoom"
+                wv-pan-viewport-tool="toolbar.pan"
+                wv-pixel-probe-viewport-tool="toolbar.pixelprobe"
+                wv-rectangle-roi-viewport-tool="toolbar.rectangleroi"
+                
                 wv-state-invert="toolbar.invert"
                 wv-state-play="toolbar.play"
             ></wv-viewport>
@@ -85,15 +86,16 @@
     <script src="/src/app/image/model/image-model.js"></script>
     <script src="/src/app/image/model/image.js"></script>
     <script src="/src/app/image/plugins/angle-measure-viewport-tool.directive.js"></script>
+    <script src="/src/app/image/plugins/base-tool.class.js"></script>
+    <script src="/src/app/image/plugins/default-viewport-tool.directive.js"></script>
+    <script src="/src/app/image/plugins/elliptical-roi-viewport-tool.directive.js"></script>
+    <script src="/src/app/image/plugins/invertion-viewport-state.directive.js"></script>
+    <script src="/src/app/image/plugins/length-measure-viewport-tool.directive.js"></script>
+    <script src="/src/app/image/plugins/pan-viewport-tool.directive.js"></script>
+    <script src="/src/app/image/plugins/pixel-probe-viewport-tool.directive.js"></script>
+    <script src="/src/app/image/plugins/rectangle-roi-viewport-tool.directive.js"></script>
     <script src="/src/app/image/plugins/wv-state-invert.js"></script>
-    <script src="/src/app/image/plugins/wv-tool-ellipticalroi.js"></script>
-    <script src="/src/app/image/plugins/wv-tool-lengthmeasure.js"></script>
-    <script src="/src/app/image/plugins/wv-tool-pan.js"></script>
-    <script src="/src/app/image/plugins/wv-tool-pixelprobe.js"></script>
-    <script src="/src/app/image/plugins/wv-tool-rectangleroi.js"></script>
-    <script src="/src/app/image/plugins/wv-tool-stackscroll.js"></script>
-    <script src="/src/app/image/plugins/wv-tool-zoom.js"></script>
-    <script src="/src/app/image/plugins/wv-viewport-mouse-events.js"></script>
+    <script src="/src/app/image/plugins/zoom-viewport-tool.directive.js"></script>
     <script src="/src/app/image/viewport.directive.js"></script>
     <script src="/src/app/overlay/overlay.directive.js"></script>
     <script src="/src/app/overlay/scrollbar-overlay-item.directive.js"></script>
