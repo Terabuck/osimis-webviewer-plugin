@@ -4,7 +4,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update; apt-get -y install libgdcm2-d
 
 ADD . /root/osimis-webviewer
 
-RUN bash /root/osimis-webviewer/scripts/dockerConfigWebViewerJs.sh "default"
 RUN bash /root/osimis-webviewer/scripts/dockerBuildWebViewer.sh "default"
 
 EXPOSE 4242
