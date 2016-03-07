@@ -276,7 +276,7 @@ gulp.task('optimize', ['inject'], function() {
     var templateCache = config.temp + config.templateCache.file;
 
     return gulp
-        .src([config.index, config.config, './bower.json'])
+        .src([config.index[0], config.index[1], config.config, './bower.json'])
         .pipe($.plumber())
         .pipe(inject(templateCache, 'templates'))
         .pipe(assets) // Gather all assets from the html with useref
