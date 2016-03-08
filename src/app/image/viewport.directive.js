@@ -188,7 +188,7 @@
             this._image = null;
             this._viewportWidth = null;
             this._viewportHeight = null;
-            this._imageShownPromise = null;
+            this._cancelImageDisplaying = null;
 
             this.onImageChanged = new osimis.Listener();
 
@@ -198,6 +198,9 @@
         ViewportViewModel.prototype.onImageChanged = angular.noop;
         
         ViewportViewModel.prototype.destroy = function() {
+            if (this._cancelImageDisplaying) {
+                this._cancelImageDisplaying();
+            }
             cornerstone.disable(this._enabledElement);
         };
 
@@ -227,31 +230,38 @@
             resetConfig = resetConfig || false;
 
             this._imageId = id;
-            
-            this._imageShownPromise = $q
-                // make sure multiple setImage calls are always sequencials
-                // @todo make the last setImage be taken into account
-                // @note serie model should have the responsibililty to handle which one is displayed
-                .when(this._imageShownPromise)
-                .then(function() {
-                    return $q.all({
-                        processedImage: cornerstone.loadImage('orthanc://' + id),
-                        imageModel: _this._imageRepository.get(id)
-                    });
+
+            if (this._cancelImageDisplaying) {
+                this._cancelImageDisplaying();
+            }
+
+            var _cancelImageDisplaying = false;
+            this._cancelImageDisplaying = function() {
+                _cancelImageDisplaying = true;
+                _this._cancelImageDisplaying = null;
+            };
+            // @todo true canceling
+            return $q
+                .all({
+                    processedImage: cornerstone.loadImage('orthanc://' + id),
+                    imageModel: _this._imageRepository.get(id)
+                })
+                .then(function(args) {
+                    if (_cancelImageDisplaying) {
+                        throw 'wv-viewport: image displaying canceled';
+                    }
+                    return args;
                 })
                 .then(function(args) {
+                    if (_cancelImageDisplaying) {
+                        throw 'wv-viewport: image displaying canceled';
+                    }
+
                     var processedImage = args.processedImage;
                     var imageModel = args.imageModel;
 
                     return $q(function(resolve, reject) {
-                        /*
-                        if (_this._imageId != imageModel.id) {
-                            reject('This image no longer need to be shown');
-                            return;
-                        }
-                        */
-
-                        requestAnimationFrame(function() {
+                        var cancelId = requestAnimationFrame(function() {
                             $rootScope.$apply(function() {
                                 if (!resetConfig) {
                                     cornerstone.displayImage(_this._enabledElement, processedImage);
@@ -270,16 +280,25 @@
                                 resolve(args);
                             });
                         });
+
+                        var oldCancelFn = _this._cancelImageDisplaying;
+                        _this._cancelImageDisplaying = function() {
+                            cancelAnimationFrame(cancelId);
+                            oldCancelFn();
+                        }
                     });
                 })
                 .then(function(args) {
+                    if (_cancelImageDisplaying) {
+                        throw 'wv-viewport: image displaying canceled';
+                    }
+
                     var newImageModel = args.imageModel;
                     var oldImageModel = _this._image;
                     _this._image = newImageModel;
                     _this.onImageChanged.trigger(newImageModel, oldImageModel);
-                });
-
-            return this._imageShownPromise;
+                })
+                ;
         };
         ViewportViewModel.prototype.clearImage = function() {
             this._imageId = null;
