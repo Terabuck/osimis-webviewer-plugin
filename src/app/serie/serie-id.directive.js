@@ -33,8 +33,9 @@
             // bind view model -> viewport controller
             viewmodel.onCurrentImageIdChanged(function(imageId, isNewSerie, setShownImageCallback) {
                 if (imageId) {
+                    var resetViewport = isNewSerie;
                     viewportController
-                        .setImage(imageId, isNewSerie ? true : false)
+                        .setImage(imageId, resetViewport)
                         .then(function() {
                             if (setShownImageCallback) {
                                 setShownImageCallback(imageId);

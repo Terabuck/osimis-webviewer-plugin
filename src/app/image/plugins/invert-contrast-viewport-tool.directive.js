@@ -43,7 +43,18 @@
 
         /* @ngInject */
         function Controller() {
+            var _this = this;
+
             WVBaseTool.call(this, 'invertContrast');
+
+            this._listenViewChange = function(viewport) {
+                viewport.onViewportResetting(this, function(viewportData) {
+                    viewportData.invert = _this.isActivated;
+                });
+            };
+            this._unlistenViewChange = function(viewport) {
+                viewport.onViewportResetting.close(this);
+            };
 
             this._process = function(viewport) {
                 var viewportData = viewport.getViewport();
@@ -61,8 +72,6 @@
             this._deactivateInputs = angular.noop;
             this._listenModelChange = angular.noop;
             this._unlistenModelChange = angular.noop;
-            this._listenViewChange = angular.noop;
-            this._unlistenViewChange = angular.noop;
         }
         Controller.prototype = Object.create(WVBaseTool.prototype)
         Controller.prototype.constructor = Controller;
