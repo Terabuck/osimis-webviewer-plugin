@@ -11,6 +11,7 @@
   width: 150px;
   height: 150px;
   margin: auto;
+  margin-bottom: 0.5rem;
 }
 
 .wv-serielist-overlay {
@@ -19,7 +20,8 @@
   left:0;
   right:0;
   color: #CCC;
-  background-color: rgba(0,0,0,0.75);
+  background-color: rgba(0,0,0,0.5);
   text-align: center;
   padding: 0.5em;
+  border: 1px solid rgba(255, 255, 255, 0.13);
 }
