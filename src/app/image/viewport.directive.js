@@ -263,32 +263,19 @@
                     var processedImage = args.processedImage;
                     var imageModel = args.imageModel;
 
-                    return $q(function(resolve, reject) {
-                        var cancelId = requestAnimationFrame(function() {
-                            $rootScope.$apply(function() {
-                                var viewportData;
+                    var viewportData;
+                    if (!reset) {
+                        viewportData = cornerstone.getViewport(_this._enabledElement); // get old viewportData
+                    }
+                    else {
+                        viewportData = _this.resetViewport(processedImage);
+                    }
 
-                                if (!reset) {
-                                    viewportData = cornerstone.getViewport(_this._enabledElement); // get old viewportData
-                                }
-                                else {
-                                    viewportData = _this.resetViewport(processedImage);
-                                }
+                    cornerstone.displayImage(_this._enabledElement, processedImage, viewportData);
 
-                                cornerstone.displayImage(_this._enabledElement, processedImage, viewportData);
+                    $(_this._enabledElement).css('visibility', 'visible');
 
-                                $(_this._enabledElement).css('visibility', 'visible');
-
-                                resolve(args);
-                            });
-                        });
-
-                        var oldCancelFn = _this._cancelImageDisplaying;
-                        _this._cancelImageDisplaying = function() {
-                            cancelAnimationFrame(cancelId);
-                            oldCancelFn();
-                        }
-                    });
+                    return args;
                 })
                 .then(function(args) {
                     if (_cancelImageDisplaying) {

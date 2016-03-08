@@ -34,19 +34,13 @@
             scope.$watchGroup(['vm.wvImageIndex', 'vm.wvImageCount'], _setLoadingScrollbarDimension);
             
             function _setLoadedScrollbarDimension() {
-              requestAnimationFrame(function() {
                 var eq = Math.ceil(100 * (scope.vm.wvShownImageIndex+1) / scope.vm.wvImageCount);
                 scope.vm.loadedScrollbarDistanceFromRight = 100 - eq + '%';
-                scope.$digest();
-              });
             }
 
             function _setLoadingScrollbarDimension() {
-              requestAnimationFrame(function() {
                 var eq = Math.ceil(100 * (scope.vm.wvImageIndex+1) / scope.vm.wvImageCount);
                 scope.vm.loadingScrollbarDistanceFromRight = 100 - eq + '%';
-                scope.$digest();
-              });
             }
         }
     }
