@@ -36,8 +36,7 @@
             },
             scope: {
                 wvImageId: '=?',
-                // wvImage: '=?',
-                wvTags: '=?',
+                wvImage: '=?',
                 wvViewport: '=?',
                 wvEnableOverlay: '=?'
             }
@@ -98,9 +97,9 @@
             }
 
             // bind model to directive's attributes
-            // bind tags
+            // bind image
             model.onImageChanged(function(image) {
-                scope.vm.wvTags = image.tags;
+                scope.vm.wvImage = image;
             });
             element.on('CornerstoneImageRendered', function(evt, args) { // element.off not needed
                 scope.$evalAsync(function() { // trigger a new digest if needed
