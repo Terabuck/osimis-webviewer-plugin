@@ -75,12 +75,10 @@
                 ctrl.getImage = function() {
                     return model.getImageId();
                 };
-                ctrl.setImage = function(id, resetConfig) {
-                    var resetConfig = resetConfig || false;
-
+                ctrl.setImage = function(id, reset) { // reset is optional
                     scope.vm.wvImageId = id;
 
-                    return model.setImage(id, resetConfig);
+                    return model.setImage(id, reset);
                 };
                 ctrl.clearImage = function() {
                     scope.vm.wvImageId = null;
@@ -134,10 +132,6 @@
                     var height = wvSizeController.getHeightInPixel();
 
                     model.resizeViewport(width, height);
-                    
-                    if (model.hasImage()) {
-                        model.autoScaleImage();
-                    }
                 });
 
                 return function unbind() {
@@ -151,18 +145,14 @@
              * - name ends with ViewportTool
              * 
              * Tool controller interface:
-             * - void register(enabledElement, imageModel)
-             * - void unregister(enabledElement)
-             * - void setCurrentImage(imageModel)
-             * - void activate()
-             * - void deactivate()
+             * - void register(ctrl)
+             * - void unregister(ctrl)
              */
             model.onImageChanged.once(function(currentImage) {
                 _forEachViewportTool(function(toolCtrl) {
-                    toolCtrl.register(enabledElement, currentImage);
-                    model.onImageChanged(toolCtrl.setCurrentImage.bind(toolCtrl));
+                    toolCtrl.register(model);
                     scope.$on('$destroy', function() {
-                        toolCtrl.unregister(enabledElement);
+                        toolCtrl.unregister(model);
                     });
                 });
             });
@@ -183,15 +173,19 @@
          * responsibility: manage cornerstone viewport
          */
         function ViewportViewModel(wvImageRepository, enabledElement) {
+            var _this = this;
+
             this._imageRepository = wvImageRepository;
             this._enabledElement = enabledElement;
 
             this._imageId = null;
+            this._image = null;
             this._viewportWidth = null;
             this._viewportHeight = null;
-            this._imageShownPromise = null;
+            this._cancelImageDisplaying = null;
 
             this.onImageChanged = new osimis.Listener();
+            this.onViewportResetting = new osimis.Listener();
 
             cornerstone.enable(enabledElement);
         }
@@ -199,79 +193,108 @@
         ViewportViewModel.prototype.onImageChanged = angular.noop;
         
         ViewportViewModel.prototype.destroy = function() {
+            if (this._cancelImageDisplaying) {
+                this._cancelImageDisplaying();
+            }
             cornerstone.disable(this._enabledElement);
+        };
+
+        ViewportViewModel.prototype.getEnabledElement = function() {
+            return this._enabledElement;
+        };
+        ViewportViewModel.prototype.getViewport = function() {
+            return cornerstone.getViewport(this._enabledElement);
+        };
+        ViewportViewModel.prototype.setViewport = function(viewport) {
+            return cornerstone.setViewport(this._enabledElement, viewport);
         };
 
         ViewportViewModel.prototype.getImageId = function() {
             return this._imageId;
         };
-        ViewportViewModel.prototype.setImage = function(id, resetConfig) {
-            if (id == this._imageId && !resetConfig) {
+        ViewportViewModel.prototype.getImage = function() {
+            return this._image;
+        };
+        ViewportViewModel.prototype.updateImage = function(reset) {
+            if (!this.hasImage()) {
+                return;
+            }
+
+            // @todo assert previousViewport should always exists
+            //reset.call(this, ..., ..)
+            
+        };
+        ViewportViewModel.prototype.setImage = function(id, reset) {
+            if (id == this._imageId && !reset) {
                 return $q.reject('This image is already shown');
+            }
+            
+            reset = reset || false;
+
+            // force reset when no previous data
+            if (this._imageId === null) {
+                reset = true;
             }
 
             var _this = this;
-            var doAutoScaleImage = this._imageId === null ? true : false; // don't override actual viewport configuration
-            resetConfig = resetConfig || false;
 
             this._imageId = id;
-            
-            this._imageShownPromise = $q
-                // make sure multiple setImage calls are always sequencials
-                // @todo make the last setImage be taken into account
-                // @note serie model should have the responsibililty to handle which one is displayed
-                .when(this._imageShownPromise)
-                .then(function() {
-                    return $q.all({
-                        processedImage: cornerstone.loadImage('orthanc://' + id),
-                        imageModel: _this._imageRepository.get(id)
-                    });
+
+            if (this._cancelImageDisplaying) {
+                this._cancelImageDisplaying();
+            }
+
+            var _cancelImageDisplaying = false;
+            this._cancelImageDisplaying = function() {
+                _cancelImageDisplaying = true;
+                _this._cancelImageDisplaying = null;
+            };
+            // @todo true canceling
+            return $q
+                .all({
+                    processedImage: cornerstone.loadImage('orthanc://' + id),
+                    imageModel: _this._imageRepository.get(id)
                 })
                 .then(function(args) {
+                    if (_cancelImageDisplaying) {
+                        throw 'wv-viewport: image displaying canceled';
+                    }
+
                     var processedImage = args.processedImage;
                     var imageModel = args.imageModel;
 
-                    return $q(function(resolve, reject) {
-                        /*
-                        if (_this._imageId != imageModel.id) {
-                            reject('This image no longer need to be shown');
-                            return;
-                        }
-                        */
+                    var viewportData;
+                    if (!reset) {
+                        viewportData = cornerstone.getViewport(_this._enabledElement); // get old viewportData
+                    }
+                    else {
+                        viewportData = _this.resetViewport(processedImage);
+                    }
 
-                        requestAnimationFrame(function() {
-                            $rootScope.$apply(function() {
-                                if (!resetConfig) {
-                                    cornerstone.displayImage(_this._enabledElement, processedImage);
-                                }
-                                else {
-                                    var viewport = cornerstone.getDefaultViewportForImage(_this._enabledElement, processedImage);
-                                    cornerstone.displayImage(_this._enabledElement, processedImage, viewport);
-                                }
+                    cornerstone.displayImage(_this._enabledElement, processedImage, viewportData);
 
-                                if (doAutoScaleImage || resetConfig) {
-                                    _this.autoScaleImage();
-                                }
+                    $(_this._enabledElement).css('visibility', 'visible');
 
-                                $(_this._enabledElement).css('visibility', 'visible');
-
-                                resolve(args);
-                            });
-                        });
-                    });
+                    return args;
                 })
                 .then(function(args) {
-                    var imageModel = args.imageModel;
+                    if (_cancelImageDisplaying) {
+                        throw 'wv-viewport: image displaying canceled';
+                    }
 
-                    _this.onImageChanged.trigger(imageModel);
-                });
+                    var newImageModel = args.imageModel;
+                    var oldImageModel = _this._image;
+                    //var newViewport = args.newViewport;
+                    //var oldViewport = args.oldViewport;
 
-            return this._imageShownPromise;
+                    _this._image = newImageModel;
+                    _this.onImageChanged.trigger(newImageModel, oldImageModel);//, newViewport, oldViewport);
+                })
+                ;
         };
         ViewportViewModel.prototype.clearImage = function() {
             this._imageId = null;
 
-            //cornerstone.displayImage(this._enabledElement, null);
             $(this._enabledElement).css('visibility', 'hidden');
         };
         ViewportViewModel.prototype.hasImage = function() {
@@ -287,20 +310,45 @@
             jqEnabledElement.width(width);
             jqEnabledElement.height(height);
             cornerstone.resize(this._enabledElement, false);
+
+            var csImage = cornerstone.getImage(this._enabledElement);
+            var viewportData = cornerstone.getViewport(this._enabledElement);
+            if (csImage && viewportData) {
+                // rescale the image
+                _setViewportScaleByImage(viewportData, this._viewportWidth, this._viewportHeight, csImage);
+                // redraw it
+                cornerstone.displayImage(this._enabledElement, csImage, viewportData);
+            }
         };
 
-        ViewportViewModel.prototype.autoScaleImage = function() {
-            var csImage = cornerstone.getImage(this._enabledElement);
+        ViewportViewModel.prototype.resetViewport = function(csImage) {
+            var viewportData = cornerstone.getDefaultViewportForImage(this._enabledElement, csImage);
 
-            var isImageSmallerThanViewport = csImage.width <= this._viewportWidth && csImage.height <= this._viewportHeight;
+            // rescale the image
+            _setViewportScaleByImage(viewportData, this._viewportWidth, this._viewportHeight, csImage);
+
+            // allow extensions to extend this behavior
+            this.onViewportResetting.trigger(viewportData);
+
+            return viewportData;
+        };
+
+        function _setViewportScaleByImage(viewportData, elementWidth, elementHeight, csImage) {
+            var isImageSmallerThanViewport = csImage.width <= elementWidth && csImage.height <= elementHeight;
             if (isImageSmallerThanViewport) {
-                cornerstone.resize(this._enabledElement, false);
-                var viewport = cornerstone.getViewport(this._enabledElement);
-                viewport.scale = 1.0;
-                cornerstone.setViewport(this._enabledElement, viewport);
+                viewportData.scale = 1.0;
             }
             else {
-                cornerstone.fitToWindow(this._enabledElement);
+                var verticalScale = elementHeight / csImage.height;
+                var horizontalScale = elementWidth / csImage.width;
+                if(horizontalScale < verticalScale) {
+                  viewportData.scale = horizontalScale;
+                }
+                else {
+                  viewportData.scale = verticalScale;
+                }
+                viewportData.translation.x = 0;
+                viewportData.translation.y = 0;
             }
         };
 

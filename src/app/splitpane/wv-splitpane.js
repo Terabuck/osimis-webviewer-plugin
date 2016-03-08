@@ -7,11 +7,11 @@
  * # wvSplitpane
  */
 angular.module('webviewer')
-  .directive('wvSplitpane', function ($) {
+  .directive('wvSplitpane', function ($, $timeout) {
     return {
       scope: {
         wvLayout: '=?',
-        wvSettings: '=?'
+        wvSettings: '=?' // used by transcluded directives
       },
       // @todo add template path angular constant
       templateUrl: 'app/splitpane/wv-splitpane.tpl.html',
@@ -19,17 +19,12 @@ angular.module('webviewer')
       transclude: true,
       link: function postLink(scope, element, attrs) {
         /* jshint -W116 */
-        if (scope.wvLayout == undefined) { 
-          scope.wvLayout = scope.wvSettings && scope.wvSettings.layout || {
+          scope.wvLayout = scope.wvLayout || scope.wvSettings && scope.wvSettings.layout || {
             x: 1,
             y: 1
           };
-        }
         /* jshint +W116 */
 
-        _updateLayout(scope.wvLayout);
-        
-        scope.$watch('wvSettings.layout', _updateLayout, true);
         scope.$watch('wvLayout', _updateLayout, true);
 
         function _updateLayout(layout, old) {
@@ -40,7 +35,10 @@ angular.module('webviewer')
           scope.rowHeight = 100 / layout.y + '%';
           scope.rowWidth = 100 / layout.x + '%';
 
-          $(window).resize();
+          // @note trigger this after reflow
+          $timeout(function() {
+              $(window).resize();
+          });
         }
       }
     };

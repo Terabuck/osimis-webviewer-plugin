@@ -3,24 +3,24 @@
 
     angular
         .module('webviewer')
-        .directive('wvAngleMeasureViewportTool', wvAngleMeasureViewportTool)
+        .directive('wvRectangleRoiViewportTool', wvRectangleRoiViewportTool)
         .config(function($provide) {
             $provide.decorator('wvViewportDirective', function($delegate) {
                 var directive = $delegate[0];
-                directive.require['wvAngleMeasureViewportTool'] = '?^wvAngleMeasureViewportTool';
+                directive.require['wvRectangleRoiViewportTool'] = '?^wvRectangleRoiViewportTool';
 
                 return $delegate;
             });
         });
 
     /* @ngInject */
-    function wvAngleMeasureViewportTool($parse, WVBaseTool) {
+    function wvRectangleRoiViewportTool($parse, WVBaseTool) {
         // Usage:
         //
         // Creates:
         //
         var directive = {
-            require: 'wvAngleMeasureViewportTool',
+            require: 'wvRectangleRoiViewportTool',
             controller: Controller,
             link: link,
             restrict: 'A',
@@ -28,10 +28,10 @@
         };
 
         function link(scope, element, attrs, tool) {
-            var wvAngleMeasureViewportToolParser = $parse(attrs.wvAngleMeasureViewportTool);
+            var wvRectangleRoiViewportToolParser = $parse(attrs.wvRectangleRoiViewportTool);
             
             // bind attributes -> tool
-            scope.$watch(wvAngleMeasureViewportToolParser, function(isActivated) {
+            scope.$watch(wvRectangleRoiViewportToolParser, function(isActivated) {
                 if (isActivated) {
                     tool.activate();
                 }
@@ -43,11 +43,11 @@
 
         /* @ngInject */
         function Controller() {
-            WVBaseTool.call(this, 'angle');
+            WVBaseTool.call(this, 'rectangleRoi');
         }
         Controller.prototype = Object.create(WVBaseTool.prototype)
         Controller.prototype.constructor = Controller;
-    
+        
         return directive;
     }
 

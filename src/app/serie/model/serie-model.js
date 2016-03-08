@@ -62,59 +62,46 @@
             this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
         };
 
+        var _cancelAnimationId = null;
         WVSerieModel.prototype.play = function(speed) {
-            if (this.isPlaying) return;
-
-            if (speed) {
-              this.playAtSpeed(speed);
-            }
-            else {
-              var mmPerSeconds = 25;
-              this.playAtRate(mmPerSeconds);
-            }
-        };
-
-        WVSerieModel.prototype.pause = function() {
-            if (this._playTimeout) {
-              $timeout.cancel(this._playTimeout);
-              this._playTimeout = null;
-            }
-
-            this.isPlaying = false;
-        };
-
-        WVSerieModel.prototype.playAtSpeed = function(speed) {
             var _this = this;
 
-            this._playTimeout = $timeout(function() {
-                _this.goToNextImage(true);
-                if (_this.isPlaying) {
-                    _this.playAtSpeed(speed);
-                }
-            }, speed);
+            if (this.isPlaying) {
+                return;
+            }
+
+            var _lastMsTime = null;
+            var _toSkip = 0;
+            (function loop() {
+                _cancelAnimationId = requestAnimationFrame(function(msTime) {
+                    // force skipping useless frames
+                    if (_toSkip) {
+                        --_toSkip;
+                    }
+                    else {
+                        var fps = 1000 / (msTime - _lastMsTime);
+                        _toSkip = Math.round(fps / speed);
+
+                        _this.goToNextImage(true);
+                    }
+
+                    _lastMsTime = msTime;
+                    
+                    if (_this.isPlaying) {
+                        loop();
+                    }
+                });
+            })();
             
             this.isPlaying = true;
         };
+        WVSerieModel.prototype.pause = function() {
+            if (_cancelAnimationId) {
+                cancelAnimationFrame(_cancelAnimationId);
+                _cancelAnimationId = null;
+            }
 
-        WVSerieModel.prototype.playAtRate = function(rate) {
-            this.playAtSpeed(50);
-            // @todo require instance datas
-            // @note very approximative algorithm to automaticaly set speed
-            
-            // elementScope.$broadcast('viewport:GetInstanceData', function(tags) {
-            //   if (!tags) return;
-
-            //   // @todo calculate SpacingBetweenSlices using positions and orientation...
-            //   var size = +tags.SliceThickness + (+tags.SpacingBetweenSlices || 0); 
-            //   var fps = mmPerSeconds / size;
-            //   var speed = Math.round(1000 / fps);
-
-            //   nextTimeout = $timeout(function() {
-            //     _showNextInstance(true);
-            //     if (playing)
-            //       scope.$evalAsync(processNextIterationCalculatedSpeed);
-            //   }, speed);
-            // });
+            this.isPlaying = false;
         };
 
         ////////////////
