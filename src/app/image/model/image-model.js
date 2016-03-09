@@ -6,22 +6,32 @@
         .factory('WVImageModel', factory);
 
     /* @ngInject */
-    function factory() {
+    function factory(wvAnnotation) {
 
         function WVImageModel(id, tags) {
+            var _this = this;
+
             this.id = id;
             this.tags = tags;
-            this.annotations = {};
+
             this.onAnnotationChanged = new osimis.Listener();
+            
+            wvAnnotation.onAnnotationChanged(function(imageId, type, data) {
+                // @todo need to be destroyed on no listener anymore.
+
+                if (imageId !== _this.id) return;
+
+                _this.onAnnotationChanged(type, data);
+            });
+
         }
         
         WVImageModel.prototype.getAnnotations = function(type) {
-            return this.annotations[type];
+            return wvAnnotation.getByImageId(this.id, type);
         };
 
         WVImageModel.prototype.setAnnotations = function(type, data) {
-            this.annotations[type] = data;
-            this.onAnnotationChanged.trigger(type, data);
+            wvAnnotation.setByImageId(this.id, type, data);            
         };
 
         ////////////////
