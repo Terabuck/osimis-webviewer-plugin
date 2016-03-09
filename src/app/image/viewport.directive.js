@@ -256,7 +256,7 @@
                 })
                 .then(function(args) {
                     if (_cancelImageDisplaying) {
-                        throw 'wv-viewport: image displaying canceled';
+                        return $q.reject('wv-viewport: image displaying canceled');
                     }
 
                     var processedImage = args.processedImage;
@@ -278,7 +278,7 @@
                 })
                 .then(function(args) {
                     if (_cancelImageDisplaying) {
-                        throw 'wv-viewport: image displaying canceled';
+                        return $q.reject('wv-viewport: image displaying canceled');;
                     }
 
                     var newImageModel = args.imageModel;
@@ -288,6 +288,8 @@
 
                     _this._image = newImageModel;
                     _this.onImageChanged.trigger(newImageModel, oldImageModel);//, newViewport, oldViewport);
+
+                    return newImageModel;
                 })
                 ;
         };
