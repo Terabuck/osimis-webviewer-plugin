@@ -18,12 +18,11 @@
             },
             restrict: 'A',
             scope: false,
-            require: 'wvSize',
-            priority: 100
+            require: 'wvSize'
         };
         return directive;
     
-        // postLink: make sure the element is watching its size only once it has been added to dom.
+        // preLink: make sure the element is watching its size only once it has been added to dom.
         function preLink(scope, element, attrs, ctrl) {
             if (!element.parent().length) return;
 
