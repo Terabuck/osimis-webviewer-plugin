@@ -2,37 +2,10 @@ chai.config.includeStack = true;;
 
 describe('size', function() {
 
-    function _createDirective(html) {
-        var element = $compile(html)($rootScope);
-
-        // @note element must appended to body to retrieve its size
-        $('body').append(element);
-
-        return element;
-    }
-
     describe('directive', function() {
         
-        beforeEach(function() {
-            bard.appModule('webviewer');
-
-            bard.inject(this, '$compile', '$httpBackend', '$rootScope', '$timeout');
-
-            _.forEach(orthanc.raw, function(data, path) {
-              $httpBackend
-                .when('GET', '/' + path)
-                .respond(data);
-            });
-            
-            bard.mockService(_, _.runInContext({
-                setTimeout: $timeout
-            }));
-        });
-
-        afterEach(function() {
-            $rootScope.$destroy();
-            $('body').children().remove();
-        });
+        osi.beforeEach();
+        osi.afterEach();
 
         it('could set a specific width and height', function() {
             $rootScope.opts = {
@@ -40,9 +13,7 @@ describe('size', function() {
               height: '70px'
             };
 
-            var element = _createDirective('<div wv-size="opts"></div>');
-
-            $rootScope.$digest();
+            var element = osi.directive('<div wv-size="opts"></div>');
             
             expect(element.width(), 'width').to.be.closeTo(+$rootScope.opts.width.replace('px', ''), 1);
             expect(element.height(), 'height').to.be.closeTo(+$rootScope.opts.height.replace('px', ''), 1);
@@ -54,9 +25,9 @@ describe('size', function() {
                 height: 1/3
             };
 
-            var element = _createDirective('<div wv-size="opts"></div>');
-
-            $rootScope.$digest();
+            var element = osi.directive('<div wv-size="opts"></div>');
+            
+            osi.digest();
 
             expect(element.width(), 'width').to.be.closeTo(+$rootScope.opts.width.replace('px', ''), 1);
             expect(element.height(), 'height').to.be.closeTo(+$rootScope.opts.width.replace('px', '') * (1/3), 1);
@@ -68,9 +39,9 @@ describe('size', function() {
                 width: 1/3,
             };
 
-            var element = _createDirective('<div wv-size="opts"></div>');
-
-            $rootScope.$digest();
+            var element = osi.directive('<div wv-size="opts"></div>');
+            
+            osi.digest();
 
             expect(element.height(), 'height').to.be.closeTo(+$rootScope.opts.height.replace('px', ''), 1);
             expect(element.width(), 'width').to.be.closeTo(+$rootScope.opts.height.replace('px', '') * (1/3), 1);
@@ -82,16 +53,12 @@ describe('size', function() {
                 height: '[wv-size-tag]'
             };
 
-            var element = _createDirective([
-                '<div wv-size-tag>',
+            var element = osi.directive([
+                '<div style="width: 100px; height: 200px;" wv-size-tag>',
                     '<div wv-size="opts">',
                     '</div>',
                 '</div>'
             ].join(''));
-
-            element.width(100);
-            element.height(200);
-            $rootScope.$digest();
 
             expect(element.children().height(), 'height').to.be.closeTo(200, 1);
             expect(element.children().width(), 'width').to.be.closeTo(100, 1);
@@ -103,15 +70,12 @@ describe('size', function() {
                 width: 1/3
             };
 
-            var element = _createDirective([
-                '<div wv-size-tag>',
+            var element = osi.directive([
+                '<div style="height: 100px;" wv-size-tag>',
                     '<div wv-size="opts">',
                     '</div>',
                 '</div>'
             ].join(''));
-
-            element.height(100);
-            $rootScope.$digest();
 
             expect(element.children().height(), 'height').to.be.closeTo(100, 1);
             expect(element.children().width(), 'width').to.be.closeTo(100 * (1/3), 1);
@@ -123,16 +87,12 @@ describe('size', function() {
                 height: 1/3
             };
 
-            var element = _createDirective([
-                '<div wv-size-tag>',
+            var element = osi.directive([
+                '<div style="width: 100px;" wv-size-tag>',
                     '<div wv-size="opts">',
                     '</div>',
                 '</div>'
             ].join(''));
-
-            element.width(100);
-
-            $rootScope.$digest();
 
             expect(element.children().width(), 'width').to.be.closeTo(100, 1);
             expect(element.children().height(), 'height').to.be.closeTo(100 * (1/3), 1);
@@ -144,17 +104,13 @@ describe('size', function() {
                 height: 1/3
             };
 
-            var element = _createDirective([
-                '<div wv-size-tag>',
+            var element = osi.directive([
+                '<div style="width: 50px" wv-size-tag>',
                     '<div wv-size="opts">',
                     '</div>',
                 '</div>'
             ].join(''));
 
-            // set 50px width
-            element.width('50px');
-            $rootScope.$digest();
-            
             // expect normal value
             expect(element.children().width(), 'width').to.be.closeTo(50, 1);
             expect(element.children().height(), 'height').to.be.closeTo(50 * (1/3), 1);
@@ -168,7 +124,7 @@ describe('size', function() {
             
             // expect changes once window is resized
             $(window).resize();
-            $timeout.flush(); // flush _.debounce's set timeout..
+            osi.flush(); // flush _.debounce's set timeout..
             
             expect(element.children().width(), 'width').to.be.closeTo(100, 1); // expect the width to have doubled
             expect(element.children().height(), 'height').to.be.closeTo(100 * (1/3), 1);
@@ -185,7 +141,7 @@ describe('size', function() {
         beforeEach(function() {
             bard.appModule('webviewer');
 
-            bard.inject(this, '$compile', '$httpBackend', '$rootScope');
+            bard.inject(this, '$compile', '$httpBackend', '$rootScope', '$timeout');
 
             _.forEach(orthanc.raw, function(data, path) {
               $httpBackend
@@ -199,10 +155,8 @@ describe('size', function() {
               width: '100px'
             };
 
-            var element = _createDirective('<div wv-size="opts"></div>');
+            var element = osi.directive('<div wv-size="opts"></div>');
             var ctrl = element.controller('wvSize');
-
-            $rootScope.$digest();
             
             ctrl.setHeight('70px');
 
@@ -215,11 +169,9 @@ describe('size', function() {
                 width: '100px'
             };
 
-            var element = _createDirective('<div wv-size="opts"></div>');
+            var element = osi.directive('<div wv-size="opts"></div>');
             var ctrl = element.controller('wvSize');
-
-            $rootScope.$digest();
-
+            
             ctrl.setHeight(1/3);
 
             expect(element.width(), 'width').to.be.closeTo(+$rootScope.opts.width.replace('px', ''), 1);
@@ -231,10 +183,8 @@ describe('size', function() {
                 height: '100px'
             };
 
-            var element = _createDirective('<div wv-size="opts"></div>');
+            var element = osi.directive('<div wv-size="opts"></div>');
             var ctrl = element.controller('wvSize');
-
-            $rootScope.$digest();
 
             ctrl.setWidth(1/3);
 
@@ -250,17 +200,13 @@ describe('size', function() {
                 height: '[wv-size-tag]'
             };
 
-            var element = _createDirective([
-                '<div wv-size-tag>',
+            var element = osi.directive([
+                '<div style="height: 100px" wv-size-tag>',
                     '<div wv-size="opts">',
                     '</div>',
                 '</div>'
             ].join(''));
             var ctrl = element.children('[wv-size]').controller('wvSize');
-
-            $rootScope.$digest();
-            
-            element.height(100);
 
             ctrl.setWidth(1/3);
             
@@ -275,17 +221,13 @@ describe('size', function() {
                 width: '[wv-size-tag]'
             };
 
-            var element = _createDirective([
-                '<div wv-size-tag>',
+            var element = osi.directive([
+                '<div style="width: 100px" wv-size-tag>',
                     '<div wv-size="opts">',
                     '</div>',
                 '</div>'
             ].join(''));
             var ctrl = element.children('[wv-size]').controller('wvSize');
-
-            $rootScope.$digest();
-
-            element.width(100);
 
             ctrl.setHeight(1/3);
 
@@ -302,9 +244,8 @@ describe('size', function() {
             };
 
             // init directive
-            var element = _createDirective('<div wv-size="opts"></div>');
+            var element = osi.directive('<div wv-size="opts"></div>');
             var ctrl = element.controller('wvSize');
-            $rootScope.$digest();
 
             // listen to size updates
             var onUpdateCallback = sinon.spy();
@@ -312,22 +253,22 @@ describe('size', function() {
 
             // check if the listener is called
             $rootScope.opts.width = '100px'; // no change
-            $rootScope.$digest();
+            osi.digest();
             expect(onUpdateCallback.callCount).to.equal(0);
 
             $rootScope.opts.width = '200px'; // one change
-            $rootScope.$digest();
+            osi.digest();
             expect(onUpdateCallback.callCount).to.equal(1);
 
             $rootScope.opts.width = '150px'; // two changes
             $rootScope.opts.height = 2;
-            $rootScope.$digest();
+            osi.digest();
             expect(onUpdateCallback.callCount).to.equal(2);
 
             // check if unlistening work
             unlisten();
             $rootScope.opts.width = '33px'; // one change
-            $rootScope.$digest();
+            osi.digest();
             expect(onUpdateCallback.callCount).to.equal(2); // no new listener trigger
         });
 
@@ -338,15 +279,13 @@ describe('size', function() {
             };
 
             // init directive
-            var element = _createDirective([
-                '<div wv-size-tag>',
+            var element = osi.directive([
+                '<div style="width: 200px" wv-size-tag>',
                     '<div wv-size="opts">',
                     '</div>',
                 '</div>'
             ].join(''));
             var ctrl = element.children('[wv-size]').controller('wvSize');
-            element.width('200px');
-            $rootScope.$digest();
 
             // check if the size is in pixel
             // @note this may trigger reflow !

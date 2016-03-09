@@ -1,4 +1,4 @@
-(function() {
+ (function() {
     'use strict';
 
     angular
@@ -6,7 +6,7 @@
         .factory('WVImageModel', factory);
 
     /* @ngInject */
-    function factory(wvAnnotation) {
+    function factory(wvAnnotation, WVAnnotationModel) {
 
         function WVImageModel(id, tags) {
             var _this = this;
@@ -16,22 +16,23 @@
 
             this.onAnnotationChanged = new osimis.Listener();
             
-            wvAnnotation.onAnnotationChanged(function(imageId, type, data) {
+            wvAnnotation.onAnnotationChanged(function(annotation) {
                 // @todo need to be destroyed on no listener anymore.
 
-                if (imageId !== _this.id) return;
+                if (annotation.imageId !== _this.id) return;
 
-                _this.onAnnotationChanged.trigger(type, data);
+                _this.onAnnotationChanged.trigger(annotation);
             });
 
         }
-        
+
         WVImageModel.prototype.getAnnotations = function(type) {
             return wvAnnotation.getByImageId(this.id, type);
         };
 
         WVImageModel.prototype.setAnnotations = function(type, data) {
-            wvAnnotation.setByImageId(this.id, type, data);            
+            var annotation = new WVAnnotationModel(type, this.id, data);
+            wvAnnotation.set(annotation);
         };
 
         ////////////////

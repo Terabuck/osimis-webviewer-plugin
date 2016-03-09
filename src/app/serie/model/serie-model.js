@@ -6,9 +6,11 @@
         .factory('WVSerieModel', factory);
 
     /* @ngInject */
-    function factory($timeout) {
+    function factory($timeout, wvAnnotation) {
 
         function WVSerieModel(id, imageIds, tags) {
+            var _this = this;
+
             this.id = id; // id == orthancId + ':' + subSerieIndex
             this.imageIds = imageIds;
             this.imageCount = imageIds.length;
@@ -16,9 +18,31 @@
             this.currentShownIndex = 0; // index shown at the moment
             this.tags = tags;
             this.onCurrentImageIdChanged = new osimis.Listener();
+            this.onAnnotationChanged = new osimis.Listener();
+
+            wvAnnotation.onAnnotationChanged(function(annotation) {
+                // @todo need to be destroyed on no listener anymore.
+
+                // if the serie contains the annotation's image
+                if (_this.imageIds.indexOf(annotation.imageId) === -1) return;
+
+                // trigger the change
+                _this.onAnnotationChanged.trigger(annotation);
+            });
 
             this.isPlaying = false;
             this._playTimeout = null;
+        };
+
+        WVSerieModel.prototype.getAnnotations = function(type) {
+            return _(this.imageIds)
+                .flatMap(function(imageId) {
+                    return wvAnnotation.getByImageId(imageId, type);
+                })
+                .filter(function(annotations) {
+                    return !!annotations;
+                })
+                .value();
         };
 
         WVSerieModel.prototype.setShownImage = function(id) {

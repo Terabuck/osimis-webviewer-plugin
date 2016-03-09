@@ -106,10 +106,12 @@
     }
 
     function directive(html) {
-        var element = $compile(html)($rootScope);
+        var domElement = $(html);
 
         // @note element must appended to body to retrieve its size
-        $('body').append(element);
+        $('body').append(domElement);
+
+        var element = $compile(domElement)($rootScope);
 
         digest();
 
