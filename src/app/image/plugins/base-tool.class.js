@@ -56,15 +56,15 @@
             var currentImage = viewport.getImage();
 
             // load tool data in cornerstone elements
-            var data = currentImage.getAnnotations(_this.toolName);
-            if (data) {
-                toolStateManager.restoreStateByToolAndImageId(toolName, currentImage.id, data);
+            var annotation = currentImage.getAnnotations(_this.toolName);
+            if (annotation) {
+                toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data);
             }
 
             // listen to the new image model changes
-            currentImage.onAnnotationChanged([_this, viewport], function(type, data) {
-                if (type !== _this.toolName) return;
-                toolStateManager.restoreStateByToolAndImageId(toolName, currentImage.id, data);
+            currentImage.onAnnotationChanged([_this, viewport], function(annotation) {
+                if (annotation.type !== _this.toolName) return;
+                toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data);
             });
 
             viewport.onImageChanged(this, function(newImage, oldImage) {
@@ -74,15 +74,15 @@
                 }
 
                 // load tool data in cornerstone elements
-                var data = newImage.getAnnotations(_this.toolName);
-                if (data) {
-                    toolStateManager.restoreStateByToolAndImageId(toolName, newImage.id, data);
+                var annotation = newImage.getAnnotations(_this.toolName);
+                if (annotation) {
+                    toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data);
                 }
                 
                 // listen to the new image model changes
-                newImage.onAnnotationChanged([_this, viewport], function(type, data) {
-                    if (type !== _this.toolName) return;
-                    toolStateManager.restoreStateByToolAndImageId(toolName, newImage.id, data);
+                newImage.onAnnotationChanged([_this, viewport], function(annotation) {
+                    if (annotation.type !== _this.toolName) return;
+                    toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data);
                 });
             });
         };
@@ -106,7 +106,9 @@
                     var image = viewport.getImage();
                     var data = _.clone(toolStateManager.getStateByToolAndImageId(_this.toolName, image.id));
                     //image.onAnnotationChanged.ignore([_this, viewport], function() {
+                    if (data) {
                         image.setAnnotations(_this.toolName, data);
+                    }
                     //});
                 });
             }, 20));
