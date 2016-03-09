@@ -12,6 +12,13 @@
             toolStateManager.restoreStateByToolAndImageId = function(toolName, imageId, state) {
                 this.toolState[imageId] = this.toolState[imageId] || {};
                 this.toolState[imageId][toolName] = state;
+
+                // refresh viewports
+                var enabledElementObjects = cornerstone.getEnabledElementsByImageId(imageId);
+                enabledElementObjects.forEach(function(enabledElementObject) {
+                    var enabledElement = enabledElementObject.element;
+                    cornerstone.draw(enabledElement);
+                });
             };
             cornerstoneTools.globalImageIdSpecificToolStateManager = toolStateManager;
         });

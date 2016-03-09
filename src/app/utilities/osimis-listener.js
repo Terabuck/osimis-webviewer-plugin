@@ -45,7 +45,7 @@
             }
             else {
                 _.remove(_listeners, function(listener) {
-                    return listener.namespace && listener.namespace === namespace;
+                    return listener.namespace && _compareNamespace(listener.namespace, namespace);
                 });
             }
 
@@ -54,7 +54,7 @@
         // dont trigger for namespace during the wrappedCodeCallback
         OsimisListener.ignore = function(namespace, wrappedCodeCallback) {
             _listeners.forEach(function(listener) {
-                if (listener.namespace === namespace) {
+                if (_compareNamespace(listener.namespace, namespace)) {
                     listener.ignore = true;
                 }
             });
@@ -62,7 +62,7 @@
             wrappedCodeCallback();
 
             _listeners.forEach(function(listener) {
-                if (listener.namespace === namespace) {
+                if (_compareNamespace(listener.namespace, namespace)) {
                     listener.ignore = false;
                 }
             });
@@ -83,6 +83,20 @@
 
         // return listen method (= functor)
     	return OsimisListener;
+    }
+    
+    function _compareNamespace(n1, n2) {
+        if (!_.isArray(n1) || !_.isArray(n2)) {
+            return n1 === n2;
+        }
+        else {
+            // shallow comparison
+            return _.isEqualWith(n1, n2, function(n1, n2) {
+                return n1.length === n2.length && n1.reduce(function(result, value, idx) {
+                    return result && value === n2[idx];
+                }, true);
+            });
+        }
     }
 
     root.Listener = OsimisListener;

@@ -21,7 +21,7 @@
 
                 if (imageId !== _this.id) return;
 
-                _this.onAnnotationChanged(type, data);
+                _this.onAnnotationChanged.trigger(type, data);
             });
 
         }
