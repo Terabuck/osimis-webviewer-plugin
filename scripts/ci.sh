@@ -35,14 +35,17 @@ currentBranch=$1
 buildDir="build"
 buildBranch="build_$currentBranch"
 
+#enter ruby virtual environment
 source ~/.rvm/scripts/rvm
 
 cd $startScriptDir/../
 npm cache clean # make sure install is fine
 npm install
 gulp build
+gulp test --novet # run the unit tests (--novet disables jshint and jscs)
 npm cache clean
 
+#push the gulp output to the buildBranch
 GIT_DEPLOY_DIR=$buildDir GIT_DEPLOY_BRANCH=$buildBranch GIT_DEPLOY_REPO=origin ./scripts/deploy.sh
 
 cd $startScriptDir
