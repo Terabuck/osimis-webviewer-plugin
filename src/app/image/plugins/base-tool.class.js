@@ -105,11 +105,11 @@
                     // using a fast shallow object clone
                     var image = viewport.getImage();
                     var data = _.clone(toolStateManager.getStateByToolAndImageId(_this.toolName, image.id));
-                    //image.onAnnotationChanged.ignore([_this, viewport], function() {
-                    if (data) {
-                        image.setAnnotations(_this.toolName, data);
-                    }
-                    //});
+                    image.onAnnotationChanged.ignore([_this, viewport], function() {
+                        if (data) {
+                            image.setAnnotations(_this.toolName, data);
+                        }
+                    });
                 });
             }, 20));
         };

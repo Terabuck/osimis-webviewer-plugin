@@ -20,12 +20,16 @@
             this.onCurrentImageIdChanged = new osimis.Listener();
             this.onAnnotationChanged = new osimis.Listener();
 
+            this._annotationCache = null;
+
             wvAnnotation.onAnnotationChanged(function(annotation) {
                 // @todo need to be destroyed on no listener anymore.
 
                 // if the serie contains the annotation's image
                 if (_this.imageIds.indexOf(annotation.imageId) === -1) return;
-
+                
+                _this._annotationCache = null;
+                
                 // trigger the change
                 _this.onAnnotationChanged.trigger(annotation);
             });
@@ -35,15 +39,22 @@
         };
 
         WVSerieModel.prototype.getAnnotations = function(type) {
-            return _(this.imageIds)
-                .flatMap(function(imageId) {
-                    return wvAnnotation.getByImageId(imageId, type);
-                })
-                .filter(function(annotations) {
-                    return !!annotations;
-                })
-                .value();
+            if (!this._annotationCache) {
+                this._annotationCache = _(this.imageIds)
+                    .flatMap(function(imageId) {
+                        return wvAnnotation.getByImageId(imageId, type);
+                    })
+                    .filter(function(annotations) {
+                        return !!annotations;
+                    })
+                    .value()
+            }
+            return this._annotationCache;
         };
+
+        WVSerieModel.prototype.getIndexOf = function(imageId) {
+            return this.imageIds.indexOf(imageId);
+        }
 
         WVSerieModel.prototype.setShownImage = function(id) {
             this.currentShownIndex = _.indexOf(this.imageIds, id);
