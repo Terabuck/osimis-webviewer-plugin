@@ -6,7 +6,7 @@
         .factory('WVSerieModel', factory);
 
     /* @ngInject */
-    function factory($timeout, wvAnnotation) {
+    function factory($timeout, wvAnnotation, WVAnnotationGroup) {
 
         function WVSerieModel(id, imageIds, tags) {
             var _this = this;
@@ -20,49 +20,63 @@
             this.onCurrentImageIdChanged = new osimis.Listener();
             this.onAnnotationChanged = new osimis.Listener();
 
-            this._annotationCache = null;
-
-            wvAnnotation.onAnnotationChanged(function(annotation) {
-                // @todo need to be destroyed on no listener anymore.
-
-                // if the serie contains the annotation's image
-                if (_this.imageIds.indexOf(annotation.imageId) === -1) return;
-                
-                _this._annotationCache = null;
-                
-                // trigger the change
-                _this.onAnnotationChanged.trigger(annotation);
-            });
+            // @note _annotationGroup is just a local cache for filtering
+            // the real cache is handled by the wvAnnotation service
+            this._annotationGroup = null;
 
             this.isPlaying = false;
             this._playTimeout = null;
         };
 
-        WVSerieModel.prototype.getAnnotedImageIds = function(type) {
-            return this.getAnnotations(type)
-                .reduce(function(result, annotationGroup) {
-                    var imageId = annotationGroup.imageId;
+        WVSerieModel.prototype._loadAnnotationGroup = function() {
+            var _this = this;
+
+            if (!this._annotationGroup) {
+                // retrieve each kind of annotation for each image in the serie
+                var annotations = [];
+                this.imageIds.forEach(function(imageId) {
+                    annotations.push(wvAnnotation.getByImageId(imageId));
+                });
+
+                // cache annotations
+                this._annotationGroup = new WVAnnotationGroup(annotations);
+
+                // invalidate cache on change
+                wvAnnotation.onAnnotationChanged.once(function(annotation) {
+                    if (_this.imageIds.indexOf(annotation.imageId) !== -1) {
+                        // invalidate the cache if the serie is concerned by the changed annotation
+                        _this._annotationGroup = null;
                     
-                    if (result.indexOf(imageId) === -1) {
-                        result.push(imageId);
+                        // trigger the change
+                        _this.onAnnotationChanged.trigger(annotation);
                     }
-
-                    return result;
-                }, []);
-        };
-
-        WVSerieModel.prototype.getAnnotations = function(type) {
-            if (!this._annotationCache) {
-                this._annotationCache = _(this.imageIds)
-                    .flatMap(function(imageId) {
-                        return wvAnnotation.getByImageId(imageId, type);
-                    })
-                    .filter(function(annotations) {
-                        return !!annotations;
-                    })
-                    .value()
+                });
             }
-            return this._annotationCache;
+
+            return this._annotationGroup;
+        }
+
+        WVSerieModel.prototype.getAnnotedImageIds = function(type) {
+            return this._loadAnnotationGroup()
+                .filterByType(type)
+                .getImageIds();
+        };
+        
+        WVSerieModel.prototype.getAnnotationGroup = function(type) {
+            return this._loadAnnotationGroup();
+        };
+        
+        /** $serie.getAnnotations([type: string])
+         *
+         */
+        WVSerieModel.prototype.getAnnotations = function(type) {
+            var annotationGroup = this._loadAnnotationGroup();
+
+            if (type) {
+                annotationGroup.filterByType(type);
+            }
+
+            return annotationGroup.toArray();
         };
 
         WVSerieModel.prototype.getIndexOf = function(imageId) {
@@ -70,7 +84,7 @@
         }
 
         WVSerieModel.prototype.setShownImage = function(id) {
-            this.currentShownIndex = _.indexOf(this.imageIds, id);
+            this.currentShownIndex = this.getIndexOf(this.imageIds);
         };
         WVSerieModel.prototype.getCurrentImageId = function() {
            return this.imageIds[this.currentIndex];
