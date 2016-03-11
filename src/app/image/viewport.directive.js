@@ -44,6 +44,7 @@
             scope: {
                 wvImageId: '=?',
                 wvImage: '=?',
+                wvOnImageChange: '&?',
                 wvViewport: '=?',
                 wvEnableOverlay: '=?'
             }
@@ -107,6 +108,9 @@
             // bind image
             model.onImageChanged(function(image) {
                 scope.vm.wvImage = image;
+                if (scope.vm.wvOnImageChange) {
+                    scope.vm.wvOnImageChange({$image: image});
+                }
             });
             element.on('CornerstoneImageRendered', function(evt, args) { // element.off not needed
                 scope.$evalAsync(function() { // trigger a new digest if needed
