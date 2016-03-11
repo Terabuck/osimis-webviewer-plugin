@@ -23,6 +23,17 @@
             // @note _annotationGroup is just a local cache for filtering
             // the real cache is handled by the wvAnnotation service
             this._annotationGroup = null;
+            // invalidate cache on change
+            wvAnnotation.onAnnotationChanged(function(annotation) {
+                if (_this.imageIds.indexOf(annotation.imageId) !== -1) {
+                    // invalidate the cache if the serie is concerned by the changed annotation
+                    _this._annotationGroup = null;
+
+                    // trigger the change
+                    _this.onAnnotationChanged.trigger(annotation);
+                }
+            });
+            // @todo unlisten
 
             this.isPlaying = false;
             this._playTimeout = null;
@@ -40,17 +51,6 @@
 
                 // cache annotations
                 this._annotationGroup = new WVAnnotationGroup(annotations);
-
-                // invalidate cache on change
-                wvAnnotation.onAnnotationChanged.once(function(annotation) {
-                    if (_this.imageIds.indexOf(annotation.imageId) !== -1) {
-                        // invalidate the cache if the serie is concerned by the changed annotation
-                        _this._annotationGroup = null;
-                    
-                        // trigger the change
-                        _this.onAnnotationChanged.trigger(annotation);
-                    }
-                });
             }
 
             return this._annotationGroup;
