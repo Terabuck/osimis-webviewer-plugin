@@ -38,6 +38,19 @@
             this._playTimeout = null;
         };
 
+        WVSerieModel.prototype.getAnnotedImageIds = function(type) {
+            return this.getAnnotations(type)
+                .reduce(function(result, annotationGroup) {
+                    var imageId = annotationGroup.imageId;
+                    
+                    if (result.indexOf(imageId) === -1) {
+                        result.push(imageId);
+                    }
+
+                    return result;
+                }, []);
+        };
+
         WVSerieModel.prototype.getAnnotations = function(type) {
             if (!this._annotationCache) {
                 this._annotationCache = _(this.imageIds)
