@@ -22,7 +22,7 @@
             annotations[annotation.type] = annotations[annotation.type] || {};
             annotations[annotation.type][annotation.imageId] = annotation;
 
-            if (!annotation.data.data.length) {
+            if (!annotation.data) {
                 delete annotations[annotation.type][annotation.imageId];
             }
             

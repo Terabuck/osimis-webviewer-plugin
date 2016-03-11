@@ -106,8 +106,12 @@
                     var image = viewport.getImage();
                     var data = _.clone(toolStateManager.getStateByToolAndImageId(_this.toolName, image.id));
                     image.onAnnotationChanged.ignore([_this, viewport], function() {
-                        if (data) {
+                        if (data && data.data.length) {
                             image.setAnnotations(_this.toolName, data);
+                        }
+                        else if (data && !data.data.length) {
+                            // remove empty annotation
+                            image.setAnnotations(_this.toolName, null);
                         }
                     });
                 });
