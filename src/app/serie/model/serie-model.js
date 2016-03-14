@@ -128,6 +128,8 @@
         WVSerieModel.prototype.play = function(speed) {
             var _this = this;
 
+            speed = speed || 1000 / 30; // 30 fps by default
+
             if (this.isPlaying) {
                 return;
             }
