@@ -6,7 +6,7 @@
         .factory('WVSerieModel', factory);
 
     /* @ngInject */
-    function factory($timeout, wvAnnotation, WVAnnotationGroup) {
+    function factory($rootScope, $timeout, wvAnnotation, WVAnnotationGroup) {
 
         function WVSerieModel(id, imageIds, tags) {
             var _this = this;
@@ -144,7 +144,9 @@
                         var fps = 1000 / (msTime - _lastMsTime);
                         _toSkip = Math.round(fps / speed);
 
-                        _this.goToNextImage(true);
+                        $rootScope.$apply(function() {
+                            _this.goToNextImage(true);
+                        });
                     }
 
                     _lastMsTime = msTime;

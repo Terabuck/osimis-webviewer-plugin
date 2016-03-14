@@ -5,20 +5,36 @@
         .module('webviewer')
         .directive('wvViewport', wvViewport)
         .run(function(cornerstoneTools) {
+            // extend the cornerstone toolStateManager
+
             var toolStateManager = cornerstoneTools.newImageIdSpecificToolStateManager();
             toolStateManager.getStateByToolAndImageId = function(toolName, imageId) {
                 return this.toolState[imageId] && this.toolState[imageId][toolName];
             };
-            toolStateManager.restoreStateByToolAndImageId = function(toolName, imageId, state) {
+            toolStateManager.restoreStateByToolAndImageId = function(toolName, imageId, state, redraw) {
+                /**
+                 *
+                 * @param redraw: boolean (default: true)
+                 *
+                 * You can choose to not redraw the image after updating the tools data.
+                 * This is usefull when the tools change because the image is changing.
+                 *
+                 * As long as the listener onImageChanging is used instead of onImageChanged,
+                 * the drawing will occurs after the tool reloading,
+                 */
+                if (typeof redraw === 'undefined') redraw = true;
+
                 this.toolState[imageId] = this.toolState[imageId] || {};
                 this.toolState[imageId][toolName] = state;
-
-                // refresh viewports
-                var enabledElementObjects = cornerstone.getEnabledElementsByImageId(imageId);
-                enabledElementObjects.forEach(function(enabledElementObject) {
-                    var enabledElement = enabledElementObject.element;
-                    cornerstone.draw(enabledElement);
-                });
+                
+                if (redraw) {
+                    // refresh viewports
+                    var enabledElementObjects = cornerstone.getEnabledElementsByImageId(imageId);
+                    enabledElementObjects.forEach(function(enabledElementObject) {
+                        var enabledElement = enabledElementObject.element;
+                        cornerstone.draw(enabledElement);
+                    });
+                }
             };
             cornerstoneTools.globalImageIdSpecificToolStateManager = toolStateManager;
         });
@@ -158,6 +174,7 @@
              * - void register(ctrl)
              * - void unregister(ctrl)
              */
+            // register the tools once there is an image
             model.onImageChanged.once(function(currentImage) {
                 _forEachViewportTool(function(toolCtrl) {
                     toolCtrl.register(model);
@@ -194,12 +211,14 @@
             this._viewportHeight = null;
             this._cancelImageDisplaying = null;
 
+            this.onImageChanging = new osimis.Listener();
             this.onImageChanged = new osimis.Listener();
             this.onViewportResetting = new osimis.Listener();
 
             cornerstone.enable(enabledElement);
         }
-
+        
+        ViewportViewModel.prototype.onImageChanging = angular.noop;
         ViewportViewModel.prototype.onImageChanged = angular.noop;
         
         ViewportViewModel.prototype.destroy = function() {
@@ -271,7 +290,8 @@
                     }
 
                     var processedImage = args.processedImage;
-                    var imageModel = args.imageModel;
+                    var newImageModel = args.imageModel;
+                    var oldImageModel = _this._image;
 
                     var viewportData;
                     if (!reset) {
@@ -280,6 +300,10 @@
                     else {
                         viewportData = _this.resetViewport(processedImage);
                     }
+                    
+                    // trigger onImageChanging prior to image drawing
+                    // but after the viewport data is updated
+                    _this.onImageChanging.trigger(newImageModel, oldImageModel);
 
                     cornerstone.displayImage(_this._enabledElement, processedImage, viewportData);
 

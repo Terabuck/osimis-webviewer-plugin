@@ -58,16 +58,18 @@
             // load tool data in cornerstone elements
             var annotation = currentImage.getAnnotations(_this.toolName);
             if (annotation) {
-                toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data);
+                toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data, false);//false?
             }
 
             // listen to the new image model changes
             currentImage.onAnnotationChanged([_this, viewport], function(annotation) {
                 if (annotation.type !== _this.toolName) return;
-                toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data);
+                toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data, true);
             });
-
-            viewport.onImageChanged(this, function(newImage, oldImage) {
+            
+            // onImageChanging is used instead of onImageChanged to avoid useless repaint
+            // as the toolStateManager.restoreStateByToolAndImageId does redraw the image
+            viewport.onImageChanging(this, function(newImage, oldImage) {
                 // close old image listeners
                 if (oldImage) {
                     oldImage.onAnnotationChanged.close([_this, viewport]);
@@ -76,13 +78,13 @@
                 // load tool data in cornerstone elements
                 var annotation = newImage.getAnnotations(_this.toolName);
                 if (annotation) {
-                    toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data);
+                    toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data, false);
                 }
                 
                 // listen to the new image model changes
                 newImage.onAnnotationChanged([_this, viewport], function(annotation) {
                     if (annotation.type !== _this.toolName) return;
-                    toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data);
+                    toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data, true);
                 });
             });
         };
@@ -92,7 +94,7 @@
                 image.onAnnotationChanged.close([this, viewport]);
             }
 
-            viewport.onImageChanged.close(this);
+            viewport.onImageChanging.close(this);
         };
         BaseTool.prototype._listenViewChange = function(viewport) {
             var _this = this;
