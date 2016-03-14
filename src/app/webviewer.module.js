@@ -48,6 +48,8 @@
      * It is only usable in prototypal context.
      */
     $httpProvider.defaults.cache = true;
+
+    console.error('warning: cache is activated in the whole application');
   }]);
 
 })();
