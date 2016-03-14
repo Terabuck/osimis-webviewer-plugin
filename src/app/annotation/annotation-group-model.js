@@ -38,6 +38,19 @@
         };
 
         /**
+         * @param type: string
+         * @return WVAnnotationGroup
+         */
+        WVAnnotationGroup.prototype.filterByImageId = function(imageId) {
+            var annotations = this._annotations
+                .filter(function(annotation) {
+                    return annotation.imageId === imageId;
+                });
+
+            return new WVAnnotationGroup(annotations);
+        };
+
+        /**
          * @return Array
          */
         WVAnnotationGroup.prototype.getImageIds = function() {
@@ -47,6 +60,22 @@
                     
                     if (result.indexOf(imageId) === -1) {
                         result.push(imageId);
+                    }
+
+                    return result;
+                }, []);
+        };
+
+        /**
+         * @return Array
+         */
+        WVAnnotationGroup.prototype.getTypes = function() {
+            return this._annotations
+                .reduce(function(result, annotation) {
+                    var type = annotation.type;
+                    
+                    if (result.indexOf(type) === -1) {
+                        result.push(type);
                     }
 
                     return result;
