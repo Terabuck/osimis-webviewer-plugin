@@ -100,11 +100,22 @@
             var toolStateManager = cornerstoneTools.getElementToolStateManager(enabledElement);
 
             $(enabledElement).on('CornerstoneImageRendered.'+this.toolName, _.debounce(function() {
-                $timeout(function() {
+                var image = viewport.getImage();
+                var newAnnotationsData = toolStateManager.getStateByToolAndImageId(_this.toolName, image.id);
+                var oldAnnotations = image.getAnnotations(_this.toolName);
+                
+                // As update checks are made on each CornerstoneImageRendered
+                // don't trigger update if the newAnnotations hasn't changed
+                // this would be way too slow otherwise
+                if (oldAnnotations && _.isEqual(newAnnotationsData, oldAnnotations.data)) return;
+                
+                // do the $apply after the check to avoid an useless $digest cycle in case there is no change
+                $rootScope.$apply(function() {
                     // avoid having to use angular deep $watch
                     // using a fast shallow object clone
-                    var image = viewport.getImage();
-                    var data = _.clone(toolStateManager.getStateByToolAndImageId(_this.toolName, image.id));
+                    var data = _.clone(newAnnotationsData);
+
+                    // ignore is used to avoid recursive event cycle (trigger <-> listen)
                     image.onAnnotationChanged.ignore([_this, viewport], function() {
                         if (data && data.data.length) {
                             image.setAnnotations(_this.toolName, data);
