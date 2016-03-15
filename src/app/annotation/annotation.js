@@ -25,7 +25,7 @@
             annotations[annotation.type] = annotations[annotation.type] || {};
             annotations[annotation.type][annotation.imageId] = annotation;
 
-            if (!annotation.data) {
+            if (!annotation.data || (typeof annotation.data.length !== 'undefined' && annotation.data.length === 0)) {
                 delete annotations[annotation.type][annotation.imageId];
             }
             
