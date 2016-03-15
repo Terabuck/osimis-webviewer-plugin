@@ -19,6 +19,9 @@
         ////////////////
 
         function set(annotation) {
+            // as annotations are stateless, we clone them to avoid unexpected behavior
+            annotation = _.cloneDeep(annotation);
+            
             annotations[annotation.type] = annotations[annotation.type] || {};
             annotations[annotation.type][annotation.imageId] = annotation;
 
@@ -41,7 +44,8 @@
                     .filter(function(annotation) {
                         return annotation.imageId === imageId;
                     })
-                    .value();
+                    // as annotations are stateless, we clone them to avoid unexpected behavior
+                    .cloneDeep();
             }
         }
         
