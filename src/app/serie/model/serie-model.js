@@ -84,7 +84,7 @@
         }
 
         WVSerieModel.prototype.setShownImage = function(id) {
-            this.currentShownIndex = this.getIndexOf(this.imageIds);
+            this.currentShownIndex = this.getIndexOf(id);
         };
         WVSerieModel.prototype.getCurrentImageId = function() {
            return this.imageIds[this.currentIndex];
