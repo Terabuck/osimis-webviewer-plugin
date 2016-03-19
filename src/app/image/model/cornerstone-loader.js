@@ -10,7 +10,7 @@
     function runLoader(cornerstone, wvCornerstoneLoader) {
         cornerstone.registerImageLoader('orthanc', function(id) {
             id = id.replace('orthanc://', '');
-            return wvCornerstoneLoader.getCompressedImage(id);
+            return wvCornerstoneLoader.get(id);
         });
     }
 
@@ -26,7 +26,7 @@
              * this instruction caches every pixels.
              * It is only usable in prototypal context.
              */
-            getCompressedImage: _.memoize(getCompressedImage)
+            get: _.memoize(get)
         };
 
         //////////
@@ -35,9 +35,12 @@
 
         //////////
 
-        function getCompressedImage(id) {
+        function get(id) {
             return wvImage
-                .getCompressedImage(id)
+                .get(id)
+                .then(function(image) {
+                    return image.getPixels();
+                })
                 .then(function(image) {
                     image.imageId = id;
 
