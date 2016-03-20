@@ -14,10 +14,6 @@
              */
             get: get,
             /**
-             * @namespace private function used by @RootAggregate image-model at namespace level
-             */
-            getCompressedImage: getCompressedImage,
-            /**
              * @public register a post processor
              */
             registerPostProcessor: registerPostProcessor
@@ -33,18 +29,21 @@
         function get(id) {
             // split between image id and postProcesses
             var splitted = id.split('|');
-            id = id[0];
-            var postProcessesStrings = id.splice(1);
-            var postProcesses = [];
-            postProcessesStrings.forEach(function (processString) {
+            id = splitted[0];
+            var postProcessesStrings = splitted.splice(1);
+            var postProcesses = postProcessesStrings.map(function (processString) {
                 // split processString between process name and its arguments
                 splitted = processString.split('~');
                 var processName = splitted[0];
                 var processArgs = splitted.splice(1);
 
-                var postProcessObject = new (Function.prototype.apply(_postProcessorClasses[processName], processArgs));
-                postProcesses.push(postProcessObject);
-            })
+                if (!_postProcessorClasses.hasOwnProperty(processName)) {
+                    throw new Error('wv-image: unknown post processor');
+                }
+                
+                var postProcessObject = new (Function.prototype.bind.apply(_postProcessorClasses[processName], [null].concat(processArgs)));
+                return postProcessObject;
+            });
 
             // split between dicom instance id and frame index
             splitted = id.split(':');
@@ -63,19 +62,6 @@
         
         function registerPostProcessor(name, PostProcessor) {
             _postProcessorClasses[name] = PostProcessor;
-        }
-
-
-        function getCompressedImage(id) {
-            var compression = wvConfig.defaultCompression;
-            id = id.split(':');
-            var instanceId = id[0];
-            var frameIndex = id[1];
-            return $http
-                .get(wvConfig.webviewerApiURL + '/instances/' +compression+ '-' + instanceId + '_' + frameIndex)
-                .then(function(response) {
-                    return response.data;
-                });
         }
 
     }

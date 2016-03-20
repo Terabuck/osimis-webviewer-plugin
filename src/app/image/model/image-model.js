@@ -6,7 +6,7 @@
         .factory('WVImageModel', factory);
 
     /* @ngInject */
-    function factory(wvAnnotation, WVAnnotationModel, wvImage) {
+    function factory(wvAnnotation, WVAnnotationModel, wvImagePixels) {
 
         /** 
          * @RootAggregate
@@ -32,17 +32,20 @@
         }
 
         // with real pixels (for now)
-        WVImageModel.prototype.getPixels = function() {
+        // this returns a promise
+        WVImageModel.prototype.getPixelObject = function() {
             // @note resultPixels are not a 2d array of pixels but an object containing an attribute with the array
-            var resultPixels = wvImage.getCompressedImage(this.id);
-            var getImagePixelsFromIdFn = wvImage.getCompressedImage.bind(wvImage);
+            var resultPromise = wvImagePixels.getPixelObject(this.id); // mainImagePixelObject
+            var getPixelsObjectFromImageIdFn = wvImagePixels.getPixelObject.bind(wvImagePixels);
 
-            // postprocess the pixels
             this.postProcesses.forEach(function(postProcess) {
-                resultPixels = postProcess.execute(resultPixels, getImagePixelsFromIdFn);
+                resultPromise = resultPromise
+                    .then(function(actualPixelObject) {
+                        return postProcess.execute(actualPixelObject, getPixelsObjectFromImageIdFn);
+                    });
             });
-
-            return resultPixels;
+            
+            return resultPromise;
         };
 
         WVImageModel.prototype.getAnnotations = function(type) {
