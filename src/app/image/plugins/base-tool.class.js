@@ -58,16 +58,18 @@
             // load tool data in cornerstone elements
             var annotation = currentImage.getAnnotations(_this.toolName);
             if (annotation) {
-                toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data);
+                toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data, false);//false?
             }
 
             // listen to the new image model changes
             currentImage.onAnnotationChanged([_this, viewport], function(annotation) {
                 if (annotation.type !== _this.toolName) return;
-                toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data);
+                toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data, true);
             });
-
-            viewport.onImageChanged(this, function(newImage, oldImage) {
+            
+            // onImageChanging is used instead of onImageChanged to avoid useless repaint
+            // as the toolStateManager.restoreStateByToolAndImageId does redraw the image
+            viewport.onImageChanging(this, function(newImage, oldImage) {
                 // close old image listeners
                 if (oldImage) {
                     oldImage.onAnnotationChanged.close([_this, viewport]);
@@ -76,13 +78,13 @@
                 // load tool data in cornerstone elements
                 var annotation = newImage.getAnnotations(_this.toolName);
                 if (annotation) {
-                    toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data);
+                    toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data, false);
                 }
                 
                 // listen to the new image model changes
                 newImage.onAnnotationChanged([_this, viewport], function(annotation) {
                     if (annotation.type !== _this.toolName) return;
-                    toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data);
+                    toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data, true);
                 });
             });
         };
@@ -92,7 +94,7 @@
                 image.onAnnotationChanged.close([this, viewport]);
             }
 
-            viewport.onImageChanged.close(this);
+            viewport.onImageChanging.close(this);
         };
         BaseTool.prototype._listenViewChange = function(viewport) {
             var _this = this;
@@ -100,16 +102,31 @@
             var toolStateManager = cornerstoneTools.getElementToolStateManager(enabledElement);
 
             $(enabledElement).on('CornerstoneImageRendered.'+this.toolName, _.debounce(function() {
-                $timeout(function() {
+                var image = viewport.getImage();
+                var newAnnotationsData = toolStateManager.getStateByToolAndImageId(_this.toolName, image.id);
+                var oldAnnotations = image.getAnnotations(_this.toolName);
+                
+                // As update checks are made on each CornerstoneImageRendered
+                // don't trigger update if the newAnnotations hasn't changed
+                // this would be way too slow otherwise
+                if (oldAnnotations && _.isEqual(newAnnotationsData, oldAnnotations.data)) return;
+                
+                // do the $apply after the check to avoid an useless $digest cycle in case there is no change
+                $rootScope.$apply(function() {
                     // avoid having to use angular deep $watch
                     // using a fast shallow object clone
-                    var image = viewport.getImage();
-                    var data = _.clone(toolStateManager.getStateByToolAndImageId(_this.toolName, image.id));
-                    //image.onAnnotationChanged.ignore([_this, viewport], function() {
-                    if (data) {
-                        image.setAnnotations(_this.toolName, data);
-                    }
-                    //});
+                    var data = _.clone(newAnnotationsData);
+
+                    // ignore is used to avoid recursive event cycle (trigger <-> listen)
+                    image.onAnnotationChanged.ignore([_this, viewport], function() {
+                        if (data && data.data.length) {
+                            image.setAnnotations(_this.toolName, data);
+                        }
+                        else if (data && !data.data.length) {
+                            // remove empty annotation
+                            image.setAnnotations(_this.toolName, null);
+                        }
+                    });
                 });
             }, 20));
         };

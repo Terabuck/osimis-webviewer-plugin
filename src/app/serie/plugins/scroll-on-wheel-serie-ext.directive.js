@@ -40,42 +40,33 @@
     	this.unregister = function(viewmodel) {
             _.pull(_wvSerieIdViewModels, viewmodel);
     	};
+        
+        hamster = hamster($element[0]);
 
-        // var _cancelAnimationId = null;
-        hamster($element[0]).wheel(function(event, delta, deltaX, deltaY) {
-            // if (_cancelAnimationId) {
-            //     cancelAnimationFrame(_cancelAnimationId);
-            //     _cancelAnimationId = null;
-            // }
-            // _cancelAnimationId = requestAnimationFrame(function() {
-                $scope.$apply(function() {
-                    _wvSerieIdViewModels.forEach(function(viewmodel) {
-                        var serie = viewmodel.getSerie();
-                        
-                        if (!serie) {
-                            return;
-                        }
-                        else if (deltaY < 0) {
-                            serie.goToPreviousImage();
-                        }
-                        else if (deltaY > 0) {
-                            // @todo calibrate the required speed and accuracy for the enduser
-                            serie.goToNextImage(false);
-                        }
-                    });
+        hamster.wheel(function(event, delta, deltaX, deltaY) {
+            $scope.$apply(function() {
+                _wvSerieIdViewModels.forEach(function(viewmodel) {
+                    var serie = viewmodel.getSerie();
+
+                    if (!serie) {
+                        return;
+                    }
+                    else if (deltaY < 0) {
+                        serie.goToPreviousImage();
+                    }
+                    else if (deltaY > 0) {
+                        // @todo calibrate the required speed and accuracy for the enduser
+                        serie.goToNextImage(false);
+                    }
                 });
-            // });
+            });
 
             // prevent horizontal & vertical page scrolling
             event.preventDefault();
         });
 
         $scope.$on('$destroy', function() {
-            // if (_cancelAnimationId) {
-            //     cancelAnimationFrame(_cancelAnimationId);
-            //     _cancelAnimationId = null;
-            // }
-            hamster($element[0]).unwheel();
+            hamster.unwheel();
         });
     }
 })();

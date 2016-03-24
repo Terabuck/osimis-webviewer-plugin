@@ -23,6 +23,7 @@
 
                 _this.onAnnotationChanged.trigger(annotation);
             });
+
         }
 
         WVImageModel.prototype.getAnnotations = function(type) {

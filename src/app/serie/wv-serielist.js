@@ -19,7 +19,9 @@ return {
   link: function postLink(scope, element, attrs) {
     // @todo make sure there is enough space left for the overlay bar in html
     
-    _setDefaultCssClasses();
+    scope.$watchCollection('wvClassTmp', function() {
+      _setDefaultCssClasses();
+    });
 
     scope.$watch('wvStudy.id', _setStudy);
     scope.serieIds = []; // @todo allow user defined specific set

@@ -7,7 +7,7 @@ var gulp = require('gulp');
 var path = require('path');
 var _ = require('lodash');
 var $ = require('gulp-load-plugins')({lazy: true});
-var osisync = require('osisync').slave;
+var osisync = require('osisync');
 
 var colors = $.util.colors;
 var envenv = $.util.env;
@@ -252,7 +252,7 @@ gulp.task('osisync', ['styles', 'templatecache'], function() {
             console.log('*** nodemon started');
 
             // @todo should be in server.js with real ports
-            osisync.start({
+            osisync.slave.start({
                 host: 'localhost',
                 port: port
             });
@@ -663,7 +663,7 @@ function startTests(singleRun, done) {
         if (karmaResult === 1) {
             log('karma: tests failed with code ' + karmaResult);
             done();
-            if (yargs.killOnFail) {
+            if (args.killOnFail) {
                 process.exit(karmaResult);
             }
         } else {

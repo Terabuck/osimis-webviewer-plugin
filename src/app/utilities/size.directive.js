@@ -18,7 +18,8 @@
             },
             restrict: 'A',
             scope: false,
-            require: 'wvSize'
+            require: 'wvSize',
+            priority: 100
         };
         return directive;
     

@@ -4,6 +4,12 @@
     angular
         .module('webviewer')
         .directive('wvSerieId', wvSerieId);
+    
+    /** <wv-viewport wv-serie-id="some_serie_id"></wv-viewport>
+     * attributes:
+     * - wv-serie="$serie"
+     * - wv-on-serie-change="youFunction($serie)" 
+     */
 
     /* @ngInject */
     function wvSerieId($parse) {
@@ -59,6 +65,7 @@
             });
 
             // bind view model -> attributes
+            var wvOnSerieChangeParser = $parse(attrs.wvOnSerieChange);
             var wvSerieParser = $parse(attrs.wvSerie);
             viewmodel.onSerieChanged(function(serie) {
                 if (!wvSerieParser || !wvSerieParser.assign) {
@@ -66,6 +73,10 @@
                 }
                 
                 wvSerieParser.assign(scope, serie);
+
+                if (wvOnSerieChangeParser) {
+                    wvOnSerieChangeParser(scope, {$serie: serie});
+                }
             });
 
             // bind view model -> extensions -> model

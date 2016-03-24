@@ -6,7 +6,7 @@
         .factory('WVSerieModel', factory);
 
     /* @ngInject */
-    function factory($timeout, wvAnnotation) {
+    function factory($rootScope, $timeout, wvAnnotation, WVAnnotationGroup) {
 
         function WVSerieModel(id, imageIds, tags) {
             var _this = this;
@@ -20,33 +20,71 @@
             this.onCurrentImageIdChanged = new osimis.Listener();
             this.onAnnotationChanged = new osimis.Listener();
 
+            // @note _annotationGroup is just a local cache for filtering
+            // the real cache is handled by the wvAnnotation service
+            this._annotationGroup = null;
+            // invalidate cache on change
             wvAnnotation.onAnnotationChanged(function(annotation) {
-                // @todo need to be destroyed on no listener anymore.
+                if (_this.imageIds.indexOf(annotation.imageId) !== -1) {
+                    // invalidate the cache if the serie is concerned by the changed annotation
+                    _this._annotationGroup = null;
 
-                // if the serie contains the annotation's image
-                if (_this.imageIds.indexOf(annotation.imageId) === -1) return;
-
-                // trigger the change
-                _this.onAnnotationChanged.trigger(annotation);
+                    // trigger the change
+                    _this.onAnnotationChanged.trigger(annotation);
+                }
             });
+            // @todo unlisten
 
             this.isPlaying = false;
             this._playTimeout = null;
         };
 
+        WVSerieModel.prototype._loadAnnotationGroup = function() {
+            var _this = this;
+
+            if (!this._annotationGroup) {
+                // retrieve each kind of annotation for each image in the serie
+                var annotations = [];
+                this.imageIds.forEach(function(imageId) {
+                    annotations.push(wvAnnotation.getByImageId(imageId));
+                });
+
+                // cache annotations
+                this._annotationGroup = new WVAnnotationGroup(annotations);
+            }
+
+            return this._annotationGroup;
+        }
+
+        WVSerieModel.prototype.getAnnotedImageIds = function(type) {
+            return this._loadAnnotationGroup()
+                .filterByType(type)
+                .getImageIds();
+        };
+        
+        WVSerieModel.prototype.getAnnotationGroup = function(type) {
+            return this._loadAnnotationGroup();
+        };
+        
+        /** $serie.getAnnotations([type: string])
+         *
+         */
         WVSerieModel.prototype.getAnnotations = function(type) {
-            return _(this.imageIds)
-                .flatMap(function(imageId) {
-                    return wvAnnotation.getByImageId(imageId, type);
-                })
-                .filter(function(annotations) {
-                    return !!annotations;
-                })
-                .value();
+            var annotationGroup = this._loadAnnotationGroup();
+
+            if (type) {
+                annotationGroup.filterByType(type);
+            }
+
+            return annotationGroup.toArray();
         };
 
+        WVSerieModel.prototype.getIndexOf = function(imageId) {
+            return this.imageIds.indexOf(imageId);
+        }
+
         WVSerieModel.prototype.setShownImage = function(id) {
-            this.currentShownIndex = _.indexOf(this.imageIds, id);
+            this.currentShownIndex = this.getIndexOf(id);
         };
         WVSerieModel.prototype.getCurrentImageId = function() {
            return this.imageIds[this.currentIndex];
@@ -90,6 +128,8 @@
         WVSerieModel.prototype.play = function(speed) {
             var _this = this;
 
+            speed = speed || 1000 / 30; // 30 fps by default
+
             if (this.isPlaying) {
                 return;
             }
@@ -106,7 +146,9 @@
                         var fps = 1000 / (msTime - _lastMsTime);
                         _toSkip = Math.round(fps / speed);
 
-                        _this.goToNextImage(true);
+                        $rootScope.$apply(function() {
+                            _this.goToNextImage(true);
+                        });
                     }
 
                     _lastMsTime = msTime;

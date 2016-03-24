@@ -17,7 +17,17 @@ angular.module('webviewer')
       templateUrl: 'app/splitpane/wv-splitpane.tpl.html',
       restrict: 'E',
       transclude: true,
-      link: function postLink(scope, element, attrs) {
+      link: function postLink(scope, element, attrs, ctrls, transcludeFn) {
+          // make sure default content is not created if there is transclusion
+          // I don't use angular transclude fallback because its buggy
+          scope.showDefaultContent = false;
+          transcludeFn(function(trancludedContent) {
+              // ignore empty strings
+              if (!_.filter(trancludedContent, function(v) {return v instanceof HTMLElement || _.trim(v.textContent).length}).length) {
+                  scope.showDefaultContent = true
+              }
+          });
+          
         /* jshint -W116 */
           scope.wvLayout = scope.wvLayout || scope.wvSettings && scope.wvSettings.layout || {
             x: 1,
