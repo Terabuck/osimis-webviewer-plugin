@@ -47,7 +47,7 @@ describe('viewport', function() {
             
             // check the image has been displayed once
             expect(cornerstone.displayImage).calledOnce;
-            var expectedProcessedImage = osi.sync(wvCornerstoneLoader.getCompressedImage($scope.imageId));
+            var expectedProcessedImage = osi.sync(wvCornerstoneLoader.get($scope.imageId));
             var lastDisplayedImage = cornerstone.displayImage.lastCall.args[1];
             expect(lastDisplayedImage.Orthanc.PixelData).to.equal(expectedProcessedImage.Orthanc.PixelData);
 
@@ -61,7 +61,7 @@ describe('viewport', function() {
 
             // check the new image has been displayed twice
             expect(cornerstone.displayImage).calledTwice;
-            expectedProcessedImage = osi.sync(wvCornerstoneLoader.getCompressedImage($scope.imageId));
+            expectedProcessedImage = osi.sync(wvCornerstoneLoader.get($scope.imageId));
             var lastDisplayedImage = cornerstone.displayImage.lastCall.args[1];
             expect(lastDisplayedImage.Orthanc.PixelData).to.equal(expectedProcessedImage.Orthanc.PixelData);
 
