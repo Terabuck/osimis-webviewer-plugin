@@ -6,7 +6,7 @@
         .factory('WVSerieModel', factory);
 
     /* @ngInject */
-    function factory($rootScope, $timeout, wvAnnotation, WVAnnotationGroup) {
+    function factory($rootScope, $timeout, wvAnnotationManager, WvAnnotationGroup) {
 
         function WVSerieModel(id, imageIds, tags) {
             var _this = this;
@@ -21,10 +21,10 @@
             this.onAnnotationChanged = new osimis.Listener();
 
             // @note _annotationGroup is just a local cache for filtering
-            // the real cache is handled by the wvAnnotation service
+            // the real cache is handled by the wvAnnotationManager service
             this._annotationGroup = null;
             // invalidate cache on change
-            wvAnnotation.onAnnotationChanged(function(annotation) {
+            wvAnnotationManager.onAnnotationChanged(function(annotation) {
                 if (_this.imageIds.indexOf(annotation.imageId) !== -1) {
                     // invalidate the cache if the serie is concerned by the changed annotation
                     _this._annotationGroup = null;
@@ -46,11 +46,11 @@
                 // retrieve each kind of annotation for each image in the serie
                 var annotations = [];
                 this.imageIds.forEach(function(imageId) {
-                    annotations.push(wvAnnotation.getByImageId(imageId));
+                    annotations.push(wvAnnotationManager.getByImageId(imageId));
                 });
 
                 // cache annotations
-                this._annotationGroup = new WVAnnotationGroup(annotations);
+                this._annotationGroup = new WvAnnotationGroup(annotations);
             }
 
             return this._annotationGroup;

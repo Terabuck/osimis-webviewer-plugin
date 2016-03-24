@@ -3,11 +3,11 @@
 
     angular
         .module('webviewer')
-        .factory('wvAnnotation', wvAnnotation);
+        .factory('wvAnnotationManager', wvAnnotationManager);
 
 
     /* @ngInject */
-    function wvAnnotation(WVAnnotationModel) {
+    function wvAnnotationManager(WvAnnotationValueObject) {
     	var annotations = {};
 
         var service = {

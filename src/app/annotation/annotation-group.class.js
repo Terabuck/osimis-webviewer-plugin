@@ -3,14 +3,14 @@
 
     angular
         .module('webviewer')
-        .factory('WVAnnotationGroup', factory);
+        .factory('WvAnnotationGroup', factory);
 
     /* @ngInject */
     function factory() {
 
         // @note This is stateless
         // @note This collection can be used for filtering and accessing a group of annotations
-        function WVAnnotationGroup(annotations) {
+        function WvAnnotationGroup(annotations) {
             annotations = _.flatten(annotations);
             this._annotations = annotations || [];
         }
@@ -20,40 +20,40 @@
         /**
          * @return Array
          */
-        WVAnnotationGroup.prototype.toArray = function() {
+        WvAnnotationGroup.prototype.toArray = function() {
             return this._annotations;
         };
 
         /**
          * @param type: string
-         * @return WVAnnotationGroup
+         * @return WvAnnotationGroup
          */
-        WVAnnotationGroup.prototype.filterByType = function(type) {
+        WvAnnotationGroup.prototype.filterByType = function(type) {
             var annotations = this._annotations
                 .filter(function(annotation) {
                     return annotation.type === type;
                 });
 
-            return new WVAnnotationGroup(annotations);
+            return new WvAnnotationGroup(annotations);
         };
 
         /**
          * @param type: string
-         * @return WVAnnotationGroup
+         * @return WvAnnotationGroup
          */
-        WVAnnotationGroup.prototype.filterByImageId = function(imageId) {
+        WvAnnotationGroup.prototype.filterByImageId = function(imageId) {
             var annotations = this._annotations
                 .filter(function(annotation) {
                     return annotation.imageId === imageId;
                 });
 
-            return new WVAnnotationGroup(annotations);
+            return new WvAnnotationGroup(annotations);
         };
 
         /**
          * @return Array
          */
-        WVAnnotationGroup.prototype.getImageIds = function() {
+        WvAnnotationGroup.prototype.getImageIds = function() {
             return this._annotations
                 .reduce(function(result, annotation) {
                     var imageId = annotation.imageId;
@@ -69,7 +69,7 @@
         /**
          * @return Array
          */
-        WVAnnotationGroup.prototype.getTypes = function() {
+        WvAnnotationGroup.prototype.getTypes = function() {
             return this._annotations
                 .reduce(function(result, annotation) {
                     var type = annotation.type;
@@ -83,10 +83,10 @@
         };
 
         /**
-         * @param fn function(WVAnnotationGroup, imageId)
+         * @param fn function(WvAnnotationGroup, imageId)
          * @return Array
          */
-        WVAnnotationGroup.prototype.mapByImageIds = function(fn) {
+        WvAnnotationGroup.prototype.mapByImageIds = function(fn) {
             // group by imageId
             var annotationsByImageId = this._annotations
                 .reduce(function(result, nextAnnotation) {
@@ -101,10 +101,10 @@
                     return result;
                 }, {});
 
-            // convert annotation arrays into WVAnnotationGroup
+            // convert annotation arrays into WvAnnotationGroup
             var annotationGroupsByImageId = _(annotationsByImageId)
                 .mapValues(function(annotations) {
-                    return new WVAnnotationGroup(annotations);
+                    return new WvAnnotationGroup(annotations);
                 })
                 .value();
 
@@ -116,13 +116,13 @@
         /**
          * @return boolean
          */
-         WVAnnotationGroup.prototype.hasType = function(type) {
+         WvAnnotationGroup.prototype.hasType = function(type) {
             return this._annotations
                 .reduce(function(result, nextAnnotation) {
                     return result || nextAnnotation.type === type;
                 }, false);
          };
 
-        return WVAnnotationGroup;
+        return WvAnnotationGroup;
     }
 })();

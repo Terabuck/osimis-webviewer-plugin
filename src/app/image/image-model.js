@@ -6,7 +6,7 @@
         .factory('WVImageModel', factory);
 
     /* @ngInject */
-    function factory(wvAnnotation, WVAnnotationModel, wvImagePixels) {
+    function factory(wvAnnotationManager, WvAnnotationValueObject, wvImagePixels) {
 
         /** 
          * @RootAggregate
@@ -22,7 +22,7 @@
 
             this.onAnnotationChanged = new osimis.Listener();
             
-            wvAnnotation.onAnnotationChanged(function(annotation) {
+            wvAnnotationManager.onAnnotationChanged(function(annotation) {
                 // @todo need to be destroyed on no listener anymore
 
                 if (annotation.imageId !== _this.id) return;
@@ -50,12 +50,12 @@
         };
 
         WVImageModel.prototype.getAnnotations = function(type) {
-            return wvAnnotation.getByImageId(this.id, type);
+            return wvAnnotationManager.getByImageId(this.id, type);
         };
 
         WVImageModel.prototype.setAnnotations = function(type, data) {
-            var annotation = new WVAnnotationModel(type, this.id, data);
-            wvAnnotation.set(annotation);
+            var annotation = new WvAnnotationValueObject(type, this.id, data);
+            wvAnnotationManager.set(annotation);
         };
 
         ////////////////
