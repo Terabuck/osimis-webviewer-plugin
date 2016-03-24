@@ -5,7 +5,7 @@ describe('image', function() {
 	    beforeEach(function() {
 	        bard.appModule('webviewer');
 
-	        bard.inject(this, '$httpBackend', 'wvImage', 'WVImageModel');
+	        bard.inject(this, '$httpBackend', 'wvImageManager', 'WvImage');
 
 	        _.forEach(orthanc.raw, function(data, path) {
 	          $httpBackend
@@ -20,12 +20,12 @@ describe('image', function() {
 			var imageId = instance.ID + ':0';
 
 			// when
-			var images = wvImage
+			var images = wvImageManager
                 .get(imageId)
                 .then(function(image) {
 
                     // then
-                    expect(image).to.be.an.instanceof(WVImageModel);
+                    expect(image).to.be.an.instanceof(WvImage);
                     expect(image.id).to.equal(imageId);
 
                     done();
@@ -40,12 +40,12 @@ describe('image', function() {
 			var instanceId = instance.ID;
 			var imageId = instanceId + ':16';
 
-			var image = wvImage
+			var image = wvImageManager
 			    .get(imageId)
 			    .then(function(image) {
                     
                     // then
-                    expect(image).to.be.an.instanceof(WVImageModel);
+                    expect(image).to.be.an.instanceof(WvImage);
                     expect(image.id).to.equal(imageId);
 
                     done();

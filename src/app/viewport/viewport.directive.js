@@ -40,7 +40,7 @@
         });
 
     /* @ngInject */
-    function wvViewport($, _, cornerstone, cornerstoneTools, $rootScope, $q, $parse, wvImage) {
+    function wvViewport($, _, cornerstone, cornerstoneTools, $rootScope, $q, $parse, wvImageManager) {
         // Usage:
         //
         // Creates:
@@ -81,7 +81,7 @@
          */
         function link(scope, element, attrs, ctrls) {
             var enabledElement = element.children('.wv-cornerstone-enabled-image')[0];
-            var model = new ViewportViewModel(wvImage, enabledElement);
+            var model = new ViewportViewModel(wvImageManager, enabledElement);
 
             scope.vm.wvEnableOverlay = !!scope.vm.wvEnableOverlay;
             var wvImageIdParser = $parse(attrs.wvImageId);
@@ -199,10 +199,10 @@
         /**
          * responsibility: manage cornerstone viewport
          */
-        function ViewportViewModel(wvImageRepository, enabledElement) {
+        function ViewportViewModel(wvImageManager, enabledElement) {
             var _this = this;
 
-            this._imageRepository = wvImageRepository;
+            this._imageManager = wvImageManager;
             this._enabledElement = enabledElement;
 
             this._imageId = null;
@@ -282,7 +282,7 @@
             return $q
                 .all({
                     processedImage: cornerstone.loadImage('orthanc://' + id),
-                    imageModel: _this._imageRepository.get(id)
+                    imageModel: _this._imageManager.get(id)
                 })
                 .then(function(args) {
                     if (_cancelImageDisplaying) {
@@ -396,7 +396,7 @@
      *
      * @ngInject
      */
-    function Controller($scope, $element, cornerstone, wvImage) {
+    function Controller($scope, $element, cornerstone, wvImageManager) {
         this.getImage = angular.noop;
         this.setImage = angular.noop;
         this.clearImage = angular.noop;

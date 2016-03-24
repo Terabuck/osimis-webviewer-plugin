@@ -6,7 +6,7 @@
         .run(runLoader);
 
     /* @ngInject */
-    function runLoader(cornerstone, wvImage) {
+    function runLoader(cornerstone, wvImageManager) {
         cornerstone.registerImageLoader('orthanc', function(id) {
             id = id.replace('orthanc://', '');
             return wvImage.get(id)
