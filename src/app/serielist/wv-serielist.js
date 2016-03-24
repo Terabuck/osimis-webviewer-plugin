@@ -2,12 +2,12 @@
 
 /**
  * @ngdoc directive
- * @name webviewer.directive:wvSerielist
+ * @name webviewer.directive:wvSerieManagerlist
  * @description
- * # wvSerielist
+ * # wvSerieManagerlist
  */
 angular.module('webviewer')
-.directive('wvSerielist', ['wvSerie', function(wvSerie) {
+.directive('wvSerielist', ['wvSerieManager', function(wvSerieManager) {
 return {
   scope: {
     wvStudy: '=',
@@ -30,7 +30,7 @@ return {
       if (!id) return; 
       // @todo handle IsStable === false
 
-      wvSerie
+      wvSerieManager
         .listFromOrthancStudyId(id)
         .then(function(series) {
           scope.serieIds = series.map(function(serie) {

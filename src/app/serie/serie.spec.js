@@ -6,7 +6,7 @@ describe('serie', function() {
         bard.appModule('webviewer');
         
         bard.inject(this, '$controller', '$q', '$rootScope', '$timeout', '$httpBackend',
-            'wvConfig', 'wvSerie', 'wvOrthancSerieAdapter', 'wvSerie');
+            'wvConfig', 'wvSerieManager', 'wvOrthancSerieAdapter', 'wvSerieManager');
 
         _.forEach(orthanc.raw, function(data, path) {
           $httpBackend
@@ -22,7 +22,7 @@ describe('serie', function() {
       var orthancSerie = orthanc.series.with2SingleFrameInstances;
 
       // when
-      var serie = wvSerie.listFromOrthancSerieId(orthancSerie.ID);
+      var serie = wvSerieManager.listFromOrthancSerieId(orthancSerie.ID);
 
       // then
       expect(serie.then).to.not.equal(undefined);
@@ -35,7 +35,7 @@ describe('serie', function() {
       var orthancStudy = orthanc.studies.withMultiFrameInstances; // 25 wv series in that data sheet
 
       // when
-      wvSerie
+      wvSerieManager
       .listFromOrthancStudyId(orthancStudy.ID)
       .then(function(wvSeries) {
 
@@ -54,16 +54,16 @@ describe('serie', function() {
       var orthancSortedInstances = orthanc.sortedInstances.with2SingleFrameInstances;
 
       // when
-      wvSerie
+      wvSerieManager
       .listFromOrthancSerieId(orthancSerie.ID)
-      .then(function(wvSerie) {
+      .then(function(wvSeries) {
 
         // then
         var expectedResult = wvOrthancSerieAdapter.process(orthancSerie, orthancSortedInstances);
-        expect(wvSerie.length).to.equal(expectedResult.length);
-        expect(wvSerie.id).to.equal(expectedResult.id);
-        expect(wvSerie.tags).to.deep.equal(expectedResult.tags);
-        expect(wvSerie.imageIds).to.deep.equal(expectedResult.imageIds);
+        expect(wvSeries.length).to.equal(expectedResult.length);
+        expect(wvSeries.id).to.equal(expectedResult.id);
+        expect(wvSeries.tags).to.deep.equal(expectedResult.tags);
+        expect(wvSeries.imageIds).to.deep.equal(expectedResult.imageIds);
         done();
 
       });

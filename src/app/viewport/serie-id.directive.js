@@ -99,10 +99,10 @@
 
     /* responsibility: manage the directive states */
     /* @ngInject */
-    function SerieViewModel(wvSerie) {
+    function SerieViewModel(wvSerieManager) {
         var _this = this;
 
-        this._serieRepository = wvSerie;
+        this._serieManager = wvSerieManager;
         this._serieId = null;
         this._serie = null;
 
@@ -144,7 +144,7 @@
 
         this._serieId = id;
 
-        this._serieRepository
+        this._serieManager
             .get(id)
             .then(function(serie) {
                 var oldSerie = _this._serie;

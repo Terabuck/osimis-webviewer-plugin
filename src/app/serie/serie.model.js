@@ -3,12 +3,12 @@
 
     angular
         .module('webviewer')
-        .factory('WVSerieModel', factory);
+        .factory('WvSerie', factory);
 
     /* @ngInject */
     function factory($rootScope, $timeout, wvAnnotationManager, WvAnnotationGroup) {
 
-        function WVSerieModel(id, imageIds, tags) {
+        function WvSerie(id, imageIds, tags) {
             var _this = this;
 
             this.id = id; // id == orthancId + ':' + subSerieIndex
@@ -39,7 +39,7 @@
             this._playTimeout = null;
         };
 
-        WVSerieModel.prototype._loadAnnotationGroup = function() {
+        WvSerie.prototype._loadAnnotationGroup = function() {
             var _this = this;
 
             if (!this._annotationGroup) {
@@ -56,20 +56,20 @@
             return this._annotationGroup;
         }
 
-        WVSerieModel.prototype.getAnnotedImageIds = function(type) {
+        WvSerie.prototype.getAnnotedImageIds = function(type) {
             return this._loadAnnotationGroup()
                 .filterByType(type)
                 .getImageIds();
         };
         
-        WVSerieModel.prototype.getAnnotationGroup = function(type) {
+        WvSerie.prototype.getAnnotationGroup = function(type) {
             return this._loadAnnotationGroup();
         };
         
         /** $serie.getAnnotations([type: string])
          *
          */
-        WVSerieModel.prototype.getAnnotations = function(type) {
+        WvSerie.prototype.getAnnotations = function(type) {
             var annotationGroup = this._loadAnnotationGroup();
 
             if (type) {
@@ -79,18 +79,18 @@
             return annotationGroup.toArray();
         };
 
-        WVSerieModel.prototype.getIndexOf = function(imageId) {
+        WvSerie.prototype.getIndexOf = function(imageId) {
             return this.imageIds.indexOf(imageId);
         }
 
-        WVSerieModel.prototype.setShownImage = function(id) {
+        WvSerie.prototype.setShownImage = function(id) {
             this.currentShownIndex = this.getIndexOf(id);
         };
-        WVSerieModel.prototype.getCurrentImageId = function() {
+        WvSerie.prototype.getCurrentImageId = function() {
            return this.imageIds[this.currentIndex];
         };
 
-        WVSerieModel.prototype.goToNextImage = function(restartWhenSerieEnd) {
+        WvSerie.prototype.goToNextImage = function(restartWhenSerieEnd) {
             if (restartWhenSerieEnd !== true) restartWhenSerieEnd = false;
             
             this.currentIndex++;
@@ -102,7 +102,7 @@
             this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
         };
 
-        WVSerieModel.prototype.goToPreviousImage = function() {
+        WvSerie.prototype.goToPreviousImage = function() {
             this.currentIndex--;
 
             if (this.currentIndex < 0) {
@@ -112,7 +112,7 @@
             this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
         };
 
-        WVSerieModel.prototype.goToImage = function(newIndex) {
+        WvSerie.prototype.goToImage = function(newIndex) {
             if (newIndex < 0) {
               newIndex = 0;
             }
@@ -125,7 +125,7 @@
         };
 
         var _cancelAnimationId = null;
-        WVSerieModel.prototype.play = function(speed) {
+        WvSerie.prototype.play = function(speed) {
             var _this = this;
 
             speed = speed || 1000 / 30; // 30 fps by default
@@ -161,7 +161,7 @@
             
             this.isPlaying = true;
         };
-        WVSerieModel.prototype.pause = function() {
+        WvSerie.prototype.pause = function() {
             if (_cancelAnimationId) {
                 cancelAnimationFrame(_cancelAnimationId);
                 _cancelAnimationId = null;
@@ -172,7 +172,7 @@
 
         ////////////////
 
-        return WVSerieModel;
+        return WvSerie;
     }
 
 })();

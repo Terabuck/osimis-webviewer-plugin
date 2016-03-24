@@ -7,7 +7,7 @@ describe('serie', function () {
         bard.appModule('webviewer');
         
         bard.inject(this, '$controller', '$q', '$rootScope', '$timeout', '$httpBackend',
-            'wvConfig', 'wvSerie');
+            'wvConfig', 'wvSerieManager');
     });
 
     bard.verifyNoOutstandingHttpRequests();

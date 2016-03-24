@@ -6,7 +6,7 @@ describe('serie', function() {
         bard.appModule('webviewer');
         
         bard.inject(this, '$controller', '$q', '$rootScope', '$timeout', '$httpBackend',
-            'wvOrthancSerieAdapter', 'WVSerieModel');
+            'wvOrthancSerieAdapter', 'WvSerie');
     });
 
     bard.verifyNoOutstandingHttpRequests();
@@ -20,7 +20,7 @@ describe('serie', function() {
         var series = wvOrthancSerieAdapter.process(ortSerie, ortSortedInstances);
 
         expect(series.length).to.equal(1);
-        expect(series[0]).to.be.an.instanceof(WVSerieModel);
+        expect(series[0]).to.be.an.instanceof(WvSerie);
         expect(series[0].id).to.equal(ortSerie.ID + ':0');
 
         // check there is 2 images in the serie
