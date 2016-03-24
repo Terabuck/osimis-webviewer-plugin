@@ -50,7 +50,7 @@
             bindToController: true,
             controller: Controller,
             controllerAs: 'vm',
-            templateUrl: 'app/image/viewport.directive.tpl.html',
+            templateUrl: 'app/viewport/viewport.directive.tpl.html',
             link: link,
             restrict: 'E',
             require: {
