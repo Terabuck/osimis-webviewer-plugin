@@ -3,7 +3,7 @@
 
     angular
         .module('webviewer')
-        .factory('WVBaseTool', factory);
+        .factory('WvBaseTool', factory);
 
     /* @ngInject */
     function factory($rootScope, $timeout, $, _, cornerstoneTools, debounce) {

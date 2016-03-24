@@ -14,7 +14,7 @@
         });
 
     /* @ngInject */
-    function wvPanViewportTool($parse, WVBaseTool) {
+    function wvPanViewportTool($parse, WvBaseTool) {
         // Usage:
         //
         // Creates:
@@ -43,7 +43,7 @@
 
         /* @ngInject */
         function Controller($scope) {
-            WVBaseTool.call(this, 'pan');
+            WvBaseTool.call(this, 'pan');
 
             this._activateInputs = function(viewport) {
                 var _this = this;
@@ -98,7 +98,7 @@
                 viewport.setViewport(viewportData);
             };
         }
-        Controller.prototype = Object.create(WVBaseTool.prototype)
+        Controller.prototype = Object.create(WvBaseTool.prototype)
         Controller.prototype.constructor = Controller;
         
         return directive;

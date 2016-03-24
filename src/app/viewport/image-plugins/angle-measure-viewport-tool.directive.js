@@ -14,7 +14,7 @@
         });
 
     /* @ngInject */
-    function wvAngleMeasureViewportTool($parse, WVBaseTool) {
+    function wvAngleMeasureViewportTool($parse, WvBaseTool) {
         // Usage:
         //
         // Creates:
@@ -43,9 +43,9 @@
 
         /* @ngInject */
         function Controller() {
-            WVBaseTool.call(this, 'angle');
+            WvBaseTool.call(this, 'angle');
         }
-        Controller.prototype = Object.create(WVBaseTool.prototype)
+        Controller.prototype = Object.create(WvBaseTool.prototype)
         Controller.prototype.constructor = Controller;
     
         return directive;

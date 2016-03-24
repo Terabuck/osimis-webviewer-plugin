@@ -14,7 +14,7 @@
         });
 
     /* @ngInject */
-    function wvRectangleRoiViewportTool($parse, WVBaseTool) {
+    function wvRectangleRoiViewportTool($parse, WvBaseTool) {
         // Usage:
         //
         // Creates:
@@ -43,9 +43,9 @@
 
         /* @ngInject */
         function Controller() {
-            WVBaseTool.call(this, 'rectangleRoi');
+            WvBaseTool.call(this, 'rectangleRoi');
         }
-        Controller.prototype = Object.create(WVBaseTool.prototype)
+        Controller.prototype = Object.create(WvBaseTool.prototype)
         Controller.prototype.constructor = Controller;
         
         return directive;

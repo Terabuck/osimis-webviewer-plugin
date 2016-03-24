@@ -14,7 +14,7 @@
         });
 
     /* @ngInject */
-    function wvDefaultViewportTool($, $parse, WVBaseTool) {
+    function wvDefaultViewportTool($, $parse, WvBaseTool) {
         // Usage:
         //
         // Creates:
@@ -43,7 +43,7 @@
 
         /* @ngInject */
         function Controller($scope) {
-            WVBaseTool.call(this, 'default');
+            WvBaseTool.call(this, 'default');
 
             this._activateInputs = function(viewport) {
                 var _this = this;
@@ -124,7 +124,7 @@
                 viewport.setViewport(viewportData);
             };
         }
-        Controller.prototype = Object.create(WVBaseTool.prototype)
+        Controller.prototype = Object.create(WvBaseTool.prototype)
         Controller.prototype.constructor = Controller;
 
         return directive;

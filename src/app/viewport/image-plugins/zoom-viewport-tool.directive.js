@@ -14,7 +14,7 @@
         });
 
     /* @ngInject */
-    function wvZoomViewportTool($parse, WVBaseTool) {
+    function wvZoomViewportTool($parse, WvBaseTool) {
         // Usage:
         //
         // Creates:
@@ -43,9 +43,9 @@
 
         /* @ngInject */
         function Controller() {
-            WVBaseTool.call(this, 'zoom');
+            WvBaseTool.call(this, 'zoom');
         }
-        Controller.prototype = Object.create(WVBaseTool.prototype)
+        Controller.prototype = Object.create(WvBaseTool.prototype)
         Controller.prototype.constructor = Controller;
         
         return directive;

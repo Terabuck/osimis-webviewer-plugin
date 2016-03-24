@@ -14,7 +14,7 @@
         });
 
     /* @ngInject */
-    function wvLengthMeasureViewportTool($parse, WVBaseTool) {
+    function wvLengthMeasureViewportTool($parse, WvBaseTool) {
         // Usage:
         //
         // Creates:
@@ -43,9 +43,9 @@
 
         /* @ngInject */
         function Controller() {
-            WVBaseTool.call(this, 'length');
+            WvBaseTool.call(this, 'length');
         }
-        Controller.prototype = Object.create(WVBaseTool.prototype)
+        Controller.prototype = Object.create(WvBaseTool.prototype)
         Controller.prototype.constructor = Controller;
         
         return directive;

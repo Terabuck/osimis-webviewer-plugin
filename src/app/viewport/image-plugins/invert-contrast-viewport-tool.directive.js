@@ -14,7 +14,7 @@
         });
 
     /* @ngInject */
-    function wvInvertContrastViewportTool($parse, WVBaseTool) {
+    function wvInvertContrastViewportTool($parse, WvBaseTool) {
         // Usage:
         //
         // Creates:
@@ -45,7 +45,7 @@
         function Controller() {
             var _this = this;
 
-            WVBaseTool.call(this, 'invertContrast');
+            WvBaseTool.call(this, 'invertContrast');
 
             this._listenViewChange = function(viewport) {
                 viewport.onViewportResetting(this, function(viewportData) {
@@ -73,7 +73,7 @@
             this._listenModelChange = angular.noop;
             this._unlistenModelChange = angular.noop;
         }
-        Controller.prototype = Object.create(WVBaseTool.prototype)
+        Controller.prototype = Object.create(WvBaseTool.prototype)
         Controller.prototype.constructor = Controller;
         
         return directive;
