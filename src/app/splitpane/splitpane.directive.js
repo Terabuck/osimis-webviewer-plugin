@@ -14,7 +14,7 @@ angular.module('webviewer')
         wvSettings: '=?' // used by transcluded directives
       },
       // @todo add template path angular constant
-      templateUrl: 'app/splitpane/wv-splitpane.tpl.html',
+      templateUrl: 'app/splitpane/splitpane.directive.html',
       restrict: 'E',
       transclude: true,
       link: function postLink(scope, element, attrs, ctrls, transcludeFn) {
