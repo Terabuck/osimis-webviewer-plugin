@@ -75,9 +75,9 @@
         function getPixelObject(id) {
             if (!pixelCache.hasOwnProperty(id)) {
                 var compression = wvConfig.defaultCompression;
-                id = id.split(':');
-                var instanceId = id[0];
-                var frameIndex = id[1];
+                var splittedId = id.split(':');
+                var instanceId = splittedId[0];
+                var frameIndex = splittedId[1];
                 pixelCache[id] = $http
                     .get(wvConfig.webviewerApiURL + '/instances/' +compression+ '-' + instanceId + '_' + frameIndex)
                     .then(function(response) {
