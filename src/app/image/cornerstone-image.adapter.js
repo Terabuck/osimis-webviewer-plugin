@@ -33,8 +33,13 @@
             else {
                 pixelObject.render = cornerstone.renderGrayscaleImage;
             }
-            
-            pixelObject.getPixelData = _getPixelData;
+
+            // load the pixels out of the getPixelData to avoid lazy loading
+            // because loading control should never be handled by an adapter
+            var _pixels = _getPixels(pixelObject);
+            pixelObject.getPixelData = function() {
+                return _pixels;
+            };
             
             return pixelObject;
         }
@@ -50,6 +55,17 @@
         }    
     }
 
+    function _getPixels(pixelObject) {
+        switch (pixelObject.Orthanc.Compression) {
+          case 'Deflate':
+            return _getPixelDataDeflate(pixelObject);
+          case 'Jpeg':
+            return _getPixelDataJpeg(pixelObject);
+          default:
+            throw new Error('unknown compression');
+        }
+    }
+
     // http://stackoverflow.com/a/11058858/881731
     function _str2ab(str) {
         var buf = new ArrayBuffer(str.length);
@@ -58,18 +74,6 @@
             pixels[i] = str.charCodeAt(i);
         }
         return pixels;
-    }
-
-
-    function _getPixelData() {
-        switch (this.Orthanc.Compression) {
-          case 'Deflate':
-            return _getPixelDataDeflate(this);
-          case 'Jpeg':
-            return _getPixelDataJpeg(this);
-          default:
-            throw new Error('unknown compression');
-        }
     }
 
     function _getPixelDataDeflate(pixelObject) {
