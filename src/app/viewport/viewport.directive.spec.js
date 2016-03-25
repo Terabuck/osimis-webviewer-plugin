@@ -11,9 +11,8 @@ describe('viewport', function() {
         osi.afterEach();
 
         beforeEach(function() {
-            bard.inject(this, 'wvCornerstoneImageAdapter');
+            bard.inject(this, 'wvCornerstoneImageAdapter', 'wvImageManager');
 
-            sinon.spy(cornerstone, 'loadImage');
             sinon.spy(cornerstone, 'enable');
             sinon.spy(cornerstone, 'displayImage');
             sinon.spy(cornerstone, 'resize');
@@ -168,7 +167,6 @@ describe('viewport', function() {
         beforeEach(function() {
             bard.inject(this, 'wvCornerstoneImageAdapter');
 
-            sinon.spy(cornerstone, 'loadImage');
             sinon.spy(cornerstone, 'enable');
             sinon.spy(cornerstone, 'displayImage');
             sinon.spy(cornerstone, 'resize');

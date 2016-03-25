@@ -33,7 +33,7 @@
             // lazy load the pixel object
             var _cachedPixelObjectPromise = null;
             this.getPixelObject = function() {
-                if (_cachedPixelObject === null) {
+                if (_cachedPixelObjectPromise === null) {
                     // result is not a 2d array of pixels but an object containing an attribute with the array
                     _cachedPixelObjectPromise = wvImageManager.getPixelObject(this.id); // mainImagePixelObject
                     var getPixelsObjectFromImageIdFn = wvImageManager.getPixelObject.bind(wvImageManager);

@@ -1,20 +1,11 @@
 describe('image', function() {
 
 	describe('manager', function() {
-		
-		var $httpBackend, wvImageManager, WvImage;
-
-		beforeEach(angular.mock.module(
-		    'webviewer'
-	    ));
-
-		beforeEach(inject(function(_$httpBackend_, _wvImageManager_, _WvImage_) {
-		    $httpBackend = _$httpBackend_;
-		    wvImageManager = _wvImageManager_;
-		    WvImage = _WvImage_;
-		}));
 
 	    beforeEach(function() {
+	    	bard.appModule('webviewer');
+	    	bard.inject('$httpBackend', 'wvImageManager', 'WvImage');
+
 	        _.forEach(orthanc.raw, function(data, path) {
 	          $httpBackend
 	            .when('GET', '/' + path)
@@ -51,7 +42,6 @@ describe('image', function() {
 			var image = wvImageManager
 			    .get(imageId)
 			    .then(function(image) {
-                    
                     // then
                     expect(image).to.be.an.instanceof(WvImage);
                     expect(image.id).to.equal(imageId);
