@@ -281,7 +281,11 @@
             // @todo true canceling
             return $q
                 .all({
-                    processedImage: cornerstone.loadImage('orthanc://' + id),
+                    processedImage: _this._imageManager
+                        .get(id)
+                        .then(function (image) {
+                            return image.getPixelObject(); // getPixelObject returns a promise
+                        }),
                     imageModel: _this._imageManager.get(id)
                 })
                 .then(function(args) {

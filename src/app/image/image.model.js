@@ -1,4 +1,4 @@
- (function() {
+(function() {
     'use strict';
 
     angular
@@ -6,11 +6,12 @@
         .factory('WvImage', factory);
 
     /* @ngInject */
-    function factory(wvAnnotationManager, WvAnnotationValueObject, wvImagePixels) {
-         /*
+    function factory(wvAnnotationManager, WvAnnotationValueObject) {
+        /*
          * @RootAggregate
+         * @note wvImageManager is injected for lazy loading purpose
          */
-        function WvImage(id, tags, postProcesses) {
+        function WvImage(wvImageManager, id, tags, postProcesses) {
             var _this = this;
 
             this.id = id;
@@ -29,24 +30,23 @@
                 _this.onAnnotationChanged.trigger(annotation);
             });
 
+            // lazy load the pixel object
+            this.getPixelObject = function() {
+                // result is not a 2d array of pixels but an object containing an attribute with the array
+                var resultPromise = wvImageManager.getPixelObject(this.id); // mainImagePixelObject
+                var getPixelsObjectFromImageIdFn = wvImageManager.getPixelObject.bind(wvImageManager);
+
+                this.postProcesses.forEach(function(postProcess) {
+                    resultPromise = resultPromise
+                        .then(function(actualPixelObject) {
+                            return postProcess.execute(actualPixelObject, getPixelsObjectFromImageIdFn);
+                        });
+                });
+                
+                return resultPromise;
+            }
+
         }
-
-        // with real pixels (for now)
-        // this returns a promise
-        WvImage.prototype.getPixelObject = function() {
-            // @note resultPixels are not a 2d array of pixels but an object containing an attribute with the array
-            var resultPromise = wvImagePixels.getPixelObject(this.id); // mainImagePixelObject
-            var getPixelsObjectFromImageIdFn = wvImagePixels.getPixelObject.bind(wvImagePixels);
-
-            this.postProcesses.forEach(function(postProcess) {
-                resultPromise = resultPromise
-                    .then(function(actualPixelObject) {
-                        return postProcess.execute(actualPixelObject, getPixelsObjectFromImageIdFn);
-                    });
-            });
-            
-            return resultPromise;
-        };
 
         WvImage.prototype.getAnnotations = function(type) {
             return wvAnnotationManager.getByImageId(this.id, type);

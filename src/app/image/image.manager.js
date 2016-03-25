@@ -6,42 +6,73 @@
         .factory('wvImageManager', wvImageManager);
 
     /* @ngInject */
-    function wvImageManager($http, $q, $compile, $timeout, $rootScope, wvConfig, WvImage) {
+    function wvImageManager($http, $q, $compile, $timeout, $rootScope, wvConfig, WvImage, wvCornerstoneImageAdapter) {
         var service = {
             get: get,
-            getCompressedImage: getCompressedImage,
-            createAnnotedImage: createAnnotedImage
+            getPixelObject: getPixelObject,
+            createAnnotedImage: createAnnotedImage,
+            /**
+             * @public register a post processor
+             */
+            registerPostProcessor: registerPostProcessor
         };
     
+        var postProcessorClasses = {};
+
         // @todo flush somehow
         var modelCache = {};
 
         // @todo flush somehow
         var pixelCache = {};
-        
+
 
         return service;
 
         ////////////////
         
+        // @input id: string <slice-id>[|<processor>...]
+        //    <slice-id>: *:\d+ (_instance_:_slice_)
+        //    <processor>: <string>[~<string>...] (_name_~_param1_~_param2_...)
         function get(id) {
-            if (!modelCache.hasOwnProperty(id)) {
-                var splittedId = id.split(':');
-                var instanceId = splittedId[0];
-                var frameIndex = splittedId[1] || 0;
+            var _this = this;
 
+            if (!modelCache.hasOwnProperty(id)) {
+                // split between image id and postProcesses
+                var splitted = id.split('|');
+                id = splitted[0];
+                var postProcessesStrings = splitted.splice(1);
+                var postProcesses = postProcessesStrings.map(function (processString) {
+                    // split processString between process name and its arguments
+                    splitted = processString.split('~');
+                    var processName = splitted[0];
+                    var processArgs = splitted.splice(1);
+
+                    if (!postProcessorClasses.hasOwnProperty(processName)) {
+                        throw new Error('wv-image: unknown post processor');
+                    }
+                    
+                    var postProcessObject = new (Function.prototype.bind.apply(postProcessorClasses[processName], [null].concat(processArgs)));
+                    return postProcessObject;
+                });
+
+                // split between dicom instance id and frame index
+                splitted = id.split(':');
+                var instanceId = splitted[0];
+                var frameIndex = splitted[1] || 0;
+                
+                // return results
                 modelCache[id] = $http
                     .get(wvConfig.orthancApiURL + '/instances/'+instanceId+'/simplified-tags')
                     .then(function(response) {
                         var tags = response.data;
-                        return new WvImage(id, tags);
+                        return new WvImage(_this, id, tags, postProcesses);
                     });
-            }
+            };
 
             return modelCache[id];
         };
 
-        function getCompressedImage(id) {
+        function getPixelObject(id) {
             if (!pixelCache.hasOwnProperty(id)) {
                 var compression = wvConfig.defaultCompression;
                 id = id.split(':');
@@ -50,13 +81,17 @@
                 pixelCache[id] = $http
                     .get(wvConfig.webviewerApiURL + '/instances/' +compression+ '-' + instanceId + '_' + frameIndex)
                     .then(function(response) {
-                        return response.data;
+                        return wvCornerstoneImageAdapter.process(id, response.data);
                     });
             }
 
             return pixelCache[id];
         }
-    
+        
+        function registerPostProcessor(name, PostProcessor) {
+            postProcessorClasses[name] = PostProcessor;
+        }
+
         // @todo should be in @RootAggregate (ie. image-model)
         function createAnnotedImage(id, width, height) {
             // create a fake viewport containing the image to save it with the annotations

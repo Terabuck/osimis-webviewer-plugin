@@ -3,10 +3,10 @@
 
     angular
         .module('webviewer')
-        .factory('WVMask', WVMask);
+        .factory('WvMask', WvMask);
 
     /* @ngInject */
-    function WVMask() {
+    function WvMask() {
     	
     	function Mask() {
 

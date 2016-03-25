@@ -3,14 +3,14 @@
 
     angular
         .module('webviewer')
-        .factory('WVColorMaskPostProcessor', WVColorMaskPostProcessor)
-        .run(function(wvImage,  WVColorMaskPostProcessor) {
-            wvImage.registerPostProcessor('colormask', WVColorMaskPostProcessor);
+        .factory('WvColorMaskPostProcessor', WvColorMaskPostProcessor)
+        .run(function(wvImageManager,  WvColorMaskPostProcessor) {
+            wvImageManager.registerPostProcessor('colormask', WvColorMaskPostProcessor);
             // @todo register
         });
 
     /* @ngInject */
-    function WVColorMaskPostProcessor(_, $q) {
+    function WvColorMaskPostProcessor(_, $q) {
     	// needs data
 
         /**

@@ -5,13 +5,13 @@ describe('viewport', function() {
     //beforeEach(module(function($exceptionHandler) {
     //    $exceptionHandlerProvider.mode('log');
     //}));
-
+    
     describe('directive', function() {
         osi.beforeEach();
         osi.afterEach();
 
         beforeEach(function() {
-            bard.inject(this, 'wvCornerstoneLoader');
+            bard.inject(this, 'wvCornerstoneImageAdapter');
 
             sinon.spy(cornerstone, 'loadImage');
             sinon.spy(cornerstone, 'enable');
@@ -20,7 +20,6 @@ describe('viewport', function() {
         });
 
         afterEach(function() {
-            cornerstone.loadImage.restore();
             cornerstone.enable.restore();
             cornerstone.displayImage.restore();
             cornerstone.resize.restore();
@@ -41,13 +40,10 @@ describe('viewport', function() {
             var element = osi.directive('<wv-viewport wv-image-id="imageId"></wv-viewport>');
             var enabledElement = element.find('.wv-cornerstone-enabled-image')[0]; // dom element used by cornerstone
             
-            // expect the directive to load the image once
-            expect(cornerstone.loadImage).calledOnce;
-            expect(cornerstone.loadImage).calledWith('orthanc://' + $scope.imageId);
-            
             // check the image has been displayed once
             expect(cornerstone.displayImage).calledOnce;
-            var expectedProcessedImage = osi.sync(wvCornerstoneLoader.get($scope.imageId));
+            var orthancPixelObject = osi.sync(wvImageManager.getPixelObject($scope.imageId));
+            var expectedProcessedImage = wvCornerstoneImageAdapter.process($scope.imageId, orthancPixelObject);
             var lastDisplayedImage = cornerstone.displayImage.lastCall.args[1];
             expect(lastDisplayedImage.Orthanc.PixelData).to.equal(expectedProcessedImage.Orthanc.PixelData);
 
@@ -55,13 +51,10 @@ describe('viewport', function() {
             $scope.imageId = '0d76c26b-1e36515d-0fec1815-7db3052a-1c5c5d6e:1';
             osi.digest();
             
-            // expect the new image to have been loaded
-            expect(cornerstone.loadImage).calledTwice;
-            expect(cornerstone.loadImage).calledWith('orthanc://' + $scope.imageId);
-
             // check the new image has been displayed twice
             expect(cornerstone.displayImage).calledTwice;
-            expectedProcessedImage = osi.sync(wvCornerstoneLoader.get($scope.imageId));
+            var orthancPixelObject = osi.sync(wvImageManager.getPixelObject($scope.imageId));
+            expectedProcessedImage = wvCornerstoneImageAdapter.process($scope.imageId, orthancPixelObject);
             var lastDisplayedImage = cornerstone.displayImage.lastCall.args[1];
             expect(lastDisplayedImage.Orthanc.PixelData).to.equal(expectedProcessedImage.Orthanc.PixelData);
 
@@ -76,9 +69,6 @@ describe('viewport', function() {
             var element = osi.directive('<wv-viewport wv-image-id="imageId"></wv-viewport>');
             var enabledElement = element.find('.wv-cornerstone-enabled-image')[0]; // dom element used by cornerstone
             
-            // expect the directive to load the image once
-            expect(cornerstone.loadImage).calledOnce;
-            
             // check the image has been displayed once
             expect(cornerstone.displayImage).calledOnce;
 
@@ -86,8 +76,6 @@ describe('viewport', function() {
             $scope.imageId = null;
             osi.digest();
             
-            // expect no new image to have been loaded
-            expect(cornerstone.loadImage).calledOnce; // no new call
             // check the new image has been cleared
             expect($(enabledElement).css('visibility')).to.equal('hidden');
             
@@ -109,7 +97,6 @@ describe('viewport', function() {
             var element = osi.directive('<wv-viewport wv-image-id="imageId" wv-size="size"></wv-viewport>');
             var enabledElement = element.find('.wv-cornerstone-enabled-image')[0]; // dom element used by cornerstone
             
-            expect(cornerstone.loadImage).calledOnce;
             expect(cornerstone.displayImage).calledOnce;
             // expect the viewport to scale the image to its fullest.
             var viewport = cornerstone.getViewport(enabledElement);
@@ -179,7 +166,7 @@ describe('viewport', function() {
         osi.afterEach();
 
         beforeEach(function() {
-            bard.inject(this, 'wvCornerstoneLoader');
+            bard.inject(this, 'wvCornerstoneImageAdapter');
 
             sinon.spy(cornerstone, 'loadImage');
             sinon.spy(cornerstone, 'enable');
@@ -188,7 +175,6 @@ describe('viewport', function() {
         });
 
         afterEach(function() {
-            cornerstone.loadImage.restore();
             cornerstone.enable.restore();
             cornerstone.displayImage.restore();
             cornerstone.resize.restore();
@@ -210,8 +196,6 @@ describe('viewport', function() {
             // expect the $scope to have been updated
             // goal: check databinding
             expect($scope.imageId).to.equal(imageId);
-            expect(cornerstone.loadImage).calledOnce;
-            expect(cornerstone.loadImage).calledWith('orthanc://' + imageId);
         });
 
 		it('should keep its configuration when image change by default', function() {

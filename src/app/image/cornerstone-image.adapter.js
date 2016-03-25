@@ -1,52 +1,42 @@
 (function() {
+    
+    /**
+     * vwCornerstoneImageAdapter
+     *
+     * Converts an orthanc pixel object into a cornerstone pixel object
+     */
+
     'use strict';
 
     angular
         .module('webviewer')
-        .factory('wvImagePixels', wvImagePixels);
+        .factory('wvCornerstoneImageAdapter', wvCornerstoneImageAdapter);
 
     /* @ngInject */
-    function wvImagePixels($http, wvConfig) {
+    function wvCornerstoneImageAdapter($http, wvConfig, cornerstone) {
         var service = {
-            /**
-             * @namespace private function used by @RootAggregate image-model at namespace level
-             */
-            getPixelObject: getPixelObject
+            process: process
         };
         return service;
 
         ////////////////
 
-        function getPixelObject(id) {
-            var compression = wvConfig.defaultCompression;
-            id = id.split(':');
-            var instanceId = id[0];
-            var frameIndex = id[1] || 0;
-            return $http
-                .get(wvConfig.webviewerApiURL + '/instances/' +compression+ '-' + instanceId + '_' + frameIndex)
-                .then(function(response) {
-                    var image = response.data;
+        function process(imageId, orthancPixelObject) {
+            var pixelObject = orthancPixelObject;
 
-                    image.imageId = id;
+            // @todo check if this variable is required, remove it if not, write why otherwise
+            pixelObject.imageId = imageId;
 
-                    if (image.color) {
-                        image.render = cornerstone.renderColorImage;
-                    }
-                    else {
-                        image.render = cornerstone.renderGrayscaleImage;
-                    }
-
-                    /* @warning @note @todo
-                     *
-                     * getPixelData is called by cornerstone
-                     *
-                     * this instruction caches every pixels.
-                     * It is only usable in prototypal context.
-                     */
-                    image.getPixelData = _getPixelData;
-                    
-                    return image;
-                });
+            if (pixelObject.color) {
+                pixelObject.render = cornerstone.renderColorImage;
+            }
+            else {
+                pixelObject.render = cornerstone.renderGrayscaleImage;
+            }
+            
+            pixelObject.getPixelData = _getPixelData;
+            
+            return pixelObject;
         }
     }
 
@@ -82,13 +72,13 @@
         }
     }
 
-    function _getPixelDataDeflate(image) {
+    function _getPixelDataDeflate(pixelObject) {
         // Decompresses the base64 buffer that was compressed with Deflate
-        var s = pako.inflate(window.atob(image.Orthanc.PixelData));
+        var s = pako.inflate(window.atob(pixelObject.Orthanc.PixelData));
         var pixels = null;
         var buf, index, i;
 
-        if (image.color) {
+        if (pixelObject.color) {
             buf = new ArrayBuffer(s.length / 3 * 4); // RGB32
             pixels = new Uint8Array(buf);
             index = 0;
@@ -113,15 +103,15 @@
         return pixels;
     }
 
-    function _getPixelDataJpeg(image) {
+    function _getPixelDataJpeg(pixelObject) {
         var jpegReader = new JpegImage();
-        var jpeg = _str2ab(window.atob(image.Orthanc.PixelData));
+        var jpeg = _str2ab(window.atob(pixelObject.Orthanc.PixelData));
         jpegReader.parse(jpeg);
-        var s = jpegReader.getData(image.width, image.height);
+        var s = jpegReader.getData(pixelObject.width, pixelObject.height);
         var pixels = null;
         var buf, index, i;
 
-        if (image.color) {
+        if (pixelObject.color) {
             buf = new ArrayBuffer(s.length / 3 * 4); // RGB32
             pixels = new Uint8ClampedArray(buf);
             index = 0;
@@ -140,8 +130,8 @@
                 index++;
             }
 
-            if (image.Orthanc.Stretched) {
-                _changeDynamics(pixels, 0, image.Orthanc.StretchLow, 255, image.Orthanc.StretchHigh);
+            if (pixelObject.Orthanc.Stretched) {
+                _changeDynamics(pixels, 0, pixelObject.Orthanc.StretchLow, 255, pixelObject.Orthanc.StretchHigh);
             }
         }
 
