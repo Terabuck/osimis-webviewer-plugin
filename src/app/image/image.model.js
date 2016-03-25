@@ -31,19 +31,22 @@
             });
 
             // lazy load the pixel object
+            var _cachedPixelObjectPromise = null;
             this.getPixelObject = function() {
-                // result is not a 2d array of pixels but an object containing an attribute with the array
-                var resultPromise = wvImageManager.getPixelObject(this.id); // mainImagePixelObject
-                var getPixelsObjectFromImageIdFn = wvImageManager.getPixelObject.bind(wvImageManager);
+                if (_cachedPixelObject === null) {
+                    // result is not a 2d array of pixels but an object containing an attribute with the array
+                    _cachedPixelObjectPromise = wvImageManager.getPixelObject(this.id); // mainImagePixelObject
+                    var getPixelsObjectFromImageIdFn = wvImageManager.getPixelObject.bind(wvImageManager);
 
-                this.postProcesses.forEach(function(postProcess) {
-                    resultPromise = resultPromise
-                        .then(function(actualPixelObject) {
-                            return postProcess.execute(actualPixelObject, getPixelsObjectFromImageIdFn);
-                        });
-                });
+                    this.postProcesses.forEach(function(postProcess) {
+                        _cachedPixelObjectPromise = _cachedPixelObjectPromise
+                            .then(function(actualPixelObject) {
+                                return postProcess.execute(actualPixelObject, getPixelsObjectFromImageIdFn);
+                            });
+                    });
+                }
                 
-                return resultPromise;
+                return _cachedPixelObjectPromise;
             }
 
         }
