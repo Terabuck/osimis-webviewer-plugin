@@ -12,7 +12,7 @@
         // Creates:
         //
         var directive = {
-            templateUrl: 'app/overlay/scrollbar-overlay-item.directive.tpl.html',
+            templateUrl: 'app/overlay/scrollbar-overlay-item.directive.html',
             bindToController: true,
             controller: Controller,
             controllerAs: 'vm',

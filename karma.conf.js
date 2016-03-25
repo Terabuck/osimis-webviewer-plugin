@@ -59,6 +59,13 @@ module.exports = function(config) {
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
-        singleRun: false
+        singleRun: false,
+
+        // fix phantomjs issue: http://stackoverflow.com/a/33802985/939741
+        // we reload phantomjs everytimes it fails up to 100 times...
+        captureTimeout: 60000,
+        browserDisconnectTimeout: 10000,
+        browserDisconnectTolerance: 100, // by default 0
+        browserNoActivityTimeout: 1000 // by default 10000
     });
 };
