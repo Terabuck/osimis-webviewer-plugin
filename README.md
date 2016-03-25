@@ -1,4 +1,4 @@
-# webViewer
+# webviewer
 
 **Generated from Osimis Angular**
 
@@ -10,15 +10,31 @@
  - on OSX use [homebrew](http://brew.sh) `brew install node`
  - on Windows use [chocolatey](https://chocolatey.org/) `choco install nodejs`
 
-2. Install Yeoman `npm install -g yo`
+2. Install ruby
 
-3. Install these NPM packages globally
+3. Install compass
 
-    ```bash
-    npm install -g bower gulp nodemon
+    ```
+    gem update --system
+    gem install compass
+    ```
+
+4. Install Yeoman `npm install -g yo`
+
+5. Install these NPM packages globally
+
+    ```
+    npm install -g bower gulp
     ```
 
     >Refer to these [instructions on how to not require sudo](https://github.com/sindresorhus/guides/blob/master/npm-global-without-sudo.md)
+
+6. Install tests dependencies
+
+    ```
+    npm install -g nodemon marked jsonlint jshint eslint jscs phantomjs protractor karma-cli
+    webdriver-manager update
+    ```
 
 ## Running OsimisAngular
 
@@ -47,9 +63,8 @@ OsimisAngular starter project
 The structure also contains a gulpfile.js and a server folder. The server is there just so we can serve the app using node. Feel free to use any server you wish.
 
 	/src
-		/client
-			/app
-			/content
+    /app
+    /content
 
 ### Installing Packages
 When you generate the project it should run these commands, but if you notice missing packages, run these again:

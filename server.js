@@ -6,6 +6,7 @@ var app = express();
 var bodyParser = require('body-parser');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
+var osisync = require('osisync');
 var port = process.env.PORT || 5554;
 
 var environment = process.env.NODE_ENV;
@@ -28,10 +29,16 @@ switch (environment){
             // four0four.send404(req, res);
         });
         // Any deep link calls should return index.html
-        app.use('/*', express.static('./build/index.html'));
+        // app.use('/*', express.static('./build/index.html'));
         break;
     default:
         console.log('** DEV **');
+        
+        if (osisync.master) {
+            // overload the index.html with the osisync-master injected one
+            app.use(express.static('./.osisync/'));
+        }
+
         app.use(express.static('./src/'));
         app.use(express.static('./'));
         app.use(express.static('./tmp'));
@@ -41,7 +48,7 @@ switch (environment){
             // four0four.send404(req, res);
         });
         // Any deep link calls should return index.html
-        app.use('/*', express.static('./src/index.html'));
+        // app.use('/*', express.static('./src/index.html'));
         break;
 }
 
