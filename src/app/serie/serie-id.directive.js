@@ -4,11 +4,11 @@
     angular
         .module('webviewer')
         .directive('wvSerieId', wvSerieId);
-    
+
     /** <wv-viewport wv-serie-id="some_serie_id"></wv-viewport>
      * attributes:
      * - wv-serie="$serie"
-     * - wv-on-serie-change="youFunction($serie)" 
+     * - wv-on-serie-change="youFunction($serie)"
      */
 
     /* @ngInject */
@@ -71,7 +71,7 @@
                 if (!wvSerieParser || !wvSerieParser.assign) {
                     return;
                 }
-                
+
                 wvSerieParser.assign(scope, serie);
 
                 if (wvOnSerieChangeParser) {
@@ -87,7 +87,7 @@
                 }
                 else if (ctrlIsExtension) {
                     ctrl.register(viewmodel);
-                    
+
                     scope.$on('$destroy', function() {
                         ctrl.unregister(viewmodel);
                     });
@@ -129,9 +129,9 @@
             }
         });
     }
-    
+
     SerieViewModel.prototype.onSerieChanged = angular.noop;
-    
+
     SerieViewModel.prototype.clearSerie = function() {
         var oldSerie = this.serie;
         this._serieId = null;
@@ -156,5 +156,5 @@
     SerieViewModel.prototype.getSerie = function() {
         return this._serie;
     };
-    
+
 })();
