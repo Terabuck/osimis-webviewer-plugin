@@ -14,5 +14,4 @@ This repo contains the plugin C++ code.  The html/js code lies in [this repo](ht
 
 ### Pulling changes from Fork origin
 To retrieve changes from original mercurial repo to git fork, uses
-- https://github.com/fingolfin/git-remote-hg 
--> This is insanely awesome, thanks god !
+- https://github.com/fingolfin/git-remote-hg
