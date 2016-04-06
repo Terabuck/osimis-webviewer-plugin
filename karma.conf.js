@@ -27,12 +27,12 @@ module.exports = function(config) {
         // possible values: 'dots', 'progress', 'coverage'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
         reporters: ['mocha'/*, 'coverage'*/],
-        
+
         mochaReporter: {
             output: 'full',
             showDiff: 'unified'
         },
-
+        
         // coverageReporter: {
         //     dir: gulpConfig.karma.coverage.dir,
         //     reporters: gulpConfig.karma.coverage.reporters

@@ -1,9 +1,16 @@
-.DS_Store
-.sass-cache/
-.idea/
-.tmp/
-bower_components/
+# Dependency directory
+# https://docs.npmjs.com/misc/faq#should-i-check-my-node-modules-folder-into-git
 node_modules/
+bower_components/
+
+# Build directory
 build/
+
+# other
 report/
+.tmp/
+.sass-cache/
+.osisync/
+.idea/
+.DS_Store
 npm-debug.log
