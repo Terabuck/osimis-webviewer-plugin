@@ -11,7 +11,8 @@ module.exports = function() {
     var bowerFiles = wiredep({devDependencies: true})['js'];
     var bower = {
         json: require('./bower.json'),
-        directory: './bower_components/'
+        directory: './bower_components/',
+        ignorePath: '..'
     };
     var nodeModules = 'node_modules';
 
@@ -28,11 +29,13 @@ module.exports = function() {
         client: client,
         cssDir: cssDir,
         css: cssDir + 'styles.css',
-        fonts: bower.directory + 'font-awesome/fonts/**/*.*',
-        html: client + '**/*.html',
+        fonts: [
+            bower.directory + 'font-awesome/fonts/**/*.{eot,svg,ttf,woff,woff2}'
+        ],
+        html: client + '/*.html',
         htmltemplates: clientApp + '**/*.html',
         images: client + 'images/**/*.*',
-        index: [
+        indexes: [
             client + 'index.html',
             client + 'plugin-entrypoint.html'
         ],
@@ -127,7 +130,7 @@ module.exports = function() {
          * Node settings
          */
         nodeServer: './server.js',
-        defaultPort: '7123'
+        defaultPort: '5554'
     };
 
     /**
@@ -137,7 +140,7 @@ module.exports = function() {
         var options = {
             bowerJson: config.bower.json,
             directory: config.bower.directory,
-            ignorePath: '..',
+            ignorePath: config.bower.ignorePath,
             fileTypes: {
                 scss: {
                   block: /(([ \t]*)\/\/\s*bower:*(\S*))(\n|\r|.)*?(\/\/\s*endbower)/gi,
@@ -147,9 +150,9 @@ module.exports = function() {
                     scss: /@import\s['"](.+scss)['"]/gi
                   },
                   replace: {
-                    css: '@import "..{{filePath}}";',
-                    sass: '@import "..{{filePath}}";',
-                    scss: '@import "..{{filePath}}";'
+                    css: '@import "' + config.bower.ignorePath + '{{filePath}}";',
+                    sass: '@import "' + config.bower.ignorePath + '{{filePath}}";',
+                    scss: '@import "' + config.bower.ignorePath + '{{filePath}}";'
                   }
                 }
             }

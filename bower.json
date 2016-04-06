@@ -22,32 +22,32 @@
     "url": "https://bitbucket.org/osimis/osimis-webviewer.git"
   },
   "devDependencies": {
+    "angular-mocks": "^1.5.0",
     "sinon": "http://sinonjs.org/releases/sinon-1.12.1.js",
-    "bardjs": "^0.1.8",
-    "angular-mocks": "^1.5.0"
+    "bardjs": "^0.1.8"
   },
   "dependencies": {
-    "angular": "1.5.0",
-    "angular-animate": "1.5.0",
-    "angular-resource": "1.5.0",
-    "angular-sanitize": "1.5.0",
+    "jquery": "^2.2.0",
+    "angular": "^1.5.0",
+    "angular-animate": "^1.5.0",
+    "angular-resource": "^1.5.0",
+    "angular-sanitize": "^1.5.0",
+    "bootstrap": "^3.3.6",
+    "lodash": "^4.5.1",
+    "ng-range-filter": "~0.1.0",
     "font-awesome": "fontawesome#~4.5.0",
-    "cornerstone": "~0.8.4",
-    "cornerstoneTools": "~0.7.7",
+    "cornerstone": "^0.9.0",
+    "cornerstoneTools": "^0.7.7",
     "jpgjs": "notmasteryet/jpgjs",
     "hamsterjs": "~1.1.0",
-    "bootstrap": "~3.3.6",
-    "lodash": "^4.5.1",
     "angular-dragdrop": "~1.0.12",
     "angular-strap": "~2.3.6",
     "jqueryui-touch-punch": "*",
-    "ng-range-filter": "~0.1.0",
     "ng-debounce": "^0.1.7"
   },
   "resolutions": {
-    "angular": "1.5.0",
-    "cornerstone": "~0.9.0",
-    "jquery": "~2.2.0"
+    "angular": "^1.5.0",
+    "jquery": "^2.2.0"
   },
   "overrides": {
     "bootstrap": {

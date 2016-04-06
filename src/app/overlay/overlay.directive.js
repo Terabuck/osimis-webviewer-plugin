@@ -21,7 +21,7 @@
             require: {
                 serie: '?^^wvSerieId'
             },
-            templateUrl: 'app/overlay/overlay.directive.tpl.html',
+            templateUrl: 'app/overlay/overlay.directive.html',
             scope: {
                 'wvTags': '=?',
             	'wvSerie': '=?',

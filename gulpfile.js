@@ -11,12 +11,18 @@ var osisync = require('osisync');
 
 var colors = $.util.colors;
 var envenv = $.util.env;
-var port = process.env.PORT || config.defaultPort;
+
+var serverPort = osisync.getPort() || process.env.PORT || config.defaultPort;
+var browserSyncPort = osisync.getPort() || 3000;
+var browserSyncUiPort = osisync.getPort() || 3001;
+var weinrePort = osisync.getPort() || 9090;
+var nodeDebugPort = osisync.getPort() || 5858;
 
 /**
  * yargs variables can be passed in to alter the behavior, when present.
  * Example: gulp serve-dev
  *
+ * --exit-on-test-failed : exit gulp with error when tests fail.
  * --verbose  : Various tasks will produce more output to the console.
  * --nosync   : Don't launch the browser with browser-sync when serving code.
  * --debug    : Launch debugger with node-inspector.
@@ -37,17 +43,17 @@ gulp.task('default', ['help']);
  * @return {Stream}
  */
 gulp.task('vet', function() {
-    if (args.novet) return;
-    
-    log('Analyzing source with JSHint and JSCS');
+    if (!args.novet) {
+        log('Analyzing source with JSHint and JSCS');
 
-    return gulp
-        .src(config.alljs)
-        .pipe($.if(args.verbose, $.print()))
-        .pipe($.jshint())
-        .pipe($.jshint.reporter('jshint-stylish', {verbose: true}))
-        // .pipe($.jshint.reporter('fail'))
-        .pipe($.if(!args.nojscs, $.jscs()));
+        return gulp
+            .src(config.alljs)
+            .pipe($.if(args.verbose, $.print()))
+            .pipe($.jshint())
+            .pipe($.jshint.reporter('jshint-stylish', {verbose: true}))
+    //        .pipe($.jshint.reporter('fail'))
+            .pipe($.if(!args.nojscs, $.jscs()));
+    }
 });
 
 /**
@@ -59,6 +65,8 @@ gulp.task('plato', function(done) {
 
     startPlatoVisualizer(done);
 });
+
+
 
 /**
  * Compile scss to css
@@ -103,10 +111,6 @@ gulp.task('images', ['clean-images'], function() {
         .src(config.images)
         // .pipe($.imagemin({optimizationLevel: 4}))
         .pipe(gulp.dest(config.build + 'images'));
-});
-
-gulp.task('scss-watcher', function() {
-    gulp.watch([config.scss], ['styles']);
 });
 
 /**
@@ -156,21 +160,39 @@ gulp.task('wiredep', ['wiredep-scss'], function() {
 
     // Only include stubs if flag is enabled
     var js = args.stubs ? [].concat(config.js, config.stubsjs) : config.js;
+    
+    // gulp.fonts contains the eot, svg, ttf, ... file paths (with glob)
+    // this command replace those extensions with .css
+    // as it is the standard that font packages comes with a .css in the same folder as the fonts to
+    // include them.
+    // we inject these .css which themself include the .eot, .svg, ...
+    var fonts = config.fonts.map(
+        function (a) { return a.replace(/^(.*)(\.[^.\/]*)$/i, '$1.css'); }
+    );
 
     return gulp
-        .src(config.index)
+        .src(config.indexes)
         .pipe(wiredep(options))
         .pipe(inject(js, '', config.jsOrder))
+        .pipe(inject(fonts, 'fonts'))
         .pipe(gulp.dest(config.client));
 });
 
 gulp.task('inject', ['wiredep', 'styles', 'templatecache'], function() {
     log('Wire up css into the html, after files are ready');
 
-    return gulp
-        .src(config.index)
+    var pipe = gulp
+        .src(config.indexes)
         .pipe(inject(config.css))
         .pipe(gulp.dest(config.client));
+
+    if (osisync.master) {
+        pipe = pipe
+            .pipe(osisync.master.processHtmlStream())
+            .pipe(gulp.dest('./.osisync/'));
+    }
+
+    return pipe;
 });
 
 /**
@@ -226,37 +248,6 @@ gulp.task('build', ['optimize', 'images', 'fonts'], function() {
     };
     del(config.temp);
     log(msg);
-    notify(msg);
-});
-
-// Just do the preprocess tasks required by dev mode
-gulp.task('osisync', ['styles', 'templatecache'], function() {
-    log('OsiSync: Watch and update changes and serve files');
-
-    gulp.watch([config.htmltemplates], ['templatecache']).on('change', changeEvent);
-    gulp.watch([config.scss], ['styles']).on('change', changeEvent);
-
-    // start server
-    var debugMode = '--debug';
-    var nodeOptions = getNodeOptions(true);
-
-    // @todo use standard express start instead of nodemon - no need to restart
-    nodeOptions.nodeArgs = [debugMode + '=7124']; // @todo use random port
-
-    if (args.verbose) {
-        console.log(nodeOptions);
-    }
-
-    return $.nodemon(nodeOptions)
-        .on('start', function () {
-            console.log('*** nodemon started');
-
-            // @todo should be in server.js with real ports
-            osisync.slave.start({
-                host: 'localhost',
-                port: port
-            });
-        });
 });
 
 /**
@@ -267,7 +258,7 @@ gulp.task('osisync', ['styles', 'templatecache'], function() {
 gulp.task('optimize', ['inject'], function() {
     log('Optimizing the js, css, and html');
 
-    var assets = $.useref.assets({searchPath: ['./', './src/']});
+    var assets = $.useref.assets({searchPath: ['./', config.client]});
     // Filters are named for the gulp-useref path
     var cssFilter = $.filter('**/*.css');
     var jsAppFilter = $.filter('**/' + config.optimized.app);
@@ -275,10 +266,17 @@ gulp.task('optimize', ['inject'], function() {
 
     var templateCache = config.temp + config.templateCache.file;
 
+    // Assume .css font-inject files exist in the font directories
+    var fontsCss = config.fonts.map(
+        function (a) { return a.replace(/^(.*)(\.[^.\/]*)$/i, '$1.css'); }
+    );
+
     return gulp
-        .src([config.index[0], config.index[1], config.config, './bower.json'])
+        .src(config.indexes.concat(['./bower.json']))
         .pipe($.plumber())
         .pipe(inject(templateCache, 'templates'))
+        // Replace the font .css locations
+        .pipe(inject(fontsCss, 'fonts'))
         .pipe(assets) // Gather all assets from the html with useref
         // Get the css
         .pipe(cssFilter)
@@ -299,14 +297,11 @@ gulp.task('optimize', ['inject'], function() {
         // Apply the concat and file replacement with useref
         .pipe(assets.restore())
         .pipe($.useref())
-        // Replace the file names in the html & bower.json with rev numbers
-      //   .pipe($.revReplace({
-    		// replaceInExtensions: ['.js', '.css', '.html', '.hbs', '.json'] // Replace also in bower.json
-      //   }))
-        .pipe(gulp.dest(config.build))
-        // Write the rev-manifest.json - used by @osisync
-        // .pipe($.rev.manifest())
-        // .pipe(gulp.dest(config.build));
+        // Replace the file names in the html with rev numbers
+        // .pipe($.revReplace({
+        //     replaceInExtensions: ['.js', '.css', '.html', '.hbs', '.json'] // Replace also in bower.json
+        // }))
+        .pipe(gulp.dest(config.build));
 });
 
 /**
@@ -363,7 +358,7 @@ gulp.task('clean-code', function(done) {
 /**
  * Run specs once and exit
  * To start servers and run midway specs as well:
- *    gulp test --startServers --killOnFail
+ *    gulp test --startServers
  * @return {Stream}
  */
 gulp.task('test', ['vet', 'templatecache'], function(done) {
@@ -377,7 +372,6 @@ gulp.task('test', ['vet', 'templatecache'], function(done) {
  *    gulp autotest --startServers
  */
 gulp.task('autotest', function(done) {
-    // @todo auto retrigger build-specs ?
     startTests(false /*singleRun*/ , done);
 });
 
@@ -388,6 +382,52 @@ gulp.task('autotest', function(done) {
  */
 gulp.task('serve-dev', ['inject'], function() {
     serve(true /*isDev*/);
+});
+
+// inject index.html
+// start browsersync w/ new index.html watch
+// send CLI info
+
+/**
+ * serve the osisync *slave* dev environment
+ * watch and preprocess files
+ */
+gulp.task('osisync', ['inject'], function() {
+    log('OsiSync: Watch and update changes and serve files');
+
+    gulp.watch(config.indexes, ['inject']);
+    gulp.watch([config.scssDir+'**/*'], ['styles']);
+    gulp.watch([config.htmltemplates], ['templatecache']);
+
+    // start the server
+    var env = _.cloneDeep(process.env); // make sure OSISYNC_* are present
+    env.PORT = serverPort;
+    env.NODE_ENV = 'dev';
+
+    var nodeOptions = {
+        script: config.nodeServer,
+        delayTime: 1,
+        env: env,
+        watch: [config.server],
+        nodeArgs: ['--debug' + '=' + nodeDebugPort],
+        stdOut: true
+    };
+
+    if (args.verbose) {
+        console.log(nodeOptions);
+    }
+
+    // @todo use standard express start instead of nodemon - no need to restart the server
+    return $.nodemon(nodeOptions)
+        .on('start', function () {
+            console.log('*** nodemon started');
+
+            // @todo should be in server.js with real ports
+            osisync.slave.start({
+                host: 'localhost',
+                port: serverPort
+            });
+        });
 });
 
 /**
@@ -494,7 +534,7 @@ function serve(isDev, specRunner) {
     var debugMode = '--debug';
     var nodeOptions = getNodeOptions(isDev);
 
-    nodeOptions.nodeArgs = [debugMode + '=7124'];
+    nodeOptions.nodeArgs = [debugMode + '=' + nodeDebugPort];
 
     if (args.verbose) {
         console.log(nodeOptions);
@@ -522,20 +562,22 @@ function serve(isDev, specRunner) {
 }
 
 function getNodeOptions(isDev) {
+    var env = _.cloneDeep(process.env); // make sure OSISYNC_* are present
+    env.PORT = serverPort;
+    env.NODE_ENV = isDev ? 'dev' : 'build';
+
     return {
         script: config.nodeServer,
         delayTime: 1,
-        env: {
-            'PORT': port,
-            'NODE_ENV': isDev ? 'dev' : 'build'
-        },
-        watch: [config.server]
+        env: env,
+        watch: [config.server],
+        stdOut: true
     };
 }
 
 //function runNodeInspector() {
 //    log('Running node-inspector.');
-//    log('Browse to http://localhost:8080/debug?port=7124');
+//    log('Browse to http://localhost:8080/debug?port='+nodeDebugPort);
 //    var exec = require('child_process').exec;
 //    exec('node-inspector');
 //}
@@ -549,35 +591,40 @@ function startBrowserSync(isDev, specRunner) {
         return;
     }
 
-    log('Starting BrowserSync on port ' + port);
+    log('Starting BrowserSync on port ' + browserSyncPort);
 
     // If build: watches the files, builds, and restarts browser-sync.
     // If dev: watches scss, compiles it to css, browser-sync handles reload
     if (isDev) {
-        gulp.watch([config.index], ['inject']);
+        gulp.watch(config.indexes, ['inject']);
         gulp.watch([config.scssDir+'**/*'], ['styles']);
         gulp.watch([config.htmltemplates], ['templatecache']);
 
-        gulp.watch(['index.html', '.tmp/*', config.js])
+        gulp.watch([
+            !!osisync.master ? '.osisync/index.html' : 'index.html',
+            '.tmp/*',
+            config.js
+        ]).on('change', changeEvent);
     } else {
         gulp.watch([config.scss, config.js, config.html], ['browserSyncReload'])
             .on('change', changeEvent);
     }
 
     var options = {
-        proxy: 'localhost:' + port,
-        port: 3000,
+        proxy: 'localhost:' + serverPort,
+        port: browserSyncPort,
+        ui: {
+            port: browserSyncUiPort,
+            weinre: {
+                port: weinrePort
+            }
+        },
         files: isDev ? [
             config.client + '**/*.*',
             '!' + config.scss,
-            config.temp + '**/*.css'
+            config.temp + '**/*.*'
         ] : [],
-        ghostMode: { // these are the defaults t,f,t,t
-            clicks: true,
-            location: false,
-            forms: true,
-            scroll: true
-        },
+        ghostMode: false, // disable ghostMode
         injectChanges: true,
         logFileChanges: true,
         logLevel: 'info',
@@ -585,12 +632,37 @@ function startBrowserSync(isDev, specRunner) {
         notify: true,
         open: false,
         reloadDelay: 0 //1000
-    } ;
+    };
+
     if (specRunner) {
         options.startPath = config.specRunnerFile;
     }
 
+    if (osisync.master) {
+        // use osisync index.html instead of the default one
+        options.files = [
+            '!' + config.client + 'index.html',
+            './.osisync/index.html'
+        ].concat(options.files);
+    }
+
+    // @todo 
+    // https://www.browsersync.io/docs/gulp/
+    // https://www.npmjs.com/package/browser-sync-angular-template
+    // https://github.com/shakyShane/browser-sync-spa
     browserSync(options);
+
+    if (osisync.master) {
+        browserSync.emitter.on("init", function () {
+            osisync.master.start({
+                serverPort: serverPort,
+                browserSyncPort: browserSyncPort,
+                browserSyncUiPort: browserSyncUiPort,
+                weinrePort: weinrePort,
+                nodeDebugPort: nodeDebugPort
+            });
+        });
+    }
 }
 
 /**
@@ -630,7 +702,7 @@ function startTests(singleRun, done) {
     var child;
     var excludeFiles = [];
     var fork = require('child_process').fork;
-    var karma = require('karma');
+    var karma = require('karma').server;
     var serverSpecs = config.serverIntegrationSpecs;
 
     if (args.startServers) {
@@ -663,7 +735,7 @@ function startTests(singleRun, done) {
         if (karmaResult === 1) {
             log('karma: tests failed with code ' + karmaResult);
             done();
-            if (args.killOnFail) {
+            if (args.exitOnTestFailed) {
                 process.exit(karmaResult);
             }
         } else {
@@ -739,20 +811,6 @@ function log(msg) {
     } else {
         $.util.log($.util.colors.blue(msg));
     }
-}
-
-/**
- * Show OS level notification using node-notifier
- */
-function notify(options) {
-    // var notifier = require('node-notifier');
-    // var notifyOptions = {
-    //     sound: 'Bottle',
-    //     contentImage: path.join(__dirname, 'gulp.png'),
-    //     icon: path.join(__dirname, 'gulp.png')
-    // };
-    // _.assign(notifyOptions, options);
-    // notifier.notify(notifyOptions);
 }
 
 module.exports = gulp;
