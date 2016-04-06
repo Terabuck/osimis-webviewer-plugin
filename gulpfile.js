@@ -38,7 +38,7 @@ gulp.task('default', ['help']);
  */
 gulp.task('vet', function() {
     if (args.novet) return;
-    
+
     log('Analyzing source with JSHint and JSCS');
 
     return gulp
@@ -161,16 +161,16 @@ gulp.task('wiredep', ['wiredep-scss'], function() {
         .src(config.index)
         .pipe(wiredep(options))
         .pipe(inject(js, '', config.jsOrder))
-        .pipe(gulp.dest(config.client));
+        .pipe(gulp.dest(config.temp));
 });
 
 gulp.task('inject', ['wiredep', 'styles', 'templatecache'], function() {
     log('Wire up css into the html, after files are ready');
 
     return gulp
-        .src(config.index)
+        .src(config.tempIndex)
         .pipe(inject(config.css))
-        .pipe(gulp.dest(config.client));
+        .pipe(gulp.dest(config.temp));
 });
 
 /**
@@ -276,7 +276,7 @@ gulp.task('optimize', ['inject'], function() {
     var templateCache = config.temp + config.templateCache.file;
 
     return gulp
-        .src([config.index[0], config.index[1], config.config, './bower.json'])
+        .src([config.tempIndex[0], config.tempIndex[1], config.config, './bower.json'])
         .pipe($.plumber())
         .pipe(inject(templateCache, 'templates'))
         .pipe(assets) // Gather all assets from the html with useref
@@ -303,7 +303,7 @@ gulp.task('optimize', ['inject'], function() {
       //   .pipe($.revReplace({
     		// replaceInExtensions: ['.js', '.css', '.html', '.hbs', '.json'] // Replace also in bower.json
       //   }))
-        .pipe(gulp.dest(config.build))
+        .pipe(gulp.dest(config.build));
         // Write the rev-manifest.json - used by @osisync
         // .pipe($.rev.manifest())
         // .pipe(gulp.dest(config.build));
