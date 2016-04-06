@@ -13,14 +13,11 @@
 
     <!-- build:css styles/lib.css -->
     <!-- bower:css -->
-    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap-theme.css" />
     <!-- endbower -->
     <!-- endbuild -->
 
     <!-- build:css styles/app.css -->
     <!-- inject:css -->
-    <link rel="stylesheet" href="/.tmp/styles.css">
     <!-- endinject -->
     <!-- endbuild -->
   </head>
@@ -40,7 +37,7 @@
                 wv-pan-viewport-tool="toolbar.pan"
                 wv-pixel-probe-viewport-tool="toolbar.pixelprobe"
                 wv-rectangle-roi-viewport-tool="toolbar.rectangleroi"
-                
+
                 wv-invert-contrast-viewport-tool="toolbar.invert"
                 wv-play-serie-ext="toolbar.play"
             ></wv-viewport>
@@ -57,71 +54,11 @@
 
     <!-- build:js js/lib.js -->
     <!-- bower:js -->
-    <script src="/bower_components/jquery/dist/jquery.js"></script>
-    <script src="/bower_components/angular/angular.js"></script>
-    <script src="/bower_components/angular-animate/angular-animate.js"></script>
-    <script src="/bower_components/angular-resource/angular-resource.js"></script>
-    <script src="/bower_components/angular-sanitize/angular-sanitize.js"></script>
-    <script src="/bower_components/cornerstone/dist/cornerstone.js"></script>
-    <script src="/bower_components/cornerstoneMath/dist/cornerstoneMath.js"></script>
-    <script src="/bower_components/hammerjs/hammer.js"></script>
-    <script src="/bower_components/cornerstoneTools/dist/cornerstoneTools.js"></script>
-    <script src="/bower_components/jpgjs/jpg.js"></script>
-    <script src="/bower_components/hamsterjs/hamster.js"></script>
-    <script src="/bower_components/lodash/lodash.js"></script>
-    <script src="/bower_components/jquery-ui/jquery-ui.js"></script>
-    <script src="/bower_components/angular-dragdrop/src/angular-dragdrop.js"></script>
-    <script src="/bower_components/angular-strap/dist/angular-strap.js"></script>
-    <script src="/bower_components/angular-strap/dist/angular-strap.tpl.js"></script>
-    <script src="/bower_components/jqueryui-touch-punch/jquery.ui.touch-punch.min.js"></script>
-    <script src="/bower_components/ng-range-filter/src/ngRangeFilter.js"></script>
-    <script src="/bower_components/ng-debounce/angular-debounce.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
     <!-- build:js js/app.js -->
     <!-- inject:js -->
-    <script src="/src/app/webviewer.module.js"></script>
-    <script src="/src/app/annotation/annotation-group.class.js"></script>
-    <script src="/src/app/annotation/annotation.manager.js"></script>
-    <script src="/src/app/annotation/annotation.value-object.js"></script>
-    <script src="/src/app/image/cornerstone-image.adapter.js"></script>
-    <script src="/src/app/image/image.manager.js"></script>
-    <script src="/src/app/image/image.model.js"></script>
-    <script src="/src/app/image/postprocessors/mask.class.js"></script>
-    <script src="/src/app/image/postprocessors/maskcolor.class.js"></script>
-    <script src="/src/app/image/postprocessors/postprocess.interface.js"></script>
-    <script src="/src/app/overlay/overlay.directive.js"></script>
-    <script src="/src/app/overlay/scrollbar-overlay-item.directive.js"></script>
-    <script src="/src/app/serie/orthanc-serie.adapter.js"></script>
-    <script src="/src/app/serie/serie.manager.js"></script>
-    <script src="/src/app/serie/serie.model.js"></script>
-    <script src="/src/app/serielist/serielist.directive.js"></script>
-    <script src="/src/app/splitpane/splitpane.directive.js"></script>
-    <script src="/src/app/toolbar/wv-toolbar-setting.js"></script>
-    <script src="/src/app/toolbar/wv-toolbar-state.js"></script>
-    <script src="/src/app/toolbar/wv-toolbar-tool.js"></script>
-    <script src="/src/app/toolbar/wv-toolbar.js"></script>
-    <script src="/src/app/utilities/osimis-listener.js"></script>
-    <script src="/src/app/utilities/size.directive.js"></script>
-    <script src="/src/app/utilities/studylist.directive.js"></script>
-    <script src="/src/app/viewport/image-plugins/angle-measure-viewport-tool.directive.js"></script>
-    <script src="/src/app/viewport/image-plugins/base-tool.class.js"></script>
-    <script src="/src/app/viewport/image-plugins/default-viewport-tool.directive.js"></script>
-    <script src="/src/app/viewport/image-plugins/elliptical-roi-viewport-tool.directive.js"></script>
-    <script src="/src/app/viewport/image-plugins/invert-contrast-viewport-tool.directive.js"></script>
-    <script src="/src/app/viewport/image-plugins/length-measure-viewport-tool.directive.js"></script>
-    <script src="/src/app/viewport/image-plugins/pan-viewport-tool.directive.js"></script>
-    <script src="/src/app/viewport/image-plugins/pixel-probe-viewport-tool.directive.js"></script>
-    <script src="/src/app/viewport/image-plugins/rectangle-roi-viewport-tool.directive.js"></script>
-    <script src="/src/app/viewport/image-plugins/zoom-viewport-tool.directive.js"></script>
-    <script src="/src/app/viewport/serie-id.directive.js"></script>
-    <script src="/src/app/viewport/serie-plugins/draggable-serie-ext.directive.js"></script>
-    <script src="/src/app/viewport/serie-plugins/droppable-serie-ext.directive.js"></script>
-    <script src="/src/app/viewport/serie-plugins/play-serie-ext.directive.js"></script>
-    <script src="/src/app/viewport/serie-plugins/scroll-on-over-serie-ext.directive.js"></script>
-    <script src="/src/app/viewport/serie-plugins/scroll-on-wheel-serie-ext.directive.js"></script>
-    <script src="/src/app/viewport/viewport.directive.js"></script>
     <!-- endinject -->
 
     <!-- inject:templates:js -->
@@ -129,14 +66,13 @@
     <!-- endbuild -->
 
     <!-- build:js config.js -->
-    <script src="/src/config.js"></script>
     <!-- endbuild -->
-    
+
     <script>
         angular.module('orthanc', ['webviewer'])
         .config(function($locationProvider, wvConfigProvider) {
             wvConfigProvider.setApiURL(window.orthancUrl);
-            
+
             $locationProvider.html5Mode({
                 enabled: true,
                 requireBase: false

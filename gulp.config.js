@@ -58,7 +58,10 @@ module.exports = function() {
             client + 'stubs/**/*.js'
         ],
         temp: temp,
-
+        tempIndex: [
+            temp + 'index.html',
+            temp + 'plugin-entrypoint.html'
+        ],
         /**
          * optimized files
          */
