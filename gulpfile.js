@@ -160,7 +160,7 @@ gulp.task('wiredep', ['wiredep-scss'], function() {
 
     // Only include stubs if flag is enabled
     var js = args.stubs ? [].concat(config.js, config.stubsjs) : config.js;
-    
+
     // gulp.fonts contains the eot, svg, ttf, ... file paths (with glob)
     // this command replace those extensions with .css
     // as it is the standard that font packages comes with a .css in the same folder as the fonts to
@@ -175,16 +175,16 @@ gulp.task('wiredep', ['wiredep-scss'], function() {
         .pipe(wiredep(options))
         .pipe(inject(js, '', config.jsOrder))
         .pipe(inject(fonts, 'fonts'))
-        .pipe(gulp.dest(config.client));
+        .pipe(gulp.dest(config.temp));
 });
 
 gulp.task('inject', ['wiredep', 'styles', 'templatecache'], function() {
     log('Wire up css into the html, after files are ready');
 
     var pipe = gulp
-        .src(config.indexes)
+        .src(config.tempIndexes)
         .pipe(inject(config.css))
-        .pipe(gulp.dest(config.client));
+        .pipe(gulp.dest(config.temp));
 
     if (osisync.master) {
         pipe = pipe
@@ -272,7 +272,7 @@ gulp.task('optimize', ['inject'], function() {
     );
 
     return gulp
-        .src(config.indexes.concat(['./bower.json']))
+        .src(config.tempIndexes.concat(['./bower.json', config.config]))
         .pipe($.plumber())
         .pipe(inject(templateCache, 'templates'))
         // Replace the font .css locations
@@ -297,11 +297,14 @@ gulp.task('optimize', ['inject'], function() {
         // Apply the concat and file replacement with useref
         .pipe(assets.restore())
         .pipe($.useref())
-        // Replace the file names in the html with rev numbers
-        // .pipe($.revReplace({
-        //     replaceInExtensions: ['.js', '.css', '.html', '.hbs', '.json'] // Replace also in bower.json
-        // }))
+        // Replace the file names in the html & bower.json with rev numbers
+        //   .pipe($.revReplace({
+        //      replaceInExtensions: ['.js', '.css', '.html', '.hbs', '.json'] // Replace also in bower.json
+        //   }))
         .pipe(gulp.dest(config.build));
+        // Write the rev-manifest.json - used by @osisync
+        // .pipe($.rev.manifest())
+        // .pipe(gulp.dest(config.build));
 });
 
 /**
@@ -646,7 +649,7 @@ function startBrowserSync(isDev, specRunner) {
         ].concat(options.files);
     }
 
-    // @todo 
+    // @todo
     // https://www.browsersync.io/docs/gulp/
     // https://www.npmjs.com/package/browser-sync-angular-template
     // https://github.com/shakyShane/browser-sync-spa
