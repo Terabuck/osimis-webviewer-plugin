@@ -182,7 +182,7 @@ gulp.task('inject', ['wiredep', 'styles', 'templatecache'], function() {
     log('Wire up css into the html, after files are ready');
 
     var pipe = gulp
-        .src(config.tempIndex)
+        .src(config.tempIndexes)
         .pipe(inject(config.css))
         .pipe(gulp.dest(config.temp));
 
@@ -272,7 +272,7 @@ gulp.task('optimize', ['inject'], function() {
     );
 
     return gulp
-        .src(config.tempIndex.concat(['./bower.json', config.config]))
+        .src(config.tempIndexes.concat(['./bower.json', config.config]))
         .pipe($.plumber())
         .pipe(inject(templateCache, 'templates'))
         // Replace the font .css locations
