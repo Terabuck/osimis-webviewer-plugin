@@ -82,7 +82,7 @@ namespace OrthancPlugins
   bool DecodedImageAdapter::Create(std::string& content,
                                    const std::string& uri)
   {
-    std::string message = "Decoding DICOM instance: " + uri;
+    std::string message = "DIA: Decoding DICOM instance: " + uri;
     OrthancPluginLogInfo(context_, message.c_str());
 
     CompressionType type;
@@ -98,6 +98,9 @@ namespace OrthancPlugins
 
     bool ok = false;
 
+    message = "DIA: Retrieving DICOM instance & tags from Orthanc: " + uri;
+    OrthancPluginLogInfo(context_, message.c_str());
+    
     Json::Value tags;
     std::string dicom;
     if (!GetStringFromOrthanc(dicom, context_, "/instances/" + instanceId + "/file") ||
@@ -106,7 +109,14 @@ namespace OrthancPlugins
       throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
     }
 
+
+    message = "DIA: Retrieving Frame image from DICOM file: " + uri;
+    OrthancPluginLogInfo(context_, message.c_str());
+    
     std::auto_ptr<OrthancImageWrapper> image(new OrthancImageWrapper(context_, OrthancPluginDecodeDicomImage(context_, dicom.c_str(), dicom.size(), frameIndex)));
+
+    message = "DIA: Compressing Frame image into JPEG: " + uri;
+    OrthancPluginLogInfo(context_, message.c_str());
 
     Json::Value json;
     if (GetCornerstoneMetadata(json, tags, *image))
@@ -125,6 +135,8 @@ namespace OrthancPlugins
     {
       Json::FastWriter writer;
       content = writer.write(json);
+      std::string message = "DIA: Work finished: " + uri;
+      OrthancPluginLogInfo(context_, message.c_str());
       return true;
     }
     else

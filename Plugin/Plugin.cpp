@@ -175,8 +175,15 @@ static OrthancPluginErrorCode ServeCache(OrthancPluginRestOutput* output,
     const std::string id = request->groups[0];
     std::string content;
 
+
+    std::string message = "Processing GET request: " + std::string(url);
+    OrthancPluginLogInfo(context_, message.c_str());
+    
     if (cache_->GetScheduler().Access(content, bundle, id))
     {
+      std::string message = "Answering GET request: " + std::string(url);
+      OrthancPluginLogInfo(context_, message.c_str());
+      
       OrthancPluginAnswerBuffer(context_, output, content.c_str(), content.size(), "application/json");
     }
     else
