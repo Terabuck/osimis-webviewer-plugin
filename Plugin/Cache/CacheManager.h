@@ -17,6 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  **/
 
+#if ENABLE_CACHE == 1
 
 #pragma once
 
@@ -106,3 +107,5 @@ namespace OrthancPlugins
                         CacheProperty property);
   };
 }
+
+#endif // ENABLE_CACHE == 1

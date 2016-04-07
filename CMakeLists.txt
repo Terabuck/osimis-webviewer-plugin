@@ -24,6 +24,7 @@ project(OsimisWebViewer)
 include(${CMAKE_SOURCE_DIR}/Resources/CMake/GetProductVersionFromGitTag.cmake)
 
 # Parameters of the build
+set(ENABLE_CACHE TRUE CACHE BOOL "Cache the plugin REST responses")
 set(STATIC_BUILD ON CACHE BOOL "Static build of the third-party libraries (necessary for Windows)")
 SET(STANDALONE_BUILD ON CACHE BOOL "Standalone build (all the resources are embedded, necessary for releases)")
 set(ALLOW_DOWNLOADS ON CACHE BOOL "Allow CMake to download packages")

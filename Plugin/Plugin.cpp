@@ -26,17 +26,19 @@
 #include "../Orthanc/Core/OrthancException.h"
 #include "../Orthanc/Core/Toolbox.h"
 #include "ViewerToolbox.h"
+
+#if ENABLE_CACHE == 1
 #include "ViewerPrefetchPolicy.h"
+#endif // ENABLE_CACHE == 1
+
 #include "DecodedImageAdapter.h"
 #include "SeriesInformationAdapter.h"
 #include "../Orthanc/Plugins/Samples/GdcmDecoder/GdcmDecoderCache.h"
 #include "../Orthanc/Core/Toolbox.h"
 #include "Version.h"
-
 static OrthancPluginContext* context_ = NULL;
 
-
-
+#if ENABLE_CACHE == 1
 class CacheContext
 {
 private:
@@ -130,11 +132,7 @@ public:
   }
 };
 
-
-
 static CacheContext* cache_ = NULL;
-
-
 
 static OrthancPluginErrorCode OnChangeCallback(OrthancPluginChangeType changeType,
                                                OrthancPluginResourceType resourceType,
@@ -157,8 +155,10 @@ static OrthancPluginErrorCode OnChangeCallback(OrthancPluginChangeType changeTyp
   }
 }
 
+#endif
 
 
+#if ENABLE_CACHE == 1
 template <enum OrthancPlugins::CacheBundle bundle>
 static OrthancPluginErrorCode ServeCache(OrthancPluginRestOutput* output,
                                          const char* url,
@@ -209,9 +209,69 @@ static OrthancPluginErrorCode ServeCache(OrthancPluginRestOutput* output,
     return OrthancPluginErrorCode_Plugin;
   }
 }
+#else
+//OrthancPluginRegisterRestCallback(context_, "/web-viewer/series/(.*)", ServeCache<CacheBundle_SeriesInformation>);
+//OrthancPluginRegisterRestCallback(context_, "/web-viewer/instances/(.*)", ServeCache<CacheBundle_DecodedImage>);
+template <typename TFactory>
+static OrthancPluginErrorCode ServeData(OrthancPluginRestOutput* output,
+                                         const char* url,
+                                         const OrthancPluginHttpRequest* request)
+{
+  try
+  {
+    if (request->method != OrthancPluginHttpMethod_Get)
+    {
+      OrthancPluginSendMethodNotAllowed(context_, output, "GET");
+      return OrthancPluginErrorCode_Success;
+    }
 
+    const std::string id = request->groups[0];
+    std::string content;
 
+    std::string message = "Processing GET request: " + std::string(url);
+    OrthancPluginLogInfo(context_, message.c_str());
 
+#if 0 // @todo implement cache the generic way with template instead of bundle ID
+    if (cache_->GetScheduler().Access(content, cacheBundleId, id))
+    {
+      std::string message = "Answering GET request: " + std::string(url);
+      OrthancPluginLogInfo(context_, message.c_str());
+
+      OrthancPluginAnswerBuffer(context_, output, content.c_str(), content.size(), "application/json");
+    }
+#else
+    TFactory* factory = new TFactory(context_);
+    if (factory->Create(content, id)) {
+        std::string message = "Answering GET request: " + std::string(url);
+        OrthancPluginLogInfo(context_, message.c_str());
+
+        OrthancPluginAnswerBuffer(context_, output, content.c_str(), content.size(), "application/json");
+    }
+#endif
+    else
+    {
+      OrthancPluginSendHttpStatusCode(context_, output, 404);
+    }
+
+    return OrthancPluginErrorCode_Success;
+  }
+  catch (Orthanc::OrthancException& e)
+  {
+    OrthancPluginLogError(context_, e.What());
+    return OrthancPluginErrorCode_Plugin;
+  }
+  catch (std::runtime_error& e)
+  {
+    OrthancPluginLogError(context_, e.what());
+    return OrthancPluginErrorCode_Plugin;
+  }
+  catch (boost::bad_lexical_cast&)
+  {
+    OrthancPluginLogError(context_, "Bad lexical cast");
+    return OrthancPluginErrorCode_Plugin;
+  }
+}
+#endif
 
 #if ORTHANC_STANDALONE == 0
 static OrthancPluginErrorCode ServeWebViewer(OrthancPluginRestOutput* output,
@@ -243,10 +303,7 @@ static OrthancPluginErrorCode ServeWebViewer(OrthancPluginRestOutput* output,
 
   return OrthancPluginErrorCode_Success;
 }
-
 #endif
-
-
 
 template <enum Orthanc::EmbeddedResources::DirectoryResourceId folder>
 static OrthancPluginErrorCode ServeEmbeddedFolder(OrthancPluginRestOutput* output,
@@ -340,13 +397,12 @@ static OrthancPluginErrorCode DecodeImageCallback(OrthancPluginImage** target,
   {
     std::auto_ptr<OrthancPlugins::OrthancImageWrapper> image;
 
-#if 0
-    // Do not use the cache
-    OrthancPlugins::GdcmImageDecoder decoder(dicom, size);
-    image.reset(new OrthancPlugins::OrthancImageWrapper(context_, decoder, frameIndex));
-#else
+#if ENABLE_CACHE == 1
     using namespace OrthancPlugins;
     image.reset(cache_->GetDecoder().Decode(context_, dicom, size, frameIndex));
+#else
+    OrthancPlugins::GdcmImageDecoder decoder(dicom, size);
+    image.reset(new OrthancPlugins::OrthancImageWrapper(context_, decoder.Decode(context_, frameIndex)));
 #endif
 
     *target = image->Release();
@@ -419,38 +475,28 @@ extern "C"
         return -1;
       }
 
+#if ENABLE_CACHE == 1
       // By default, the cache of the Web viewer is located inside the
       // "StorageDirectory" of Orthanc
       boost::filesystem::path cachePath = GetStringValue(configuration, "StorageDirectory", ".");
       cachePath /= "WebViewerCache";
       int cacheSize = 100;  // By default, a cache of 100 MB is used
 
+      /* Read cache options in json config file */
       if (configuration.isMember("WebViewer"))
       {
-        std::string key = "CachePath";
-        if (!configuration["WebViewer"].isMember(key))
-        {
-          // For backward compatibility with the initial release of the Web viewer
-          key = "Cache";
-        }
+          std::string key = "CachePath";
+          if (!configuration["WebViewer"].isMember(key))
+          {
+            // For backward compatibility with the initial release of the Web viewer
+            key = "Cache";
+          }
 
-        cachePath = GetStringValue(configuration["WebViewer"], key, cachePath.string());
-        cacheSize = GetIntegerValue(configuration["WebViewer"], "CacheSize", cacheSize);
-        decodingThreads = GetIntegerValue(configuration["WebViewer"], "Threads", decodingThreads);
-
-        if (configuration["WebViewer"].isMember("EnableGdcm") &&
-            configuration["WebViewer"]["EnableGdcm"].type() == Json::booleanValue)
-        {
-          enableGdcm = configuration["WebViewer"]["EnableGdcm"].asBool();
-        }
+          cachePath = GetStringValue(configuration["WebViewer"], key, cachePath.string());
+          cacheSize = GetIntegerValue(configuration["WebViewer"], "CacheSize", cacheSize);
       }
 
-      std::string message = ("Web viewer using " + boost::lexical_cast<std::string>(decodingThreads) + 
-                             " threads for the decoding of the DICOM images");
-      OrthancPluginLogWarning(context_, message.c_str());
-
-      if (decodingThreads <= 0 ||
-          cacheSize <= 0)
+      if (cacheSize <= 0)
       {
         throw Orthanc::OrthancException(Orthanc::ErrorCode_ParameterOutOfRange);
       }
@@ -458,7 +504,7 @@ extern "C"
       message = "Storing the cache of the Web viewer in folder: " + cachePath.string();
       OrthancPluginLogWarning(context_, message.c_str());
 
-   
+
       /* Create the cache */
       cache_ = new CacheContext(cachePath.string());
       CacheScheduler& scheduler = cache_->GetScheduler();
@@ -470,7 +516,7 @@ extern "C"
       if (!scheduler.LookupProperty(orthancVersion, CacheProperty_OrthancVersion) ||
           orthancVersion != std::string(context_->orthancVersion))
       {
-        std::string s = ("The version of Orthanc has changed from \"" + orthancVersion + "\" to \"" + 
+        std::string s = ("The version of Orthanc has changed from \"" + orthancVersion + "\" to \"" +
                          std::string(context_->orthancVersion) + "\": The cache of the Web viewer will be cleared");
         OrthancPluginLogWarning(context_, s.c_str());
         clear = true;
@@ -479,7 +525,7 @@ extern "C"
       if (!scheduler.LookupProperty(webViewerVersion, CacheProperty_WebViewerVersion) ||
           webViewerVersion != std::string(PRODUCT_VERSION_MAJOR_MINOR_STRING))
       {
-        std::string s = ("The version of the Web viewer plugin has changed from \"" + webViewerVersion + "\" to \"" + 
+        std::string s = ("The version of the Web viewer plugin has changed from \"" + webViewerVersion + "\" to \"" +
                          std::string(PRODUCT_VERSION_MAJOR_MINOR_STRING) + "\": The cache of the Web viewer will be cleared");
         OrthancPluginLogWarning(context_, s.c_str());
         clear = true;
@@ -502,19 +548,42 @@ extern "C"
 
       /* Configure the cache */
       scheduler.RegisterPolicy(new ViewerPrefetchPolicy(context_));
-      scheduler.Register(CacheBundle_SeriesInformation, 
+
+      /* Register bundle schedulers */
+      scheduler.Register(CacheBundle_SeriesInformation,
                          new SeriesInformationAdapter(context_, scheduler), 1);
-      scheduler.Register(CacheBundle_DecodedImage, 
+      scheduler.Register(CacheBundle_DecodedImage,
                          new DecodedImageAdapter(context_), decodingThreads);
 
 
       /* Set the quotas */
       scheduler.SetQuota(CacheBundle_SeriesInformation, 1000, 0);    // Keep info about 1000 series
-      
+
       message = "Web viewer using a cache of " + boost::lexical_cast<std::string>(cacheSize) + " MB";
       OrthancPluginLogWarning(context_, message.c_str());
 
       scheduler.SetQuota(CacheBundle_DecodedImage, 0, static_cast<uint64_t>(cacheSize) * 1024 * 1024);
+#endif
+
+      if (configuration.isMember("WebViewer"))
+      {
+        decodingThreads = GetIntegerValue(configuration["WebViewer"], "Threads", decodingThreads);
+
+        if (configuration["WebViewer"].isMember("EnableGdcm") &&
+            configuration["WebViewer"]["EnableGdcm"].type() == Json::booleanValue)
+        {
+          enableGdcm = configuration["WebViewer"]["EnableGdcm"].asBool();
+        }
+      }
+
+      std::string message = ("Web viewer using " + boost::lexical_cast<std::string>(decodingThreads) + 
+                             " threads for the decoding of the DICOM images");
+      OrthancPluginLogWarning(context_, message.c_str());
+
+      if (decodingThreads <= 0)
+      {
+        throw Orthanc::OrthancException(Orthanc::ErrorCode_ParameterOutOfRange);
+      }
     }
     catch (std::runtime_error& e)
     {
@@ -542,19 +611,22 @@ extern "C"
 
 
     /* Install the callbacks */
-    OrthancPluginRegisterRestCallback(context_, "/web-viewer/series/(.*)", ServeCache<CacheBundle_SeriesInformation>);
+    OrthancPluginRegisterRestCallback(context_, "/web-viewer/libs/(.*)", ServeEmbeddedFolder<Orthanc::EmbeddedResources::JAVASCRIPT_LIBS>);
     OrthancPluginRegisterRestCallback(context_, "/web-viewer/is-stable-series/(.*)", IsStableSeries);
+#if ENABLE_CACHE == 1
+    OrthancPluginRegisterRestCallback(context_, "/web-viewer/series/(.*)", ServeCache<CacheBundle_SeriesInformation>);
     OrthancPluginRegisterRestCallback(context_, "/web-viewer/instances/(.*)", ServeCache<CacheBundle_DecodedImage>);
-    OrthancPluginRegisterRestCallback(context, "/web-viewer/libs/(.*)", ServeEmbeddedFolder<Orthanc::EmbeddedResources::JAVASCRIPT_LIBS>);
+    OrthancPluginRegisterOnChangeCallback(context, OnChangeCallback);
+#else
+    OrthancPluginRegisterRestCallback(context_, "/web-viewer/series/(.*)", ServeData<SeriesInformationAdapter>);
+    OrthancPluginRegisterRestCallback(context_, "/web-viewer/instances/(.*)", ServeData<DecodedImageAdapter>);
+#endif
 
 #if ORTHANC_STANDALONE == 1
     OrthancPluginRegisterRestCallback(context, "/web-viewer/app/(.*)", ServeEmbeddedFolder<Orthanc::EmbeddedResources::WEB_VIEWER>);
 #else
     OrthancPluginRegisterRestCallback(context, "/web-viewer/app/(.*)", ServeWebViewer);
 #endif
-
-    OrthancPluginRegisterOnChangeCallback(context, OnChangeCallback);
-
 
     /* Extend the default Orthanc Explorer with custom JavaScript */
     std::string explorer;
@@ -569,11 +641,13 @@ extern "C"
   {
     OrthancPluginLogWarning(context_, "Finalizing the Web viewer");
 
+#if ENABLE_CACHE == 1
     if (cache_ != NULL)
     {
       delete cache_;
       cache_ = NULL;
     }
+#endif
   }
 
 

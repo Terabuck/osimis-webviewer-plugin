@@ -31,13 +31,10 @@ namespace OrthancPlugins
   {
   private:
     OrthancPluginContext* context_;
-    CacheScheduler&       cache_;
 
   public:
-    SeriesInformationAdapter(OrthancPluginContext* context,
-                             CacheScheduler&       cache) : 
-      context_(context),
-      cache_(cache)
+    SeriesInformationAdapter(OrthancPluginContext* context) :
+      context_(context)
     {
     }
 

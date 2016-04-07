@@ -17,6 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  **/
 
+#if ENABLE_CACHE == 1
 
 #include "ViewerPrefetchPolicy.h"
 
@@ -161,3 +162,4 @@ namespace OrthancPlugins
   }
 }
 
+#endif // ENABLE_CACHE == 1

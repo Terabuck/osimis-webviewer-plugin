@@ -33,7 +33,7 @@ static char** argv_;
 
 using namespace OrthancPlugins;
 
-
+#if ENABLE_CACHE == 1
 class CacheManagerTest : public testing::Test
 {
 private:
@@ -183,8 +183,7 @@ TEST_F(CacheManagerTest, Invalidate)
   GetStorage().ListAllFiles(f);
   ASSERT_EQ(0u, f.size());
 }
-
-
+#endif
 
 int main(int argc, char **argv)
 {
