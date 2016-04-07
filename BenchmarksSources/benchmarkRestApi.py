@@ -4,6 +4,7 @@ from orthancRestApi import OrthancClient
 from orthancServer import OrthancServer
 from helpers import LogHelpers
 from datetime import datetime
+from datetime import timedelta
 
 import logging
 
@@ -57,24 +58,19 @@ class RestAPIBenchmark:
         return avgTime
 
     def __measureRequestTime(self, relativeUrl):
-        totalTime = 0
+        totalTimeDelta = timedelta(0, 0, 0)
         for x in range(0, self.trialCount):
+            print()
             print("new trial")
 
-            now = datetime.now().time()
-            print(now)
-            
-            start = time.clock()
+            start = datetime.now()
             self.client.getRequest(relativeUrl)
-            end = time.clock()
+            end = datetime.now()
 
-            now = datetime.now().time()
-            print(now)
+            totalTimeDelta += end - start
 
-            totalTime += end - start
-
-        averageTime = totalTime / self.trialCount
-        return averageTime * 1000 # sec -> millisec
+        averageTimeDelta = totalTimeDelta / self.trialCount
+        return averageTimeDelta
 
 if __name__ == '__main__':
     LogHelpers.configureLogging(logging.INFO)
@@ -90,10 +86,10 @@ if __name__ == '__main__':
     benchmark.setCompression('jpeg95')
     benchmark.setTrialCount(1)
     print(str(benchmark.benchGetFrame('3ad3515c-cae5ec82-97f271ca-1e35e62d-a56ac7e2', 0))+'ms')
-    print(str(benchmark.benchGetFrame('3ad3515c-cae5ec82-97f271ca-1e35e62d-a56ac7e2', 1))+'ms')
+    #print(str(benchmark.benchGetFrame('3ad3515c-cae5ec82-97f271ca-1e35e62d-a56ac7e2', 1))+'ms')
 
     includeOnco = True
-    #server.stop()
+    server.stop()
 
 #    if includeOnco:
 #        #PET-CT 1
