@@ -61,13 +61,16 @@ class RestAPIBenchmark:
         totalTimeDelta = timedelta(0, 0, 0)
         for x in range(0, self.trialCount):
             print()
-            print("new trial")
+            print("-- new trial")
 
             start = datetime.now()
             self.client.getRequest(relativeUrl)
             end = datetime.now()
 
-            totalTimeDelta += end - start
+            timeDelta = end - start
+            print("=> trial time: " + str(timeDelta))
+
+            totalTimeDelta += timeDelta
 
         averageTimeDelta = totalTimeDelta / self.trialCount
         return averageTimeDelta
@@ -82,13 +85,20 @@ if __name__ == '__main__':
 
     client = OrthancClient('http://127.0.0.1:5080')
 
+    print()
+
     benchmark = RestAPIBenchmark(client)
     benchmark.setCompression('jpeg95')
-    benchmark.setTrialCount(1)
-    print(str(benchmark.benchGetFrame('3ad3515c-cae5ec82-97f271ca-1e35e62d-a56ac7e2', 0))+'ms')
+    benchmark.setTrialCount(3)
+    benchmarkAvgTime = benchmark.benchGetFrame('3ad3515c-cae5ec82-97f271ca-1e35e62d-a56ac7e2', 0)
+
+    print()
+    print("== average time: " + str(benchmarkAvgTime))
     #print(str(benchmark.benchGetFrame('3ad3515c-cae5ec82-97f271ca-1e35e62d-a56ac7e2', 1))+'ms')
 
     includeOnco = True
+    print()
+    print()
     server.stop()
 
 #    if includeOnco:
