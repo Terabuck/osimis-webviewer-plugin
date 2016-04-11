@@ -24,7 +24,8 @@ project(OsimisWebViewer)
 include(${CMAKE_SOURCE_DIR}/Resources/CMake/GetProductVersionFromGitTag.cmake)
 
 # Parameters of the build
-set(ENABLE_CACHE TRUE CACHE BOOL "Cache the plugin REST responses")
+set(ENABLE_CACHE ON CACHE BOOL "Cache the plugin REST responses")
+set(BENCHMARK OFF CACHE BOOL "Send benchmark informations to stdout")
 set(STATIC_BUILD ON CACHE BOOL "Static build of the third-party libraries (necessary for Windows)")
 SET(STANDALONE_BUILD ON CACHE BOOL "Standalone build (all the resources are embedded, necessary for releases)")
 set(ALLOW_DOWNLOADS ON CACHE BOOL "Allow CMake to download packages")
@@ -58,6 +59,22 @@ include(${CMAKE_SOURCE_DIR}/Orthanc/Resources/CMake/SQLiteConfiguration.cmake)
 include(${CMAKE_SOURCE_DIR}/Resources/CMake/GdcmConfiguration.cmake)
 include(${CMAKE_SOURCE_DIR}/Resources/CMake/JavaScriptLibraries.cmake)
 
+if (ENABLE_CACHE)
+  add_definitions(
+    -DENABLE_CACHE=1
+    )
+endif()
+
+if (BENCHMARK)
+  add_definitions(
+    -DBENCHMARK=1
+    )
+  add_definitions(
+      -DBOOST_CHRONO_HEADER_ONLY
+  #    -DBOOST_ERROR_CODE_HEADER_ONLY
+      -D_DARWIN_C_SOURCE
+    )
+endif()
 
 # Check that the Orthanc SDK headers are available or download them
 if (STATIC_BUILD OR NOT USE_SYSTEM_ORTHANC_SDK)
@@ -137,6 +154,7 @@ set(CORE_SOURCES
   ${CMAKE_SOURCE_DIR}/Orthanc/Core/Uuid.cpp
   ${CMAKE_SOURCE_DIR}/Orthanc/Resources/ThirdParty/base64/base64.cpp
 
+  ${CMAKE_SOURCE_DIR}/Plugin/BenchmarkHelper.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Cache/CacheManager.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Cache/CacheScheduler.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/ViewerToolbox.cpp
