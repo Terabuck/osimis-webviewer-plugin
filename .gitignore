@@ -4,7 +4,7 @@ node_modules/
 bower_components/
 
 # Build directory
-build/
+/build/
 
 # other
 report/
