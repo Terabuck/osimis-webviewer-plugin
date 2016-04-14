@@ -705,7 +705,7 @@ function startTests(singleRun, done) {
     var child;
     var excludeFiles = [];
     var fork = require('child_process').fork;
-    var karma = require('karma').server;
+    var karma = require('karma');
     var serverSpecs = config.serverIntegrationSpecs;
 
     if (args.startServers) {
