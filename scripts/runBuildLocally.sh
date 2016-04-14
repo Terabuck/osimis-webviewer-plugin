@@ -3,7 +3,7 @@
 # @warning script should be launched from the osimis-webviewer root
 
 # npm cache clean # make sure install is fine
-npm install --unsafe-perm
+npm install --unsafe-perm --python=python2.7
 
 bower install --allow-root
 
