@@ -6,7 +6,7 @@ set -e #to exit script at first command failure
 set -x #to debug the script
 
 echo "build wv dependencies"
-docker build --rm -t wv_build:latest ../docker/build/
+docker build --rm -t wv_build:latest ./docker/build/
 
 echo "build wv"
 # ! script should be launched from the osimis-webviewer root
