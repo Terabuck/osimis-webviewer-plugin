@@ -66,19 +66,9 @@
         }
     }
 
-    // http://stackoverflow.com/a/11058858/881731
-    function _str2ab(str) {
-        var buf = new ArrayBuffer(str.length);
-        var pixels = new Uint8Array(buf);
-        for (var i = 0, strLen=str.length; i<strLen; i++) {
-            pixels[i] = str.charCodeAt(i);
-        }
-        return pixels;
-    }
-
     function _getPixelDataDeflate(pixelObject) {
         // Decompresses the base64 buffer that was compressed with Deflate
-        var s = pako.inflate(window.atob(pixelObject.Orthanc.PixelData));
+        var s = pako.inflate(pixelObject.Orthanc.PixelData);
         var pixels = null;
         var buf, index, i;
 
@@ -114,7 +104,7 @@
 
     function _getPixelDataJpeg(pixelObject) {
         var jpegReader = new JpegImage();
-        var jpeg = _str2ab(window.atob(pixelObject.Orthanc.PixelData));
+        var jpeg = pixelObject.Orthanc.PixelData;
         jpegReader.parse(jpeg);
         var s = jpegReader.getData(pixelObject.width, pixelObject.height);
         var pixels = null;

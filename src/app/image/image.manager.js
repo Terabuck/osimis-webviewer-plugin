@@ -78,11 +78,37 @@
                 var splittedId = id.split(':');
                 var instanceId = splittedId[0];
                 var frameIndex = splittedId[1];
-                pixelCache[id] = $http
-                    .get(wvConfig.webviewerApiURL + '/instances/' +compression+ '-' + instanceId + '_' + frameIndex, {cache: true})
-                    .then(function(response) {
-                        return wvCornerstoneImageAdapter.process(id, response.data);
-                    });
+
+                var USE_REST_API_0_2 = true;
+                if (USE_REST_API_0_2) {
+                    pixelCache[id] = $http
+                        .get(wvConfig.webviewerApiURL + '/instances/' +compression+ '-' + instanceId + '_' + frameIndex, {
+                            responseType: 'arraybuffer'
+                        })
+                        .then(function(response) {
+                            // retrieve json and image from binary
+                            var klvReader = new KLVReader(response.data);
+                            
+                            var keys = {
+                                json: 0,
+                                pixels: 1
+                            };
+
+                            var json = klvReader.getJSON(keys.json);
+                            json.Orthanc.PixelData = klvReader.get(keys.pixels);
+
+                            // adapt the image datas to cornerstone
+                            return wvCornerstoneImageAdapter.process(id, json);
+                        });
+                }
+                else {
+                    pixelCache[id] = $http
+                        .get(wvConfig.webviewerApiURL + '/instances/' +compression+ '-' + instanceId + '_' + frameIndex, {cache: true})
+                        .then(function(response) {
+                            response.data.Orthanc.PixelData = _str2ab(window.atob(response.data.Orthanc.PixelData));
+                            return wvCornerstoneImageAdapter.process(id, response.data);
+                        });
+                }
             }
 
             return pixelCache[id];
@@ -162,4 +188,16 @@
         }
 
     }
+
+    // http://stackoverflow.com/a/11058858/881731
+    function _str2ab(str) {
+        var buf = new ArrayBuffer(str.length);
+        var pixels = new Uint8Array(buf);
+        for (var i = 0, strLen=str.length; i<strLen; i++) {
+            pixels[i] = str.charCodeAt(i);
+        }
+        return pixels;
+    }
+
 })();
+
