@@ -2,6 +2,9 @@
 
 # @warning script should be launched from the osimis-webviewer root
 
+set -e #to exit script at first command failure
+set -x #to debug the script
+
 # npm cache clean # make sure install is fine
 npm install --unsafe-perm --python=python2.7
 

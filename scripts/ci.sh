@@ -18,7 +18,7 @@ startScriptDir=$(pwd)
 cd $startScriptDir/../
 
 
-./scripts/runBuildWithDocker.sh
+sudo ./scripts/runBuildWithDocker.sh
 
 
 #make sure an output has actually been generated (only the most important ones, we assume other files will generated too)
