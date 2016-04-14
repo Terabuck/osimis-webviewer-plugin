@@ -11,4 +11,4 @@ docker build --rm -t wv_build:latest ./docker/build/
 echo "build wv"
 # ! script should be launched from the osimis-webviewer root
 currentScript=$(pwd)
-docker run --rm -v $currentScript:/buildApp wv_build bash -c 'cd /buildApp && ./scripts/runBuildLocally.sh'"
+docker run --rm -v $currentScript:/buildApp wv_build bash -c 'cd /buildApp && ./scripts/runBuildLocally.sh'
