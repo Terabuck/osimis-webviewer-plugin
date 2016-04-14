@@ -20,13 +20,13 @@
 
 #pragma once
 
-#include "Cache/ICacheFactory.h"
+#include "../Cache/ICacheFactory.h"
 
 #include <orthanc/OrthancCPlugin.h>
 #include <stdint.h>
 #include <json/value.h>
 
-#include "../Orthanc/Plugins/Samples/GdcmDecoder/OrthancImageWrapper.h"
+#include "../../Orthanc/Plugins/Samples/GdcmDecoder/OrthancImageWrapper.h"
 
 
 namespace OrthancPlugins
@@ -50,11 +50,13 @@ namespace OrthancPlugins
                                        const Json::Value& tags,
                                        OrthancImageWrapper& image);
 
-    static bool EncodeUsingDeflate(Json::Value& result,
+    static bool EncodeUsingDeflate(Json::Value& jsonResult,
+                                   std::string& imageResult,
                                    OrthancImageWrapper& image,
                                    uint8_t compressionLevel  /* between 0 and 9 */);
 
-    static bool EncodeUsingJpeg(Json::Value& result,
+    static bool EncodeUsingJpeg(Json::Value& jsonResult,
+                                std::string& jpegResult,
                                 OrthancImageWrapper& image,
                                 uint8_t quality /* between 0 and 100 */);
 

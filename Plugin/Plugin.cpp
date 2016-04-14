@@ -31,7 +31,7 @@
 #include "ViewerPrefetchPolicy.h"
 #endif // ENABLE_CACHE == 1
 
-#include "DecodedImageAdapter.h"
+#include "Image/DecodedImageAdapter.h"
 #include "SeriesInformationAdapter.h"
 #include "../Orthanc/Plugins/Samples/GdcmDecoder/GdcmDecoderCache.h"
 #include "../Orthanc/Core/Toolbox.h"
@@ -209,66 +209,134 @@ static OrthancPluginErrorCode ServeCache(OrthancPluginRestOutput* output,
     return OrthancPluginErrorCode_Plugin;
   }
 }
+// @todo implement binary output
 #else
-//OrthancPluginRegisterRestCallback(context_, "/web-viewer/series/(.*)", ServeCache<CacheBundle_SeriesInformation>);
-//OrthancPluginRegisterRestCallback(context_, "/web-viewer/instances/(.*)", ServeCache<CacheBundle_DecodedImage>);
-template <typename TFactory>
-static OrthancPluginErrorCode ServeData(OrthancPluginRestOutput* output,
-                                         const char* url,
-                                         const OrthancPluginHttpRequest* request)
-{
-  try
+
+// use arraybuffer instead of json for DecodedImageAdapter
+namespace {
+  // use anonymous namespace instead of static because 
+  // static doesn't work with specialized templates
+
+  //OrthancPluginRegisterRestCallback(context_, "/web-viewer/series/(.*)", ServeCache<CacheBundle_SeriesInformation>);
+  //OrthancPluginRegisterRestCallback(context_, "/web-viewer/instances/(.*)", ServeCache<CacheBundle_DecodedImage>);
+  template <typename TFactory>
+  OrthancPluginErrorCode ServeData(OrthancPluginRestOutput* output,
+                                           const char* url,
+                                           const OrthancPluginHttpRequest* request)
   {
-    if (request->method != OrthancPluginHttpMethod_Get)
+    try
     {
-      OrthancPluginSendMethodNotAllowed(context_, output, "GET");
-      return OrthancPluginErrorCode_Success;
-    }
+      if (request->method != OrthancPluginHttpMethod_Get)
+      {
+        OrthancPluginSendMethodNotAllowed(context_, output, "GET");
+        return OrthancPluginErrorCode_Success;
+      }
 
-    const std::string id = request->groups[0];
-    std::string content;
+      const std::string id = request->groups[0];
+      std::string content;
 
-    std::string message = "Processing GET request: " + std::string(url);
-    OrthancPluginLogInfo(context_, message.c_str());
-
-#if 0 // @todo implement cache the generic way with template instead of bundle ID
-    if (cache_->GetScheduler().Access(content, cacheBundleId, id))
-    {
-      std::string message = "Answering GET request: " + std::string(url);
+      std::string message = "Processing GET request: " + std::string(url);
       OrthancPluginLogInfo(context_, message.c_str());
 
-      OrthancPluginAnswerBuffer(context_, output, content.c_str(), content.size(), "application/json");
-    }
-#else
-    TFactory* factory = new TFactory(context_);
-    if (factory->Create(content, id)) {
+  #if 0 // @todo implement cache the generic way with template instead of bundle ID
+      if (cache_->GetScheduler().Access(content, cacheBundleId, id))
+      {
         std::string message = "Answering GET request: " + std::string(url);
         OrthancPluginLogInfo(context_, message.c_str());
 
         OrthancPluginAnswerBuffer(context_, output, content.c_str(), content.size(), "application/json");
-    }
-#endif
-    else
-    {
-      OrthancPluginSendHttpStatusCode(context_, output, 404);
-    }
+      }
+  #else
+      TFactory* factory = new TFactory(context_);
+      if (factory->Create(content, id)) {
+          std::string message = "Answering GET request: " + std::string(url);
+          OrthancPluginLogInfo(context_, message.c_str());
 
-    return OrthancPluginErrorCode_Success;
+          OrthancPluginAnswerBuffer(context_, output, content.c_str(), content.size(), "application/json");
+      }
+  #endif
+      else
+      {
+        OrthancPluginSendHttpStatusCode(context_, output, 404);
+      }
+
+      return OrthancPluginErrorCode_Success;
+    }
+    catch (Orthanc::OrthancException& e)
+    {
+      OrthancPluginLogError(context_, e.What());
+      return OrthancPluginErrorCode_Plugin;
+    }
+    catch (std::runtime_error& e)
+    {
+      OrthancPluginLogError(context_, e.what());
+      return OrthancPluginErrorCode_Plugin;
+    }
+    catch (boost::bad_lexical_cast&)
+    {
+      OrthancPluginLogError(context_, "Bad lexical cast");
+      return OrthancPluginErrorCode_Plugin;
+    }
   }
-  catch (Orthanc::OrthancException& e)
+
+  template <typename TFactory>
+  OrthancPluginErrorCode ServeBinary(OrthancPluginRestOutput* output,
+                                           const char* url,
+                                           const OrthancPluginHttpRequest* request)
   {
-    OrthancPluginLogError(context_, e.What());
-    return OrthancPluginErrorCode_Plugin;
-  }
-  catch (std::runtime_error& e)
-  {
-    OrthancPluginLogError(context_, e.what());
-    return OrthancPluginErrorCode_Plugin;
-  }
-  catch (boost::bad_lexical_cast&)
-  {
-    OrthancPluginLogError(context_, "Bad lexical cast");
-    return OrthancPluginErrorCode_Plugin;
+    try
+    {
+      if (request->method != OrthancPluginHttpMethod_Get)
+      {
+        OrthancPluginSendMethodNotAllowed(context_, output, "GET");
+        return OrthancPluginErrorCode_Success;
+      }
+
+      const std::string id = request->groups[0];
+      std::string content;
+
+      std::string message = "Processing GET request: " + std::string(url);
+      OrthancPluginLogInfo(context_, message.c_str());
+
+  #if 0 // @todo implement cache the generic way with template instead of bundle ID
+      if (cache_->GetScheduler().Access(content, cacheBundleId, id))
+      {
+        std::string message = "Answering GET request: " + std::string(url);
+        OrthancPluginLogInfo(context_, message.c_str());
+
+        OrthancPluginAnswerBuffer(context_, output, content.c_str(), content.size(), "application/arraybuffer");
+      }
+  #else
+      TFactory* factory = new TFactory(context_);
+      if (factory->Create(content, id)) {
+          std::string message = "Answering GET request: " + std::string(url);
+          OrthancPluginLogInfo(context_, message.c_str());
+
+          OrthancPluginAnswerBuffer(context_, output, content.c_str(), content.size(), "application/arraybuffer");
+      }
+  #endif
+      else
+      {
+        OrthancPluginSendHttpStatusCode(context_, output, 404);
+      }
+
+      return OrthancPluginErrorCode_Success;
+    }
+    catch (Orthanc::OrthancException& e)
+    {
+      OrthancPluginLogError(context_, e.What());
+      return OrthancPluginErrorCode_Plugin;
+    }
+    catch (std::runtime_error& e)
+    {
+      OrthancPluginLogError(context_, e.what());
+      return OrthancPluginErrorCode_Plugin;
+    }
+    catch (boost::bad_lexical_cast&)
+    {
+      OrthancPluginLogError(context_, "Bad lexical cast");
+      return OrthancPluginErrorCode_Plugin;
+    }
   }
 }
 #endif
@@ -619,7 +687,7 @@ extern "C"
     OrthancPluginRegisterOnChangeCallback(context, OnChangeCallback);
 #else
     OrthancPluginRegisterRestCallback(context_, "/web-viewer/series/(.*)", ServeData<SeriesInformationAdapter>);
-    OrthancPluginRegisterRestCallback(context_, "/web-viewer/instances/(.*)", ServeData<DecodedImageAdapter>);
+    OrthancPluginRegisterRestCallback(context_, "/web-viewer/instances/(.*)", ServeBinary<DecodedImageAdapter>);
 #endif
 
 #if ORTHANC_STANDALONE == 1

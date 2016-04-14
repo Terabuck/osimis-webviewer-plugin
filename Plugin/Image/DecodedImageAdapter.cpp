@@ -20,14 +20,15 @@
 
 #include "DecodedImageAdapter.h"
 
-#include "../Orthanc/Core/Images/ImageBuffer.h"
-#include "../Orthanc/Core/Images/ImageProcessing.h"
-#include "../Orthanc/Core/OrthancException.h"
-#include "../Orthanc/Core/Toolbox.h"
-#include "../Orthanc/Plugins/Samples/GdcmDecoder/OrthancImageWrapper.h"
-#include "../Orthanc/Resources/ThirdParty/base64/base64.h"
-#include "ViewerToolbox.h"
-#include "BenchmarkHelper.h"
+#include "../../Orthanc/Core/Images/ImageBuffer.h"
+#include "../../Orthanc/Core/Images/ImageProcessing.h"
+#include "../../Orthanc/Core/OrthancException.h"
+#include "../../Orthanc/Core/Toolbox.h"
+#include "../../Orthanc/Plugins/Samples/GdcmDecoder/OrthancImageWrapper.h"
+#include "../../Orthanc/Resources/ThirdParty/base64/base64.h"
+#include "../ViewerToolbox.h"
+#include "../BenchmarkHelper.h"
+#include "KLVWriter.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -104,26 +105,28 @@ namespace OrthancPlugins
     bool ok = false;
 
     Json::Value tags;
-    std::string dicom;
+    OrthancPluginMemoryBuffer dicom;
     {
         BENCH(LOAD_DICOM);
 
-        if (!GetStringFromOrthanc(dicom, context_, "/instances/" + instanceId + "/file") ||
+        if (!GetDicomFromOrthanc(&dicom, context_, instanceId) ||
             !GetJsonFromOrthanc(tags, context_, "/instances/" + instanceId + "/tags"))
         {
           throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
         }
 
-        BENCH_LOG(DICOM_SIZE, dicom.size());
+        BENCH_LOG(DICOM_SIZE, dicom.size);
     }
 
     std::auto_ptr<OrthancImageWrapper> image;
     {
         BENCH(GET_FRAME_FROM_DICOM);
-        image.reset(new OrthancImageWrapper(context_, OrthancPluginDecodeDicomImage(context_, dicom.c_str(), dicom.size(), frameIndex)));
+        image.reset(new OrthancImageWrapper(context_, OrthancPluginDecodeDicomImage(context_, dicom.data, dicom.size, frameIndex)));
+        OrthancPluginFreeMemoryBuffer(context_, &dicom);
     }
 
     Json::Value json;
+    std::string compressedImage;
     {
         BENCH(COMPRESS_FRAME);
 
@@ -131,11 +134,11 @@ namespace OrthancPlugins
         {
           if (type == CompressionType_Deflate)
           {
-            ok = EncodeUsingDeflate(json, *image, 9);
+            ok = EncodeUsingDeflate(json, compressedImage, *image, 9);
           }
           else if (type == CompressionType_Jpeg)
           {
-            ok = EncodeUsingJpeg(json, *image, level);
+            ok = EncodeUsingJpeg(json, compressedImage, *image, level);
           }
         }
 
@@ -149,7 +152,13 @@ namespace OrthancPlugins
       BENCH(WRITE_REST_RESPONSE);
 
       Json::FastWriter writer;
-      content = writer.write(json);
+      std::string jsonString = writer.write(json);
+
+      KLVWriter klvWriter;
+      klvWriter.setValue(0, jsonString.size(), jsonString.c_str()); // ASCII
+      klvWriter.setValue(1, compressedImage.size(), compressedImage.c_str());
+      content = klvWriter.write();
+
       return true;
     }
     else
@@ -301,66 +310,55 @@ namespace OrthancPlugins
 
 
 
-  bool  DecodedImageAdapter::EncodeUsingDeflate(Json::Value& result,
+  bool  DecodedImageAdapter::EncodeUsingDeflate(Json::Value& jsonResult,
+                                                std::string& imageResult,
                                                 OrthancImageWrapper& image,
                                                 uint8_t compressionLevel  /* between 0 and 9 */)
   {
-    std::string z;
+    BENCH(COMPRESS_FRAME_IN_DEFLATE);
+
+    Orthanc::ImageAccessor accessor;
+    accessor.AssignReadOnly(OrthancPlugins::Convert(image.GetFormat()), image.GetWidth(),
+                            image.GetHeight(), image.GetPitch(), image.GetBuffer());
+
+    Orthanc::ImageBuffer buffer;
+    buffer.SetMinimalPitchForced(true);
+
+    Orthanc::ImageAccessor converted;
+
+    switch (accessor.GetFormat())
     {
-        BENCH(COMPRESS_FRAME_IN_DEFLATE);
+      case Orthanc::PixelFormat_RGB24:
+        converted = accessor;
+        break;
 
-        Orthanc::ImageAccessor accessor;
-        accessor.AssignReadOnly(OrthancPlugins::Convert(image.GetFormat()), image.GetWidth(),
-                                image.GetHeight(), image.GetPitch(), image.GetBuffer());
+      case Orthanc::PixelFormat_Grayscale8:
+      case Orthanc::PixelFormat_Grayscale16:
+        buffer.SetFormat(Orthanc::PixelFormat_Grayscale16);
+        buffer.SetWidth(accessor.GetWidth());
+        buffer.SetHeight(accessor.GetHeight());
+        converted = buffer.GetAccessor();
+        Orthanc::ImageProcessing::Convert(converted, accessor);
+        break;
 
-        Orthanc::ImageBuffer buffer;
-        buffer.SetMinimalPitchForced(true);
+      case Orthanc::PixelFormat_SignedGrayscale16:
+        converted = accessor;
+        break;
 
-        Orthanc::ImageAccessor converted;
-
-        switch (accessor.GetFormat())
-        {
-          case Orthanc::PixelFormat_RGB24:
-            converted = accessor;
-            break;
-
-          case Orthanc::PixelFormat_Grayscale8:
-          case Orthanc::PixelFormat_Grayscale16:
-            buffer.SetFormat(Orthanc::PixelFormat_Grayscale16);
-            buffer.SetWidth(accessor.GetWidth());
-            buffer.SetHeight(accessor.GetHeight());
-            converted = buffer.GetAccessor();
-            Orthanc::ImageProcessing::Convert(converted, accessor);
-            break;
-
-          case Orthanc::PixelFormat_SignedGrayscale16:
-            converted = accessor;
-            break;
-
-          default:
-            // Unsupported pixel format
-            return false;
-        }
-
-        result["Orthanc"]["IsSigned"] = (accessor.GetFormat() == Orthanc::PixelFormat_SignedGrayscale16);
-
-        // Sanity check: The pitch must be minimal
-        assert(converted.GetSize() == converted.GetWidth() * converted.GetHeight() *
-               GetBytesPerPixel(converted.GetFormat()));
-        result["Orthanc"]["Compression"] = "Deflate";
-        result["sizeInBytes"] = converted.GetSize();
-
-        CompressUsingDeflate(z, image.GetContext(), converted.GetConstBuffer(), converted.GetSize());
+      default:
+        // Unsupported pixel format
+        return false;
     }
 
-    {
-        BENCH(COMPRESS_FRAME_IN_BASE64);
+    jsonResult["Orthanc"]["IsSigned"] = (accessor.GetFormat() == Orthanc::PixelFormat_SignedGrayscale16);
 
-        std::string base64PixelData = base64_encode(z);
-        result["Orthanc"]["PixelData"] = base64PixelData;
+    // Sanity check: The pitch must be minimal
+    assert(converted.GetSize() == converted.GetWidth() * converted.GetHeight() *
+           GetBytesPerPixel(converted.GetFormat()));
+    jsonResult["Orthanc"]["Compression"] = "Deflate";
+    jsonResult["sizeInBytes"] = converted.GetSize();
 
-        BENCH_LOG(COMPRESSION_BASE64_SIZE, base64PixelData.size());
-    }
+    CompressUsingDeflate(imageResult, image.GetContext(), converted.GetConstBuffer(), converted.GetSize());
 
     return true;
   }
@@ -414,73 +412,62 @@ namespace OrthancPlugins
   }
 
 
-  bool  DecodedImageAdapter::EncodeUsingJpeg(Json::Value& result,
+  bool  DecodedImageAdapter::EncodeUsingJpeg(Json::Value& jsonResult,
+                                             std::string& jpegResult,
                                              OrthancImageWrapper& image,
                                              uint8_t quality /* between 0 and 100 */)
   {
-    std::string jpeg;
+    BENCH(COMPRESS_FRAME_IN_JPEG);
+    Orthanc::ImageAccessor accessor;
+    accessor.AssignReadOnly(OrthancPlugins::Convert(image.GetFormat()), image.GetWidth(),
+                            image.GetHeight(), image.GetPitch(), image.GetBuffer());
+
+    Orthanc::ImageBuffer buffer;
+    buffer.SetMinimalPitchForced(true);
+
+    Orthanc::ImageAccessor converted;
+
+    if (accessor.GetFormat() == Orthanc::PixelFormat_Grayscale8 ||
+        accessor.GetFormat() == Orthanc::PixelFormat_RGB24)
     {
-        BENCH(COMPRESS_FRAME_IN_JPEG);
-        Orthanc::ImageAccessor accessor;
-        accessor.AssignReadOnly(OrthancPlugins::Convert(image.GetFormat()), image.GetWidth(),
-                                image.GetHeight(), image.GetPitch(), image.GetBuffer());
+      jsonResult["Orthanc"]["Stretched"] = false;
+      converted = accessor;
+    }
+    else if (accessor.GetFormat() == Orthanc::PixelFormat_Grayscale16 ||
+             accessor.GetFormat() == Orthanc::PixelFormat_SignedGrayscale16)
+    {
+      jsonResult["Orthanc"]["Stretched"] = true;
+      buffer.SetFormat(Orthanc::PixelFormat_Grayscale8);
+      buffer.SetWidth(accessor.GetWidth());
+      buffer.SetHeight(accessor.GetHeight());
+      converted = buffer.GetAccessor();
 
-        Orthanc::ImageBuffer buffer;
-        buffer.SetMinimalPitchForced(true);
+      int64_t a, b;
+      Orthanc::ImageProcessing::GetMinMaxValue(a, b, accessor);
+      jsonResult["Orthanc"]["StretchLow"] = static_cast<int32_t>(a);
+      jsonResult["Orthanc"]["StretchHigh"] = static_cast<int32_t>(b);
 
-        Orthanc::ImageAccessor converted;
-
-        if (accessor.GetFormat() == Orthanc::PixelFormat_Grayscale8 ||
-            accessor.GetFormat() == Orthanc::PixelFormat_RGB24)
-        {
-          result["Orthanc"]["Stretched"] = false;
-          converted = accessor;
-        }
-        else if (accessor.GetFormat() == Orthanc::PixelFormat_Grayscale16 ||
-                 accessor.GetFormat() == Orthanc::PixelFormat_SignedGrayscale16)
-        {
-          result["Orthanc"]["Stretched"] = true;
-          buffer.SetFormat(Orthanc::PixelFormat_Grayscale8);
-          buffer.SetWidth(accessor.GetWidth());
-          buffer.SetHeight(accessor.GetHeight());
-          converted = buffer.GetAccessor();
-
-          int64_t a, b;
-          Orthanc::ImageProcessing::GetMinMaxValue(a, b, accessor);
-          result["Orthanc"]["StretchLow"] = static_cast<int32_t>(a);
-          result["Orthanc"]["StretchHigh"] = static_cast<int32_t>(b);
-
-          if (accessor.GetFormat() == Orthanc::PixelFormat_Grayscale16)
-          {
-            ChangeDynamics<uint8_t, uint16_t>(converted, accessor, a, 0, b, 255);
-          }
-          else
-          {
-            ChangeDynamics<uint8_t, int16_t>(converted, accessor, a, 0, b, 255);
-          }
-        }
-        else
-        {
-          return false;
-        }
-
-        result["Orthanc"]["IsSigned"] = (accessor.GetFormat() == Orthanc::PixelFormat_SignedGrayscale16);
-        result["Orthanc"]["Compression"] = "Jpeg";
-        result["sizeInBytes"] = converted.GetSize();
-
-        WriteJpegToMemory(jpeg, image.GetContext(), converted, quality);
-        BENCH_LOG(COMPRESSION_JPEG_QUALITY, (int) quality);
-        BENCH_LOG(COMPRESSION_JPEG_SIZE, jpeg.size());
+      if (accessor.GetFormat() == Orthanc::PixelFormat_Grayscale16)
+      {
+        ChangeDynamics<uint8_t, uint16_t>(converted, accessor, a, 0, b, 255);
+      }
+      else
+      {
+        ChangeDynamics<uint8_t, int16_t>(converted, accessor, a, 0, b, 255);
+      }
+    }
+    else
+    {
+      return false;
     }
 
-    {
-        BENCH(COMPRESS_FRAME_IN_BASE64);
+    jsonResult["Orthanc"]["IsSigned"] = (accessor.GetFormat() == Orthanc::PixelFormat_SignedGrayscale16);
+    jsonResult["Orthanc"]["Compression"] = "Jpeg";
+    jsonResult["sizeInBytes"] = converted.GetSize();
 
-        std::string base64PixelData = base64_encode(jpeg);
-        result["Orthanc"]["PixelData"] = base64PixelData;
-
-        BENCH_LOG(COMPRESSION_BASE64_SIZE, base64PixelData.size());
-    }
+    WriteJpegToMemory(jpegResult, image.GetContext(), converted, quality);
+    BENCH_LOG(COMPRESSION_JPEG_QUALITY, (int) quality);
+    BENCH_LOG(COMPRESSION_JPEG_SIZE, jpegResult.size());
 
     return true;
   }

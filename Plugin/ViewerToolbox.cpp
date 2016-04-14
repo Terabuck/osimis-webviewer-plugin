@@ -58,6 +58,21 @@ namespace OrthancPlugins
     return true;
   }
 
+  // content has to be freed with OrthancPluginFreeMemoryBuffer(context, &buffer)
+  bool GetDicomFromOrthanc(OrthancPluginMemoryBuffer* content,
+                            OrthancPluginContext* context,
+                            const std::string& instanceId)
+  {
+    std::string uri = "/instances/" + instanceId + "/file";
+
+    if (OrthancPluginRestApiGet(context, content, uri.c_str()))
+    {
+      return false;
+    }
+
+    return true;
+  }
+
 
   bool GetJsonFromOrthanc(Json::Value& json,
                           OrthancPluginContext* context,

@@ -171,7 +171,8 @@ add_library(OsimisWebViewer
   ${CMAKE_SOURCE_DIR}/Plugin/Version.h
 
   # The following files depend on GDCM
-  ${CMAKE_SOURCE_DIR}/Plugin/DecodedImageAdapter.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/KLVWriter.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/DecodedImageAdapter.cpp
   ${CMAKE_SOURCE_DIR}/Orthanc/Plugins/Samples/GdcmDecoder/GdcmImageDecoder.cpp
   ${CMAKE_SOURCE_DIR}/Orthanc/Plugins/Samples/GdcmDecoder/GdcmDecoderCache.cpp
   ${CMAKE_SOURCE_DIR}/Orthanc/Plugins/Samples/GdcmDecoder/OrthancImageWrapper.cpp

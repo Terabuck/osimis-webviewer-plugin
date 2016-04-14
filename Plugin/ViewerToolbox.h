@@ -43,6 +43,10 @@ namespace OrthancPlugins
                           OrthancPluginContext* context,
                           const std::string& uri);
 
+  bool GetDicomFromOrthanc(OrthancPluginMemoryBuffer* content,
+                            OrthancPluginContext* context,
+                            const std::string& instanceId);
+
   bool TokenizeVector(std::vector<float>& result,
                       const std::string& value,
                       unsigned int expectedSize);
