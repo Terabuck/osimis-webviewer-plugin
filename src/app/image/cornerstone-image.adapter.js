@@ -93,8 +93,13 @@
                 pixels[index++] = 255;  // Alpha channel
             }
         } else {
-            buf = new ArrayBuffer(s.length * 2); // int16_t
-            pixels = new Int16Array(buf);
+            buf = new ArrayBuffer(s.length * 2); // uint16_t or int16_t
+            if (image.Orthanc.IsSigned) {
+                pixels = new Int16Array(buf);
+            } else {
+                pixels = new Uint16Array(buf);
+            }
+
             index = 0;
             for (i = 0; i < s.length; i += 2) {
                 var lower = s[i];
@@ -126,8 +131,13 @@
                 pixels[index++] = 255;  // Alpha channel
             }
         } else {
-            buf = new ArrayBuffer(s.length * 2); // uint8_t
-            pixels = new Int16Array(buf);
+            buf = new ArrayBuffer(s.length * 2); // uint16_t or int16_t
+            if (image.Orthanc.IsSigned) {
+                pixels = new Int16Array(buf);
+            } else {
+                pixels = new Uint16Array(buf);
+            }
+            
             index = 0;
             for (i = 0; i < s.length; i++) {
                 pixels[index] = s[i];
