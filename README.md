@@ -14,8 +14,7 @@ This repo contains the plugin C++ code.  The html/js code lies in [this repo](ht
 
 ### Pulling changes from Fork origin
 To retrieve changes from original mercurial repo to git fork, uses
-- https://github.com/fingolfin/git-remote-hg 
--> This is insanely awesome, thanks god !
+- https://github.com/fingolfin/git-remote-hg
 
 
 
@@ -27,4 +26,5 @@ until we change the dev workflow :-)
 - merge JS[dev] in JS[master] (but it's actually not very useful since JS[master] is not really used)
 - wait jenkins complete the generation of the JS[build-dev] branch ("compiled" JS) 
 - wait jenkins updates C++[dev]/subtrees/osimis-webviewer with JS[build-dev]
+- merge C++[dev] into C++[master] (keep in mind that the C++[master]/subtrees is actually pointing to JS[build-dev]
 - merge C++[dev] into C++[master] (keep in mind that the C++[master]/subtrees is actually pointing to JS[build-dev]

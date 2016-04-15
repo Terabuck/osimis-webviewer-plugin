@@ -1,6 +1,6 @@
 /**
  * Orthanc - A Lightweight, RESTful DICOM Store
- * Copyright (C) 2012-2015 Sebastien Jodogne, Medical Physics
+ * Copyright (C) 2012-2016 Sebastien Jodogne, Medical Physics
  * Department, University Hospital of Liege, Belgium
  *
  * This program is free software: you can redistribute it and/or
@@ -897,7 +897,7 @@ namespace Orthanc
     std::string s = specificCharacterSet;
     Toolbox::ToUpperCase(s);
 
-    // http://www.dabsoft.ch/dicom/3/C.12.1.1.2/
+    // http://dicom.nema.org/medical/dicom/current/output/html/part03.html#sect_C.12.1.1.2
     // https://github.com/dcm4che/dcm4che/blob/master/dcm4che-core/src/main/java/org/dcm4che3/data/SpecificCharacterSet.java
     if (s == "ISO_IR 6" ||
         s == "ISO_IR 192" ||
@@ -1046,7 +1046,7 @@ namespace Orthanc
 
   const char* GetDicomSpecificCharacterSet(Encoding encoding)
   {
-    // http://www.dabsoft.ch/dicom/3/C.12.1.1.2/
+    // http://dicom.nema.org/medical/dicom/current/output/html/part03.html#sect_C.12.1.1.2
     switch (encoding)
     {
       case Encoding_Utf8:
