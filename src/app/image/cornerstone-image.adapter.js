@@ -94,7 +94,7 @@
             }
         } else {
             buf = new ArrayBuffer(s.length * 2); // uint16_t or int16_t
-            if (image.Orthanc.IsSigned) {
+            if (pixelObject.Orthanc.IsSigned) {
                 pixels = new Int16Array(buf);
             } else {
                 pixels = new Uint16Array(buf);
@@ -132,12 +132,12 @@
             }
         } else {
             buf = new ArrayBuffer(s.length * 2); // uint16_t or int16_t
-            if (image.Orthanc.IsSigned) {
+            if (pixelObject.Orthanc.IsSigned) {
                 pixels = new Int16Array(buf);
             } else {
                 pixels = new Uint16Array(buf);
             }
-            
+
             index = 0;
             for (i = 0; i < s.length; i++) {
                 pixels[index] = s[i];
