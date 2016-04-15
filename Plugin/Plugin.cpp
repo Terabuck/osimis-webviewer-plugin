@@ -304,7 +304,7 @@ namespace {
         std::string message = "Answering GET request: " + std::string(url);
         OrthancPluginLogInfo(context_, message.c_str());
 
-        OrthancPluginAnswerBuffer(context_, output, content.c_str(), content.size(), "application/arraybuffer");
+        OrthancPluginAnswerBuffer(context_, output, content.c_str(), content.size(), "application/octet-stream");
       }
   #else
       TFactory* factory = new TFactory(context_);
@@ -312,7 +312,7 @@ namespace {
           std::string message = "Answering GET request: " + std::string(url);
           OrthancPluginLogInfo(context_, message.c_str());
 
-          OrthancPluginAnswerBuffer(context_, output, content.c_str(), content.size(), "application/arraybuffer");
+          OrthancPluginAnswerBuffer(context_, output, content.c_str(), content.size(), "application/octet-stream");
       }
   #endif
       else
