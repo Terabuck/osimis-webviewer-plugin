@@ -48,12 +48,31 @@
     "Threads" : 1
   },
 
+
+
   /**
    * Configuration of the HTTP server
    **/
 
+  // Enable the HTTP server. If this parameter is set to "false",
+  // Orthanc acts as a pure DICOM server. The REST API and Orthanc
+  // Explorer will not be available.
+  "HttpServerEnabled" : true,
+
   // HTTP port for the REST services and for the GUI
   "HttpPort" : 5080,
+
+  // When the following option is "true", if an error is encountered
+  // while calling the REST API, a JSON message describing the error
+  // is put in the HTTP answer. This feature can be disabled if the
+  // HTTP client does not properly handles such answers.
+  "HttpDescribeErrors" : true,
+
+  // Enable HTTP compression to improve network bandwidth utilization,
+  // at the expense of more computations on the server. Orthanc
+  // supports the "gzip" and "deflate" HTTP encodings.
+  "HttpCompressionEnabled" : false,
+
 
 
 
