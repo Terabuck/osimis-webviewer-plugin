@@ -679,21 +679,21 @@ extern "C"
 
 
     /* Install the callbacks */
-    OrthancPluginRegisterRestCallback(context_, "/web-viewer/libs/(.*)", ServeEmbeddedFolder<Orthanc::EmbeddedResources::JAVASCRIPT_LIBS>);
-    OrthancPluginRegisterRestCallback(context_, "/web-viewer/is-stable-series/(.*)", IsStableSeries);
+    OrthancPluginRegisterRestCallbackNoLock(context_, "/web-viewer/libs/(.*)", ServeEmbeddedFolder<Orthanc::EmbeddedResources::JAVASCRIPT_LIBS>);
+    OrthancPluginRegisterRestCallbackNoLock(context_, "/web-viewer/is-stable-series/(.*)", IsStableSeries);
 #if ENABLE_CACHE == 1
     OrthancPluginRegisterRestCallback(context_, "/web-viewer/series/(.*)", ServeCache<CacheBundle_SeriesInformation>);
     OrthancPluginRegisterRestCallback(context_, "/web-viewer/instances/(.*)", ServeCache<CacheBundle_DecodedImage>);
     OrthancPluginRegisterOnChangeCallback(context, OnChangeCallback);
 #else
-    OrthancPluginRegisterRestCallback(context_, "/web-viewer/series/(.*)", ServeData<SeriesInformationAdapter>);
-    OrthancPluginRegisterRestCallback(context_, "/web-viewer/instances/(.*)", ServeBinary<DecodedImageAdapter>);
+    OrthancPluginRegisterRestCallbackNoLock(context_, "/web-viewer/series/(.*)", ServeData<SeriesInformationAdapter>);
+    OrthancPluginRegisterRestCallbackNoLock(context_, "/web-viewer/instances/(.*)", ServeBinary<DecodedImageAdapter>);
 #endif
 
 #if ORTHANC_STANDALONE == 1
-    OrthancPluginRegisterRestCallback(context, "/web-viewer/app/(.*)", ServeEmbeddedFolder<Orthanc::EmbeddedResources::WEB_VIEWER>);
+    OrthancPluginRegisterRestCallbackNoLock(context, "/web-viewer/app/(.*)", ServeEmbeddedFolder<Orthanc::EmbeddedResources::WEB_VIEWER>);
 #else
-    OrthancPluginRegisterRestCallback(context, "/web-viewer/app/(.*)", ServeWebViewer);
+    OrthancPluginRegisterRestCallbackNoLock(context, "/web-viewer/app/(.*)", ServeWebViewer);
 #endif
 
     /* Extend the default Orthanc Explorer with custom JavaScript */
