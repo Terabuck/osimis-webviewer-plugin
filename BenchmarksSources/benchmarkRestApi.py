@@ -73,11 +73,6 @@ if __name__ == '__main__':
     addBenchmarkCases(benchmarkManager, compression = 'jpeg80', gzip = False)
     addBenchmarkCases(benchmarkManager, compression = 'jpeg50', gzip = False)
     addBenchmarkCases(benchmarkManager, compression = 'jpeg25', gzip = False)
-    addBenchmarkCases(benchmarkManager, compression = 'jpeg100', gzip = True)
-    addBenchmarkCases(benchmarkManager, compression = 'jpeg95', gzip = True)
-    addBenchmarkCases(benchmarkManager, compression = 'jpeg80', gzip = True)
-    addBenchmarkCases(benchmarkManager, compression = 'jpeg50', gzip = True)
-    addBenchmarkCases(benchmarkManager, compression = 'jpeg25', gzip = True)
 
     benchmarkManager.close()
 
