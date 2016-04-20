@@ -34,6 +34,8 @@ std::string KLVWriter::write() {
 
     if (Orthanc::Toolbox::DetectEndianness() == Orthanc::Endianness_Little) {
       // convert key & length to big_endian
+      // std::string#operator+= requires single char
+
       char* keyByte = (char*) &key;
       result += keyByte[3];
       result += keyByte[2];

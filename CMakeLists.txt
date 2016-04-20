@@ -153,13 +153,6 @@ set(CORE_SOURCES
   ${CMAKE_SOURCE_DIR}/Orthanc/Core/Toolbox.cpp
   ${CMAKE_SOURCE_DIR}/Orthanc/Core/Uuid.cpp
   ${CMAKE_SOURCE_DIR}/Orthanc/Resources/ThirdParty/base64/base64.cpp
-
-  ${CMAKE_SOURCE_DIR}/Plugin/BenchmarkHelper.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Cache/CacheManager.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Cache/CacheScheduler.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/ViewerToolbox.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/ViewerPrefetchPolicy.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/SeriesInformationAdapter.cpp
   )
 
 add_library(OsimisWebViewer
@@ -171,11 +164,30 @@ add_library(OsimisWebViewer
   ${CMAKE_SOURCE_DIR}/Plugin/Version.h
 
   # The following files depend on GDCM
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/KLVWriter.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/DecodedImageAdapter.cpp
   ${CMAKE_SOURCE_DIR}/Orthanc/Plugins/Samples/GdcmDecoder/GdcmImageDecoder.cpp
   ${CMAKE_SOURCE_DIR}/Orthanc/Plugins/Samples/GdcmDecoder/GdcmDecoderCache.cpp
   ${CMAKE_SOURCE_DIR}/Orthanc/Plugins/Samples/GdcmDecoder/OrthancImageWrapper.cpp
+  
+  ${CMAKE_SOURCE_DIR}/Plugin/OrthancContextManager.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/BaseController.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/RawImageContainer.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/JpegImageContainer.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/CornerstoneKLVContainer.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/CompositePolicy.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/Uint8ConversionPolicy.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/JpegConversionPolicy.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/Image.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageRepository.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageController.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/KLVWriter.cpp
+  
+  ${CMAKE_SOURCE_DIR}/Plugin/BenchmarkHelper.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Cache/CacheManager.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Cache/CacheScheduler.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/ViewerToolbox.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/ViewerPrefetchPolicy.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/SeriesInformationAdapter.cpp
   )
 
 

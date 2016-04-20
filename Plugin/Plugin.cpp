@@ -31,6 +31,9 @@
 #include "ViewerPrefetchPolicy.h"
 #endif // ENABLE_CACHE == 1
 
+#include "OrthancContextManager.h"
+#include "BaseController.h"
+#include "Image/ImageController.h"
 #include "Image/DecodedImageAdapter.h"
 #include "SeriesInformationAdapter.h"
 #include "../Orthanc/Plugins/Samples/GdcmDecoder/GdcmDecoderCache.h"
@@ -502,6 +505,8 @@ extern "C"
   {
     using namespace OrthancPlugins;
 
+    OrthancContextManager::Set(context);
+
     context_ = context;
     OrthancPluginLogWarning(context_, "Initializing the Web viewer");
 
@@ -686,6 +691,14 @@ extern "C"
     OrthancPluginRegisterRestCallback(context_, "/web-viewer/instances/(.*)", ServeCache<CacheBundle_DecodedImage>);
     OrthancPluginRegisterOnChangeCallback(context, OnChangeCallback);
 #else
+
+    // @todo free
+    ImageRepository* imageRepository = new ImageRepository;
+
+    // @todo free
+    ImageController::Inject(imageRepository);
+
+    RegisterRoute<ImageController>("/nuks/");
     OrthancPluginRegisterRestCallbackNoLock(context_, "/web-viewer/series/(.*)", ServeData<SeriesInformationAdapter>);
     OrthancPluginRegisterRestCallbackNoLock(context_, "/web-viewer/instances/(.*)", ServeBinary<DecodedImageAdapter>);
 #endif
