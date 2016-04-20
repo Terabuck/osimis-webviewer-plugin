@@ -10,13 +10,13 @@ CompositePolicy::~CompositePolicy()
   }
 }
 
-IImageContainer* CompositePolicy::Apply(IImageContainer* input)
+IImageContainer* CompositePolicy::Apply(IImageContainer* input, ImageMetaData* metaData)
 {
   IImageContainer* output = input;
   
   BOOST_FOREACH(IImageProcessingPolicy* policy, policyChain_)
   {
-    output = policy->Apply(output);
+    output = policy->Apply(output, metaData);
   }
 
   return output;

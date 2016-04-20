@@ -5,6 +5,7 @@
 #include "ImageProcessingPolicy/CompositePolicy.h"
 #include "ImageProcessingPolicy/JpegConversionPolicy.h"
 #include "ImageProcessingPolicy/Uint8ConversionPolicy.h"
+#include "ImageProcessingPolicy/KLVEmbeddingPolicy.h"
 
 #include "ImageController.h"
 
@@ -23,6 +24,7 @@ ImageController::ImageController(OrthancPluginRestOutput* response, const std::s
   imageProcessingRouteParser_.RegisterRoute<CompositePolicy>("^(\\.+/\\.+)$"); // regex: at least a single "/"
   imageProcessingRouteParser_.RegisterRoute<JpegConversionPolicy>("^jpeg:?(\\d{0,3})$"); // regex: jpeg:<compression rate: int[0;100]>
   imageProcessingRouteParser_.RegisterRoute<Uint8ConversionPolicy>("^8bit$");
+  imageProcessingRouteParser_.RegisterRoute<KLVEmbeddingPolicy>("^klv$");
 }
 
 OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlPostfix) {
@@ -94,6 +96,7 @@ inline CompositePolicy* ImageProcessingRouteParser::_Instanciate<CompositePolicy
   ImageProcessingRouteParser imageProcessingRouteParser;
   imageProcessingRouteParser.RegisterRoute<JpegConversionPolicy>("^jpeg:?(\\d{0,3})$");
   imageProcessingRouteParser.RegisterRoute<Uint8ConversionPolicy>("^8bit$");
+  imageProcessingRouteParser.RegisterRoute<KLVEmbeddingPolicy>("^klv$");
 
   CompositePolicy* compositePolicy = new CompositePolicy();
 

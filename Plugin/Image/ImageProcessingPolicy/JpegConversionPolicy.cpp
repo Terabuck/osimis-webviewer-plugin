@@ -19,7 +19,7 @@ JpegConversionPolicy::~JpegConversionPolicy()
 {
 }
 
-IImageContainer* JpegConversionPolicy::Apply(IImageContainer* input) {
+IImageContainer* JpegConversionPolicy::Apply(IImageContainer* input, ImageMetaData* metaData) {
   BENCH(COMPRESS_FRAME_IN_JPEG);
 
   RawImageContainer* rawImage = dynamic_cast<RawImageContainer*>(input);
@@ -53,6 +53,8 @@ IImageContainer* JpegConversionPolicy::Apply(IImageContainer* input) {
   BENCH_LOG(COMPRESSION_JPEG_QUALITY, (int) quality_);
   BENCH_LOG(COMPRESSION_JPEG_SIZE, buffer->size);
 
+  metaData->compression = "Jpeg";
+  
   JpegImageContainer* jpegContainer = new JpegImageContainer(buffer);
 
   return jpegContainer;

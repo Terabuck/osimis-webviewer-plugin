@@ -11,19 +11,19 @@
 
 namespace
 {
-  void _loadJSON(Json::Value& jsonOutput, const std::string& instanceId);
+  void _loadDicomTags(Json::Value& jsonOutput, const std::string& instanceId);
   void _loadDICOM(OrthancPluginMemoryBuffer* dicomOutput, const std::string& instanceId);
   void _getFrame(OrthancPluginImage** frameOutput, const void* dicomData, uint32_t dicomDataSize, uint32_t frameIndex);
 }
 
 Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIndex) const
 {
-  // @todo catch both method's exceptions ?
+  // @todo catch method call's exceptions ?
 
   // @todo check if it's useful. json should not be required
   // as the content is already in the dicom.
-  Json::Value json;
-  _loadJSON(json, instanceId);
+  Json::Value dicomTags;
+  _loadDicomTags(dicomTags, instanceId);
 
   OrthancPluginMemoryBuffer dicom;
   _loadDICOM(&dicom, instanceId);
@@ -33,7 +33,7 @@ Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIn
   OrthancPluginFreeMemoryBuffer(OrthancContextManager::Get(), &dicom);
 
   RawImageContainer* data = new RawImageContainer(frame);
-  Image* image = new Image(instanceId, frameIndex, data);
+  Image* image = new Image(instanceId, frameIndex, data, dicomTags);
 
   return image;
 }
@@ -43,10 +43,6 @@ Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIn
 
   image->ApplyProcessing(policy);
 
-  // @todo compress
-
-  // @todo write KLV
-
   return image;
 }
 
@@ -54,7 +50,7 @@ namespace
 {
   using namespace OrthancPlugins;
 
-  void _loadJSON(Json::Value& jsonOutput, const std::string& instanceId)
+  void _loadDicomTags(Json::Value& jsonOutput, const std::string& instanceId)
   {
     BENCH(LOAD_JSON);
     if (!GetJsonFromOrthanc(jsonOutput, OrthancContextManager::Get(), "/instances/" + instanceId + "/tags")) {

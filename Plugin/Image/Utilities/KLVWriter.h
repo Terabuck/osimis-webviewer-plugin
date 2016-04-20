@@ -13,6 +13,9 @@ class KLVWriter
 public:
   KLVWriter();
 
+  template<typename T>
+  inline void setValue(uint32_t key, const T& value);
+
   // @param value never copied, it has to be kept in memory
   void setValue(uint32_t key, size_t length, const char* value);
 
@@ -23,5 +26,17 @@ private:
   std::vector<KLVTuple> klv_tuples_;
   size_t total_size_;
 };
+
+template<typename T>
+inline void KLVWriter::setValue(uint32_t key, const T& value)
+{
+  setValue(key, sizeof(value), reinterpret_cast<const char*>(&value));
+}
+
+template<>
+inline void KLVWriter::setValue<std::string>(uint32_t key, const std::string& value)
+{
+  setValue(key, value.size(), value.c_str());
+}
 
 #endif // KLVWRITER_H

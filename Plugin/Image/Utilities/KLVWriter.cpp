@@ -3,8 +3,8 @@
 #include <boost/foreach.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
-#include "../../Orthanc/Core/Toolbox.h" // Orthanc/Core or Orthanc/ ?
-#include "../../Orthanc/Core/Enumerations.h" // for Endianness - Orthanc/Core or Orthanc/ ?
+#include "../../../Orthanc/Core/Toolbox.h" // Orthanc/Core or Orthanc/ ?
+#include "../../../Orthanc/Core/Enumerations.h" // for Endianness - Orthanc/Core or Orthanc/ ?
 
 KLVWriter::KLVWriter()
 {

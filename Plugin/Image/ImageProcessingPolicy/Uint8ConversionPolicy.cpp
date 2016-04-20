@@ -16,7 +16,7 @@ namespace {
                              SourceType source2, TargetType target2);
 }
 
-IImageContainer* Uint8ConversionPolicy::Apply(IImageContainer* input)
+IImageContainer* Uint8ConversionPolicy::Apply(IImageContainer* input, ImageMetaData* metaData)
 {
   RawImageContainer* rawInputImage = dynamic_cast<RawImageContainer*>(input);
   if (!rawInputImage)
@@ -41,17 +41,16 @@ IImageContainer* Uint8ConversionPolicy::Apply(IImageContainer* input)
   outBuffer->SetHeight(inAccessor->GetHeight());
   Orthanc::ImageAccessor outAccessor = outBuffer->GetAccessor();
 
-  int64_t a, b;
-  Orthanc::ImageProcessing::GetMinMaxValue(a, b, *inAccessor); // @todo cache this processing
-
   if (inAccessor->GetFormat() == Orthanc::PixelFormat_Grayscale16)
   {
-    ChangeDynamics<uint8_t, uint16_t>(outAccessor, *inAccessor, a, 0, b, 255);
+    ChangeDynamics<uint8_t, uint16_t>(outAccessor, *inAccessor, metaData->minPixelValue, 0, metaData->maxPixelValue, 255);
   }
   else
   {
-    ChangeDynamics<uint8_t, int16_t>(outAccessor, *inAccessor, a, 0, b, 255);
+    ChangeDynamics<uint8_t, int16_t>(outAccessor, *inAccessor, metaData->minPixelValue, 0, metaData->maxPixelValue, 255);
   }
+
+  metaData->sizeInBytes = outAccessor.GetSize();
 
   RawImageContainer* rawOutputImage = new RawImageContainer(outBuffer);
   return rawOutputImage;

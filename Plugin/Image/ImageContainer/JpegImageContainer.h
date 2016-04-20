@@ -6,6 +6,7 @@
 
 class JpegImageContainer : public IImageContainer {
 public:
+  // takes ownership
   JpegImageContainer(OrthancPluginMemoryBuffer* buffer);
   virtual ~JpegImageContainer();
 

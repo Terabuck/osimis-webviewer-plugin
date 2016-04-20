@@ -28,7 +28,7 @@
 #include "../../Orthanc/Resources/ThirdParty/base64/base64.h"
 #include "../ViewerToolbox.h"
 #include "../BenchmarkHelper.h"
-#include "KLVWriter.h"
+#include "Utilities/KLVWriter.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -155,7 +155,7 @@ namespace OrthancPlugins
       std::string jsonString = writer.write(json);
 
       KLVWriter klvWriter;
-      klvWriter.setValue(0, jsonString.size(), jsonString.c_str()); // ASCII
+      klvWriter.setValue(0, jsonString.size(), jsonString.c_str());
       klvWriter.setValue(1, compressedImage.size(), compressedImage.c_str());
       content = klvWriter.write();
 

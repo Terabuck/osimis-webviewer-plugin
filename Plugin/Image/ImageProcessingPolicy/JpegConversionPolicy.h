@@ -11,7 +11,7 @@ public:
 
   // in: RawImageContainer<8bit>
   // out: JpegImageContainer
-  virtual IImageContainer* Apply(IImageContainer* input);
+  virtual IImageContainer* Apply(IImageContainer* input, ImageMetaData* metaData);
 
 private:
   int quality_;

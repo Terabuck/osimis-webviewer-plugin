@@ -7,7 +7,7 @@
 class CompositePolicy : public IImageProcessingPolicy {
 public:
   virtual ~CompositePolicy();
-  virtual IImageContainer* Apply(IImageContainer* input);
+  virtual IImageContainer* Apply(IImageContainer* input, ImageMetaData* metaData);
 
   // takes ownership
   void AddPolicy(IImageProcessingPolicy* policy);

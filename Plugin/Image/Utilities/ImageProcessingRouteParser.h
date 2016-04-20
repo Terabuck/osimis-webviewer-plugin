@@ -7,10 +7,9 @@
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "ImageProcessingPolicy/IImageProcessingPolicy.h"
-#include "ImageProcessingPolicy/JpegConversionPolicy.h"
+#include "../ImageProcessingPolicy/IImageProcessingPolicy.h"
 
-/** ImageProcessingRouteParser [@StateLess]
+/** ImageProcessingRouteParser
  *
  * Instanciate any ImageProcessingPolicy based on a route string.
  * It provide the constructors arguments required by the instantiation using the string parsed with a regex.

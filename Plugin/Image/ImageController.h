@@ -5,7 +5,7 @@
 
 #include "../BaseController.h"
 #include "ImageRepository.h"
-#include "ImageProcessingRouteParser.h"
+#include "Utilities/ImageProcessingRouteParser.h"
 #include "ImageProcessingPolicy/IImageProcessingPolicy.h"
 
 
