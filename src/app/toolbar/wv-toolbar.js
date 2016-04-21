@@ -58,7 +58,12 @@ angular.module('webviewer')
             y: 1
           },
           play: false,
-          overlay: true
+          overlay: true,
+          flip: {
+            horizontal: false,
+            vertical: false
+          },
+          rotate: 0 // in degree
         };
         /* jshint +W116*/
 

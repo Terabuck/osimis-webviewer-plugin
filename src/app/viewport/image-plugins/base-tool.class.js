@@ -8,16 +8,17 @@
     /* @ngInject */
     function factory($rootScope, $timeout, $, _, cornerstoneTools, debounce) {
         
-    function BaseTool(toolName) {
-        this.viewports = [];
+        function BaseTool(toolName) {
+            this.viewports = [];
 
-        this.toolName = toolName;
-        this.isActivated = false;
-    }
+            this.toolName = toolName;
+            this.isActivated = false;
+        }
 
-    BaseTool.prototype.register = function(viewport) {
-        var _this = this;
-        
+        // method called by the viewport
+        BaseTool.prototype.register = function(viewport) {
+            var _this = this;
+            
             this.viewports.push(viewport)
 
             this._listenModelChange(viewport);
@@ -25,8 +26,9 @@
             if (this.isActivated) {
                 this.activate(viewport);
             }
-    }
+        }
 
+        // method called by the viewport
         BaseTool.prototype.unregister = function(viewport) {
             this._unlistenModelChange(viewport);
             
@@ -45,7 +47,9 @@
             cornerstoneTools[this.toolName].deactivate(enabledElement);
             cornerstoneTools.mouseInput.disable(enabledElement);
         };
+
         var _imageByViewportListenerIds = [];
+        // listen viewport annotation change or viewport image change
         BaseTool.prototype._listenModelChange = function(viewport) {
             var _this = this;
 
@@ -130,6 +134,7 @@
                 });
             }, 20));
         };
+
         BaseTool.prototype._unlistenViewChange = function(viewport) {
             var enabledElement = viewport.getEnabledElement();
 

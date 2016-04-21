@@ -1,6 +1,6 @@
 <div class="wv-toolbar btn-toolbar" role="toolbar" style="margin-left: 0;"
   ng-transclude
-    ng-init="wvItems = wvItems || $parent.wvItems"
+  ng-init="wvItems = wvItems || $parent.wvItems"
 >
   <div class="wv-toolbar-settings">
     <!-- splitpane -->
@@ -28,6 +28,14 @@
     <wv-toolbar-tool wv-name="pixelprobe" wv-icon="fa fa-dot-circle-o"></wv-toolbar-tool>
     <wv-toolbar-tool wv-name="ellipticalroi" wv-icon="fa fa-circle-o"></wv-toolbar-tool>
     <wv-toolbar-tool wv-name="rectangleroi" wv-icon="fa fa-square-o"></wv-toolbar-tool>
+  </div>
+
+  <div class="wv-toolbar-actions">
+    <!-- actions -->
+    <wv-toolbar-action wv-name="rotate" wv-icon="fa fa-rotate-left" wv-action="wvItems.rotate = wvItems.rotate - 90"></wv-toolbar-action>
+    <wv-toolbar-action wv-name="rotate" wv-icon="fa fa-rotate-right" wv-action="wvItems.rotate = wvItems.rotate + 90"></wv-toolbar-action>
+    <wv-toolbar-action wv-name="flip" wv-icon="fa fa-exchange" wv-action="wvItems.flip.horizontal = !wvItems.flip.horizontal"></wv-toolbar-action>
+    <wv-toolbar-action wv-name="flip" wv-icon="fa fa-exchange wv-toolbar-icon-rotate-right" wv-action="wvItems.flip.vertical = !wvItems.flip.vertical"></wv-toolbar-action>
   </div>
 
   <div class="wv-toolbar-end">
