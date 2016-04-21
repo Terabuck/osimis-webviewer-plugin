@@ -59,11 +59,10 @@ angular.module('webviewer')
           },
           play: false,
           overlay: true,
-          flip: {
-            horizontal: false,
-            vertical: false
-          },
-          rotate: 0 // in degree
+          vflip: false,
+          hflip: false,
+          rotateleft: false,
+          rotateright: false
         };
         /* jshint +W116*/
 

@@ -8,6 +8,11 @@
     /* @ngInject */
     function factory($rootScope, $timeout, $, _, cornerstoneTools, debounce) {
         
+        /** BaseTool
+          *
+          * Base class for cornerstoneTools implementation
+          *
+          */
         function BaseTool(toolName) {
             this.viewports = [];
 
@@ -149,7 +154,8 @@
          */
         BaseTool.prototype.activate = function(viewport) {
             if (typeof viewport === 'undefined') {
-        this.viewports.forEach(this.activate.bind(this))
+                // apply to every viewports
+                this.viewports.forEach(this.activate.bind(this));
                 this.isActivated = true;
             }
             else {

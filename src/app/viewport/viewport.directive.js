@@ -231,6 +231,25 @@
         ViewportViewModel.prototype.getEnabledElement = function() {
             return this._enabledElement;
         };
+
+        ViewportViewModel.prototype.setSelectable = function(onSelectedCallback) {
+            var _this = this;
+            
+            if (this._onViewportSelectedCallback) {
+                throw new Error("viewport selection already active");
+            }
+
+            this._onViewportSelectedCallback = function() {
+                onSelectedCallback(_this);
+            };
+            
+            $(this._enabledElement).on('click', this._onViewportSelectedCallback);
+        };
+        ViewportViewModel.prototype.setUnselectable = function() {
+            $(this._enabledElement).off('click', this._onViewportSelectedCallback);
+            this._onViewportSelectedCallback = null;
+        };
+
         ViewportViewModel.prototype.getViewport = function() {
             return cornerstone.getViewport(this._enabledElement);
         };
