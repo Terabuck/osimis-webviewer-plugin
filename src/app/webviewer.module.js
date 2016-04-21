@@ -25,7 +25,7 @@
       version: version,
       orthancApiURL: '',
       webviewerApiURL: 'web-viewer',
-      defaultCompression: 'jpeg95'
+      defaultCompression: '95'
     };
 
     this.setApiURL = function(url) {

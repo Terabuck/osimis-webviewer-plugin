@@ -82,7 +82,7 @@
                 var USE_REST_API_0_2 = true;
                 if (USE_REST_API_0_2) {
                     pixelCache[id] = $http
-                        .get(wvConfig.webviewerApiURL + '/instances/' +compression+ '-' + instanceId + '_' + frameIndex, {
+                        .get(wvConfig.orthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/8bit/' + 'jpeg:'+compression +'/klv', {
                             responseType: 'arraybuffer'
                         })
                         .then(function(response) {
@@ -90,12 +90,62 @@
                             var klvReader = new KLVReader(response.data);
                             
                             var keys = {
-                                json: 0,
-                                pixels: 1
+                                // - Cornerstone related
+                                Color: 0,
+                                Height: 1,
+                                Width: 2,
+                                SizeInBytes: 3, // size in raw prior to compression
+
+                                // Pixel size / aspect ratio
+                                ColumnPixelSpacing: 4,
+                                RowPixelSpacing: 5,
+
+                                // LUT
+                                MinPixelValue: 6,
+                                MaxPixelValue: 7,
+                                Slope: 8,
+                                Intercept: 9,
+                                WindowCenter: 10,
+                                WindowWidth: 11,
+
+
+                                // - WebViewer related
+                                IsSigned: 12,
+                                Stretched: 13, // set back 8bit to 16bit if true
+                                Compression: 14,
+
+
+                                // - Image binary
+                                ImageBinary: 15
                             };
 
-                            var json = klvReader.getJSON(keys.json);
-                            json.Orthanc.PixelData = klvReader.get(keys.pixels);
+                            var json = {
+                                color: klvReader.getUInt(keys.Color),
+                                height: klvReader.getUInt(keys.Height),
+                                width: klvReader.getUInt(keys.Width),
+                                rows: klvReader.getUInt(keys.Height),
+                                columns: klvReader.getUInt(keys.Width),
+                                sizeInBytes: klvReader.getUInt(keys.SizeInBytes),
+
+                                columnPixelSpacing: klvReader.getFloat(keys.ColumnPixelSpacing),
+                                rowPixelSpacing: klvReader.getFloat(keys.RowPixelSpacing),
+
+                                minPixelValue: klvReader.getInt(keys.MinPixelValue),
+                                maxPixelValue: klvReader.getInt(keys.MaxPixelValue),
+                                slope: klvReader.getFloat(keys.Slope),
+                                intercept: klvReader.getFloat(keys.Intercept),
+                                windowCenter: klvReader.getFloat(keys.WindowCenter),
+                                windowWidth: klvReader.getFloat(keys.WindowWidth),
+
+                                Orthanc: {
+                                    IsSigned: klvReader.getUInt(keys.IsSigned),
+                                    Compression: klvReader.getString(keys.Compression),
+                                    Stretched: klvReader.getUInt(keys.Stretched),
+                                    StretchLow: klvReader.getInt(keys.MinPixelValue),
+                                    StretchHigh: klvReader.getInt(keys.MaxPixelValue),
+                                    PixelData: klvReader.getBinary(keys.ImageBinary)
+                                }
+                            };
 
                             // adapt the image datas to cornerstone
                             return wvCornerstoneImageAdapter.process(id, json);
@@ -103,7 +153,7 @@
                 }
                 else {
                     pixelCache[id] = $http
-                        .get(wvConfig.webviewerApiURL + '/instances/' +compression+ '-' + instanceId + '_' + frameIndex, {cache: true})
+                        .get(wvConfig.webviewerApiURL + '/instances/' +'jpeg'+compression+ '-' + instanceId + '_' + frameIndex, {cache: true})
                         .then(function(response) {
                             response.data.Orthanc.PixelData = _str2ab(window.atob(response.data.Orthanc.PixelData));
                             return wvCornerstoneImageAdapter.process(id, response.data);
