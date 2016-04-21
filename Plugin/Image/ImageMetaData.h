@@ -24,12 +24,12 @@ struct ImageMetaData {
   uint32_t sizeInBytes; // size in raw prior to compression
 
   // Pixel size / aspect ratio
-  uint32_t columnPixelSpacing;
-  uint32_t rowPixelSpacing;
+  float columnPixelSpacing;
+  float rowPixelSpacing;
 
   // LUT
-  uint32_t minPixelValue;
-  uint32_t maxPixelValue;
+  int32_t minPixelValue;
+  int32_t maxPixelValue;
   float slope;
   float intercept;
   float windowCenter;

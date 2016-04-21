@@ -8,7 +8,7 @@
 #include "ImageProcessingPolicy/KLVEmbeddingPolicy.h"
 
 #include "ImageController.h"
-
+#include <iostream>
 ImageRepository* ImageController::imageRepository_ = 0;
 
 template<>
@@ -21,7 +21,7 @@ ImageController::ImageController(OrthancPluginRestOutput* response, const std::s
 {
   // Register sub routes
 
-  imageProcessingRouteParser_.RegisterRoute<CompositePolicy>("^(\\.+/\\.+)$"); // regex: at least a single "/"
+  imageProcessingRouteParser_.RegisterRoute<CompositePolicy>("^(.+/.+)$"); // regex: at least a single "/"
   imageProcessingRouteParser_.RegisterRoute<JpegConversionPolicy>("^jpeg:?(\\d{0,3})$"); // regex: jpeg:<compression rate: int[0;100]>
   imageProcessingRouteParser_.RegisterRoute<Uint8ConversionPolicy>("^8bit$");
   imageProcessingRouteParser_.RegisterRoute<KLVEmbeddingPolicy>("^klv$");
@@ -39,7 +39,7 @@ OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlP
     try {
       this->instanceId_ = matches[1];
       this->frameIndex_ = boost::lexical_cast<uint32_t>(matches[2]);
-      this->processingPolicy_ = matches.length() < 3 ? 0 : imageProcessingRouteParser_.InstantiatePolicyFromRoute(matches[3]);
+      this->processingPolicy_ = matches.size() < 4 ? 0 : imageProcessingRouteParser_.InstantiatePolicyFromRoute(matches[3]);
     }
     catch (const boost::bad_lexical_cast&) {
       // should be prevented by the regex

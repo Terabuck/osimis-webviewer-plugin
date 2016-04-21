@@ -1,10 +1,6 @@
 #include "KLVWriter.h"
 #include <boost/asio.hpp> // for cross platform htonl include
 #include <boost/foreach.hpp>
-#include <boost/numeric/conversion/cast.hpp>
-
-#include "../../../Orthanc/Core/Toolbox.h" // Orthanc/Core or Orthanc/ ?
-#include "../../../Orthanc/Core/Enumerations.h" // for Endianness - Orthanc/Core or Orthanc/ ?
 
 KLVWriter::KLVWriter()
 {
@@ -15,7 +11,7 @@ void KLVWriter::setValue(uint32_t key, size_t length, const char* value)
 {
   // @todo catch  bad_numeric_cast, (negative_overflow) and positive_overflow std::bad_cast 
 
-  KLVTuple klvTuple(key, boost::numeric_cast<uint32_t>(length), reinterpret_cast<const uint8_t *>(value));
+  KLVTuple klvTuple(key, boost::numeric_cast<uint32_t>(length), reinterpret_cast<const uint8_t *>(value), false);
   klv_tuples_.push_back(klvTuple);
 
   total_size_ += 4 + 4 + length; // key byte + length byte + value length
@@ -31,7 +27,9 @@ std::string KLVWriter::write() {
     uint32_t key = klvTuple.get<0>();
     uint32_t length = klvTuple.get<1>();
     const uint8_t* value = klvTuple.get<2>();
+    bool convertValueEndianness = klvTuple.get<3>();
 
+    // append key & length
     if (Orthanc::Toolbox::DetectEndianness() == Orthanc::Endianness_Little) {
       // convert key & length to big_endian
       // std::string#operator+= requires single char
@@ -63,7 +61,25 @@ std::string KLVWriter::write() {
     }
 
     // @note make sure length still has the host endianness
-    result.append(reinterpret_cast<const char *>(value), length);
+
+    // append value
+    if (Orthanc::Toolbox::DetectEndianness() == Orthanc::Endianness_Little && convertValueEndianness)
+    {
+      // revert endianness
+      char valueBigEndian[4] = {0, 0, 0, 0};
+      for (int i=0; i<length; ++i)
+      {
+        // use reinterpet_cast on ptr because standard cast change value content (unsigned to signed)
+        valueBigEndian[i] += *reinterpret_cast<const char*>(&value[length-1-i]);
+      }
+
+      result.append(valueBigEndian, length);
+    }
+    else
+    {
+      result.append(reinterpret_cast<const char *>(value), length);
+    }
+
   }
 
   return result;

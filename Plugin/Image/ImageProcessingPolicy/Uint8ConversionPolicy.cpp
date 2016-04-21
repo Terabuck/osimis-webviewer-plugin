@@ -21,14 +21,25 @@ IImageContainer* Uint8ConversionPolicy::Apply(IImageContainer* input, ImageMetaD
   RawImageContainer* rawInputImage = dynamic_cast<RawImageContainer*>(input);
   if (!rawInputImage)
   {
+    throw new std::invalid_argument("Input is not raw");
     // @todo Throw exception : input is not a raw image
     return 0;
   }
 
   Orthanc::ImageAccessor* inAccessor = rawInputImage->GetOrthancImageAccessor();
-  if (inAccessor->GetFormat() != Orthanc::PixelFormat_Grayscale16 &&
-      inAccessor->GetFormat() != Orthanc::PixelFormat_SignedGrayscale16)
+  Orthanc::PixelFormat pixelFormat = inAccessor->GetFormat();
+
+  if (pixelFormat == Orthanc::PixelFormat_Grayscale8 || pixelFormat == Orthanc::PixelFormat_RGB24)
   {
+    // @todo OUT OF THE POLICY !
+    // already Uint8 or RGB24 (uint8 * 3)
+    return input;
+  }
+
+  if (pixelFormat != Orthanc::PixelFormat_Grayscale16 &&
+      pixelFormat != Orthanc::PixelFormat_SignedGrayscale16)
+  {
+    throw new std::invalid_argument("Input is not 16bit");
     // @todo Throw exception : input is not 16bit
     // @todo do nothing if already uint8_t
     return 0;
@@ -41,7 +52,7 @@ IImageContainer* Uint8ConversionPolicy::Apply(IImageContainer* input, ImageMetaD
   outBuffer->SetHeight(inAccessor->GetHeight());
   Orthanc::ImageAccessor outAccessor = outBuffer->GetAccessor();
 
-  if (inAccessor->GetFormat() == Orthanc::PixelFormat_Grayscale16)
+  if (pixelFormat == Orthanc::PixelFormat_Grayscale16)
   {
     ChangeDynamics<uint8_t, uint16_t>(outAccessor, *inAccessor, metaData->minPixelValue, 0, metaData->maxPixelValue, 255);
   }
@@ -50,6 +61,7 @@ IImageContainer* Uint8ConversionPolicy::Apply(IImageContainer* input, ImageMetaD
     ChangeDynamics<uint8_t, int16_t>(outAccessor, *inAccessor, metaData->minPixelValue, 0, metaData->maxPixelValue, 255);
   }
 
+  metaData->stretched = true;
   metaData->sizeInBytes = outAccessor.GetSize();
 
   RawImageContainer* rawOutputImage = new RawImageContainer(outBuffer);

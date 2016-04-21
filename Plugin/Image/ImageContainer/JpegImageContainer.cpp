@@ -11,8 +11,8 @@ JpegImageContainer::~JpegImageContainer() {
 }
 
 const char* JpegImageContainer::GetBinary() {
-  return 0;
+  return reinterpret_cast<const char*>(data_->data);
 }
 uint32_t JpegImageContainer::GetBinarySize() {
-  return 0;
+  return data_->size;
 }
