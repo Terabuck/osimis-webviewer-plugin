@@ -130,6 +130,10 @@
         });
     }
 
+    SerieViewModel.prototype.hasSerie = function() {
+        return !!this._serieId;
+    };
+
     SerieViewModel.prototype.onSerieChanged = angular.noop;
 
     SerieViewModel.prototype.clearSerie = function() {

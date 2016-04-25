@@ -47,6 +47,18 @@
     background-color: rgba(0, 0, 0, 0.9);
 }
 
+.wv-droppable-serie-overlay-item {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    transform: translateY(-50%);
+
+    font-weight: 100;
+    text-align: center;
+    color: white;
+    font-size: 2rem;
+}
+
 .wv-overlay-scrollbar-loaded {
     position: absolute;
     bottom:0;

@@ -330,7 +330,7 @@
 
                     cornerstone.displayImage(_this._enabledElement, processedImage, viewportData);
 
-                    $(_this._enabledElement).css('visibility', 'visible');
+                    $(_this._enabledElement).find('canvas').css('visibility', 'visible');
 
                     return args;
                 })
@@ -354,7 +354,7 @@
         ViewportViewModel.prototype.clearImage = function() {
             this._imageId = null;
 
-            $(this._enabledElement).css('visibility', 'hidden');
+            $(this._enabledElement).find('canvas').css('visibility', 'hidden');
         };
         ViewportViewModel.prototype.hasImage = function() {
             return this._imageId !== null;

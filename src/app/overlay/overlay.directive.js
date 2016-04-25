@@ -50,7 +50,7 @@
 
             // auto grab serie model
             if (scope.vm.wvShowTimeline && typeof scope.vm.wvSerie === 'undefined') {
-                ctrls.serie.onSerieChanged(this, function(serie) {
+                ctrls.serie.onSerieChanged(_this, function(serie) {
                     scope.vm.wvSerie = serie;
                 });
                 scope.$on('$destroy', function() {
