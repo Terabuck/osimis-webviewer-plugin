@@ -543,8 +543,11 @@ function serve(isDev, specRunner) {
         console.log(nodeOptions);
     }
 
+    var onRestartGulpTasks = [];
+    if (!args.novet) onRestartGulpTasks.push('vet');
+    
     return $.nodemon(nodeOptions)
-        .on('restart', ['vet'], function(ev) {
+        .on('restart', onRestartGulpTasks, function(ev) {
             log('*** nodemon restarted');
             log('files changed:\n' + ev);
             setTimeout(function() {
