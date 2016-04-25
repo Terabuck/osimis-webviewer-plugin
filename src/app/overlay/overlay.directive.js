@@ -43,15 +43,16 @@
                     !!scope.vm.wvTags.SeriesNumber;
             };
             scope.vm.showBottomRightArea = function() {
-                return !!scope.vm.wvViewport;
+                return !!scope.vm.wvViewport && !!scope.vm.wvTags;
             };
             scope.vm.wvShowTimeline = typeof scope.vm.wvShowTimeline === 'undefined' ? true : scope.vm.wvShowTimeline;
-            scope.vm.wvShowTimeline = scope.vm.wvShowTimeline && !!ctrls.serie;
+            scope.vm.showTimeline = false;
 
             // auto grab serie model
             if (scope.vm.wvShowTimeline && typeof scope.vm.wvSerie === 'undefined') {
                 ctrls.serie.onSerieChanged(_this, function(serie) {
                     scope.vm.wvSerie = serie;
+                    scope.vm.showTimeline = scope.vm.wvShowTimeline && !!serie.imageCount;
                 });
                 scope.$on('$destroy', function() {
                     ctrls.serie.onSerieChanged.close(_this);
