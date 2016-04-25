@@ -17,32 +17,37 @@
   </head>
   <body ng-app="orthanc">
     <div ng-controller="OsimisWebViewer" class="wv-container">
-        <wv-toolbar wv-items="toolbar" ng-if="minimize"></wv-toolbar>
-        <div style="height: calc(100% - 40px)" wv-size-tag ng-if="minimize">
-            <wv-viewport wv-serie-id="serieId" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}"
+        <wv-toolbar wv-items="vm.toolbar" ng-if="vm.minimize"></wv-toolbar>
+        <div style="height: calc(100% - 40px)" wv-size-tag ng-if="vm.minimize">
+            <wv-viewport wv-serie-id="vm.serieId" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}"
                 wv-scroll-on-wheel-serie-ext="true"
-                wv-enable-overlay="toolbar.overlay"
+                wv-enable-overlay="vm.toolbar.overlay"
 
-                wv-default-viewport-tool="toolbar.windowing"
-                wv-angle-measure-viewport-tool="toolbar.anglemeasure"
-                wv-length-measure-viewport-tool="toolbar.lengthmeasure"
-                wv-elliptical-roi-viewport-tool="toolbar.ellipticalroi"
-                wv-zoom-viewport-tool="toolbar.zoom"
-                wv-pan-viewport-tool="toolbar.pan"
-                wv-pixel-probe-viewport-tool="toolbar.pixelprobe"
-                wv-rectangle-roi-viewport-tool="toolbar.rectangleroi"
+                wv-default-viewport-tool="vm.toolbar.windowing"
+                wv-angle-measure-viewport-tool="vm.toolbar.anglemeasure"
+                wv-length-measure-viewport-tool="vm.toolbar.lengthmeasure"
+                wv-elliptical-roi-viewport-tool="vm.toolbar.ellipticalroi"
+                wv-zoom-viewport-tool="vm.toolbar.zoom"
+                wv-pan-viewport-tool="vm.toolbar.pan"
+                wv-pixel-probe-viewport-tool="vm.toolbar.pixelprobe"
+                wv-rectangle-roi-viewport-tool="vm.toolbar.rectangleroi"
 
-                wv-invert-contrast-viewport-tool="toolbar.invert"
-                wv-play-serie-ext="toolbar.play"
+                wv-invert-contrast-viewport-tool="vm.toolbar.invert"
+                wv-play-serie-ext="vm.toolbar.play"
+
+                wv-rotateleft-viewport-tool="vm.toolbar.rotateleft"
+                wv-rotateright-viewport-tool="vm.toolbar.rotateright"
+                wv-vflip-viewport-tool="vm.toolbar.vflip"
+                wv-hflip-viewport-tool="vm.toolbar.hflip"
             ></wv-viewport>
         </div>
 
-        <div class="wv-menu" ng-if="!minimize">
-            <wv-serielist wv-study="study"></wv-serielist>
+        <div class="wv-menu" ng-if="!vm.minimize">
+            <wv-serielist wv-study="vm.study"></wv-serielist>
         </div>
-        <div class="wv-main" ng-if="!minimize">
-            <wv-toolbar wv-items="toolbar"></wv-toolbar>
-            <wv-splitpane wv-layout="toolbar.layout" wv-settings="toolbar"></wv-splitpane>
+        <div class="wv-main" ng-if="!vm.minimize">
+            <wv-toolbar wv-items="vm.toolbar"></wv-toolbar>
+            <wv-splitpane wv-layout="vm.toolbar.layout" wv-settings="vm.toolbar"></wv-splitpane>
         </div>
     </div>
 
@@ -63,26 +68,15 @@
             });
         })
         .controller('OsimisWebViewer', function($scope, $location) {
-            $scope.toolbar = {
-                zoom: false,
-                pan: false,
-                invert: false,
-                lengthmeasure: false,
-                anglemeasure: false,
-                pixelprobe: false,
-                ellipticalroi: false,
-                rectangleroi: false,
-                play: false,
-                overlay: true
-            };
+            $scope.vm = {};
 
-            $scope.serieId = $location.search().series;
+            $scope.vm.serieId = $location.search().series;
 
-            $scope.study = {
+            $scope.vm.study = {
                 id: $location.search().study
             };
 
-            $scope.minimize = !$scope.study.id;
+            $scope.vm.minimize = !$scope.vm.study.id;
         })
         ;
     </script>
