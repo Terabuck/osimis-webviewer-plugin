@@ -31,7 +31,7 @@
 #include "SeriesInformationAdapter.h"
 #include "../Orthanc/Plugins/Samples/GdcmDecoder/GdcmDecoderCache.h"
 #include "../Orthanc/Core/Toolbox.h"
-
+#include "Version.h"
 
 static OrthancPluginContext* context_ = NULL;
 
@@ -470,10 +470,10 @@ extern "C"
       }
 
       if (!scheduler.LookupProperty(webViewerVersion, CacheProperty_WebViewerVersion) ||
-          webViewerVersion != std::string(ORTHANC_WEBVIEWER_VERSION))
+          webViewerVersion != std::string(PRODUCT_VERSION_MAJOR_MINOR_STRING))
       {
         std::string s = ("The version of the Web viewer plugin has changed from \"" + webViewerVersion + "\" to \"" + 
-                         std::string(ORTHANC_WEBVIEWER_VERSION) + "\": The cache of the Web viewer will be cleared");
+                         std::string(PRODUCT_VERSION_MAJOR_MINOR_STRING) + "\": The cache of the Web viewer will be cleared");
         OrthancPluginLogWarning(context_, s.c_str());
         clear = true;
       }
@@ -485,7 +485,7 @@ extern "C"
         OrthancPluginLogWarning(context_, "Clearing the cache of the Web viewer");
         scheduler.Clear();
         scheduler.SetProperty(CacheProperty_OrthancVersion, context_->orthancVersion);
-        scheduler.SetProperty(CacheProperty_WebViewerVersion, ORTHANC_WEBVIEWER_VERSION);
+        scheduler.SetProperty(CacheProperty_WebViewerVersion, PRODUCT_VERSION_MAJOR_MINOR_STRING);
       }
       else
       {
@@ -578,6 +578,6 @@ extern "C"
 
   ORTHANC_PLUGINS_API const char* OrthancPluginGetVersion()
   {
-    return ORTHANC_WEBVIEWER_VERSION;
+    return PRODUCT_VERSION_FULL_STRING;
   }
 }
