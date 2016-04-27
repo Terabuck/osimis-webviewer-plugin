@@ -25,6 +25,8 @@
         // @todo flush somehow
         var pixelCache = {};
 
+        window.osimis.WorkerPool.createPromise = $q;
+        var imageParserPool = new window.osimis.WorkerPool('/app/image/image-parser.async/main.js', 4);
 
         return service;
 
@@ -72,32 +74,23 @@
             return modelCache[id];
         };
 
+
         function getPixelObject(id) {
             if (!pixelCache.hasOwnProperty(id)) {
-                var worker = new Worker('/app/image/image-parser.async/main.js');
-                worker.addEventListener('message', function(e) {
-                  // console.log('Worker said: ', e.data);
-                }, false);
-                worker.addEventListener('error', function(e) {
-                  console.log('Worker said [error]: ', e.data);
-                }, false);
-
                 var compression = wvConfig.defaultCompression;
                 var splittedId = id.split(':');
                 var instanceId = splittedId[0];
                 var frameIndex = splittedId[1];
-
                 var uri = wvConfig.orthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/8bit/' + 'jpeg:'+compression +'/klv';
-                pixelCache[id] = $q(function(resolve, reject) {
-                    worker.postMessage(uri);
-                    worker.addEventListener('message', function(evt) {
-                        var msg = evt.data;
 
-                        var cornerstoneImageObject = wvCornerstoneImageAdapter.process(id, msg.cornerstoneMetaData, msg.pixelArray);
+                pixelCache[id] = imageParserPool.postMessage(uri)
+                    .then(function (result) {
+                        // wrap back buffer into an array
 
-                        resolve(cornerstoneImageObject);
+                        // configure cornerstone related object methods
+                        var cornerstoneImageObject = wvCornerstoneImageAdapter.process(id, result.cornerstoneMetaData, result.pixelBuffer, result.pixelBufferFormat);
+                        return cornerstoneImageObject;
                     });
-                });
             }
 
             return pixelCache[id];

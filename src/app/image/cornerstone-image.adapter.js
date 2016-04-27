@@ -21,7 +21,7 @@
 
         ////////////////
 
-        function process(imageId, metaData, pixelArray) {
+        function process(imageId, metaData, pixelBuffer, pixelBufferFormat) {
             // @todo check if this variable is required, remove it if not, write why otherwise
             metaData.imageId = imageId;
 
@@ -31,7 +31,23 @@
             else {
                 metaData.render = cornerstone.renderGrayscaleImage;
             }
-
+            
+            // wrap back buffer into an array
+            // create pixelArray out of getPixelData for caching
+            var pixelArray = null
+            switch (pixelBufferFormat) {
+            case 'Uint8':
+                pixelArray = new Uint8Array(pixelBuffer);
+                break;
+            case 'Uint16':
+                pixelArray = new Uint16Array(pixelBuffer);
+                break;
+            case 'Int16':
+                pixelArray = new Int16Array(pixelBuffer);
+                break;
+            default:
+                throw new Error("Unexpected array binary format");
+            }
             metaData.getPixelData = function() {
                 return pixelArray;
             };

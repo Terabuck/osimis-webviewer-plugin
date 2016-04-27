@@ -23,19 +23,39 @@ function getURI(uri) {
     xhr.open('GET', encodeURI(uri), false);
     xhr.responseType = 'arraybuffer';
     xhr.send();
+
     if (xhr.status === 200) {
+        // process binary into jpeg
         var arraybuffer = xhr.response;
         var metaData = parseKLV(arraybuffer);
         var pixelArray = parseJpeg(metaData.decompression);
 
+        // stock the format of the array, and return the array's buffer
+        // with its format instead of the array itself (array can't be worker transferable object but buffer can)
+        var pixelBufferFormat = null;
+        if (pixelArray instanceof Uint8Array) {
+            pixelBufferFormat = 'Uint8';
+        }
+        else if (pixelArray instanceof Uint16Array) {
+            pixelBufferFormat = 'Uint16';
+        }
+        else if (pixelArray instanceof Int16Array) {
+            pixelBufferFormat = 'Int16';
+        }
+        else {
+            throw new Error("Unexpected array binary format");
+        }
+
+        // answer request to the main thread
         self.postMessage({
             cornerstoneMetaData: metaData.cornerstone,
-            pixelArray: pixelArray
-        });
+            pixelBuffer: pixelArray.buffer,
+            pixelBufferFormat: pixelBufferFormat
+        }, [pixelArray.buffer]); // pixelArray is transferable
     }
     else {
         // @todo
-        alert('Request failed.  Returned status of ' + xhr.status);
+        throw new Error('Request failed.  Returned status of ' + xhr.status);
     }
 }
 
@@ -87,7 +107,7 @@ function parseKLV(arraybuffer) {
         slope: klvReader.getFloat(keys.Slope),
         intercept: klvReader.getFloat(keys.Intercept),
         windowCenter: klvReader.getFloat(keys.WindowCenter),
-        windowWidth: klvReader.getFloat(keys.WindowWidth),
+        windowWidth: klvReader.getFloat(keys.WindowWidth)
     };
 
     var compression = klvReader.getString(keys.Compression);
@@ -131,7 +151,7 @@ function parseJpeg(config) {
 
     if (config.hasColor) {
         buf = new ArrayBuffer(s.length / 3 * 4); // RGB32
-        pixels = new Uint8ClampedArray(buf);
+        pixels = new Uint8Array(buf);
         index = 0;
         for (i = 0; i < s.length; i += 3) {
             pixels[index++] = s[i];
