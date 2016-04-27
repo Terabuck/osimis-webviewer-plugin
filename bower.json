@@ -44,7 +44,6 @@
     "angular-strap": "~2.3.6",
     "jqueryui-touch-punch": "*",
     "ng-debounce": "^0.1.7",
-    "threads": "^0.6.0",
     "hammerjs": "^2.0.8",
     "hammer-time": "^1.1.0"
   },
@@ -62,9 +61,6 @@
     },
     "ng-range-filter": {
       "main": "src/ngRangeFilter.js"
-    },
-    "threads": {
-      "main": "dist/threads.browser.js"
     }
   }
 }
