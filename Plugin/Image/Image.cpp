@@ -13,9 +13,11 @@ Image::Image(const std::string& instanceId, uint32_t frameIndex, RawImageContain
   data_ = data;
 }
 
-Image::Image(const std::string& instanceId, uint32_t frameIndex, IImageContainer* data, const ImageMetaData& metaData)
-  : metaData_(metaData)
+Image::Image(const std::string& instanceId, uint32_t frameIndex, CornerstoneKLVContainer* data)
+  : metaData_()
 {
+  // @todo @warning metaData_ aren't consistent !
+  // fetch them from data with struct definition ? direct copy ?
   instanceId_ = instanceId;
   frameIndex_ = frameIndex;
   data_ = data;

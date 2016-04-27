@@ -8,6 +8,11 @@ public:
   // in: RawImageContainer PixelFormat_Grayscale16 || PixelFormat_Grayscale16
   // out: RawImageContainer PixelFormat_Grayscale8
   virtual IImageContainer* Apply(IImageContainer* input, ImageMetaData* metaData);
+
+  virtual std::string ToString() const 
+  { 
+    return "8bit";
+  }
 };
 
 #endif // UINT8_CONVERSION_POLICY_H

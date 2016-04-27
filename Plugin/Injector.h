@@ -5,7 +5,7 @@
 /** Injector 
  *
  * @Usage class YourClass
- *        : public Injector<PolicyRepository, ImageRepository>
+ *        : public Injector<ImageRepository>
  *
  */
 class Injector {

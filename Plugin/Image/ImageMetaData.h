@@ -39,8 +39,9 @@ struct ImageMetaData {
 
   bool isSigned;
 
-  // when 16bit image is converted to 8 bit
+  // when 16bit image is converted to 8 bit,
   // used convert image back to 16bit in the web frontend
+  // with minPixelValue & maxPixelValue
   bool stretched;
   
   std::string compression;

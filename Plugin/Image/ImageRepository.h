@@ -2,6 +2,7 @@
 #define IMAGE_REPOSITORY_H
 
 #include <string>
+#include <boost/thread/mutex.hpp>
 
 #include "Image.h"
 
@@ -11,8 +12,7 @@
  *
  * Retrieve an Image from an instance uid and a frame index.
  *
- * @Responsibility Handle all the I/O operations related to Images,
- * including the communication with the Orthanc's core.
+ * @Responsibility Handle all the I/O operations related to Images
  *
  * @Responsibility Manage cache
  *
@@ -26,6 +26,9 @@ public:
 
   // gives memory ownership
   Image* GetImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const;
+
+private:
+  mutable boost::mutex mutex_;
 };
 
 #endif // IMAGE_REPOSITORY_H

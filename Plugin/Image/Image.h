@@ -7,6 +7,7 @@
 #include "../OrthancContextManager.h"
 #include "ImageContainer/IImageContainer.h"
 #include "ImageContainer/RawImageContainer.h"
+#include "ImageContainer/CornerstoneKLVContainer.h"
 #include "ImageProcessingPolicy/IImageProcessingPolicy.h"
 #include "ImageMetaData.h"
 
@@ -33,7 +34,7 @@ private:
   Image(const std::string& instanceId, uint32_t frameIndex, RawImageContainer* data, const Json::Value& dicomTags);
 
   // takes memory ownership
-  Image(const std::string& instanceId, uint32_t frameIndex, IImageContainer* data, const ImageMetaData& metaData);
+  Image(const std::string& instanceId, uint32_t frameIndex, CornerstoneKLVContainer* data);
 
   void ApplyProcessing(IImageProcessingPolicy* policy);
 

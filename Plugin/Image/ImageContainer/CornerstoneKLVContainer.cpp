@@ -30,19 +30,43 @@ CornerstoneKLVContainer::CornerstoneKLVContainer(IImageContainer* data, const Im
   klvWriter.setValue(ImageBinary, data->GetBinarySize(), data->GetBinary());
 
   // write klv binary
-  data_ = klvWriter.write();
+  dataAsString_ = klvWriter.write();
+  dataAsMemoryBuffer_ = 0;
+}
+
+CornerstoneKLVContainer::CornerstoneKLVContainer(OrthancPluginMemoryBuffer* data)
+{
+  dataAsMemoryBuffer_ = data;
 }
 
 CornerstoneKLVContainer::~CornerstoneKLVContainer()
 {
-
+  if (dataAsMemoryBuffer_)
+  {
+    OrthancPluginFreeMemoryBuffer(OrthancContextManager::Get(), dataAsMemoryBuffer_);
+    delete dataAsMemoryBuffer_;
+  }
 }
 
 const char* CornerstoneKLVContainer::GetBinary()
 {
-  return data_.c_str();
+  if (dataAsMemoryBuffer_)
+  {
+    return static_cast<const char*>(dataAsMemoryBuffer_->data);
+  }
+  else 
+  {
+    return dataAsString_.c_str();
+  }
 }
 uint32_t CornerstoneKLVContainer::GetBinarySize()
 {
-  return data_.length();
+  if (dataAsMemoryBuffer_)
+  {
+    return dataAsMemoryBuffer_->size;
+  }
+  else
+  {
+    return dataAsString_.length();
+  }
 }

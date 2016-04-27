@@ -1,6 +1,8 @@
 #include "ImageMetaData.h"
 
 #include <boost/lexical_cast.hpp>
+
+#include "../BenchmarkHelper.h"
 #include "../../Orthanc/Core/Toolbox.h" // for TokenizeString && StripSpaces
 #include "../../Orthanc/Core/Images/ImageProcessing.h" // for GetMinMaxValue
 
@@ -38,6 +40,7 @@ ImageMetaData::ImageMetaData()
 
 ImageMetaData::ImageMetaData(RawImageContainer* rawImage, const Json::Value& dicomTags)
 {
+  BENCH(CALCULATE_METADATA)
   Orthanc::ImageAccessor* accessor = rawImage->GetOrthancImageAccessor();
 
   // define
@@ -134,6 +137,9 @@ ImageMetaData::ImageMetaData(RawImageContainer* rawImage, const Json::Value& dic
   isSigned = (accessor->GetFormat() == Orthanc::PixelFormat_SignedGrayscale16);
   stretched = false;
   compression = "raw";
+
+  BENCH_LOG(IMAGE_WIDTH, width);
+  BENCH_LOG(IMAGE_HEIGHT, height);
 }
 
 namespace {

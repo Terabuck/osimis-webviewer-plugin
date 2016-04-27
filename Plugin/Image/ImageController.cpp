@@ -1,7 +1,10 @@
 #include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp> // for boost::split
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/lock_guard.hpp> 
 
+#include "../BenchmarkHelper.h" // for BENCH(*)
 #include "ImageProcessingPolicy/CompositePolicy.h"
 #include "ImageProcessingPolicy/JpegConversionPolicy.h"
 #include "ImageProcessingPolicy/Uint8ConversionPolicy.h"
@@ -28,6 +31,7 @@ ImageController::ImageController(OrthancPluginRestOutput* response, const std::s
 }
 
 OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlPostfix) {
+  BENCH(URL_PARSING);
   // <instance_uid>/<frame_index>/<processing-policy>
   boost::regex regexp("^([^/]+)/(\\d+)(?:/(.+))?$");
 
@@ -40,6 +44,9 @@ OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlP
       this->instanceId_ = matches[1];
       this->frameIndex_ = boost::lexical_cast<uint32_t>(matches[2]);
       this->processingPolicy_ = matches.size() < 4 ? 0 : imageProcessingRouteParser_.InstantiatePolicyFromRoute(matches[3]);
+
+      BENCH_LOG(INSTANCE, instanceId_);
+      BENCH_LOG(FRAME_INDEX, frameIndex_);
     }
     catch (const boost::bad_lexical_cast&) {
       // should be prevented by the regex
@@ -57,6 +64,8 @@ OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlP
 
 OrthancPluginErrorCode ImageController::_ProcessRequest()
 {
+  BENCH(FULL_PROCESS);
+
   // retrieve processed image
   Image* image = 0;
   if (!this->processingPolicy_) {
@@ -66,10 +75,19 @@ OrthancPluginErrorCode ImageController::_ProcessRequest()
     image = imageRepository_->GetImage(this->instanceId_, this->frameIndex_, this->processingPolicy_);
   }
   
-  // answer rest request
-  OrthancPluginAnswerBuffer(OrthancContextManager::Get(), this->response_, image->GetBinary(), image->GetBinarySize(), "application/octet-stream");
+  if (image)
+  {
+    BENCH(REQUEST_ANSWERING);
 
-  delete image;
+    // answer rest request
+    OrthancPluginAnswerBuffer(OrthancContextManager::Get(), this->response_, image->GetBinary(), image->GetBinarySize(), "application/octet-stream");
+
+    delete image;
+  }
+  else
+  {
+    return OrthancPluginErrorCode_InternalError;
+  }
 
   return OrthancPluginErrorCode_Success;
 }

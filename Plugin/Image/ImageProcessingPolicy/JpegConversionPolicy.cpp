@@ -4,6 +4,7 @@
 #include "../../Orthanc/Core/Images/ImageBuffer.h"
 #include "../../Orthanc/Core/OrthancException.h"
 #include "../../ViewerToolbox.h" // for WriteJpegToMemory
+#include "../../BenchmarkHelper.h"
 
 #include "../ImageContainer/RawImageContainer.h"
 #include "../ImageContainer/JpegImageContainer.h"

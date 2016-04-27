@@ -3,8 +3,10 @@
 #include "../../Orthanc/Core/Images/ImageBuffer.h" // for ImageBuffer
 #include "../../Orthanc/Core/Images/ImageProcessing.h" // for ImageProcessing::GetMinMaxValue
 #include "../../Orthanc/Core/OrthancException.h"
+#include "../../BenchmarkHelper.h"
 
 #include "../ImageContainer/RawImageContainer.h"
+
 
 #include <cmath> // for std::floor
 
@@ -45,6 +47,8 @@ IImageContainer* Uint8ConversionPolicy::Apply(IImageContainer* input, ImageMetaD
     return 0;
   }
 
+  BENCH(CONVERT_TO_UINT8);
+
   Orthanc::ImageBuffer* outBuffer = new Orthanc::ImageBuffer;
   outBuffer->SetMinimalPitchForced(true);
   outBuffer->SetFormat(Orthanc::PixelFormat_Grayscale8);
@@ -63,6 +67,8 @@ IImageContainer* Uint8ConversionPolicy::Apply(IImageContainer* input, ImageMetaD
 
   metaData->stretched = true;
   metaData->sizeInBytes = outAccessor.GetSize();
+  
+  BENCH_LOG(SIZE_IN_BYTES, metaData->sizeInBytes);
 
   RawImageContainer* rawOutputImage = new RawImageContainer(outBuffer);
   return rawOutputImage;
