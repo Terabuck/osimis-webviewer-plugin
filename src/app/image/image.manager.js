@@ -16,6 +16,23 @@
              */
             registerPostProcessor: registerPostProcessor
         };
+        
+        // as threadjs uses blob for thread pooling,
+        // we need to define absolute path for thread spawning & import
+        var baseUrl = window.location.protocol + '//' + window.location.host;
+
+        var Pool = window.thread.Pool;
+        var pool = new Pool(4); // 4 threads
+        pool
+            .run(baseUrl +'/app/image/image-parser.async/main.js')
+            .send({
+                command: 'import',
+                src: baseUrl + '/app/image/image-parser.async/klvreader.class.js'
+            })
+            .send({
+                command: 'import',
+                src: baseUrl + '/bower_components/jpgjs/jpg.js'
+            });
     
         var postProcessorClasses = {};
 
@@ -74,13 +91,6 @@
 
         function getPixelObject(id) {
             if (!pixelCache.hasOwnProperty(id)) {
-                var worker = new Worker('/app/image/image-parser.async/main.js');
-                worker.addEventListener('message', function(e) {
-                  // console.log('Worker said: ', e.data);
-                }, false);
-                worker.addEventListener('error', function(e) {
-                  console.log('Worker said [error]: ', e.data);
-                }, false);
 
                 var compression = wvConfig.defaultCompression;
                 var splittedId = id.split(':');
@@ -88,16 +98,18 @@
                 var frameIndex = splittedId[1];
 
                 var uri = wvConfig.orthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/8bit/' + 'jpeg:'+compression +'/klv';
-                pixelCache[id] = $q(function(resolve, reject) {
-                    worker.postMessage(uri);
-                    worker.addEventListener('message', function(evt) {
-                        var msg = evt.data;
-
+                pixelCache[id] = pool
+                    //.run(window.location.protocol + '//' + window.location.host + '/app/image/image-parser.async/main.js')
+                    .send({
+                        command: 'loadJpeg',
+                        src: uri
+                    })
+                    .promise()
+                    .then(function(message) {
                         var cornerstoneImageObject = wvCornerstoneImageAdapter.process(id, msg.cornerstoneMetaData, msg.pixelArray);
-
-                        resolve(cornerstoneImageObject);
+                    }, function(error) {
+                        console.error(error);
                     });
-                });
             }
 
             return pixelCache[id];
