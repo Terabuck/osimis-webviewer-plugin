@@ -86,4 +86,4 @@
 
 	module.KLVReader = KLVReader;
 
-})(window);
+})(typeof WorkerGlobalScope !== 'undefined' ? WorkerGlobalScope : window);

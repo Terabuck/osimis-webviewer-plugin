@@ -2,6 +2,7 @@
   "name": "webViewer",
   "prefix": "wv",
   "ignore": [
+    "**/*.async/**/*.js",
     "**/*.spec.js"
   ],
   "dev": {

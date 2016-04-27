@@ -44,6 +44,7 @@ module.exports = function() {
         js: [
             clientApp + '**/*.module.js',
             clientApp + '**/*.js',
+            '!' + clientApp + '**/*.async/**/*.js',
             '!' + clientApp + '**/*.spec.js'
         ],
         jsOrder: [
