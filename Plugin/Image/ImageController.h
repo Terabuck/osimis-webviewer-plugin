@@ -26,6 +26,7 @@ private:
   static ImageRepository* imageRepository_;
   ImageProcessingRouteParser imageProcessingRouteParser_;
 
+  bool disableCache_;
   std::string instanceId_;
   uint32_t frameIndex_;
   IImageProcessingPolicy* processingPolicy_; // @todo use smart_ptr ?

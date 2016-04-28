@@ -20,8 +20,10 @@ namespace
   void _getFrame(OrthancPluginImage** frameOutput, const void* dicomData, uint32_t dicomDataSize, uint32_t frameIndex);
 }
 
-Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIndex) const
+Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIndex, bool enableCache) const
 {
+  // @todo activate cache
+
   BENCH_LOG(IMAGE_FORMATING, "");
   boost::lock_guard<boost::mutex> guard(mutex_); // make sure the memory amount doesn't overrise 
 
@@ -45,11 +47,16 @@ Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIn
   return image;
 }
 
-Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const
-{
+Image* ImageRepository::_GetImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const {
+    // create file
+    Image* image = this->GetImage(instanceId, frameIndex, false);
 
-  // check attachments/test
+    image->ApplyProcessing(policy);
+    
+    return image;
+}
 
+Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const {
   // if not found - create
   // if found - retrieve
   Image* image;
@@ -58,8 +65,8 @@ Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIn
   // store attachment
   // /{resourceType}/{id}/attachments/{name}
   // -> no result
-  // -> data Unknown Resource
-  // -> fale attachment name : inexistent item
+  // -> data : Unknown Resource
+  // -> unregistered attachment name : inexistent item
 
   std::string attachmentName = "frame:" + boost::lexical_cast<std::string>(frameIndex) + '~' + policy->ToString();
   std::string path = "/instances/" + instanceId + "/attachments/" + attachmentName + "/data";
@@ -83,10 +90,7 @@ Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIn
   else if (error == OrthancPluginErrorCode_UnknownResource)
   {
     BENCH(FILE_CACHE_CREATION);
-    // create file
-    Image* image = this->GetImage(instanceId, frameIndex);
-
-    image->ApplyProcessing(policy);
+    image = _GetImage(instanceId, frameIndex, policy);
 
     // save file
     OrthancPluginMemoryBuffer putResultBuffer;
@@ -106,6 +110,7 @@ Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIn
 
       return image;
     }
+
   }
   else if (error == OrthancPluginErrorCode_Success)
   {
@@ -129,6 +134,17 @@ Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIn
 
     // @todo clear buffer
   // clear buffer
+}
+
+Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy, bool enableCache) const
+{
+  if (enableCache) {
+    return _GetImageFromCache(instanceId, frameIndex, policy);
+  }
+  else {
+    return _GetImage(instanceId, frameIndex, policy);
+  }
+
 }
 
 
