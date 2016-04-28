@@ -27,19 +27,29 @@
         }
 
         function listFromOrthancSerieId(id) {
+            // @todo bench this method
             var serieInfoPromise = $http.get(wvConfig.orthancApiURL + '/series/'+id);
             var orderedInstancePromise = $http.get(wvConfig.orthancApiURL + '/series/'+id+'/ordered-slices');
 
-            return $q
-                .all({
-                  orthancSerie: serieInfoPromise,
-                  orthancOrderedInstances: orderedInstancePromise
+            return orderedInstancePromise
+                .then(function(orderInstancesResult) {
+                    // retrieve tags of the first serie instance (once we have the first instance id)
+                    var firstInstanceId = orderInstancesResult.data.SlicesShort[0][0];
+                    var tagsPromise = $http.get(wvConfig.orthancApiURL + '/instances/'+firstInstanceId+'/simplified-tags');
+                    
+                    return $q.all({
+                      orthancSerie: serieInfoPromise,
+                      orthancOrderedInstances: orderInstancesResult,
+                      tags: tagsPromise
+                    });
                 })
                 .then(function(args) {
+                    // instanciate osiviewer series from orthanc serie
                     var orthancSerie = args.orthancSerie.data;
                     var orthancOrderedInstances = args.orthancOrderedInstances.data;
+                    var tags = args.tags.data;
 
-                    return wvOrthancSerieAdapter.process(orthancSerie, orthancOrderedInstances);
+                    return wvOrthancSerieAdapter.process(orthancSerie, orthancOrderedInstances, tags);
                 });
         }
 

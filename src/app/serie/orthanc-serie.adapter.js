@@ -14,7 +14,7 @@
 
         ////////////////
 
-        function process(orthancSerie, orthancOrderedInstances) {
+        function process(orthancSerie, orthancOrderedInstances, tags) {
             // for each instance in one serie, retrieve each image ids
             var imagesByInstance = orthancOrderedInstances.SlicesShort
                 // .reverse()
@@ -30,22 +30,26 @@
                     return imageIds;
                 });
             
+            // check if image is single frame
             var isSingleFrame = imagesByInstance
                 .filter(function(images) {
                     return images.length === 1;
                 })
                 .length === imagesByInstance.length; // each instances have only one image
-
+            
             if (isSingleFrame) {
+                // if image is mono frame, set one serie = many instances / mono frames
                 var imagesBySerie = [_.flatten(imagesByInstance)];
             }
             else {
+                // if image is multi frame, set one serie = one instance / many frames
                 var imagesBySerie = imagesByInstance;
             }
-
+            
+            // instanciate serie objects
             var series = imagesBySerie.map(function(imageIds, serieIndex) {
                 var id = orthancSerie.ID + ':' + serieIndex;
-                var tags = orthancSerie.MainDicomTags;
+                tags = tags || orthancSerie.MainDicomTags;
 
                 return new WvSerie(id, imageIds, tags);
             });
