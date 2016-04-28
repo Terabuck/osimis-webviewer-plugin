@@ -65,7 +65,7 @@
                         return;
                     }
                     
-                    serie.play(1000/30); // 30fps
+                    serie.play();
                 });
             });
         }

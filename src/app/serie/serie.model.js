@@ -125,10 +125,10 @@
         };
 
         var _cancelAnimationId = null;
-        WvSerie.prototype.play = function(speed) {
+        WvSerie.prototype.play = function() {
             var _this = this;
 
-            speed = speed || 1000 / 30; // 30 fps by default
+            var speed = 1000 / this.tags.RecommendedDisplayFrameRate || 1000 / 30; // 30 fps by default
 
             if (this.isPlaying) {
                 return;
