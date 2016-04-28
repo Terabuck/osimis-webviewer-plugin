@@ -2,12 +2,15 @@
 
 #include "../../ViewerToolbox.h" // for Convert
 
+using namespace boost;
+
 RawImageContainer::RawImageContainer(OrthancPluginImage* data)
 {
   dataAsImageBuffer_ = 0;
   dataAsImageWrapper_ = new OrthancPlugins::OrthancImageWrapper(OrthancContextManager::Get(), data);
 
-  accessor_.AssignReadOnly(OrthancPlugins::Convert(dataAsImageWrapper_->GetFormat()), dataAsImageWrapper_->GetWidth(),
+  // @todo AssignReadOnly ?
+  accessor_.AssignWritable(OrthancPlugins::Convert(dataAsImageWrapper_->GetFormat()), dataAsImageWrapper_->GetWidth(),
                             dataAsImageWrapper_->GetHeight(), dataAsImageWrapper_->GetPitch(), dataAsImageWrapper_->GetBuffer());
 }
 
@@ -44,4 +47,35 @@ uint32_t RawImageContainer::GetBinarySize()
 Orthanc::ImageAccessor* RawImageContainer::GetOrthancImageAccessor()
 {
   return &accessor_;
+}
+
+
+RawImageContainer::gil_image_view_t RawImageContainer::GetGILImageView()
+{
+  Orthanc::PixelFormat format = accessor_.GetFormat();
+
+  ptrdiff_t w = accessor_.GetWidth();
+  ptrdiff_t h = accessor_.GetHeight();
+  ptrdiff_t rowWidth = accessor_.GetPitch();
+
+  switch (format)
+  {
+    case Orthanc::PixelFormat_Grayscale8:
+    {
+      gil::gray8_pixel_t* iterator = (gil::gray8_pixel_t*) accessor_.GetBuffer();
+      gil::gray8_view_t view = gil::interleaved_view(w, h, iterator, rowWidth);
+      return gil_image_view_t(view);
+      break;
+    }
+    case Orthanc::PixelFormat_Grayscale16:
+    {
+      gil::gray16_pixel_t* iterator = (gil::gray16_pixel_t*) accessor_.GetBuffer();
+      gil::gray16_view_t view = gil::interleaved_view(w, h, iterator, rowWidth);
+      return gil_image_view_t(view);
+      break;
+    }
+    default:
+      throw new std::invalid_argument("Unsupported image format");
+  }
+
 }

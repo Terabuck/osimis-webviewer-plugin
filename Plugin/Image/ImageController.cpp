@@ -6,6 +6,7 @@
 
 #include "../BenchmarkHelper.h" // for BENCH(*)
 #include "ImageProcessingPolicy/CompositePolicy.h"
+#include "ImageProcessingPolicy/ResizePolicy.h"
 #include "ImageProcessingPolicy/JpegConversionPolicy.h"
 #include "ImageProcessingPolicy/Uint8ConversionPolicy.h"
 #include "ImageProcessingPolicy/KLVEmbeddingPolicy.h"
@@ -25,6 +26,7 @@ ImageController::ImageController(OrthancPluginRestOutput* response, const std::s
   // Register sub routes
 
   imageProcessingRouteParser_.RegisterRoute<CompositePolicy>("^(.+/.+)$"); // regex: at least a single "/"
+  imageProcessingRouteParser_.RegisterRoute<ResizePolicy>("^resize:(\\d+)$"); // resize:<maximal height/width: uint>
   imageProcessingRouteParser_.RegisterRoute<JpegConversionPolicy>("^jpeg:?(\\d{0,3})$"); // regex: jpeg:<compression rate: int[0;100]>
   imageProcessingRouteParser_.RegisterRoute<Uint8ConversionPolicy>("^8bit$");
   imageProcessingRouteParser_.RegisterRoute<KLVEmbeddingPolicy>("^klv$");
@@ -108,11 +110,26 @@ inline JpegConversionPolicy* ImageProcessingRouteParser::_Instanciate<JpegConver
   return new JpegConversionPolicy(compression);
 };
 
+// Parse ResizePolicy compression parameter from its route regex matches
+template<>
+inline ResizePolicy* ImageProcessingRouteParser::_Instanciate<ResizePolicy>(boost::cmatch& regexpMatches)
+{
+  unsigned int maxWidthHeight = 0;
+  
+  if (regexpMatches[1].length()) {
+    // @todo catch lexical_cast
+    maxWidthHeight = boost::lexical_cast<unsigned int>(regexpMatches[1]);
+  }
+
+  return new ResizePolicy(maxWidthHeight);
+};
+
 // Parse a route containing multiple policies into a single CompositePolicy
 template<>
 inline CompositePolicy* ImageProcessingRouteParser::_Instanciate<CompositePolicy>(boost::cmatch& regexpMatches)
 {
   ImageProcessingRouteParser imageProcessingRouteParser;
+  imageProcessingRouteParser.RegisterRoute<ResizePolicy>("^resize:(\\d+)$"); // resize:<maximal height/width: uint>
   imageProcessingRouteParser.RegisterRoute<JpegConversionPolicy>("^jpeg:?(\\d{0,3})$");
   imageProcessingRouteParser.RegisterRoute<Uint8ConversionPolicy>("^8bit$");
   imageProcessingRouteParser.RegisterRoute<KLVEmbeddingPolicy>("^klv$");
