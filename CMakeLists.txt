@@ -59,6 +59,14 @@ include(${CMAKE_SOURCE_DIR}/Orthanc/Resources/CMake/SQLiteConfiguration.cmake)
 include(${CMAKE_SOURCE_DIR}/Resources/CMake/GdcmConfiguration.cmake)
 include(${CMAKE_SOURCE_DIR}/Resources/CMake/JavaScriptLibraries.cmake)
 
+# include GIL boost library - adobe version with numeric extensions
+# help debug boost GIL templates
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+  add_definitions(-DBOOST_GIL_USE_CONCEPT_CHECK=1)
+endif()
+include_directories(${CMAKE_SOURCE_DIR}/Dependencies/gil-2_1_1/)
+
+
 if (ENABLE_CACHE)
   add_definitions(
     -DENABLE_CACHE=1
@@ -72,9 +80,10 @@ if (BENCHMARK)
   add_definitions(
       -DBOOST_CHRONO_HEADER_ONLY
   #    -DBOOST_ERROR_CODE_HEADER_ONLY
-      -D_DARWIN_C_SOURCE
+      -D_DARWIN_C_SOURCE # for boost chrono to work on mac X.11
     )
 endif()
+
 
 # Check that the Orthanc SDK headers are available or download them
 if (STATIC_BUILD OR NOT USE_SYSTEM_ORTHANC_SDK)
