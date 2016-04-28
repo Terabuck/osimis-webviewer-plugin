@@ -43,7 +43,9 @@
     "angular-dragdrop": "~1.0.12",
     "angular-strap": "~2.3.6",
     "jqueryui-touch-punch": "*",
-    "ng-debounce": "^0.1.7"
+    "ng-debounce": "^0.1.7",
+    "hammerjs": "^2.0.8",
+    "hammer-time": "^1.1.0"
   },
   "resolutions": {
     "angular": "^1.5.0",
