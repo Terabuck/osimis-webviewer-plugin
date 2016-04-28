@@ -24,7 +24,7 @@ console.log('NODE_ENV=' + environment);
 // setting proxies
 var orthancProxy = httpProxy.createProxyServer();
 app.all("/orthanc/*", function(req, res) {
-    var orthancUrl = 'http://localhost:8042/';
+    var orthancUrl = 'http://localhost:8042';
 
     console.log('redirecting to Orthanc server');
     req.url = req.url.replace('/orthanc', '');
