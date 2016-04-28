@@ -50,6 +50,7 @@
     "gulp-uglify": "^1.0.1",
     "gulp-useref": "^1.0.2",
     "gulp-util": "^3.0.1",
+    "http-proxy": "https://registry.npmjs.org/http-proxy/-/http-proxy-1.13.2.tgz",
     "jshint-stylish": "^2.0.1",
     "karma": "^0.13.2",
     "karma-chai": "^0.1.0",
