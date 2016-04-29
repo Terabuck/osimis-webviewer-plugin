@@ -1,7 +1,4 @@
 Build/
 ThirdPartyDownloads/
-.gitignore
-AUTHORS
-NEWS
 
 CMakeLists.txt.user
