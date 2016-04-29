@@ -29,11 +29,11 @@ public:
 
   // can be used for GIL processing
   // see gil/extension/typedefs.hpp for available types (defined using macros)
-  typedef boost::gil::any_image_view< boost::mpl::vector3<
-    boost::gil::gray8_view_t, boost::gil::gray16_view_t, boost::gil::gray16s_view_t //, boost::gil::rgb24_view_t
+  typedef boost::gil::any_image_view< boost::mpl::vector4<
+    boost::gil::gray8_view_t, boost::gil::gray16_view_t, boost::gil::gray16s_view_t, boost::gil::rgb8_view_t
   > > gil_image_view_t;
-  typedef boost::gil::any_image< boost::mpl::vector3<
-    boost::gil::gray8_image_t, boost::gil::gray16_image_t, boost::gil::gray16s_image_t //, boost::gil::rgb24_image_t
+  typedef boost::gil::any_image< boost::mpl::vector4<
+    boost::gil::gray8_image_t, boost::gil::gray16_image_t, boost::gil::gray16s_image_t, boost::gil::rgb8_view_t
   > > gil_image_t;
 
   gil_image_view_t GetGILImageView();

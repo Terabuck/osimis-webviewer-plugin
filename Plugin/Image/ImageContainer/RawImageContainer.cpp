@@ -74,6 +74,20 @@ RawImageContainer::gil_image_view_t RawImageContainer::GetGILImageView()
       return gil_image_view_t(view);
       break;
     }
+    case Orthanc::PixelFormat_SignedGrayscale16:
+    {
+      gil::gray16s_pixel_t* iterator = (gil::gray16s_pixel_t*) accessor_.GetBuffer();
+      gil::gray16s_view_t view = gil::interleaved_view(w, h, iterator, rowWidth);
+      return gil_image_view_t(view);
+      break;
+    }
+    case Orthanc::PixelFormat_RGB24:
+    {
+      gil::rgb8_pixel_t* iterator = (gil::rgb8_pixel_t*) accessor_.GetBuffer();
+      gil::rgb8_view_t view = gil::interleaved_view(w, h, iterator, rowWidth);
+      return gil_image_view_t(view);
+      break;
+    }
     default:
       throw new std::invalid_argument("Unsupported image format");
   }
