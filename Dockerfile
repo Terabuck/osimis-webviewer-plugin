@@ -6,6 +6,7 @@ ADD . /root/osimis-webviewer
 WORKDIR /root/osimis-webviewer
 RUN ls -al
 RUN git status
+RUN git describe
 
 RUN bash /root/osimis-webviewer/scripts/dockerBuildWebViewer.sh "default"
 
