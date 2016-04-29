@@ -2,19 +2,36 @@ if(NOT GIT_FOUND)
     find_package(Git QUIET)
 endif()
 
-execute_process(COMMAND
-    "${GIT_EXECUTABLE}"
-    describe --tags --long --dirty=-dirty
-    WORKING_DIRECTORY
-    "${CMAKE_SOURCE_DIR}"
-    RESULT_VARIABLE
-    res
-    OUTPUT_VARIABLE
-    gitRepoVersion
-    ERROR_QUIET
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
-if(NOT res EQUAL 0)
-    message(FATAL_ERROR "could not describe git tag.  Make sure you have already tagged your repo with a command like 'git tag -a \"v0.1.0\"' ${gitRepoVersion}-${res}")
+if (false) #since we can't get gitTags on DockerHub, we'll use the version from version.txt
+    execute_process(COMMAND
+        "${GIT_EXECUTABLE}"
+        describe --tags --long --dirty=-dirty
+        WORKING_DIRECTORY
+        "${CMAKE_SOURCE_DIR}"
+        RESULT_VARIABLE
+        res
+        OUTPUT_VARIABLE
+        gitRepoVersion
+        ERROR_QUIET
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if(NOT res EQUAL 0)
+        message(FATAL_ERROR "could not describe git tag.  Make sure you have already tagged your repo with a command like 'git tag -a \"v0.1.0\"' ${gitRepoVersion}-${res}")
+    endif()
+else()
+    file (STRINGS "version.txt" version)
+    execute_process(COMMAND
+        "${GIT_EXECUTABLE}"
+        rev-parse --short HEAD
+        WORKING_DIRECTORY
+        "${CMAKE_SOURCE_DIR}"
+        RESULT_VARIABLE
+        res
+        OUTPUT_VARIABLE
+        gitRepoCommitSha1
+        ERROR_QUIET
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+    set(gitRepoVersion "${version}-0-${gitRepoCommitSha1}")
 endif()
 
 message("CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
