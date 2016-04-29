@@ -17,6 +17,7 @@ if(NOT res EQUAL 0)
     message(FATAL_ERROR "could not describe git tag.  Make sure you have already tagged your repo with a command like 'git tag -a \"v0.1.0\"' ${gitRepoVersion}-${res}")
 endif()
 
+message("CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
 message("Git version = ${gitRepoVersion}")
 
 #parse the version information into pieces.
