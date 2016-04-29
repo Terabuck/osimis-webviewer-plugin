@@ -6,12 +6,12 @@ ADD . /root/osimis-webviewer
 WORKDIR /root/osimis-webviewer
 RUN ls -al
 RUN git status
-RUN git describe
+#RUN git describe
 
-RUN bash /root/osimis-webviewer/scripts/dockerBuildWebViewer.sh "default"
+#RUN bash /root/osimis-webviewer/scripts/dockerBuildWebViewer.sh "default"
 
-EXPOSE 4242
-EXPOSE 8042
+#EXPOSE 4242
+#EXPOSE 8042
 
-ENTRYPOINT [ "Orthanc" ]
-CMD [ "/etc/orthanc/orthanc.json" ]
+#ENTRYPOINT [ "Orthanc" ]
+#CMD [ "/etc/orthanc/orthanc.json" ]
