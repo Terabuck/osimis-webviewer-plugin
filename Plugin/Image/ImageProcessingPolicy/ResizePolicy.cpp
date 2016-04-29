@@ -35,15 +35,15 @@ IImageContainer* ResizePolicy::Apply(IImageContainer* input, ImageMetaData* meta
   unsigned int inHeight = accessor->GetHeight();
   unsigned int outWidth = 0;
   unsigned int outHeight = 0;
-  double scale = inHeight / inWidth;
+  double scale = (double)inHeight / inWidth;
 
   if (inWidth >= inHeight) {
-    outWidth = inWidth;
-    outHeight = outWidth * scale;
+    outWidth = maxWidthHeight_;
+    outHeight = maxWidthHeight_ * scale;
   }
   else {
-    outHeight = inHeight;
-    outWidth = outHeight * (1/scale);
+    outHeight = maxWidthHeight_;
+    outWidth = maxWidthHeight_ * (1/scale);
   }
   
   // create outpute image
@@ -59,6 +59,10 @@ IImageContainer* ResizePolicy::Apply(IImageContainer* input, ImageMetaData* meta
   RawImageContainer::gil_image_view_t inGILView = inRawImage->GetGILImageView();
   RawImageContainer::gil_image_view_t outGILView = outRawImage->GetGILImageView();
   boost::gil::resize_view(inGILView, outGILView, boost::gil::bilinear_sampler());
+
+  metaData->width = outWidth;
+  metaData->height = outHeight;
+  metaData->sizeInBytes = outAccessor.GetSize();
 
   return outRawImage;
 }
