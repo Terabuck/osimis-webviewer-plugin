@@ -27,6 +27,8 @@ public:
   // gives memory ownership
   Image* GetImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy, bool enableCache) const;
 
+  void CleanImageCache(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const;
+
 private:
   mutable boost::mutex mutex_;
 

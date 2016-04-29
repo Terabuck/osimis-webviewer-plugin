@@ -70,10 +70,6 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
 
   std::string attachmentName = "frame:" + boost::lexical_cast<std::string>(frameIndex) + '~' + policy->ToString();
   std::string path = "/instances/" + instanceId + "/attachments/" + attachmentName + "/data";
-  // - add frame index
-  // - add policies options
-
-  // std::string path = "/instances/" + instanceId + "/attachments/" + "frame_" + boost::lexical_cast<std::string>(frameIndex) + "_policy_x";
 
   OrthancPluginErrorCode error;
 
@@ -89,7 +85,7 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
   }
   else if (error == OrthancPluginErrorCode_UnknownResource)
   {
-    BENCH(FILE_CACHE_CREATION);
+    BENCH(FILE_CACHE_CREATION); // @todo Split in two when refactoring. This contains the file processing..
     image = _GetImage(instanceId, frameIndex, policy);
 
     // save file
@@ -145,6 +141,24 @@ Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIn
     return _GetImage(instanceId, frameIndex, policy);
   }
 
+}
+
+void ImageRepository::CleanImageCache(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const
+{
+  // set cache path
+  std::string attachmentName = "frame:" + boost::lexical_cast<std::string>(frameIndex);
+  if (policy)
+  {
+    attachmentName += "~" + policy->ToString();
+  }
+  std::string path = "/instances/" + instanceId + "/attachments/" + attachmentName;
+
+  // send clean path request
+  OrthancPluginErrorCode error;
+  {
+    BENCH(FILE_CACHE_CLEAN);
+    error = OrthancPluginRestApiDelete(OrthancContextManager::Get(), path.c_str());
+  }
 }
 
 

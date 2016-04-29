@@ -35,7 +35,7 @@ ImageController::ImageController(OrthancPluginRestOutput* response, const std::s
 OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlPostfix) {
   BENCH(URL_PARSING);
   // <instance_uid>/<frame_index>/<processing-policy>
-  boost::regex regexp("^(nocache/)?([^/]+)/(\\d+)(?:/(.+))?$");
+  boost::regex regexp("^(nocache/|cleancache/)?([^/]+)/(\\d+)(?:/(.+))?$");
 
   boost::cmatch matches;
   if (!boost::regex_match(urlPostfix.c_str(), matches, regexp)) {
@@ -44,6 +44,7 @@ OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlP
   else {
     try {
       this->disableCache_ = (std::string(matches[1]) == "nocache/");
+      this->cleanCache_ = (std::string(matches[1]) == "cleancache/");
       this->instanceId_ = matches[2];
       this->frameIndex_ = boost::lexical_cast<uint32_t>(matches[3]);
       this->processingPolicy_ = matches.size() < 4 ? 0 : imageProcessingRouteParser_.InstantiatePolicyFromRoute(matches[4]);
@@ -68,6 +69,11 @@ OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlP
 OrthancPluginErrorCode ImageController::_ProcessRequest()
 {
   BENCH(FULL_PROCESS);
+
+  // clean cache
+  if (cleanCache_) {
+    imageRepository_->CleanImageCache(this->instanceId_, this->frameIndex_, this->processingPolicy_);
+  }
 
   // retrieve processed image
   Image* image = 0;
