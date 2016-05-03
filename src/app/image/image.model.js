@@ -30,24 +30,30 @@
                 _this.onAnnotationChanged.trigger(annotation);
             });
 
-            // lazy load the pixel object
-            var _cachedPixelObjectPromise = null;
-            this.getPixelObject = function() {
-                if (_cachedPixelObjectPromise === null) {
-                    // result is not a 2d array of pixels but an object containing an attribute with the array
-                    _cachedPixelObjectPromise = wvImageManager.getPixelObject(this.id); // mainImagePixelObject
-                    var getPixelsObjectFromImageIdFn = wvImageManager.getPixelObject.bind(wvImageManager);
+            // @todo pass by parameter instead to avoid recursive dependency
+            var _downloadStream = wvImageManager.getPixelObjectStream(id);
 
-                    this.postProcesses.forEach(function(postProcess) {
-                        _cachedPixelObjectPromise = _cachedPixelObjectPromise
-                            .then(function(actualPixelObject) {
-                                return postProcess.execute(actualPixelObject, getPixelsObjectFromImageIdFn);
-                            });
-                    });
-                }
-                
-                return _cachedPixelObjectPromise;
+            _downloadStream.onImageReceived(function(pixelObjectPromise) {
+                // tell when a better quality has been downloaded
+                // used by the viewport to reload its canvas
+                _this.onPixelObjectReceived.trigger(pixelObjectPromise);
+            });
+            this.askPixelObject = function() {
+                // get raw image but event will retrieve intermediate compressed images meanwhile,
+                return _downloadStream.getCompressedImage();;
+
+                // @todo enable postprocessing back
+                // var getPixelsObjectFromImageIdFn = wvImageManager.getPixelObject.bind(wvImageManager);
+
+                // this.postProcesses.forEach(function(postProcess) {
+                //     _cachedPixelObjectPromise = _cachedPixelObjectPromise
+                //         .then(function(actualPixelObject) {
+                //             return postProcess.execute(actualPixelObject, getPixelsObjectFromImageIdFn);
+                //         });
+                // });
+                // result is not a 2d array of pixels but a cornerstone object containing an attribute with the array
             }
+            this.onPixelObjectReceived = new osimis.Listener();
 
         }
 
