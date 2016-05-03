@@ -295,25 +295,51 @@
             return _this._imageManager
                 .get(id)
                 .then(function (imageModel) {
+                    // chose quality depending of viewport size
+                    var qualityLevel = null;
+                    if (_this._viewportWidth <= 150 || _this._viewportHeight <= 150) {
+                        qualityLevel = WvImageQualities.R150J95;
+                    }
+                    else {
+                        qualityLevel = WvImageQualities.J95;
+                    }
+
                     // redraw canvas when binary are available
-                    imageModel.onBinaryLoaded(function(qualityLevel, cornerstoneImageObject) {
-                        _updateImage(imageModel, cornerstoneImageObject);
+                    imageModel.onBinaryLoaded(function(newQualityLevel, cornerstoneImageObject) {
+                        var previousQualityLevel = 0; // @todo add as param
+
+                        // only redraws viewport if required
+                        // @note onBinaryLoaded can be triggered by another viewport using
+                        // the same image (or even something else)
+                        if (newQualityLevel > previousQualityLevel && cornerstoneImageObject.qualityLevel <= qualityLevel) {
+                            _updateImage(imageModel, cornerstoneImageObject);
+                            // @todo adapt zoom
+                        }
+
+                        // @todo allow cornerstone zoom to go behond 0.25
                     });
                     // @todo clean listener
 
-                    // get the best already available binary
+                    // show the best already available binary
                     // use the *available* binary to avoid duplicate draw (one with the promise result, the other with the onBinaryLoaded event)
                     var cornerstoneImageObjectPromise = imageModel.getBinaryOfHighestQualityAvailable();
                     if (cornerstoneImageObjectPromise) {
-                        // draw it directly
                         cornerstoneImageObjectPromise.then(function(cornerstoneImageObject) {
+                            // draw it directly
                             _updateImage(imageModel, cornerstoneImageObject);
+                            
+                            // load better quality if required
+                            if (cornerstoneImageObject.qualityLevel < qualityLevel) {
+                                imageModel.loadBinary(qualityLevel);
+                            }
                         });
+                        
                     }
-
-                    if (!cornerstoneImageObjectPromise || cornerstoneImageObjectPromise.qualityLevel < WvImageQualities.R150J95) {
+    
+                    // load binary if none is available at the moment
+                    if (!cornerstoneImageObjectPromise) {
                         // if the quality desired is not available, load it - the event will draw it
-                        imageModel.loadBinary(WvImageQualities.R150J95);
+                        imageModel.loadBinary(qualityLevel);
                     }
 
                     return imageModel;
