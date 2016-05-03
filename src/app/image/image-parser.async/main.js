@@ -27,8 +27,9 @@ function getURI(uri) {
     if (xhr.status === 200) {
         // process binary into jpeg
         var arraybuffer = xhr.response;
-        var metaData = parseKLV(arraybuffer);
-        var pixelArray = parseJpeg(metaData.decompression);
+        var data = parseKLV(arraybuffer);
+        var pixelArray = parseJpeg(data.decompression);
+        pixelArray = convertBackTo16bit(pixelArray, data.decompression);
 
         // stock the format of the array, and return the array's buffer
         // with its format instead of the array itself (array can't be worker transferable object but buffer can)
@@ -48,7 +49,7 @@ function getURI(uri) {
 
         // answer request to the main thread
         self.postMessage({
-            cornerstoneMetaData: metaData.cornerstone,
+            cornerstoneMetaData: data.cornerstone,
             pixelBuffer: pixelArray.buffer,
             pixelBufferFormat: pixelBufferFormat
         }, [pixelArray.buffer]); // pixelArray is transferable
@@ -146,6 +147,11 @@ function parseJpeg(config) {
     var jpegReader = new JpegImage();
     jpegReader.parse(config.binary);
     var s = jpegReader.getData(config.width, config.height);
+    return s;
+}
+
+function convertBackTo16bit(s, config) {
+    
     var pixels = null;
     var buf, index, i;
 
