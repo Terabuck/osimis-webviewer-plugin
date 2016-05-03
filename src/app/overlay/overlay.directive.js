@@ -49,7 +49,7 @@
             scope.vm.showTimeline = false;
 
             // auto grab serie model
-            if (scope.vm.wvShowTimeline && typeof scope.vm.wvSerie === 'undefined') {
+            if (scope.vm.wvShowTimeline && ctrls.serie) {
                 ctrls.serie.onSerieChanged(_this, function(serie) {
                     scope.vm.wvSerie = serie;
                     scope.vm.showTimeline = scope.vm.wvShowTimeline && !!serie.imageCount;
