@@ -6,10 +6,14 @@
         .factory('WvImage', factory);
 
     /* @ngInject */
-    function factory(wvAnnotationManager, WvAnnotationValueObject) {
-        /*
+    function factory(wvImageBinaryManager, wvAnnotationManager, WvAnnotationValueObject, WvImageQualities) {
+        /** class WvImage
+         *
          * @RootAggregate
-         * @note wvImageManager is injected for lazy loading purpose
+         *
+         * This contains image id, tags, annotations & binaries.
+         * an image either account for a DICOM instance (if the instance is monoframe), or a frame.
+         *
          */
         function WvImage(wvImageManager, id, tags, postProcesses) {
             var _this = this;
@@ -21,50 +25,93 @@
             this.postProcesses = postProcesses || [];
 
             this.onAnnotationChanged = new osimis.Listener();
-            
-            wvAnnotationManager.onAnnotationChanged(function(annotation) {
-                // @todo need to be destroyed on no listener anymore
+            this.onBinaryLoaded = new osimis.Listener();
 
-                if (annotation.imageId !== _this.id) return;
-
-                _this.onAnnotationChanged.trigger(annotation);
-            });
-
-            // @todo pass by parameter instead to avoid recursive dependency
-            var _downloadStream = wvImageManager.getPixelObjectStream(id);
-
-            _downloadStream.onImageReceived(function(pixelObjectPromise) {
-                // tell when a better quality has been downloaded
-                // used by the viewport to reload its canvas
-                _this.onPixelObjectReceived.trigger(pixelObjectPromise);
-            });
-            this.askPixelObject = function() {
-                // get raw image but event will retrieve intermediate compressed images meanwhile,
-                return _downloadStream.getCompressedImage();;
-
-                // @todo enable postprocessing back
-                // var getPixelsObjectFromImageIdFn = wvImageManager.getPixelObject.bind(wvImageManager);
-
-                // this.postProcesses.forEach(function(postProcess) {
-                //     _cachedPixelObjectPromise = _cachedPixelObjectPromise
-                //         .then(function(actualPixelObject) {
-                //             return postProcess.execute(actualPixelObject, getPixelsObjectFromImageIdFn);
-                //         });
-                // });
-                // result is not a 2d array of pixels but a cornerstone object containing an attribute with the array
-            }
-            this.onPixelObjectReceived = new osimis.Listener();
-
+            _feedAnnotationChangedEvents(this);
+            _feedBinaryLoadedEvents(this);
         }
 
+        /** WvImage#getAnnotations(type)
+         *
+         * @param type Annotation tool's name
+         * @return cornerstoneTools' annotation array for one instance
+         *
+         */
         WvImage.prototype.getAnnotations = function(type) {
             return wvAnnotationManager.getByImageId(this.id, type);
         };
 
+        /** WvImage#setAnnotations(type, data)
+         *
+         * @param type Annotation tool's name
+         * @param data cornerstoneTools' annotation array for one instance
+         *
+         */
         WvImage.prototype.setAnnotations = function(type, data) {
             var annotation = new WvAnnotationValueObject(type, this.id, data);
             wvAnnotationManager.set(annotation);
         };
+
+        /** WvImage#onAnnotationChanged(callback)
+         *
+         * @event called when one image's annotation has changed
+         * @param callback function(annotation: WvAnnotationValueObject)
+         *
+         */
+        WvImage.prototype.onAnnotationChanged = angular.noop;
+
+        /** WvImage#loadBinary(qualityLevel)
+         * 
+         * @param qualityLevel see WvImageQualities // @todo out !
+         * @return Promise<cornerstoneImageObject> // see https://github.com/chafey/cornerstone/wiki/image
+         *
+         */
+        WvImage.prototype.loadBinary = function(qualityLevel) {
+            return wvImageBinaryManager.get(this.id, qualityLevel);
+        };
+
+        /** WvImage#getBinaryOfHighestQualityAvailable()
+         * 
+         * @return Promise<cornerstoneImageObject> // see https://github.com/chafey/cornerstone/wiki/image
+         *
+         */
+        WvImage.prototype.getBinaryOfHighestQualityAvailable = function() {
+            return wvImageBinaryManager.getCachedHighestQuality(this.id);
+        };
+
+        /** WvImage#onBinaryLoaded(callback)
+         *
+         * @event called when a new binary has been loaded
+         * @param callback function(qualityLevel: WvImageQualities, binary: cornerstoneImageObject)
+         *
+         */
+        WvImage.prototype.onBinaryLoaded = angular.noop;
+
+        ////////////////
+
+        function _feedAnnotationChangedEvents(imageModel) {
+            wvAnnotationManager.onAnnotationChanged(function(annotation) {
+                // filter events that are related to this image
+                if (annotation.imageId !== imageModel.id) return;
+
+                // propagate event
+                imageModel.onAnnotationChanged.trigger(annotation);
+            });
+
+            // @todo need to be destroyed on no listener anymore
+        }
+
+        function _feedBinaryLoadedEvents(imageModel) {
+            wvImageBinaryManager.onBinaryLoaded(function(id, qualityLevel, cornerstoneImageObject) {
+                // filter events that are related to this image
+                if (id !== imageModel.id) return;
+
+                // propagate event
+                imageModel.onBinaryLoaded.trigger(qualityLevel, cornerstoneImageObject);
+            });
+
+            // @todo need to be destroyed on no listener anymore
+        }
 
         ////////////////
 

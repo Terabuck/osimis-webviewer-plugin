@@ -40,7 +40,7 @@
         });
 
     /* @ngInject */
-    function wvViewport($, _, cornerstone, cornerstoneTools, $rootScope, $q, $parse, wvImageManager) {
+    function wvViewport($, _, cornerstone, cornerstoneTools, $rootScope, $q, $parse, wvImageManager, WvImageQualities) {
         // Usage:
         //
         // Creates:
@@ -231,7 +231,9 @@
         ViewportViewModel.prototype.getEnabledElement = function() {
             return this._enabledElement;
         };
-
+        
+        // allow tools to reacts to click on the viewport
+        // @todo move out ?
         ViewportViewModel.prototype.setSelectable = function(onSelectedCallback) {
             var _this = this;
             
@@ -263,15 +265,6 @@
         ViewportViewModel.prototype.getImage = function() {
             return this._image;
         };
-        ViewportViewModel.prototype.updateImage = function(reset) {
-            if (!this.hasImage()) {
-                return;
-            }
-
-            // @todo assert previousViewport should always exists
-            //reset.call(this, ..., ..)
-            
-        };
         ViewportViewModel.prototype.setImage = function(id, reset) {
             if (id == this._imageId && !reset) {
                 return $q.reject('This image is already shown');
@@ -297,59 +290,61 @@
                 _cancelImageDisplaying = true;
                 _this._cancelImageDisplaying = null;
             };
-            // @todo true canceling
-            return $q
-                .all({
-                    processedImage: _this._imageManager
-                        .get(id)
-                        .then(function (image) {
-                            return image.getPixelObject(); // getPixelObject returns a promise
-                        }),
-                    imageModel: _this._imageManager.get(id)
-                })
-                .then(function(args) {
-                    if (_cancelImageDisplaying) {
-                        return $q.reject('wv-viewport: image displaying canceled');
+
+            // retrieve image model
+            return _this._imageManager
+                .get(id)
+                .then(function (imageModel) {
+                    // redraw canvas when binary are available
+                    imageModel.onBinaryLoaded(function(qualityLevel, cornerstoneImageObject) {
+                        _updateImage(imageModel, cornerstoneImageObject);
+                    });
+                    // @todo clean listener
+
+                    // get the best already available binary
+                    // use the *available* binary to avoid duplicate draw (one with the promise result, the other with the onBinaryLoaded event)
+                    var cornerstoneImageObjectPromise = imageModel.getBinaryOfHighestQualityAvailable();
+                    if (cornerstoneImageObjectPromise) {
+                        // draw it directly
+                        cornerstoneImageObjectPromise.then(function(cornerstoneImageObject) {
+                            _updateImage(imageModel, cornerstoneImageObject);
+                        });
                     }
 
-                    var processedImage = args.processedImage;
-                    var newImageModel = args.imageModel;
-                    var oldImageModel = _this._image;
-
-                    var viewportData;
-                    if (!reset) {
-                        viewportData = cornerstone.getViewport(_this._enabledElement); // get old viewportData
-                    }
-                    else {
-                        viewportData = _this.resetViewport(processedImage);
-                    }
-                    
-                    // trigger onImageChanging prior to image drawing
-                    // but after the viewport data is updated
-                    _this.onImageChanging.trigger(newImageModel, oldImageModel);
-
-                    cornerstone.displayImage(_this._enabledElement, processedImage, viewportData);
-
-                    $(_this._enabledElement).find('canvas').css('visibility', 'visible');
-
-                    return args;
-                })
-                .then(function(args) {
-                    if (_cancelImageDisplaying) {
-                        return $q.reject('wv-viewport: image displaying canceled');;
+                    if (!cornerstoneImageObjectPromise || cornerstoneImageObjectPromise.qualityLevel < WvImageQualities.R150J95) {
+                        // if the quality desired is not available, load it - the event will draw it
+                        imageModel.loadBinary(WvImageQualities.R150J95);
                     }
 
-                    var newImageModel = args.imageModel;
-                    var oldImageModel = _this._image;
-                    //var newViewport = args.newViewport;
-                    //var oldViewport = args.oldViewport;
+                    return imageModel;
+                });
+            
+            function _updateImage(imageModel, pixelObject) {
+                var processedImage = pixelObject;
+                var newImageModel = imageModel;
+                var oldImageModel = _this._image;
 
-                    _this._image = newImageModel;
-                    _this.onImageChanged.trigger(newImageModel, oldImageModel);//, newViewport, oldViewport);
+                var viewportData;
+                if (!reset) {
+                    viewportData = cornerstone.getViewport(_this._enabledElement); // get old viewportData
+                }
+                else {
+                    viewportData = _this.resetViewport(processedImage);
+                }
 
-                    return newImageModel;
-                })
-                ;
+                // trigger onImageChanging prior to image drawing
+                // but after the viewport data is updated
+                _this.onImageChanging.trigger(newImageModel, oldImageModel);
+
+                cornerstone.displayImage(_this._enabledElement, processedImage, viewportData);
+
+                $(_this._enabledElement).find('canvas').css('visibility', 'visible');
+
+                _this._image = newImageModel;
+                _this.onImageChanged.trigger(newImageModel, oldImageModel);
+
+                return newImageModel;
+            }
         };
         ViewportViewModel.prototype.clearImage = function() {
             this._imageId = null;

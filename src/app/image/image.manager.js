@@ -6,10 +6,9 @@
         .factory('wvImageManager', wvImageManager);
 
     /* @ngInject */
-    function wvImageManager($http, $q, $compile, $timeout, $rootScope, wvConfig, wvCornerstoneImageAdapter, WvImage) {
+    function wvImageManager($http, $q, $compile, $timeout, $rootScope, wvConfig, WvImage) {
         var service = {
             get: get,
-            getPixelObjectStream: getPixelObjectStream,
             createAnnotedImage: createAnnotedImage,
             /**
              * @public register a post processor
@@ -24,9 +23,6 @@
 
         // @todo flush somehow
         var pixelCache = {};
-
-        window.osimis.WorkerPool.createPromise = $q;
-        var imageParserPool = new window.osimis.WorkerPool('/app/image/image-parser.async/main.js', 4);
 
         return service;
 
@@ -74,76 +70,6 @@
             return modelCache[id];
         };
 
-        function getPixelObjectStream(id) {
-            var splittedId = id.split(':');
-            var instanceId = splittedId[0];
-            var frameIndex = splittedId[1];
-
-            var stream = new osimis.ImageDownloadStream(instanceId, frameIndex);
-
-            var _cache1 = null;
-            stream.setCompressedImageDownloadPolicy(function(qualityLevel) {
-                if (!_cache1) {
-                    // the repo still can manage the cache
-                    var compression = wvConfig.defaultCompression;
-                    var url = wvConfig.orthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/resize:150' + '/8bit' + '/jpeg:'+compression +'/klv';
-
-                    _cache1 = imageParserPool
-                        .postMessage(url)
-                        .then(function (result) {
-                            // configure cornerstone related object methods
-                            var cornerstoneImageObject = wvCornerstoneImageAdapter.process(id, result.cornerstoneMetaData, result.pixelBuffer, result.pixelBufferFormat);
-                            // JUST FOR TEST
-                            stream.getRawImage(); // JUST
-                            // JUST FOR TEST
-                            return cornerstoneImageObject;
-                        });
-                }
-
-                return _cache1;
-            });
-            var _cache2 = null;
-            stream.setRawImageDownloadPolicy(function() {
-                if (!_cache2) {
-                    // the repo still can manage the cache
-                    // this is not raw for now.. just not subsampled
-                    var compression = wvConfig.defaultCompression;
-                    var url = wvConfig.orthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/8bit' + '/jpeg:'+compression +'/klv';
-
-                    _cache2 = imageParserPool
-                        .postMessage(url)
-                        .then(function (result) {
-                            // configure cornerstone related object methods
-                            var cornerstoneImageObject = wvCornerstoneImageAdapter.process(id, result.cornerstoneMetaData, result.pixelBuffer, result.pixelBufferFormat);
-                            return cornerstoneImageObject;
-                        });
-                }
-
-                return _cache2;
-            });
-
-            return stream;
-        }
-
-        // function getPixelObject(id) {
-        //     if (!pixelCache.hasOwnProperty(id)) {
-        //         var compression = wvConfig.defaultCompression;
-        //         var splittedId = id.split(':');
-        //         var instanceId = splittedId[0];
-        //         var frameIndex = splittedId[1];
-        //         var uri = wvConfig.orthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/resize:150' + '/8bit' + '/jpeg:'+compression +'/klv';
-
-        //         pixelCache[id] = imageParserPool.postMessage(uri)
-        //             .then(function (result) {
-        //                 // configure cornerstone related object methods
-        //                 var cornerstoneImageObject = wvCornerstoneImageAdapter.process(id, result.cornerstoneMetaData, result.pixelBuffer, result.pixelBufferFormat);
-        //                 return cornerstoneImageObject;
-        //             });
-        //     }
-
-        //     return pixelCache[id];
-        // }
-        
         function registerPostProcessor(name, PostProcessor) {
             postProcessorClasses[name] = PostProcessor;
         }
@@ -217,16 +143,6 @@
             })
         }
 
-    }
-
-    // http://stackoverflow.com/a/11058858/881731
-    function _str2ab(str) {
-        var buf = new ArrayBuffer(str.length);
-        var pixels = new Uint8Array(buf);
-        for (var i = 0, strLen=str.length; i<strLen; i++) {
-            pixels[i] = str.charCodeAt(i);
-        }
-        return pixels;
     }
 
 })();

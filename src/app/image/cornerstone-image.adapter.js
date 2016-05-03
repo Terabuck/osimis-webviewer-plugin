@@ -21,9 +21,10 @@
 
         ////////////////
 
-        function process(imageId, metaData, pixelBuffer, pixelBufferFormat) {
+        function process(imageId, qualityLevel, metaData, pixelBuffer, pixelBufferFormat) {
             // @todo check if this variable is required, remove it if not, write why otherwise
             metaData.imageId = imageId;
+            metaData.qualityLevel = qualityLevel;
 
             if (metaData.color) {
                 metaData.render = cornerstone.renderColorImage;
