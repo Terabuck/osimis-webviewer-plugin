@@ -60,14 +60,16 @@
          */
         WvImage.prototype.onAnnotationChanged = angular.noop;
 
-        /** WvImage#loadBinary(qualityLevel)
+        /** WvImage#loadBinary(desiredQualityLevel)
          * 
-         * @param qualityLevel see WvImageQualities // @todo out !
+         * @param desiredQualityLevel see WvImageQualities
+         *        note the manager may load intermediate image qualities
+         *        those can be retrieved using the onBinaryLoaded event
          * @return Promise<cornerstoneImageObject> // see https://github.com/chafey/cornerstone/wiki/image
          *
          */
-        WvImage.prototype.loadBinary = function(qualityLevel) {
-            return wvImageBinaryManager.get(this.id, qualityLevel);
+        WvImage.prototype.loadBinary = function(desiredQualityLevel) {
+            return wvImageBinaryManager.get(this.id, desiredQualityLevel);
         };
 
         /** WvImage#getBinaryOfHighestQualityAvailable()

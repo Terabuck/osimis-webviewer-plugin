@@ -313,7 +313,8 @@
                         // the same image (or even something else)
                         if (newQualityLevel > previousQualityLevel && cornerstoneImageObject.qualityLevel <= qualityLevel) {
                             _updateImage(imageModel, cornerstoneImageObject);
-                            // @todo adapt zoom
+                            // force redraw because image binary changes, even if param do not
+                            cornerstone.invalidateImageId(imageModel.id);
                         }
 
                         // @todo allow cornerstone zoom to go behond 0.25
@@ -346,7 +347,6 @@
                 });
             
             function _updateImage(imageModel, pixelObject) {
-                var processedImage = pixelObject;
                 var newImageModel = imageModel;
                 var oldImageModel = _this._image;
 
@@ -355,14 +355,14 @@
                     viewportData = cornerstone.getViewport(_this._enabledElement); // get old viewportData
                 }
                 else {
-                    viewportData = _this.resetViewport(processedImage);
+                    viewportData = _this.resetViewport(pixelObject);
                 }
 
                 // trigger onImageChanging prior to image drawing
                 // but after the viewport data is updated
                 _this.onImageChanging.trigger(newImageModel, oldImageModel);
-
-                cornerstone.displayImage(_this._enabledElement, processedImage, viewportData);
+                
+                cornerstone.displayImage(_this._enabledElement, pixelObject, viewportData);
 
                 $(_this._enabledElement).find('canvas').css('visibility', 'visible');
 
@@ -414,18 +414,20 @@
         };
 
         function _setViewportScaleByImage(viewportData, elementWidth, elementHeight, csImage) {
-            var isImageSmallerThanViewport = csImage.width <= elementWidth && csImage.height <= elementHeight;
+            var scale = csImage.originalWidth / csImage.width;
+
+            var isImageSmallerThanViewport = (csImage.width * scale) <= elementWidth && (csImage.height * scale) <= elementHeight;
             if (isImageSmallerThanViewport) {
-                viewportData.scale = 1.0;
+                viewportData.scale = 1.0 * scale;
             }
             else {
-                var verticalScale = elementHeight / csImage.height;
-                var horizontalScale = elementWidth / csImage.width;
+                var verticalScale = elementHeight / (csImage.height * scale);
+                var horizontalScale = elementWidth / (csImage.width * scale);
                 if(horizontalScale < verticalScale) {
-                  viewportData.scale = horizontalScale;
+                  viewportData.scale = horizontalScale * scale;
                 }
                 else {
-                  viewportData.scale = verticalScale;
+                  viewportData.scale = verticalScale * scale;
                 }
                 viewportData.translation.x = 0;
                 viewportData.translation.y = 0;

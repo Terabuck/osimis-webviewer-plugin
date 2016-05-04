@@ -46,6 +46,18 @@
         function get(id, qualityLevel) {
         	// @todo handle cache better 
 
+        	if (qualityLevel > _.min(_.values(WvImageQualities))) {
+        	    // download a lower quality first
+        	    var newMax = 0;
+        	    for (var prop in WvImageQualities) {
+        	        if (!WvImageQualities.hasOwnProperty(prop)) continue;
+        	        if (WvImageQualities[prop] > newMax && WvImageQualities[prop] < qualityLevel) {
+        	            newMax = WvImageQualities[prop];
+        	        }
+        	    }
+        	    get(id, newMax);
+        	}
+
         	if (!_cache[id]) {
         		_cache[id] = {};
         	}

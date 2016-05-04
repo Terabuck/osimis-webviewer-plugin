@@ -87,9 +87,13 @@ function parseKLV(arraybuffer) {
         Stretched: 13, // set back 8bit to 16bit if true
         Compression: 14,
 
+        // used to zoom downsampled images back to original size
+        // cornerstone doesn't support this natively, it's done in the viewport
+        OriginalHeight: 15, 
+        OriginalWidth: 16,
 
         // - Image binary
-        ImageBinary: 15
+        ImageBinary: 17
     };
 
     var cornerstoneMetaData = {
@@ -108,7 +112,10 @@ function parseKLV(arraybuffer) {
         slope: klvReader.getFloat(keys.Slope),
         intercept: klvReader.getFloat(keys.Intercept),
         windowCenter: klvReader.getFloat(keys.WindowCenter),
-        windowWidth: klvReader.getFloat(keys.WindowWidth)
+        windowWidth: klvReader.getFloat(keys.WindowWidth),
+
+        originalHeight: klvReader.getUInt(keys.OriginalHeight),
+        originalWidth: klvReader.getUInt(keys.OriginalWidth)
     };
 
     var compression = klvReader.getString(keys.Compression);
