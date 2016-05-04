@@ -5,8 +5,9 @@
         .module('webviewer')
         .factory('wvImageBinaryManager', wvImageBinaryManager)
         .constant('WvImageQualities', {
-        	J95: 100,
-			R150J95: 2 // resampling to 150 px + compressed to jpeg95
+        	J100: 100,
+			R150J100: 1, // resampling to 150 px + compressed to jpeg100
+			R1000J100: 2 // resampling to 1000 px + compressed to jpeg100
         });
 
     /* @ngInject */
@@ -69,11 +70,14 @@
 
 	            var url = null;
 	            switch (qualityLevel) {
-	            case WvImageQualities.J95:
-	            	url = wvConfig.orthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/8bit' + '/jpeg:95' + '/klv';
+	            case WvImageQualities.J100:
+	            	url = wvConfig.orthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/8bit' + '/jpeg:100' + '/klv';
 	            	break;
-	            case WvImageQualities.R150J95:
-	                url = wvConfig.orthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/resize:150' + '/8bit' + '/jpeg:95' + '/klv';
+	            case WvImageQualities.R1000J100:
+	                url = wvConfig.orthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/resize:1000' + '/8bit' + '/jpeg:100' + '/klv';
+	                break;
+                case WvImageQualities.R150J100:
+	                url = wvConfig.orthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/resize:150' + '/8bit' + '/jpeg:100' + '/klv';
 	                break;
 	            default:
 	            	throw new Error('Undefined qualityLevel: ' + qualityLevel);

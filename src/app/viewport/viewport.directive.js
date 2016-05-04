@@ -298,24 +298,36 @@
                     // chose quality depending of viewport size
                     var qualityLevel = null;
                     if (_this._viewportWidth <= 150 || _this._viewportHeight <= 150) {
-                        qualityLevel = WvImageQualities.R150J95;
+                        qualityLevel = WvImageQualities.R150J100;
+                    }
+                    else if (_this._viewportWidth <= 1000 || _this._viewportHeight <= 1000) {
+                        qualityLevel = WvImageQualities.R1000J100;
                     }
                     else {
-                        qualityLevel = WvImageQualities.J95;
+                        qualityLevel = WvImageQualities.J100;
                     }
+
+                    var actualQualityLevel = null;
 
                     // redraw canvas when binary are available
                     imageModel.onBinaryLoaded(function(newQualityLevel, cornerstoneImageObject) {
-                        var previousQualityLevel = 0; // @todo add as param
+                        var previousQualityLevel = actualQualityLevel;
 
-                        // only redraws viewport if required
                         // @note onBinaryLoaded can be triggered by another viewport using
                         // the same image (or even something else)
+
+                        // only redraws viewport if required
                         if (newQualityLevel > previousQualityLevel && cornerstoneImageObject.qualityLevel <= qualityLevel) {
+                            // update image
                             _updateImage(imageModel, cornerstoneImageObject);
+
                             // force redraw because image binary changes, even if param do not
                             cornerstone.invalidateImageId(imageModel.id);
                         }
+
+                        // save the actual quality level to avoid drawing an inferior quality later
+                        // this may occurs if another viewport load the same image with an inferior quality
+                        actualQualityLevel = cornerstoneImageObject.qualityLevel;
 
                         // @todo allow cornerstone zoom to go behond 0.25
                     });
