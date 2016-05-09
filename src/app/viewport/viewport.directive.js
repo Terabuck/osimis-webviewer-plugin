@@ -17,7 +17,7 @@
                  * @param redraw: boolean (default: true)
                  *
                  * You can choose to not redraw the image after updating the tools data.
-                 * This is usefull when the tools change because the image is changing.
+                 * This is usefull to avoid useless dual redrawing when the data changes because the image also changes.
                  *
                  * As long as the listener onImageChanging is used instead of onImageChanged,
                  * the drawing will occurs after the tool reloading,
@@ -210,7 +210,6 @@
             this._image = null;
             this._viewportWidth = null;
             this._viewportHeight = null;
-            this._cancelImageDisplaying = null;
 
             // store the resolutionScale to scale image back when image resolution changes
             this._resolutionScale = null;
@@ -226,12 +225,11 @@
         ViewportViewModel.prototype.onImageChanged = angular.noop;
         
         ViewportViewModel.prototype.destroy = function() {
-            if (this._cancelImageDisplaying) {
-                this._cancelImageDisplaying();
-            }
+            // cancel loading
             cornerstone.disable(this._enabledElement);
         };
 
+        // used by extensions
         ViewportViewModel.prototype.getEnabledElement = function() {
             return this._enabledElement;
         };
@@ -282,18 +280,9 @@
             }
 
             var _this = this;
-
+            
+            var oldImageId = this._imageId;
             this._imageId = id;
-
-            if (this._cancelImageDisplaying) {
-                this._cancelImageDisplaying();
-            }
-
-            var _cancelImageDisplaying = false;
-            this._cancelImageDisplaying = function() {
-                _cancelImageDisplaying = true;
-                _this._cancelImageDisplaying = null;
-            };
 
             // retrieve image model
             return _this._imageManager
@@ -324,9 +313,6 @@
                         if (newQualityLevel > previousQualityLevel && cornerstoneImageObject.qualityLevel <= qualityLevel) {
                             // update image
                             _updateImage(imageModel, cornerstoneImageObject);
-
-                            // force redraw because image binary changes, even if param do not
-                            cornerstone.invalidateImageId(imageModel.id);
                         }
 
                         // save the actual quality level to avoid drawing an inferior quality later
@@ -371,16 +357,18 @@
                 var newImageModel = imageModel;
                 var oldImageModel = _this._image;
 
-                // reset the viewport data or gather them
-                var viewportData = null;
-                if (reset) {
+                // reset the viewport data or gather the actual one
+                var viewportData = cornerstone.getViewport(_this._enabledElement);
+                if (!viewportData || reset) {
+                    // reset viewport define an image scale adapted to the viewport size
                     viewportData = _this.resetViewport(cornerstoneImageObject);
                     
-                    // keep resetting for when new resolutions of the same image are drawed
+                    reset = false;
                 }
-                else  {
-                    // get old viewportData
-                    viewportData = cornerstone.getViewport(_this._enabledElement);
+                else {
+                    // we want to adapt to the new resolution of the image
+                    // on reset, we do not want to adapt to the image resolution 
+                    // because it could scale the image larger than the viewport size for instance
 
                     // rescale the image to its (possible) new resolution
                     var oldResolutionScale = _this._resolutionScale || 1;
@@ -391,10 +379,7 @@
                     var newScale = oldScale / oldResolutionScale * newResolutionScale;
                     viewportData.scale = newScale;
                     
-                    // issue: zoom is applied to translation.
-                    // new resolution changes translation.
-                    
-                    // compensate the translation rescaling induced by image resolution change
+                    // Compensate the translation rescaling induced by image resolution change (zoom is applied to the translation).
                     var deltaScale = newScale / oldScale;
                     viewportData.translation.x = viewportData.translation.x / deltaScale;
                     viewportData.translation.y = viewportData.translation.y / deltaScale;
@@ -409,7 +394,14 @@
                 _this.onImageChanging.trigger(newImageModel, oldImageModel);
                 
                 // Display image
-                cornerstone.displayImage(_this._enabledElement, cornerstoneImageObject, viewportData);
+                //   force redraw because image binary changes, even if param do not (reset the canvas size)
+                //   cornerstone#displayImage can not be used because it doesn't allow to invalidate cornerstone cache
+                var enabledElementObject = cornerstone.getEnabledElement(_this._enabledElement); // enabledElementObject != enabledElementDom
+                enabledElementObject.image = cornerstoneImageObject;
+                enabledElementObject.viewport = viewportData;
+                cornerstone.updateImage(_this._enabledElement, true); // draw image & invalidate cornerstone cache
+                
+                // unhide viewport
                 $(_this._enabledElement).find('canvas').css('visibility', 'visible');
 
                 // Trigger onImageChanged
