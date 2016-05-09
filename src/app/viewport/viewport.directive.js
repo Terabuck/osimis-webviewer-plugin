@@ -21,6 +21,7 @@
                  *
                  * As long as the listener onImageChanging is used instead of onImageChanged,
                  * the drawing will occurs after the tool reloading,
+                 *
                  */
                 if (typeof redraw === 'undefined') redraw = true;
 
@@ -211,6 +212,9 @@
             this._viewportHeight = null;
             this._cancelImageDisplaying = null;
 
+            // store the resolutionScale to scale image back when image resolution changes
+            this._resolutionScale = null;
+    
             this.onImageChanging = new osimis.Listener();
             this.onImageChanged = new osimis.Listener();
             this.onViewportResetting = new osimis.Listener();
@@ -337,9 +341,14 @@
                     // use the *available* binary to avoid duplicate draw (one with the promise result, the other with the onBinaryLoaded event)
                     var cornerstoneImageObjectPromise = imageModel.getBinaryOfHighestQualityAvailable();
                     if (cornerstoneImageObjectPromise) {
+                        // draw the image directly from the cache (even if the loading might not be finished, in this case the loading can be dual)
                         cornerstoneImageObjectPromise.then(function(cornerstoneImageObject) {
-                            // draw it directly
+                            // update image
                             _updateImage(imageModel, cornerstoneImageObject);
+
+                            // save the actual quality level to avoid drawing an inferior quality later
+                            // this may occurs if another viewport load the same image with an inferior quality
+                            actualQualityLevel = cornerstoneImageObject.qualityLevel;
                             
                             // load better quality if required
                             if (cornerstoneImageObject.qualityLevel < qualityLevel) {
@@ -358,32 +367,59 @@
                     return imageModel;
                 });
             
-            function _updateImage(imageModel, pixelObject) {
+            function _updateImage(imageModel, cornerstoneImageObject) { // viewportData is optional
                 var newImageModel = imageModel;
                 var oldImageModel = _this._image;
 
-                var viewportData;
-                if (!reset) {
-                    viewportData = cornerstone.getViewport(_this._enabledElement); // get old viewportData
+                // reset the viewport data or gather them
+                var viewportData = null;
+                if (reset) {
+                    viewportData = _this.resetViewport(cornerstoneImageObject);
+                    
+                    // keep resetting for when new resolutions of the same image are drawed
                 }
-                else {
-                    viewportData = _this.resetViewport(pixelObject);
+                else  {
+                    // get old viewportData
+                    viewportData = cornerstone.getViewport(_this._enabledElement);
+
+                    // rescale the image to its (possible) new resolution
+                    var oldResolutionScale = _this._resolutionScale || 1;
+                    var newResolutionScale = cornerstoneImageObject.originalWidth / cornerstoneImageObject.width;
+
+                    // scale viewportData.scale from oldResolutionScale to newResolutionScale
+                    var oldScale = viewportData.scale;
+                    var newScale = oldScale / oldResolutionScale * newResolutionScale;
+                    viewportData.scale = newScale;
+                    
+                    // issue: zoom is applied to translation.
+                    // new resolution changes translation.
+                    
+                    // compensate the translation rescaling induced by image resolution change
+                    var deltaScale = newScale / oldScale;
+                    viewportData.translation.x = viewportData.translation.x / deltaScale;
+                    viewportData.translation.y = viewportData.translation.y / deltaScale;
+
+                    // save the resolutionScale further uses (eg. when image resolution change)
+                    _this._resolutionScale = newResolutionScale;
                 }
 
-                // trigger onImageChanging prior to image drawing
+                // Trigger onImageChanging prior to image drawing
                 // but after the viewport data is updated
+                // Used to avoid multiple useless consecutive redrawing
                 _this.onImageChanging.trigger(newImageModel, oldImageModel);
                 
-                cornerstone.displayImage(_this._enabledElement, pixelObject, viewportData);
-
+                // Display image
+                cornerstone.displayImage(_this._enabledElement, cornerstoneImageObject, viewportData);
                 $(_this._enabledElement).find('canvas').css('visibility', 'visible');
 
+                // Trigger onImageChanged
                 _this._image = newImageModel;
                 _this.onImageChanged.trigger(newImageModel, oldImageModel);
 
                 return newImageModel;
             }
         };
+        
         ViewportViewModel.prototype.clearImage = function() {
             this._imageId = null;
 
@@ -395,55 +431,72 @@
 
         ViewportViewModel.prototype.resizeViewport = function(width, height) {
             var jqEnabledElement = $(this._enabledElement);
-
+            
+            // save the viewport canvas size for ulterior uses (eg. know if an image is larger than its viewport)
             this._viewportWidth = width;
             this._viewportHeight = height;
-
+            
+            // set the canvas size
             jqEnabledElement.width(width);
             jqEnabledElement.height(height);
-            cornerstone.resize(this._enabledElement, false);
 
+            // set the pixel quantity (? not sure it does that)
+            cornerstone.resize(this._enabledElement, false);
+            
+            // draw & scale the image (if one is displayed)
             var csImage = cornerstone.getImage(this._enabledElement);
             var viewportData = cornerstone.getViewport(this._enabledElement);
             if (csImage && viewportData) {
                 // rescale the image
-                _setViewportScaleByImage(viewportData, this._viewportWidth, this._viewportHeight, csImage);
+                this._resetViewportScaleByImage(viewportData, csImage);
                 // redraw it
                 cornerstone.displayImage(this._enabledElement, csImage, viewportData);
             }
         };
 
         ViewportViewModel.prototype.resetViewport = function(csImage) {
+            // get the base viewport data
             var viewportData = cornerstone.getDefaultViewportForImage(this._enabledElement, csImage);
 
             // rescale the image
-            _setViewportScaleByImage(viewportData, this._viewportWidth, this._viewportHeight, csImage);
+            this._resetViewportScaleByImage(viewportData, csImage);
 
             // allow extensions to extend this behavior
             this.onViewportResetting.trigger(viewportData);
 
             return viewportData;
         };
+        
+        // updates viewportData
+        ViewportViewModel.prototype._resetViewportScaleByImage = function(viewportData, cornerstoneImageObject) {
+            var newResolutionScale = cornerstoneImageObject.originalWidth / cornerstoneImageObject.width;
 
-        function _setViewportScaleByImage(viewportData, elementWidth, elementHeight, csImage) {
-            var scale = csImage.originalWidth / csImage.width;
-
-            var isImageSmallerThanViewport = (csImage.width * scale) <= elementWidth && (csImage.height * scale) <= elementHeight;
+            var isImageSmallerThanViewport = cornerstoneImageObject.originalWidth <= this._viewportWidth && cornerstoneImageObject.originalHeight <= this._viewportHeight;
             if (isImageSmallerThanViewport) {
-                viewportData.scale = 1.0 * scale;
+                // show the image unscalled
+                viewportData.scale = 1.0 * newResolutionScale;
             }
             else {
-                var verticalScale = elementHeight / (csImage.height * scale);
-                var horizontalScale = elementWidth / (csImage.width * scale);
+                // downscale the image to fit the viewport
+
+                // choose the smallest between vertical and horizontal scale to show the entire image (and not upscale one of the two)
+
+                var verticalScale = this._viewportHeight / cornerstoneImageObject.originalHeight * newResolutionScale;
+                var horizontalScale = this._viewportWidth / cornerstoneImageObject.originalWidth * newResolutionScale;
                 if(horizontalScale < verticalScale) {
-                  viewportData.scale = horizontalScale * scale;
+                  viewportData.scale = horizontalScale;
                 }
                 else {
-                  viewportData.scale = verticalScale * scale;
+                  viewportData.scale = verticalScale;
                 }
-                viewportData.translation.x = 0;
-                viewportData.translation.y = 0;
             }
+            
+            // also, reset the image position
+            viewportData.translation.x = 0;
+            viewportData.translation.y = 0;
+
+            // save the resolutionScale for further uses (eg. image resolution change)
+            this._resolutionScale = newResolutionScale;
         };
 
         return directive;
