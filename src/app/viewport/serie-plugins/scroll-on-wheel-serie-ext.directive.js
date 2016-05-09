@@ -76,7 +76,9 @@
 
         /* mobile scrolling */
 
-        var hammertime = new Hammer($element[0]);
+        var hammertime = new Hammer($element[0], {
+            inputClass: Hammer.TouchInput // disable panning on desktop
+        });
         hammertime.get('pan').set({
             direction: Hammer.DIRECTION_HORIZONTAL,
             pointers: 1
