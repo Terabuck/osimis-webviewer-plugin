@@ -106,9 +106,20 @@
             // Get cleaned parameters
             this._resetCornerstoneViewportData(enabledElement, cornerstoneImageObject); // @todo only clean width/height
 
-            // Redraw the image
+            // Redraw the image - don't use cornerstone#displayImage because bugs occurs (only when debugger is off)
+            // those issues may come from changing the cornerstoneImageObject (cornerstone probably cache it)
             var viewportData = cornerstone.getViewport(enabledElement);
-            cornerstone.displayImage(enabledElement, cornerstoneImageObject, viewportData);
+            var enabledElementObject = cornerstone.getEnabledElement(enabledElement); // enabledElementObject != enabledElementDom
+            enabledElementObject.viewport = viewportData;
+            enabledElementObject.image = cornerstoneImageObject;
+            cornerstone.updateImage(enabledElement, true); // draw image & invalidate cornerstone cache
+            $(enabledElementObject.element).trigger("CornerstoneImageRendered", {
+                viewport: enabledElementObject.viewport,
+                element : enabledElementObject.element,
+                image : enabledElementObject.image,
+                enabledElement : enabledElementObject,
+                canvasContext: enabledElementObject.canvas.getContext('2d')
+            });
         }
     };
 
@@ -255,7 +266,7 @@
      *
      * Draw an image into the viewport using cornerstone.
      * This handle dynamic resolution change of image.
-     * To achieve this, cornerstone viewport scale and translation are scaled at each resolution change,
+     * To achieve this, cornerstone viewport scale and translation are rescaled at each resolution change,
      * as well as the tools data (wich are stored in pixels, not mm).
      *
      * @return Promise<Image> resolved when the first image drawing occurs
@@ -332,6 +343,13 @@
                 var enabledElementObject = cornerstone.getEnabledElement(enabledElement); // enabledElementObject != enabledElementDom
                 enabledElementObject.image = cornerstoneImageObject;
                 cornerstone.updateImage(enabledElement, true); // draw image & invalidate cornerstone cache
+                $(enabledElementObject.element).trigger("CornerstoneImageRendered", {
+                    viewport: enabledElementObject.viewport,
+                    element : enabledElementObject.element,
+                    image : enabledElementObject.image,
+                    enabledElement : enabledElementObject,
+                    canvasContext: enabledElementObject.canvas.getContext('2d')
+                });
                 
                 // unhide viewport
                 $(enabledElement).find('canvas').css('visibility', 'visible');

@@ -34,9 +34,13 @@
 
         function getByImageId(imageId, type) {
             if (type) {
-                return annotations[type] && annotations[type][imageId];
+                // Return filtered annotations (by type)
+                
+                // as annotations are stateless, we clone them to avoid unexpected behavior
+                return annotations[type] && _.cloneDeep(annotations[type][imageId]);
             }
             else {
+                // Return all annotations
                 return _(annotations)
                     .flatMap(function(annotationByTypes) {
                         return _.values(annotationByTypes);

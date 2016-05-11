@@ -116,11 +116,11 @@
             var enabledElement = viewport.getEnabledElement();
             var toolStateManager = cornerstoneTools.getElementToolStateManager(enabledElement);
 
+            // for each viewport, listen..
             $(enabledElement).on('CornerstoneImageRendered.'+this.toolName, _.debounce(function() {
                 var image = viewport.getImage();
                 var newAnnotationsData = toolStateManager.getStateByToolAndImageId(_this.toolName, image.id);
                 var oldAnnotations = image.getAnnotations(_this.toolName);
-                
                 
                 // As update checks are made on each CornerstoneImageRendered
                 // don't trigger update if the newAnnotations hasn't changed
@@ -134,7 +134,8 @@
                     // using a fast shallow object clone
                     var data = _.clone(newAnnotationsData);
 
-                    // ignore is used to avoid recursive event cycle (trigger <-> listen) - don't redraw the annotations that are already drawn
+                    // Ignore the BaseTool onAnnotationChanged listening to avoid dual annotation draw (the 
+                    // annotations are already drawed). The onAnnotationChanged will still be listened by other observers.
                     image.onAnnotationChanged.ignore([_this, viewport], function() {
                         if (data && data.data.length) {
                             image.setAnnotations(_this.toolName, data);

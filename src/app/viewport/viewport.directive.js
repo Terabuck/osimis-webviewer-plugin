@@ -30,14 +30,27 @@
                 if (typeof redraw === 'undefined') redraw = true;
 
                 this.toolState[imageId] = this.toolState[imageId] || {};
-                this.toolState[imageId][toolName] = state;
+                
+                // Merge the data into cornernerstone
+                // We can't simply change the object references because cornerstone would lose link to the handles it's working on.
+                // Strange behavior: merge seems to handle property deletion as well
+                _.merge(this.toolState[imageId][toolName], state);
                 
                 if (redraw) {
                     // refresh viewports
                     var enabledElementObjects = cornerstone.getEnabledElementsByImageId(imageId);
                     enabledElementObjects.forEach(function(enabledElementObject) {
                         var enabledElement = enabledElementObject.element;
-                        cornerstone.draw(enabledElement);
+                        // Redraw the image - don't use cornerstone#draw because bugs occurs (only when debugger is off)
+                        // those issues may come from changing the cornerstoneImageObject when image resolution change (cornerstone probably cache it)
+                        cornerstone.updateImage(enabledElement, true); // draw image & invalidate cornerstone cache
+                        $(enabledElementObject.element).trigger("CornerstoneImageRendered", {
+                            viewport: enabledElementObject.viewport,
+                            element : enabledElementObject.element,
+                            image : enabledElementObject.image,
+                            enabledElement : enabledElementObject,
+                            canvasContext: enabledElementObject.canvas.getContext('2d')
+                        });
                     });
                 }
             };
@@ -166,7 +179,7 @@
                 }
 
                 //model.resizeCanvas(wvSizeController.getWidthInPixel(), wvSizeController.getHeightInPixel());
-                var unlistenWvSizeFn = wvSizeController && wvSizeController.onUpdate(function() {
+                var unlistenWvSizeFn = wvSizeController && wvSizeController.onUpdate(function resizeCanvas() {
                     var width = wvSizeController.getWidthInPixel();
                     var height = wvSizeController.getHeightInPixel();
 
