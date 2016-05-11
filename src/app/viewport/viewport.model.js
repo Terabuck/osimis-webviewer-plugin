@@ -11,7 +11,7 @@
         // Used to throw exception if the same image is drawn multiple times
         this._inProcessingImageId = null;
         
-        // Used for instance by tools to retrieve image annotations
+        // Used for instance by tools to retrieve image annotations - or by pixel to mm conversion (used by tools as well)
         this._inProcessingImage = null;
 
         // Stored to scale the image based on it and to load the most adapted image resolution

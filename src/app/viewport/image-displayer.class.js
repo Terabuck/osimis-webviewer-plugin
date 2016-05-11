@@ -104,128 +104,159 @@
         var viewportData = cornerstone.getViewport(enabledElement);
         if (cornerstoneImageObject && viewportData) {
             // Get cleaned parameters
-            // @todo only clean width/height
-            var viewportData = this._getCornerstoneViewport(enabledElement, cornerstoneImageObject, true);
+            this._resetCornerstoneViewportData(enabledElement, cornerstoneImageObject); // @todo only clean width/height
 
             // Redraw the image
+            var viewportData = cornerstone.getViewport(enabledElement);
             cornerstone.displayImage(enabledElement, cornerstoneImageObject, viewportData);
         }
     };
 
-    /** ImageDisplayer#_getCornerstoneViewport
+    // // Convert annotation pixels data into milimeters
+    // // @warning this is a dirty fix for CornerstoneTools required by multiresolution image displaying
+    // data.data.map(function(annotation) {
+    //     return annotation;
+    //     var startHandle = annotation.handles.start;
+    //     var endHandle = annotation.handles.end;
+
+    //     // Convert handles x and y to milimeters
+    //     var newStartHandlePosition = viewport.convertPixelsPositionInMillimeters(startHandle);
+    //     var newEndHandlePosition = viewport.convertPixelsPositionInMillimeters(startHandle);
+        
+    //     // Merge data (instead of replacing) to avoid losing the data unrelated to the position
+    //     _.merge(startHandle, newStartHandlePosition);
+    //     _.merge(endHandle, newEndHandlePosition);
+        
+    //     // Add a mm unit footprint to advise the toolStateManager to convert back unit in pixels
+    //     annotation.unit = 'mm';
+
+    //     return annotation;
+    // });
+
+    /** ImageDisplayer#_resetCornerstoneViewportData()
      *
-     * Get cornerstone viewport data, and fix adapt them to the image resolution
+     * Reset the cornerstone viewport data.
+     * Fit the image in the canvas.
      *
      */
-    ImageDisplayer.prototype._getCornerstoneViewport = function(enabledElement, cornerstoneImageObject, resetParameters) {
-        var viewportData = null;
+    ImageDisplayer.prototype._resetCornerstoneViewportData = function(enabledElement, cornerstoneImageObject) {
+        // get the base viewport data
+        var viewportData = cornerstone.getDefaultViewportForImage(enabledElement, cornerstoneImageObject);
 
-        // Force resetParameters if canvas is still empty
-        if (!cornerstone.getViewport(enabledElement)) {
-            resetParameters = true;
-        }
+        // rescale the image to fit it into viewport
+        var newResolutionScale = cornerstoneImageObject.originalWidth / cornerstoneImageObject.width;
 
-        if (resetParameters) {
-            // Clean Parameters - First Image Load - Or explicit image resetting (on window resize)
-            // resetParameters viewport define an image scale adapted to the viewport size
-
-            // get the base viewport data
-            viewportData = cornerstone.getDefaultViewportForImage(enabledElement, cornerstoneImageObject);
-
-            // rescale the image to fit it into viewport
-            var newResolutionScale = cornerstoneImageObject.originalWidth / cornerstoneImageObject.width;
-
-            var isImageSmallerThanViewport = cornerstoneImageObject.originalWidth <= this._canvasWidth && cornerstoneImageObject.originalHeight <= this._canvasHeight;
-            if (isImageSmallerThanViewport) {
-                // show the image unscalled
-                viewportData.scale = 1.0 * newResolutionScale;
-            }
-            else {
-                // downscale the image to fit the viewport
-
-                // choose the smallest between vertical and horizontal scale to show the entire image (and not upscale one of the two)
-                var verticalScale = this._canvasHeight / cornerstoneImageObject.originalHeight * newResolutionScale;
-                var horizontalScale = this._canvasWidth / cornerstoneImageObject.originalWidth * newResolutionScale;
-                if(horizontalScale < verticalScale) {
-                  viewportData.scale = horizontalScale;
-                }
-                else {
-                  viewportData.scale = verticalScale;
-                }
-            }
-            
-            // also, resetParameters the image position
-            viewportData.translation.x = 0;
-            viewportData.translation.y = 0;
-
-            // save the resolutionScale for further uses (eg. image resolution change)
-            this._actualResolutionScale = newResolutionScale;
-
-            // allow extensions to extend this behavior
-            // @todo this.onViewportResetting.trigger(viewportData);
-        }
-        else if (!resetParameters && !this._isImageLoaded) {
-            // Dirty Parameters - First Image Load
-
-            // get the current viewport data
-            viewportData = cornerstone.getViewport(enabledElement);
-
-            // we want to adapt to the new resolution of the image
-            // on resetParameters, we do not want to adapt to the image resolution 
-            // because it could scale the image larger than the viewport size for instance
-
-            // rescale the image to its (possible) new resolution
-            var oldResolutionScale = this._actualResolutionScale || 1;
-            var newResolutionScale = cornerstoneImageObject.originalWidth / cornerstoneImageObject.width;
-
-            // scale viewportData.scale from oldResolutionScale to newResolutionScale
-            var oldScale = viewportData.scale;
-            var newScale = oldScale / oldResolutionScale * newResolutionScale;
-            viewportData.scale = newScale;
-            
-            // Compensate the translation rescaling induced by image resolution change (zoom is applied to the translation).
-            var deltaScale = newScale / oldScale;
-            viewportData.translation.x = viewportData.translation.x / deltaScale;
-            viewportData.translation.y = viewportData.translation.y / deltaScale;
-
-            // save the resolutionScale further uses (eg. when image resolution change)
-            this._actualResolutionScale = newResolutionScale;
-        }
-        else if (!resetParameters && this._isImageLoaded) {
-            // Dirty Parameters - Resolution Change
-
-            // get the current viewport data
-            viewportData = cornerstone.getViewport(enabledElement);
-
-            // we want to adapt to the new resolution of the image
-            // on resetParameters, we do not want to adapt to the image resolution 
-            // because it could scale the image larger than the viewport size for instance
-
-            // rescale the image to its (possible) new resolution
-            var oldResolutionScale = this._actualResolutionScale || 1;
-            var newResolutionScale = cornerstoneImageObject.originalWidth / cornerstoneImageObject.width;
-
-            // scale viewportData.scale from oldResolutionScale to newResolutionScale
-            var oldScale = viewportData.scale;
-            var newScale = oldScale / oldResolutionScale * newResolutionScale;
-            viewportData.scale = newScale;
-            
-            // Compensate the translation rescaling induced by image resolution change (zoom is applied to the translation).
-            var deltaScale = newScale / oldScale;
-            viewportData.translation.x = viewportData.translation.x / deltaScale;
-            viewportData.translation.y = viewportData.translation.y / deltaScale;
-
-            // save the resolutionScale further uses (eg. when image resolution change)
-            this._actualResolutionScale = newResolutionScale;
+        var isImageSmallerThanViewport = cornerstoneImageObject.originalWidth <= this._canvasWidth && cornerstoneImageObject.originalHeight <= this._canvasHeight;
+        if (isImageSmallerThanViewport) {
+            // show the image unscalled
+            viewportData.scale = 1.0 * newResolutionScale;
         }
         else {
-            throw new Error('incoherent state');
+            // downscale the image to fit the viewport
+
+            // choose the smallest between vertical and horizontal scale to show the entire image (and not upscale one of the two)
+            var verticalScale = this._canvasHeight / cornerstoneImageObject.originalHeight * newResolutionScale;
+            var horizontalScale = this._canvasWidth / cornerstoneImageObject.originalWidth * newResolutionScale;
+            if(horizontalScale < verticalScale) {
+              viewportData.scale = horizontalScale;
+            }
+            else {
+              viewportData.scale = verticalScale;
+            }
         }
 
-        return viewportData;
+        // save the resolutionScale for further uses (eg. image resolution change)
+        this._actualResolutionScale = newResolutionScale;
+
+        // Save changes in cornerstone (without redrawing)
+        var enabledElementObject = cornerstone.getEnabledElement(enabledElement); // enabledElementObject != enabledElementDom
+        enabledElementObject.viewport = viewportData;
+
+        // allow extensions to extend this behavior
+        // Used by invert tool to redefine inversion on viewport reset
+        // @todo this.onViewportResetting.trigger(viewportData);
+    };
+
+    /** ImageDisplayer#_adaptImageResolution()
+     *
+     * Convert the cornerstone viewport data (scale & translation) to the new resolution.
+     * Convert the annotations (scale & translation) to the new resolution. (* dirty fix, cornerstoneTools should use mm instead of px)
+     *
+     */
+    ImageDisplayer.prototype._adaptImageResolution = function(enabledElement, cornerstoneImageObject) {
+        /* Convert cornerstone viewport data */
+
+        // get the current viewport data
+        var viewportData = cornerstone.getViewport(enabledElement);
+
+        // we want to adapt to the new resolution of the image
+        // on resetParameters, we do not want to adapt to the image resolution 
+        // because it could scale the image larger than the viewport size for instance
+
+        // rescale the image to its (possible) new resolution
+        var oldResolutionScale = this._actualResolutionScale || 1;
+        var newResolutionScale = cornerstoneImageObject.originalWidth / cornerstoneImageObject.width;
+
+        // scale viewportData.scale from oldResolutionScale to newResolutionScale
+        var oldScale = viewportData.scale;
+        var newScale = oldScale / oldResolutionScale * newResolutionScale;
+        viewportData.scale = newScale;
+        
+        // Compensate the translation rescaling induced by image resolution change (zoom is applied to the translation).
+        var deltaScale = newScale / oldScale;
+        viewportData.translation.x = viewportData.translation.x / deltaScale;
+        viewportData.translation.y = viewportData.translation.y / deltaScale;
+
+        // save the resolutionScale further uses (eg. when image resolution change)
+        this._actualResolutionScale = newResolutionScale;
+
+        // Save changes in cornerstone (without redrawing)
+        var enabledElementObject = cornerstone.getEnabledElement(enabledElement); // enabledElementObject != enabledElementDom
+        enabledElementObject.viewport = viewportData;
+
+
+        /* Convert cornerstone tools data */
+
+        // Retrieve annotations as they were saved
+        var image = this._image;
+        var annotations = image.getAnnotations();
+
+        // Convert annotation pixel positions to the new resolution
+        annotations.forEach(function(annotationGroup) {
+            if (annotationGroup.type === 'length') {
+                // Convert pixel position of each annotation to the new image resolution
+                var originalScale = annotationGroup.data.scale || oldResolutionScale;
+                var scaleDelta = originalScale / newResolutionScale;
+
+                // @todo @warning Save the original scale in annotationGroup.data when it is first created
+                // to ensure its saving through user sessions
+            
+                // Process each handles individualy
+                var handlesData = annotationGroup.data.data;
+                handlesData.forEach(function(annotation) {
+                    var startHandle = annotation.handles.start;
+                    var endHandle = annotation.handles.end;
+                    startHandle.x = startHandle.x * scaleDelta;
+                    startHandle.y = startHandle.y * scaleDelta;
+                    endHandle.x = endHandle.x * scaleDelta;
+                    endHandle.y = endHandle.y * scaleDelta;
+                });
+                
+                // Save the rescaling of the annotation for further processing
+                annotationGroup.data.scale = newResolutionScale;
+
+                // Save back annotations
+                image.setAnnotations(annotationGroup.type, annotationGroup.data);
+            }
+        });
     };
 
     /** ImageDisplayer#draw(enabledElement)
+     *
+     * Draw an image into the viewport using cornerstone.
+     * This handle dynamic resolution change of image.
+     * To achieve this, cornerstone viewport scale and translation are scaled at each resolution change,
+     * as well as the tools data (wich are stored in pixels, not mm).
      *
      * @return Promise<Image> resolved when the first image drawing occurs
      *
@@ -252,13 +283,42 @@
                 return;
             }
 
-            // Draw the binary
             {
-                // Gatter the viewport datas
-                var viewportData = _this._getCornerstoneViewport(enabledElement, cornerstoneImageObject, _this._resetParameters);
+                /** Draw the binary
+                 * Use Cases:
+                 *   (1. Window Resize -> Reset Canvas : reset scale & translation) on ImageDisplayer#resizeCanvas call - not when onBinaryLoaded
+                 *   2. Serie change or manual reset -> Reset Parameters : reset scale, translation & everything else (windowing, ...)
+                 *   3. Image change -> Convert Parameters to new Image Resolution
+                 *   4. Resolution change -> Convert Parameters to new Image Resolution
+                 */
 
-                // Disable resetParameters for resolution changes
-                _this._resetParameters = false;
+                // Force canvas reset if it is still empty
+                var viewportData = cornerstone.getViewport(enabledElement);
+                if (!viewportData) {
+                    _this._resetParameters = true;
+                }
+
+                // Either clear viewport or convert cornerstone datas to the actual resolution
+                if (!_this._isImageLoaded && _this._resetParameters) {
+                    // First image displaying - Reset parameters
+                    _this._resetCornerstoneViewportData(enabledElement, cornerstoneImageObject);
+
+                    // Disable resetParameters for resolution changes
+                    _this._resetParameters = false;
+                }
+                else if (_this._isImageLoaded && !_this._resetParameters) {
+                    // First image displaying - adapt resolution from previous image
+                    _this._adaptImageResolution(enabledElement, cornerstoneImageObject);
+                }
+                else if (!_this._isImageLoaded && !_this._resetParameters) {
+                    // Image Resolution Change - enhance resolution from already loaded image
+                    _this._adaptImageResolution(enabledElement, cornerstoneImageObject);
+                }
+                else {
+                    throw new Error('Unknown state');
+                }
+
+                // var viewportData = _this._getCornerstoneViewport(enabledElement, cornerstoneImageObject, _this._resetParameters);
 
                 // Trigger onImageLoading prior to image drawing
                 // but after the viewport data is updated
@@ -271,7 +331,6 @@
                 //   cornerstone#displayImage can not be used because it doesn't allow to invalidate cornerstone cache
                 var enabledElementObject = cornerstone.getEnabledElement(enabledElement); // enabledElementObject != enabledElementDom
                 enabledElementObject.image = cornerstoneImageObject;
-                enabledElementObject.viewport = viewportData;
                 cornerstone.updateImage(enabledElement, true); // draw image & invalidate cornerstone cache
                 
                 // unhide viewport

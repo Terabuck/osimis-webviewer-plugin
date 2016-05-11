@@ -72,7 +72,10 @@
 
             // listen to the new image model changes
             currentImage.onAnnotationChanged([_this, viewport], function(annotation) {
+                // Filter out annotations that are not concerned by this tool
                 if (annotation.type !== _this.toolName) return;
+
+                // Restore annotations in cornerstone
                 toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data, true);
             });
             
@@ -92,7 +95,10 @@
                 
                 // listen to the new image model changes
                 newImage.onAnnotationChanged([_this, viewport], function(annotation) {
+                    // Filter out annotations that are not concerned by this tool
                     if (annotation.type !== _this.toolName) return;
+
+                    // Restore annotations in cornerstone
                     toolStateManager.restoreStateByToolAndImageId(annotation.type, annotation.imageId, annotation.data, true);
                 });
             });
@@ -115,9 +121,11 @@
                 var newAnnotationsData = toolStateManager.getStateByToolAndImageId(_this.toolName, image.id);
                 var oldAnnotations = image.getAnnotations(_this.toolName);
                 
+                
                 // As update checks are made on each CornerstoneImageRendered
                 // don't trigger update if the newAnnotations hasn't changed
                 // this would be way too slow otherwise
+                // The handles visibility is compared as well (highlight & active properties) - for livesharing purpose
                 if (oldAnnotations && _.isEqual(newAnnotationsData, oldAnnotations.data)) return;
                 
                 // do the $apply after the check to avoid an useless $digest cycle in case there is no change
@@ -126,7 +134,7 @@
                     // using a fast shallow object clone
                     var data = _.clone(newAnnotationsData);
 
-                    // ignore is used to avoid recursive event cycle (trigger <-> listen)
+                    // ignore is used to avoid recursive event cycle (trigger <-> listen) - don't redraw the annotations that are already drawn
                     image.onAnnotationChanged.ignore([_this, viewport], function() {
                         if (data && data.data.length) {
                             image.setAnnotations(_this.toolName, data);
