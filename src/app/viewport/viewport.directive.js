@@ -4,6 +4,10 @@
     angular
         .module('webviewer')
         .directive('wvViewport', wvViewport)
+        .run(function($q) {
+            // Inject $q in Viewport model
+            osimis.Viewport.$q = $q;
+        })
         .run(function(cornerstoneTools) {
             // extend the cornerstone toolStateManager
 
@@ -82,7 +86,7 @@
          */
         function link(scope, element, attrs, ctrls) {
             var enabledElement = element.children('.wv-cornerstone-enabled-image')[0];
-            var model = new ViewportViewModel(wvImageManager, enabledElement);
+            var model = new osimis.Viewport(wvImageManager, enabledElement);
 
             scope.vm.wvEnableOverlay = !!scope.vm.wvEnableOverlay;
             var wvImageIdParser = $parse(attrs.wvImageId);
@@ -94,15 +98,18 @@
             }
 
             // bind directive's controller to cornerstone (via directive's attributes)
+            var _cancelCyclicCall = false; // cancel databinding induced by controller calls
             {
                 var ctrl = ctrls.wvViewport;
                 ctrl.getImage = function() {
                     return model.getImageId();
                 };
-                ctrl.setImage = function(id, reset) { // reset is optional
+                ctrl.setImage = function(id, resetParameters) { // resetParameters is optional
+                    _cancelCyclicCall = true;
+
                     scope.vm.wvImageId = id;
 
-                    return model.setImage(id, reset);
+                    return model.setImage(id, resetParameters);
                 };
                 ctrl.clearImage = function() {
                     scope.vm.wvImageId = null;
@@ -112,10 +119,15 @@
             // bind directive's attributes to cornerstone
             {
                 scope.$watch('vm.wvImageId', function (wvImageId, old) {
-                    if (!wvImageId) {
+                    if (_cancelCyclicCall) {
+                        _cancelCyclicCall = false;
+                        return;
+                    }
+
+                    if (old && !wvImageId) {
                         model.clearImage();
                     }
-                    else {
+                    else if (wvImageId) {
                         model.setImage(wvImageId);
                     }
                 });
@@ -149,16 +161,16 @@
 
             function _bindWvSizeController(wvSizeController, model) {
                 if (!wvSizeController) {
-                    model.resizeViewport(element.width(), element.height());
+                    model.resizeCanvas(element.width(), element.height());
                     return null;
                 }
 
-                //model.resizeViewport(wvSizeController.getWidthInPixel(), wvSizeController.getHeightInPixel());
+                //model.resizeCanvas(wvSizeController.getWidthInPixel(), wvSizeController.getHeightInPixel());
                 var unlistenWvSizeFn = wvSizeController && wvSizeController.onUpdate(function() {
                     var width = wvSizeController.getWidthInPixel();
                     var height = wvSizeController.getHeightInPixel();
 
-                    model.resizeViewport(width, height);
+                    model.resizeCanvas(width, height);
                 });
 
                 return function unbind() {
@@ -195,301 +207,8 @@
                     }
                 });
             }
-        }
+        }        
 
-        /**
-         * responsibility: manage cornerstone viewport
-         */
-        function ViewportViewModel(wvImageManager, enabledElement) {
-            var _this = this;
-
-            this._imageManager = wvImageManager;
-            this._enabledElement = enabledElement;
-
-            this._imageId = null;
-            this._image = null;
-            this._viewportWidth = null;
-            this._viewportHeight = null;
-
-            // store the resolutionScale to scale image back when image resolution changes
-            this._resolutionScale = null;
-    
-            this.onImageChanging = new osimis.Listener();
-            this.onImageChanged = new osimis.Listener();
-            this.onViewportResetting = new osimis.Listener();
-
-            cornerstone.enable(enabledElement);
-        }
-        
-        ViewportViewModel.prototype.onImageChanging = angular.noop;
-        ViewportViewModel.prototype.onImageChanged = angular.noop;
-        
-        ViewportViewModel.prototype.destroy = function() {
-            // cancel loading
-            cornerstone.disable(this._enabledElement);
-        };
-
-        // used by extensions
-        ViewportViewModel.prototype.getEnabledElement = function() {
-            return this._enabledElement;
-        };
-        
-        // allow tools to reacts to click on the viewport
-        // @todo move out ?
-        ViewportViewModel.prototype.setSelectable = function(onSelectedCallback) {
-            var _this = this;
-            
-            if (this._onViewportSelectedCallback) {
-                throw new Error("viewport selection already active");
-            }
-
-            this._onViewportSelectedCallback = function() {
-                onSelectedCallback(_this);
-            };
-            
-            $(this._enabledElement).on('click', this._onViewportSelectedCallback);
-        };
-        ViewportViewModel.prototype.setUnselectable = function() {
-            $(this._enabledElement).off('click', this._onViewportSelectedCallback);
-            this._onViewportSelectedCallback = null;
-        };
-
-        ViewportViewModel.prototype.getViewport = function() {
-            return cornerstone.getViewport(this._enabledElement);
-        };
-        ViewportViewModel.prototype.setViewport = function(viewport) {
-            return cornerstone.setViewport(this._enabledElement, viewport);
-        };
-
-        ViewportViewModel.prototype.getImageId = function() {
-            return this._imageId;
-        };
-        ViewportViewModel.prototype.getImage = function() {
-            return this._image;
-        };
-        ViewportViewModel.prototype.setImage = function(id, reset) {
-            if (id == this._imageId && !reset) {
-                return $q.reject('This image is already shown');
-            }
-            
-            reset = reset || false;
-
-            // force reset when no previous data
-            if (this._imageId === null) {
-                reset = true;
-            }
-
-            var _this = this;
-            
-            var oldImageId = this._imageId;
-            this._imageId = id;
-
-            // retrieve image model
-            return _this._imageManager
-                .get(id)
-                .then(function (imageModel) {
-                    // chose quality depending of viewport size
-                    var qualityLevel = null;
-                    if (_this._viewportWidth <= 150 || _this._viewportHeight <= 150) {
-                        qualityLevel = WvImageQualities.R150J100;
-                    }
-                    else if (_this._viewportWidth <= 1000 || _this._viewportHeight <= 1000) {
-                        qualityLevel = WvImageQualities.R1000J100;
-                    }
-                    else {
-                        qualityLevel = WvImageQualities.J100;
-                    }
-
-                    var actualQualityLevel = null;
-
-                    // redraw canvas when binary are available
-                    imageModel.onBinaryLoaded(function(newQualityLevel, cornerstoneImageObject) {
-                        var previousQualityLevel = actualQualityLevel;
-
-                        // @note onBinaryLoaded can be triggered by another viewport using
-                        // the same image (or even something else)
-
-                        // only redraws viewport if required
-                        if (newQualityLevel > previousQualityLevel && cornerstoneImageObject.qualityLevel <= qualityLevel) {
-                            // update image
-                            _updateImage(imageModel, cornerstoneImageObject);
-                        }
-
-                        // save the actual quality level to avoid drawing an inferior quality later
-                        // this may occurs if another viewport load the same image with an inferior quality
-                        actualQualityLevel = cornerstoneImageObject.qualityLevel;
-
-                        // @todo allow cornerstone zoom to go behond 0.25
-                    });
-                    // @todo clean listener
-
-                    // show the best already available binary
-                    // use the *available* binary to avoid duplicate draw (one with the promise result, the other with the onBinaryLoaded event)
-                    var cornerstoneImageObjectPromise = imageModel.getBinaryOfHighestQualityAvailable();
-                    if (cornerstoneImageObjectPromise) {
-                        // draw the image directly from the cache (even if the loading might not be finished, in this case the loading can be dual)
-                        cornerstoneImageObjectPromise.then(function(cornerstoneImageObject) {
-                            // update image
-                            _updateImage(imageModel, cornerstoneImageObject);
-
-                            // save the actual quality level to avoid drawing an inferior quality later
-                            // this may occurs if another viewport load the same image with an inferior quality
-                            actualQualityLevel = cornerstoneImageObject.qualityLevel;
-                            
-                            // load better quality if required
-                            if (cornerstoneImageObject.qualityLevel < qualityLevel) {
-                                imageModel.loadBinary(qualityLevel);
-                            }
-                        });
-                        
-                    }
-    
-                    // load binary if none is available at the moment
-                    if (!cornerstoneImageObjectPromise) {
-                        // if the quality desired is not available, load it - the event will draw it
-                        imageModel.loadBinary(qualityLevel);
-                    }
-
-                    return imageModel;
-                });
-            
-            function _updateImage(imageModel, cornerstoneImageObject) { // viewportData is optional
-                var newImageModel = imageModel;
-                var oldImageModel = _this._image;
-
-                // reset the viewport data or gather the actual one
-                var viewportData = cornerstone.getViewport(_this._enabledElement);
-                if (!viewportData || reset) {
-                    // reset viewport define an image scale adapted to the viewport size
-                    viewportData = _this.resetViewport(cornerstoneImageObject);
-                    
-                    reset = false;
-                }
-                else {
-                    // we want to adapt to the new resolution of the image
-                    // on reset, we do not want to adapt to the image resolution 
-                    // because it could scale the image larger than the viewport size for instance
-
-                    // rescale the image to its (possible) new resolution
-                    var oldResolutionScale = _this._resolutionScale || 1;
-                    var newResolutionScale = cornerstoneImageObject.originalWidth / cornerstoneImageObject.width;
-
-                    // scale viewportData.scale from oldResolutionScale to newResolutionScale
-                    var oldScale = viewportData.scale;
-                    var newScale = oldScale / oldResolutionScale * newResolutionScale;
-                    viewportData.scale = newScale;
-                    
-                    // Compensate the translation rescaling induced by image resolution change (zoom is applied to the translation).
-                    var deltaScale = newScale / oldScale;
-                    viewportData.translation.x = viewportData.translation.x / deltaScale;
-                    viewportData.translation.y = viewportData.translation.y / deltaScale;
-
-                    // save the resolutionScale further uses (eg. when image resolution change)
-                    _this._resolutionScale = newResolutionScale;
-                }
-
-                // Trigger onImageChanging prior to image drawing
-                // but after the viewport data is updated
-                // Used to avoid multiple useless consecutive redrawing
-                _this.onImageChanging.trigger(newImageModel, oldImageModel);
-                
-                // Display image
-                //   force redraw because image binary changes, even if param do not (reset the canvas size)
-                //   cornerstone#displayImage can not be used because it doesn't allow to invalidate cornerstone cache
-                var enabledElementObject = cornerstone.getEnabledElement(_this._enabledElement); // enabledElementObject != enabledElementDom
-                enabledElementObject.image = cornerstoneImageObject;
-                enabledElementObject.viewport = viewportData;
-                cornerstone.updateImage(_this._enabledElement, true); // draw image & invalidate cornerstone cache
-                
-                // unhide viewport
-                $(_this._enabledElement).find('canvas').css('visibility', 'visible');
-
-                // Trigger onImageChanged
-                _this._image = newImageModel;
-                _this.onImageChanged.trigger(newImageModel, oldImageModel);
-
-                return newImageModel;
-            }
-        };
-        
-        ViewportViewModel.prototype.clearImage = function() {
-            this._imageId = null;
-
-            $(this._enabledElement).find('canvas').css('visibility', 'hidden');
-        };
-        ViewportViewModel.prototype.hasImage = function() {
-            return this._imageId !== null;
-        }
-
-        ViewportViewModel.prototype.resizeViewport = function(width, height) {
-            var jqEnabledElement = $(this._enabledElement);
-            
-            // save the viewport canvas size for ulterior uses (eg. know if an image is larger than its viewport)
-            this._viewportWidth = width;
-            this._viewportHeight = height;
-            
-            // set the canvas size
-            jqEnabledElement.width(width);
-            jqEnabledElement.height(height);
-
-            // set the pixel quantity (? not sure it does that)
-            cornerstone.resize(this._enabledElement, false);
-            
-            // draw & scale the image (if one is displayed)
-            var csImage = cornerstone.getImage(this._enabledElement);
-            var viewportData = cornerstone.getViewport(this._enabledElement);
-            if (csImage && viewportData) {
-                // rescale the image
-                this._resetViewportScaleByImage(viewportData, csImage);
-                // redraw it
-                cornerstone.displayImage(this._enabledElement, csImage, viewportData);
-            }
-        };
-
-        ViewportViewModel.prototype.resetViewport = function(csImage) {
-            // get the base viewport data
-            var viewportData = cornerstone.getDefaultViewportForImage(this._enabledElement, csImage);
-
-            // rescale the image
-            this._resetViewportScaleByImage(viewportData, csImage);
-
-            // allow extensions to extend this behavior
-            this.onViewportResetting.trigger(viewportData);
-
-            return viewportData;
-        };
-        
-        // updates viewportData
-        ViewportViewModel.prototype._resetViewportScaleByImage = function(viewportData, cornerstoneImageObject) {
-            var newResolutionScale = cornerstoneImageObject.originalWidth / cornerstoneImageObject.width;
-
-            var isImageSmallerThanViewport = cornerstoneImageObject.originalWidth <= this._viewportWidth && cornerstoneImageObject.originalHeight <= this._viewportHeight;
-            if (isImageSmallerThanViewport) {
-                // show the image unscalled
-                viewportData.scale = 1.0 * newResolutionScale;
-            }
-            else {
-                // downscale the image to fit the viewport
-
-                // choose the smallest between vertical and horizontal scale to show the entire image (and not upscale one of the two)
-
-                var verticalScale = this._viewportHeight / cornerstoneImageObject.originalHeight * newResolutionScale;
-                var horizontalScale = this._viewportWidth / cornerstoneImageObject.originalWidth * newResolutionScale;
-                if(horizontalScale < verticalScale) {
-                  viewportData.scale = horizontalScale;
-                }
-                else {
-                  viewportData.scale = verticalScale;
-                }
-            }
-            
-            // also, reset the image position
-            viewportData.translation.x = 0;
-            viewportData.translation.y = 0;
-
-            // save the resolutionScale for further uses (eg. image resolution change)
-            this._resolutionScale = newResolutionScale;
-        };
 
         return directive;
     }

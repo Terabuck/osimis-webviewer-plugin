@@ -24,7 +24,7 @@
         var service = {
             get: get,
             hasCache: hasCache,
-            getCachedHighestQuality: getCachedHighestQuality,
+            getBestQualityInCache: getBestQualityInCache,
             onBinaryLoaded: new osimis.Listener() // (id, qualityLevel, cornerstoneImageObject)
         };
 
@@ -45,20 +45,6 @@
          *
          */
         function get(id, qualityLevel) {
-        	// @todo handle cache better 
-
-        	if (qualityLevel > _.min(_.values(WvImageQualities))) {
-        	    // download a lower quality first
-        	    var newMax = 0;
-        	    for (var prop in WvImageQualities) {
-        	        if (!WvImageQualities.hasOwnProperty(prop)) continue;
-        	        if (WvImageQualities[prop] > newMax && WvImageQualities[prop] < qualityLevel) {
-        	            newMax = WvImageQualities[prop];
-        	        }
-        	    }
-        	    get(id, newMax);
-        	}
-
         	if (!_cache[id]) {
         		_cache[id] = {};
         	}
@@ -120,18 +106,14 @@
          *         (the request is cached instead of the result)
          *
          */
-        function getCachedHighestQuality(id) {
+        function getBestQualityInCache(id) {
         	if (!_cache[id]) {
         		return null;
         	}
 
         	var highestQuality = _.max(_.keys(_cache[id]));
-        	if (!highestQuality) {
-        		return null;
-        	}
-        	else {
-        		return _cache[id][highestQuality];
-        	}
+
+            return highestQuality;
         }
 
         ////////////////

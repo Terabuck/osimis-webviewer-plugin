@@ -30,6 +30,10 @@
             _feedAnnotationChangedEvents(this);
             _feedBinaryLoadedEvents(this);
         }
+        
+        WvImage.prototype.getAvailableQualities = function() {
+            return WvImageQualities;
+        };
 
         /** WvImage#getAnnotations(type)
          *
@@ -77,8 +81,8 @@
          * @return Promise<cornerstoneImageObject> // see https://github.com/chafey/cornerstone/wiki/image
          *
          */
-        WvImage.prototype.getBinaryOfHighestQualityAvailable = function() {
-            return wvImageBinaryManager.getCachedHighestQuality(this.id);
+        WvImage.prototype.getBestQualityInCache = function() {
+            return wvImageBinaryManager.getBestQualityInCache(this.id);
         };
 
         /** WvImage#onBinaryLoaded(callback)
