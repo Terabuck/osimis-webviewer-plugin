@@ -91,25 +91,29 @@
         };
 
         WvSerie.prototype.goToNextImage = function(restartWhenSerieEnd) {
-            if (restartWhenSerieEnd !== true) restartWhenSerieEnd = false;
-            
-            this.currentIndex++;
+            restartWhenSerieEnd = restartWhenSerieEnd || false;
 
-            if (this.currentIndex >= this.imageCount) {
-              this.currentIndex = restartWhenSerieEnd ? 0 : this.imageCount - 1;
+            if (this.currentIndex >= this.imageCount && restartWhenSerieEnd) {
+                this.currentIndex = 0;
+                this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
             }
-
-            this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
+            else if (this.currentIndex < this.imageCount-1) {
+                this.currentIndex++;
+                this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
+            }
+            else {
+                // Don't trigger event when nothing happens (the serie is already at its end)
+            }
         };
 
         WvSerie.prototype.goToPreviousImage = function() {
-            this.currentIndex--;
-
-            if (this.currentIndex < 0) {
-              this.currentIndex = 0;
+            if (this.currentIndex > 0) {
+                this.currentIndex--;
+                this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
             }
-
-            this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
+            else {
+                // Don't trigger event when nothing happens (the serie is already at the first image)
+            }
         };
 
         WvSerie.prototype.goToImage = function(newIndex) {
@@ -120,6 +124,11 @@
               return;
             }
 
+            // Do nothing when the image do not change
+            if (this.currentIndex == newIndex) {
+                return;
+            }
+
             this.currentIndex = newIndex;
             this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
         };
@@ -127,6 +136,11 @@
         var _cancelAnimationId = null;
         WvSerie.prototype.play = function() {
             var _this = this;
+
+            // Do nothing when there is only one image
+            if (this.imageCount < 2) {
+                return;
+            }
 
             var speed = 1000 / this.tags.RecommendedDisplayFrameRate || 1000 / 30; // 30 fps by default
 
