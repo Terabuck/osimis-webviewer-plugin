@@ -32,8 +32,11 @@
 
         ////////////////
 
-        window.osimis.WorkerPool.createPromise = $q; // @todo move into class file
-        var imageParserPool = new window.osimis.WorkerPool('/src/app/image/image-parser.async/main.js', 1);
+        var pool = new window.osimis.WorkerPool({
+            path: '/src/app/image/image-parser.async/main.js',
+            workerCount: 4,
+            createPromiseFn: $q
+        });
 
         /** _cache: cornerstoneImageObject[<imageId>][<quality>]
          *
@@ -71,37 +74,31 @@
         		_cache[id] = {};
         	}
         	if (!_cache[id][quality]) {
-	            var splitted = id.split(':');
-	            var instanceId = splitted[0];
-	            var frameIndex = splitted[1] || 0;
-
-	            var url = null;
-	            switch (quality) {
-	            case WvImageQualities.J100:
-	            	url = wvConfig.orthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/8bit' + '/jpeg:100' + '/klv';
-	            	break;
-	            case WvImageQualities.R1000J100:
-	                url = wvConfig.orthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/resize:1000' + '/8bit' + '/jpeg:100' + '/klv';
-	                break;
-                case WvImageQualities.R150J100:
-	                url = wvConfig.orthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/resize:150' + '/8bit' + '/jpeg:100' + '/klv';
-	                break;
-	            default:
-	            	throw new Error('Undefined quality: ' + quality);
-	            }
-
-
                 // Set binary loading flag so the loading may be aborted
                 if (!_binaryIsLoading[id]) {
                     _binaryIsLoading[id] = {};
                 }
                 _binaryIsLoading[id][quality] = true;
 
+                // pool
+                //     .filterTasks({
+                //         quality: 2
+                //     })
+                //     .setPriority(1);
+
+                // pool
+                //     .abortTask({
+                //         type: 'getBinary',
+                //         id: id,
+                //         quality: quality
+                //     });
+
 	            // download klv, extract metadata & decompress data to raw image
-	            _cache[id][quality] = imageParserPool
-	                .postMessage({
-                        command: 'get',
-                        url: url
+	            _cache[id][quality] = pool
+                    .queueTask({
+                        type: 'getBinary',
+                        id: id,
+                        quality: quality
                     })
 	                .then(function(result) {
                         // Loading done
@@ -173,11 +170,11 @@
                 }
                 
                 // Abort the url loading @todo
-                imageParserPool
-                   .postMessage({
-                       command: 'abort',
-                       url: url
-                   });
+                // pool
+                //    .postMessage({
+                //        command: 'abort',
+                //        url: url
+                //    });
 
                 // Note the loading flag is unset by the promise (see wvImageBinaryManager#get(id, quality))
                 // The cache is also removed by the promise
@@ -230,7 +227,7 @@
 	            }
                 
                 // Abort the url loading @todo
-                //imageParserPool
+                //pool
                 //    .postMessage({
                 //        command: 'abort',
                 //        url: url

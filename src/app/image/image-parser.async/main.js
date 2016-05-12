@@ -12,16 +12,45 @@
 importScripts('/app/image/image-parser.async/klvreader.class.js');
 importScripts('/bower_components/jpgjs/jpg.js'); // @todo in build mode
 
-
 var KLVReader = WorkerGlobalScope.KLVReader;
 
-self.addEventListener('message', function(evt) {
-    var command = evt.data.command;
+// @todo out..
+var OrthancApiURL = 'http://localhost:8042';
+var Qualities = {
+    // 0 is reserved as none..
+    J100: 100,
+    R150J100: 1, // resampling to 150 px + compressed to jpeg100
+    R1000J100: 2 // resampling to 1000 px + compressed to jpeg100
+};
 
-    switch(command) {
-    case 'get':
+self.addEventListener('message', function(evt) {
+    var type = evt.data.type;
+
+    switch(type) {
+    case 'getBinary':
         // Get an image binary
-        var url = evt.data.url;
+        var id = evt.data.id;
+        var quality = evt.data.quality;
+
+        // Parse url
+        var splittedId = id.split(':');
+        var instanceId = splittedId[0];
+        var frameIndex = splittedId[1] || 0;
+
+        var url = null;
+        switch (quality) {
+        case Qualities.J100:
+            url = OrthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/8bit' + '/jpeg:100' + '/klv';
+            break;
+        case Qualities.R1000J100:
+            url = OrthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/resize:1000' + '/8bit' + '/jpeg:100' + '/klv';
+            break;
+        case Qualities.R150J100:
+            url = OrthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/resize:150' + '/8bit' + '/jpeg:100' + '/klv';
+            break;
+        default:
+            throw new Error('Undefined quality: ' + quality);
+        }
 
         getCommand(url);
         break;
