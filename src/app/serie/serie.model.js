@@ -93,7 +93,7 @@
         WvSerie.prototype.goToNextImage = function(restartWhenSerieEnd) {
             restartWhenSerieEnd = restartWhenSerieEnd || false;
 
-            if (this.currentIndex >= this.imageCount && restartWhenSerieEnd) {
+            if (this.currentIndex >= this.imageCount-1 && restartWhenSerieEnd) {
                 this.currentIndex = 0;
                 this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
             }
