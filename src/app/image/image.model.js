@@ -30,7 +30,7 @@
             _feedAnnotationChangedEvents(this);
             _feedBinaryLoadedEvents(this);
         }
-        
+
         WvImage.prototype.getAvailableQualities = function() {
             return WvImageQualities;
         };
@@ -74,6 +74,30 @@
          */
         WvImage.prototype.loadBinary = function(desiredQualityLevel) {
             return wvImageBinaryManager.get(this.id, desiredQualityLevel);
+        };
+
+        /** WvImage#freeBinary(quality)
+         *
+         * Free binary memory - note it doesn't mean the cache will be freed
+         * as the cache logic is implemented by the image-binary-manager (and
+         * probably work with reference counting and other specific mechanisms).
+         *
+         * @param quality: int the quality level of the binary to be freed
+         *
+         */
+        WvImage.prototype.freeBinary = function(quality) {
+            // wvImageBinaryManager.free(this.id, quality);
+        };
+
+        /** WvImage#abortBinaryLoading(quality)
+         *
+         * Alias of freeBinary (if a request is pending, it's automaticaly canceled before its freed).
+         *
+         * @param quality: int the quality level of the binary to be freed
+         *
+         */
+        WvImage.prototype.abortBinaryLoading = function(quality) {
+            wvImageBinaryManager.abortLoading(this.id, quality);
         };
 
         /** WvImage#getBinaryOfHighestQualityAvailable()

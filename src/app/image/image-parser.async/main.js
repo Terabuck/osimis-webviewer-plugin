@@ -1,3 +1,12 @@
+/**
+ *
+ * Worker that retrieve and process image binaries.
+ *
+ * Can only process one request at a time.
+ * User has to wait request end (or abort it using a command) to send a new one, otherwise it'll bug.
+ *
+ */
+
 'use strict';
 
 importScripts('/app/image/image-parser.async/klvreader.class.js');
@@ -7,58 +16,113 @@ importScripts('/bower_components/jpgjs/jpg.js'); // @todo in build mode
 var KLVReader = WorkerGlobalScope.KLVReader;
 
 self.addEventListener('message', function(evt) {
-    var uri = evt.data;
-	
-	// var instanceId = evt.data.instanceId;
-	// var frameIndex = evt.data.frameIndex;
-	// var compression = evt.data.compression;
-    
-    getURI(uri);
+    var command = evt.data.command;
+
+    switch(command) {
+    case 'get':
+        // Get an image binary
+        var url = evt.data.url;
+
+        getCommand(url);
+        break;
+    case 'abort':
+        // Abort a getCommand.
+        // Do not reply anything, the reply is sent by the aborted getCommand.
+
+        abortCommand();
+        break;
+    default:
+        throw new Error('Unknown command');
+    };
 }, false);
 
+var _processingRequest = null;
 
-function getURI(uri) {
-    var xhr = new XMLHttpRequest();
+function abortCommand() {
+    if (!_processingRequest) {
+        console.error('Can\'t abort. No request is in process.');
+        throw new Error('Can\'t abort. No request is in process.');
+        return;
+    }
 
-    xhr.open('GET', encodeURI(uri), false);
-    xhr.responseType = 'arraybuffer';
-    xhr.send();
+    // Abort request (& answer via BinaryRequest failure - not sure its crossbrowser compatible)
+    _processingRequest.abort();
+}
 
-    if (xhr.status === 200) {
-        // process binary into jpeg
-        var arraybuffer = xhr.response;
-        var data = parseKLV(arraybuffer);
-        var pixelArray = parseJpeg(data.decompression);
-        pixelArray = convertBackTo16bit(pixelArray, data.decompression);
+function getCommand(url) {
+    if (_processingRequest) {
+        throw new Error('Another request is already in process within worker thread.');
+    }
 
-        // stock the format of the array, and return the array's buffer
-        // with its format instead of the array itself (array can't be worker transferable object but buffer can)
-        var pixelBufferFormat = null;
-        if (pixelArray instanceof Uint8Array) {
-            pixelBufferFormat = 'Uint8';
+    // Execute request
+    _processingRequest = new BinaryRequest(url);
+    _processingRequest.execute();
+}
+
+function BinaryRequest(url) {
+    this.xhr = new XMLHttpRequest();
+    this.xhr.open('GET', encodeURI(url), true); // async xhr request because we wan't to be able to abort the request
+    this.xhr.responseType = 'arraybuffer';
+}
+BinaryRequest.prototype.execute = function() {
+    var xhr = this.xhr;
+
+    xhr.onreadystatechange = function() {
+        // Only check finished requests
+        if (xhr.readyState !== XMLHttpRequest.DONE) {
+            return;
         }
-        else if (pixelArray instanceof Uint16Array) {
-            pixelBufferFormat = 'Uint16';
-        }
-        else if (pixelArray instanceof Int16Array) {
-            pixelBufferFormat = 'Int16';
+
+        if (xhr.status === 200) {
+            // process binary into jpeg
+            var arraybuffer = xhr.response;
+            var data = parseKLV(arraybuffer);
+            var pixelArray = parseJpeg(data.decompression);
+            pixelArray = convertBackTo16bit(pixelArray, data.decompression);
+
+            // stock the format of the array, and return the array's buffer
+            // with its format instead of the array itself (array can't be worker transferable object but buffer can)
+            var pixelBufferFormat = null;
+            if (pixelArray instanceof Uint8Array) {
+                pixelBufferFormat = 'Uint8';
+            }
+            else if (pixelArray instanceof Uint16Array) {
+                pixelBufferFormat = 'Uint16';
+            }
+            else if (pixelArray instanceof Int16Array) {
+                pixelBufferFormat = 'Int16';
+            }
+            else {
+                throw new Error("Unexpected array binary format");
+            }
+
+            // answer request to the main thread
+            self.postMessage({
+                cornerstoneMetaData: data.cornerstone,
+                pixelBuffer: pixelArray.buffer,
+                pixelBufferFormat: pixelBufferFormat
+            }, [pixelArray.buffer]); // pixelArray is transferable
+
+            // Clean the processing request when it's done
+            _processingRequest = null;
         }
         else {
-            throw new Error("Unexpected array binary format");
-        }
+            // May be called by abort (@todo not sure this behavior is crossbrowser compatible)
 
-        // answer request to the main thread
-        self.postMessage({
-            cornerstoneMetaData: data.cornerstone,
-            pixelBuffer: pixelArray.buffer,
-            pixelBufferFormat: pixelBufferFormat
-        }, [pixelArray.buffer]); // pixelArray is transferable
-    }
-    else {
-        // @todo
-        throw new Error('Request failed.  Returned status of ' + xhr.status);
-    }
-}
+            // Clean the processing request when it's done
+            _processingRequest = null;
+
+            // @todo
+            throw new Error('Request failed. Returned status of ' + xhr.status);
+        }
+    };
+
+    xhr.send(); // async call
+};
+
+BinaryRequest.prototype.abort = function() {
+    this.xhr.abort();
+};
 
 function parseKLV(arraybuffer) {
     var klvReader = new KLVReader(arraybuffer);

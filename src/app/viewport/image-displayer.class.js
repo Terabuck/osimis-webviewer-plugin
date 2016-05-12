@@ -13,6 +13,9 @@
         this._resetParameters = false;
         this._isImageLoaded = false;
 
+        // Used to cancel binaries loading on destroy
+        this._binariesInLoading = []; // [<quality1>, <quality2>, ...]
+
         // Cancel drawing when the image is no longer displayed
         this._isDestroyed = false;
         
@@ -29,10 +32,22 @@
     }
     
     ImageDisplayer.prototype.destroy = function() {
-        this._isDestroyed = true;
-        
-        this.onImageLoading.close();
+        var _this = this;
 
+        this._isDestroyed = true;
+
+        // Cancel binary loading requests
+        this._binariesInLoading.forEach(function(quality) {
+            _this._image.abortBinaryLoading(quality);
+        });
+
+        // Free image binary
+        if (this._actualQuality) {
+            this._image.freeBinary(this._actualQuality);
+        }
+        
+        // Free events
+        this.onImageLoading.close();
         this.onLoadingCancelled.close();
         this.onImageLoaded.close();
 
@@ -85,12 +100,23 @@
                 (function(quality) {
                     // On loaded, call the callback
                     promise.then(function(cornerstoneImageObject) {
-                        // @todo cancel intermediate request if somehow better quality is downloaded
+                        // The binary has loaded
+                        // Remove the binary from the binariesInLoading queue (used to be able to cancel the loading request)
+                        _.pull(_this._binariesInLoading, quality);
 
+                        // Call the "binary has loaded" callback
                         onBinaryLoadedCallback(quality, cornerstoneImageObject);
+
+                        // @todo cancel intermediate request if somehow better quality is already downloaded
                         // @todo manage errors
+                    }, function(err) {
+                        // Call loading cancelled callback
+                        _this.onLoadingCancelled.trigger(err);
                     });
                 })(quality);
+
+                // Save the loaded quality to be able to cancel the loading request if the displayer is destroyed
+                _this._binariesInLoading.push(quality);
             }
         }
     };
@@ -122,27 +148,6 @@
             });
         }
     };
-
-    // // Convert annotation pixels data into milimeters
-    // // @warning this is a dirty fix for CornerstoneTools required by multiresolution image displaying
-    // data.data.map(function(annotation) {
-    //     return annotation;
-    //     var startHandle = annotation.handles.start;
-    //     var endHandle = annotation.handles.end;
-
-    //     // Convert handles x and y to milimeters
-    //     var newStartHandlePosition = viewport.convertPixelsPositionInMillimeters(startHandle);
-    //     var newEndHandlePosition = viewport.convertPixelsPositionInMillimeters(startHandle);
-        
-    //     // Merge data (instead of replacing) to avoid losing the data unrelated to the position
-    //     _.merge(startHandle, newStartHandlePosition);
-    //     _.merge(endHandle, newEndHandlePosition);
-        
-    //     // Add a mm unit footprint to advise the toolStateManager to convert back unit in pixels
-    //     annotation.unit = 'mm';
-
-    //     return annotation;
-    // });
 
     /** ImageDisplayer#_resetCornerstoneViewportData()
      *
@@ -282,7 +287,12 @@
         function _onBinaryLoaded(quality, cornerstoneImageObject) {
             // Cancel drawing if the image is no longer displayed & trigger event used by Viewport#setImage to return promise
             if (_this._isDestroyed) {
+                // Free image from cache
+                _this._image.freeBinary(quality);
+
+                // Trigger loading canceled (so the setImage caller can reject its promise)
                 _this.onLoadingCancelled.trigger();
+                
                 return;
             }
 
@@ -329,8 +339,6 @@
                     throw new Error('Unknown state');
                 }
 
-                // var viewportData = _this._getCornerstoneViewport(enabledElement, cornerstoneImageObject, _this._resetParameters);
-
                 // Trigger onImageLoading prior to image drawing
                 // but after the viewport data is updated
                 // Used to avoid multiple useless consecutive redrawing with tool
@@ -365,6 +373,11 @@
 
             // Trigger event used by Viewport#setImage to return promise
             _this.onImageLoaded.trigger(newQuality);
+
+            // Free the former loaded binary once the new one is shown
+            if (formerQuality) {
+                _this._image.freeBinary(formerQuality);
+            }
         };
     };
 
