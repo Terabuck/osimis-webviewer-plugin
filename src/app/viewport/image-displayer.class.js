@@ -110,6 +110,9 @@
                         // @todo cancel intermediate request if somehow better quality is already downloaded
                         // @todo manage errors
                     }, function(err) {
+                        // Remove the binary from the binariesInLoading queue (used to be able to cancel the loading request)
+                        _.pull(_this._binariesInLoading, quality);
+                        
                         // Call loading cancelled callback
                         _this.onLoadingCancelled.trigger(err);
                     });
@@ -287,12 +290,11 @@
         function _onBinaryLoaded(quality, cornerstoneImageObject) {
             // Cancel drawing if the image is no longer displayed & trigger event used by Viewport#setImage to return promise
             if (_this._isDestroyed) {
-                // Free image from cache
-                _this._image.freeBinary(quality);
-
                 // Trigger loading canceled (so the setImage caller can reject its promise)
                 _this.onLoadingCancelled.trigger();
-                
+
+                // Note the image is already freed from cancelImageLoading
+                                
                 return;
             }
 

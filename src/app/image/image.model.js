@@ -86,7 +86,7 @@
          *
          */
         WvImage.prototype.freeBinary = function(quality) {
-            // wvImageBinaryManager.free(this.id, quality);
+            wvImageBinaryManager.free(this.id, quality);
         };
 
         /** WvImage#abortBinaryLoading(quality)
@@ -97,7 +97,7 @@
          *
          */
         WvImage.prototype.abortBinaryLoading = function(quality) {
-            wvImageBinaryManager.abortLoading(this.id, quality);
+            wvImageBinaryManager.free(this.id, quality);
         };
 
         /** WvImage#getBinaryOfHighestQualityAvailable()

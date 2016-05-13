@@ -69,8 +69,8 @@ var _processingRequest = null;
 
 function abortCommand() {
     if (!_processingRequest) {
-        console.error('Can\'t abort. No request is in process.');
-        throw new Error('Can\'t abort. No request is in process.');
+        // There is no reliable way to know from the main thread task has already been processed
+        // so we just do nothing when it's the case
         return;
     }
 
@@ -127,30 +127,33 @@ BinaryRequest.prototype.execute = function() {
 
             // answer request to the main thread
             self.postMessage({
+                type: 'success',
                 cornerstoneMetaData: data.cornerstone,
                 pixelBuffer: pixelArray.buffer,
                 pixelBufferFormat: pixelBufferFormat
             }, [pixelArray.buffer]); // pixelArray is transferable
-
-            // Clean the processing request when it's done
-            _processingRequest = null;
         }
         else {
             // May be called by abort (@todo not sure this behavior is crossbrowser compatible)
 
-            // Clean the processing request when it's done
-            _processingRequest = null;
-
-            // @todo
-            throw new Error('Request failed. Returned status of ' + xhr.status);
+            self.postMessage({
+                type: 'failure',
+                status: xhr.status
+            });
         }
+
+        // Clean the processing request when it's done
+        _processingRequest = null;
     };
 
     xhr.send(); // async call
 };
 
 BinaryRequest.prototype.abort = function() {
+    // Abort the http request
     this.xhr.abort();
+
+    // The jpeg decompression can't be aborted (requires setTimeout loop during decompression to allow a function to stop it asynchronously during the event loop)
 };
 
 function parseKLV(arraybuffer) {

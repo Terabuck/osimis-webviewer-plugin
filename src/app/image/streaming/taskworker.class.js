@@ -16,13 +16,24 @@
         this._workerThread.addEventListener('message', function(evt) {
             var task = _this._currentTask;
 
-            // Trigger task has succeed
-            task.onSucceed.trigger(evt.data);
-            
+            switch (evt.data.type) {
+            case 'success':
+                // Trigger task has succeed
+                task.onSucceed.trigger(evt.data);
+                break;
+            case 'failure':
+                // Trigger task has failed
+                task.onFailure.trigger(evt.data);
+                break;
+            default:
+                throw new Error('Unknown worker response type');
+            }
+
             // Set worker available
+            _this._currentTask.onAbort.close(_this); // Close listener
             _this._currentTask = null;
             _this.onAvailable.trigger();
-        }, false);
+    }, false);
         this._workerThread.addEventListener('error', function(evt) {
             var task = _this._currentTask;
 
@@ -30,6 +41,7 @@
             task.onFailure.trigger(evt.data);
 
             // Set worker available
+            _this._currentTask.onAbort.close(_this); // Close listener
             _this._currentTask = null;
             _this.onAvailable.trigger();
         }, false);
@@ -45,6 +57,13 @@
 
         // Assign the current task
         this._currentTask = task;
+
+        // Listen to abortion
+        task.onAbort(this, function() {
+            _this._workerThread.postMessage({
+                type: 'abort'
+            });
+        });
 
         // Process the task
         _this._workerThread.postMessage(task.options);

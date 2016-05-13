@@ -1,6 +1,9 @@
 /** WorkerPool
  * Usage:
  *  // in workerScript: just listen to message & post message back (only once) or throw..
+ *  Worker listens to message evt.data.type (with specific type: 'abort')
+ *  They respond {type: 'success', ...} or {type: 'failure', ...}
+ *  
  * To Test:
  *  - does throw in workerScript result in failed promise
  *  - can a new taskOptions be performed after an uncatched throw in a workerScript
@@ -84,6 +87,66 @@
         }
     }
 
+    /** WorkerPool#queueTask(taskOptions)
+     *
+     * @param taskOptions {type: <string>, ...}
+     * @return Promise<TaskResult> once the taskOptions has finished (succeded, failed or aborted)
+     *
+     */
+    WorkerPool.prototype.queueTask = function(taskOptions) {
+        var _this = this;
+
+        var task = new module.Task(taskOptions);
+
+        this._tasksToProcess.push(task);
+
+        this._processQueuedTaskInAvailableWorker();
+
+        // Returne promise bound to task events
+        return this._createPromiseFn(function(resolve, reject) {
+            task.onSucceed(_this.queueTask, function(result) {
+                // Close event listeners
+                task.onFailure.close(_this.queueTask);
+                task.onSucceed.close(_this.queueTask);
+                // Resolve
+                resolve(result);
+            });
+            task.onFailure(_this.queueTask, function(reason) {
+                // Close event listeners
+                task.onFailure.close(_this.queueTask);
+                task.onSucceed.close(_this.queueTask);
+                // Reject
+                reject(reason);
+            });
+        });
+    };
+
+    /** WorkerPool#abortTask(taskOptions)
+     *
+     * Abort a task, note this method do nothing when task is inexistant.
+     *
+     * Compare the tasks in _tasksToProcess and remove them from the queue.
+     * Compare the tasks in _tasksInProcess and abort them.
+     *
+     * @param taskOptions {type: <string>, ...}
+     *
+     */
+    WorkerPool.prototype.abortTask = function(taskOptions) {
+        // Remove task from the toProcess queue (if here)
+        _.pullAllWith(this._tasksToProcess, [taskOptions], function(a, b) {
+            return _.isEqual(a.options, b);
+        });
+
+        // Abort task from the inProcess queue
+        for (var i=this._tasksInProcess.length-1; i>=0; --i) { // loop in reverse so we can remove items without breaking the loop iterations
+            var task = this._tasksInProcess[i];
+            if (_.isEqual(task.options, taskOptions)) {
+                task.abort();
+                _.pull(this._tasksInProcess, task);
+            }
+        }
+    };
+
     /** WorkerPool#_processQueuedTaskInAvailableWorker()
      *
      * Called everytime a worker is available or a new task is added
@@ -115,10 +178,14 @@
             _this._busyTaskWorkers.push(worker);
 
             // Remove from taskInProcess once the task has been processed
-            task.onSucceed.once(function() {
+            task.onSucceed(_this._processQueuedTaskInAvailableWorker, function() {
+                task.onSucceed.close(_this._processQueuedTaskInAvailableWorker);
+                task.onFailure.close(_this._processQueuedTaskInAvailableWorker);
                 _.pull(_this._tasksInProcess, task);
             });
-            task.onFailure.once(function() {
+            task.onFailure(_this._processQueuedTaskInAvailableWorker, function() {
+                task.onSucceed.close(_this._processQueuedTaskInAvailableWorker);
+                task.onFailure.close(_this._processQueuedTaskInAvailableWorker);
                 _.pull(_this._tasksInProcess, task);
             });
 
@@ -126,34 +193,6 @@
             worker.processTask(task);
         });
     };
-
-    /** WorkerPool#queueTask(taskOptions)
-     *
-     * @param taskOptions {type: <string>, ...}
-     * @return Promise<TaskResult> once the taskOptions has finished (succeded, failed or aborted)
-     *
-     */
-    WorkerPool.prototype.queueTask = function(taskOptions) {
-        var _this = this;
-
-        var task = new module.Task(taskOptions);
-
-        this._tasksToProcess.push(task);
-
-        this._processQueuedTaskInAvailableWorker();
-
-        // Returne promise bound to task events
-        return this._createPromiseFn(function(resolve, reject) {
-            task.onSucceed.once(function(result) {
-                resolve(result);
-            });
-            task.onFailure.once(function(reason) {
-                reject(reason);
-            });
-            // task.onAbort ?
-        });
-    }
-
     module.WorkerPool = WorkerPool;
 
 })(window.osimis || (window.osimis = {}));

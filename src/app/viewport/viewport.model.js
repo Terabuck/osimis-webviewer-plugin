@@ -40,6 +40,12 @@
     Viewport.$q = null;
 
     Viewport.prototype.destroy = function() {
+        // Kill displayer
+        var oldDisplayer = this._actualImageDisplayer;
+        if (oldDisplayer) {
+            oldDisplayer.destroy();
+        }
+
         // Free listener
         this.onImageChanged.close();
 
@@ -126,14 +132,18 @@
         return _this._imageManager
             .get(id)
             .then(function(imageModel) {
-                // Destroy old image displayer (to remove image observers)
+                // Gather previous image resolution to scale new image parameters
                 var oldDisplayer = _this._actualImageDisplayer;
+                var previousResolutionScale = oldDisplayer ? oldDisplayer._actualResolutionScale : null;
+
+                // Destroy old image displayer (to remove image observers) & gather its resolution (to convert canvas & paramaters)
                 if (oldDisplayer) {
                     oldDisplayer.destroy();
+                    _this._actualImageDisplayer = displayer; // make sure the displayer is removed in case of exception
                 }
 
                 // Set a new displayer
-                var displayer = new module.ImageDisplayer(_this._canvasWidth, _this._canvasHeight, imageModel, oldDisplayer ? oldDisplayer._actualResolutionScale : null);
+                var displayer = new module.ImageDisplayer(_this._canvasWidth, _this._canvasHeight, imageModel, previousResolutionScale);
 
                 // Save the displayer to be able destroy it latter
                 _this._actualImageDisplayer = displayer;

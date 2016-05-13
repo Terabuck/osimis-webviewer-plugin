@@ -24,7 +24,6 @@
          */
         var service = {
             get: get,
-            abortLoading: abortLoading,
             free: free,
             getBestQualityInCache: getBestQualityInCache,
             onBinaryLoaded: new osimis.Listener() // (id, quality, cornerstoneImageObject)
@@ -53,14 +52,6 @@
          */
         var _cacheReferenceCount = {};
 
-        /** _binaryIsLoading: bool[<imageId>][<quality>]
-         *
-         * Flag at true when the xhr request is pending
-         * Used to abort request
-         *
-         */
-        var _binaryIsLoading = {};
-
         /** wvImageBinaryManager#get(id, quality)
          *
          * @param id <instanceId>:<frameIndex>
@@ -74,24 +65,11 @@
         		_cache[id] = {};
         	}
         	if (!_cache[id][quality]) {
-                // Set binary loading flag so the loading may be aborted
-                if (!_binaryIsLoading[id]) {
-                    _binaryIsLoading[id] = {};
-                }
-                _binaryIsLoading[id][quality] = true;
-
                 // pool
                 //     .filterTasks({
                 //         quality: 2
                 //     })
                 //     .setPriority(1);
-
-                // pool
-                //     .abortTask({
-                //         type: 'getBinary',
-                //         id: id,
-                //         quality: quality
-                //     });
 
 	            // download klv, extract metadata & decompress data to raw image
 	            _cache[id][quality] = pool
@@ -103,8 +81,10 @@
 	                .then(function(result) {
                         // Loading done
 
-                        // Unset loading flag
-                        _binaryIsLoading[id][quality] = false;
+                        // Abort the finished loading when an abortion has been asked but not made in time
+                        if (_cacheReferenceCount[id][quality] === 0) {
+                            return $q.reject('aborted');
+                        }
 
 	                    // configure cornerstone related object methods
 	                    var cornerstoneImageObject = wvCornerstoneImageAdapter.process(id, quality, result.cornerstoneMetaData, result.pixelBuffer, result.pixelBufferFormat);
@@ -117,18 +97,15 @@
                     .then(null, function(err) {
                         // Loading aborted
 
-                        // Unset loading flag
-                        _binaryIsLoading[id][quality] = false;
-
                         // This is called even when the error comes from the adapter (promise <.then(null, function(err) {...})> syntax)
                         // to be sure the promise is uncached anytime the promise is rejected
 
                         // Remove promise from cache / Uncount reference
-                        _cacheReferenceCount[id][quality] = 1; // Reset the reference count to 1 so aborted loading do not have to be freed
-                        service.free(quality);
+                        _cacheReferenceCount[id][quality] = 1; // Reset the reference count to 1 so failed loading do not have to be freed
+                        service.free(id, quality);
 
                         // Propagate promise error
-                        throw err;
+                        // throw err;
                     });
             }
 
@@ -143,43 +120,6 @@
 
             // Return Promise<cornerstoneImageObject>
             return _cache[id][quality];
-        }
-
-        function abortLoading(id, quality) {
-            // Cancel request if pending
-            if (_binaryIsLoading[id][quality]) {
-                // Retrieve the url (needed by the pool to retrieve the thread loading the image)
-                // @todo put in worker
-                var splitted = id.split(':');
-                var instanceId = splitted[0];
-                var frameIndex = splitted[1] || 0;
-
-                var url = null;
-                switch (quality) {
-                case WvImageQualities.J100:
-                    url = wvConfig.orthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/8bit' + '/jpeg:100' + '/klv';
-                    break;
-                case WvImageQualities.R1000J100:
-                    url = wvConfig.orthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/resize:1000' + '/8bit' + '/jpeg:100' + '/klv';
-                    break;
-                case WvImageQualities.R150J100:
-                    url = wvConfig.orthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/resize:150' + '/8bit' + '/jpeg:100' + '/klv';
-                    break;
-                default:
-                    throw new Error('Undefined quality: ' + quality);
-                }
-                
-                // Abort the url loading @todo
-                // pool
-                //    .postMessage({
-                //        command: 'abort',
-                //        url: url
-                //    });
-
-                // Note the loading flag is unset by the promise (see wvImageBinaryManager#get(id, quality))
-                // The cache is also removed by the promise
-            }
-
         }
 
         /** wvImageBinaryManager#free(id, quality)
@@ -203,43 +143,19 @@
             // Decount reference
             --_cacheReferenceCount[id][quality];
 
-            // Cancel request if pending
-            if (_cacheReferenceCount[id][quality] === 0 && _binaryIsLoading[id][quality]) {
-                // Retrieve the url (needed by the pool to retrieve the thread loading the image)
-                // @todo put in worker
-                var splitted = id.split(':');
-	            var instanceId = splitted[0];
-	            var frameIndex = splitted[1] || 0;
-
-	            var url = null;
-	            switch (quality) {
-	            case WvImageQualities.J100:
-	            	url = wvConfig.orthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/8bit' + '/jpeg:100' + '/klv';
-	            	break;
-	            case WvImageQualities.R1000J100:
-	                url = wvConfig.orthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/resize:1000' + '/8bit' + '/jpeg:100' + '/klv';
-	                break;
-                case WvImageQualities.R150J100:
-	                url = wvConfig.orthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/resize:150' + '/8bit' + '/jpeg:100' + '/klv';
-	                break;
-	            default:
-	            	throw new Error('Undefined quality: ' + quality);
-	            }
-                
-                // Abort the url loading @todo
-                //pool
-                //    .postMessage({
-                //        command: 'abort',
-                //        url: url
-                //    });
-
-                // Note the loading flag is unset by the promise (see wvImageBinaryManager#get(id, quality))
-                // The cache is also removed by the promise
-            }
-
-            // Clean cache when no reference left
+            // Clean cache when no reference left - Cancel request if pending
             if (_cacheReferenceCount[id][quality] === 0) {
+                // Cancel request if pending
+                pool
+                    .abortTask({
+                        type: 'getBinary',
+                        id: id,
+                        quality: quality
+                    });
+
+                // Clean cache
                 _cache[id][quality] = null;
+                delete _cache[id][quality]; // @todo inefficient, use null & adapt getBestQualityInCache instead
             }
         }
 
