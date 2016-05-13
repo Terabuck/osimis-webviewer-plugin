@@ -8,6 +8,7 @@
 #include "ImageProcessingPolicy/CompositePolicy.h"
 #include "ImageProcessingPolicy/ResizePolicy.h"
 #include "ImageProcessingPolicy/JpegConversionPolicy.h"
+#include "ImageProcessingPolicy/PngConversionPolicy.h"
 #include "ImageProcessingPolicy/Uint8ConversionPolicy.h"
 #include "ImageProcessingPolicy/KLVEmbeddingPolicy.h"
 
@@ -28,6 +29,7 @@ ImageController::ImageController(OrthancPluginRestOutput* response, const std::s
   imageProcessingRouteParser_.RegisterRoute<CompositePolicy>("^(.+/.+)$"); // regex: at least a single "/"
   imageProcessingRouteParser_.RegisterRoute<ResizePolicy>("^resize:(\\d+)$"); // resize:<maximal height/width: uint>
   imageProcessingRouteParser_.RegisterRoute<JpegConversionPolicy>("^jpeg:?(\\d{0,3})$"); // regex: jpeg:<compression rate: int[0;100]>
+  imageProcessingRouteParser_.RegisterRoute<PngConversionPolicy>("^png$");
   imageProcessingRouteParser_.RegisterRoute<Uint8ConversionPolicy>("^8bit$");
   imageProcessingRouteParser_.RegisterRoute<KLVEmbeddingPolicy>("^klv$");
 }
@@ -137,6 +139,7 @@ inline CompositePolicy* ImageProcessingRouteParser::_Instanciate<CompositePolicy
   ImageProcessingRouteParser imageProcessingRouteParser;
   imageProcessingRouteParser.RegisterRoute<ResizePolicy>("^resize:(\\d+)$"); // resize:<maximal height/width: uint>
   imageProcessingRouteParser.RegisterRoute<JpegConversionPolicy>("^jpeg:?(\\d{0,3})$");
+  imageProcessingRouteParser.RegisterRoute<PngConversionPolicy>("^png$");
   imageProcessingRouteParser.RegisterRoute<Uint8ConversionPolicy>("^8bit$");
   imageProcessingRouteParser.RegisterRoute<KLVEmbeddingPolicy>("^klv$");
 

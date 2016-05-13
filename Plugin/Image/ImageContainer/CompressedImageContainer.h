@@ -4,11 +4,12 @@
 #include <orthanc/OrthancCPlugin.h> // for OrthancPluginMemoryBuffer
 #include "IImageContainer.h"
 
-class JpegImageContainer : public IImageContainer {
+// For Jpeg or Png, pure binary with no access to image data
+class CompressedImageContainer : public IImageContainer {
 public:
   // takes ownership
-  JpegImageContainer(OrthancPluginMemoryBuffer* buffer);
-  virtual ~JpegImageContainer();
+  CompressedImageContainer(OrthancPluginMemoryBuffer* buffer);
+  virtual ~CompressedImageContainer();
 
   virtual const char* GetBinary();
   virtual uint32_t GetBinarySize();

@@ -3,11 +3,10 @@
 #include <orthanc/OrthancCPlugin.h> // for OrthancPluginMemoryBuffer
 #include "../../Orthanc/Core/Images/ImageBuffer.h"
 #include "../../Orthanc/Core/OrthancException.h"
-#include "../../ViewerToolbox.h" // for WriteJpegToMemory
 #include "../../BenchmarkHelper.h"
 
 #include "../ImageContainer/RawImageContainer.h"
-#include "../ImageContainer/JpegImageContainer.h"
+#include "../ImageContainer/CompressedImageContainer.h"
 #include "../../OrthancContextManager.h"
 #include "../../BenchmarkHelper.h"
 
@@ -64,7 +63,7 @@ IImageContainer* JpegConversionPolicy::Apply(IImageContainer* input, ImageMetaDa
 
   metaData->compression = "Jpeg";
   
-  JpegImageContainer* jpegContainer = new JpegImageContainer(buffer);
+  CompressedImageContainer* jpegContainer = new CompressedImageContainer(buffer);
 
   return jpegContainer;
 }

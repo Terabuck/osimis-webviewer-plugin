@@ -182,12 +182,13 @@ add_library(OsimisWebViewer
   ${CMAKE_SOURCE_DIR}/Plugin/BaseController.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/Utilities/KLVWriter.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/RawImageContainer.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/JpegImageContainer.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/CompressedImageContainer.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/CornerstoneKLVContainer.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/CompositePolicy.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/ResizePolicy.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/Uint8ConversionPolicy.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/JpegConversionPolicy.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/PngConversionPolicy.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/KLVEmbeddingPolicy.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/Image.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageMetaData.cpp
