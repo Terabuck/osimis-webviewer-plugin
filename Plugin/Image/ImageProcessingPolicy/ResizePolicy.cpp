@@ -22,12 +22,6 @@ IImageContainer* ResizePolicy::Apply(IImageContainer* input, ImageMetaData* meta
     return 0;
   }
 
-  // Orthanc::ImageAccessor* accessor = inRawImage->GetOrthancImageAccessor();
-
-
-  
-  // need same pixel format GIL
-
   Orthanc::ImageAccessor* accessor = inRawImage->GetOrthancImageAccessor();
 
   // Keep the same scale
@@ -46,20 +40,22 @@ IImageContainer* ResizePolicy::Apply(IImageContainer* input, ImageMetaData* meta
     outWidth = maxWidthHeight_ * (1/scale);
   }
   
-  // create outpute image
+  // Create output image buffer
   Orthanc::ImageBuffer* outBuffer = new Orthanc::ImageBuffer;
 
+  // Use the input format for output
   outBuffer->SetFormat(accessor->GetFormat());
-  // @todo scale width or height as required
   outBuffer->SetWidth(outWidth);
   outBuffer->SetHeight(outHeight);
   Orthanc::ImageAccessor outAccessor = outBuffer->GetAccessor();
   RawImageContainer* outRawImage = new RawImageContainer(outBuffer);
 
+  // Resize the input and put the result in the output
   RawImageContainer::gil_image_view_t inGILView = inRawImage->GetGILImageView();
   RawImageContainer::gil_image_view_t outGILView = outRawImage->GetGILImageView();
   boost::gil::resize_view(inGILView, outGILView, boost::gil::bilinear_sampler());
 
+  // Update image metadata
   metaData->width = outWidth;
   metaData->height = outHeight;
   metaData->sizeInBytes = outAccessor.GetSize();

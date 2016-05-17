@@ -36,6 +36,9 @@ ImageMetaData::ImageMetaData()
   isSigned = false;
   stretched = false;
   compression = "raw";
+
+  originalHeight = 0;
+  originalWidth = 0;
 }
 
 ImageMetaData::ImageMetaData(RawImageContainer* rawImage, const Json::Value& dicomTags)
@@ -137,6 +140,9 @@ ImageMetaData::ImageMetaData(RawImageContainer* rawImage, const Json::Value& dic
   isSigned = (accessor->GetFormat() == Orthanc::PixelFormat_SignedGrayscale16);
   stretched = false;
   compression = "raw";
+
+  originalHeight = accessor->GetHeight();
+  originalWidth = accessor->GetWidth();
 
   BENCH_LOG(IMAGE_WIDTH, width);
   BENCH_LOG(IMAGE_HEIGHT, height);

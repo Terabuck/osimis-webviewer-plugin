@@ -26,6 +26,9 @@ CornerstoneKLVContainer::CornerstoneKLVContainer(IImageContainer* data, const Im
   klvWriter.setValue(Stretched, metaData->stretched);
   klvWriter.setValue(Compression, metaData->compression);
 
+  klvWriter.setValue(OriginalHeight, metaData->originalHeight);
+  klvWriter.setValue(OriginalWidth, metaData->originalWidth);
+
   // set image binary
   klvWriter.setValue(ImageBinary, data->GetBinarySize(), data->GetBinary());
 

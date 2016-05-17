@@ -36,6 +36,7 @@ private:
   size_t total_size_;
 };
 
+// converted to big endian
 template<typename T>
 inline void KLVWriter::setValue(uint32_t key, const T& value)
 {
@@ -45,6 +46,7 @@ inline void KLVWriter::setValue(uint32_t key, const T& value)
   total_size_ += 4 + 4 + sizeof(value); // key byte + length byte + value length
 }
 
+// no endianness conversion
 template<>
 inline void KLVWriter::setValue<std::string>(uint32_t key, const std::string& value)
 {

@@ -43,6 +43,10 @@ struct ImageMetaData {
   // used convert image back to 16bit in the web frontend
   // with minPixelValue & maxPixelValue
   bool stretched;
+
+  // used to retrieve original coordinate when resampling is applied
+  uint32_t originalHeight;
+  uint32_t originalWidth;
   
   std::string compression;
 };

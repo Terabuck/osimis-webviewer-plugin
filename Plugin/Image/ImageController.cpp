@@ -1,8 +1,6 @@
 #include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp> // for boost::split
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/lock_guard.hpp> 
 
 #include "../BenchmarkHelper.h" // for BENCH(*)
 #include "ImageProcessingPolicy/CompositePolicy.h"
@@ -75,6 +73,9 @@ OrthancPluginErrorCode ImageController::_ProcessRequest()
   // clean cache
   if (cleanCache_) {
     imageRepository_->CleanImageCache(this->instanceId_, this->frameIndex_, this->processingPolicy_);
+    std::string answer = "{}";
+    OrthancPluginAnswerBuffer(OrthancContextManager::Get(), this->response_, answer.c_str(), answer.size(), "application/octet-stream");
+    return OrthancPluginErrorCode_Success;
   }
 
   // retrieve processed image

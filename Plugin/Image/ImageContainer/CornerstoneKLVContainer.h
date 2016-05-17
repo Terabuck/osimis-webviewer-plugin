@@ -39,6 +39,8 @@ private:
     IsSigned,
     Stretched,
     Compression,
+    OriginalHeight,
+    OriginalWidth,
 
     // - Image binary
     ImageBinary
