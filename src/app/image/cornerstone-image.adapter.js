@@ -25,6 +25,10 @@
             // @todo check if this variable is required, remove it if not, write why otherwise
             metaData.imageId = imageId;
             metaData.qualityLevel = qualityLevel;
+            
+            var resamplingScale = metaData.width / metaData.originalWidth;
+            metaData.columnPixelSpacing = metaData.columnPixelSpacing / resamplingScale;
+            metaData.rowPixelSpacing = metaData.rowPixelSpacing / resamplingScale;
 
             if (metaData.color) {
                 metaData.render = cornerstone.renderColorImage;
@@ -55,5 +59,6 @@
             
             return metaData;
         }
+
     }
 })();

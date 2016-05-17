@@ -152,8 +152,6 @@ BinaryRequest.prototype.execute = function() {
                 throw new Error("Unexpected array binary format");
             }
 
-            console.log(data.decompression.compression, pixelBufferFormat);
-
             // answer request to the main thread
             self.postMessage({
                 type: 'success',
