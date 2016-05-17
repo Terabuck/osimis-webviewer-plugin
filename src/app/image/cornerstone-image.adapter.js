@@ -13,7 +13,7 @@
         .factory('wvCornerstoneImageAdapter', wvCornerstoneImageAdapter);
 
     /* @ngInject */
-    function wvCornerstoneImageAdapter($http, wvConfig, cornerstone) {
+    function wvCornerstoneImageAdapter(wvConfig, cornerstone) {
         var service = {
             process: process
         };

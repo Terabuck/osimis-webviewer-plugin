@@ -24,7 +24,7 @@ angular.module('webviewer')
         scope.studies = [];
         
         $http
-        .get(wvConfig.orthancApiURL + '/studies/')
+        .get(wvConfig.orthancApiURL + '/studies/', {cache: true})
         .then(function(response) {
             var studyIds = response.data;
             scope.studies = studyIds.map(function(studyId) {
@@ -38,7 +38,7 @@ angular.module('webviewer')
           
         scope.studies.forEach(function(v) {
             $http
-                .get(wvConfig.orthancApiURL + '/studies/'+v.value.id)
+                .get(wvConfig.orthancApiURL + '/studies/'+v.value.id, {cache: true})
                 .then(function(response) {
                     var study = response.data;
                     v.label = study.MainDicomTags.StudyDescription;

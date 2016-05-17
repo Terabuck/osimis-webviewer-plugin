@@ -40,16 +40,6 @@
     this.$get = function() {
       return _config;
     };
-  })
-  .config(['$httpProvider', function ($httpProvider) {
-    /* @warning @note @todo
-     *
-     * this instruction cache every http requests.
-     * It is only usable in prototypal context.
-     */
-    $httpProvider.defaults.cache = true;
-
-    console.error('warning: cache is activated in the whole application');
-  }]);
+  });
 
 })();

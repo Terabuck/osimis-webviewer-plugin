@@ -62,7 +62,7 @@
                 
                 // return results
                 modelCache[id] = $http
-                    .get(wvConfig.orthancApiURL + '/instances/'+instanceId+'/simplified-tags')
+                    .get(wvConfig.orthancApiURL + '/instances/'+instanceId+'/simplified-tags', {cache: true})
                     .then(function(response) {
                         var tags = response.data;
                         return new WvImage(_this, id, tags, postProcesses);
@@ -79,7 +79,7 @@
                 var instanceId = splittedId[0];
                 var frameIndex = splittedId[1];
                 pixelCache[id] = $http
-                    .get(wvConfig.webviewerApiURL + '/instances/' +compression+ '-' + instanceId + '_' + frameIndex)
+                    .get(wvConfig.webviewerApiURL + '/instances/' +compression+ '-' + instanceId + '_' + frameIndex, {cache: true})
                     .then(function(response) {
                         return wvCornerstoneImageAdapter.process(id, response.data);
                     });
