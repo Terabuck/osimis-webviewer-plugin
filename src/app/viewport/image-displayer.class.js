@@ -18,6 +18,12 @@
 
         // Cancel drawing when the image is no longer displayed
         this._isDestroyed = false;
+
+        // Store the last loaded image quality to free memory latter.
+        // Note _lastLoadedImageQuality !== _actualQuality has the last loaded image may not
+        // be the last shown image (for instance if the last loaded image has lower quality than the last
+        // shown image)
+        this._lastLoadedImageQuality = null;
         
         // Used when previous image was resampled - scale and translation where corrupted
         // In order for this to work, only one image can be shown at a time !
@@ -46,8 +52,8 @@
         });
 
         // Free image binary
-        if (this._actualQuality) {
-            this._image.freeBinary(this._actualQuality);
+        if (this._lastLoadedImageQuality) {
+            this._image.freeBinary(this._lastLoadedImageQuality);
         }
         
         // Free events
@@ -352,12 +358,20 @@
                 _this.onLoadingCancelled.trigger();
 
                 // Note the image is already freed from cancelImageLoading
-                                
+                
                 return;
             }
 
             var formerQuality = _this._actualQuality || 0;
             var newQuality = quality;
+
+            // Free the former loaded binary
+            // do not use formerQuality because _actualQuality is not updated if the new loaded quality
+            // is lower than the previous one
+            if (_this._lastLoadedImageQuality !== null) {
+                _this._image.freeBinary(_this._lastLoadedImageQuality);
+            }
+            _this._lastLoadedImageQuality = quality;
 
             // Do not draw the new binary if its quality is lower than the former one
             if (newQuality <= formerQuality) {
@@ -455,11 +469,6 @@
 
             // Trigger event used by Viewport#setImage to return promise
             _this.onImageLoaded.trigger(newQuality);
-
-            // Free the former loaded binary once the new one is shown
-            if (formerQuality) {
-                _this._image.freeBinary(formerQuality);
-            }
         };
     };
 
