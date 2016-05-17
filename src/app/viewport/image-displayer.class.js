@@ -70,7 +70,7 @@
             quality = availableQualities.R1000J100;
         }
         else {
-            quality = availableQualities.J100;
+            quality = availableQualities.LOSSLESS;
         }
 
         this._desiredQuality = quality;

@@ -12,13 +12,26 @@
 importScripts('/app/image/image-parser.async/klvreader.class.js');
 importScripts('/bower_components/jpgjs/jpg.js'); // @todo in build mode
 
+// Make png.js worker compatible
+var document = {
+    createElement: function() { return { getContext: function() {} } }
+};
+var window = {};
+
+// Import png.js
+importScripts('/bower_components/png.js/zlib.js'); // @todo in build mode
+importScripts('/bower_components/png.js/png.js'); // @todo in build mode
+var PNG = window.PNG;
+
 var KLVReader = WorkerGlobalScope.KLVReader;
 
 // @todo out..
 var OrthancApiURL = 'http://localhost:8042';
 var Qualities = {
     // 0 is reserved as none..
-    J100: 100,
+    LOSSLESS: 100,
+    // THUMBNAIL
+    // MEDIUM
     R150J100: 1, // resampling to 150 px + compressed to jpeg100
     R1000J100: 2 // resampling to 1000 px + compressed to jpeg100
 };
@@ -32,27 +45,7 @@ self.addEventListener('message', function(evt) {
         var id = evt.data.id;
         var quality = evt.data.quality;
 
-        // Parse url
-        var splittedId = id.split(':');
-        var instanceId = splittedId[0];
-        var frameIndex = splittedId[1] || 0;
-
-        var url = null;
-        switch (quality) {
-        case Qualities.J100:
-            url = OrthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/8bit' + '/jpeg:100' + '/klv';
-            break;
-        case Qualities.R1000J100:
-            url = OrthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/resize:1000' + '/8bit' + '/jpeg:100' + '/klv';
-            break;
-        case Qualities.R150J100:
-            url = OrthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/resize:150' + '/8bit' + '/jpeg:100' + '/klv';
-            break;
-        default:
-            throw new Error('Undefined quality: ' + quality);
-        }
-
-        getCommand(url);
+        getCommand(id, quality);
         break;
     case 'abort':
         // Abort a getCommand.
@@ -78,23 +71,48 @@ function abortCommand() {
     _processingRequest.abort();
 }
 
-function getCommand(url) {
+function getCommand(id, quality) {
     if (_processingRequest) {
         throw new Error('Another request is already in process within worker thread.');
     }
 
     // Execute request
-    _processingRequest = new BinaryRequest(url);
+    _processingRequest = new BinaryRequest(id, quality);
     _processingRequest.execute();
 }
 
-function BinaryRequest(url) {
+function BinaryRequest(id, quality) {
+    this.id = id;
+    this.quality = quality;
+
+    // Parse url
+    var splittedId = id.split(':');
+    var instanceId = splittedId[0];
+    var frameIndex = splittedId[1] || 0;
+    
+    var url = null;
+    switch (quality) {
+    case Qualities.LOSSLESS:
+        url = OrthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/png' + '/klv';
+        break;
+    case Qualities.R1000J100:
+        url = OrthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/resize:1000' + '/8bit' + '/jpeg:100' + '/klv';
+        break;
+    case Qualities.R150J100:
+        url = OrthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/resize:150' + '/8bit' + '/jpeg:100' + '/klv';
+        break;
+    default:
+        throw new Error('Undefined quality: ' + quality);
+    }
+
+    // Create request
     this.xhr = new XMLHttpRequest();
     this.xhr.open('GET', encodeURI(url), true); // async xhr request because we wan't to be able to abort the request
     this.xhr.responseType = 'arraybuffer';
 }
 BinaryRequest.prototype.execute = function() {
     var xhr = this.xhr;
+    var quality = this.quality;
 
     xhr.onreadystatechange = function() {
         // Only check finished requests
@@ -103,11 +121,20 @@ BinaryRequest.prototype.execute = function() {
         }
 
         if (xhr.status === 200) {
-            // process binary into jpeg
+            // process binary out of the klv
             var arraybuffer = xhr.response;
             var data = parseKLV(arraybuffer);
-            var pixelArray = parseJpeg(data.decompression);
-            pixelArray = convertBackTo16bit(pixelArray, data.decompression);
+
+            if (data.decompression.compression === 'Jpeg') {
+                // Decompress lossy jpeg into 16bit
+                var pixelArray = parseJpeg(data.decompression);
+                pixelArray = convertBackTo16bit(pixelArray, data.decompression);
+            }
+            else if (data.decompression.compression === 'Png') {
+                // Decompress lossless png
+                var pixelArray = parsePng(data.decompression)
+            }
+            
 
             // stock the format of the array, and return the array's buffer
             // with its format instead of the array itself (array can't be worker transferable object but buffer can)
@@ -124,6 +151,8 @@ BinaryRequest.prototype.execute = function() {
             else {
                 throw new Error("Unexpected array binary format");
             }
+
+            console.log(data.decompression.compression, pixelBufferFormat);
 
             // answer request to the main thread
             self.postMessage({
@@ -215,12 +244,13 @@ function parseKLV(arraybuffer) {
     };
 
     var compression = klvReader.getString(keys.Compression);
-    if (compression !== 'Jpeg') {
+    if (compression !== 'Jpeg' && compression !== 'Png') {
         throw new Error('unknown compression');
     }
 
     var decompressionMetaData = {
         binary: klvReader.getBinary(keys.ImageBinary),
+        compression: compression,
         width: cornerstoneMetaData.width,
         height: cornerstoneMetaData.height,
         hasColor: cornerstoneMetaData.color,
@@ -253,14 +283,73 @@ function parseJpeg(config) {
     return s;
 }
 
-function convertBackTo16bit(s, config) {
+function parsePng(config) {
+    var pixels = null;
+    var buf, index, i;
+
+    var png = new PNG(config.binary);
+
+    var s = png.decodePixels(); // returns Uint8 array
     
+    if (config.hasColor) {
+        // Convert png24 to rgb32
+
+        buf = new ArrayBuffer(s.length / 3 * 4); // RGB32
+        pixels = new Uint8Array(buf); // RGB24
+        index = 0;
+        for (i = 0; i < s.length; i += 3) {
+            pixels[index++] = s[i];
+            pixels[index++] = s[i + 1];
+            pixels[index++] = s[i + 2];
+            pixels[index++] = 255;  // Alpha channel
+        }
+    } else {
+        // Cast uint8_t array to (u)int16_t array
+        
+        // if (config.isSigned) {
+        //     pixels = new Int16Array(s.buffer);
+        // } else {
+        //     pixels = new Uint16Array(s.buffer);
+        // }
+        
+        pixels = _convertPngEndianness(s, config);
+
+    }
+
+    return pixels;
+}
+// Raw is big endian..
+function _convertPngEndianness(s, config) {
+    var pixels, buf, index, i, lower, upper;
+
+    buf = new ArrayBuffer(s.length * 2); // uint16_t or int16_t
+    if (config.isSigned) {
+        // pixels = new Int16Array(buf);
+        pixels = new Int16Array(s.buffer);
+    } else {
+        // pixels = new Uint16Array(buf);
+        pixels = new Uint16Array(s.buffer);
+    }
+
+    index = 0;
+    for (i = 0; i < s.length; i += 2) {
+        // PNG is little endian
+        upper = s[i];
+        lower = s[i + 1];
+        pixels[index] = lower + upper * 256;
+        index++;
+    }
+
+    return pixels;
+}
+
+function convertBackTo16bit(s, config) {
     var pixels = null;
     var buf, index, i;
 
     if (config.hasColor) {
         buf = new ArrayBuffer(s.length / 3 * 4); // RGB32
-        pixels = new Uint8Array(buf);
+        pixels = new Uint8Array(buf); // RGB24
         index = 0;
         for (i = 0; i < s.length; i += 3) {
             pixels[index++] = s[i];
