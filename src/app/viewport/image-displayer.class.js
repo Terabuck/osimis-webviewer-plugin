@@ -56,7 +56,8 @@
         this.onImageLoaded.close();
         this.onParametersResetting.close();
 
-        // @todo Free listeners
+        // Free listeners
+        this._image.onAnnotationChanged.close(_this);
     };
 
     ImageDisplayer.prototype.resetParameters = function() {
@@ -189,9 +190,6 @@
             }
         }
 
-        // save the resolutionScale for further uses (eg. image resolution change)
-        this._actualResolutionScale = newResolutionScale;
-
         // Save changes in cornerstone (without redrawing)
         var enabledElementObject = cornerstone.getEnabledElement(enabledElement); // enabledElementObject != enabledElementDom
         enabledElementObject.viewport = viewportData;
@@ -201,6 +199,97 @@
         this.onParametersResetting.trigger(viewportData);
     };
 
+    /** ImageDisplayer#_adaptAnnotationsResolution()
+     *
+     * Convert the annotations (scale & translation) to the new resolution.
+     * Dirty fix, cornerstoneTools should use mm instead of px.
+     *
+     */
+    ImageDisplayer.prototype._adaptAnnotationsResolution = function(enabledElement, cornerstoneImageObject) {
+        // Retrieve annotations as they were saved
+        var image = this._image;
+        var annotations = image.getAnnotations();
+
+        // Retrieve the resolution change
+        var resolutionScale = cornerstoneImageObject.originalWidth / cornerstoneImageObject.width;
+
+        // List which properties should be converted by annotation type
+        var propertyConversionTable = {
+            length: [
+                'handles.start.x',
+                'handles.start.y',
+                'handles.end.x',
+                'handles.end.y',
+            ],
+            rectangleRoi: [
+                'handles.start.x',
+                'handles.start.y',
+                'handles.end.x',
+                'handles.end.y',
+            ],
+            ellipticalRoi: [
+                'handles.start.x',
+                'handles.start.y',
+                'handles.end.x',
+                'handles.end.y',
+            ],
+            angle: [
+                'handles.start.x',
+                'handles.start.y',
+                'handles.start2.x',
+                'handles.start2.y',
+                'handles.end.x',
+                'handles.end.y',
+                'handles.end2.x',
+                'handles.end2.y',
+            ],
+            probe: [
+                'handles.end.x',
+                'handles.end.y',
+            ]
+        };
+
+        // Convert annotation pixel positions to the new resolution
+        annotations.forEach(function(annotationGroup) {
+            // Convert the handle positions for the annotations using two handles.
+            if (propertyConversionTable.hasOwnProperty(annotationGroup.type)) {
+                // Convert pixel position of each annotation to the new image resolution
+                var originalScale = annotationGroup.data.scale || 1;
+                var scaleDelta = originalScale / resolutionScale;
+
+                // @todo @warning Save the original scale in annotationGroup.data when it is first created
+                // to ensure its saving through user sessions
+
+                var annotationsData = annotationGroup.data.data;
+                var propertiesToConvert = propertyConversionTable[annotationGroup.type];
+                
+                // Convert each annotations' data
+                annotationsData.forEach(function(data) {
+                    // Retrieve an array with all the values to convert, convert them all
+                    _
+                        .at(data, propertiesToConvert)
+                        .forEach(function(value, index) {
+                            // Retrieve the converted property name
+                            var convertedProperty = propertiesToConvert[index];
+
+                            // Convert the value
+                            var convertedValue = value * scaleDelta;
+
+                            // Replace the converted property's value
+                            _.set(data, convertedProperty, convertedValue);
+                        });
+                });
+
+                // Save the rescaling of the annotation for further processing
+                annotationGroup.data.scale = resolutionScale;
+
+                // Save back annotations
+                image.setAnnotations(annotationGroup.type, annotationGroup.data);
+            }
+        });
+
+        
+    };
     /** ImageDisplayer#_adaptImageResolution()
      *
      * Convert the cornerstone viewport data (scale & translation) to the new resolution.
@@ -237,42 +326,6 @@
         // Save changes in cornerstone (without redrawing)
         var enabledElementObject = cornerstone.getEnabledElement(enabledElement); // enabledElementObject != enabledElementDom
         enabledElementObject.viewport = viewportData;
-
-
-        /* Convert cornerstone tools data */
-
-        // Retrieve annotations as they were saved
-        var image = this._image;
-        var annotations = image.getAnnotations();
-
-        // Convert annotation pixel positions to the new resolution
-        annotations.forEach(function(annotationGroup) {
-            if (annotationGroup.type === 'length') {
-                // Convert pixel position of each annotation to the new image resolution
-                var originalScale = annotationGroup.data.scale || oldResolutionScale;
-                var scaleDelta = originalScale / newResolutionScale;
-
-                // @todo @warning Save the original scale in annotationGroup.data when it is first created
-                // to ensure its saving through user sessions
-            
-                // Process each handles individualy
-                var handlesData = annotationGroup.data.data;
-                handlesData.forEach(function(annotation) {
-                    var startHandle = annotation.handles.start;
-                    var endHandle = annotation.handles.end;
-                    startHandle.x = startHandle.x * scaleDelta;
-                    startHandle.y = startHandle.y * scaleDelta;
-                    endHandle.x = endHandle.x * scaleDelta;
-                    endHandle.y = endHandle.y * scaleDelta;
-                });
-                
-                // Save the rescaling of the annotation for further processing
-                annotationGroup.data.scale = newResolutionScale;
-
-                // Save back annotations
-                image.setAnnotations(annotationGroup.type, annotationGroup.data);
-            }
-        });
     };
 
     /** ImageDisplayer#draw(enabledElement)
@@ -326,10 +379,27 @@
                     _this._resetParameters = true;
                 }
 
+                // Tag each new annotations with the actual image resolution
+                // so the annotations can be scaled to the right amount when 
+                // resolution change (the annotations are positionned in pixels)
+                // - unregister the previous annotation listener
+                if (_this._isImageLoaded) {
+                    _this._image.onAnnotationChanged.close(_this);
+                }
+                // - register the new annotation listener
+                _this._image.onAnnotationChanged(_this, function(annotation) {
+                    // For every new untagged annotation
+                    if (annotation && annotation.data && typeof annotation.data.scale === 'undefined') {
+                        // Tag the annotation with the image resolution
+                        annotation.data.scale = cornerstoneImageObject.originalWidth / cornerstoneImageObject.width;
+                    }
+                });
+
                 // Either clear viewport or convert cornerstone datas to the actual resolution
                 if (!_this._isImageLoaded && _this._resetParameters) {
                     // First image displaying - Reset parameters
                     _this._resetCornerstoneViewportData(enabledElement, cornerstoneImageObject);
+                    _this._adaptAnnotationsResolution(enabledElement, cornerstoneImageObject);
 
                     // Disable resetParameters for resolution changes
                     _this._resetParameters = false;
@@ -337,14 +407,19 @@
                 else if (_this._isImageLoaded && !_this._resetParameters) {
                     // First image displaying - adapt resolution from previous image
                     _this._adaptImageResolution(enabledElement, cornerstoneImageObject);
+                    _this._adaptAnnotationsResolution(enabledElement, cornerstoneImageObject);
                 }
                 else if (!_this._isImageLoaded && !_this._resetParameters) {
                     // Image Resolution Change - enhance resolution from already loaded image
                     _this._adaptImageResolution(enabledElement, cornerstoneImageObject);
+                    _this._adaptAnnotationsResolution(enabledElement, cornerstoneImageObject);
                 }
                 else {
                     throw new Error('Unknown state');
                 }
+                
+                // save the resolutionScale for further uses (eg. image resolution change)
+                _this._actualResolutionScale = cornerstoneImageObject.originalWidth / cornerstoneImageObject.width;
 
                 // Trigger onImageLoading prior to image drawing
                 // but after the viewport data is updated
