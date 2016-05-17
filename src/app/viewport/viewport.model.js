@@ -26,11 +26,15 @@
         
         // Trigger onImageChanging prior to image drawing
         // but after the viewport data is updated
-        // Used for instance by tools to add the annotations prior to the drawing
+        // Used for instance by tools to set the canvas image annotations prior to the drawing
         this.onImageChanging = new module.Listener();
 
-        // Used for instance by tools on first image shown on viewport to configure cornerstone)
+        // Used for instance by tools on first image shown on viewport to configure cornerstone
         this.onImageChanged = new module.Listener();
+
+        // Used by tools to override the default viewport data
+        // For instance, invert-contrast tool switch the default viewportData.invert to true when active
+        this.onParametersResetting = new module.Listener();
 
         // Initialize cornerstone (and canvas)
         cornerstone.enable(this._enabledElement);
@@ -164,6 +168,11 @@
                     var newImage = imageModel;
                     var oldImage = _this._inProcessingImage;
                     _this.onImageChanging.trigger(newImage, oldImage);
+                });
+
+                // Trigger onParametersResetting
+                displayer.onParametersResetting(function(viewportData) {
+                    _this.onParametersResetting.trigger(viewportData);
                 });
                 
                 // Return the result of the drawing

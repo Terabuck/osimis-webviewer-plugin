@@ -26,6 +26,10 @@
         // Used by the viewport to return the setImage promise
         this.onImageLoaded = new module.Listener();
         this.onLoadingCancelled = new module.Listener();
+
+        // Used by tools to override the default viewport data
+        // For instance, invert-contrast tool switch the default viewportData.invert to true when active
+        this.onParametersResetting = new module.Listener();
         
         // Used by the viewport to allow tools to change the image prior to redrawing
         this.onImageLoading = new module.Listener();
@@ -50,6 +54,7 @@
         this.onImageLoading.close();
         this.onLoadingCancelled.close();
         this.onImageLoaded.close();
+        this.onParametersResetting.close();
 
         // @todo Free listeners
     };
@@ -133,7 +138,7 @@
         var viewportData = cornerstone.getViewport(enabledElement);
         if (cornerstoneImageObject && viewportData) {
             // Get cleaned parameters
-            this._resetCornerstoneViewportData(enabledElement, cornerstoneImageObject); // @todo only clean width/height
+            this._resetCornerstoneViewportData(enabledElement, cornerstoneImageObject); // @todo only clean width/height - not windowing
 
             // Redraw the image - don't use cornerstone#displayImage because bugs occurs (only when debugger is off)
             // those issues may come from changing the cornerstoneImageObject (cornerstone probably cache it)
@@ -193,7 +198,7 @@
 
         // allow extensions to extend this behavior
         // Used by invert tool to redefine inversion on viewport reset
-        // @todo this.onViewportResetting.trigger(viewportData);
+        this.onParametersResetting.trigger(viewportData);
     };
 
     /** ImageDisplayer#_adaptImageResolution()

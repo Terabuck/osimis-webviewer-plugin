@@ -48,12 +48,12 @@
             WvBaseTool.call(this, 'invertContrast');
 
             this._listenViewChange = function(viewport) {
-                viewport.onViewportResetting(this, function(viewportData) {
+                viewport.onParametersResetting(this, function(viewportData) {
                     viewportData.invert = _this.isActivated;
                 });
             };
             this._unlistenViewChange = function(viewport) {
-                viewport.onViewportResetting.close(this);
+                viewport.onParametersResetting.close(this);
             };
 
             this._process = function(viewport) {
