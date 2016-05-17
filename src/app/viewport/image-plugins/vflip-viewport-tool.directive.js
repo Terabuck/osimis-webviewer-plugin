@@ -51,13 +51,13 @@
             this._process = function(viewport) {
                 // set viewport selection overlay
                 var onViewportSelectedCallback = _onViewportSelected.bind(this);
-                viewport.setSelectable(onViewportSelectedCallback);
+                viewport.enableSelection(onViewportSelectedCallback);
             };
 
             this._unprocess = function(viewport) {
                 // disable all viewport selections
                 this.viewports.forEach(function(viewport) {
-                    viewport.setUnselectable();
+                    viewport.disableSelection();
                 });
             };
 
