@@ -80,7 +80,8 @@
                 wvImage: '=?',
                 wvOnImageChange: '&?',
                 wvViewport: '=?',
-                wvEnableOverlay: '=?'
+                wvEnableOverlay: '=?', // boolean [false]
+                wvLossless: '@?' // boolean [false] - Always fetch lossless if true
             }
         };
 
@@ -99,7 +100,7 @@
          */
         function link(scope, element, attrs, ctrls) {
             var enabledElement = element.children('.wv-cornerstone-enabled-image')[0];
-            var model = new osimis.Viewport(wvImageManager, enabledElement);
+            var model = new osimis.Viewport(wvImageManager, enabledElement, !!scope.vm.wvLossless);
 
             scope.vm.wvEnableOverlay = !!scope.vm.wvEnableOverlay;
             var wvImageIdParser = $parse(attrs.wvImageId);
@@ -159,9 +160,6 @@
                     scope.vm.wvViewport = args.viewport;
                 });
             });
-            // cornerstone.
-                // bind cornerstone viewport
-                // scope.vm.wvViewport
 
             // unlisten binds
             scope.$on('$destroy', function() {

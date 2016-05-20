@@ -70,6 +70,23 @@
         this._resetParameters = true;
     };
 
+    /** ImageDisplayer#setLosslessQuality
+     *
+     * Always fetch lossless quality.
+     * Note the displayer will still show intermediate quality levels before showing the lossless
+     *
+     */
+    ImageDisplayer.prototype.setLosslessQuality = function() {
+        var availableQualities = this._image.getAvailableQualities();
+        this._desiredQuality = availableQualities.LOSSLESS;
+    };
+
+    /** ImageDisplayer#setLosslessQuality
+     *
+     * Select fetched quality base on canvas size.
+     * Useful for thumbnail-like viewports.
+     *
+     */
     ImageDisplayer.prototype.setQualityBasedOnCanvasSize = function() {
         var availableQualities = this._image.getAvailableQualities();
 

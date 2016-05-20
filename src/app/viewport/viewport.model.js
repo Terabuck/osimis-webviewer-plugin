@@ -4,9 +4,12 @@
     /**
      * responsibility: manage cornerstone viewport
      */
-    function Viewport(wvImageManager, enabledElement) {
+    function Viewport(wvImageManager, enabledElement, useLosslessByDefault) {
         this._imageManager = wvImageManager;
         this._enabledElement = enabledElement;
+
+        // Always fetch lossless images if true, fetch resolution adapted to canvas size else
+        this._useLosslessByDefault = useLosslessByDefault;
 
         // Used to throw exception if the same image is drawn multiple times
         this._inProcessingImageId = null;
@@ -152,8 +155,13 @@
                 // Save the displayer to be able destroy it latter
                 _this._actualImageDisplayer = displayer;
 
-                // Select the image quality based on the canvas size
-                displayer.setQualityBasedOnCanvasSize();
+                // Either select the image quality based on the canvas size or use lossless quality
+                if (_this._useLosslessByDefault) {
+                    displayer.setLosslessQuality();
+                }
+                else {
+                    displayer.setQualityBasedOnCanvasSize();
+                }
 
                 // Either keep old parameters from the previous image or clear them
                 if (resetParameters) {

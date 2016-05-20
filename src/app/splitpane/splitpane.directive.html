@@ -1,38 +1,38 @@
 <div class="wv-splitpane">
     <div 
         ng-repeat="$y in y | range track by $index"
-    	class="wv-splitpane-row" ng-style="{height: rowHeight}"
-	>
+      class="wv-splitpane-row" ng-style="{height: rowHeight}"
+    >
         <div
             ng-repeat="$x in x | range track by $index"
-        	class="wv-splitpane-cell" ng-style="{width: rowWidth}"
-        	wv-size-tag
-    	>  
-    	   <ng-transclude></ng-transclude>
-    	   <div ng-if="showDefaultContent">
-               <wv-viewport wv-serie-id="randomSerieId" wv-size="{width: '[wv-size-tag]', height:'[wv-size-tag]'}"
-                   wv-droppable-serie-ext
-                   wv-scroll-on-wheel-serie-ext
-                   wv-enable-overlay="!wvSettings || wvSettings.hasOwnProperty('overlay') == false || wvSettings.overlay"
+          class="wv-splitpane-cell" ng-style="{width: rowWidth}"
+          wv-size-tag
+        >  
+         <ng-transclude></ng-transclude>
+         <div ng-if="showDefaultContent">
+             <wv-viewport wv-serie-id="randomSerieId" wv-size="{width: '[wv-size-tag]', height:'[wv-size-tag]'}" wv-lossless="true"
+                 wv-droppable-serie-ext
+                 wv-scroll-on-wheel-serie-ext
+                 wv-enable-overlay="!wvSettings || wvSettings.hasOwnProperty('overlay') == false || wvSettings.overlay"
 
-                   wv-default-viewport-tool="wvSettings.windowing"
-                   wv-angle-measure-viewport-tool="wvSettings.anglemeasure"
-                   wv-length-measure-viewport-tool="wvSettings.lengthmeasure"
-                   wv-elliptical-roi-viewport-tool="wvSettings.ellipticalroi"
-                   wv-zoom-viewport-tool="wvSettings.zoom"
-                   wv-pan-viewport-tool="wvSettings.pan"
-                   wv-pixel-probe-viewport-tool="wvSettings.pixelprobe"
-                   wv-rectangle-roi-viewport-tool="wvSettings.rectangleroi"
-                   
-                   wv-invert-contrast-viewport-tool="wvSettings.invert"
-                   wv-play-serie-ext="wvSettings.play"
+                 wv-default-viewport-tool="wvSettings.windowing"
+                 wv-angle-measure-viewport-tool="wvSettings.anglemeasure"
+                 wv-length-measure-viewport-tool="wvSettings.lengthmeasure"
+                 wv-elliptical-roi-viewport-tool="wvSettings.ellipticalroi"
+                 wv-zoom-viewport-tool="wvSettings.zoom"
+                 wv-pan-viewport-tool="wvSettings.pan"
+                 wv-pixel-probe-viewport-tool="wvSettings.pixelprobe"
+                 wv-rectangle-roi-viewport-tool="wvSettings.rectangleroi"
+                 
+                 wv-invert-contrast-viewport-tool="wvSettings.invert"
+                 wv-play-serie-ext="wvSettings.play"
 
-                   wv-rotateright-viewport-tool="wvSettings.rotateright"
-                   wv-rotateleft-viewport-tool="wvSettings.rotateleft"
-                   wv-vflip-viewport-tool="wvSettings.vflip"
-                   wv-hflip-viewport-tool="wvSettings.hflip"
-               ></wv-viewport>
-    	   </div>
-    	</div>
+                 wv-rotateright-viewport-tool="wvSettings.rotateright"
+                 wv-rotateleft-viewport-tool="wvSettings.rotateleft"
+                 wv-vflip-viewport-tool="wvSettings.vflip"
+                 wv-hflip-viewport-tool="wvSettings.hflip"
+             ></wv-viewport>
+         </div>
+      </div>
     </div>
 </div>
