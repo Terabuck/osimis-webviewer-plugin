@@ -134,6 +134,10 @@
         }
         
         this._inProcessingImageId = id;
+
+        if (resetParameters) {
+            this.clearImage();
+        }
         
         // Load image model
         return _this._imageManager
@@ -207,8 +211,10 @@
         this._inProcessingImageId = null;
 
         $(this._enabledElement).find('canvas').css('visibility', 'hidden');
-
-        this._actualImageDisplayer.destroy();
+    
+        if (this._actualImageDisplayer) {
+            this._actualImageDisplayer.destroy();
+        }
         this._actualImageDisplayer = null;
     };
     Viewport.prototype.resizeCanvas = function(width, height) {
