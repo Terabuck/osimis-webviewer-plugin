@@ -39,13 +39,22 @@
             createPromiseFn: $q
         });
 
-        /** _cache: cornerstoneImageObject[<imageId>][<quality>]
+        /** _cache: Promise<cornerstoneImageObject>[<imageId>][<quality>]
          *
-         * @invariant _cache[imageId][quality] = cornerstoneImageObject
+         * A cache of request (and their results) to avoid multiple request.
+         *
+         * @invariant _cache[imageId][quality] = Promise<cornerstoneImageObject>
          * @invariant _cache[*] should always contains at least one item for hasCache method to work
          *
          */
         var _cache = {};
+
+        /** _loadedCachedRequests: boolean[imageId][quality]
+         *
+         * Used to differentiate unfineshed cached request from fineshed cached requests.
+         *
+         */
+        var _loadedCacheIndex = {};
 
         /** _cacheReferenceCount: int[<imageId>][<quality>]
          *
@@ -62,17 +71,17 @@
          *
          */
         function get(id, quality) {
-            // Generate cache (if inexistant)
+            // Generate cache index
+            // used to differentiate cached requests from finished cached requests
+            if (!_loadedCacheIndex[id]) {
+                _loadedCacheIndex[id] = {};
+            }
+
+            // Generate request cache (if inexistant)
         	if (!_cache[id]) {
         		_cache[id] = {};
         	}
         	if (!_cache[id][quality]) {
-                // pool
-                //     .filterTasks({
-                //         quality: 2
-                //     })
-                //     .setPriority(1);
-
 	            // download klv, extract metadata & decompress data to raw image
 	            _cache[id][quality] = pool
                     .queueTask({
@@ -91,6 +100,9 @@
 	                    // configure cornerstone related object methods
 	                    var cornerstoneImageObject = wvCornerstoneImageAdapter.process(id, quality, result.cornerstoneMetaData, result.pixelBuffer, result.pixelBufferFormat);
 
+                        // consider the promise to be resolved
+                        _loadedCacheIndex[id][quality] = true;
+
 	                    // trigger binaryLoaded event
 	                    service.onBinaryLoaded.trigger(id, quality, cornerstoneImageObject);
 
@@ -107,7 +119,7 @@
                         service.free(id, quality);
 
                         // Propagate promise error
-                        // throw err;
+                        return $q.reject(err);
                     });
             }
 
@@ -155,9 +167,14 @@
                         quality: quality
                     });
 
-                // Clean cache
+                // Clean request cache
                 _cache[id][quality] = null;
                 delete _cache[id][quality]; // @todo inefficient, use null & adapt getBestQualityInCache instead
+
+                // Clean cache index
+                if (typeof _loadedCacheIndex[id][quality] !== 'undefined') {
+                    delete _loadedCacheIndex[id][quality];
+                }
 
                 // Trigger binary has been unloaded (used by torrent-like loading bar)
                 service.onBinaryUnLoaded.trigger(id, quality);
@@ -176,12 +193,12 @@
         function listCachedBinaries(id) {
             var result = [];
 
-            if (!_cache[id]) {
+            if (!_loadedCacheIndex[id]) {
                 result = [];
             }
             else {
                 result = _
-                    .keys(_cache[id])
+                    .keys(_loadedCacheIndex[id])
                     .map(function(k) {
                         return +k; // Make sure keys stay integers
                     });
@@ -193,17 +210,15 @@
         /** wvImageBinaryManager#getCachedHighestQuality(id)
          *
          * @param id <instanceId>:<frameIndex>
-         * @return Promise<cornerstoneImageObject>
-         *         returns a promise to avoid having duplicate pendant requests
-         *         (the request is cached instead of the result)
+         * @return quality: int
          *
          */
         function getBestQualityInCache(id) {
-        	if (!_cache[id]) {
+        	if (!_loadedCacheIndex[id]) {
         		return null;
         	}
 
-        	var highestQuality = _.max(_.keys(_cache[id]));
+        	var highestQuality = _.max(_.keys(_loadedCacheIndex[id]));
 
             return highestQuality;
         }
