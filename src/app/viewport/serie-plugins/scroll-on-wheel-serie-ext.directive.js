@@ -75,20 +75,31 @@
         });
 
         /* mobile scrolling */
-
-        var hammertime = new Hammer($element[0], {
-            inputClass: Hammer.TouchInput // disable panning on desktop
-        });
-        hammertime.get('pan').set({
-            direction: Hammer.DIRECTION_HORIZONTAL,
-            pointers: 1
-        });
         
+        var _hammertimeObjectsByViewport = {};
         var _mobileEvtBySerieVM = {};
+
         function registerMobileEvents(viewmodel) {
+            // Configure the dom element
+            // Use the enabledElement instead of the current element 
+            // to avoid hammertime making the overlay unselectable
+            var enabledElement = viewmodel.getViewport().getEnabledElement();
+            var hammertime = new Hammer(enabledElement, {
+                inputClass: Hammer.TouchInput // disable panning on desktop
+            });
+            hammertime.get('pan').set({
+                direction: Hammer.DIRECTION_HORIZONTAL,
+                pointers: 1
+            });
+
+            // Cache the hammertime object for future destruction
+            _hammertimeObjectsByViewport[viewmodel] = hammertime;
+
+            // Add the panning event
             _mobileEvtBySerieVM[viewmodel] = onMobilePanning;
             hammertime.on('pan', _mobileEvtBySerieVM[viewmodel]);
 
+            // React to panning
             var _lastDistance = 0;
             function onMobilePanning(evt) {
                 var serie = viewmodel.getSerie();
@@ -124,10 +135,17 @@
             }
         };
         function unregisterMobileEvents(viewmodel) {
+            var hammertime = _hammertimeObjectsByViewport[viewmodel];
             hammertime.off('pan', _mobileEvtBySerieVM[viewmodel])
+            delete _hammertimeObjectsByViewport[viewmodel];
         }
         $scope.$on('$destroy', function() {
-            hammertime.destroy();
+            // Destroy hammertime objects
+            for (var viewmodel in _hammertimeObjectsByViewport) {
+                var hammertime = _hammertimeObjectsByViewport[viewmodel];
+                hammertime.destroy();
+            }
+            _hammertimeObjectsByViewport = {};
         });
 
 

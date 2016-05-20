@@ -99,7 +99,7 @@
          *     [update] -> viewmodel -> cornerstone API -> [dom]
          */
         function link(scope, element, attrs, ctrls) {
-            var enabledElement = element.children('.wv-cornerstone-enabled-image')[0];
+            var enabledElement = element.children('div').children('.wv-cornerstone-enabled-image')[0];
             var model = new osimis.Viewport(wvImageManager, enabledElement, !!scope.vm.wvLossless);
 
             scope.vm.wvEnableOverlay = !!scope.vm.wvEnableOverlay;
@@ -118,6 +118,9 @@
                 ctrl.getImage = function() {
                     return model.getImageId();
                 };
+                ctrl.getModel = function() {
+                    return model;
+                }
                 ctrl.setImage = function(id, resetParameters) { // resetParameters is optional
                     _cancelCyclicCall = true;
 

@@ -15,6 +15,7 @@
             bindToController: true,
             controller: Controller,
             controllerAs: 'vm',
+            replace: true, // avoid overlay capturing viewport events
             link: link,
             restrict: 'E',
             transclude: true,

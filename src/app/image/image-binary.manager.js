@@ -25,8 +25,10 @@
         var service = {
             get: get,
             free: free,
+            listCachedBinaries: listCachedBinaries,
             getBestQualityInCache: getBestQualityInCache,
-            onBinaryLoaded: new osimis.Listener() // (id, quality, cornerstoneImageObject)
+            onBinaryLoaded: new osimis.Listener(), // (id, quality, cornerstoneImageObject)
+            onBinaryUnLoaded: new osimis.Listener() // (id, quality)
         };
 
         ////////////////
@@ -156,7 +158,36 @@
                 // Clean cache
                 _cache[id][quality] = null;
                 delete _cache[id][quality]; // @todo inefficient, use null & adapt getBestQualityInCache instead
+
+                // Trigger binary has been unloaded (used by torrent-like loading bar)
+                service.onBinaryUnLoaded.trigger(id, quality);
             }
+        }
+
+        /** wvImageBinaryManager#listCachedBinaries(id)
+         *
+         * Return all the cached binaries of an image, listed
+         * by their quality number.
+         *
+         * @param id <instanceId>:<frameIndex>
+         * @return [] or [<quality-value: int>, ...]
+         *
+         */
+        function listCachedBinaries(id) {
+            var result = [];
+
+            if (!_cache[id]) {
+                result = [];
+            }
+            else {
+                result = _
+                    .keys(_cache[id])
+                    .map(function(k) {
+                        return +k; // Make sure keys stay integers
+                    });
+            }
+
+            return result;
         }
 
         /** wvImageBinaryManager#getCachedHighestQuality(id)

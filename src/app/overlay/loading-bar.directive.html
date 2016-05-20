@@ -1,0 +1,48 @@
+<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <style>
+        .image-bar {
+            cursor: pointer;
+        }
+        .no-quality {
+            fill: rgba(255, 255, 255, 0.1);
+        }
+        .no-quality:hover, .in-loading {
+            fill: rgba(255, 255, 255, 0.2);
+        }
+        .LOSSLESS-quality {
+            fill:rgba(0, 255, 0, 0.7);
+        }
+        .LOSSLESS-quality:hover, .LOSSLESS-quality.in-loading {
+            fill:rgba(0, 255, 0, 1);
+        }
+        .R150J100-quality {
+            fill:rgba(255, 0, 0, 0.7);
+        }
+        .R150J100-quality:hover, .R150J100-quality.in-loading {
+            fill:rgba(255, 0, 0, 1);
+        }
+        .R1000J100-quality {
+            fill:rgba(255, 95, 0, 0.7);
+        }
+        .R1000J100-quality:hover, .R1000J100-quality.in-loading {
+            fill:rgba(255, 95, 0, 1);
+        }
+    </style> 
+    <defs>
+    <g id="image-loading-bar">
+        <rect ng-attr-width="{{vm.imageBarWidth}}%" height="100%"/>
+    </g>
+    </defs>
+
+    <!-- Image Bars -->
+    <use xlink:href="#image-loading-bar"
+        ng-repeat="i in [0, vm.imageCount] | range track by $index"
+        ng-attr-x="{{vm.imageBarWidth*i}}%" 
+        ng-attr-class="image-bar {{vm.QualityKeys[vm.bestQualityByImage[i]] || 'no'}}-quality {{vm.imageInLoadingIndex == i ? 'in-loading' : ''}}" 
+        ng-click="vm.serie.goToImage(i)"
+    />
+
+
+
+
+ </svg>

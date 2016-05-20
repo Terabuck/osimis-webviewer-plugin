@@ -6,7 +6,7 @@
         .factory('WvSerie', factory);
 
     /* @ngInject */
-    function factory($rootScope, $timeout, wvAnnotationManager, WvAnnotationGroup) {
+    function factory($rootScope, $timeout, wvAnnotationManager, WvAnnotationGroup, wvImageBinaryManager) {
 
         function WvSerie(id, imageIds, tags) {
             var _this = this;
@@ -39,22 +39,20 @@
             this._playTimeout = null;
         };
 
-        WvSerie.prototype._loadAnnotationGroup = function() {
+        /** WvSerie#getCachedImageBinaries()
+         *
+         * @return [<image-index>: [<quality-value>, ...], ...]
+         *
+         */
+        WvSerie.prototype.listCachedImageBinaries = function() {
             var _this = this;
 
-            if (!this._annotationGroup) {
-                // retrieve each kind of annotation for each image in the serie
-                var annotations = [];
-                this.imageIds.forEach(function(imageId) {
-                    annotations.push(wvAnnotationManager.getByImageId(imageId));
+            // For each image of the serie -> list binaries in cache
+            return this.imageIds
+                .map(function(imageId, imageIndex) {
+                    return wvImageBinaryManager.listCachedBinaries(imageId);
                 });
-
-                // cache annotations
-                this._annotationGroup = new WvAnnotationGroup(annotations);
-            }
-
-            return this._annotationGroup;
-        }
+        };
 
         WvSerie.prototype.getAnnotedImageIds = function(type) {
             return this._loadAnnotationGroup()
@@ -184,9 +182,26 @@
             this.isPlaying = false;
         };
 
+        WvSerie.prototype._loadAnnotationGroup = function() {
+            var _this = this;
+
+            if (!this._annotationGroup) {
+                // retrieve each kind of annotation for each image in the serie
+                var annotations = [];
+                this.imageIds.forEach(function(imageId) {
+                    annotations.push(wvAnnotationManager.getByImageId(imageId));
+                });
+
+                // cache annotations
+                this._annotationGroup = new WvAnnotationGroup(annotations);
+            }
+
+            return this._annotationGroup;
+        };
+        
         ////////////////
 
         return WvSerie;
-    }
+    };
 
 })();

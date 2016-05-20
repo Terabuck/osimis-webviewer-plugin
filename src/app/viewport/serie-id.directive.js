@@ -36,6 +36,11 @@
             var viewmodel = ctrls.wvSerieId;
             var viewportController = ctrls.wvViewport;
 
+            // Provide access to the viewport controller through the serieId
+            ctrls.wvSerieId.getViewport = function() {
+                return viewportController.getModel();
+            };
+
             // bind view model -> viewport controller
             viewmodel.onCurrentImageIdChanged(function(imageId, isNewSerie, setShownImageCallback) {
                 if (imageId) {
@@ -129,6 +134,8 @@
             }
         });
     }
+
+    SerieViewModel.prototype.getViewport = angular.noop; // defined inside the linker
 
     SerieViewModel.prototype.hasSerie = function() {
         return !!this._serieId;
