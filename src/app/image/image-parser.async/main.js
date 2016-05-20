@@ -142,6 +142,9 @@ BinaryRequest.prototype.execute = function() {
             if (pixelArray instanceof Uint8Array) {
                 pixelBufferFormat = 'Uint8';
             }
+            else if (pixelArray instanceof Int8Array) {
+                pixelBufferFormat = 'Int8';
+            }
             else if (pixelArray instanceof Uint16Array) {
                 pixelBufferFormat = 'Uint16';
             }
@@ -288,6 +291,8 @@ function parsePng(config) {
     var png = new PNG(config.binary);
 
     var s = png.decodePixels(); // returns Uint8 array
+
+    var bytePerPixel = png.bits;
     
     if (config.hasColor) {
         // Convert png24 to rgb32
@@ -301,17 +306,20 @@ function parsePng(config) {
             pixels[index++] = s[i + 2];
             pixels[index++] = 255;  // Alpha channel
         }
-    } else {
+    } else if (png.bits === 16) {
         // Cast uint8_t array to (u)int16_t array
-        
-        // if (config.isSigned) {
-        //     pixels = new Int16Array(s.buffer);
-        // } else {
-        //     pixels = new Uint16Array(s.buffer);
-        // }
         
         pixels = _convertPngEndianness(s, config);
 
+    }
+    else if (png.bits === 8 && config.isSigned) {
+        pixels = new Int8Array(s.buffer);
+    }
+    else if (png.bits === 8 && !config.isSigned) {
+        pixels = new Uint8Array(s.buffer);
+    }
+    else {
+        throw new Error('unexpected png format');
     }
 
     return pixels;

@@ -44,6 +44,9 @@
             case 'Uint8':
                 pixelArray = new Uint8Array(pixelBuffer);
                 break;
+            case 'Int8':
+                pixelArray = new Int8Array(pixelBuffer);
+                break;
             case 'Uint16':
                 pixelArray = new Uint16Array(pixelBuffer);
                 break;
