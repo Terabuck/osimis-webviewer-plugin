@@ -48,7 +48,17 @@
 
         // Cancel binary loading requests
         this._binariesInLoading.forEach(function(quality) {
-            _this._image.abortBinaryLoading(quality);
+            try {
+                _this._image.abortBinaryLoading(quality);
+            }
+            catch(exc) {
+                // Ignore exceptions: they may be caused because
+                // we try to free a binary whose download has been
+                // successfuly cancelled by the repository but not
+                // yet been removed from _binariesInLoading.
+                // @todo check this theory w/ chrome timeline
+                // @todo unit test
+            }
         });
 
         // Free image binary
@@ -374,13 +384,20 @@
                 // Trigger loading canceled (so the setImage caller can reject its promise)
                 _this.onLoadingCancelled.trigger();
 
-                // Note the image is already freed from cancelImageLoading
+                // Note the image is already freed by the #destroy() method
                 
                 return;
             }
 
             var formerQuality = _this._actualQuality || 0;
             var newQuality = quality;
+
+            // Do not draw the new binary if its quality is lower than the former one
+            if (newQuality <= formerQuality) {
+                // Free new quality we won't use anyway...
+                _this._image.freeBinary(newQuality);
+                return;
+            }
 
             // Free the former loaded binary
             // do not use formerQuality because _actualQuality is not updated if the new loaded quality
@@ -389,11 +406,6 @@
                 _this._image.freeBinary(_this._lastLoadedImageQuality);
             }
             _this._lastLoadedImageQuality = quality;
-
-            // Do not draw the new binary if its quality is lower than the former one
-            if (newQuality <= formerQuality) {
-                return;
-            }
 
             {
                 /** Draw the binary
