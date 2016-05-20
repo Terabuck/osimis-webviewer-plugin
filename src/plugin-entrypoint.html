@@ -25,7 +25,7 @@
     <div ng-controller="OsimisWebViewer" class="wv-container">
         <wv-toolbar wv-items="vm.toolbar" ng-if="vm.minimize"></wv-toolbar>
         <div style="height: calc(100% - 40px)" wv-size-tag ng-if="vm.minimize">
-            <wv-viewport wv-serie-id="vm.serieId" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}"
+            <wv-viewport wv-serie-id="vm.serieId" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}" wv-lossless="true"
                 wv-scroll-on-wheel-serie-ext="true"
                 wv-enable-overlay="vm.toolbar.overlay"
 
