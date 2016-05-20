@@ -2,11 +2,15 @@
     <style>
         .image-bar {
             cursor: pointer;
+            transition: fill 250ms;
         }
-        .no-quality {
+        .not-loaded {
             fill: rgba(255, 255, 255, 0.1);
         }
-        .no-quality:hover, .in-loading {
+        .not-loaded, .R150J100-quality {
+            transition: none;
+        }
+        .not-loaded:hover, .in-loading {
             fill: rgba(255, 255, 255, 0.2);
         }
         .LOSSLESS-quality {
@@ -29,20 +33,17 @@
         }
     </style> 
     <defs>
-    <g id="image-loading-bar">
+    <g id="image-loading-bar-{{$id}}">
         <rect ng-attr-width="{{vm.imageBarWidth}}%" height="100%"/>
     </g>
     </defs>
 
     <!-- Image Bars -->
-    <use xlink:href="#image-loading-bar"
+    <use xlink:href="" ng-attr-xlink:href="{{'#image-loading-bar-'+$parent.$id}}"
         ng-repeat="i in [0, vm.imageCount] | range track by $index"
         ng-attr-x="{{vm.imageBarWidth*i}}%" 
-        ng-attr-class="image-bar {{vm.QualityKeys[vm.bestQualityByImage[i]] || 'no'}}-quality {{vm.imageInLoadingIndex == i ? 'in-loading' : ''}}" 
+        ng-attr-class="image-bar {{vm.QualityKeys[vm.bestQualityByImage[i]] ? vm.QualityKeys[vm.bestQualityByImage[i]]+'-quality' : 'not-loaded'}} {{vm.imageInLoadingIndex == i ? 'in-loading' : ''}}" 
         ng-click="vm.serie.goToImage(i)"
     />
-
-
-
 
  </svg>

@@ -180,7 +180,7 @@
             var enabledElementObject = cornerstone.getEnabledElement(enabledElement); // enabledElementObject != enabledElementDom
             enabledElementObject.viewport = viewportData;
             enabledElementObject.image = cornerstoneImageObject;
-            cornerstone.updateImage(enabledElement, true); // draw image & invalidate cornerstone cache
+            cornerstone.updateImage(enabledElement, true); // draw image & invalidate cornerstone cache (multiple viewport with different resolution can be displayed at the same time)
             $(enabledElementObject.element).trigger("CornerstoneImageRendered", {
                 viewport: enabledElementObject.viewport,
                 element : enabledElementObject.element,
@@ -473,9 +473,12 @@
                 // Display image
                 //   force redraw because image binary changes, even if param do not (resetParameters the canvas size)
                 //   cornerstone#displayImage can not be used because it doesn't allow to invalidate cornerstone cache
+                // @warning !!! @warning in this case, cornerstone cache doesn't show a lower quality because the chosen
+                // quality is always the topmost available in cache - @todo test this behavior !
+                var invalidateCornerstoneCache = formerQuality != newQuality;
                 var enabledElementObject = cornerstone.getEnabledElement(enabledElement); // enabledElementObject != enabledElementDom
                 enabledElementObject.image = cornerstoneImageObject;
-                cornerstone.updateImage(enabledElement, true); // draw image & invalidate cornerstone cache
+                cornerstone.updateImage(enabledElement, invalidateCornerstoneCache); // draw image & invalidate cornerstone cache
                 $(enabledElementObject.element).trigger("CornerstoneImageRendered", {
                     viewport: enabledElementObject.viewport,
                     element : enabledElementObject.element,

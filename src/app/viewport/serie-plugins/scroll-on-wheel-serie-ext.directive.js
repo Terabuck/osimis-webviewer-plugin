@@ -139,14 +139,6 @@
             hammertime.off('pan', _mobileEvtBySerieVM[viewmodel])
             delete _hammertimeObjectsByViewport[viewmodel];
         }
-        $scope.$on('$destroy', function() {
-            // Destroy hammertime objects
-            for (var viewmodel in _hammertimeObjectsByViewport) {
-                var hammertime = _hammertimeObjectsByViewport[viewmodel];
-                hammertime.destroy();
-            }
-            _hammertimeObjectsByViewport = {};
-        });
 
 
         // listen to events...
