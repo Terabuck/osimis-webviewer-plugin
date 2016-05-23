@@ -28,7 +28,9 @@
             listCachedBinaries: listCachedBinaries,
             getBestQualityInCache: getBestQualityInCache,
             onBinaryLoaded: new osimis.Listener(), // (id, quality, cornerstoneImageObject)
-            onBinaryUnLoaded: new osimis.Listener() // (id, quality)
+            onBinaryUnLoaded: new osimis.Listener(), // (id, quality)
+            requestLoading: requestLoading,
+            abortLoading: abortLoading
         };
 
         ////////////////
@@ -64,14 +66,7 @@
          */
         var _cacheReferenceCount = {};
 
-        /** wvImageBinaryManager#get(id, quality)
-         *
-         * @param id <instanceId>:<frameIndex>
-         * @param quality see WvImageQualities
-         * @return Promise<cornerstoneImageObject> // see https://github.com/chafey/cornerstone/wiki/image
-         *
-         */
-        function get(id, quality) {
+        function requestLoading(id, quality, priority) {
             // Generate cache index
             // used to differentiate cached requests from finished cached requests
             if (!_loadedCacheIndex[id]) {
@@ -79,18 +74,18 @@
             }
 
             // Generate request cache (if inexistant)
-        	if (!_cache[id]) {
-        		_cache[id] = {};
-        	}
-        	if (!_cache[id][quality]) {
-	            // download klv, extract metadata & decompress data to raw image
-	            var requestPromise = pool
+            if (!_cache[id]) {
+                _cache[id] = {};
+            }
+            if (!_cache[id][quality]) {
+                // download klv, extract metadata & decompress data to raw image
+                var requestPromise = pool
                     .queueTask({
                         type: 'getBinary',
                         id: id,
                         quality: quality
                     })
-	                .then(function(result) {
+                    .then(function(result) {
                         // Loading done
 
                         // Abort the finished loading when an abortion has been asked but not made in time
@@ -98,17 +93,17 @@
                             return $q.reject('aborted');
                         }
 
-	                    // configure cornerstone related object methods
-	                    var cornerstoneImageObject = wvCornerstoneImageAdapter.process(id, quality, result.cornerstoneMetaData, result.pixelBuffer, result.pixelBufferFormat);
+                        // configure cornerstone related object methods
+                        var cornerstoneImageObject = wvCornerstoneImageAdapter.process(id, quality, result.cornerstoneMetaData, result.pixelBuffer, result.pixelBufferFormat);
 
                         // consider the promise to be resolved
                         _loadedCacheIndex[id][quality] = true;
 
-	                    // trigger binaryLoaded event
-	                    service.onBinaryLoaded.trigger(id, quality, cornerstoneImageObject);
+                        // trigger binaryLoaded event
+                        service.onBinaryLoaded.trigger(id, quality, cornerstoneImageObject);
 
-	                    return cornerstoneImageObject;
-	                })
+                        return cornerstoneImageObject;
+                    })
                     .then(null, function(err) {
                         // Loading aborted
 
@@ -127,7 +122,7 @@
             }
 
             // Increment cache reference count
-            _cache[id][quality].pushOrigin('display');
+            _cache[id][quality].pushPriority(priority);
             if (!_cacheReferenceCount[id]) {
                 _cacheReferenceCount[id] = {};
             }
@@ -140,19 +135,7 @@
             return _cache[id][quality].promise;
         }
 
-        /** wvImageBinaryManager#free(id, quality)
-         *
-         * Free the defined image binary.
-         * Reference counting implementation (if the image was called 4 times, #free has to be called 4 time as well to effectively free the memory).
-         *
-         * @pre The promise returned by wvImageBinary#get has been resolved (do not call free when the promise has been rejected !).
-         * @pre The user has deleted his own pointers to the binary in order to allow the GC to clean the memory.
-         *
-         * @param id <instanceId>:<frameIndex>
-         * @param quality see WvImageQualities
-         *
-         */
-        function free(id, quality) {
+        function abortLoading(id, quality, priority) {
             // Check the item is cached
             if (!_cacheReferenceCount.hasOwnProperty(id) || !_cacheReferenceCount[id].hasOwnProperty(quality) || _cacheReferenceCount[id][quality] < 1) {
                 throw new Error('Free uncached image binary.');
@@ -160,7 +143,9 @@
 
             // Decount reference
             --_cacheReferenceCount[id][quality];
-            _cache[id][quality].popOrigin('display');
+            if (_cache[id][quality]) {
+                _cache[id][quality].popPriority(priority);
+            }
 
             // Clean cache when no reference left - Cancel request if pending
             if (_cacheReferenceCount[id][quality] === 0) {
@@ -184,6 +169,33 @@
                 // Trigger binary has been unloaded (used by torrent-like loading bar)
                 service.onBinaryUnLoaded.trigger(id, quality);
             }
+        }
+
+        /** wvImageBinaryManager#get(id, quality)
+         *
+         * @param id <instanceId>:<frameIndex>
+         * @param quality see WvImageQualities
+         * @return Promise<cornerstoneImageObject> // see https://github.com/chafey/cornerstone/wiki/image
+         *
+         */
+        function get(id, quality) {
+            return requestLoading(id, quality, 0);
+        }
+
+        /** wvImageBinaryManager#free(id, quality)
+         *
+         * Free the defined image binary.
+         * Reference counting implementation (if the image was called 4 times, #free has to be called 4 time as well to effectively free the memory).
+         *
+         * @pre The promise returned by wvImageBinary#get has been resolved (do not call free when the promise has been rejected !).
+         * @pre The user has deleted his own pointers to the binary in order to allow the GC to clean the memory.
+         *
+         * @param id <instanceId>:<frameIndex>
+         * @param quality see WvImageQualities
+         *
+         */
+        function free(id, quality) {
+            return abortLoading(id, quality, 0)
         }
 
         /** wvImageBinaryManager#listCachedBinaries(id)

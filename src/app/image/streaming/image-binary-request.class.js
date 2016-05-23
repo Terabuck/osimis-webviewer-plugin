@@ -32,19 +32,22 @@
          */
         this.size = undefined;
 
-        /** requestOrigins: Array<RequestOrigin>
+        /** requestHistory: Array<RequestPriority>
          *
-         * requestOrigins.length === referenceCount
+         * requestHistory.length === referenceCount
          *
-         * RequestOrigins[<any>].source = 'prefetching' | 'display'
-         *   The highest priority is set for CachedBinaries w/ requestOrigins[<any>].source === 'display'
+         * RequestHistory[<any>].priority =
+         *   From highest to lowest
+         *   0 - currently displaying
+         *   1 - preloaded from selected study
+         *   2 - preloaded from selected series
          *
-         * RequestOrigins[<any>].timestamp = Date.now()
+         * RequestHistory[<any>].timestamp = Date.now()
          *   timestamp is used by WorkerPool to determine which binary load first when no other parameters are left.
          *   timestamp is used by CacheFlushPolicy to determine which binary should be freed first.
          *
          */
-        this.requestOrigins = [];
+        this.requestHistory= [];
 
         /** lastTimeDisplayed: undefined | timestamp
          *
@@ -71,40 +74,35 @@
      *
      */
     ImageBinaryRequest.prototype.getReferenceCount = function() {
-        return this.requestOrigins.length;
+        return this.requestHistory.length;
     };
 
-    /** ImageBinaryRequest#pushOrigin(source: 'prefetching' | 'display')
+    /** ImageBinaryRequest#pushPriority(priority: 'prefetching' | 'display')
      *
      * Increment the reference count of the cached binary.
      *
      */
-    ImageBinaryRequest.prototype.pushOrigin = function(source) {
-        // Throw error if source argument is malformated
-        if (['prefetching', 'display'].indexOf(source) === -1) {
-            throw new Error('unknown source type');
-        }
-
-        // Instantiate RequestOrigin
-        var RequestOrigin = {
-            source: source,
+    ImageBinaryRequest.prototype.pushPriority = function(priority) {
+        // Instantiate RequestPriority
+        var RequestPriority = {
+            priority: priority,
             timestamp: Date.now()
         };
 
-        // Add RequestOrigin to the queue
-        this.requestOrigins.push(RequestOrigin);
+        // Add RequestPriority to the queue
+        this.requestHistory.push(RequestPriority);
 
         // unset _lastTimeDisplayed if the binary is being displayed at the moment
-        if (source === 'display') {
+        if (priority === 'display') {
             this._lastTimeDisplayed = undefined;
         }
     };
 
-    ImageBinaryRequest.prototype.hasOrigin = function(source) {
-        // Find the latest reference provided by the specified source
-        for (var i=0; i<this.requestOrigins.length; ++i) {
-            var requestOrigin = this.requestOrigins[i];
-            if (requestOrigin.source === source) {
+    ImageBinaryRequest.prototype.hasPriority = function(priority) {
+        // Find the latest reference provided by the specified priority
+        for (var i=0; i<this.requestHistory.length; ++i) {
+            var requestPriority = this.requestHistory[i];
+            if (requestPriority.priority === priority) {
                 // Return true - it has been found
                 return true;
             }
@@ -114,36 +112,36 @@
         return false;
     };
 
-    /** ImageBinaryRequest#popOrigin(source: 'prefetching' | 'display')
+    /** ImageBinaryRequest#popPriority(priority: 'prefetching' | 'display')
      *
      * Decrement the reference count of the cached binary.
      * Used to know if a binary is no longer waiting for display or no longer required to be preloaded.
      *
      */
-    ImageBinaryRequest.prototype.popOrigin = function(source) {
-        var latestSourceIndex = null;
+    ImageBinaryRequest.prototype.popPriority = function(priority) {
+        var latestPriorityIndex = null;
 
-        // Find the latest reference provided by the specified source
-        for (var i=this.requestOrigins.length-1; i>=0; ++i) {
-            var requestOrigin = this.requestOrigins[i];
-            if (requestOrigin.source === source) {
-                // Save the first source found (in reverse loop order)
-                latestSourceIndex = i;
+        // Find the latest reference provided by the specified priority
+        for (var i=this.requestHistory.length-1; i>=0; --i) {
+            var requestPriority = this.requestHistory[i];
+            if (requestPriority.priority === priority) {
+                // Save the first priority found (in reverse loop order)
+                latestPriorityIndex = i;
                 break;
             }
         }
 
-        // Remove the latest reference provided by the specified source
-        if (latestSourceIndex === null) {
-            // No origin with source has been found - throw error
-            throw new Error('Request origin source not found');
+        // Remove the latest reference provided by the specified priority
+        if (latestPriorityIndex === null) {
+            // No Priority with priority has been found - throw error
+            throw new Error('Request Priority priority not found');
         }
         else {
-            // Remove the request origin from the queue
-            this.requestOrigins.splice(latestSourceIndex, 1);
+            // Remove the request Priority from the queue
+            this.requestHistory.splice(latestPriorityIndex, 1);
 
-            // If the source his no longer displayed, set the last time it's been to now
-            if (source === 'display' && this.hasOrigin('display')) {
+            // If the priority his no longer displayed, set the last time it's been to now
+            if (priority === 0 && !this.hasPriority(0)) {
                 this._lastTimeDisplayed = Date.now();
             }
         }
@@ -157,10 +155,10 @@
      *
      */
     ImageBinaryRequest.prototype.isWaitingForDisplay = function() {
-        // Return true if a request origin of display source has been found
-        for (var i=this.requestOrigins.length-1; i>=0; ++i) {
-            var requestOrigin = this.requestOrigins[i];
-            if (requestOrigin.source === 'display') {
+        // Return true if a request Priority of display priority has been found
+        for (var i=this.requestHistory.length-1; i>=0; --i) {
+            var requestPriority = this.requestHistory[i];
+            if (requestPriority.priority === 0) {
                 return true;
             }
         }

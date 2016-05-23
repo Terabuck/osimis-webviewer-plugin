@@ -7,7 +7,7 @@
  * # wvStudylist
  */
 angular.module('webviewer')
-  .directive('wvStudylist', function ($http, wvConfig) {
+  .directive('wvStudylist', function ($rootScope, $http, wvConfig) {
     return {
       scope: {
         wvSelectedStudy: '='
@@ -44,6 +44,15 @@ angular.module('webviewer')
                     v.label = study.MainDicomTags.StudyDescription;
                 });
              });
+        });
+
+        scope.$watch('wvSelectedStudy', function(newStudy, oldStudy) {
+            if (oldStudy && oldStudy.id && newStudy !== oldStudy) {
+                $rootScope.$emit('UserUnSelectedStudyId', oldStudy.id);
+            }
+            if (newStudy && newStudy.id) {
+                $rootScope.$emit('UserSelectedStudyId', newStudy.id);
+            }
         });
       }
     };

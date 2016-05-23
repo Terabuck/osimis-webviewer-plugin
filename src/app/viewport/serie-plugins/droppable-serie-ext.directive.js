@@ -32,7 +32,7 @@
     }
 
     /* @ngInject */
-    function Controller($scope, $element) {
+    function Controller($rootScope, $scope, $element) {
         var _wvSerieIdViewModels = [];
         this.register = function(viewmodel) {
             _wvSerieIdViewModels.push(viewmodel);
@@ -48,7 +48,21 @@
                 var serieId = droppedElement.data('serie-id');
                 $scope.$apply(function() {
                     _wvSerieIdViewModels.forEach(function(viewmodel) {
-                        viewmodel.setSerie(serieId);
+                        // Trigger old series removed UX global event
+                        var oldSerie = viewmodel.getSerie();
+                        if (oldSerie) {
+                            $rootScope.$emit('UserUnSelectedSeries', oldSerie);
+                        }
+
+                        // Set new serie
+                        viewmodel
+                            .setSerie(serieId)
+                            .then(function(newSerie) {
+                                // Trigger new series UX global event
+                                if (newSerie) {
+                                    $rootScope.$emit('UserSelectedSeries', newSerie);
+                                }
+                            });
                     });
                 });
             }

@@ -155,12 +155,15 @@
 
         this._serieId = id;
 
-        this._serieManager
+        this._serie = null; // Make sure getSerie returns null during the loading of the new one.
+
+        return this._serieManager
             .get(id)
             .then(function(serie) {
                 var oldSerie = _this._serie;
                 _this._serie = serie;
                 _this.onSerieChanged.trigger(serie, oldSerie);
+                return serie;
             });
     };
 
