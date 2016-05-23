@@ -36,7 +36,8 @@
         var pool = new window.osimis.WorkerPool({
             path: '/src/app/image/image-parser.async/main.js',
             workerCount: 4,
-            createPromiseFn: $q
+            createPromiseFn: $q,
+            taskPriorityPolicy: new osimis.TaskPriorityPolicy(_cache)
         });
 
         /** _cache: Promise<cornerstoneImageObject>[<imageId>][<quality>]
@@ -83,7 +84,7 @@
         	}
         	if (!_cache[id][quality]) {
 	            // download klv, extract metadata & decompress data to raw image
-	            _cache[id][quality] = pool
+	            var requestPromise = pool
                     .queueTask({
                         type: 'getBinary',
                         id: id,
@@ -121,9 +122,12 @@
                         // Propagate promise error
                         return $q.reject(err);
                     });
+
+                _cache[id][quality] = new osimis.ImageBinaryRequest(id, quality, requestPromise);
             }
 
             // Increment cache reference count
+            _cache[id][quality].pushOrigin('display');
             if (!_cacheReferenceCount[id]) {
                 _cacheReferenceCount[id] = {};
             }
@@ -133,7 +137,7 @@
             ++_cacheReferenceCount[id][quality];
 
             // Return Promise<cornerstoneImageObject>
-            return _cache[id][quality];
+            return _cache[id][quality].promise;
         }
 
         /** wvImageBinaryManager#free(id, quality)
@@ -156,6 +160,7 @@
 
             // Decount reference
             --_cacheReferenceCount[id][quality];
+            _cache[id][quality].popOrigin('display');
 
             // Clean cache when no reference left - Cancel request if pending
             if (_cacheReferenceCount[id][quality] === 0) {

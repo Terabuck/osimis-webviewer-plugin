@@ -67,6 +67,16 @@
          */
         this._tasksInProcess = [];
 
+        /** _taskPriorityPolicy: Object
+         *
+         * Used to determine which task is chosen
+         *
+         * @interface _taskPriorityPolicy
+         *   #selectTask(availableWorkers, busyWorkers, tasksToProcess, tasksInProcess)
+         *
+         */
+        this._taskPriorityPolicy = options.taskPriorityPolicy;
+
         // Initialize workers
         for (var i=0; i<this._workerCount; ++i) {
             // Create Worker - Put them in the available queue
@@ -166,7 +176,18 @@
             }
 
             // Retrieve both the first available task & worker
-            var task = _this._tasksToProcess[0];
+            var task = _this._taskPriorityPolicy.selectTask(
+                _this._availableTaskWorkers,
+                _this._busyTaskWorkers,
+                _this._tasksToProcess,
+                _this._tasksInProcess
+            );
+
+            // Cancel if no task has been chosen
+            if (!task) {
+                return;
+            }
+
             var worker = _this._availableTaskWorkers[0];
 
             // Switch task from taskToProcess queue to taskInProcess queue
