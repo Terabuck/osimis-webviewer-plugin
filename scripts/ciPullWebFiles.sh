@@ -19,7 +19,7 @@ startScriptDir=$(pwd)
 
 currentBranch=$1
 buildDir="subtrees/webViewer.git/"
-buildRemote="https://nuKsBe@bitbucket.org/osimis/osimis-webviewer.git"
+buildRemote="https://bitbucket.org/osimis/osimis-webviewer.git"
 buildBranch="build_$currentBranch"
 
 cd ..
