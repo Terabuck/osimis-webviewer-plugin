@@ -26,7 +26,7 @@ Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIn
   // @todo activate cache
 
   BENCH_LOG(IMAGE_FORMATING, "");
-  boost::lock_guard<boost::mutex> guard(mutex_); // make sure the memory amount doesn't overrise 
+  // boost::lock_guard<boost::mutex> guard(mutex_); // make sure the memory amount doesn't overrise 
 
   // @todo catch method call's exceptions ?
 
