@@ -18,6 +18,7 @@ namespace
   void _loadDicomTags(Json::Value& jsonOutput, const std::string& instanceId);
   void _loadDICOM(OrthancPluginMemoryBuffer* dicomOutput, const std::string& instanceId);
   void _getFrame(OrthancPluginImage** frameOutput, const void* dicomData, uint32_t dicomDataSize, uint32_t frameIndex);
+  std::string _getAttachmentName(int frameIndex, const IImageProcessingPolicy* policy);
 }
 
 Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIndex, bool enableCache) const
@@ -60,7 +61,8 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
   // if not found - create
   // if found - retrieve
   Image* image;
-  OrthancPluginMemoryBuffer *getResultBuffer = new OrthancPluginMemoryBuffer;
+  OrthancPluginMemoryBuffer *getResultBuffer = new OrthancPluginMemoryBuffer; // @todo check if must be allocated from Orthanc
+  // @todo delete on throw
 
   // store attachment
   // /{resourceType}/{id}/attachments/{name}
@@ -68,11 +70,12 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
   // -> data : Unknown Resource
   // -> unregistered attachment name : inexistent item
 
-  std::string attachmentName = "frame:" + boost::lexical_cast<std::string>(frameIndex) + '~' + policy->ToString();
-  std::string path = "/instances/" + instanceId + "/attachments/" + attachmentName + "/data";
+  // Define attachment name based upon policy
+  std::string attachmentName = _getAttachmentName(frameIndex, policy);
 
+  // Get attachment content
   OrthancPluginErrorCode error;
-
+  std::string path = "/instances/" + instanceId + "/attachments/" + attachmentName + "/data";
   {
     BENCH(FILE_CACHE_RETRIEVAL);
     error = OrthancPluginRestApiGet(OrthancContextManager::Get(), getResultBuffer, path.c_str());
@@ -80,11 +83,13 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
 
   if (error == OrthancPluginErrorCode_InexistentItem)
   {
-    // attachment tag doesn't exists
+    // @todo throw exception - attachment tag doesn't exists
     return 0;
   }
   else if (error == OrthancPluginErrorCode_UnknownResource)
   {
+    // No cache available - Create content & save cache
+
     BENCH(FILE_CACHE_CREATION); // @todo Split in two when refactoring. This contains the file processing..
     image = _GetImage(instanceId, frameIndex, policy);
 
@@ -110,7 +115,7 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
   }
   else if (error == OrthancPluginErrorCode_Success)
   {
-    // send retrieved file
+    // Cache available - send retrieved file
 
     // issue: buffer doesn't go well with the rest
 
@@ -188,5 +193,29 @@ namespace
     BENCH(GET_FRAME_FROM_DICOM);
 
     *frameOutput = OrthancPluginDecodeDicomImage(OrthancContextManager::Get(), dicomData, dicomDataSize, frameIndex);
+  }
+
+  std::string _getAttachmentName(int frameIndex, const IImageProcessingPolicy* policy)
+  {
+    std::string attachmentName;
+    std::string policyString = policy->ToString();
+    int attachmentPrefix = 10000; 
+    int maxFrameCount = 1000; // @todo use adaptative maxFrameCount !
+
+    if (policyString == "png~klv") {
+      attachmentName = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 0 + frameIndex);
+    }
+    else if (policyString == "resize:1000~8bit~jpeg:100~klv") {
+      attachmentName = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 1 + frameIndex);
+
+    }
+    else if (policyString == "resize:150~8bit~jpeg:100~klv") {
+      attachmentName = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 2 + frameIndex);
+    }
+    else {
+      throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
+    }
+
+    return attachmentName;
   }
 }
