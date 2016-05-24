@@ -23,9 +23,9 @@
 */
 
 #include <functional>
-#include "../../gil_config.hpp"
-#include "../../pixel.hpp"
-#include "../../color_base_algorithm.hpp"
+#include "../gil_config.hpp"
+#include "../pixel.hpp"
+#include "../color_base_algorithm.hpp"
 #include "channel_numeric_operations.hpp"
 
 namespace boost { namespace gil {
