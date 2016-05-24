@@ -47,7 +47,7 @@
          *   timestamp is used by CacheFlushPolicy to determine which binary should be freed first.
          *
          */
-        this.requestHistory= [];
+        this.requestHistory = [];
 
         /** lastTimeDisplayed: undefined | timestamp
          *
@@ -98,7 +98,29 @@
         }
     };
 
-    ImageBinaryRequest.prototype.hasPriority = function(priority) {
+    /** ImageBinaryRequest#getPriority()
+     *
+     * @return the highest priority in history (0 is the highest possible)
+     *
+     */
+    ImageBinaryRequest.prototype.getPriority = function() {
+        var highestPriority = null;
+
+        // Find the highest priority in the history
+        for (var i=0; i<this.requestHistory.length; ++i) {
+            var historyPriority = this.requestHistory[i].priority;
+            if (highestPriority === null || historyPriority < highestPriority) {
+                highestPriority = historyPriority;
+            }
+        }
+
+        return highestPriority;
+    };
+    /**
+     *
+     *
+     */
+    ImageBinaryRequest.prototype.hasPriorityInHistory = function(priority) {
         // Find the latest reference provided by the specified priority
         for (var i=0; i<this.requestHistory.length; ++i) {
             var requestPriority = this.requestHistory[i];
@@ -141,7 +163,7 @@
             this.requestHistory.splice(latestPriorityIndex, 1);
 
             // If the priority his no longer displayed, set the last time it's been to now
-            if (priority === 0 && !this.hasPriority(0)) {
+            if (priority === 0 && !this.hasPriorityInHistory(0)) {
                 this._lastTimeDisplayed = Date.now();
             }
         }

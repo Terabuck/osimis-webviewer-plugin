@@ -36,7 +36,6 @@
                     });
             });
 
-
             $rootScope.$on('UserSelectedSeries', function(evt, series) {
                 // Preload every series' thumbnails
                 for (var i=0; i<series.imageIds.length; ++i) {

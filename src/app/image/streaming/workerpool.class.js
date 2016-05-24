@@ -16,7 +16,7 @@
      *
      * 
      * @param options.path 
-     * @param options.workerCount int
+     * @param options.workerCount int - minimum 2 (one is always kept for high priority displays)
      * @param options.createPromiseFn function(wrappedFunction: (resolve, reject)=>Any): Promise
      * 
      */
@@ -143,6 +143,7 @@
      */
     WorkerPool.prototype.abortTask = function(taskOptions) {
         // Remove task from the toProcess queue (if here)
+        // @todo optimize (actually 50ms process) -> sorted by quality + tree research on id ?
         _.pullAllWith(this._tasksToProcess, [taskOptions], function(a, b) {
             return _.isEqual(a.options, b);
         });
