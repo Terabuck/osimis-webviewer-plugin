@@ -9,7 +9,11 @@
 
 'use strict';
 
-importScripts('/app/image/image-parser.async/klvreader.class.js');
+// @todo move jpgjs & pngjs out of bower_components
+
+/** import:/app/image/image-parser.worker/klvreader.class.js **/
+importScripts('/app/image/image-parser.worker/klvreader.class.js');
+/** import:/bower_components/jpgjs/jpg.js **/
 importScripts('/bower_components/jpgjs/jpg.js'); // @todo in build mode
 
 // Make png.js worker compatible
@@ -17,6 +21,9 @@ var document = {
     createElement: function() { return { getContext: function() {} } }
 };
 var window = {};
+
+/** import:/bower_components/png.js/zlib.js **/
+/** import:/bower_components/png.js/png.js **/
 
 // Import png.js
 importScripts('/bower_components/png.js/zlib.js'); // @todo in build mode

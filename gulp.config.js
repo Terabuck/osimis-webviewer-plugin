@@ -22,6 +22,7 @@ module.exports = function() {
          */
         // all javascript that we want to vet
         alljs: [
+            '!./src/**/*.worker/**/*.js',
             './src/**/*.js',
             './*.js'
         ],
@@ -44,7 +45,7 @@ module.exports = function() {
         js: [
             clientApp + '**/*.module.js',
             clientApp + '**/*.js',
-            '!' + clientApp + '**/*.async/**/*.js',
+            '!' + clientApp + '**/*.worker/**/*.js',
             '!' + clientApp + '**/*.spec.js'
         ],
         jsOrder: [

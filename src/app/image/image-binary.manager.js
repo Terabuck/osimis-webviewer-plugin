@@ -35,13 +35,6 @@
 
         ////////////////
 
-        var pool = new window.osimis.WorkerPool({
-            path: '/src/app/image/image-parser.async/main.js',
-            workerCount: 4,
-            createPromiseFn: $q,
-            taskPriorityPolicy: new osimis.TaskPriorityPolicy(_cache)
-        });
-
         /** _cache: Promise<cornerstoneImageObject>[<imageId>][<quality>]
          *
          * A cache of request (and their results) to avoid multiple request.
@@ -66,6 +59,15 @@
          */
         var _cacheReferenceCount = {};
 
+        var pool = new window.osimis.WorkerPool({
+            path: /* @inline-worker: */ '/app/image/image-parser.worker/main.js',
+            workerCount: 4,
+            createPromiseFn: $q,
+            taskPriorityPolicy: new osimis.TaskPriorityPolicy(_cache)
+        });
+
+        // @todo Free inline-worker's ObjectUrl
+        
         function requestLoading(id, quality, priority) {
             // Generate cache index
             // used to differentiate cached requests from finished cached requests

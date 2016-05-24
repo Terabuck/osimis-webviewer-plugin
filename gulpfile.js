@@ -8,6 +8,7 @@ var path = require('path');
 var _ = require('lodash');
 var $ = require('gulp-load-plugins')({lazy: true});
 var osisync = require('osisync');
+$.injectInlineWorker = require('./gulp-injectInlineWorker/index.js');
 
 var colors = $.util.colors;
 var envenv = $.util.env;
@@ -277,13 +278,20 @@ gulp.task('optimize', ['inject'], function() {
         .pipe(inject(templateCache, 'templates'))
         // Replace the font .css locations
         .pipe(inject(fontsCss, 'fonts'))
-        .pipe(assets) // Gather all assets from the html with useref
+        .pipe(assets) // Concatenate all assets from the html with useref
+        // @todo remove duplicate build files (induced by duplicate build file request on different *.html)
         // Get the css
         .pipe(cssFilter)
         .pipe($.minifyCss())
         .pipe(cssFilter.restore())
         // Get the custom javascript
         .pipe(jsAppFilter)
+        .pipe($.injectInlineWorker({ // Inlines worker scripts' path to BLOB
+            pathRouter: {
+                '/app/': './src/app/',
+                '/bower_components/': './bower_components/'
+            }
+        }))
         .pipe($.ngAnnotate({add: true}))
         .pipe($.uglify())
         .pipe(getHeader())
