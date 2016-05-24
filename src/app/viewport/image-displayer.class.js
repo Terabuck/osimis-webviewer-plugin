@@ -60,11 +60,6 @@
                 // @todo unit test
             }
         });
-
-        // Free image binary
-        if (this._lastLoadedImageQuality) {
-            this._image.freeBinary(this._lastLoadedImageQuality);
-        }
         
         // Free events
         this.onImageLoading.close();
@@ -74,6 +69,13 @@
 
         // Free listeners
         this._image.onAnnotationChanged.close(_this);
+
+        // Free image binary
+        if (this._lastLoadedImageQuality) {
+            this._image.freeBinary(this._lastLoadedImageQuality);
+            this._image = null;
+            this._lastLoadedImageQuality = null;
+        }
     };
 
     ImageDisplayer.prototype.resetParameters = function() {
@@ -385,7 +387,6 @@
                 _this.onLoadingCancelled.trigger();
 
                 // Note the image is already freed by the #destroy() method
-                
                 return;
             }
 
@@ -475,10 +476,9 @@
                 //   cornerstone#displayImage can not be used because it doesn't allow to invalidate cornerstone cache
                 // @warning !!! @warning in this case, cornerstone cache doesn't show a lower quality because the chosen
                 // quality is always the topmost available in cache - @todo test this behavior !
-                var invalidateCornerstoneCache = formerQuality != newQuality;
                 var enabledElementObject = cornerstone.getEnabledElement(enabledElement); // enabledElementObject != enabledElementDom
                 enabledElementObject.image = cornerstoneImageObject;
-                cornerstone.updateImage(enabledElement, invalidateCornerstoneCache); // draw image & invalidate cornerstone cache
+                cornerstone.updateImage(enabledElement, true); // draw image & invalidate cornerstone cache
                 $(enabledElementObject.element).trigger("CornerstoneImageRendered", {
                     viewport: enabledElementObject.viewport,
                     element : enabledElementObject.element,
