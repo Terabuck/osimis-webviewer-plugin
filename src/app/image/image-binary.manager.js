@@ -92,6 +92,12 @@
 
                         // Abort the finished loading when an abortion has been asked but not made in time
                         if (!_cacheReferenceCount[id][quality]) {
+                            // Remove promise from cache
+                            delete _cacheReferenceCount[id][quality];
+                            delete _cache[id][quality]; // @todo inefficient, use null & adapt getBestQualityInCache instead
+                            if (typeof _loadedCacheIndex[id][quality] !== 'undefined') {
+                                delete _loadedCacheIndex[id][quality];
+                            }
                             return $q.reject('aborted');
                         }
 
@@ -189,7 +195,6 @@
                     // Flush cache
                     var refCount = _cacheReferenceCount[id][quality];
                     if (refCount === 0) {
-                        console.log('unloading ', !!_cache[id][quality].isLoaded);
                         // Decrement cache size
                         var flushedSize = _cache[id][quality].size || 0;
                         totalCacheSizeByQuality[quality] -= flushedSize;
