@@ -2,7 +2,7 @@
 #define BASE_ROUTE_H
 
 #include <string>
-#include <Orthanc/OrthancCPlugin.h>
+#include <orthanc/OrthancCPlugin.h>
 #include "OrthancContextManager.h"
 
 class BaseController {

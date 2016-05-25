@@ -1,7 +1,7 @@
 #ifndef ORHTANC_CONTEXT_MANAGER_H
 #define ORHTANC_CONTEXT_MANAGER_H
 
-#include <Orthanc/OrthancCPlugin.h>
+#include <orthanc/OrthancCPlugin.h>
 
 class OrthancContextManager {
 public:
