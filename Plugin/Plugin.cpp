@@ -624,7 +624,7 @@ extern "C"
 
       /* Register bundle schedulers */
       scheduler.Register(CacheBundle_SeriesInformation,
-                         new SeriesInformationAdapter(context_, scheduler), 1);
+                         new SeriesInformationAdapter(context_));
       scheduler.Register(CacheBundle_DecodedImage,
                          new DecodedImageAdapter(context_), decodingThreads);
 
