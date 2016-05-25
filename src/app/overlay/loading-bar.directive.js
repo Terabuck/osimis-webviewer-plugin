@@ -47,7 +47,7 @@
         // });
 
         // Show current loading image
-        this.imageInLoadingIndex = null;
+        this.currentImageIndex = null;
         $scope.$watch('vm.serie', function(newSerie, oldSerie) {
             // Unbind the old serie if exists
             if (oldSerie) {
@@ -63,7 +63,7 @@
             // Set the new serie if exists
             if (newSerie) {
                 // Set actual image
-                _this.imageInLoadingIndex = newSerie.currentIndex;
+                _this.currentImageIndex = newSerie.currentIndex;
 
                 // Set bar size
                 _this.imageCount = newSerie.imageCount;
@@ -71,7 +71,7 @@
 
                 // Listen to actual image
                 newSerie.onCurrentImageIdChanged(_this, function(imageId) {
-                    _this.imageInLoadingIndex = newSerie.getIndexOf(imageId);
+                    _this.currentImageIndex = newSerie.getIndexOf(imageId);
                 });
                 // @todo close on destroy
 

@@ -2,7 +2,7 @@
     <style>
         .image-bar {
             cursor: pointer;
-            transition: fill 250ms;
+            transition: fill 250ms, transform 250ms;
         }
         .not-loaded {
             fill: rgba(255, 255, 255, 0.1);
@@ -10,26 +10,30 @@
         .not-loaded, .R150J100-quality {
             transition: none;
         }
-        .not-loaded:hover, .in-loading {
+        .not-loaded:hover, .active {
             fill: rgba(255, 255, 255, 0.2);
         }
         .LOSSLESS-quality {
             fill:rgba(0, 255, 0, 0.7);
         }
-        .LOSSLESS-quality:hover, .LOSSLESS-quality.in-loading {
+        .LOSSLESS-quality:hover, .LOSSLESS-quality.active {
             fill:rgba(0, 255, 0, 1);
         }
         .R150J100-quality {
             fill:rgba(255, 0, 0, 0.7);
         }
-        .R150J100-quality:hover, .R150J100-quality.in-loading {
+        .R150J100-quality:hover, .R150J100-quality.active {
             fill:rgba(255, 0, 0, 1);
         }
         .R1000J100-quality {
             fill:rgba(255, 95, 0, 0.7);
         }
-        .R1000J100-quality:hover, .R1000J100-quality.in-loading {
+        .R1000J100-quality:hover, .R1000J100-quality.active {
             fill:rgba(255, 95, 0, 1);
+        }
+
+        .active {
+            /*transform: rotateZ(5deg);*/
         }
     </style> 
     <defs>
@@ -42,8 +46,17 @@
     <use xlink:href="" ng-attr-xlink:href="{{'#image-loading-bar-'+$parent.$id}}"
         ng-repeat="i in [0, vm.imageCount] | range track by $index"
         ng-attr-x="{{vm.imageBarWidth*i}}%" 
-        ng-attr-class="image-bar {{vm.QualityKeys[vm.bestQualityByImage[i]] ? vm.QualityKeys[vm.bestQualityByImage[i]]+'-quality' : 'not-loaded'}} {{vm.imageInLoadingIndex == i ? 'in-loading' : ''}}" 
+        ng-attr-class="image-bar {{vm.QualityKeys[vm.bestQualityByImage[i]] ? vm.QualityKeys[vm.bestQualityByImage[i]]+'-quality' : 'not-loaded'}} {{vm.currentImageIndex == i ? 'active' : ''}}" 
         ng-click="vm.serie.goToImage(i)"
+        y="2px"
+    />
+
+    <!-- Position Helper -->
+    <use xlink:href="" ng-attr-xlink:href="{{'#image-loading-bar-'+$parent.$id}}"
+        ng-if="vm.imageBarWidth"
+        ng-attr-x="{{vm.imageBarWidth*vm.currentImageIndex}}%" 
+        ng-attr-class="image-bar {{vm.QualityKeys[vm.bestQualityByImage[vm.currentImageIndex]] ? vm.QualityKeys[vm.bestQualityByImage[vm.currentImageIndex]]+'-quality' : 'not-loaded'}} active" ng-click="vm.serie.goToImage(vm.currentImageIndex)"
+        y="0px"
     />
 
  </svg>
