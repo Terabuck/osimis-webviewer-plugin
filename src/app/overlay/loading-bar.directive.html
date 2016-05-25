@@ -46,7 +46,7 @@
     <use xlink:href="" ng-attr-xlink:href="{{'#image-loading-bar-'+$parent.$id}}"
         ng-repeat="i in [0, vm.imageCount] | range track by $index"
         ng-attr-x="{{vm.imageBarWidth*i}}%" 
-        ng-attr-class="image-bar {{vm.QualityKeys[vm.bestQualityByImage[i]] ? vm.QualityKeys[vm.bestQualityByImage[i]]+'-quality' : 'not-loaded'}} {{vm.currentImageIndex == i ? 'active' : ''}}" 
+        ng-attr-class="image-bar {{vm.QualityKeys[vm.bestQualityByImage[i]] ? vm.QualityKeys[vm.bestQualityByImage[i]]+'-quality' : 'not-loaded'}}" 
         ng-click="vm.serie.goToImage(i)"
         y="2px"
     />
