@@ -61,7 +61,7 @@
 
         var pool = new window.osimis.WorkerPool({
             path: /* @inline-worker: */ '/app/image/image-parser.worker/main.js',
-            workerCount: 4, // @todo throw exception if workerCount < 2
+            workerCount: 6, // @todo throw exception if workerCount < 2
             createPromiseFn: $q,
             taskPriorityPolicy: new osimis.TaskPriorityPolicy(_cache)
         });
