@@ -156,7 +156,7 @@ struct bit_aligned_pixel_reference {
 
     const bit_aligned_pixel_reference* operator->()    const { return this; }
 
-    const bit_range_t& bit_range() const { return _bit_range; }
+//    const bit_range_t& bit_range() const { return _bit_range; }
 private:
     mutable bit_range_t _bit_range;
     template <typename C, typename L, bool M> friend struct bit_aligned_pixel_reference;

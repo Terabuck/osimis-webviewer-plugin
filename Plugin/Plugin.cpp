@@ -574,7 +574,7 @@ extern "C"
         throw Orthanc::OrthancException(Orthanc::ErrorCode_ParameterOutOfRange);
       }
 
-      message = "Storing the cache of the Web viewer in folder: " + cachePath.string();
+      std::string message = "Storing the cache of the Web viewer in folder: " + cachePath.string();
       OrthancPluginLogWarning(context_, message.c_str());
 
 
@@ -624,7 +624,7 @@ extern "C"
 
       /* Register bundle schedulers */
       scheduler.Register(CacheBundle_SeriesInformation,
-                         new SeriesInformationAdapter(context_));
+                         new SeriesInformationAdapter(context_), 1);
       scheduler.Register(CacheBundle_DecodedImage,
                          new DecodedImageAdapter(context_), decodingThreads);
 
