@@ -4,6 +4,8 @@
     angular
         .module('webviewer')
         .run(function($rootScope, wvSerieManager, wvImageBinaryManager, WvImageQualities) {
+            // @todo preload tags too ?
+
             $rootScope.$on('UserSelectedStudyId', function(evt, studyId) {
                 wvSerieManager
                     .listFromOrthancStudyId(studyId)

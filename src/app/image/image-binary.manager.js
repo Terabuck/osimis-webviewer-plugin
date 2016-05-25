@@ -61,7 +61,7 @@
 
         var pool = new window.osimis.WorkerPool({
             path: /* @inline-worker: */ '/app/image/image-parser.worker/main.js',
-            workerCount: 4,
+            workerCount: 4, // @todo throw exception if workerCount < 2
             createPromiseFn: $q,
             taskPriorityPolicy: new osimis.TaskPriorityPolicy(_cache)
         });
@@ -91,7 +91,7 @@
                         // Loading done
 
                         // Abort the finished loading when an abortion has been asked but not made in time
-                        if (_cacheReferenceCount[id][quality] === 0) {
+                        if (!_cacheReferenceCount[id][quality]) {
                             return $q.reject('aborted');
                         }
 
@@ -100,6 +100,10 @@
 
                         // consider the promise to be resolved
                         _loadedCacheIndex[id][quality] = true;
+                        _cache[id][quality].isLoaded = true;
+
+                        // Set the cache size so total memory size can be limited
+                        _cache[id][quality].size = result.pixelBuffer.byteLength;
 
                         // trigger binaryLoaded event
                         service.onBinaryLoaded.trigger(id, quality, cornerstoneImageObject);
@@ -112,9 +116,15 @@
                         // This is called even when the error comes from the adapter (promise <.then(null, function(err) {...})> syntax)
                         // to be sure the promise is uncached anytime the promise is rejected
 
-                        // Remove promise from cache / Uncount reference
-                        _cacheReferenceCount[id][quality] = 1; // Reset the reference count to 1 so failed loading do not have to be freed
-                        service.free(id, quality);
+                        // Remove promise from cache
+                        delete _cacheReferenceCount[id][quality];
+                        delete _cache[id][quality]; // @todo inefficient, use null & adapt getBestQualityInCache instead
+                        if (typeof _loadedCacheIndex[id][quality] !== 'undefined') {
+                            delete _loadedCacheIndex[id][quality];
+                        }
+                            
+                        // Trigger binary has been unloaded (used by torrent-like loading bar)
+                        // service.onBinaryUnLoaded.trigger(id, quality);
 
                         // Propagate promise error
                         return $q.reject(err);
@@ -137,6 +147,74 @@
             return _cache[id][quality].promise;
         }
 
+        // Clean cache every 5 seconds if cache size > 2000
+        window.setInterval(function() {
+            // @todo check once binary has been loaded + add debounce
+            
+            var id, quality, totalCacheSizeByQuality = {}, totalFlushedCacheSizeByQuality = {};
+
+            // Calculate cache amount by looping through each requests
+            for (id in _cache) {
+                for (quality in _cache[id]) {
+                    var cachedRequest = _cache[id][+quality];
+
+                    // Init totalCacheSizeByQuality[quality] if required
+                    totalCacheSizeByQuality[+quality] = totalCacheSizeByQuality[+quality] || 0;
+                    
+                    // Increment totalCache amount
+                    if (cachedRequest.isLoaded) {
+                        totalCacheSizeByQuality[+quality] += cachedRequest.size;
+                    }
+                }
+            }
+
+            // Flush lossless files
+            console.log('flush cache..');
+            _flushCache(WvImageQualities.LOSSLESS, 1024 * 1024 * 700); // Max 700mo
+            _flushCache(WvImageQualities.R1000J100, 1024 * 1024 * 700); // Max 700mo
+            _flushCache(WvImageQualities.R150J100, 1024 * 1024 * 300); // Max 300mo
+
+            function _flushCache(quality, cacheSizeLimit) {
+                totalFlushedCacheSizeByQuality[quality] = totalFlushedCacheSizeByQuality[quality] || 0;
+                totalCacheSizeByQuality[quality] = totalCacheSizeByQuality[quality] || 0;
+
+                if (totalCacheSizeByQuality[quality] < cacheSizeLimit) { 
+                    console.log('q:', quality, 'prior:', totalCacheSizeByQuality[quality] / 1024 / 1024, 'flushed:', 0 / 1024 / 1024);
+                    return;
+                }
+                for (var id in _cacheReferenceCount) {
+                    // Stop flush too much as soon as there is enough space left
+                    if (totalCacheSizeByQuality[quality] < cacheSizeLimit) {
+                        return;
+                    }
+
+                    // Flush cache
+                    var refCount = _cacheReferenceCount[id][quality];
+                    if (refCount === 0) {
+                        console.log('unloading ', !!_cache[id][quality].isLoaded);
+                        // Decrement cache size
+                        var flushedSize = _cache[id][quality].size || 0;
+                        totalCacheSizeByQuality[quality] -= flushedSize;
+
+                        // Save flushed quantity for logging purpose
+                        totalFlushedCacheSizeByQuality[quality] += flushedSize;
+
+                        // Clean request cache
+                        _cache[id][quality] = null;
+                        delete _cache[id][quality]; // @todo inefficient, use null & adapt getBestQualityInCache instead
+
+                        // Clean cache index
+                        if (typeof _loadedCacheIndex[id][quality] !== 'undefined') {
+                            delete _loadedCacheIndex[id][quality];
+                        }
+                        delete _cacheReferenceCount[id][quality];
+                    }
+                }
+
+                console.log('q:', quality, 'pre:', totalCacheSizeByQuality[quality] / 1024 / 1024, 'post:', totalFlushedCacheSizeByQuality[quality] / 1024 / 1024);
+            }
+        }, 5000);
+
         function abortLoading(id, quality, priority) {
             // Check the item is cached
             if (!_cacheReferenceCount.hasOwnProperty(id) || !_cacheReferenceCount[id].hasOwnProperty(quality) || _cacheReferenceCount[id][quality] < 1) {
@@ -149,8 +227,8 @@
                 _cache[id][quality].popPriority(priority);
             }
 
-            // Clean cache when no reference left - Cancel request if pending
-            if (_cacheReferenceCount[id][quality] === 0) {
+            // Cancel request if pending
+            if (_cacheReferenceCount[id][quality] === 0 && !_loadedCacheIndex[id][quality]) {
                 // Cancel request if pending
                 pool
                     .abortTask({
@@ -167,7 +245,8 @@
                 if (typeof _loadedCacheIndex[id][quality] !== 'undefined') {
                     delete _loadedCacheIndex[id][quality];
                 }
-
+                delete _cacheReferenceCount[id][quality];
+                
                 // Trigger binary has been unloaded (used by torrent-like loading bar)
                 service.onBinaryUnLoaded.trigger(id, quality);
             }

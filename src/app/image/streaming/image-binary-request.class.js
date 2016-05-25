@@ -22,7 +22,7 @@
          */
         this.isLoaded = false;
 
-        /** size: undefined | Uint32
+        /** size: undefined | Uint32 (in bytes)
          *
          * Used by cache engine to determine the total amount of cache.
          * The cache can be then flushed when it becomes too big.
@@ -116,6 +116,7 @@
 
         return highestPriority;
     };
+    
     /**
      *
      *
@@ -146,7 +147,7 @@
         // Find the latest reference provided by the specified priority
         for (var i=this.requestHistory.length-1; i>=0; --i) {
             var requestPriority = this.requestHistory[i];
-            if (requestPriority.priority === priority) {
+            if (requestPriority.priority == priority) {
                 // Save the first priority found (in reverse loop order)
                 latestPriorityIndex = i;
                 break;
@@ -156,14 +157,14 @@
         // Remove the latest reference provided by the specified priority
         if (latestPriorityIndex === null) {
             // No Priority with priority has been found - throw error
-            throw new Error('Request Priority priority not found');
+            throw new Error('ImageBinaryRequest pop priority not found');
         }
         else {
             // Remove the request Priority from the queue
             this.requestHistory.splice(latestPriorityIndex, 1);
 
             // If the priority his no longer displayed, set the last time it's been to now
-            if (priority === 0 && !this.hasPriorityInHistory(0)) {
+            if (priority == 0 && !this.hasPriorityInHistory(0)) {
                 this._lastTimeDisplayed = Date.now();
             }
         }
