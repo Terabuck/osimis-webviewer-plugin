@@ -191,6 +191,7 @@ BinaryRequest.prototype.abort = function() {
     this.xhr.abort();
 
     // The jpeg decompression can't be aborted (requires setTimeout loop during decompression to allow a function to stop it asynchronously during the event loop)
+    // Png decompression is done it two times so it could potentially be stopped at half.
 };
 
 function parseKLV(arraybuffer) {

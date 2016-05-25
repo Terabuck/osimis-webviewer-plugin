@@ -169,7 +169,6 @@
             }
 
             // Flush lossless files
-            console.log('flush cache..');
             _flushCache(WvImageQualities.LOSSLESS, 1024 * 1024 * 700); // Max 700mo
             _flushCache(WvImageQualities.R1000J100, 1024 * 1024 * 700); // Max 700mo
             _flushCache(WvImageQualities.R150J100, 1024 * 1024 * 300); // Max 300mo
@@ -179,7 +178,6 @@
                 totalCacheSizeByQuality[quality] = totalCacheSizeByQuality[quality] || 0;
 
                 if (totalCacheSizeByQuality[quality] < cacheSizeLimit) { 
-                    console.log('q:', quality, 'prior:', totalCacheSizeByQuality[quality] / 1024 / 1024, 'flushed:', 0 / 1024 / 1024);
                     return;
                 }
                 for (var id in _cacheReferenceCount) {
@@ -211,7 +209,7 @@
                     }
                 }
 
-                console.log('q:', quality, 'pre:', totalCacheSizeByQuality[quality] / 1024 / 1024, 'post:', totalFlushedCacheSizeByQuality[quality] / 1024 / 1024);
+                console.log('flush cache q:', quality, 'pre:', totalCacheSizeByQuality[quality] / 1024 / 1024, 'post:', totalFlushedCacheSizeByQuality[quality] / 1024 / 1024);
             }
         }, 5000);
 
