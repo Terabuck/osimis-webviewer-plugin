@@ -64,6 +64,7 @@ include(${CMAKE_SOURCE_DIR}/Resources/CMake/JavaScriptLibraries.cmake)
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_definitions(-DBOOST_GIL_USE_CONCEPT_CHECK=1)
 endif()
+include_directories(${CMAKE_SOURCE_DIR}/Dependencies/boost-1_60_0/)
 include_directories(${CMAKE_SOURCE_DIR}/Dependencies/gil-2_1_1/)
 
 
