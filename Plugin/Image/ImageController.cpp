@@ -70,38 +70,43 @@ OrthancPluginErrorCode ImageController::_ProcessRequest()
 {
   BENCH(FULL_PROCESS);
 
-  // clean cache
-  if (cleanCache_) {
-    imageRepository_->CleanImageCache(this->instanceId_, this->frameIndex_, this->processingPolicy_);
-    std::string answer = "{}";
-    OrthancPluginAnswerBuffer(OrthancContextManager::Get(), this->response_, answer.c_str(), answer.size(), "application/octet-stream");
+  try {
+    // clean cache
+    if (cleanCache_) {
+      imageRepository_->CleanImageCache(this->instanceId_, this->frameIndex_, this->processingPolicy_);
+      std::string answer = "{}";
+      OrthancPluginAnswerBuffer(OrthancContextManager::Get(), this->response_, answer.c_str(), answer.size(), "application/octet-stream");
+      return OrthancPluginErrorCode_Success;
+    }
+
+    // retrieve processed image
+    Image* image = 0;
+    if (!this->processingPolicy_) {
+      image = imageRepository_->GetImage(this->instanceId_, this->frameIndex_, !this->disableCache_);
+    }
+    else {
+      image = imageRepository_->GetImage(this->instanceId_, this->frameIndex_, this->processingPolicy_, !this->disableCache_);
+    }
+    
+    if (image)
+    {
+      BENCH(REQUEST_ANSWERING);
+
+      // answer rest request
+      OrthancPluginAnswerBuffer(OrthancContextManager::Get(), this->response_, image->GetBinary(), image->GetBinarySize(), "application/octet-stream");
+
+      delete image;
+    }
+    else
+    {
+      return OrthancPluginErrorCode_InternalError;
+    }
+
     return OrthancPluginErrorCode_Success;
   }
-
-  // retrieve processed image
-  Image* image = 0;
-  if (!this->processingPolicy_) {
-    image = imageRepository_->GetImage(this->instanceId_, this->frameIndex_, !this->disableCache_);
+  catch (...) {
+    return this->_AnswerError(500);
   }
-  else {
-    image = imageRepository_->GetImage(this->instanceId_, this->frameIndex_, this->processingPolicy_, !this->disableCache_);
-  }
-  
-  if (image)
-  {
-    BENCH(REQUEST_ANSWERING);
-
-    // answer rest request
-    OrthancPluginAnswerBuffer(OrthancContextManager::Get(), this->response_, image->GetBinary(), image->GetBinarySize(), "application/octet-stream");
-
-    delete image;
-  }
-  else
-  {
-    return OrthancPluginErrorCode_InternalError;
-  }
-
-  return OrthancPluginErrorCode_Success;
 }
 
 
