@@ -90,20 +90,20 @@
 
         /** preloading high priority **/
 
-        // Process preloading high priority in second - lossless quality
+        // Process preloading high priority in second - lowest quality
         for (i=0; i<preloadingHighPriorityQueue.length; ++i) {
             var task = preloadingHighPriorityQueue[0].task;
             var request = preloadingHighPriorityQueue[0].request;
             
-            if (request.quality === 100) return task;
+            if (request.quality === 1) return task;
         }
 
-        // Process preloading high priority in second - lossless quality
+        // Process preloading high priority in second - medium quality
         for (i=0; i<preloadingHighPriorityQueue.length; ++i) {
             var task = preloadingHighPriorityQueue[0].task;
             var request = preloadingHighPriorityQueue[0].request;
             
-            if (request.quality === 100) return task;
+            if (request.quality === 2) return task;
         }
 
         // Process preloading high priority in second - lossless quality
@@ -116,20 +116,20 @@
 
         /** preloading low priority **/
 
-        // Process preloading low priority in second - lossless quality
+        // Process preloading low priority in second - lowest quality
         for (i=0; i<preloadingLowPriorityQueue.length; ++i) {
             var task = preloadingLowPriorityQueue[0].task;
             var request = preloadingLowPriorityQueue[0].request;
             
-            if (request.quality === 100) return task;
+            if (request.quality === 1) return task;
         }
 
-        // Process preloading low priority in second - lossless quality
+        // Process preloading low priority in second - medium quality
         for (i=0; i<preloadingLowPriorityQueue.length; ++i) {
             var task = preloadingLowPriorityQueue[0].task;
             var request = preloadingLowPriorityQueue[0].request;
             
-            if (request.quality === 100) return task;
+            if (request.quality === 2) return task;
         }
 
         // Process preloading low priority in second - lossless quality
