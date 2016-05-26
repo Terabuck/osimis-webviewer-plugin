@@ -17,12 +17,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  **/
 
+// @todo refactor
+#define ENABLE_CACHE 0 // Force previous cache OFF since a new cache system has been developed
 
 #include <gtest/gtest.h>
 #include <boost/lexical_cast.hpp>
 
 static int argc_;
 static char** argv_;
+
+#if ENABLE_CACHE == 1
 
 #include "../Orthanc/Core/OrthancException.h"
 #include "../Orthanc/Core/Toolbox.h"
@@ -33,7 +37,6 @@ static char** argv_;
 
 using namespace OrthancPlugins;
 
-#if ENABLE_CACHE == 1
 class CacheManagerTest : public testing::Test
 {
 private:
