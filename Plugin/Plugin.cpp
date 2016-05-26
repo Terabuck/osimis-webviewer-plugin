@@ -17,6 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  **/
 
+#include <typeinfo> // Fix 'bad_cast' not member of 'std' https://svn.boost.org/trac/boost/ticket/2483
 
 #include <boost/thread.hpp>
 #include <boost/lexical_cast.hpp>
