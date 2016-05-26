@@ -33,7 +33,7 @@ importScripts('/config.js');
 var OrthancApiURL = window.orthancUrl;
 if (OrthancApiURL.indexOf('://') === -1) {
     // Remove bad url/cors issue induced by blob protocol.
-    OrthancApiUrl = location.origin + OrthancApiUrl;
+    OrthancApiUrl = location.origin + '/' + OrthancApiUrl;
 }
 // @todo out..
 var Qualities = {
