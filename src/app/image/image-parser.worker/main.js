@@ -30,8 +30,12 @@ var KLVReader = WorkerGlobalScope.KLVReader;
 // Import config
 importScripts('/config.js');
 
-// @todo out..
 var OrthancApiURL = window.orthancUrl;
+if (OrthancApiURL.indexOf('://') === -1) {
+    // Remove bad url/cors issue induced by blob protocol.
+    OrthancApiUrl = location.origin + OrthancApiUrl;
+}
+// @todo out..
 var Qualities = {
     // 0 is reserved as none..
     LOSSLESS: 100,
