@@ -25,6 +25,7 @@
 #include "../../gil_config.hpp"
 #include "../../utilities.hpp"
 #include <cassert>
+#include <typeinfo>
 #include <stdexcept>
 #include <boost/bind.hpp>
 

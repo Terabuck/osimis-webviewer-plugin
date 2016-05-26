@@ -12,6 +12,7 @@
 #ifndef GIL_DYNAMICIMAGE_ALGORITHM_HPP
 #define GIL_DYNAMICIMAGE_ALGORITHM_HPP
 
+#include <typeinfo>
 #include "../../algorithm.hpp"
 #include "any_image.hpp"
 #include <boost/bind.hpp>
