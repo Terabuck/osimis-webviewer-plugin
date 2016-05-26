@@ -504,6 +504,7 @@ extern "C"
   ORTHANC_PLUGINS_API int32_t OrthancPluginInitialize(OrthancPluginContext* context)
   {
     using namespace OrthancPlugins;
+    std::string message;
 
     OrthancContextManager::Set(context);
 
