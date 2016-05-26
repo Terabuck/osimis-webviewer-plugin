@@ -574,7 +574,7 @@ extern "C"
         throw Orthanc::OrthancException(Orthanc::ErrorCode_ParameterOutOfRange);
       }
 
-      std::string message = "Storing the cache of the Web viewer in folder: " + cachePath.string();
+      message = "Storing the cache of the Web viewer in folder: " + cachePath.string();
       OrthancPluginLogWarning(context_, message.c_str());
 
 
@@ -649,7 +649,7 @@ extern "C"
         }
       }
 
-      std::string message = ("Web viewer using " + boost::lexical_cast<std::string>(decodingThreads) + 
+      message = ("Web viewer using " + boost::lexical_cast<std::string>(decodingThreads) + 
                              " threads for the decoding of the DICOM images");
       OrthancPluginLogWarning(context_, message.c_str());
 
