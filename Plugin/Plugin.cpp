@@ -17,7 +17,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  **/
 
-#include <typeinfo> // Fix 'bad_cast' not member of 'std' https://svn.boost.org/trac/boost/ticket/2483
+// @todo refactor
+#define ENABLE_CACHE 0 // Force previous cache OFF since a new cache system has been developed
+
+#include <typeinfo> // Fix gil 'bad_cast' not member of 'std' https://svn.boost.org/trac/boost/ticket/2483
 
 #include <boost/thread.hpp>
 #include <boost/lexical_cast.hpp>
