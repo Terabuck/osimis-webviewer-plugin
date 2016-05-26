@@ -289,7 +289,8 @@ gulp.task('optimize', ['inject'], function() {
         .pipe($.injectInlineWorker({ // Inlines worker scripts' path to BLOB
             pathRouter: {
                 '/app/': './src/app/',
-                '/bower_components/': './bower_components/'
+                '/bower_components/': './bower_components/',
+                '/config.js': './src/config.js',
             }
         }))
         .pipe($.ngAnnotate({add: true}))

@@ -11,29 +11,27 @@
 
 // @todo move jpgjs & pngjs out of bower_components
 
-/** import:/app/image/image-parser.worker/klvreader.class.js **/
 importScripts('/app/image/image-parser.worker/klvreader.class.js');
-/** import:/bower_components/jpgjs/jpg.js **/
-importScripts('/bower_components/jpgjs/jpg.js'); // @todo in build mode
+importScripts('/bower_components/jpgjs/jpg.js');
 
-// Make png.js worker compatible
+// Make png.js & config.js worker compatible
 var document = {
     createElement: function() { return { getContext: function() {} } }
 };
 var window = {};
 
-/** import:/bower_components/png.js/zlib.js **/
-/** import:/bower_components/png.js/png.js **/
-
 // Import png.js
 importScripts('/bower_components/png.js/zlib.js'); // @todo in build mode
 importScripts('/bower_components/png.js/png.js'); // @todo in build mode
-var PNG = window.PNG;
 
+var PNG = window.PNG;
 var KLVReader = WorkerGlobalScope.KLVReader;
 
+// Import config
+importScripts('/config.js');
+
 // @todo out..
-var OrthancApiURL = 'http://localhost:8042';
+var OrthancApiURL = window.orthancUrl;
 var Qualities = {
     // 0 is reserved as none..
     LOSSLESS: 100,
