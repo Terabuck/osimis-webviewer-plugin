@@ -13,21 +13,83 @@
 #include "ImageContainer/RawImageContainer.h"
 #include "ImageContainer/CornerstoneKLVContainer.h"
 #include "ScopedBuffers.h"
+#include <boost/foreach.hpp>
 
 namespace
 {
-  void _loadDicomTags(Json::Value& jsonOutput, const std::string& instanceId);
-  void _loadDICOM(ScopedOrthancPluginMemoryBuffer& dicomOutput, const std::string& instanceId);
-  void _getFrame(OrthancPluginImage** frameOutput, const void* dicomData, uint32_t dicomDataSize, uint32_t frameIndex);
-  std::string _getAttachmentName(int frameIndex, const IImageProcessingPolicy* policy);
+void _loadDicomTags(Json::Value& jsonOutput, const std::string& instanceId);
+void _loadDICOM(OrthancPluginMemoryBuffer& dicomOutput, const std::string& instanceId);
+void _getFrame(OrthancPluginImage** frameOutput, const void* dicomData, uint32_t dicomDataSize, uint32_t frameIndex);
+std::string _getAttachmentName(int frameIndex, const IImageProcessingPolicy* policy);
 }
+
+ImageRepository::ImageRepository()
+  : _cachedImageStorageEnabled(true)
+{
+}
+
+bool ImageRepository::getDicomFile(const std::string instanceId, OrthancPluginMemoryBuffer& dicomFileBuffer) const
+{
+  boost::lock_guard<boost::mutex> guard(_dicomFilesMutex);
+
+  BOOST_FOREACH(DicomFile& dicomFile, _dicomFiles)
+  {
+    if (dicomFile.instanceId == instanceId)
+    {
+      dicomFileBuffer = dicomFile.dicomFileBuffer;
+      dicomFile.refCount++;
+      return true;
+    }
+  }
+
+  //load the dicom file now (the dicomFilesMutex is still locked, this will prevent other threads to request the loading as well)
+  if (_dicomFiles.size() > 3) //remove the oldest file that is not used
+  {
+    for (std::deque<DicomFile>::iterator it = _dicomFiles.begin(); it != _dicomFiles.end(); it++)
+    {
+      if (it->instanceId != instanceId && it->refCount == 0)
+      {
+        OrthancPluginFreeMemoryBuffer(OrthancContextManager::Get(), &(it->dicomFileBuffer));
+        _dicomFiles.erase(it);
+        break;
+      }
+    }
+  }
+
+  _loadDICOM(dicomFileBuffer, instanceId);
+  DicomFile dicomFile;
+  dicomFile.refCount = 1;
+  dicomFile.instanceId = instanceId;
+  dicomFile.dicomFileBuffer = dicomFileBuffer;
+  _dicomFiles.push_back(dicomFile);
+
+  return false;
+}
+
+void ImageRepository::decrefDicomFile(const std::string instanceId) const
+{
+  boost::lock_guard<boost::mutex> guard(_dicomFilesMutex);
+
+  BOOST_FOREACH(DicomFile& dicomFile, _dicomFiles)
+  {
+    if (dicomFile.instanceId == instanceId)
+    {
+      assert(dicomFile.refCount >= 1);
+      dicomFile.refCount--;
+      return;
+    }
+  }
+  assert(false); //it means we did not find the file
+}
+
+
 
 Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIndex, bool enableCache) const
 {
   // @todo activate cache
 
   BENCH_LOG(IMAGE_FORMATING, "");
-  // boost::lock_guard<boost::mutex> guard(mutex_); // make sure the memory amount doesn't overrise 
+  // boost::lock_guard<boost::mutex> guard(mutex_); // make sure the memory amount doesn't overrise
 
   // @todo catch method call's exceptions ?
 
@@ -36,25 +98,30 @@ Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIn
   Json::Value dicomTags;
   _loadDicomTags(dicomTags, instanceId);
 
-  ScopedOrthancPluginMemoryBuffer dicom(OrthancContextManager::Get());
-  _loadDICOM(dicom, instanceId);
+  OrthancPluginMemoryBuffer dicom;
+  getDicomFile(instanceId, dicom);
 
   OrthancPluginImage* frame = NULL;
-  _getFrame(&frame, reinterpret_cast<const void*>(dicom.getData()), dicom.getSize(), frameIndex);
+  {
+    //boost::lock_guard<boost::mutex> guard(mutex_); // check what happens if only one thread asks for frame at a time
+    _getFrame(&frame, reinterpret_cast<const void*>(dicom.data), dicom.size, frameIndex);
+  }
 
   RawImageContainer* data = new RawImageContainer(frame);
   Image* image = new Image(instanceId, frameIndex, data, dicomTags);
+
+  decrefDicomFile(instanceId);
 
   return image;
 }
 
 Image* ImageRepository::_GetImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const {
-    // create file
-    Image* image = this->GetImage(instanceId, frameIndex, false);
+  // create file
+  Image* image = this->GetImage(instanceId, frameIndex, false);
 
-    image->ApplyProcessing(policy);
-    
-    return image;
+  image->ApplyProcessing(policy);
+
+  return image;
 }
 
 Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const {
@@ -126,7 +193,7 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
     
     return image;
   }
-  else 
+  else
   {
     // throw new Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
     // @todo throw;
@@ -136,7 +203,7 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
 
 Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy, bool enableCache) const
 {
-  if (enableCache) {
+  if (enableCache && isCachedImageStorageEnabled()) {
     return _GetImageFromCache(instanceId, frameIndex, policy);
   }
   else {
@@ -166,53 +233,54 @@ void ImageRepository::CleanImageCache(const std::string& instanceId, uint32_t fr
 
 namespace
 {
-  using namespace OrthancPlugins;
+using namespace OrthancPlugins;
 
-  void _loadDicomTags(Json::Value& jsonOutput, const std::string& instanceId)
-  {
-    BENCH(LOAD_JSON);
-    if (!GetJsonFromOrthanc(jsonOutput, OrthancContextManager::Get(), "/instances/" + instanceId + "/tags")) {
-      throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
-    }
+void _loadDicomTags(Json::Value& jsonOutput, const std::string& instanceId)
+{
+  BENCH(LOAD_JSON);
+  if (!GetJsonFromOrthanc(jsonOutput, OrthancContextManager::Get(), "/instances/" + instanceId + "/tags")) {
+    throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
+  }
+}
+
+void _loadDICOM(OrthancPluginMemoryBuffer& dicomOutput, const std::string& instanceId)
+{
+  BENCH(LOAD_DICOM);
+
+  if (!GetDicomFromOrthanc(&dicomOutput, OrthancContextManager::Get(), instanceId)) {
+    throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
+  }
+  BENCH_LOG(DICOM_SIZE, dicomOutput.size);
+}
+
+void _getFrame(OrthancPluginImage** frameOutput, const void* dicomData, uint32_t dicomDataSize, uint32_t frameIndex)
+{
+  BENCH(GET_FRAME_FROM_DICOM);
+
+  *frameOutput = OrthancPluginDecodeDicomImage(OrthancContextManager::Get(), dicomData, dicomDataSize, frameIndex);
+}
+
+std::string _getAttachmentName(int frameIndex, const IImageProcessingPolicy* policy)
+{
+  std::string attachmentName;
+  std::string policyString = policy->ToString();
+  int attachmentPrefix = 10000;
+  int maxFrameCount = 1000; // @todo use adaptative maxFrameCount !
+
+  if (policyString == "png~klv") {
+    attachmentName = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 0 + frameIndex);
+  }
+  else if (policyString == "resize:1000~8bit~jpeg:100~klv") {
+    attachmentName = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 1 + frameIndex);
+
+  }
+  else if (policyString == "resize:150~8bit~jpeg:100~klv") {
+    attachmentName = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 2 + frameIndex);
+  }
+  else {
+    throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
   }
 
-  void _loadDICOM(ScopedOrthancPluginMemoryBuffer& dicomOutput, const std::string& instanceId)
-  {
-    BENCH(LOAD_DICOM);
-    if (!GetDicomFromOrthanc(dicomOutput.getPtr(), OrthancContextManager::Get(), instanceId)) {
-      throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
-    }
-    BENCH_LOG(DICOM_SIZE, dicomOutput->size);
-  }
-
-  void _getFrame(OrthancPluginImage** frameOutput, const void* dicomData, uint32_t dicomDataSize, uint32_t frameIndex)
-  {
-    BENCH(GET_FRAME_FROM_DICOM);
-
-    *frameOutput = OrthancPluginDecodeDicomImage(OrthancContextManager::Get(), dicomData, dicomDataSize, frameIndex);
-  }
-
-  std::string _getAttachmentName(int frameIndex, const IImageProcessingPolicy* policy)
-  {
-    std::string attachmentName;
-    std::string policyString = policy->ToString();
-    int attachmentPrefix = 10000; 
-    int maxFrameCount = 1000; // @todo use adaptative maxFrameCount !
-
-    if (policyString == "png~klv") {
-      attachmentName = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 0 + frameIndex);
-    }
-    else if (policyString == "resize:1000~8bit~jpeg:100~klv") {
-      attachmentName = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 1 + frameIndex);
-
-    }
-    else if (policyString == "resize:150~8bit~jpeg:100~klv") {
-      attachmentName = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 2 + frameIndex);
-    }
-    else {
-      throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
-    }
-
-    return attachmentName;
-  }
+  return attachmentName;
+}
 }

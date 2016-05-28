@@ -538,7 +538,7 @@ extern "C"
 
     /* By default, use GDCM */
     bool enableGdcm = true;
-
+    bool cachedImageStorageEnabled = true;
 
     try
     {
@@ -649,6 +649,12 @@ extern "C"
         {
           enableGdcm = configuration["WebViewer"]["EnableGdcm"].asBool();
         }
+
+        if (configuration["WebViewer"].isMember("CacheEnabled") &&
+            configuration["WebViewer"]["CacheEnabled"].type() == Json::booleanValue)
+        {
+          cachedImageStorageEnabled = configuration["WebViewer"]["CacheEnabled"].asBool();
+        }
       }
 
       message = ("Web viewer using " + boost::lexical_cast<std::string>(decodingThreads) + 
@@ -696,6 +702,7 @@ extern "C"
 
     // @todo free
     ImageRepository* imageRepository = new ImageRepository;
+    imageRepository->enableCachedImageStorage(cachedImageStorageEnabled);
 
     // @todo free
     ImageController::Inject(imageRepository);
