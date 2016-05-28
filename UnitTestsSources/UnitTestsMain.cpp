@@ -17,9 +17,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  **/
 
-// @todo refactor
-#define ENABLE_CACHE 0 // Force previous cache OFF since a new cache system has been developed
-
 #include <gtest/gtest.h>
 #include <boost/lexical_cast.hpp>
 
