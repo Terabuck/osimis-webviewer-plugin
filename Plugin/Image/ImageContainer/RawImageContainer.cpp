@@ -6,7 +6,7 @@ using namespace boost;
 
 RawImageContainer::RawImageContainer(OrthancPluginImage* data)
 {
-  dataAsImageBuffer_ = 0;
+  dataAsImageBuffer_ = NULL;
   dataAsImageWrapper_ = new OrthancPlugins::OrthancImageWrapper(OrthancContextManager::Get(), data);
 
   // @todo AssignReadOnly ?
@@ -17,7 +17,7 @@ RawImageContainer::RawImageContainer(OrthancPluginImage* data)
 RawImageContainer::RawImageContainer(Orthanc::ImageBuffer* data) : accessor_(data->GetAccessor())
 {
   dataAsImageBuffer_ = data;
-  dataAsImageWrapper_ = 0;
+  dataAsImageWrapper_ = NULL;
 }
 
 RawImageContainer::~RawImageContainer() 

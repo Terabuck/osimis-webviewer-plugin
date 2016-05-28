@@ -12,7 +12,7 @@
 
 #include "ImageController.h"
 #include <iostream>
-ImageRepository* ImageController::imageRepository_ = 0;
+ImageRepository* ImageController::imageRepository_ = NULL;
 
 template<>
 void ImageController::Inject<ImageRepository>(ImageRepository* obj) {
@@ -47,7 +47,7 @@ OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlP
       this->cleanCache_ = (std::string(matches[1]) == "cleancache/");
       this->instanceId_ = matches[2];
       this->frameIndex_ = boost::lexical_cast<uint32_t>(matches[3]);
-      this->processingPolicy_ = matches.size() < 4 ? 0 : imageProcessingRouteParser_.InstantiatePolicyFromRoute(matches[4]);
+      this->processingPolicy_ = matches.size() < 4 ? NULL : imageProcessingRouteParser_.InstantiatePolicyFromRoute(matches[4]);
 
       BENCH_LOG(INSTANCE, instanceId_);
       BENCH_LOG(FRAME_INDEX, frameIndex_);
@@ -80,7 +80,7 @@ OrthancPluginErrorCode ImageController::_ProcessRequest()
     }
 
     // retrieve processed image
-    Image* image = 0;
+    Image* image = NULL;
     if (!this->processingPolicy_) {
       image = imageRepository_->GetImage(this->instanceId_, this->frameIndex_, !this->disableCache_);
     }

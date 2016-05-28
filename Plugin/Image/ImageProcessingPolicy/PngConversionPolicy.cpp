@@ -18,7 +18,7 @@ IImageContainer* PngConversionPolicy::Apply(IImageContainer* input, ImageMetaDat
   {
     throw new std::invalid_argument("Input is not raw");
     // @todo Throw exception : input is not a raw image
-    return 0;
+    return NULL;
   }
 
   Orthanc::ImageAccessor* accessor = rawImage->GetOrthancImageAccessor();

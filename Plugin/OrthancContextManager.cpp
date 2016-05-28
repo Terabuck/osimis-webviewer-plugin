@@ -1,6 +1,6 @@
 #include "OrthancContextManager.h"
 
-OrthancPluginContext* OrthancContextManager::context_ = 0;
+OrthancPluginContext* OrthancContextManager::context_ = NULL;
 
 void OrthancContextManager::Set(OrthancPluginContext* context) {
   OrthancContextManager::context_ = context;

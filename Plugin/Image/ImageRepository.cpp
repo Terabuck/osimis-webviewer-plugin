@@ -38,7 +38,7 @@ Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIn
   OrthancPluginMemoryBuffer dicom;
   _loadDICOM(&dicom, instanceId);
 
-  OrthancPluginImage* frame = 0;
+  OrthancPluginImage* frame = NULL;
   _getFrame(&frame, reinterpret_cast<const void*>(dicom.data), dicom.size, frameIndex);
   OrthancPluginFreeMemoryBuffer(OrthancContextManager::Get(), &dicom);
 
@@ -84,7 +84,7 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
   if (error == OrthancPluginErrorCode_InexistentItem)
   {
     // @todo throw exception - attachment tag doesn't exists
-    return 0;
+    return NULL;
   }
   else if (error == OrthancPluginErrorCode_UnknownResource)
   {
@@ -103,7 +103,7 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
     {
       // @todo throw or be sure orthanc is up to date at plugin init
       // throw new Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
-      return 0;
+      return NULL;
     }
     else
     {
@@ -130,7 +130,7 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
   {
     // throw new Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
     // @todo throw;
-    return 0;
+    return NULL;
   }
 
     // @todo clear buffer

@@ -34,7 +34,7 @@ CornerstoneKLVContainer::CornerstoneKLVContainer(IImageContainer* data, const Im
 
   // write klv binary
   dataAsString_ = klvWriter.write();
-  dataAsMemoryBuffer_ = 0;
+  dataAsMemoryBuffer_ = NULL;
 }
 
 CornerstoneKLVContainer::CornerstoneKLVContainer(OrthancPluginMemoryBuffer* data)

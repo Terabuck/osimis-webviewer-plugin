@@ -25,7 +25,7 @@ IImageContainer* Uint8ConversionPolicy::Apply(IImageContainer* input, ImageMetaD
   {
     throw new std::invalid_argument("Input is not raw");
     // @todo Throw exception : input is not a raw image
-    return 0;
+    return NULL;
   }
 
   Orthanc::ImageAccessor* inAccessor = rawInputImage->GetOrthancImageAccessor();
