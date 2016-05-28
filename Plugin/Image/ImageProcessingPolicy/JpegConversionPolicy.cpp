@@ -43,10 +43,10 @@ IImageContainer* JpegConversionPolicy::Apply(IImageContainer* input, ImageMetaDa
   // avoidable memory copy from OrthancPluginMemoryBuffer to std::string
   // using std::string#assign(const char*, size_t);
 
-  OrthancPluginMemoryBuffer* buffer = new OrthancPluginMemoryBuffer;
+  OrthancPluginMemoryBuffer buffer; //will be adopted by the CompressedImageContainer so, no need to delete it
 
   OrthancPluginErrorCode error = OrthancPluginCompressJpegImage(
-   OrthancContextManager::Get(), buffer, OrthancPlugins::Convert(accessor->GetFormat()),
+   OrthancContextManager::Get(), &buffer, OrthancPlugins::Convert(accessor->GetFormat()),
    accessor->GetWidth(), accessor->GetHeight(), accessor->GetPitch(),
    accessor->GetConstBuffer(), quality_
   );
@@ -63,7 +63,5 @@ IImageContainer* JpegConversionPolicy::Apply(IImageContainer* input, ImageMetaDa
 
   metaData->compression = "Jpeg";
   
-  CompressedImageContainer* jpegContainer = new CompressedImageContainer(buffer);
-
-  return jpegContainer;
+  return new CompressedImageContainer(buffer);
 }

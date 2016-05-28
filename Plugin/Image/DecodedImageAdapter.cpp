@@ -29,6 +29,7 @@
 #include "../ViewerToolbox.h"
 #include "../BenchmarkHelper.h"
 #include "Utilities/KLVWriter.h"
+#include "Utilities/ScopedBuffers.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -105,24 +106,27 @@ namespace OrthancPlugins
     bool ok = false;
 
     Json::Value tags;
-    OrthancPluginMemoryBuffer dicom;
-    {
-        BENCH(LOAD_DICOM);
+    std::auto_ptr<OrthancImageWrapper> image;
 
-        if (!GetDicomFromOrthanc(&dicom, context_, instanceId) ||
-            !GetJsonFromOrthanc(tags, context_, "/instances/" + instanceId + "/tags"))
+    {
+        ScopedOrthancPluginMemoryBuffer dicom(context_);
+
         {
-          throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
+            BENCH(LOAD_DICOM);
+
+            if (!GetDicomFromOrthanc(dicom.getPtr(), context_, instanceId) ||
+                !GetJsonFromOrthanc(tags, context_, "/instances/" + instanceId + "/tags"))
+            {
+              throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
+            }
+
+            BENCH_LOG(DICOM_SIZE, dicom.getSize());
         }
 
-        BENCH_LOG(DICOM_SIZE, dicom.size);
-    }
-
-    std::auto_ptr<OrthancImageWrapper> image;
-    {
-        BENCH(GET_FRAME_FROM_DICOM);
-        image.reset(new OrthancImageWrapper(context_, OrthancPluginDecodeDicomImage(context_, dicom.data, dicom.size, frameIndex)));
-        OrthancPluginFreeMemoryBuffer(context_, &dicom);
+        {
+            BENCH(GET_FRAME_FROM_DICOM);
+            image.reset(new OrthancImageWrapper(context_, OrthancPluginDecodeDicomImage(context_, dicom.getData(), dicom.getSize(), frameIndex)));
+        }
     }
 
     Json::Value json;

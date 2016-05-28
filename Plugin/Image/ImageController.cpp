@@ -47,7 +47,7 @@ OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlP
       this->cleanCache_ = (std::string(matches[1]) == "cleancache/");
       this->instanceId_ = matches[2];
       this->frameIndex_ = boost::lexical_cast<uint32_t>(matches[3]);
-      this->processingPolicy_ = matches.size() < 4 ? NULL : imageProcessingRouteParser_.InstantiatePolicyFromRoute(matches[4]);
+      this->processingPolicy_.reset(matches.size() < 4 ? NULL : imageProcessingRouteParser_.InstantiatePolicyFromRoute(matches[4]));
 
       BENCH_LOG(INSTANCE, instanceId_);
       BENCH_LOG(FRAME_INDEX, frameIndex_);
@@ -73,29 +73,27 @@ OrthancPluginErrorCode ImageController::_ProcessRequest()
   try {
     // clean cache
     if (cleanCache_) {
-      imageRepository_->CleanImageCache(this->instanceId_, this->frameIndex_, this->processingPolicy_);
+      imageRepository_->CleanImageCache(this->instanceId_, this->frameIndex_, this->processingPolicy_.get());
       std::string answer = "{}";
       OrthancPluginAnswerBuffer(OrthancContextManager::Get(), this->response_, answer.c_str(), answer.size(), "application/octet-stream");
       return OrthancPluginErrorCode_Success;
     }
 
     // retrieve processed image
-    Image* image = NULL;
-    if (!this->processingPolicy_) {
-      image = imageRepository_->GetImage(this->instanceId_, this->frameIndex_, !this->disableCache_);
+    std::auto_ptr<Image> image;
+    if (this->processingPolicy_.get() == NULL) {
+      image.reset(imageRepository_->GetImage(this->instanceId_, this->frameIndex_, !this->disableCache_));
     }
     else {
-      image = imageRepository_->GetImage(this->instanceId_, this->frameIndex_, this->processingPolicy_, !this->disableCache_);
+      image.reset(imageRepository_->GetImage(this->instanceId_, this->frameIndex_, this->processingPolicy_.get(), !this->disableCache_));
     }
     
-    if (image)
+    if (image.get() != NULL)
     {
       BENCH(REQUEST_ANSWERING);
 
       // answer rest request
       OrthancPluginAnswerBuffer(OrthancContextManager::Get(), this->response_, image->GetBinary(), image->GetBinarySize(), "application/octet-stream");
-
-      delete image;
     }
     else
     {

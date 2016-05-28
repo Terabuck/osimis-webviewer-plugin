@@ -1,8 +1,9 @@
 #include "CornerstoneKLVContainer.h"
 
 #include "../Utilities/KLVWriter.h"
+#include "OrthancContextManager.h"
 
-CornerstoneKLVContainer::CornerstoneKLVContainer(IImageContainer* data, const ImageMetaData* metaData)
+CornerstoneKLVContainer::CornerstoneKLVContainer(IImageContainer* data, const ImageMetaData* metaData) : dataAsMemoryBuffer_(OrthancContextManager::Get())
 {
   KLVWriter klvWriter;
 
@@ -34,39 +35,29 @@ CornerstoneKLVContainer::CornerstoneKLVContainer(IImageContainer* data, const Im
 
   // write klv binary
   dataAsString_ = klvWriter.write();
-  dataAsMemoryBuffer_ = NULL;
 }
 
-CornerstoneKLVContainer::CornerstoneKLVContainer(OrthancPluginMemoryBuffer* data)
+CornerstoneKLVContainer::CornerstoneKLVContainer(OrthancPluginMemoryBuffer& data) : dataAsMemoryBuffer_(OrthancContextManager::Get(), data)
 {
-  dataAsMemoryBuffer_ = data;
 }
 
-CornerstoneKLVContainer::~CornerstoneKLVContainer()
+
+const char* CornerstoneKLVContainer::GetBinary() const
 {
-  if (dataAsMemoryBuffer_)
+  if (dataAsMemoryBuffer_.getData() != NULL)
   {
-    OrthancPluginFreeMemoryBuffer(OrthancContextManager::Get(), dataAsMemoryBuffer_);
-    delete dataAsMemoryBuffer_;
-  }
-}
-
-const char* CornerstoneKLVContainer::GetBinary()
-{
-  if (dataAsMemoryBuffer_)
-  {
-    return static_cast<const char*>(dataAsMemoryBuffer_->data);
+    return static_cast<const char*>(dataAsMemoryBuffer_.getData());
   }
   else 
   {
     return dataAsString_.c_str();
   }
 }
-uint32_t CornerstoneKLVContainer::GetBinarySize()
+uint32_t CornerstoneKLVContainer::GetBinarySize() const
 {
-  if (dataAsMemoryBuffer_)
+  if (dataAsMemoryBuffer_.getData() != NULL)
   {
-    return dataAsMemoryBuffer_->size;
+    return dataAsMemoryBuffer_.getSize();
   }
   else
   {

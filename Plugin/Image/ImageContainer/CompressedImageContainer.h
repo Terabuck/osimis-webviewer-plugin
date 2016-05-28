@@ -1,21 +1,20 @@
-#ifndef JPEG_IMAGE_CONTAINER_H
-#define JPEG_IMAGE_CONTAINER_H
+#pragma once
 
 #include <orthanc/OrthancCPlugin.h> // for OrthancPluginMemoryBuffer
 #include "IImageContainer.h"
+#include "ScopedBuffers.h"
 
 // For Jpeg or Png, pure binary with no access to image data
 class CompressedImageContainer : public IImageContainer {
 public:
   // takes ownership
-  CompressedImageContainer(OrthancPluginMemoryBuffer* buffer);
-  virtual ~CompressedImageContainer();
+  CompressedImageContainer(OrthancPluginMemoryBuffer& buffer);
+  virtual ~CompressedImageContainer() {}
 
-  virtual const char* GetBinary();
-  virtual uint32_t GetBinarySize();
+  virtual const char* GetBinary() const;
+  virtual uint32_t GetBinarySize() const;
 
 private:
-  OrthancPluginMemoryBuffer* data_;
+  ScopedOrthancPluginMemoryBuffer data_;
 };
 
-#endif // JPEG_IMAGE_CONTAINER_H

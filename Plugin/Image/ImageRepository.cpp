@@ -12,11 +12,12 @@
 #include "ImageRepository.h"
 #include "ImageContainer/RawImageContainer.h"
 #include "ImageContainer/CornerstoneKLVContainer.h"
+#include "ScopedBuffers.h"
 
 namespace
 {
   void _loadDicomTags(Json::Value& jsonOutput, const std::string& instanceId);
-  void _loadDICOM(OrthancPluginMemoryBuffer* dicomOutput, const std::string& instanceId);
+  void _loadDICOM(ScopedOrthancPluginMemoryBuffer& dicomOutput, const std::string& instanceId);
   void _getFrame(OrthancPluginImage** frameOutput, const void* dicomData, uint32_t dicomDataSize, uint32_t frameIndex);
   std::string _getAttachmentName(int frameIndex, const IImageProcessingPolicy* policy);
 }
@@ -35,12 +36,11 @@ Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIn
   Json::Value dicomTags;
   _loadDicomTags(dicomTags, instanceId);
 
-  OrthancPluginMemoryBuffer dicom;
-  _loadDICOM(&dicom, instanceId);
+  ScopedOrthancPluginMemoryBuffer dicom(OrthancContextManager::Get());
+  _loadDICOM(dicom, instanceId);
 
   OrthancPluginImage* frame = NULL;
-  _getFrame(&frame, reinterpret_cast<const void*>(dicom.data), dicom.size, frameIndex);
-  OrthancPluginFreeMemoryBuffer(OrthancContextManager::Get(), &dicom);
+  _getFrame(&frame, reinterpret_cast<const void*>(dicom.getData()), dicom.getSize(), frameIndex);
 
   RawImageContainer* data = new RawImageContainer(frame);
   Image* image = new Image(instanceId, frameIndex, data, dicomTags);
@@ -61,8 +61,8 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
   // if not found - create
   // if found - retrieve
   Image* image;
-  OrthancPluginMemoryBuffer *getResultBuffer = new OrthancPluginMemoryBuffer; // @todo check if must be allocated from Orthanc
-  // @todo delete on throw
+  OrthancPluginMemoryBuffer getResultBuffer; //will be adopted by CornerstoneKLVContainer if the request succeeds
+  getResultBuffer.data = NULL;
 
   // store attachment
   // /{resourceType}/{id}/attachments/{name}
@@ -78,27 +78,31 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
   std::string path = "/instances/" + instanceId + "/attachments/" + attachmentName + "/data";
   {
     BENCH(FILE_CACHE_RETRIEVAL);
-    error = OrthancPluginRestApiGet(OrthancContextManager::Get(), getResultBuffer, path.c_str());
+    error = OrthancPluginRestApiGet(OrthancContextManager::Get(), &getResultBuffer, path.c_str());
   }
 
   if (error == OrthancPluginErrorCode_InexistentItem)
   {
+    assert(getResultBuffer.data == NULL); //make sure there won't be any leak since getResultBuffer is not deleted if not adopted by the KLV Container
+
     // @todo throw exception - attachment tag doesn't exists
     return NULL;
   }
   else if (error == OrthancPluginErrorCode_UnknownResource)
   {
+    assert(getResultBuffer.data == NULL); //make sure there won't be any leak since getResultBuffer is not deleted if not adopted by the KLV Container
+
     // No cache available - Create content & save cache
 
     BENCH(FILE_CACHE_CREATION); // @todo Split in two when refactoring. This contains the file processing..
     image = _GetImage(instanceId, frameIndex, policy);
 
     // save file
-    OrthancPluginMemoryBuffer putResultBuffer;
+    ScopedOrthancPluginMemoryBuffer putResultBuffer(OrthancContextManager::Get());
     path = "/instances/" + instanceId + "/attachments/" + attachmentName; // no "/data"
 
     // @todo avoid Orthanc throwing PluginsManager.cpp:194] Exception while invoking plugin service 3001: Unknown resource
-    error = OrthancPluginRestApiPut(OrthancContextManager::Get(), &putResultBuffer, path.c_str(), image->GetBinary(), image->GetBinarySize());
+    error = OrthancPluginRestApiPut(OrthancContextManager::Get(), putResultBuffer.getPtr(), path.c_str(), image->GetBinary(), image->GetBinarySize());
     if (error != OrthancPluginErrorCode_Success)
     {
       // @todo throw or be sure orthanc is up to date at plugin init
@@ -107,8 +111,6 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
     }
     else
     {
-      OrthancPluginFreeMemoryBuffer(OrthancContextManager::Get(), &putResultBuffer);
-
       return image;
     }
 
@@ -116,8 +118,6 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
   else if (error == OrthancPluginErrorCode_Success)
   {
     // Cache available - send retrieved file
-
-    // issue: buffer doesn't go well with the rest
 
     // NO METADATA ?
     // unstable...
@@ -132,9 +132,6 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
     // @todo throw;
     return NULL;
   }
-
-    // @todo clear buffer
-  // clear buffer
 }
 
 Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy, bool enableCache) const
@@ -179,10 +176,10 @@ namespace
     }
   }
 
-  void _loadDICOM(OrthancPluginMemoryBuffer* dicomOutput, const std::string& instanceId)
+  void _loadDICOM(ScopedOrthancPluginMemoryBuffer& dicomOutput, const std::string& instanceId)
   {
     BENCH(LOAD_DICOM);
-    if (!GetDicomFromOrthanc(dicomOutput, OrthancContextManager::Get(), instanceId)) {
+    if (!GetDicomFromOrthanc(dicomOutput.getPtr(), OrthancContextManager::Get(), instanceId)) {
       throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
     }
     BENCH_LOG(DICOM_SIZE, dicomOutput->size);

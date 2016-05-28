@@ -141,6 +141,13 @@ add_definitions(
   -DORTHANC_ENABLE_LOGGING=0
   )
 
+include_directories(${CMAKE_SOURCE_DIR}/Plugin/)
+include_directories(${CMAKE_SOURCE_DIR}/Plugin/Image)
+include_directories(${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer)
+include_directories(${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy)
+include_directories(${CMAKE_SOURCE_DIR}/Plugin/Image/Utilities)
+include_directories(${CMAKE_SOURCE_DIR}/Plugin/Cache)
+
 set(CORE_SOURCES
   ${BOOST_SOURCES}
   ${SQLITE_SOURCES}
@@ -182,6 +189,8 @@ add_library(OsimisWebViewer
   ${CMAKE_SOURCE_DIR}/Plugin/OrthancContextManager.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/BaseController.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/Utilities/KLVWriter.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/Utilities/ImageProcessingRouteParser.h
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/Utilities/ScopedBuffers.h
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/RawImageContainer.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/CompressedImageContainer.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/CornerstoneKLVContainer.cpp

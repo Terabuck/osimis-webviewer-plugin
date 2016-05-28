@@ -21,8 +21,8 @@ public:
 
   virtual ~RawImageContainer();
 
-  virtual const char* GetBinary();
-  virtual uint32_t GetBinarySize();
+  virtual const char* GetBinary() const;
+  virtual uint32_t GetBinarySize() const;
 
   // can be used by ImageProcessingPolicy to retrieve additionnal informations
   Orthanc::ImageAccessor* GetOrthancImageAccessor();

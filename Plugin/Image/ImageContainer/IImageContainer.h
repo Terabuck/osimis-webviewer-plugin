@@ -11,8 +11,8 @@ public:
   IImageContainer() {}
   virtual ~IImageContainer() {}
   
-  virtual const char* GetBinary() = 0; // @todo const correctness
-  virtual uint32_t GetBinarySize() = 0; // @todo const correctness
+  virtual const char* GetBinary() const = 0; // @todo const correctness
+  virtual uint32_t GetBinarySize() const = 0; // @todo const correctness
 };
 
 #endif // I_IMAGE_CONTAINER_H

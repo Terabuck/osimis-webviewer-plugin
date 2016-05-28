@@ -1,25 +1,25 @@
-#ifndef CORNERSTONE_KLV_CONTAINER_H
-#define CORNERSTONE_KLV_CONTAINER_H
+#pragma once
 
 #include <string>
 
 #include "IImageContainer.h"
 #include "../ImageMetaData.h"
+#include "ScopedBuffers.h"
 
 class CornerstoneKLVContainer : public IImageContainer {
 public:
   // does not take ownership
   CornerstoneKLVContainer(IImageContainer* data, const ImageMetaData* metaData);
   // takes ownership
-  CornerstoneKLVContainer(OrthancPluginMemoryBuffer* data);
-  virtual ~CornerstoneKLVContainer();
+  CornerstoneKLVContainer(OrthancPluginMemoryBuffer& data);
+  virtual ~CornerstoneKLVContainer() {}
 
-  virtual const char* GetBinary();
-  virtual uint32_t GetBinarySize();
+  virtual const char* GetBinary() const;
+  virtual uint32_t GetBinarySize() const;
 
 private:
   std::string dataAsString_;
-  OrthancPluginMemoryBuffer* dataAsMemoryBuffer_;
+  ScopedOrthancPluginMemoryBuffer dataAsMemoryBuffer_;
 
   enum Keys
   {
@@ -46,5 +46,3 @@ private:
     ImageBinary
   };
 };
-
-#endif // CORNERSTONE_KLV_CONTAINER_H

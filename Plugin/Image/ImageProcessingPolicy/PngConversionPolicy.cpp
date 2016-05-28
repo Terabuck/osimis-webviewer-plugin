@@ -13,7 +13,7 @@
 IImageContainer* PngConversionPolicy::Apply(IImageContainer* input, ImageMetaData* metaData) {
   BENCH(COMPRESS_FRAME_IN_PNG);
 
-  RawImageContainer* rawImage = dynamic_cast<RawImageContainer*>(input);
+  RawImageContainer* rawImage = dynamic_cast<RawImageContainer*>(input);  //@todo: this should probably be an assert (design verification)
   if (!rawImage)
   {
     throw new std::invalid_argument("Input is not raw");
@@ -23,11 +23,11 @@ IImageContainer* PngConversionPolicy::Apply(IImageContainer* input, ImageMetaDat
 
   Orthanc::ImageAccessor* accessor = rawImage->GetOrthancImageAccessor();
 
-  OrthancPluginMemoryBuffer* buffer = new OrthancPluginMemoryBuffer;
+  OrthancPluginMemoryBuffer buffer; //will be adopted by the CompressedImageContainer so, no need to delete it
   // @todo test with 8bit images
 
   OrthancPluginErrorCode error = OrthancPluginCompressPngImage(
-   OrthancContextManager::Get(), buffer, OrthancPlugins::Convert(accessor->GetFormat()),
+   OrthancContextManager::Get(), &buffer, OrthancPlugins::Convert(accessor->GetFormat()),
    accessor->GetWidth(), accessor->GetHeight(), accessor->GetPitch(),
    accessor->GetConstBuffer()
   );
@@ -39,11 +39,9 @@ IImageContainer* PngConversionPolicy::Apply(IImageContainer* input, ImageMetaDat
     throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(error));
   }
 
-  BENCH_LOG(COMPRESSION_PNG_SIZE, buffer->size);
+  BENCH_LOG(COMPRESSION_PNG_SIZE, buffer.size);
 
   metaData->compression = "Png";
   
-  CompressedImageContainer* jpegContainer = new CompressedImageContainer(buffer);
-
-  return jpegContainer;
+  return new CompressedImageContainer(buffer);
 }

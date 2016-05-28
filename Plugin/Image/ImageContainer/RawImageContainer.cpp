@@ -35,11 +35,11 @@ RawImageContainer::~RawImageContainer()
   }
 }
 
-const char* RawImageContainer::GetBinary()
+const char* RawImageContainer::GetBinary() const
 {
   return reinterpret_cast<const char *>(accessor_.GetConstBuffer());
 }
-uint32_t RawImageContainer::GetBinarySize()
+uint32_t RawImageContainer::GetBinarySize() const
 {
   return accessor_.GetSize(); // height * pitch
 }
