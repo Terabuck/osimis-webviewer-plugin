@@ -36,7 +36,7 @@
     <script>
         angular.module('webviewer')
         .config(function (wvConfigProvider) {
-            wvConfigProvider.setApiURL(window.orthancUrl);
+            wvConfigProvider.setApiURL(window.orthancUrl || '/');
         })
         .controller('MultiViewportDemo', function($scope) {
             $scope.toolbar = {};
