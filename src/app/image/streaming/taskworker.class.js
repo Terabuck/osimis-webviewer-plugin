@@ -6,6 +6,12 @@
 
         this._workerThread = new Worker(script);
 
+        // Send the current directory absolute path to allow file import
+        this._workerThread.postMessage({
+            type: 'setRootUrl',
+            url: window.location.origin + window.location.pathname.replace(/[\\\/][^\\\/]*$/, '')
+        });
+
         this._currentTask = null;
 
         // Used by pool to send new task once the worker is available

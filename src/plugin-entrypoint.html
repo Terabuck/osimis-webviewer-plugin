@@ -77,7 +77,7 @@
     <script>
         angular.module('orthanc', ['webviewer'])
         .config(function($locationProvider, wvConfigProvider) {
-            wvConfigProvider.setApiURL(window.orthancUrl);
+            wvConfigProvider.setApiURL(window.orthancUrl || '/');
 
             $locationProvider.html5Mode({
                 enabled: true,

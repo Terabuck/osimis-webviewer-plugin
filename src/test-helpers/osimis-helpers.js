@@ -30,7 +30,7 @@
         window.beforeEach(function() {
             bard.appModule('webviewer', 
                 function(wvConfigProvider) {
-                    wvConfigProvider.setApiURL('');
+                    wvConfigProvider.setApiURL('/');
                 },
                 function($exceptionHandlerProvider) {
                     $exceptionHandlerProvider.mode('rethrow');

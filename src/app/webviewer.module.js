@@ -24,17 +24,16 @@
     var _config = {
       version: version,
       orthancApiURL: '',
-      webviewerApiURL: 'web-viewer',
       defaultCompression: '95'
     };
 
     this.setApiURL = function(url) {
+      // Remove trailing slash
       if (url.substr(-1) === '/') {
         url = url.substr(0, url.length - 1);
       }
 
       _config.orthancApiURL = url;
-      _config.webviewerApiURL = url + '/web-viewer';
     };
 
     this.$get = function() {

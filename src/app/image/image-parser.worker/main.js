@@ -11,8 +11,8 @@
 
 // @todo move jpgjs & pngjs out of bower_components
 
-importScripts('/app/image/image-parser.worker/klvreader.class.js');
-importScripts('/bower_components/jpgjs/jpg.js');
+/* @inline: */ importScripts('/app/image/image-parser.worker/klvreader.class.js');
+/* @inline: */ importScripts('/bower_components/jpgjs/jpg.js');
 
 // Make png.js & config.js worker compatible
 var document = {
@@ -21,20 +21,39 @@ var document = {
 var window = {};
 
 // Import png.js
-importScripts('/bower_components/png.js/zlib.js'); // @todo in build mode
-importScripts('/bower_components/png.js/png.js'); // @todo in build mode
+/* @inline: */ importScripts('/bower_components/png.js/zlib.js');
+/* @inline: */ importScripts('/bower_components/png.js/png.js');
 
 var PNG = window.PNG;
 var KLVReader = WorkerGlobalScope.KLVReader;
 
-// Import config
-importScripts('/config.js');
+var ImageApiURL = undefined;
 
-var OrthancApiURL = window.orthancUrl;
-if (OrthancApiURL.indexOf('://') === -1) {
-    // Remove bad url/cors issue induced by blob protocol.
-    OrthancApiURL = location.origin + '/' + OrthancApiURL;
+function setImageApiUrl(rootUrl) {
+    // Import config.js for window.orthancUrl
+    importScripts(rootUrl + '/config.js');
+    var orthancUrl = window.orthancUrl;
+    
+    // Check the path is absolute
+    // (because workers are built to blob strings, their' location is not relative to the js main thread one.)
+    if (orthancUrl.indexOf('://') === -1 && orthancUrl.indexOf('/') !== 0) {
+        throw new Error('config.js should have absolute path');
+    }
+
+    // Prefix path with http://server:port (to wrong protocole issue due to blob url resolving to blob://server:port)
+    if (orthancUrl.indexOf('://') === -1) {
+        orthancUrl = location.origin + orthancUrl;
+    }
+
+    // Remove trailing slash
+    if (orthancUrl.lastIndexOf('/') === orthancUrl.length - 1) {
+        orthancUrl = orthancUrl.slice(0, -1);
+    }
+
+    // Set the route
+    ImageApiURL = orthancUrl + '/osimis-viewer/images/';
 }
+
 // @todo out..
 var Qualities = {
     // 0 is reserved as none..
@@ -49,6 +68,12 @@ self.addEventListener('message', function(evt) {
     var type = evt.data.type;
 
     switch(type) {
+    case 'setRootUrl':
+        // Configure the ImageApiURl
+        var rootUrl = evt.data.url;
+
+        setImageApiUrl(rootUrl);
+        break;
     case 'getBinary':
         // Get an image binary
         var id = evt.data.id;
@@ -102,13 +127,13 @@ function BinaryRequest(id, quality) {
     var url = null;
     switch (quality) {
     case Qualities.LOSSLESS:
-        url = OrthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/png' + '/klv';
+        url = ImageApiURL + instanceId + '/' + frameIndex + '/png' + '/klv';
         break;
     case Qualities.R1000J100:
-        url = OrthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/resize:1000' + '/8bit' + '/jpeg:100' + '/klv';
+        url = ImageApiURL + instanceId + '/' + frameIndex + '/resize:1000' + '/8bit' + '/jpeg:100' + '/klv';
         break;
     case Qualities.R150J100:
-        url = OrthancApiURL + '/nuks/' + instanceId + '/' + frameIndex + '/resize:150' + '/8bit' + '/jpeg:100' + '/klv';
+        url = ImageApiURL + instanceId + '/' + frameIndex + '/resize:150' + '/8bit' + '/jpeg:100' + '/klv';
         break;
     default:
         throw new Error('Undefined quality: ' + quality);

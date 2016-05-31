@@ -12,8 +12,8 @@
 //       if (typeof pathURL !== 'string') URL.revokeObjectUrl(path);
 // 
 // In worker thread js files:
-//   you can use importScripts(...), eg:
-//       importScripts('/app/image/image-parser.worker/klvreader.class.js');
+//   you can use inline with importScripts(...), eg:
+//       /* @inline: */ importScripts('/app/image/image-parser.worker/klvreader.class.js');
 // 
 // For path string,
 //   - Do not use double quote (use single ones) 
@@ -66,7 +66,7 @@ var injectInlineWorker = function(opts) {
         // Process file if everything seems ok
         var input = file.contents.toString();
         var workerPathRegex = /(?:\/\*\s*@inline-worker:\s*\*\/)\s'([^']*)'/g;
-        var importScriptsRegex = /importScripts\('([^']*)'\)/g;
+        var importScriptsRegex = /(?:\/\*\s@inline:\s\*\/)\simportScripts\('([^']*)'\)/g;
 
         // Inline marked worker path with the path's file content
         var output = input.replace(workerPathRegex, function(match, p1, offset, string) {
