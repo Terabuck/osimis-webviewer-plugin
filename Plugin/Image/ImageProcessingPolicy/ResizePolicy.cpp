@@ -53,7 +53,8 @@ IImageContainer* ResizePolicy::Apply(IImageContainer* input, ImageMetaData* meta
   // Resize the input and put the result in the output
   RawImageContainer::gil_image_view_t inGILView = inRawImage->GetGILImageView();
   RawImageContainer::gil_image_view_t outGILView = outRawImage->GetGILImageView();
-  boost::gil::resize_view(inGILView, outGILView, boost::gil::bilinear_sampler());
+//  boost::gil::resize_view(inGILView, outGILView, boost::gil::bilinear_sampler());
+  boost::gil::resize_view(inGILView, outGILView, boost::gil::nearest_neighbor_sampler());
 
   // Update image metadata
   metaData->width = outWidth;
