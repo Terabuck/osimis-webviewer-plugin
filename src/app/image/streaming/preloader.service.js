@@ -54,6 +54,14 @@
 
                     wvImageBinaryManager.requestLoading(imageId, quality, 1);
                 }
+
+                // Preload lossless studies images
+                for (var i=0; i<series.imageIds.length; ++i) {
+                    var imageId = series.imageIds[i];
+                    var quality = WvImageQualities.LOSSLESS;
+
+                    wvImageBinaryManager.requestLoading(imageId, quality, 1);
+                }
             });
 
             $rootScope.$on('UserUnSelectedSeries', function(evt, series) {
@@ -65,10 +73,18 @@
                     wvImageBinaryManager.abortLoading(imageId, quality, 1);
                 }
 
-                // abort 1000x1000 studies images preloading
+                // Abort 1000x1000 studies images preloading
                 for (var i=0; i<series.imageIds.length; ++i) {
                     var imageId = series.imageIds[i];
                     var quality = WvImageQualities.R1000J100;
+
+                    wvImageBinaryManager.abortLoading(imageId, quality, 1);
+                }
+
+                // Abort lossless studies images preloading
+                for (var i=0; i<series.imageIds.length; ++i) {
+                    var imageId = series.imageIds[i];
+                    var quality = WvImageQualities.LOSSLESS;
 
                     wvImageBinaryManager.abortLoading(imageId, quality, 1);
                 }
