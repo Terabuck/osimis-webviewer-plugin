@@ -707,7 +707,7 @@ extern "C"
     // @todo free
     ImageController::Inject(imageRepository);
 
-    RegisterRoute<ImageController>("/orthanc/nuks/");
+    RegisterRoute<ImageController>("/osimis-viewer/images/");
     OrthancPluginRegisterRestCallbackNoLock(context_, "/web-viewer/series/(.*)", ServeData<SeriesInformationAdapter>);
     OrthancPluginRegisterRestCallbackNoLock(context_, "/web-viewer/instances/(.*)", ServeBinary<DecodedImageAdapter>);
 #endif
