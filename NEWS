@@ -1,6 +1,10 @@
 Pending changes in the mainline
 ===============================
 
+TODO: the history below is the Orthanc Viewer history.  We should now maintain the OsimisViewer history (version numbers are not the same)
+
+* New API to allow image resizing (i.e. thumbnails)
+* Option "EnableCache" to activate pre-extraction of JPG images from DICOM files
 * Option "EnableGdcm" to replace the built-in decoder of Orthanc with GDCM
 * Fixed rendering of 16bpp images if values are < 0 or >= 32768
 * Decoding of JPEG2000 lossless images with YBR_RCT photometric interpretation
