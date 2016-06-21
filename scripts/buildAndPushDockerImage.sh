@@ -24,7 +24,7 @@ fi
 #if the branch name is something like 'am/WVB-27', the image tag should be 'am-WVB-27'
 #replace / by -
 imageTag=${imageTag/\//-}
-exit 0
+
 docker build -t $imageName:$imageTag .
 
 docker push $imageName:$imageTag
