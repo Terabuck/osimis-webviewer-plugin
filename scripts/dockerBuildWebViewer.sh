@@ -1,6 +1,8 @@
 #!/bin/bash
+# builds orthanc from inside the docker container
 set -e
 set -x
+
 
 # Get the number of available cores to speed up the builds
 COUNT_CORES=`grep -c ^processor /proc/cpuinfo`
