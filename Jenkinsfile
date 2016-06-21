@@ -5,7 +5,7 @@ node('docker') {
 	docker.withRegistry('https://registry-1.docker.io/', 'dockerhub-jenkinsosimis') {
 
 		stage 'Build and push Osimis viewer image'
-		sh 'scripts/buildAndPushDockerImage.sh'
+		sh 'scripts/buildAndPushDockerImage.sh ${BRANCH_NAME}'
 	}
 }
 
