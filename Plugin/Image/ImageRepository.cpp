@@ -267,14 +267,13 @@ std::string _getAttachmentName(int frameIndex, const IImageProcessingPolicy* pol
   int attachmentPrefix = 10000;
   int maxFrameCount = 1000; // @todo use adaptative maxFrameCount !
 
-  if (policyString == "png~klv") {
+  if (policyString == "high-quality") {
     attachmentName = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 0 + frameIndex);
   }
-  else if (policyString == "resize:1000~8bit~jpeg:100~klv") {
+  else if (policyString == "medium-quality") {
     attachmentName = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 1 + frameIndex);
-
   }
-  else if (policyString == "resize:150~8bit~jpeg:100~klv") {
+  else if (policyString == "low-quality") {
     attachmentName = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 2 + frameIndex);
   }
   else {

@@ -3,6 +3,9 @@
 #include <boost/algorithm/string.hpp> // for boost::split
 
 #include "../BenchmarkHelper.h" // for BENCH(*)
+#include "ImageProcessingPolicy/LowQualityPolicy.h"
+#include "ImageProcessingPolicy/MediumQualityPolicy.h"
+#include "ImageProcessingPolicy/HighQualityPolicy.h"
 #include "ImageProcessingPolicy/CompositePolicy.h"
 #include "ImageProcessingPolicy/ResizePolicy.h"
 #include "ImageProcessingPolicy/JpegConversionPolicy.h"
@@ -23,6 +26,10 @@ ImageController::ImageController(OrthancPluginRestOutput* response, const std::s
   : BaseController(response, url, request), frameIndex_(0), imageProcessingRouteParser_()
 {
   // Register sub routes
+
+  imageProcessingRouteParser_.RegisterRoute<LowQualityPolicy>("^low-quality$");
+  imageProcessingRouteParser_.RegisterRoute<MediumQualityPolicy>("^medium-quality$");
+  imageProcessingRouteParser_.RegisterRoute<HighQualityPolicy>("^high-quality$");
 
   imageProcessingRouteParser_.RegisterRoute<CompositePolicy>("^(.+/.+)$"); // regex: at least a single "/"
   imageProcessingRouteParser_.RegisterRoute<ResizePolicy>("^resize:(\\d+)$"); // resize:<maximal height/width: uint>
