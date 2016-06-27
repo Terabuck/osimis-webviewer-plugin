@@ -47,11 +47,17 @@ namespace Orthanc
   {
   };
 
+  enum ServerBarrierEvent
+  {
+    ServerBarrierEvent_Stop,
+    ServerBarrierEvent_Reload  // SIGHUP signal: reload configuration file
+  };
+
   namespace Toolbox
   {
-    void ServerBarrier(const bool& stopFlag);
+    ServerBarrierEvent ServerBarrier(const bool& stopFlag);
 
-    void ServerBarrier();
+    ServerBarrierEvent ServerBarrier();
 
     void ToUpperCase(std::string& s);  // Inplace version
 
@@ -127,7 +133,7 @@ namespace Orthanc
                       const std::string& data);
 
 #  if BOOST_HAS_REGEX == 1
-    void DecodeDataUriScheme(std::string& mime,
+    bool DecodeDataUriScheme(std::string& mime,
                              std::string& content,
                              const std::string& source);
 #  endif
