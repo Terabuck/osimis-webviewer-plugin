@@ -52,6 +52,10 @@ OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlP
       BENCH_LOG(INSTANCE, instanceId_);
       BENCH_LOG(FRAME_INDEX, frameIndex_);
     }
+    catch (const std::invalid_argument&) {
+      // probably because processingPolicy has not been found
+      return this->_AnswerError(404);
+    }
     catch (const boost::bad_lexical_cast&) {
       // should be prevented by the regex
       return this->_AnswerError(500);
