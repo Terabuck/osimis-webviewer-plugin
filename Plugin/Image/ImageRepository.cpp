@@ -173,7 +173,7 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
     if (error != OrthancPluginErrorCode_Success)
     {
       // @todo throw or be sure orthanc is up to date at plugin init
-      // throw new Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
+      // throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
       return NULL;
     }
     else
@@ -195,7 +195,7 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
   }
   else
   {
-    // throw new Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
+    // throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
     // @todo throw;
     return NULL;
   }

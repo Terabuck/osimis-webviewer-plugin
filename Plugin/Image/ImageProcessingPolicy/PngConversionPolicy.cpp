@@ -16,7 +16,7 @@ IImageContainer* PngConversionPolicy::Apply(IImageContainer* input, ImageMetaDat
   RawImageContainer* rawImage = dynamic_cast<RawImageContainer*>(input);  //@todo: this should probably be an assert (design verification)
   if (!rawImage)
   {
-    throw new std::invalid_argument("Input is not raw");
+    throw std::invalid_argument("Input is not raw");
     // @todo Throw exception : input is not a raw image
     return NULL;
   }
