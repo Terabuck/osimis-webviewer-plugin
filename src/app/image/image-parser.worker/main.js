@@ -66,8 +66,8 @@ var Qualities = {
     LOSSLESS: 100,
     // THUMBNAIL
     // MEDIUM
-    R150J100: 1, // resampling to 150 px + compressed to jpeg100
-    R1000J100: 2 // resampling to 1000 px + compressed to jpeg100
+    LOW: 1, // resampling to 150 px + compressed to jpeg100
+    MEDIUM: 2 // resampling to 1000 px + compressed to jpeg100
 };
 
 self.addEventListener('message', function(evt) {
@@ -133,13 +133,13 @@ function BinaryRequest(id, quality) {
     var url = null;
     switch (quality) {
     case Qualities.LOSSLESS:
-        url = ImageApiURL + instanceId + '/' + frameIndex + '/png' + '/klv';
+        url = ImageApiURL + instanceId + '/' + frameIndex + '/high-quality';
         break;
-    case Qualities.R1000J100:
-        url = ImageApiURL + instanceId + '/' + frameIndex + '/resize:1000' + '/8bit' + '/jpeg:100' + '/klv';
+    case Qualities.MEDIUM:
+        url = ImageApiURL + instanceId + '/' + frameIndex + '/medium-quality';
         break;
-    case Qualities.R150J100:
-        url = ImageApiURL + instanceId + '/' + frameIndex + '/resize:150' + '/8bit' + '/jpeg:100' + '/klv';
+    case Qualities.LOW:
+        url = ImageApiURL + instanceId + '/' + frameIndex + '/low-quality';
         break;
     default:
         throw new Error('Undefined quality: ' + quality);

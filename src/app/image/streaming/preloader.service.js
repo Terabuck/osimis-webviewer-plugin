@@ -14,7 +14,7 @@
                         seriesList.forEach(function(series) {
                             for (var i=0; i<series.imageIds.length; ++i) {
                                 var imageId = series.imageIds[i];
-                                var quality = WvImageQualities.R150J100;
+                                var quality = WvImageQualities.LOW;
 
                                 wvImageBinaryManager.requestLoading(imageId, quality, 2);
                             }
@@ -30,7 +30,7 @@
                         seriesList.forEach(function(series) {
                             for (var i=0; i<series.imageIds.length; ++i) {
                                 var imageId = series.imageIds[i];
-                                var quality = WvImageQualities.R150J100;
+                                var quality = WvImageQualities.LOW;
 
                                 wvImageBinaryManager.abortLoading(imageId, quality, 2);
                             }
@@ -42,7 +42,7 @@
                 // Preload every series' thumbnails
                 for (var i=0; i<series.imageIds.length; ++i) {
                     var imageId = series.imageIds[i];
-                    var quality = WvImageQualities.R150J100;
+                    var quality = WvImageQualities.LOW;
 
                     wvImageBinaryManager.requestLoading(imageId, quality, 1);
                 }
@@ -50,7 +50,7 @@
                 // Preload whole 1000x1000 studies images
                 for (var i=0; i<series.imageIds.length; ++i) {
                     var imageId = series.imageIds[i];
-                    var quality = WvImageQualities.R1000J100;
+                    var quality = WvImageQualities.MEDIUM;
 
                     wvImageBinaryManager.requestLoading(imageId, quality, 1);
                 }
@@ -68,7 +68,7 @@
                 // Abort every series' thumbnails preloading
                 for (var i=0; i<series.imageIds.length; ++i) {
                     var imageId = series.imageIds[i];
-                    var quality = WvImageQualities.R150J100;
+                    var quality = WvImageQualities.LOW;
 
                     wvImageBinaryManager.abortLoading(imageId, quality, 1);
                 }
@@ -76,7 +76,7 @@
                 // Abort 1000x1000 studies images preloading
                 for (var i=0; i<series.imageIds.length; ++i) {
                     var imageId = series.imageIds[i];
-                    var quality = WvImageQualities.R1000J100;
+                    var quality = WvImageQualities.MEDIUM;
 
                     wvImageBinaryManager.abortLoading(imageId, quality, 1);
                 }
