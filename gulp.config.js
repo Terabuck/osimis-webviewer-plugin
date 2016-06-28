@@ -129,7 +129,6 @@ module.exports = function() {
         ],
         specHelpers: [client + 'test-helpers/**/*.js'],
         specs: [clientApp + '**/*.spec.js'],
-        // serverIntegrationSpecs: [client + '/tests/server-integration/**/*.spec.js'],
 
         /**
          * Node settings
@@ -179,10 +178,14 @@ module.exports = function() {
             files: [].concat(
                 bowerFiles,
                 config.specHelpers,
-                clientApp + '**/*.module.js',
-                clientApp + '**/*.js',
-                temp + config.templateCache.file
-                // config.serverIntegrationSpecs
+                // Ignore unit tests for now
+                // @todo remove bard & ngmock from unit tests
+
+                // clientApp + '**/*.module.js',
+                // clientApp + '**/*.js',
+                // temp + config.templateCache.file
+
+                './integration-tests/**/*.spec.js'
             ),
             exclude: [],
             coverage: {
