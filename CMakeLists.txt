@@ -67,6 +67,10 @@ endif()
 include_directories(${CMAKE_SOURCE_DIR}/Dependencies/boost-1_60_0/)
 include_directories(${CMAKE_SOURCE_DIR}/Dependencies/gil-2_1_1/)
 
+# Enable image processing *generic* http routes on debug mode
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+  add_definitions(-DPLUGIN_ENABLE_DEBUG_ROUTE=1)
+endif()
 
 #old cache system is disabled
 #if (ENABLE_CACHE)

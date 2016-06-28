@@ -6,12 +6,15 @@
 #include "ImageProcessingPolicy/LowQualityPolicy.h"
 #include "ImageProcessingPolicy/MediumQualityPolicy.h"
 #include "ImageProcessingPolicy/HighQualityPolicy.h"
+
+#if PLUGIN_ENABLE_DEBUG_ROUTE == 1
 #include "ImageProcessingPolicy/CompositePolicy.h"
 #include "ImageProcessingPolicy/ResizePolicy.h"
 #include "ImageProcessingPolicy/JpegConversionPolicy.h"
 #include "ImageProcessingPolicy/PngConversionPolicy.h"
 #include "ImageProcessingPolicy/Uint8ConversionPolicy.h"
 #include "ImageProcessingPolicy/KLVEmbeddingPolicy.h"
+#endif // PLUGIN_ENABLE_DEBUG_ROUTE == 1
 
 #include "ImageController.h"
 #include <iostream>
@@ -31,12 +34,14 @@ ImageController::ImageController(OrthancPluginRestOutput* response, const std::s
   imageProcessingRouteParser_.RegisterRoute<MediumQualityPolicy>("^medium-quality$");
   imageProcessingRouteParser_.RegisterRoute<HighQualityPolicy>("^high-quality$");
 
+#if PLUGIN_ENABLE_DEBUG_ROUTE == 1
   imageProcessingRouteParser_.RegisterRoute<CompositePolicy>("^(.+/.+)$"); // regex: at least a single "/"
   imageProcessingRouteParser_.RegisterRoute<ResizePolicy>("^resize:(\\d+)$"); // resize:<maximal height/width: uint>
   imageProcessingRouteParser_.RegisterRoute<JpegConversionPolicy>("^jpeg:?(\\d{0,3})$"); // regex: jpeg:<compression rate: int[0;100]>
   imageProcessingRouteParser_.RegisterRoute<PngConversionPolicy>("^png$");
   imageProcessingRouteParser_.RegisterRoute<Uint8ConversionPolicy>("^8bit$");
   imageProcessingRouteParser_.RegisterRoute<KLVEmbeddingPolicy>("^klv$");
+#endif // PLUGIN_ENABLE_DEBUG_ROUTE
 }
 
 OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlPostfix) {
@@ -118,7 +123,7 @@ OrthancPluginErrorCode ImageController::_ProcessRequest()
   }
 }
 
-
+#if PLUGIN_ENABLE_DEBUG_ROUTE == 1
 // Parse JpegConversionPolicy compression parameter from its route regex matches
 template<>
 inline JpegConversionPolicy* ImageProcessingRouteParser::_Instanciate<JpegConversionPolicy>(boost::cmatch& regexpMatches)
@@ -172,3 +177,4 @@ inline CompositePolicy* ImageProcessingRouteParser::_Instanciate<CompositePolicy
 
   return compositePolicy;
 };
+#endif // PLUGIN_ENABLE_DEBUG_ROUTE
