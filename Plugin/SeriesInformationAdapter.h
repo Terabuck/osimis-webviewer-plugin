@@ -20,14 +20,12 @@
 
 #pragma once
 
-#include "Cache/ICacheFactory.h"
-#include "Cache/CacheScheduler.h"
-
+#include <string>
 #include <orthanc/OrthancCPlugin.h>
 
 namespace OrthancPlugins
 {
-  class SeriesInformationAdapter : public ICacheFactory
+  class SeriesInformationAdapter
   {
   private:
     OrthancPluginContext* context_;
@@ -38,7 +36,8 @@ namespace OrthancPlugins
     {
     }
 
-    virtual bool Create(std::string& content,
-                        const std::string& seriesId);
+    // WARNING: No mutual exclusion is enforced! Several threads could
+    // call this method at the same time.
+    bool Create(std::string& content, const std::string& seriesId);  
   };
 }

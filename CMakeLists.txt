@@ -24,7 +24,6 @@ project(OsimisWebViewer)
 include(${CMAKE_SOURCE_DIR}/Resources/CMake/GetProductVersionFromGitTag.cmake)
 
 # Parameters of the build
-set(ENABLE_CACHE ON CACHE BOOL "Cache the plugin REST responses (currently disabled but we might still need the ViewerPrefetchPolicy so we keep it in the code)")
 set(BENCHMARK OFF CACHE BOOL "Send benchmark informations to stdout")
 set(STATIC_BUILD ON CACHE BOOL "Static build of the third-party libraries (necessary for Windows)")
 SET(STANDALONE_BUILD ON CACHE BOOL "Standalone build (all the resources are embedded, necessary for releases)")
@@ -71,13 +70,6 @@ include_directories(${CMAKE_SOURCE_DIR}/Dependencies/gil-2_1_1/)
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_definitions(-DPLUGIN_ENABLE_DEBUG_ROUTE=1)
 endif()
-
-#old cache system is disabled
-#if (ENABLE_CACHE)
-#  add_definitions(
-#    -DENABLE_CACHE=1
-#    )
-#endif()
 
 if (BENCHMARK)
   add_definitions(
@@ -151,7 +143,6 @@ include_directories(${CMAKE_SOURCE_DIR}/Plugin/Image)
 include_directories(${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer)
 include_directories(${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy)
 include_directories(${CMAKE_SOURCE_DIR}/Plugin/Image/Utilities)
-include_directories(${CMAKE_SOURCE_DIR}/Plugin/Cache)
 
 set(CORE_SOURCES
   ${BOOST_SOURCES}
@@ -217,10 +208,7 @@ add_library(OsimisWebViewer
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageController.cpp
   
   ${CMAKE_SOURCE_DIR}/Plugin/BenchmarkHelper.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Cache/CacheManager.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Cache/CacheScheduler.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/ViewerToolbox.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/ViewerPrefetchPolicy.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/SeriesInformationAdapter.cpp
   )
 
