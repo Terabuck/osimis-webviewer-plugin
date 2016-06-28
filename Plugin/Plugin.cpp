@@ -427,7 +427,7 @@ extern "C"
 
 
     /* Install the callbacks */
-    // OrthancPluginRegisterRestCallbackNoLock(context_, "/web-viewer/is-stable-series/(.*)", IsStableSeries);
+    // OrthancPluginRegisterRestCallbackNoLock(context_, "/osimis-viewer/is-stable-series/(.*)", IsStableSeries);
 
     // @todo free
     ImageRepository* imageRepository = new ImageRepository;
@@ -439,9 +439,9 @@ extern "C"
     RegisterRoute<ImageController>("/osimis-viewer/images/");
 
 #if ORTHANC_STANDALONE == 1
-    OrthancPluginRegisterRestCallbackNoLock(context, "/web-viewer/app/(.*)", ServeEmbeddedFolder<Orthanc::EmbeddedResources::WEB_VIEWER>);
+    OrthancPluginRegisterRestCallbackNoLock(context, "/osimis-viewer/app/(.*)", ServeEmbeddedFolder<Orthanc::EmbeddedResources::WEB_VIEWER>);
 #else
-    OrthancPluginRegisterRestCallbackNoLock(context, "/web-viewer/app/(.*)", ServeWebViewer);
+    OrthancPluginRegisterRestCallbackNoLock(context, "/osimis-viewer/app/(.*)", ServeWebViewer);
 #endif
 
     /* Extend the default Orthanc Explorer with custom JavaScript */

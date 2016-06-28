@@ -12,7 +12,7 @@ $('#series').live('pagebeforecreate', function() {
   b.click(function() {
     if ($.mobile.pageData) {
       var series = $.mobile.pageData.uuid;
-      window.open('../web-viewer/app/plugin-entrypoint.html?series=' + series);
+      window.open('../osimis-viewer/app/plugin-entrypoint.html?series=' + series);
     }
   });
 });
@@ -31,7 +31,7 @@ $('#study').live('pagebeforecreate', function() {
   b.click(function() {
     if ($.mobile.pageData) {
       var study = $.mobile.pageData.uuid;
-      window.open('../web-viewer/app/plugin-entrypoint.html?study=' + study);
+      window.open('../osimis-viewer/app/plugin-entrypoint.html?study=' + study);
     }
   });
 });
