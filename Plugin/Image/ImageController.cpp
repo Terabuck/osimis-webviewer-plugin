@@ -91,8 +91,7 @@ OrthancPluginErrorCode ImageController::_ProcessRequest()
     if (cleanCache_) {
       imageRepository_->CleanImageCache(this->instanceId_, this->frameIndex_, this->processingPolicy_.get());
       std::string answer = "{}";
-      OrthancPluginAnswerBuffer(OrthancContextManager::Get(), this->response_, answer.c_str(), answer.size(), "application/octet-stream");
-      return OrthancPluginErrorCode_Success;
+      return this->_AnswerBuffer(answer, "application/json");
     }
 
     // retrieve processed image
@@ -108,15 +107,14 @@ OrthancPluginErrorCode ImageController::_ProcessRequest()
     {
       BENCH(REQUEST_ANSWERING);
 
-      // answer rest request
-      OrthancPluginAnswerBuffer(OrthancContextManager::Get(), this->response_, image->GetBinary(), image->GetBinarySize(), "application/octet-stream");
+      // Answer rest request
+      return this->_AnswerBuffer(image->GetBinary(), image->GetBinarySize(), "application/octet-stream");
     }
     else
     {
-      return OrthancPluginErrorCode_InternalError;
+      // Answer Internal Error
+      return this->_AnswerError(500);
     }
-
-    return OrthancPluginErrorCode_Success;
   }
   catch (...) {
     return this->_AnswerError(500);
