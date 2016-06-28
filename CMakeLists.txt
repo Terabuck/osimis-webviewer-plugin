@@ -77,9 +77,15 @@ if (BENCHMARK)
     )
   add_definitions(
       -DBOOST_CHRONO_HEADER_ONLY
-  #    -DBOOST_ERROR_CODE_HEADER_ONLY
-      -D_DARWIN_C_SOURCE # for boost chrono to work on mac X.11
+      #-DBOOST_ERROR_CODE_HEADER_ONLY
     )
+
+  # fix boost chrono to work on mac X.11
+  if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
+    add_definitions(
+      -D_DARWIN_C_SOURCE
+    )
+  endif()
 endif()
 
 
