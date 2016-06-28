@@ -10,7 +10,7 @@
 
 
 // .../<instance_id>/<frame_index>/<compression_policy>
-
+// @todo boost::noncopyable
 class ImageController : public BaseController {
 public:
   ImageController(OrthancPluginRestOutput* response, const std::string& url, const OrthancPluginHttpRequest* request);

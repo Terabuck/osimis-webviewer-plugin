@@ -10,6 +10,7 @@
 /** ImageMetaData [@Entity]
  *
  */
+// @todo boost::noncopyable
 struct ImageMetaData {
   ImageMetaData();
 

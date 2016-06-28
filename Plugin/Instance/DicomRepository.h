@@ -16,6 +16,7 @@
  *   stateless requirements !
  *
  */
+// @todo boost::noncopyable
 class DicomRepository {
 
   struct DicomFile
