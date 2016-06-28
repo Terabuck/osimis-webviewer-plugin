@@ -33,7 +33,6 @@
 #include "BaseController.h"
 #include "Image/ImageController.h"
 #include "DecodedImageAdapter.h"
-#include "SeriesInformationAdapter.h"
 #include "../Orthanc/Plugins/Samples/GdcmDecoder/GdcmDecoderCache.h"
 #include "../Orthanc/Core/Toolbox.h"
 #include "Version.h"
@@ -41,114 +40,6 @@
 static OrthancPluginContext* context_ = NULL;
 static bool restrictTransferSyntaxes_ = false;
 static std::set<std::string> enabledTransferSyntaxes_;
-
-// use arraybuffer instead of json for DecodedImageAdapter
-namespace {
-  // use anonymous namespace instead of static because 
-  // static doesn't work with specialized templates
-
-  //OrthancPluginRegisterRestCallback(context_, "/web-viewer/series/(.*)", ServeCache<CacheBundle_SeriesInformation>);
-  //OrthancPluginRegisterRestCallback(context_, "/web-viewer/instances/(.*)", ServeCache<CacheBundle_DecodedImage>);
-  template <typename TFactory>
-  OrthancPluginErrorCode ServeData(OrthancPluginRestOutput* output,
-                                           const char* url,
-                                           const OrthancPluginHttpRequest* request)
-  {
-    try
-    {
-      if (request->method != OrthancPluginHttpMethod_Get)
-      {
-        OrthancPluginSendMethodNotAllowed(context_, output, "GET");
-        return OrthancPluginErrorCode_Success;
-      }
-
-      const std::string id = request->groups[0];
-      std::string content;
-
-      std::string message = "Processing GET request: " + std::string(url);
-      OrthancPluginLogInfo(context_, message.c_str());
-
-      TFactory* factory = new TFactory(context_);
-      if (factory->Create(content, id)) {
-          std::string message = "Answering GET request: " + std::string(url);
-          OrthancPluginLogInfo(context_, message.c_str());
-
-          OrthancPluginAnswerBuffer(context_, output, content.c_str(), content.size(), "application/json");
-      }
-      else
-      {
-        OrthancPluginSendHttpStatusCode(context_, output, 404);
-      }
-
-      return OrthancPluginErrorCode_Success;
-    }
-    catch (Orthanc::OrthancException& e)
-    {
-      OrthancPluginLogError(context_, e.What());
-      return OrthancPluginErrorCode_Plugin;
-    }
-    catch (std::runtime_error& e)
-    {
-      OrthancPluginLogError(context_, e.what());
-      return OrthancPluginErrorCode_Plugin;
-    }
-    catch (boost::bad_lexical_cast&)
-    {
-      OrthancPluginLogError(context_, "Bad lexical cast");
-      return OrthancPluginErrorCode_Plugin;
-    }
-  }
-
-  template <typename TFactory>
-  OrthancPluginErrorCode ServeBinary(OrthancPluginRestOutput* output,
-                                           const char* url,
-                                           const OrthancPluginHttpRequest* request)
-  {
-    try
-    {
-      if (request->method != OrthancPluginHttpMethod_Get)
-      {
-        OrthancPluginSendMethodNotAllowed(context_, output, "GET");
-        return OrthancPluginErrorCode_Success;
-      }
-
-      const std::string id = request->groups[0];
-      std::string content;
-
-      std::string message = "Processing GET request: " + std::string(url);
-      OrthancPluginLogInfo(context_, message.c_str());
-
-      TFactory* factory = new TFactory(context_);
-      if (factory->Create(content, id)) {
-          std::string message = "Answering GET request: " + std::string(url);
-          OrthancPluginLogInfo(context_, message.c_str());
-
-          OrthancPluginAnswerBuffer(context_, output, content.c_str(), content.size(), "application/octet-stream");
-      }
-      else
-      {
-        OrthancPluginSendHttpStatusCode(context_, output, 404);
-      }
-
-      return OrthancPluginErrorCode_Success;
-    }
-    catch (Orthanc::OrthancException& e)
-    {
-      OrthancPluginLogError(context_, e.What());
-      return OrthancPluginErrorCode_Plugin;
-    }
-    catch (std::runtime_error& e)
-    {
-      OrthancPluginLogError(context_, e.what());
-      return OrthancPluginErrorCode_Plugin;
-    }
-    catch (boost::bad_lexical_cast&)
-    {
-      OrthancPluginLogError(context_, "Bad lexical cast");
-      return OrthancPluginErrorCode_Plugin;
-    }
-  }
-}
 
 #if ORTHANC_STANDALONE == 0
 static OrthancPluginErrorCode ServeWebViewer(OrthancPluginRestOutput* output,
@@ -180,8 +71,7 @@ static OrthancPluginErrorCode ServeWebViewer(OrthancPluginRestOutput* output,
 
   return OrthancPluginErrorCode_Success;
 }
-#endif
-
+#else
 template <enum Orthanc::EmbeddedResources::DirectoryResourceId folder>
 static OrthancPluginErrorCode ServeEmbeddedFolder(OrthancPluginRestOutput* output,
                                                   const char* url,
@@ -214,54 +104,54 @@ static OrthancPluginErrorCode ServeEmbeddedFolder(OrthancPluginRestOutput* outpu
     return OrthancPluginErrorCode_Success;
   }
 }
+#endif
 
-static OrthancPluginErrorCode IsStableSeries(OrthancPluginRestOutput* output,
-                                             const char* url,
-                                             const OrthancPluginHttpRequest* request)
-{
-  try
-  {
-    if (request->method != OrthancPluginHttpMethod_Get)
-    {
-      OrthancPluginSendMethodNotAllowed(context_, output, "GET");
-      return OrthancPluginErrorCode_Success;
-    }
+// static OrthancPluginErrorCode IsStableSeries(OrthancPluginRestOutput* output,
+//                                              const char* url,
+//                                              const OrthancPluginHttpRequest* request)
+// {
+//   try
+//   {
+//     if (request->method != OrthancPluginHttpMethod_Get)
+//     {
+//       OrthancPluginSendMethodNotAllowed(context_, output, "GET");
+//       return OrthancPluginErrorCode_Success;
+//     }
 
-    const std::string id = request->groups[0];
-    Json::Value series;
+//     const std::string id = request->groups[0];
+//     Json::Value series;
 
-    if (OrthancPlugins::GetJsonFromOrthanc(series, context_, "/series/" + id) &&
-        series.type() == Json::objectValue)
-    {
-      bool value = (series["IsStable"].asBool() ||
-                    series["Status"].asString() == "Complete");
-      std::string answer = value ? "true" : "false";
-      OrthancPluginAnswerBuffer(context_, output, answer.c_str(), answer.size(), "application/json");
-    }
-    else
-    {
-      OrthancPluginSendHttpStatusCode(context_, output, 404);
-    }
+//     if (OrthancPlugins::GetJsonFromOrthanc(series, context_, "/series/" + id) &&
+//         series.type() == Json::objectValue)
+//     {
+//       bool value = (series["IsStable"].asBool() ||
+//                     series["Status"].asString() == "Complete");
+//       std::string answer = value ? "true" : "false";
+//       OrthancPluginAnswerBuffer(context_, output, answer.c_str(), answer.size(), "application/json");
+//     }
+//     else
+//     {
+//       OrthancPluginSendHttpStatusCode(context_, output, 404);
+//     }
 
-    return OrthancPluginErrorCode_Success;
-  }
-  catch (Orthanc::OrthancException& e)
-  {
-    OrthancPluginLogError(context_, e.What());
-    return OrthancPluginErrorCode_Plugin;
-  }
-  catch (std::runtime_error& e)
-  {
-    OrthancPluginLogError(context_, e.what());
-    return OrthancPluginErrorCode_Plugin;
-  }
-  catch (boost::bad_lexical_cast&)
-  {
-    OrthancPluginLogError(context_, "Bad lexical cast");
-    return OrthancPluginErrorCode_Plugin;
-  }
-}
-
+//     return OrthancPluginErrorCode_Success;
+//   }
+//   catch (Orthanc::OrthancException& e)
+//   {
+//     OrthancPluginLogError(context_, e.What());
+//     return OrthancPluginErrorCode_Plugin;
+//   }
+//   catch (std::runtime_error& e)
+//   {
+//     OrthancPluginLogError(context_, e.what());
+//     return OrthancPluginErrorCode_Plugin;
+//   }
+//   catch (boost::bad_lexical_cast&)
+//   {
+//     OrthancPluginLogError(context_, "Bad lexical cast");
+//     return OrthancPluginErrorCode_Plugin;
+//   }
+// }
 
 static bool ExtractTransferSyntax(std::string& transferSyntax,
                                   const void* dicom,
@@ -537,8 +427,7 @@ extern "C"
 
 
     /* Install the callbacks */
-    OrthancPluginRegisterRestCallbackNoLock(context_, "/web-viewer/libs/(.*)", ServeEmbeddedFolder<Orthanc::EmbeddedResources::JAVASCRIPT_LIBS>);
-    OrthancPluginRegisterRestCallbackNoLock(context_, "/web-viewer/is-stable-series/(.*)", IsStableSeries);
+    // OrthancPluginRegisterRestCallbackNoLock(context_, "/web-viewer/is-stable-series/(.*)", IsStableSeries);
 
     // @todo free
     ImageRepository* imageRepository = new ImageRepository;
@@ -548,8 +437,6 @@ extern "C"
     ImageController::Inject(imageRepository);
 
     RegisterRoute<ImageController>("/osimis-viewer/images/");
-    OrthancPluginRegisterRestCallbackNoLock(context_, "/web-viewer/series/(.*)", ServeData<SeriesInformationAdapter>);
-    OrthancPluginRegisterRestCallbackNoLock(context_, "/web-viewer/instances/(.*)", ServeBinary<DecodedImageAdapter>);
 
 #if ORTHANC_STANDALONE == 1
     OrthancPluginRegisterRestCallbackNoLock(context, "/web-viewer/app/(.*)", ServeEmbeddedFolder<Orthanc::EmbeddedResources::WEB_VIEWER>);

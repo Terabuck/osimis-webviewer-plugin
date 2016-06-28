@@ -215,7 +215,6 @@ add_library(OsimisWebViewer
   
   ${CMAKE_SOURCE_DIR}/Plugin/BenchmarkHelper.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/ViewerToolbox.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/SeriesInformationAdapter.cpp
   )
 
 
