@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include "../Cache/ICacheFactory.h"
-
 #include <orthanc/OrthancCPlugin.h>
 #include <stdint.h>
 #include <json/value.h>
@@ -31,7 +29,7 @@
 
 namespace OrthancPlugins
 {
-  class DecodedImageAdapter : public ICacheFactory
+  class DecodedImageAdapter
   {
   private:
     enum CompressionType

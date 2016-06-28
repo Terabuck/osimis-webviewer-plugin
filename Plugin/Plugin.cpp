@@ -36,7 +36,7 @@
 #include "OrthancContextManager.h"
 #include "BaseController.h"
 #include "Image/ImageController.h"
-#include "Image/DecodedImageAdapter.h"
+#include "DecodedImageAdapter.h"
 #include "SeriesInformationAdapter.h"
 #include "../Orthanc/Plugins/Samples/GdcmDecoder/GdcmDecoderCache.h"
 #include "../Orthanc/Core/Toolbox.h"
