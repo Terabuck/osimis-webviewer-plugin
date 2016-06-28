@@ -31,6 +31,8 @@
 
 #include "OrthancContextManager.h"
 #include "BaseController.h"
+#include "Instance/DicomRepository.h"
+#include "Image/ImageRepository.h"
 #include "Image/ImageController.h"
 #include "DecodedImageAdapter.h"
 #include "../Orthanc/Plugins/Samples/GdcmDecoder/GdcmDecoderCache.h"
@@ -429,8 +431,8 @@ extern "C"
     /* Install the callbacks */
     // OrthancPluginRegisterRestCallbackNoLock(context_, "/osimis-viewer/is-stable-series/(.*)", IsStableSeries);
 
-    // @todo free
-    ImageRepository* imageRepository = new ImageRepository;
+    DicomRepository* dicomRepository = new DicomRepository; // @todo free
+    ImageRepository* imageRepository = new ImageRepository(dicomRepository); // @todo free
     imageRepository->enableCachedImageStorage(cachedImageStorageEnabled);
 
     // @todo free

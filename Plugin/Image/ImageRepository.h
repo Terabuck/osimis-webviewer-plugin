@@ -2,9 +2,10 @@
 #define IMAGE_REPOSITORY_H
 
 #include <string>
-#include <deque>
 #include <boost/thread/mutex.hpp>
+#include <orthanc/OrthancCPlugin.h>
 
+#include "../Instance/DicomRepository.h"
 #include "Image.h"
 
 // #include "CompressionPolicy/IImageProcessingPolicy.h"
@@ -19,16 +20,8 @@
  *
  */
 class ImageRepository {
-
-  struct DicomFile
-  {
-    std::string                     instanceId;
-    OrthancPluginMemoryBuffer       dicomFileBuffer;
-    int                             refCount;
-  };
-
 public:
-  ImageRepository();
+  ImageRepository(DicomRepository* dicomRepository);
 
   // gives memory ownership
   Image* GetImage(const std::string& instanceId, uint32_t frameIndex, bool enableCache) const;
@@ -40,16 +33,10 @@ public:
 
   void enableCachedImageStorage(bool enable) {_cachedImageStorageEnabled = enable;}
   bool isCachedImageStorageEnabled() const {return _cachedImageStorageEnabled;}
+
 private:
-  bool                                                    _cachedImageStorageEnabled;
-  mutable std::deque<DicomFile>                           _dicomFiles; //keep a few of the last dicomFile in memory to avoid reloading them many times when requesting different frames or different image quality
-  mutable boost::mutex                                    _dicomFilesMutex; //to prevent multiple threads modifying the _dicomFiles
-
-  bool getDicomFile(const std::string instanceId, OrthancPluginMemoryBuffer& buffer) const;
-//  void increfDicomFile(const std::string instanceId);
-  void decrefDicomFile(const std::string instanceId) const;
-//  void addDicomFile(const std::string instanceId, OrthancPluginMemoryBuffer& buffer);
-
+  DicomRepository* _dicomRepository;
+  bool _cachedImageStorageEnabled;
   mutable boost::mutex mutex_;
 
   Image* _GetImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const;
