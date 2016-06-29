@@ -72,7 +72,8 @@ module.exports = function(config) {
         // we reload phantomjs everytimes it fails up to 100 times...
         captureTimeout: 60000,
         browserDisconnectTimeout: 10000,
-        browserDisconnectTolerance: 100, // by default 0
-        browserNoActivityTimeout: 1000 // by default 10000
+        browserDisconnectTolerance: 5, // by default 0
+        // 30 sec to allow slow png compression processing
+        browserNoActivityTimeout: 30000 // by default 10000
     });
 };

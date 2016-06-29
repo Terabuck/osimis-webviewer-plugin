@@ -53,7 +53,7 @@ OrthancServer.loadExecutable(orthancFolder, OrthancServerVersion.NIGHTLY)
 OrthancServer.executableFolder = orthancFolder
 server = OrthancServer('Files', 'Files', orthancPort1, orthancPort2)
 server.config['HttpCompressionEnabled'] = False
-server.setStdoutCallback(lambda msg: print('[ORT] ' + msg))
+# server.setStdoutCallback(lambda msg: print('[ORT] ' + msg))
 server.addPlugin('OsimisWebViewer')
 server.launch()
 
@@ -65,7 +65,6 @@ client = OrthancClient('http://127.0.0.1:' + str(orthancPort2))
 instancesIds = []
 for path in os.listdir(dicomSamplesFolder):
     imagePath = os.path.join(dicomSamplesFolder, path)
-    print(imagePath)
     if os.path.isfile(imagePath) and '/.' not in imagePath:
         instancesIds.append(client.uploadDicomFile(imagePath))
 
