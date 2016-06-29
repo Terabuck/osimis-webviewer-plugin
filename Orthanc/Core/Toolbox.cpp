@@ -111,19 +111,25 @@ extern "C"
 
 namespace Orthanc
 {
-  static bool finish;
+  static bool finish_;
+  static ServerBarrierEvent barrierEvent_;
 
 #if defined(_WIN32)
   static BOOL WINAPI ConsoleControlHandler(DWORD dwCtrlType)
   {
     // http://msdn.microsoft.com/en-us/library/ms683242(v=vs.85).aspx
-    finish = true;
+    finish_ = true;
     return true;
   }
 #else
-  static void SignalHandler(int)
+  static void SignalHandler(int signal)
   {
-    finish = true;
+    if (signal == SIGHUP)
+    {
+      barrierEvent_ = ServerBarrierEvent_Reload;
+    }
+
+    finish_ = true;
   }
 #endif
 
@@ -140,7 +146,7 @@ namespace Orthanc
   }
 
 
-  static void ServerBarrierInternal(const bool* stopFlag)
+  static ServerBarrierEvent ServerBarrierInternal(const bool* stopFlag)
   {
 #if defined(_WIN32)
     SetConsoleCtrlHandler(ConsoleControlHandler, true);
@@ -148,11 +154,13 @@ namespace Orthanc
     signal(SIGINT, SignalHandler);
     signal(SIGQUIT, SignalHandler);
     signal(SIGTERM, SignalHandler);
+    signal(SIGHUP, SignalHandler);
 #endif
   
     // Active loop that awakens every 100ms
-    finish = false;
-    while (!(*stopFlag || finish))
+    finish_ = false;
+    barrierEvent_ = ServerBarrierEvent_Stop;
+    while (!(*stopFlag || finish_))
     {
       Toolbox::USleep(100 * 1000);
     }
@@ -163,19 +171,22 @@ namespace Orthanc
     signal(SIGINT, NULL);
     signal(SIGQUIT, NULL);
     signal(SIGTERM, NULL);
+    signal(SIGHUP, NULL);
 #endif
+
+    return barrierEvent_;
   }
 
 
-  void Toolbox::ServerBarrier(const bool& stopFlag)
+  ServerBarrierEvent Toolbox::ServerBarrier(const bool& stopFlag)
   {
-    ServerBarrierInternal(&stopFlag);
+    return ServerBarrierInternal(&stopFlag);
   }
 
-  void Toolbox::ServerBarrier()
+  ServerBarrierEvent Toolbox::ServerBarrier()
   {
     const bool stopFlag = false;
-    ServerBarrierInternal(&stopFlag);
+    return ServerBarrierInternal(&stopFlag);
   }
 
 
@@ -582,12 +593,24 @@ namespace Orthanc
   void Toolbox::DecodeBase64(std::string& result, 
                              const std::string& data)
   {
+    for (size_t i = 0; i < data.length(); i++)
+    {
+      if (!isalnum(data[i]) &&
+          data[i] != '+' &&
+          data[i] != '/' &&
+          data[i] != '=')
+      {
+        // This is not a valid character for a Base64 string
+        throw OrthancException(ErrorCode_BadFileFormat);
+      }
+    }
+
     result = base64_decode(data);
   }
 
 
 #  if BOOST_HAS_REGEX == 1
-  void Toolbox::DecodeDataUriScheme(std::string& mime,
+  bool Toolbox::DecodeDataUriScheme(std::string& mime,
                                     std::string& content,
                                     const std::string& source)
   {
@@ -599,10 +622,11 @@ namespace Orthanc
     {
       mime = what[1];
       DecodeBase64(content, what[2]);
+      return true;
     }
     else
     {
-      throw OrthancException(ErrorCode_BadFileFormat);
+      return false;
     }
   }
 #  endif

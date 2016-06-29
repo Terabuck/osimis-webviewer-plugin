@@ -6,11 +6,12 @@ TODO: the history below is the Orthanc Viewer history.  We should now maintain t
 * New API to allow image resizing (i.e. thumbnails)
 * Option "EnableCache" to activate pre-extraction of JPG images from DICOM files
 * Option "EnableGdcm" to replace the built-in decoder of Orthanc with GDCM
+* Option "RestrictTransferSyntaxes" saying which transfer syntaxes should be decoded with GDCM
 * Fixed rendering of 16bpp images if values are < 0 or >= 32768
 * Decoding of JPEG2000 lossless images with YBR_RCT photometric interpretation
 
 
-Version 2.0 (2015-12-10)
+Version 2.1 (2015-12-10)
 ========================
 
 * Automatic clearing of the cache if change in the version of Orthanc or of the plugin
