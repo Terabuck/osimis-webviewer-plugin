@@ -39,7 +39,8 @@
             _this._currentTask.onAbort.close(_this); // Close listener
             _this._currentTask = null;
             _this.onAvailable.trigger();
-    }, false);
+        }, false);
+
         this._workerThread.addEventListener('error', function(evt) {
             var task = _this._currentTask;
 

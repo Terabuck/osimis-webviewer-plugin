@@ -178,16 +178,32 @@ module.exports = function() {
             files: [].concat(
                 bowerFiles,
                 config.specHelpers,
-                // Ignore unit tests for now
-                // @todo remove bard & ngmock from unit tests
+                client + 'config.js',
 
-                // clientApp + '**/*.module.js',
-                // clientApp + '**/*.js',
-                // temp + config.templateCache.file
+                // Make sure worker files aren't included
+                {pattern: clientApp + '**/*.worker/*.js', included: false, served: true},
+
+                clientApp + '**/*.module.js',
+                clientApp + '**/!(*.worker)/*.js',
+                temp + config.templateCache.file,
 
                 './integration-tests/**/*.spec.js'
             ),
-            exclude: [],
+            exclude: [
+                // Exclude worker code uncompatible with mocha
+                // clientApp + '**/*.worker/main.js',
+                // Ignore specs for now - @todo fix back old specs
+                clientApp + '**/*.spec.js'
+            ],
+            client: {
+                // Load workers-related files in web workers
+                mochaWebWorker: {
+                    pattern : [
+                        clientApp + '**/*.worker/*.js'
+                    ],
+                }
+            },
+
             coverage: {
                 dir: report + 'coverage',
                 reporters: [
