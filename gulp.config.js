@@ -38,8 +38,7 @@ module.exports = function() {
         images: client + 'images/**/*.*',
         indexes: [
             client + 'index.html',
-            client + 'plugin-entrypoint.html',
-            client + 'integration-tests.html'
+            client + 'plugin-entrypoint.html'
         ],
         config: client + 'config.js',
         // app js, with no specs
@@ -66,8 +65,7 @@ module.exports = function() {
         temp: temp,
         tempIndexes: [
             temp + 'index.html',
-            temp + 'plugin-entrypoint.html',
-            temp + 'integration-tests.html'
+            temp + 'plugin-entrypoint.html'
         ],
         /**
          * optimized files
