@@ -17,7 +17,7 @@ imageName='osimis/orthanc-webviewer-plugin'
 gitLongTag=$(git describe --long --dirty)
 branchName=${1:-$(git rev-parse --abbrev-ref HEAD)} #if no argument defined, get the branch name from git
 
-if [ "$branchName" == "master" ]; then
+if [[ $branchName == "master" ]]; then
 	
 	#in the master branch, make sure the tag is clean ('1.2.3'; not 1.2.3-alpha) and there has been 0 commits since the tag has been set.
 	if [[ $gitLongTag =~ [0-9]+.[0-9]+.[0-9]+-0-[0-9a-g]{8}$ ]]; then 
@@ -36,7 +36,7 @@ else
 	
 	#if the branch name is something like 'am/WVB-27', the image tag should be 'am-WVB-27'
 	#replace / by -
-	imageTag=${imageTag/\//-}
+	imageTag=${imageTag//\//-}
 fi
 
 #build and push to docker hub
@@ -44,7 +44,7 @@ docker build -t $imageName:$imageTag .
 docker push $imageName:$imageTag
 
 #if in master branch, the current tag should also be marked as the latest
-if [ "$branchName" == "master" ]; then
+if [[ $branchName == "master" ]]; then
 	docker tag $imageName:$imageTag $imageName:latest
 	docker push $imageName:latest
 fi
