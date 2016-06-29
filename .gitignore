@@ -2,6 +2,10 @@
 # https://docs.npmjs.com/misc/faq#should-i-check-my-node-modules-folder-into-git
 node_modules/
 bower_components/
+osimis-test-runner/src/
+osimis-test-runner/env/
+osimis-test-runner/orthanc/
+osimis-test-runner/Orthanc_Files/
 
 # Build directory
 /build/
