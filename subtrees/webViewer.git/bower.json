@@ -22,9 +22,9 @@
     "url": "https://bitbucket.org/osimis/osimis-webviewer.git"
   },
   "devDependencies": {
-    "angular-mocks": "^1.5.0",
     "sinon": "http://sinonjs.org/releases/sinon-1.12.1.js",
-    "bardjs": "^0.1.8"
+    "bardjs": "^0.1.8",
+    "angular-mocks": "^1.5.0"
   },
   "dependencies": {
     "jquery": "^2.2.0",
