@@ -3,10 +3,10 @@
 
     angular
         .module('webviewer')
-        .factory('wvOrthancSerieAdapter', wvOrthancSerieAdapter);
+        .factory('wvOrthancSeriesAdapter', wvOrthancSeriesAdapter);
 
     /* @ngInject */
-    function wvOrthancSerieAdapter(WvSerie) {
+    function wvOrthancSeriesAdapter(WvSeries) {
         var service = {
             process: process
         };
@@ -14,8 +14,8 @@
 
         ////////////////
 
-        function process(orthancSerie, orthancOrderedInstances, tags) {
-            // for each instance in one serie, retrieve each image ids
+        function process(orthancSeries, orthancOrderedInstances, tags) {
+            // for each instance in one series, retrieve each image ids
             var imagesByInstance = orthancOrderedInstances.SlicesShort
                 // .reverse()
                 .map(function(instance) {
@@ -38,23 +38,23 @@
                 .length === imagesByInstance.length; // each instances have only one image
             
             if (isSingleFrame) {
-                // if image is mono frame, set one serie = many instances / mono frames
-                var imagesBySerie = [_.flatten(imagesByInstance)];
+                // if image is mono frame, set one series = many instances / mono frames
+                var imagesBySeries = [_.flatten(imagesByInstance)];
             }
             else {
-                // if image is multi frame, set one serie = one instance / many frames
-                var imagesBySerie = imagesByInstance;
+                // if image is multi frame, set one series = one instance / many frames
+                var imagesBySeries = imagesByInstance;
             }
             
-            // instanciate serie objects
-            var series = imagesBySerie.map(function(imageIds, serieIndex) {
-                var id = orthancSerie.ID + ':' + serieIndex;
-                tags = tags || orthancSerie.MainDicomTags;
+            // instanciate series objects
+            var seriesList = imagesBySeries.map(function(imageIds, seriesIndex) {
+                var id = orthancSeries.ID + ':' + seriesIndex;
+                tags = tags || orthancSeries.MainDicomTags;
 
-                return new WvSerie(id, imageIds, tags);
+                return new WvSeries(id, imageIds, tags);
             });
 
-            return series;
+            return seriesList;
         }
     }
 

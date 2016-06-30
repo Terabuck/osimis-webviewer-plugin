@@ -412,7 +412,7 @@
                 /** Draw the binary
                  * Use Cases:
                  *   (1. Window Resize -> Reset Canvas : reset scale & translation) on ImageDisplayer#resizeCanvas call - not when onBinaryLoaded
-                 *   2. Serie change or manual reset -> Reset Parameters : reset scale, translation & everything else (windowing, ...)
+                 *   2. Series change or manual reset -> Reset Parameters : reset scale, translation & everything else (windowing, ...)
                  *   3. Image change -> Convert Parameters to new Image Resolution
                  *   4. Resolution change -> Convert Parameters to new Image Resolution
                  */

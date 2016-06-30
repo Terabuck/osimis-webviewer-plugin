@@ -3,7 +3,7 @@ window.orthanc = (function(orthanc) {
 	orthanc.studies = {
 		withMultiFrameInstances: orthanc.raw['studies/4eddbf0e-719f42fb-4c6cea20-a778371c-51868ee5']
 	};
-	orthanc.series = {
+	orthanc.seriesList = {
 		with2SingleFrameInstances: orthanc.raw['series/a14c33b2-f2c9488a-bde0f4c6-8d4abde2-5bdf3c74'],
 		with2MultiFrameInstances: orthanc.raw['series/a763443a-c8e1bc0a-c557ae4f-ed8acaf3-7a526448']
 	};

@@ -3,18 +3,18 @@
 
     angular
         .module('webviewer')
-        .directive('wvDraggableSerieExt', wvDraggableSerieExt)
+        .directive('wvDraggableSeriesExt', wvDraggableSeriesExt)
         .config(function($provide) {
-            $provide.decorator('wvSerieIdDirective', function($delegate) {
+            $provide.decorator('wvSeriesIdDirective', function($delegate) {
                 var directive = $delegate[0];
-                directive.require['wvDraggableSerieExt'] = '?^wvDraggableSerieExt';
+                directive.require['wvDraggableSeriesExt'] = '?^wvDraggableSeriesExt';
 
                 return $delegate;
             });
         });
 
     /* @ngInject */
-    function wvDraggableSerieExt() {
+    function wvDraggableSeriesExt() {
         // Usage:
         //
         // Creates:
@@ -33,12 +33,12 @@
 
     /* @ngInject */
     function Controller($scope, $element, $attrs) {
-        var _wvSerieIdViewModels = [];
+        var _wvSeriesIdViewModels = [];
         this.register = function(viewmodel) {
-            _wvSerieIdViewModels.push(viewmodel);
+            _wvSeriesIdViewModels.push(viewmodel);
         };
         this.unregister = function(viewmodel) {
-            _.pull(_wvSerieIdViewModels, viewmodel);
+            _.pull(_wvSeriesIdViewModels, viewmodel);
         };
 
         var clone = $('<div class="wv-draggable-clone"></div>');
@@ -47,13 +47,13 @@
                 return clone;
             },
             start: function(evt, ui) {
-                var serie = _wvSerieIdViewModels[0].getSerie();
-                if (!serie) {
+                var series = _wvSeriesIdViewModels[0].getSeries();
+                if (!series) {
                     return;
                 }
 
                 var draggedElement = ui.helper;
-                draggedElement.data('serie-id', serie.id);
+                draggedElement.data('series-id', series.id);
                 draggedElement.width($element.width());
                 draggedElement.height($element.height());
             },

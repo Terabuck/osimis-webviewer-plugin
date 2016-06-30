@@ -1,5 +1,5 @@
 /* jshint -W117, -W030 */
-describe('serie', function () {
+describe('series', function () {
     var _apiUrl = 'http://localhost:8042';
     var _study;
 
@@ -7,7 +7,7 @@ describe('serie', function () {
         bard.appModule('webviewer');
         
         bard.inject(this, '$controller', '$q', '$rootScope', '$timeout', '$httpBackend',
-            'wvConfig', 'wvSerieManager');
+            'wvConfig', 'wvSeriesManager');
     });
 
     bard.verifyNoOutstandingHttpRequests();
@@ -19,10 +19,10 @@ describe('serie', function () {
         xit('should change the selected instance', function() {
 
         });
-        xit('should play the serie', function() {
+        xit('should play the series', function() {
 
         });
-        xit('should pause the serie', function() {
+        xit('should pause the series', function() {
 
         });
     });

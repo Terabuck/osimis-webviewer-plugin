@@ -1,15 +1,15 @@
 <ul class="{{wvClass.ul}}">
   	<li
-  		ng-repeat="id in serieIds"
+  		ng-repeat="id in seriesIds"
   		class="{{wvClass.li}}"
   		ng-transclude
   		wv-size-tag
 	>
-	    <wv-viewport wv-serie-id="id" wv-image="$image" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}"
-	    	wv-draggable-serie-ext wv-scroll-on-over-serie-ext
+	    <wv-viewport wv-series-id="id" wv-image="$image" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}"
+	    	wv-draggable-series-ext wv-scroll-on-over-series-ext
     	>
 		    <wv-overlay wv-tags="$image.tags">
-		    	<div class="wv-serielist-overlay">
+		    	<div class="wv-serieslist-overlay">
 	        		{{$image.tags.SeriesDescription}}
 	        	</div>
 		    </wv-overlay>

@@ -159,7 +159,7 @@ describe('viewport', function() {
         });
 	});
 
-	describe('directive\'s controller', function() { // used by serie's directive for instance
+	describe('directive\'s controller', function() { // used by series' directive for instance
 	    
         osi.beforeEach();
         osi.afterEach();

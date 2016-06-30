@@ -3,11 +3,11 @@
 
     angular
         .module('webviewer')
-        .run(function($rootScope, wvSerieManager, wvImageBinaryManager, WvImageQualities) {
+        .run(function($rootScope, wvSeriesManager, wvImageBinaryManager, WvImageQualities) {
             // @todo preload tags too ?
 
             $rootScope.$on('UserSelectedStudyId', function(evt, studyId) {
-                wvSerieManager
+                wvSeriesManager
                     .listFromOrthancStudyId(studyId)
                     .then(function(seriesList) {
                         // Preload every series' thumbnails
@@ -23,7 +23,7 @@
             });
 
             $rootScope.$on('UserUnSelectedStudyId', function(evt, studyId) {
-                wvSerieManager
+                wvSeriesManager
                     .listFromOrthancStudyId(studyId)
                     .then(function(seriesList) {
                         // Abort preloading

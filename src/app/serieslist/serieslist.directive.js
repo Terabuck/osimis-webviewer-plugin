@@ -2,18 +2,18 @@
 
 /**
  * @ngdoc directive
- * @name webviewer.directive:wvSerieManagerlist
+ * @name webviewer.directive:wvSeriesManagerlist
  * @description
- * # wvSerieManagerlist
+ * # wvSeriesManagerlist
  */
 angular.module('webviewer')
-.directive('wvSerielist', ['wvSerieManager', function(wvSerieManager) {
+.directive('wvSerieslist', ['wvSeriesManager', function(wvSeriesManager) {
 return {
   scope: {
     wvStudy: '=',
     wvClassTmp: '=?wvClass'
   },
-  templateUrl: 'app/serielist/serielist.directive.html',
+  templateUrl: 'app/serieslist/serieslist.directive.html',
   restrict: 'E',
   transclude: true,
   link: function postLink(scope, element, attrs) {
@@ -24,17 +24,17 @@ return {
     });
 
     scope.$watch('wvStudy.id', _setStudy);
-    scope.serieIds = []; // @todo allow user defined specific set
+    scope.seriesIds = []; // @todo allow user defined specific set
 
     function _setStudy(id, old) {
       if (!id) return; 
       // @todo handle IsStable === false
 
-      wvSerieManager
+      wvSeriesManager
         .listFromOrthancStudyId(id)
-        .then(function(series) {
-          scope.serieIds = series.map(function(serie) {
-            return serie.id;
+        .then(function(seriesList) {
+          scope.seriesIds = seriesList.map(function(series) {
+            return series.id;
           });
         });
       
@@ -44,9 +44,9 @@ return {
       scope.wvClass = scope.wvClassTmp || {};
 
       var cssClasses = {
-        ul: scope.wvClass.ul || 'wv-serielist',
-        li: scope.wvClass.li || 'wv-serielist-item',
-        overlay: scope.wvClass.ul || 'wv-serielist-overlay'
+        ul: scope.wvClass.ul || 'wv-serieslist',
+        li: scope.wvClass.li || 'wv-serieslist-item',
+        overlay: scope.wvClass.ul || 'wv-serieslist-overlay'
       };
       
       scope.wvClass = cssClasses;
