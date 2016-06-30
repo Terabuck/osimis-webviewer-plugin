@@ -1,33 +1,52 @@
 describe('plugin', function() {
 
-    beforeEach(function() {
-        this.timeout(30000); // Set a longer timeout for image compression
+    this.timeout(30000); // Set a long timeout because image compression can takes longer than the default 2s timeout
 
+    beforeEach(function() {
         bard.asyncModule('webviewer');
         bard.inject('wvImageBinaryManager', 'WvImageQualities');
+
+        imageId = '04389b99-731fd35c-a8ba10a0-a1d9cb32-d7dbd903:0';
     });
+
+    var imageId;
+    var imageSize = {
+        highQuality: 8389800,
+        mediumQuality: 746000,
+        lowQuality: 16800
+    };
 
     describe('route /images/<instance>/high-quality', function() {
 
         it('should load an high quality version of the image', function(done) {
+            // Retrieve image with LOSSLESS quality
             wvImageBinaryManager
-                .get('04389b99-731fd35c-a8ba10a0-a1d9cb32-d7dbd903:0', WvImageQualities.LOSSLESS)
-                .then(function() {
+                .get(imageId, WvImageQualities.LOSSLESS)
+                .then(function(pixelObject) {
+                    // Succeed if image has been retrieved
                     assert.ok(true);
+
+                    // Check the image has high quality
+                    assert.equal(pixelObject.sizeInBytes, imageSize.highQuality);
+                    
                     done();
                 }, function(error) {
+                    // Fail on error - if image should have been retrieved
                     assert.fail();
                     done();
                 });
         });
 
-        it('should fail on unknown instance', function(done) {
+        it('should fail on inexistant image', function(done) {
+            // Retrieve inexistant image
             wvImageBinaryManager
                 .get('robocop:34', WvImageQualities.LOSSLESS)
                 .then(function() {
+                    // Fail if inexistant image request returns successful result
                     assert.fail();
                     done();
                 }, function(error) {
+                    // Succeed on error - if image has not been retrieved
                     assert.ok(true);
                     done();
                 });
@@ -38,24 +57,34 @@ describe('plugin', function() {
     describe('route /images/<instance>/medium-quality', function() {
 
         it('should load an medium quality version of the image', function(done) {
+            // Retrieve image with MEDIUM quality
             wvImageBinaryManager
-                .get('04389b99-731fd35c-a8ba10a0-a1d9cb32-d7dbd903:0', WvImageQualities.MEDIUM)
-                .then(function() {
+                .get(imageId, WvImageQualities.MEDIUM)
+                .then(function(pixelObject) {
+                    // Succeed if image has been retrieved
                     assert.ok(true);
+
+                    // Check the image has medium quality
+                    assert.equal(pixelObject.sizeInBytes, imageSize.mediumQuality);
+
                     done();
                 }, function(error) {
-                    assert.fail(null, null, error);
+                    // Fail on error - if image should have been retrieved
+                    assert.fail();
                     done();
                 });
         });
 
-        it('should fail on unknown instance', function(done) {
+        it('should fail on inexistant image', function(done) {
+            // Retrieve inexistant image
             wvImageBinaryManager
                 .get('robocop:34', WvImageQualities.MEDIUM)
                 .then(function() {
+                    // Fail if inexistant image request returns successful result
                     assert.fail();
                     done();
                 }, function(error) {
+                    // Succeed on error - if image has not been retrieved
                     assert.ok(true);
                     done();
                 });
@@ -66,24 +95,34 @@ describe('plugin', function() {
     describe('route /images/<instance>/low-quality', function() {
 
         it('should load an low quality version of the image', function(done) {
+            // Retrieve image with LOW quality
             wvImageBinaryManager
-                .get('04389b99-731fd35c-a8ba10a0-a1d9cb32-d7dbd903:0', WvImageQualities.LOW)
-                .then(function() {
+                .get(imageId, WvImageQualities.LOW)
+                .then(function(pixelObject) {
+                    // Succeed if image has been retrieved
                     assert.ok(true);
+                    
+                    // Check the image has low quality
+                    assert.equal(pixelObject.sizeInBytes, imageSize.lowQuality);
+
                     done();
                 }, function(error) {
-                    assert.fail(null, null, error);
+                    // Fail on error - if image should have been retrieved
+                    assert.fail();
                     done();
                 });
         });
 
-        it('should fail on unknown instance', function(done) {
+        it('should fail on inexistant image', function(done) {
+            // Retrieve inexistant image
             wvImageBinaryManager
                 .get('robocop:34', WvImageQualities.LOW)
                 .then(function() {
+                    // Fail if inexistant image request returns successful result
                     assert.fail();
                     done();
                 }, function(error) {
+                    // Succeed on error - if image has not been retrieved
                     assert.ok(true);
                     done();
                 });
