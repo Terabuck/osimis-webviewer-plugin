@@ -105,10 +105,10 @@
         // chose quality depending of viewport size
         var quality = null;
         if (this._canvasWidth <= 150 || this._canvasHeight <= 150) {
-            quality = availableQualities.R150J100;
+            quality = availableQualities.LOW;
         }
         else if (this._canvasWidth <= 1000 || this._canvasHeight <= 1000) {
-            quality = availableQualities.R1000J100;
+            quality = availableQualities.MEDIUM;
         }
         else {
             quality = availableQualities.LOSSLESS;

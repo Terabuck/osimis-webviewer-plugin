@@ -7,8 +7,8 @@
         .constant('WvImageQualities', {
             // 0 is reserved as none..
         	LOSSLESS: 100,
-			R150J100: 1, // resampling to 150 px + compressed to jpeg100
-			R1000J100: 2 // resampling to 1000 px + compressed to jpeg100
+			LOW: 1, // resampling to 150 px + compressed to jpeg100
+			MEDIUM: 2 // resampling to 1000 px + compressed to jpeg100
         });
 
     /* @ngInject */
@@ -176,8 +176,8 @@
 
             // Flush lossless files
             _flushCache(WvImageQualities.LOSSLESS, 1024 * 1024 * 700); // Max 700mo
-            _flushCache(WvImageQualities.R1000J100, 1024 * 1024 * 700); // Max 700mo
-            _flushCache(WvImageQualities.R150J100, 1024 * 1024 * 300); // Max 300mo
+            _flushCache(WvImageQualities.MEDIUM, 1024 * 1024 * 700); // Max 700mo
+            _flushCache(WvImageQualities.LOW, 1024 * 1024 * 300); // Max 300mo
 
             function _flushCache(quality, cacheSizeLimit) {
                 totalFlushedCacheSizeByQuality[quality] = totalFlushedCacheSizeByQuality[quality] || 0;

@@ -64,10 +64,8 @@ function setImageApiUrl(rootUrl) {
 var Qualities = {
     // 0 is reserved as none..
     LOSSLESS: 100,
-    // THUMBNAIL
-    // MEDIUM
-    R150J100: 1, // resampling to 150 px + compressed to jpeg100
-    R1000J100: 2 // resampling to 1000 px + compressed to jpeg100
+    LOW: 1, // resampling to 150 px + compressed to jpeg100
+    MEDIUM: 2 // resampling to 1000 px + compressed to jpeg100
 };
 
 self.addEventListener('message', function(evt) {
@@ -133,15 +131,16 @@ function BinaryRequest(id, quality) {
     var url = null;
     switch (quality) {
     case Qualities.LOSSLESS:
-        url = ImageApiURL + instanceId + '/' + frameIndex + '/png' + '/klv';
+        url = ImageApiURL + instanceId + '/' + frameIndex + '/high-quality';
         break;
-    case Qualities.R1000J100:
-        url = ImageApiURL + instanceId + '/' + frameIndex + '/resize:1000' + '/8bit' + '/jpeg:100' + '/klv';
+    case Qualities.MEDIUM:
+        url = ImageApiURL + instanceId + '/' + frameIndex + '/medium-quality';
         break;
-    case Qualities.R150J100:
-        url = ImageApiURL + instanceId + '/' + frameIndex + '/resize:150' + '/8bit' + '/jpeg:100' + '/klv';
+    case Qualities.LOW:
+        url = ImageApiURL + instanceId + '/' + frameIndex + '/low-quality';
         break;
     default:
+        _processingRequest = null; // cleaning request
         throw new Error('Undefined quality: ' + quality);
     }
 
@@ -161,20 +160,25 @@ BinaryRequest.prototype.execute = function() {
         }
 
         if (xhr.status === 200) {
-            // process binary out of the klv
-            var arraybuffer = xhr.response;
-            var data = parseKLV(arraybuffer);
+            try {
+                // process binary out of the klv
+                var arraybuffer = xhr.response;
+                var data = parseKLV(arraybuffer);
 
-            if (data.decompression.compression === 'Jpeg') {
-                // Decompress lossy jpeg into 16bit
-                var pixelArray = parseJpeg(data.decompression);
-                pixelArray = convertBackTo16bit(pixelArray, data.decompression);
+                if (data.decompression.compression === 'Jpeg') {
+                    // Decompress lossy jpeg into 16bit
+                    var pixelArray = parseJpeg(data.decompression);
+                    pixelArray = convertBackTo16bit(pixelArray, data.decompression);
+                }
+                else if (data.decompression.compression === 'Png') {
+                    // Decompress lossless png
+                    var pixelArray = parsePng(data.decompression)
+                }
             }
-            else if (data.decompression.compression === 'Png') {
-                // Decompress lossless png
-                var pixelArray = parsePng(data.decompression)
+            catch (e) {
+                _processingRequest = null; // cleaning request
+                throw e;
             }
-            
 
             // stock the format of the array, and return the array's buffer
             // with its format instead of the array itself (array can't be worker transferable object but buffer can)
@@ -192,6 +196,7 @@ BinaryRequest.prototype.execute = function() {
                 pixelBufferFormat = 'Int16';
             }
             else {
+                _processingRequest = null; // cleaning request
                 throw new Error("Unexpected array binary format");
             }
 
@@ -287,6 +292,7 @@ function parseKLV(arraybuffer) {
 
     var compression = klvReader.getString(keys.Compression);
     if (compression !== 'Jpeg' && compression !== 'Png') {
+        _processingRequest = null; // cleaning request
         throw new Error('unknown compression');
     }
 
@@ -360,6 +366,7 @@ function parsePng(config) {
         pixels = new Uint8Array(s.buffer);
     }
     else {
+        _processingRequest = null; // cleaning request
         throw new Error('unexpected png format');
     }
 

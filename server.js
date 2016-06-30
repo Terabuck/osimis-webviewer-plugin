@@ -37,17 +37,24 @@ app.all("/orthanc/*", function(req, res) {
     req.removeAllListeners('end');
 
     process.nextTick(function () {
-    if(req.body) {
-        if(req.header("Content-Type") == "application/x-www-form-urlencoded"){
-            req.emit('data', serializedIntoFormData(req.body));
-        }else{
-            req.emit('data', JSON.stringify(req.body));
-        }
+        if(req.body) {
+            if(req.header("Content-Type") == "application/x-www-form-urlencoded"){
+                req.emit('data', serializedIntoFormData(req.body));
+            }else{
+                req.emit('data', JSON.stringify(req.body));
+            }
 
-    }
-    req.emit('end');
+        }
+        req.emit('end');
     });
-    orthancProxy.web(req, res, {target: orthancUrl});
+
+    try {
+        orthancProxy.web(req, res, {target: orthancUrl});
+    }
+    catch (e) {
+        
+    }
+
 });
 
 switch (environment){
