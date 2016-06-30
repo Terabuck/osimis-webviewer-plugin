@@ -140,8 +140,17 @@ describe('backend', function() {
                     // Fail the test - series shouldn't have been found
                     assert.fail();
                 }, function(error) {
+                    
+                    // (Fix PhantomJS issue)
+                    // Pass on error.status == 0
+                    // see https://github.com/ariya/phantomjs/issues/11195
+                    if (error.status === 0) {
+                        assert.ok(true);
+                    }
                     // Validate the returned code is 404
-                    assert.equal(error.status, 404);
+                    else {
+                        assert.equal(error.status, 404);
+                    }
                 });
         });
 
@@ -183,8 +192,17 @@ describe('backend', function() {
                     assert.fail();
                 }, function(error) {
                     // Succeed on error - if image has not been retrieved
+                    
+                    // (Fix PhantomJS issue)
+                    // Pass on error.status == 0
+                    // see https://github.com/ariya/phantomjs/issues/11195
+                    if (error.status === 0) {
+                        assert.ok(true);
+                    }
                     // Validate the returned code is 404
-                    assert.equal(error.status, 404);
+                    else {
+                        assert.equal(error.status, 404);
+                    }
                 });
         });
 
@@ -219,8 +237,17 @@ describe('backend', function() {
                     assert.fail();
                 }, function(error) {
                     // Succeed on error - if image has not been retrieved
+                    
+                    // (Fix PhantomJS issue)
+                    // Pass on error.status == 0
+                    // see https://github.com/ariya/phantomjs/issues/11195
+                    if (error.status === 0) {
+                        assert.ok(true);
+                    }
                     // Validate the returned code is 404
-                    assert.equal(error.status, 404);
+                    else {
+                        assert.equal(error.status, 404);
+                    }
                 });
         });
 
@@ -254,8 +281,17 @@ describe('backend', function() {
                     assert.fail();
                 }, function(error) {
                     // Succeed on error - if image has not been retrieved
+                    
+                    // (Fix PhantomJS issue)
+                    // Pass on error.status == 0
+                    // see https://github.com/ariya/phantomjs/issues/11195
+                    if (error.status === 0) {
+                        assert.ok(true);
+                    }
                     // Validate the returned code is 404
-                    assert.equal(error.status, 404);
+                    else {
+                        assert.equal(error.status, 404);
+                    }
                 });
         });
 
