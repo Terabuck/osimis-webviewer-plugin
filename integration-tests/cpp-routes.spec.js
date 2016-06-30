@@ -10,11 +10,6 @@ describe('plugin', function() {
     });
 
     var imageId;
-    var imageSize = {
-        highQuality: 8389800,
-        mediumQuality: 746000,
-        lowQuality: 16800
-    };
     var imageResolution = {
         // width, height
         highQuality: [1770, 2370],
@@ -33,7 +28,6 @@ describe('plugin', function() {
                     assert.ok(true);
 
                     // Check the image has high quality
-                    assert.equal(pixelObject.sizeInBytes, imageSize.highQuality);
                     assert.equal(pixelObject.width, imageResolution.highQuality[0]);
                     assert.equal(pixelObject.height, imageResolution.highQuality[1]);
                     
@@ -73,7 +67,6 @@ describe('plugin', function() {
                     assert.ok(true);
 
                     // Check the image has medium quality
-                    assert.equal(pixelObject.sizeInBytes, imageSize.mediumQuality);
                     assert.equal(pixelObject.width, imageResolution.mediumQuality[0]);
                     assert.equal(pixelObject.height, imageResolution.mediumQuality[1]);
 
@@ -113,7 +106,6 @@ describe('plugin', function() {
                     assert.ok(true);
                     
                     // Check the image has low quality
-                    assert.equal(pixelObject.sizeInBytes, imageSize.lowQuality);
                     assert.equal(pixelObject.width, imageResolution.lowQuality[0]);
                     assert.equal(pixelObject.height, imageResolution.lowQuality[1]);
 
