@@ -37,6 +37,7 @@ if (!location || !location.origin) {
 var ImageApiURL = undefined;
 function setImageApiUrl(rootUrl) {
     // Import config.js for window.orthancUrl
+    // @todo configure via wvConfigProvider.setApiURL instead
     importScripts(rootUrl + '/config.js');
     var orthancUrl = window.orthancUrl;
     
