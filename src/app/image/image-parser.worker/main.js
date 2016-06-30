@@ -27,8 +27,14 @@ var window = {};
 var PNG = window.PNG;
 var KLVReader = WorkerGlobalScope.KLVReader;
 
-var ImageApiURL = undefined;
+// dirty FIX PhantomJS for unit tests
+if (!location || !location.origin) {
+    var location = {
+        origin: 'http://localhost:9876'
+    };
+}
 
+var ImageApiURL = undefined;
 function setImageApiUrl(rootUrl) {
     // Import config.js for window.orthancUrl
     importScripts(rootUrl + '/config.js');

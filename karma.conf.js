@@ -7,7 +7,7 @@ module.exports = function(config) {
 
         // frameworks to use
         // some available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-        frameworks: ['mocha', 'chai', 'sinon', 'chai-sinon'],
+        frameworks: ['mocha', 'chai', 'sinon', 'chai-sinon', 'mocha-webworker'],
 
         // list of files / patterns to load in the browser
         files: gulpConfig.karma.files,
@@ -15,8 +15,15 @@ module.exports = function(config) {
         // list of files to exclude
         exclude: gulpConfig.karma.exclude,
 
+        client: gulpConfig.karma.client,
+
         proxies: {
-            '/': 'http://localhost:8888/'
+            // Add orthanc route
+            '/orthanc/': 'http://localhost:8042/',
+            // Proxy for web worker to work with mocha
+            '/app/': '/base/src/app/',
+            '/bower_components/': '/base/bower_components/',
+            '/config.js': '/base/src/config.js'
         },
 
         // preprocess matching files before serving them to the browser
@@ -65,7 +72,8 @@ module.exports = function(config) {
         // we reload phantomjs everytimes it fails up to 100 times...
         captureTimeout: 60000,
         browserDisconnectTimeout: 10000,
-        browserDisconnectTolerance: 100, // by default 0
-        browserNoActivityTimeout: 1000 // by default 10000
+        browserDisconnectTolerance: 5, // by default 0
+        // 30 sec to allow slow png compression processing
+        browserNoActivityTimeout: 30000 // by default 10000
     });
 };

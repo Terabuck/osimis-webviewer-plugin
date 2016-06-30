@@ -129,7 +129,6 @@ module.exports = function() {
         ],
         specHelpers: [client + 'test-helpers/**/*.js'],
         specs: [clientApp + '**/*.spec.js'],
-        // serverIntegrationSpecs: [client + '/tests/server-integration/**/*.spec.js'],
 
         /**
          * Node settings
@@ -179,12 +178,32 @@ module.exports = function() {
             files: [].concat(
                 bowerFiles,
                 config.specHelpers,
+                client + 'config.js',
+
+                // Make sure worker files aren't included
+                {pattern: clientApp + '**/*.worker/*.js', included: false, served: true},
+
                 clientApp + '**/*.module.js',
-                clientApp + '**/*.js',
-                temp + config.templateCache.file
-                // config.serverIntegrationSpecs
+                clientApp + '**/!(*.worker)/*.js',
+                temp + config.templateCache.file,
+
+                './integration-tests/**/*.spec.js'
             ),
-            exclude: [],
+            exclude: [
+                // Exclude worker code uncompatible with mocha
+                // clientApp + '**/*.worker/main.js',
+                // Ignore specs for now - @todo fix back old specs
+                clientApp + '**/*.spec.js'
+            ],
+            client: {
+                // Load workers-related files in web workers
+                mochaWebWorker: {
+                    pattern : [
+                        clientApp + '**/*.worker/*.js'
+                    ],
+                }
+            },
+
             coverage: {
                 dir: report + 'coverage',
                 reporters: [
