@@ -37,3 +37,7 @@ OrthancPluginErrorCode BaseController::_AnswerBuffer(const std::string& output, 
   OrthancPluginAnswerBuffer(OrthancContextManager::Get(), response_, output.c_str(), output.size(), mimeType.c_str());
   return OrthancPluginErrorCode_Success;
 }
+OrthancPluginErrorCode BaseController::_AnswerBuffer(const char* output, size_t outputSize, const std::string& mimeType) {
+  OrthancPluginAnswerBuffer(OrthancContextManager::Get(), response_, output, outputSize, mimeType.c_str());
+  return OrthancPluginErrorCode_Success;
+}

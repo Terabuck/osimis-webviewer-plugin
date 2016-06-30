@@ -17,7 +17,7 @@ IImageContainer* ResizePolicy::Apply(IImageContainer* input, ImageMetaData* meta
   RawImageContainer* inRawImage = dynamic_cast<RawImageContainer*>(input);
   if (!inRawImage)
   {
-    throw new std::invalid_argument("Input is not raw");
+    throw std::invalid_argument("Input is not raw");
     // @todo Throw exception : input is not a raw image
     return NULL;
   }

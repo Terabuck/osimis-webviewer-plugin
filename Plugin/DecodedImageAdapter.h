@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include "../Cache/ICacheFactory.h"
-
 #include <orthanc/OrthancCPlugin.h>
 #include <stdint.h>
 #include <json/value.h>
@@ -31,7 +29,7 @@
 
 namespace OrthancPlugins
 {
-  class DecodedImageAdapter : public ICacheFactory
+  class DecodedImageAdapter
   {
   private:
     enum CompressionType
@@ -67,7 +65,8 @@ namespace OrthancPlugins
     {
     }
 
-    virtual bool Create(std::string& content,
-                        const std::string& uri);  
+    // WARNING: No mutual exclusion is enforced! Several threads could
+    // call this method at the same time.
+    bool Create(std::string& content, const std::string& uri);  
   };
 }

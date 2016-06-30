@@ -89,7 +89,7 @@ RawImageContainer::gil_image_view_t RawImageContainer::GetGILImageView()
       break;
     }
     default:
-      throw new std::invalid_argument("Unsupported image format");
+      throw std::invalid_argument("Unsupported image format");
   }
 
 }

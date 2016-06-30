@@ -5,6 +5,7 @@
 #include <orthanc/OrthancCPlugin.h>
 #include "OrthancContextManager.h"
 
+// @todo boost::noncopyable
 class BaseController {
 public:
   BaseController(OrthancPluginRestOutput* response, const std::string& url, const OrthancPluginHttpRequest* request);
@@ -22,6 +23,7 @@ protected:
   virtual OrthancPluginErrorCode _ProcessRequest() = 0;
 
   OrthancPluginErrorCode _AnswerError(int error_code);
+  OrthancPluginErrorCode _AnswerBuffer(const char* output, size_t outputSize, const std::string& mimeType);
   OrthancPluginErrorCode _AnswerBuffer(const std::string& output, const std::string& mimeType);
 
 protected:

@@ -25,7 +25,7 @@ IImageContainer* JpegConversionPolicy::Apply(IImageContainer* input, ImageMetaDa
   RawImageContainer* rawImage = dynamic_cast<RawImageContainer*>(input);
   if (!rawImage)
   {
-    throw new std::invalid_argument("Input is not raw");
+    throw std::invalid_argument("Input is not raw");
     // @todo Throw exception : input is not a raw image
     return 0;
   }
@@ -34,7 +34,7 @@ IImageContainer* JpegConversionPolicy::Apply(IImageContainer* input, ImageMetaDa
   Orthanc::PixelFormat pixelFormat = accessor->GetFormat();
   if (pixelFormat != Orthanc::PixelFormat_Grayscale8 && pixelFormat != Orthanc::PixelFormat_RGB24)
   {
-    throw new std::invalid_argument("Input is not 8bit");
+    throw std::invalid_argument("Input is not 8bit");
     // @todo Throw exception : input is not 8bit
     return 0;
   }

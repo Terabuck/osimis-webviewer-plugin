@@ -3,12 +3,18 @@
 #include <boost/algorithm/string.hpp> // for boost::split
 
 #include "../BenchmarkHelper.h" // for BENCH(*)
+#include "ImageProcessingPolicy/LowQualityPolicy.h"
+#include "ImageProcessingPolicy/MediumQualityPolicy.h"
+#include "ImageProcessingPolicy/HighQualityPolicy.h"
+
+#if PLUGIN_ENABLE_DEBUG_ROUTE == 1
 #include "ImageProcessingPolicy/CompositePolicy.h"
 #include "ImageProcessingPolicy/ResizePolicy.h"
 #include "ImageProcessingPolicy/JpegConversionPolicy.h"
 #include "ImageProcessingPolicy/PngConversionPolicy.h"
 #include "ImageProcessingPolicy/Uint8ConversionPolicy.h"
 #include "ImageProcessingPolicy/KLVEmbeddingPolicy.h"
+#endif // PLUGIN_ENABLE_DEBUG_ROUTE == 1
 
 #include "ImageController.h"
 #include <iostream>
@@ -24,12 +30,18 @@ ImageController::ImageController(OrthancPluginRestOutput* response, const std::s
 {
   // Register sub routes
 
+  imageProcessingRouteParser_.RegisterRoute<LowQualityPolicy>("^low-quality$");
+  imageProcessingRouteParser_.RegisterRoute<MediumQualityPolicy>("^medium-quality$");
+  imageProcessingRouteParser_.RegisterRoute<HighQualityPolicy>("^high-quality$");
+
+#if PLUGIN_ENABLE_DEBUG_ROUTE == 1
   imageProcessingRouteParser_.RegisterRoute<CompositePolicy>("^(.+/.+)$"); // regex: at least a single "/"
   imageProcessingRouteParser_.RegisterRoute<ResizePolicy>("^resize:(\\d+)$"); // resize:<maximal height/width: uint>
   imageProcessingRouteParser_.RegisterRoute<JpegConversionPolicy>("^jpeg:?(\\d{0,3})$"); // regex: jpeg:<compression rate: int[0;100]>
   imageProcessingRouteParser_.RegisterRoute<PngConversionPolicy>("^png$");
   imageProcessingRouteParser_.RegisterRoute<Uint8ConversionPolicy>("^8bit$");
   imageProcessingRouteParser_.RegisterRoute<KLVEmbeddingPolicy>("^klv$");
+#endif // PLUGIN_ENABLE_DEBUG_ROUTE
 }
 
 OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlPostfix) {
@@ -51,6 +63,10 @@ OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlP
 
       BENCH_LOG(INSTANCE, instanceId_);
       BENCH_LOG(FRAME_INDEX, frameIndex_);
+    }
+    catch (const std::invalid_argument&) {
+      // probably because processingPolicy has not been found
+      return this->_AnswerError(404);
     }
     catch (const boost::bad_lexical_cast&) {
       // should be prevented by the regex
@@ -75,8 +91,7 @@ OrthancPluginErrorCode ImageController::_ProcessRequest()
     if (cleanCache_) {
       imageRepository_->CleanImageCache(this->instanceId_, this->frameIndex_, this->processingPolicy_.get());
       std::string answer = "{}";
-      OrthancPluginAnswerBuffer(OrthancContextManager::Get(), this->response_, answer.c_str(), answer.size(), "application/octet-stream");
-      return OrthancPluginErrorCode_Success;
+      return this->_AnswerBuffer(answer, "application/json");
     }
 
     // retrieve processed image
@@ -92,22 +107,21 @@ OrthancPluginErrorCode ImageController::_ProcessRequest()
     {
       BENCH(REQUEST_ANSWERING);
 
-      // answer rest request
-      OrthancPluginAnswerBuffer(OrthancContextManager::Get(), this->response_, image->GetBinary(), image->GetBinarySize(), "application/octet-stream");
+      // Answer rest request
+      return this->_AnswerBuffer(image->GetBinary(), image->GetBinarySize(), "application/octet-stream");
     }
     else
     {
-      return OrthancPluginErrorCode_InternalError;
+      // Answer Internal Error
+      return this->_AnswerError(500);
     }
-
-    return OrthancPluginErrorCode_Success;
   }
   catch (...) {
     return this->_AnswerError(500);
   }
 }
 
-
+#if PLUGIN_ENABLE_DEBUG_ROUTE == 1
 // Parse JpegConversionPolicy compression parameter from its route regex matches
 template<>
 inline JpegConversionPolicy* ImageProcessingRouteParser::_Instanciate<JpegConversionPolicy>(boost::cmatch& regexpMatches)
@@ -161,3 +175,4 @@ inline CompositePolicy* ImageProcessingRouteParser::_Instanciate<CompositePolicy
 
   return compositePolicy;
 };
+#endif // PLUGIN_ENABLE_DEBUG_ROUTE

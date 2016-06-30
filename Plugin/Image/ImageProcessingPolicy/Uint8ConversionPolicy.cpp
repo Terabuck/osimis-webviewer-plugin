@@ -7,7 +7,6 @@
 
 #include "../ImageContainer/RawImageContainer.h"
 
-
 #include <cmath> // for std::floor
 
 namespace {
@@ -23,8 +22,7 @@ IImageContainer* Uint8ConversionPolicy::Apply(IImageContainer* input, ImageMetaD
   RawImageContainer* rawInputImage = dynamic_cast<RawImageContainer*>(input);
   if (!rawInputImage)
   {
-    throw new std::invalid_argument("Input is not raw");
-    // @todo Throw exception : input is not a raw image
+    throw std::invalid_argument("Input is not raw");
     return NULL;
   }
 
@@ -41,9 +39,7 @@ IImageContainer* Uint8ConversionPolicy::Apply(IImageContainer* input, ImageMetaD
   if (pixelFormat != Orthanc::PixelFormat_Grayscale16 &&
       pixelFormat != Orthanc::PixelFormat_SignedGrayscale16)
   {
-    throw new std::invalid_argument("Input is not 16bit");
-    // @todo Throw exception : input is not 16bit
-    // @todo do nothing if already uint8_t
+    throw std::invalid_argument("Input is not 16bit");
     return 0;
   }
 

@@ -90,8 +90,8 @@ inline IImageProcessingPolicy* ImageProcessingRouteParser::InstantiatePolicyFrom
     }
   }
 
-  // if no policy found, return NULL
-  return 0;
+  // if no policy found, throw exception
+  throw std::invalid_argument("policy not found");
 }
 
 #endif // ROUTE_TO_POLICY_CONVERTOR_H

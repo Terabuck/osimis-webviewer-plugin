@@ -29,15 +29,10 @@
 #include "../Orthanc/Core/DicomFormat/DicomMap.h"
 #include "ViewerToolbox.h"
 
-#if ENABLE_CACHE == 1
-#include "ViewerPrefetchPolicy.h"
-#endif // ENABLE_CACHE == 1
-
 #include "OrthancContextManager.h"
 #include "BaseController.h"
 #include "Image/ImageController.h"
-#include "Image/DecodedImageAdapter.h"
-#include "SeriesInformationAdapter.h"
+#include "DecodedImageAdapter.h"
 #include "../Orthanc/Plugins/Samples/GdcmDecoder/GdcmDecoderCache.h"
 #include "../Orthanc/Core/Toolbox.h"
 #include "Version.h"
@@ -45,309 +40,6 @@
 static OrthancPluginContext* context_ = NULL;
 static bool restrictTransferSyntaxes_ = false;
 static std::set<std::string> enabledTransferSyntaxes_;
-
-#if ENABLE_CACHE == 1
-class CacheContext
-{
-private:
-  class DynamicString : public Orthanc::IDynamicObject
-  {
-  private:
-    std::string  value_;
-
-  public:
-    DynamicString(const char* value) : value_(value)
-    {
-    }
-    
-    const std::string& GetValue() const
-    {
-      return value_;
-    }
-  };
-
-  Orthanc::FilesystemStorage  storage_;
-  Orthanc::SQLite::Connection  db_;
-
-  std::auto_ptr<OrthancPlugins::CacheManager>  cache_;
-  std::auto_ptr<OrthancPlugins::CacheScheduler>  scheduler_;
-
-  Orthanc::SharedMessageQueue  newInstances_;
-  bool stop_;
-  boost::thread newInstancesThread_;
-  OrthancPlugins::GdcmDecoderCache  decoder_;
-
-  static void NewInstancesThread(CacheContext* cache)
-  {
-    while (!cache->stop_)
-    {
-      std::auto_ptr<Orthanc::IDynamicObject> obj(cache->newInstances_.Dequeue(100));
-      if (obj.get() != NULL)
-      {
-        const std::string& instanceId = dynamic_cast<DynamicString&>(*obj).GetValue();
-
-        // On the reception of a new instance, indalidate the parent series of the instance
-        std::string uri = "/instances/" + std::string(instanceId);
-        Json::Value instance;
-        if (OrthancPlugins::GetJsonFromOrthanc(instance, context_, uri))
-        {
-          std::string seriesId = instance["ParentSeries"].asString();
-          cache->GetScheduler().Invalidate(OrthancPlugins::CacheBundle_SeriesInformation, seriesId);
-        }
-      }
-    }
-  }
-
-public:
-  CacheContext(const std::string& path) : storage_(path), stop_(false)
-  {
-    boost::filesystem::path p(path);
-    db_.Open((p / "cache.db").string());
-
-    cache_.reset(new OrthancPlugins::CacheManager(db_, storage_));
-    //cache_->SetSanityCheckEnabled(true);  // For debug
-
-    scheduler_.reset(new OrthancPlugins::CacheScheduler(*cache_, 100));
-
-    newInstancesThread_ = boost::thread(NewInstancesThread, this);
-  }
-
-  ~CacheContext()
-  {
-    stop_ = true;
-    if (newInstancesThread_.joinable())
-    {
-      newInstancesThread_.join();
-    }
-
-    scheduler_.reset(NULL);
-    cache_.reset(NULL);
-  }
-
-  OrthancPlugins::CacheScheduler& GetScheduler()
-  {
-    return *scheduler_;
-  }
-
-  void SignalNewInstance(const char* instanceId)
-  {
-    newInstances_.Enqueue(new DynamicString(instanceId));
-  }
-
-  OrthancPlugins::GdcmDecoderCache&  GetDecoder()
-  {
-    return decoder_;
-  }
-};
-
-static CacheContext* cache_ = NULL;
-
-static OrthancPluginErrorCode OnChangeCallback(OrthancPluginChangeType changeType,
-                                               OrthancPluginResourceType resourceType,
-                                               const char* resourceId)
-{
-  try
-  {
-    if (changeType == OrthancPluginChangeType_NewInstance &&
-        resourceType == OrthancPluginResourceType_Instance)
-    {
-      cache_->SignalNewInstance(resourceId);
-    }
-
-    return OrthancPluginErrorCode_Success;
-  }
-  catch (std::runtime_error& e)
-  {
-    OrthancPluginLogError(context_, e.what());
-    return OrthancPluginErrorCode_Success;  // Ignore error
-  }
-}
-
-#endif
-
-
-#if ENABLE_CACHE == 1
-template <enum OrthancPlugins::CacheBundle bundle>
-static OrthancPluginErrorCode ServeCache(OrthancPluginRestOutput* output,
-                                         const char* url,
-                                         const OrthancPluginHttpRequest* request)
-{
-  try
-  {
-    if (request->method != OrthancPluginHttpMethod_Get)
-    {
-      OrthancPluginSendMethodNotAllowed(context_, output, "GET");
-      return OrthancPluginErrorCode_Success;
-    }
-
-    const std::string id = request->groups[0];
-    std::string content;
-
-
-    std::string message = "Processing GET request: " + std::string(url);
-    OrthancPluginLogInfo(context_, message.c_str());
-    
-    if (cache_->GetScheduler().Access(content, bundle, id))
-    {
-      std::string message = "Answering GET request: " + std::string(url);
-      OrthancPluginLogInfo(context_, message.c_str());
-      
-      OrthancPluginAnswerBuffer(context_, output, content.c_str(), content.size(), "application/json");
-    }
-    else
-    {
-      OrthancPluginSendHttpStatusCode(context_, output, 404);
-    }
-
-    return OrthancPluginErrorCode_Success;
-  }
-  catch (Orthanc::OrthancException& e)
-  {
-    OrthancPluginLogError(context_, e.What());
-    return OrthancPluginErrorCode_Plugin;
-  }
-  catch (std::runtime_error& e)
-  {
-    OrthancPluginLogError(context_, e.what());
-    return OrthancPluginErrorCode_Plugin;
-  }
-  catch (boost::bad_lexical_cast&)
-  {
-    OrthancPluginLogError(context_, "Bad lexical cast");
-    return OrthancPluginErrorCode_Plugin;
-  }
-}
-// @todo implement binary output
-#else
-
-// use arraybuffer instead of json for DecodedImageAdapter
-namespace {
-  // use anonymous namespace instead of static because 
-  // static doesn't work with specialized templates
-
-  //OrthancPluginRegisterRestCallback(context_, "/web-viewer/series/(.*)", ServeCache<CacheBundle_SeriesInformation>);
-  //OrthancPluginRegisterRestCallback(context_, "/web-viewer/instances/(.*)", ServeCache<CacheBundle_DecodedImage>);
-  template <typename TFactory>
-  OrthancPluginErrorCode ServeData(OrthancPluginRestOutput* output,
-                                           const char* url,
-                                           const OrthancPluginHttpRequest* request)
-  {
-    try
-    {
-      if (request->method != OrthancPluginHttpMethod_Get)
-      {
-        OrthancPluginSendMethodNotAllowed(context_, output, "GET");
-        return OrthancPluginErrorCode_Success;
-      }
-
-      const std::string id = request->groups[0];
-      std::string content;
-
-      std::string message = "Processing GET request: " + std::string(url);
-      OrthancPluginLogInfo(context_, message.c_str());
-
-  #if 0 // @todo implement cache the generic way with template instead of bundle ID
-      if (cache_->GetScheduler().Access(content, cacheBundleId, id))
-      {
-        std::string message = "Answering GET request: " + std::string(url);
-        OrthancPluginLogInfo(context_, message.c_str());
-
-        OrthancPluginAnswerBuffer(context_, output, content.c_str(), content.size(), "application/json");
-      }
-  #else
-      TFactory* factory = new TFactory(context_);
-      if (factory->Create(content, id)) {
-          std::string message = "Answering GET request: " + std::string(url);
-          OrthancPluginLogInfo(context_, message.c_str());
-
-          OrthancPluginAnswerBuffer(context_, output, content.c_str(), content.size(), "application/json");
-      }
-  #endif
-      else
-      {
-        OrthancPluginSendHttpStatusCode(context_, output, 404);
-      }
-
-      return OrthancPluginErrorCode_Success;
-    }
-    catch (Orthanc::OrthancException& e)
-    {
-      OrthancPluginLogError(context_, e.What());
-      return OrthancPluginErrorCode_Plugin;
-    }
-    catch (std::runtime_error& e)
-    {
-      OrthancPluginLogError(context_, e.what());
-      return OrthancPluginErrorCode_Plugin;
-    }
-    catch (boost::bad_lexical_cast&)
-    {
-      OrthancPluginLogError(context_, "Bad lexical cast");
-      return OrthancPluginErrorCode_Plugin;
-    }
-  }
-
-  template <typename TFactory>
-  OrthancPluginErrorCode ServeBinary(OrthancPluginRestOutput* output,
-                                           const char* url,
-                                           const OrthancPluginHttpRequest* request)
-  {
-    try
-    {
-      if (request->method != OrthancPluginHttpMethod_Get)
-      {
-        OrthancPluginSendMethodNotAllowed(context_, output, "GET");
-        return OrthancPluginErrorCode_Success;
-      }
-
-      const std::string id = request->groups[0];
-      std::string content;
-
-      std::string message = "Processing GET request: " + std::string(url);
-      OrthancPluginLogInfo(context_, message.c_str());
-
-  #if 0 // @todo implement cache the generic way with template instead of bundle ID
-      if (cache_->GetScheduler().Access(content, cacheBundleId, id))
-      {
-        std::string message = "Answering GET request: " + std::string(url);
-        OrthancPluginLogInfo(context_, message.c_str());
-
-        OrthancPluginAnswerBuffer(context_, output, content.c_str(), content.size(), "application/octet-stream");
-      }
-  #else
-      TFactory* factory = new TFactory(context_);
-      if (factory->Create(content, id)) {
-          std::string message = "Answering GET request: " + std::string(url);
-          OrthancPluginLogInfo(context_, message.c_str());
-
-          OrthancPluginAnswerBuffer(context_, output, content.c_str(), content.size(), "application/octet-stream");
-      }
-  #endif
-      else
-      {
-        OrthancPluginSendHttpStatusCode(context_, output, 404);
-      }
-
-      return OrthancPluginErrorCode_Success;
-    }
-    catch (Orthanc::OrthancException& e)
-    {
-      OrthancPluginLogError(context_, e.What());
-      return OrthancPluginErrorCode_Plugin;
-    }
-    catch (std::runtime_error& e)
-    {
-      OrthancPluginLogError(context_, e.what());
-      return OrthancPluginErrorCode_Plugin;
-    }
-    catch (boost::bad_lexical_cast&)
-    {
-      OrthancPluginLogError(context_, "Bad lexical cast");
-      return OrthancPluginErrorCode_Plugin;
-    }
-  }
-}
-#endif
 
 #if ORTHANC_STANDALONE == 0
 static OrthancPluginErrorCode ServeWebViewer(OrthancPluginRestOutput* output,
@@ -379,8 +71,7 @@ static OrthancPluginErrorCode ServeWebViewer(OrthancPluginRestOutput* output,
 
   return OrthancPluginErrorCode_Success;
 }
-#endif
-
+#else
 template <enum Orthanc::EmbeddedResources::DirectoryResourceId folder>
 static OrthancPluginErrorCode ServeEmbeddedFolder(OrthancPluginRestOutput* output,
                                                   const char* url,
@@ -413,56 +104,54 @@ static OrthancPluginErrorCode ServeEmbeddedFolder(OrthancPluginRestOutput* outpu
     return OrthancPluginErrorCode_Success;
   }
 }
+#endif
 
+// static OrthancPluginErrorCode IsStableSeries(OrthancPluginRestOutput* output,
+//                                              const char* url,
+//                                              const OrthancPluginHttpRequest* request)
+// {
+//   try
+//   {
+//     if (request->method != OrthancPluginHttpMethod_Get)
+//     {
+//       OrthancPluginSendMethodNotAllowed(context_, output, "GET");
+//       return OrthancPluginErrorCode_Success;
+//     }
 
+//     const std::string id = request->groups[0];
+//     Json::Value series;
 
-static OrthancPluginErrorCode IsStableSeries(OrthancPluginRestOutput* output,
-                                             const char* url,
-                                             const OrthancPluginHttpRequest* request)
-{
-  try
-  {
-    if (request->method != OrthancPluginHttpMethod_Get)
-    {
-      OrthancPluginSendMethodNotAllowed(context_, output, "GET");
-      return OrthancPluginErrorCode_Success;
-    }
+//     if (OrthancPlugins::GetJsonFromOrthanc(series, context_, "/series/" + id) &&
+//         series.type() == Json::objectValue)
+//     {
+//       bool value = (series["IsStable"].asBool() ||
+//                     series["Status"].asString() == "Complete");
+//       std::string answer = value ? "true" : "false";
+//       OrthancPluginAnswerBuffer(context_, output, answer.c_str(), answer.size(), "application/json");
+//     }
+//     else
+//     {
+//       OrthancPluginSendHttpStatusCode(context_, output, 404);
+//     }
 
-    const std::string id = request->groups[0];
-    Json::Value series;
-
-    if (OrthancPlugins::GetJsonFromOrthanc(series, context_, "/series/" + id) &&
-        series.type() == Json::objectValue)
-    {
-      bool value = (series["IsStable"].asBool() ||
-                    series["Status"].asString() == "Complete");
-      std::string answer = value ? "true" : "false";
-      OrthancPluginAnswerBuffer(context_, output, answer.c_str(), answer.size(), "application/json");
-    }
-    else
-    {
-      OrthancPluginSendHttpStatusCode(context_, output, 404);
-    }
-
-    return OrthancPluginErrorCode_Success;
-  }
-  catch (Orthanc::OrthancException& e)
-  {
-    OrthancPluginLogError(context_, e.What());
-    return OrthancPluginErrorCode_Plugin;
-  }
-  catch (std::runtime_error& e)
-  {
-    OrthancPluginLogError(context_, e.what());
-    return OrthancPluginErrorCode_Plugin;
-  }
-  catch (boost::bad_lexical_cast&)
-  {
-    OrthancPluginLogError(context_, "Bad lexical cast");
-    return OrthancPluginErrorCode_Plugin;
-  }
-}
-
+//     return OrthancPluginErrorCode_Success;
+//   }
+//   catch (Orthanc::OrthancException& e)
+//   {
+//     OrthancPluginLogError(context_, e.What());
+//     return OrthancPluginErrorCode_Plugin;
+//   }
+//   catch (std::runtime_error& e)
+//   {
+//     OrthancPluginLogError(context_, e.what());
+//     return OrthancPluginErrorCode_Plugin;
+//   }
+//   catch (boost::bad_lexical_cast&)
+//   {
+//     OrthancPluginLogError(context_, "Bad lexical cast");
+//     return OrthancPluginErrorCode_Plugin;
+//   }
+// }
 
 static bool ExtractTransferSyntax(std::string& transferSyntax,
                                   const void* dicom,
@@ -551,13 +240,8 @@ static OrthancPluginErrorCode DecodeImageCallback(OrthancPluginImage** target,
 
     std::auto_ptr<OrthancPlugins::OrthancImageWrapper> image;
 
-#if ENABLE_CACHE == 1
-    using namespace OrthancPlugins;
-    image.reset(cache_->GetDecoder().Decode(context_, dicom, size, frameIndex));
-#else
     OrthancPlugins::GdcmImageDecoder decoder(dicom, size);
     image.reset(new OrthancPlugins::OrthancImageWrapper(context_, decoder.Decode(context_, frameIndex)));
-#endif
 
     *target = image->Release();
 
@@ -594,28 +278,9 @@ void ParseConfiguration(bool& enableGdcm,
     throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);    
   }
 
-#if ENABLE_CACHE == 1
-  // By default, the cache of the Web viewer is located inside the
-  // "StorageDirectory" of Orthanc
-  cachePath = OrthancPlugins::GetStringValue(configuration, "StorageDirectory", ".");
-  cachePath /= "WebViewerCache";
-#endif
-
   static const char* CONFIG_WEB_VIEWER = "WebViewer";
   if (configuration.isMember(CONFIG_WEB_VIEWER))
   {
-
-#if ENABLE_CACHE == 1
-    std::string key = "CachePath";
-    if (!configuration[CONFIG_WEB_VIEWER].isMember(key))
-    {
-      // For backward compatibility with the initial release of the Web viewer
-      key = "Cache";
-    }
-
-    cachePath = OrthancPlugins::GetStringValue(configuration[CONFIG_WEB_VIEWER], key, cachePath.string());
-    cacheSize = OrthancPlugins::GetIntegerValue(configuration[CONFIG_WEB_VIEWER], "CacheSize", cacheSize);
-#endif
 
     decodingThreads = OrthancPlugins::GetIntegerValue(configuration[CONFIG_WEB_VIEWER], "Threads", decodingThreads);
 
@@ -728,72 +393,6 @@ extern "C"
       std::string message = ("Web viewer using " + boost::lexical_cast<std::string>(decodingThreads) + 
                              " threads for the decoding of the DICOM images");
       OrthancPluginLogWarning(context_, message.c_str());
-
-#if ENABLE_CACHE == 1
-
-      message = "Storing the cache of the Web viewer in folder: " + cachePath.string();
-      OrthancPluginLogWarning(context_, message.c_str());
-
-      /* Create the cache */
-      cache_ = new CacheContext(cachePath.string());
-      CacheScheduler& scheduler = cache_->GetScheduler();
-
-      /* Look for a change in the versions */
-      std::string orthancVersion("unknown"), webViewerVersion("unknown");
-      bool clear = false;
-      if (!scheduler.LookupProperty(orthancVersion, CacheProperty_OrthancVersion) ||
-          orthancVersion != std::string(context_->orthancVersion))
-      {
-        std::string s = ("The version of Orthanc has changed from \"" + orthancVersion + "\" to \"" + 
-                         std::string(context_->orthancVersion) + "\": The cache of the Web viewer will be cleared");
-        OrthancPluginLogWarning(context_, s.c_str());
-        clear = true;
-      }
-
-      if (!scheduler.LookupProperty(webViewerVersion, CacheProperty_WebViewerVersion) ||
-          webViewerVersion != std::string(PRODUCT_VERSION_MAJOR_MINOR_STRING))
-      {
-        std::string s = ("The version of the Web viewer plugin has changed from \"" + webViewerVersion + "\" to \"" +
-                         std::string(PRODUCT_VERSION_MAJOR_MINOR_STRING) + "\": The cache of the Web viewer will be cleared");
-        OrthancPluginLogWarning(context_, s.c_str());
-        clear = true;
-      }
-
-
-      /* Clear the cache if needed */
-      if (clear)
-      {
-        OrthancPluginLogWarning(context_, "Clearing the cache of the Web viewer");
-        scheduler.Clear();
-        scheduler.SetProperty(CacheProperty_OrthancVersion, context_->orthancVersion);
-        scheduler.SetProperty(CacheProperty_WebViewerVersion, PRODUCT_VERSION_MAJOR_MINOR_STRING);
-      }
-      else
-      {
-        OrthancPluginLogInfo(context_, "No change in the versions, no need to clear the cache of the Web viewer");
-      }
-
-
-      /* Configure the cache */
-      scheduler.RegisterPolicy(new ViewerPrefetchPolicy(context_));
-
-      /* Register bundle schedulers */
-      scheduler.Register(CacheBundle_SeriesInformation,
-                         new SeriesInformationAdapter(context_), 1);
-      scheduler.Register(CacheBundle_DecodedImage,
-                         new DecodedImageAdapter(context_), decodingThreads);
-
-
-      /* Set the quotas */
-      scheduler.SetQuota(CacheBundle_SeriesInformation, 1000, 0);    // Keep info about 1000 series
-
-      message = "Web viewer using a cache of " + boost::lexical_cast<std::string>(cacheSize) + " MB";
-      OrthancPluginLogWarning(context_, message.c_str());
-
-      scheduler.SetQuota(CacheBundle_DecodedImage, 0, static_cast<uint64_t>(cacheSize) * 1024 * 1024);
-
-#endif // ENABLE_CACHE
-
     }
     catch (std::runtime_error& e)
     {
@@ -828,13 +427,7 @@ extern "C"
 
 
     /* Install the callbacks */
-    OrthancPluginRegisterRestCallbackNoLock(context_, "/web-viewer/libs/(.*)", ServeEmbeddedFolder<Orthanc::EmbeddedResources::JAVASCRIPT_LIBS>);
-    OrthancPluginRegisterRestCallbackNoLock(context_, "/web-viewer/is-stable-series/(.*)", IsStableSeries);
-#if ENABLE_CACHE == 1
-    OrthancPluginRegisterRestCallback(context_, "/web-viewer/series/(.*)", ServeCache<CacheBundle_SeriesInformation>);
-    OrthancPluginRegisterRestCallback(context_, "/web-viewer/instances/(.*)", ServeCache<CacheBundle_DecodedImage>);
-    OrthancPluginRegisterOnChangeCallback(context, OnChangeCallback);
-#else
+    // OrthancPluginRegisterRestCallbackNoLock(context_, "/osimis-viewer/is-stable-series/(.*)", IsStableSeries);
 
     // @todo free
     ImageRepository* imageRepository = new ImageRepository;
@@ -844,14 +437,11 @@ extern "C"
     ImageController::Inject(imageRepository);
 
     RegisterRoute<ImageController>("/osimis-viewer/images/");
-    OrthancPluginRegisterRestCallbackNoLock(context_, "/web-viewer/series/(.*)", ServeData<SeriesInformationAdapter>);
-    OrthancPluginRegisterRestCallbackNoLock(context_, "/web-viewer/instances/(.*)", ServeBinary<DecodedImageAdapter>);
-#endif
 
 #if ORTHANC_STANDALONE == 1
-    OrthancPluginRegisterRestCallbackNoLock(context, "/web-viewer/app/(.*)", ServeEmbeddedFolder<Orthanc::EmbeddedResources::WEB_VIEWER>);
+    OrthancPluginRegisterRestCallbackNoLock(context, "/osimis-viewer/app/(.*)", ServeEmbeddedFolder<Orthanc::EmbeddedResources::WEB_VIEWER>);
 #else
-    OrthancPluginRegisterRestCallbackNoLock(context, "/web-viewer/app/(.*)", ServeWebViewer);
+    OrthancPluginRegisterRestCallbackNoLock(context, "/osimis-viewer/app/(.*)", ServeWebViewer);
 #endif
 
     /* Extend the default Orthanc Explorer with custom JavaScript */
@@ -866,14 +456,6 @@ extern "C"
   ORTHANC_PLUGINS_API void OrthancPluginFinalize()
   {
     OrthancPluginLogWarning(context_, "Finalizing the Web viewer");
-
-#if ENABLE_CACHE == 1
-    if (cache_ != NULL)
-    {
-      delete cache_;
-      cache_ = NULL;
-    }
-#endif
   }
 
 

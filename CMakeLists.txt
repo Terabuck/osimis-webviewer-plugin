@@ -24,7 +24,6 @@ project(OsimisWebViewer)
 include(${CMAKE_SOURCE_DIR}/Resources/CMake/GetProductVersionFromGitTag.cmake)
 
 # Parameters of the build
-set(ENABLE_CACHE ON CACHE BOOL "Cache the plugin REST responses (currently disabled but we might still need the ViewerPrefetchPolicy so we keep it in the code)")
 set(BENCHMARK OFF CACHE BOOL "Send benchmark informations to stdout")
 set(STATIC_BUILD ON CACHE BOOL "Static build of the third-party libraries (necessary for Windows)")
 SET(STANDALONE_BUILD ON CACHE BOOL "Standalone build (all the resources are embedded, necessary for releases)")
@@ -67,13 +66,10 @@ endif()
 include_directories(${CMAKE_SOURCE_DIR}/Dependencies/boost-1_60_0/)
 include_directories(${CMAKE_SOURCE_DIR}/Dependencies/gil-2_1_1/)
 
-
-#old cache system is disabled
-#if (ENABLE_CACHE)
-#  add_definitions(
-#    -DENABLE_CACHE=1
-#    )
-#endif()
+# Enable image processing *generic* http routes on debug mode
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+  add_definitions(-DPLUGIN_ENABLE_DEBUG_ROUTE=1)
+endif()
 
 if (BENCHMARK)
   add_definitions(
@@ -81,9 +77,15 @@ if (BENCHMARK)
     )
   add_definitions(
       -DBOOST_CHRONO_HEADER_ONLY
-  #    -DBOOST_ERROR_CODE_HEADER_ONLY
-      -D_DARWIN_C_SOURCE # for boost chrono to work on mac X.11
+      #-DBOOST_ERROR_CODE_HEADER_ONLY
     )
+
+  # fix boost chrono to work on mac X.11
+  if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
+    add_definitions(
+      -D_DARWIN_C_SOURCE
+    )
+  endif()
 endif()
 
 
@@ -147,7 +149,6 @@ include_directories(${CMAKE_SOURCE_DIR}/Plugin/Image)
 include_directories(${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer)
 include_directories(${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy)
 include_directories(${CMAKE_SOURCE_DIR}/Plugin/Image/Utilities)
-include_directories(${CMAKE_SOURCE_DIR}/Plugin/Cache)
 
 set(CORE_SOURCES
   ${BOOST_SOURCES}
@@ -185,7 +186,7 @@ add_library(OsimisWebViewer
   ${CMAKE_SOURCE_DIR}/Plugin/Version.h
 
   # The following files depend on GDCM
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/DecodedImageAdapter.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/DecodedImageAdapter.cpp
   ${CMAKE_SOURCE_DIR}/Orthanc/Plugins/Samples/GdcmDecoder/GdcmImageDecoder.cpp
   ${CMAKE_SOURCE_DIR}/Orthanc/Plugins/Samples/GdcmDecoder/GdcmDecoderCache.cpp
   ${CMAKE_SOURCE_DIR}/Orthanc/Plugins/Samples/GdcmDecoder/OrthancImageWrapper.cpp
@@ -199,6 +200,9 @@ add_library(OsimisWebViewer
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/CompressedImageContainer.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/CornerstoneKLVContainer.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/CompositePolicy.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/HighQualityPolicy.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/MediumQualityPolicy.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/LowQualityPolicy.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/ResizePolicy.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/Uint8ConversionPolicy.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/JpegConversionPolicy.cpp
@@ -210,11 +214,7 @@ add_library(OsimisWebViewer
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageController.cpp
   
   ${CMAKE_SOURCE_DIR}/Plugin/BenchmarkHelper.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Cache/CacheManager.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Cache/CacheScheduler.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/ViewerToolbox.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/ViewerPrefetchPolicy.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/SeriesInformationAdapter.cpp
   )
 
 

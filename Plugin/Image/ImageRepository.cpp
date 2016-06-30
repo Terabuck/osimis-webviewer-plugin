@@ -20,7 +20,7 @@ namespace
 void _loadDicomTags(Json::Value& jsonOutput, const std::string& instanceId);
 void _loadDICOM(OrthancPluginMemoryBuffer& dicomOutput, const std::string& instanceId);
 void _getFrame(OrthancPluginImage** frameOutput, const void* dicomData, uint32_t dicomDataSize, uint32_t frameIndex);
-std::string _getAttachmentName(int frameIndex, const IImageProcessingPolicy* policy);
+std::string _getAttachmentNumber(int frameIndex, const IImageProcessingPolicy* policy);
 }
 
 ImageRepository::ImageRepository()
@@ -138,7 +138,7 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
   // -> unregistered attachment name : inexistent item
 
   // Define attachment name based upon policy
-  std::string attachmentName = _getAttachmentName(frameIndex, policy);
+  std::string attachmentName = _getAttachmentNumber(frameIndex, policy);
 
   // Get attachment content
   OrthancPluginErrorCode error;
@@ -173,7 +173,7 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
     if (error != OrthancPluginErrorCode_Success)
     {
       // @todo throw or be sure orthanc is up to date at plugin init
-      // throw new Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
+      // throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
       return NULL;
     }
     else
@@ -195,7 +195,7 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
   }
   else
   {
-    // throw new Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
+    // throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
     // @todo throw;
     return NULL;
   }
@@ -260,27 +260,26 @@ void _getFrame(OrthancPluginImage** frameOutput, const void* dicomData, uint32_t
   *frameOutput = OrthancPluginDecodeDicomImage(OrthancContextManager::Get(), dicomData, dicomDataSize, frameIndex);
 }
 
-std::string _getAttachmentName(int frameIndex, const IImageProcessingPolicy* policy)
+std::string _getAttachmentNumber(int frameIndex, const IImageProcessingPolicy* policy)
 {
-  std::string attachmentName;
+  std::string attachmentNumber;
   std::string policyString = policy->ToString();
   int attachmentPrefix = 10000;
   int maxFrameCount = 1000; // @todo use adaptative maxFrameCount !
 
-  if (policyString == "png~klv") {
-    attachmentName = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 0 + frameIndex);
+  if (policyString == "high-quality") {
+    attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 0 + frameIndex);
   }
-  else if (policyString == "resize:1000~8bit~jpeg:100~klv") {
-    attachmentName = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 1 + frameIndex);
-
+  else if (policyString == "medium-quality") {
+    attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 1 + frameIndex);
   }
-  else if (policyString == "resize:150~8bit~jpeg:100~klv") {
-    attachmentName = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 2 + frameIndex);
+  else if (policyString == "low-quality") {
+    attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 2 + frameIndex);
   }
   else {
     throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
   }
 
-  return attachmentName;
+  return attachmentNumber;
 }
 }

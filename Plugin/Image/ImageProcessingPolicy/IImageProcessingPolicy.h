@@ -10,7 +10,7 @@ public:
   virtual ~IImageProcessingPolicy() {};
   virtual IImageContainer* Apply(IImageContainer* container, ImageMetaData* metaData) = 0;
 
-  // for serialization
+  // to create a generic route based on composed policies
   virtual std::string ToString() const = 0;
 };
 
