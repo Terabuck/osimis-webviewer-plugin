@@ -194,7 +194,9 @@ add_library(OsimisWebViewer
   ${CMAKE_SOURCE_DIR}/Plugin/OrthancContextManager.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/BaseController.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Instance/DicomRepository.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Instance/InstanceController.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Series/SeriesRepository.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Series/Series.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Series/SeriesController.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/Utilities/KLVWriter.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/Utilities/ImageProcessingRouteParser.h
   ${CMAKE_SOURCE_DIR}/Plugin/Image/Utilities/ScopedBuffers.h

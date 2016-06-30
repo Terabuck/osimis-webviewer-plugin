@@ -32,7 +32,8 @@
 #include "OrthancContextManager.h"
 #include "BaseController.h"
 #include "Instance/DicomRepository.h"
-#include "Instance/InstanceController.h"
+#include "Series/SeriesRepository.h"
+#include "Series/SeriesController.h"
 #include "Image/ImageRepository.h"
 #include "Image/ImageController.h"
 #include "DecodedImageAdapter.h"
@@ -434,14 +435,15 @@ extern "C"
 
     DicomRepository* dicomRepository = new DicomRepository; // @todo free
     ImageRepository* imageRepository = new ImageRepository(dicomRepository); // @todo free
+    SeriesRepository* seriesRepository = new SeriesRepository(dicomRepository); // @todo free
     imageRepository->enableCachedImageStorage(cachedImageStorageEnabled);
 
     // @todo free
     ImageController::Inject(imageRepository);
-    InstanceController::Inject(dicomRepository);
+    SeriesController::Inject(seriesRepository);
 
     RegisterRoute<ImageController>("/osimis-viewer/images/");
-    RegisterRoute<InstanceController>("/osimis-viewer/instances/");
+    RegisterRoute<SeriesController>("/osimis-viewer/series/");
 
 #if ORTHANC_STANDALONE == 1
     OrthancPluginRegisterRestCallbackNoLock(context, "/osimis-viewer/app/(.*)", ServeEmbeddedFolder<Orthanc::EmbeddedResources::WEB_VIEWER>);

@@ -170,6 +170,7 @@ void ImageRepository::CleanImageCache(const std::string& instanceId, uint32_t fr
   {
     BENCH(FILE_CACHE_CLEAN);
     error = OrthancPluginRestApiDelete(OrthancContextManager::Get(), path.c_str());
+    // @todo manage error
   }
 }
 

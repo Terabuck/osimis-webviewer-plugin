@@ -3,14 +3,14 @@
 #include <string>
 
 #include "../BaseController.h"
-#include "DicomRepository.h"
+#include "SeriesRepository.h"
 
-// .../<instance_id>/
+// .../<series_id>
 
 // @todo boost::noncopyable
-class InstanceController : public BaseController {
+class SeriesController : public BaseController {
 public:
-  InstanceController(OrthancPluginRestOutput* response, const std::string& url, const OrthancPluginHttpRequest* request);
+  SeriesController(OrthancPluginRestOutput* response, const std::string& url, const OrthancPluginHttpRequest* request);
 
   template<typename T>
   static void Inject(T* obj);
@@ -20,7 +20,7 @@ protected:
   virtual OrthancPluginErrorCode _ProcessRequest();
 
 private:
-  static DicomRepository* dicomRepository_;
+  static SeriesRepository* seriesRepository_;
 
-  std::string instanceId_;
+  std::string seriesId_;
 };

@@ -2,6 +2,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp> // for boost::split
 
+#include "../../Orthanc/Core/OrthancException.h" // for OrthancException(UnknownResource) catch
+
 #include "../BenchmarkHelper.h" // for BENCH(*)
 #include "ImageProcessingPolicy/LowQualityPolicy.h"
 #include "ImageProcessingPolicy/MediumQualityPolicy.h"
@@ -51,6 +53,7 @@ OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlP
 
   boost::cmatch matches;
   if (!boost::regex_match(urlPostfix.c_str(), matches, regexp)) {
+    // Return 404 error on badly formatted URL
     return this->_AnswerError(404);
   }
   else {
@@ -115,6 +118,9 @@ OrthancPluginErrorCode ImageController::_ProcessRequest()
       // Answer Internal Error
       return this->_AnswerError(500);
     }
+  }
+  catch (const Orthanc::OrthancException& exc) {
+    return this->_AnswerError(exc.GetHttpStatus());
   }
   catch (...) {
     return this->_AnswerError(500);
