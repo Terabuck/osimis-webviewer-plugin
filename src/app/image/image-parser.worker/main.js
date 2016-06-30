@@ -29,7 +29,7 @@ var KLVReader = WorkerGlobalScope.KLVReader;
 
 // dirty FIX PhantomJS for unit tests
 if (!location || !location.origin) {
-    var location = {
+    self.location = {
         origin: 'http://localhost:9876'
     };
 }
