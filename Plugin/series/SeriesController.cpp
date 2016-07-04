@@ -1,9 +1,11 @@
-#include <boost/regex.hpp>
-
 #include "SeriesController.h"
+
+#include <boost/regex.hpp>
+#include "../../Orthanc/Core/OrthancException.h"
 
 #include "../BenchmarkHelper.h" // for BENCH(*)
 #include "../OrthancContextManager.h"
+
 
 SeriesRepository* SeriesController::seriesRepository_ = NULL;
 
@@ -25,7 +27,7 @@ OrthancPluginErrorCode SeriesController::_ParseURLPostFix(const std::string& url
   // Parse URL
   boost::cmatch matches;
   if (!boost::regex_match(urlPostfix.c_str(), matches, regexp)) {
-    // Return 404 error on badly formatted URL
+    // Return 404 error on badly formatted URL - @todo use ErrorCode_UriSyntax instead
     return this->_AnswerError(404);
   }
   else {
@@ -52,6 +54,9 @@ OrthancPluginErrorCode SeriesController::_ProcessRequest()
 
     // Answer Request with the series' information as JSON
     return this->_AnswerBuffer(series->ToJson(), "application/json");
+  }
+  catch (const Orthanc::OrthancException& exc) {
+    return this->_AnswerError(exc.GetHttpStatus());
   }
   catch(...) {
       // @note if the exception has been thrown from some constructor,

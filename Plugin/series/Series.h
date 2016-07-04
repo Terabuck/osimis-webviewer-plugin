@@ -25,10 +25,12 @@
 
 class Series
 {
+friend class SeriesFactory;
+
 public:
-  Series(const std::string& seriesId);
   std::string ToJson() const;
 
 private:
+  Series(const std::string& seriesId);
   std::string _seriesId;
 };

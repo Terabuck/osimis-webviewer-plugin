@@ -2,6 +2,7 @@
 
 #include "../instance/DicomRepository.h"
 #include "Series.h"
+#include "SeriesFactory.h"
 
 /** SeriesRepository [@Repository]
  *
@@ -15,8 +16,10 @@ class SeriesRepository {
 public:
   SeriesRepository(DicomRepository* dicomRepository);
 
+  // @throws Orthanc::OrthancException(OrthancPluginErrorCode_InexistentItem)
   Series* GetSeries(const std::string& seriesId);
 
 private:
   DicomRepository* _dicomRepository;
+  SeriesFactory _seriesFactory;
 };

@@ -27,6 +27,7 @@ class DicomRepository {
   };
 
 public:
+  // @todo use exception instead of boolean return - (await alain confirmation)
   bool getDicomFile(const std::string instanceId, OrthancPluginMemoryBuffer& buffer) const; // throws Orthanc::ErrorCode_UnknownResource
 //  void increfDicomFile(const std::string instanceId);
   void decrefDicomFile(const std::string instanceId) const;
