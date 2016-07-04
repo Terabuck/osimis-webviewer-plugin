@@ -8,8 +8,6 @@
 #include "../Instance/DicomRepository.h"
 #include "Image.h"
 
-// #include "CompressionPolicy/IImageProcessingPolicy.h"
-
 /** ImageRepository [@Repository]
  *
  * Retrieve an Image from an instance uid and a frame index.

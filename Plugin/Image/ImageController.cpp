@@ -53,7 +53,7 @@ OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlP
 
   boost::cmatch matches;
   if (!boost::regex_match(urlPostfix.c_str(), matches, regexp)) {
-    // Return 404 error on badly formatted URL
+    // Return 404 error on badly formatted URL - @todo use ErrorCode_UriSyntax instead
     return this->_AnswerError(404);
   }
   else {
@@ -74,6 +74,9 @@ OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlP
     catch (const boost::bad_lexical_cast&) {
       // should be prevented by the regex
       return this->_AnswerError(500);
+    }
+    catch (const Orthanc::OrthancException& exc) {
+      return this->_AnswerError(exc.GetHttpStatus());
     }
     catch (...) {
       // @note if the exception has been thrown from some constructor,
