@@ -41,15 +41,24 @@ OrthancPluginErrorCode SeriesController::_ParseURLPostFix(const std::string& url
 OrthancPluginErrorCode SeriesController::_ProcessRequest()
 {
   BENCH(FULL_PROCESS);
+  try {
+    // Write Log
+    OrthancPluginContext* context = OrthancContextManager::Get();
+    std::string message = "Ordering instances of series: " + this->seriesId_;
+    OrthancPluginLogInfo(context, message.c_str());
+    
+    // Load the series with an auto_ptr so it's freed at the end of thit method
+    std::auto_ptr<Series> series(seriesRepository_->GetSeries(this->seriesId_));
 
-  // Write Log
-  OrthancPluginContext* context = OrthancContextManager::Get();
-  std::string message = "Ordering instances of series: " + this->seriesId_;
-  OrthancPluginLogInfo(context, message.c_str());
-  
-  // Load the series with an auto_ptr so it's freed at the end of thit method
-  std::auto_ptr<Series> series(seriesRepository_->GetSeries(this->seriesId_));
+    // Answer Request with the series' information as JSON
+    return this->_AnswerBuffer(series->ToJson(), "application/json");
+  }
+  catch(...) {
+      // @note if the exception has been thrown from some constructor,
+      // memory leaks may happen. we should fix the bug instead of focusing on those memory leaks.
+      // however, in case of memory leak due to bad alloc, we should clean memory.
+      // @todo avoid memory allocation within constructor
 
-  // Answer Request with the series' information as JSON
-  return this->_AnswerBuffer(series->ToJson(), "application/json");
+    return this->_AnswerError(500);
+  }
 }

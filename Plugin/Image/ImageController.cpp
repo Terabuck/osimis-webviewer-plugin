@@ -76,6 +76,11 @@ OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlP
       return this->_AnswerError(500);
     }
     catch (...) {
+      // @note if the exception has been thrown from some constructor,
+      // memory leaks may happen. we should fix the bug instead of focusing on those memory leaks.
+      // however, in case of memory leak due to bad alloc, we should clean memory.
+      // @todo avoid memory allocation within constructor
+
       // @todo better control
       return this->_AnswerError(500);
     }
