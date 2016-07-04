@@ -12,7 +12,7 @@
 
 JpegConversionPolicy::JpegConversionPolicy(int quality) : quality_(quality)
 {
-  // @todo check quality
+  assert(quality <= 100);
 }
 
 JpegConversionPolicy::~JpegConversionPolicy()
@@ -22,22 +22,11 @@ JpegConversionPolicy::~JpegConversionPolicy()
 IImageContainer* JpegConversionPolicy::Apply(IImageContainer* input, ImageMetaData* metaData) {
   BENCH(COMPRESS_FRAME_IN_JPEG);
 
+  // Except *raw* image
   RawImageContainer* rawImage = dynamic_cast<RawImageContainer*>(input);
-  if (!rawImage)
-  {
-    throw std::invalid_argument("Input is not raw");
-    // @todo Throw exception : input is not a raw image
-    return 0;
-  }
+  assert(rawImage != 0);
 
   Orthanc::ImageAccessor* accessor = rawImage->GetOrthancImageAccessor();
-  Orthanc::PixelFormat pixelFormat = accessor->GetFormat();
-  if (pixelFormat != Orthanc::PixelFormat_Grayscale8 && pixelFormat != Orthanc::PixelFormat_RGB24)
-  {
-    throw std::invalid_argument("Input is not 8bit");
-    // @todo Throw exception : input is not 8bit
-    return 0;
-  }
 
   // @note we don't use ViewerToolbox::WriteJpegToMemory because it has
   // avoidable memory copy from OrthancPluginMemoryBuffer to std::string
@@ -51,10 +40,12 @@ IImageContainer* JpegConversionPolicy::Apply(IImageContainer* input, ImageMetaDa
    accessor->GetConstBuffer(), quality_
   );
 
+  // Except 8bit image (OrthancPluginErrorCode_ParameterOutOfRange means image is not the right format)
+  assert(error != OrthancPluginErrorCode_ParameterOutOfRange);
+
+  // Check compression result (may throw on bad_alloc)
   if (error != OrthancPluginErrorCode_Success)
   {
-    // @todo catch in Controller!
-    // OrthancPluginErrorCode_ParameterOutOfRange mean image is not in 8bit
     throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(error));
   }
 

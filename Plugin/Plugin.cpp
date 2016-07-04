@@ -345,6 +345,12 @@ void ParseConfiguration(bool& enableGdcm,
 
 }
 
+
+DicomRepository* dicomRepository;
+ImageRepository* imageRepository;
+SeriesRepository* seriesRepository;
+
+
 extern "C"
 {
   ORTHANC_PLUGINS_API int32_t OrthancPluginInitialize(OrthancPluginContext* context)
@@ -430,21 +436,22 @@ extern "C"
     }
 
 
-    /* Install the callbacks */
-    // OrthancPluginRegisterRestCallbackNoLock(context_, "/osimis-viewer/is-stable-series/(.*)", IsStableSeries);
-
-    DicomRepository* dicomRepository = new DicomRepository; // @todo free
-    ImageRepository* imageRepository = new ImageRepository(dicomRepository); // @todo free
-    SeriesRepository* seriesRepository = new SeriesRepository(dicomRepository); // @todo free
+    // Instantiate repositories
+    DicomRepository* dicomRepository = new DicomRepository;
+    ImageRepository* imageRepository = new ImageRepository(dicomRepository);
+    SeriesRepository* seriesRepository = new SeriesRepository(dicomRepository);
     imageRepository->enableCachedImageStorage(cachedImageStorageEnabled);
 
-    // @todo free
     ImageController::Inject(imageRepository);
     SeriesController::Inject(seriesRepository);
 
+    // Register routes & controllers
     RegisterRoute<ImageController>("/osimis-viewer/images/");
     RegisterRoute<SeriesController>("/osimis-viewer/series/");
 
+    // OrthancPluginRegisterRestCallbackNoLock(context_, "/osimis-viewer/is-stable-series/(.*)", IsStableSeries);
+
+    // @todo use common interface with RegisterRoute
 #if ORTHANC_STANDALONE == 1
     OrthancPluginRegisterRestCallbackNoLock(context, "/osimis-viewer/app/(.*)", ServeEmbeddedFolder<Orthanc::EmbeddedResources::WEB_VIEWER>);
 #else
@@ -463,6 +470,11 @@ extern "C"
   ORTHANC_PLUGINS_API void OrthancPluginFinalize()
   {
     OrthancPluginLogWarning(context_, "Finalizing the Web viewer");
+
+    // Free repositories
+    delete seriesRepository;
+    delete imageRepository;
+    delete dicomRepository;
   }
 
 

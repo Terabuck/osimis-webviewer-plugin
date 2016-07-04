@@ -134,13 +134,13 @@ OrthancPluginErrorCode ImageController::_ProcessRequest()
 
 #if PLUGIN_ENABLE_DEBUG_ROUTE == 1
 // Parse JpegConversionPolicy compression parameter from its route regex matches
+// may throws lexical_cast on bad route
 template<>
 inline JpegConversionPolicy* ImageProcessingRouteParser::_Instanciate<JpegConversionPolicy>(boost::cmatch& regexpMatches)
 {
   int compression = 100;
   
   if (regexpMatches[1].length()) {
-    // @todo catch lexical_cast
     compression = boost::lexical_cast<int>(regexpMatches[1]);
   }
 
@@ -148,13 +148,13 @@ inline JpegConversionPolicy* ImageProcessingRouteParser::_Instanciate<JpegConver
 };
 
 // Parse ResizePolicy compression parameter from its route regex matches
+// may throws lexical_cast on bad route
 template<>
 inline ResizePolicy* ImageProcessingRouteParser::_Instanciate<ResizePolicy>(boost::cmatch& regexpMatches)
 {
   unsigned int maxWidthHeight = 0;
   
   if (regexpMatches[1].length()) {
-    // @todo catch lexical_cast
     maxWidthHeight = boost::lexical_cast<unsigned int>(regexpMatches[1]);
   }
 

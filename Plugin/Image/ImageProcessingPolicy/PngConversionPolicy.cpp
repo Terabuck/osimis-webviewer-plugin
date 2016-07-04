@@ -13,18 +13,13 @@
 IImageContainer* PngConversionPolicy::Apply(IImageContainer* input, ImageMetaData* metaData) {
   BENCH(COMPRESS_FRAME_IN_PNG);
 
-  RawImageContainer* rawImage = dynamic_cast<RawImageContainer*>(input);  //@todo: this should probably be an assert (design verification)
-  if (!rawImage)
-  {
-    throw std::invalid_argument("Input is not raw");
-    // @todo Throw exception : input is not a raw image
-    return NULL;
-  }
+  // Except *raw* image
+  RawImageContainer* rawImage = dynamic_cast<RawImageContainer*>(input);
+  assert(rawImage != 0);
 
   Orthanc::ImageAccessor* accessor = rawImage->GetOrthancImageAccessor();
 
-  OrthancPluginMemoryBuffer buffer; //will be adopted by the CompressedImageContainer so, no need to delete it
-  // @todo test with 8bit images
+  OrthancPluginMemoryBuffer buffer; // will be adopted by the CompressedImageContainer so, no need to delete it
 
   OrthancPluginErrorCode error = OrthancPluginCompressPngImage(
    OrthancContextManager::Get(), &buffer, OrthancPlugins::Convert(accessor->GetFormat()),
@@ -32,10 +27,12 @@ IImageContainer* PngConversionPolicy::Apply(IImageContainer* input, ImageMetaDat
    accessor->GetConstBuffer()
   );
 
+  // Except 8bit image (OrthancPluginErrorCode_ParameterOutOfRange means image is not the right format)
+  assert(error != OrthancPluginErrorCode_ParameterOutOfRange);
+
+  // Check compression result (may throw on bad_alloc)
   if (error != OrthancPluginErrorCode_Success)
   {
-    // @todo catch in Controller!
-    // OrthancPluginErrorCode_ParameterOutOfRange mean image is not the right format (xBit ?)
     throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(error));
   }
 

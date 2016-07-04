@@ -34,8 +34,6 @@ Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIn
   BENCH_LOG(IMAGE_FORMATING, "");
   // boost::lock_guard<boost::mutex> guard(mutex_); // make sure the memory amount doesn't overrise
 
-  // @todo catch method call's exceptions ?
-
   // @todo check if it's useful. json should not be required
   // as the content is already in the dicom.
   Json::Value dicomTags;
@@ -71,7 +69,7 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
   // if not found - create
   // if found - retrieve
   Image* image;
-  OrthancPluginMemoryBuffer getResultBuffer; //will be adopted by CornerstoneKLVContainer if the request succeeds
+  OrthancPluginMemoryBuffer getResultBuffer; // will be adopted by CornerstoneKLVContainer if the request succeeds
   getResultBuffer.data = NULL;
 
   // store attachment
@@ -91,44 +89,35 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
     error = OrthancPluginRestApiGet(OrthancContextManager::Get(), &getResultBuffer, path.c_str());
   }
 
-  if (error == OrthancPluginErrorCode_InexistentItem)
-  {
-    assert(getResultBuffer.data == NULL); //make sure there won't be any leak since getResultBuffer is not deleted if not adopted by the KLV Container
+  // Except Orthanc to accept attachmentName (it should be a number > 1024)
+  assert(error != OrthancPluginErrorCode_InexistentItem);
 
-    // @todo throw exception - attachment tag doesn't exists
-    return NULL;
-  }
-  else if (error == OrthancPluginErrorCode_UnknownResource)
+  // No cache available - Create content & save cache
+  if (error == OrthancPluginErrorCode_UnknownResource)
   {
-    assert(getResultBuffer.data == NULL); //make sure there won't be any leak since getResultBuffer is not deleted if not adopted by the KLV Container
-
-    // No cache available - Create content & save cache
+    // Make sure there won't be any leak since getResultBuffer is not deleted if not adopted by the KLV Container
+    assert(getResultBuffer.data == NULL);
 
     BENCH(FILE_CACHE_CREATION); // @todo Split in two when refactoring. This contains the file processing..
     image = _GetImage(instanceId, frameIndex, policy);
 
-    // save file
+    // Save file
     ScopedOrthancPluginMemoryBuffer putResultBuffer(OrthancContextManager::Get());
     path = "/instances/" + instanceId + "/attachments/" + attachmentName; // no "/data"
-
     // @todo avoid Orthanc throwing PluginsManager.cpp:194] Exception while invoking plugin service 3001: Unknown resource
     error = OrthancPluginRestApiPut(OrthancContextManager::Get(), putResultBuffer.getPtr(), path.c_str(), image->GetBinary(), image->GetBinarySize());
     if (error != OrthancPluginErrorCode_Success)
     {
-      // @todo throw or be sure orthanc is up to date at plugin init
-      // throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
-      return NULL;
+      throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(error));
     }
     else
     {
       return image;
     }
-
   }
+  // Cache available - send retrieved file
   else if (error == OrthancPluginErrorCode_Success)
   {
-    // Cache available - send retrieved file
-
     // NO METADATA ?
     // unstable...
     CornerstoneKLVContainer* data = new CornerstoneKLVContainer(getResultBuffer); // takes getResultBuffer memory ownership
@@ -138,9 +127,7 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
   }
   else
   {
-    // throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
-    // @todo throw;
-    return NULL;
+    throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(error));
   }
 }
 
@@ -201,6 +188,9 @@ std::string _getAttachmentNumber(int frameIndex, const IImageProcessingPolicy* p
   int attachmentPrefix = 10000;
   int maxFrameCount = 1000; // @todo use adaptative maxFrameCount !
 
+  // Except to cache only specified policies
+  assert(policyString == "high-quality" || policyString == "medium-quality" || policyString == "low-quality");
+
   if (policyString == "high-quality") {
     attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 0 + frameIndex);
   }
@@ -209,10 +199,6 @@ std::string _getAttachmentNumber(int frameIndex, const IImageProcessingPolicy* p
   }
   else if (policyString == "low-quality") {
     attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 2 + frameIndex);
-  }
-  else {
-    // @todo set better error message
-    throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
   }
 
   return attachmentNumber;
