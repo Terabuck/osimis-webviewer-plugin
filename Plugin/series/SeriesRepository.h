@@ -12,7 +12,7 @@
  *
  */
 // @todo boost::noncopyable
-class SeriesRepository {
+class SeriesRepository : public boost::noncopyable {
 public:
   SeriesRepository(DicomRepository* dicomRepository);
 

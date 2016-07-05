@@ -10,8 +10,7 @@
 /** ImageMetaData [@Entity]
  *
  */
-// @todo boost::noncopyable
-struct ImageMetaData {
+struct ImageMetaData : public boost::noncopyable {
   ImageMetaData();
 
   // @todo const RawImageContainer

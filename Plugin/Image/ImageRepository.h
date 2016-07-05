@@ -17,8 +17,7 @@
  * @Responsibility Manage cache
  *
  */
-// @todo boost::noncopyable
-class ImageRepository {
+class ImageRepository : public boost::noncopyable {
 public:
   ImageRepository(DicomRepository* dicomRepository);
 

@@ -3,7 +3,6 @@
 #include <json/writer.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/lock_guard.hpp> 
-#include <boost/foreach.hpp>
 
 #include "../../Orthanc/Core/OrthancException.h" // for throws
 #include "../ViewerToolbox.h" // for OrthancPlugins::get*FromOrthanc && OrthancPluginImage

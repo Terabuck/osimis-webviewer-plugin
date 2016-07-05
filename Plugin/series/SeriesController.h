@@ -8,7 +8,7 @@
 // .../<series_id>
 
 // @todo boost::noncopyable
-class SeriesController : public BaseController {
+class SeriesController : public BaseController, public boost::noncopyable {
 public:
   SeriesController(OrthancPluginRestOutput* response, const std::string& url, const OrthancPluginHttpRequest* request);
 

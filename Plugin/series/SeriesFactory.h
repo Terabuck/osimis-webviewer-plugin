@@ -6,7 +6,7 @@
 #include "../AvailableQuality/IAvailableQualityPolicy.h"
 #include "Series.h"
 
-class SeriesFactory {
+class SeriesFactory : public boost::noncopyable {
 public:
   SeriesFactory(IAvailableQualityPolicy* availableQualityPolicy); // takes ownership
 

@@ -18,8 +18,7 @@
  * - an instance (for monoframe instance)
  *
  */
-// @todo boost::noncopyable
-class Image {
+class Image : public boost::noncopyable {
   friend class ImageRepository;
 
 public:

@@ -16,8 +16,7 @@
  *   stateless requirements !
  *
  */
-// @todo boost::noncopyable
-class DicomRepository {
+class DicomRepository : public boost::noncopyable {
 
   struct DicomFile
   {
@@ -27,6 +26,7 @@ class DicomRepository {
   };
 
 public:
+  // @return false if the cache has been recreated
   // @todo use exception instead of boolean return - (await alain confirmation)
   bool getDicomFile(const std::string instanceId, OrthancPluginMemoryBuffer& buffer) const; // throws Orthanc::ErrorCode_UnknownResource
 //  void increfDicomFile(const std::string instanceId);
