@@ -23,38 +23,25 @@
 
 #include "../Orthanc/Core/OrthancException.h"
 #include <boost/regex.hpp>
+#include <boost/foreach.hpp>
 
-Series::Series(const std::string& seriesId) : _seriesId(seriesId)
+Series::Series(const std::string& seriesId, const Json::Value& seriesTags, const Json::Value& orderedInstances,
+    const std::set<ImageQuality>& imageQualities)
+    : _seriesId(seriesId), _seriesTags(seriesTags), _orderedInstances(orderedInstances), _imageQualities(imageQualities)
 {
+
 }
 
 std::string Series::ToJson() const {
-  std::string content;
-
   Json::Value result;
-//   result["ID"] = seriesId;
-//   result["SeriesDescription"] = series["MainDicomTags"]["SeriesDescription"].asString();
-//   result["StudyDescription"] = study["StudyDescription"].asString();
-//   result["PatientID"] = patient["PatientID"].asString();
-//   result["PatientName"] = patient["PatientName"].asString();
-//   result["Type"] = ordered["Type"];
-//   result["Slices"] = ordered["Slices"];
+  result["id"] = _seriesId;
+  result["tags"] = _seriesTags;
+  result["instances"] = _orderedInstances;
+  // result["tags"] = OrthancPlugins::ConvertDicomMapToJson(*_seriesTags.get());
 
-//   boost::regex pattern("^/instances/([a-f0-9-]+)/frames/([0-9]+)$");
+  BOOST_FOREACH(ImageQuality quality, _imageQualities) {
+    result["availableQualities"].append(quality.toString());
+  }
 
-//   for (Json::Value::ArrayIndex i = 0; i < result["Slices"].size(); i++)
-//   {
-//     boost::cmatch what;
-//     if (regex_match(result["Slices"][i].asCString(), what, pattern))
-//     {
-//       result["Slices"][i] = std::string(what[1]) + "_" + std::string(what[2]);
-//     }
-//     else
-//     {
-//       // @todo throw exception
-//     }
-//   }
-
-//   // @todo do somthing with it.
   return result.toStyledString();
 }

@@ -21,16 +21,24 @@
 #pragma once
 
 #include <string>
-#include <orthanc/OrthancCPlugin.h>
+#include <set>
+#include <json/value.h>
+#include "../../Orthanc/Core/DicomFormat/DicomMap.h"
+#include "../AvailableQuality/ImageQuality.h"
 
-class Series
-{
+class Series : public boost::noncopyable {
 friend class SeriesFactory;
 
 public:
   std::string ToJson() const;
 
 private:
-  Series(const std::string& seriesId);
+  // takes seriesTags memory ownership
+  Series(const std::string& seriesId, const Json::Value& seriesTags, const Json::Value& orderedInstances,
+      const std::set<ImageQuality>& imageQualities);
+
   std::string _seriesId;
+  Json::Value _seriesTags;
+  Json::Value _orderedInstances;
+  std::set<ImageQuality> _imageQualities;
 };

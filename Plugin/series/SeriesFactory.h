@@ -2,17 +2,16 @@
 
 #include <json/value.h>
 #include "../../Orthanc/Core/DicomFormat/DicomMap.h"
-
 #include "../AvailableQuality/IAvailableQualityPolicy.h"
 #include "Series.h"
 
 class SeriesFactory : public boost::noncopyable {
 public:
-  SeriesFactory(IAvailableQualityPolicy* availableQualityPolicy); // takes ownership
+  SeriesFactory(std::auto_ptr<IAvailableQualityPolicy> availableQualityPolicy); // takes ownership
 
-  // @post instance-related tags are removed from tags
-  Series* CreateSeries(const std::string& seriesId, const Json::Value& slicesShort, Orthanc::DicomMap& tags);
+  std::auto_ptr<Series> CreateSeries(const std::string& seriesId, const Json::Value& slicesShort,
+      const Orthanc::DicomMap& metaInfoTags, const Json::Value& otherTags);
 
 private:
-  std::auto_ptr<IAvailableQualityPolicy> _availableQualityPolicy;
+  const std::auto_ptr<IAvailableQualityPolicy> _availableQualityPolicy;
 };
