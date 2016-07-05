@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html class="wv-html">
   <head>
     <style>
         /* This helps the ng-show/ng-hide animations start at the right place. */
@@ -15,7 +15,7 @@
 
     <link rel="stylesheet" href="styles/app.css">
   </head>
-  <body ng-app="orthanc">
+  <body ng-app="orthanc" class="wv-body">
     <div ng-controller="OsimisWebViewer" class="wv-container">
         <wv-toolbar wv-items="vm.toolbar" ng-if="vm.minimize"></wv-toolbar>
         <div style="height: calc(100% - 40px)" wv-size-tag ng-if="vm.minimize">
