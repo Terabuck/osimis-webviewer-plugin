@@ -6,7 +6,7 @@
         .factory('wvOrthancSeriesAdapter', wvOrthancSeriesAdapter);
 
     /* @ngInject */
-    function wvOrthancSeriesAdapter(WvSeries) {
+    function wvOrthancSeriesAdapter(WvSeries, WvImageQualities) {
         var service = {
             process: process
         };
@@ -14,9 +14,9 @@
 
         ////////////////
 
-        function process(orthancSeries, orthancOrderedInstances, tags) {
-            // for each instance in one series, retrieve each image ids
-            var imagesByInstance = orthancOrderedInstances.SlicesShort
+        function process(orthancSeries) {
+            // Retrieve each image ids for each instance in one series
+            var imagesByInstance = orthancSeries.instances
                 // .reverse()
                 .map(function(instance) {
                     var instanceId = instance[0];
@@ -30,7 +30,7 @@
                     return imageIds;
                 });
             
-            // check if image is single frame
+            // Check if image is single frame
             var isSingleFrame = imagesByInstance
                 .filter(function(images) {
                     return images.length === 1;
@@ -46,12 +46,29 @@
                 var imagesBySeries = imagesByInstance;
             }
             
-            // instanciate series objects
-            var seriesList = imagesBySeries.map(function(imageIds, seriesIndex) {
-                var id = orthancSeries.ID + ':' + seriesIndex;
-                tags = tags || orthancSeries.MainDicomTags;
+            // Get tags
+            var tags = orthancSeries.tags;
+            
+            // Convert available qualities into WvImageQualities format
+            var availableQualities = _.pickBy(WvImageQualities, function(value, key) {
+                // availableQualities (uppercase) has key
+                for (var i=0; i<orthancSeries.availableQualities.length; ++i) {
+                    var availableQuality = orthancSeries.availableQualities[i];
 
-                return new WvSeries(id, imageIds, tags);
+                    if (key === availableQuality.toUpperCase()) {
+                        return true;
+                    }
+                };
+
+                // availableQualities (uppercase) don't contain key
+                return false;
+            });
+
+            // Instantiate series objects
+            var seriesList = imagesBySeries.map(function(imageIds, seriesIndex) {
+                var id = orthancSeries.id + ':' + seriesIndex;
+
+                return new WvSeries(id, imageIds, tags, availableQualities);
             });
 
             return seriesList;

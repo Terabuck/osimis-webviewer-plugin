@@ -8,7 +8,7 @@
     /* @ngInject */
     function factory($rootScope, $timeout, wvAnnotationManager, WvAnnotationGroup, wvImageBinaryManager) {
 
-        function WvSeries(id, imageIds, tags) {
+        function WvSeries(id, imageIds, tags, availableQualities) {
             var _this = this;
 
             this.id = id; // id == orthancId + ':' + subSeriesIndex
@@ -17,6 +17,7 @@
             this.currentIndex = 0; // real index of the image, waiting loading to be shown
             this.currentShownIndex = 0; // index shown at the moment
             this.tags = tags;
+            this.availableQualities = availableQualities;
             this.onCurrentImageIdChanged = new osimis.Listener();
             this.onAnnotationChanged = new osimis.Listener();
 
@@ -37,6 +38,36 @@
 
             this.isPlaying = false;
             this._playTimeout = null;
+        };
+
+        /** WvSeries#listInstanceIds()
+         *
+         * List instances (and not images)
+         *
+         * @return [instanceId: String, ...]
+         *
+         */
+        WvSeries.prototype.listInstanceIds = function() {
+            var instanceIds = [];
+            var previousInstanceId = null;
+
+            // Take instanceIds from imageIds
+            // @note this._imageIds is sorted
+            for (var i=0; i<this.imageIds.length; ++i) {
+                var imageId = this.imageIds[i];
+                var splittedId = imageId.split(':');
+                var instanceId = splittedId[0];
+
+                if (instanceId === previousInstanceId) {
+                    continue;
+                }
+                else {
+                    instanceIds.push(instanceId);
+                    previousInstanceId = instanceId;
+                }
+            }
+
+            return instanceIds;
         };
 
         /** WvSeries#getCachedImageBinaries()

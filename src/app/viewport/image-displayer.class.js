@@ -128,6 +128,7 @@
         var minimumQuality = image.getBestQualityInCache() || 0;
 
         // Override desired quality to a better one if already in cache
+        // @todo @warning make sure desiredQuality is in availableQualities !
         var maximumQuality = this._desiredQuality > minimumQuality ? this._desiredQuality : minimumQuality;
 
         // Start loading binaries from the highest cached quality to the desired quality

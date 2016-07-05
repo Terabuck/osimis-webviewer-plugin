@@ -6,7 +6,7 @@
         .factory('wvSeriesManager', wvSeriesManager);
 
     /* @ngInject */
-    function wvSeriesManager($q, $http, wvConfig, wvOrthancSeriesAdapter) {
+    function wvSeriesManager($rootScope, $q, $http, wvConfig, wvOrthancSeriesAdapter) {
         var service = {
             get: get,
             listFromOrthancSeriesId: listFromOrthancSeriesId,
@@ -28,28 +28,21 @@
 
         function listFromOrthancSeriesId(id) {
             // @todo bench this method
-            var seriesInfoPromise = $http.get(wvConfig.orthancApiURL + '/series/'+id, {cache: true});
-            var orderedInstancePromise = $http.get(wvConfig.orthancApiURL + '/series/'+id+'/ordered-slices', {cache: true});
+            var seriesPromise = $http.get(wvConfig.orthancApiURL + '/osimis-viewer/series/'+id, {cache: true});
 
-            return orderedInstancePromise
-                .then(function(orderInstancesResult) {
-                    // retrieve tags of the first series instance (once we have the first instance id)
-                    var firstInstanceId = orderInstancesResult.data.SlicesShort[0][0];
-                    var tagsPromise = $http.get(wvConfig.orthancApiURL + '/instances/'+firstInstanceId+'/simplified-tags', {cache: true});
-                    
-                    return $q.all({
-                      orthancSeries: seriesInfoPromise,
-                      orthancOrderedInstances: orderInstancesResult,
-                      tags: tagsPromise
+            return seriesPromise
+                .then(function(result) {
+                    // @note One server-side multiframe series is converted into multiple front-end
+                    // series, so the result is an array of series instead of a single one.
+                    var seriesList = wvOrthancSeriesAdapter.process(result.data);
+
+                    // Emit event when series have been loaded.
+                    // This is notably used by image manager to cache available image qualities.
+                    seriesList.forEach(function (series) {
+                        $rootScope.$emit('SeriesHasBeenLoaded', series);
                     });
-                })
-                .then(function(args) {
-                    // instanciate osiviewer seriesList from orthanc series
-                    var orthancSeries = args.orthancSeries.data;
-                    var orthancOrderedInstances = args.orthancOrderedInstances.data;
-                    var tags = args.tags.data;
 
-                    return wvOrthancSeriesAdapter.process(orthancSeries, orthancOrderedInstances, tags);
+                    return seriesList;
                 });
         }
 

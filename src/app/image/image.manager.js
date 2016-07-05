@@ -6,7 +6,7 @@
         .factory('wvImageManager', wvImageManager);
 
     /* @ngInject */
-    function wvImageManager($http, $q, $compile, $timeout, $rootScope, wvConfig, WvImage) {
+    function wvImageManager($rootScope, $http, $q, $compile, $timeout, wvConfig, WvImage) {
         var service = {
             get: get,
             createAnnotedImage: createAnnotedImage,
@@ -18,11 +18,25 @@
     
         var postProcessorClasses = {};
 
-        // @todo flush somehow
-        var modelCache = {};
+        // @todo flush
+        var _modelCache = {};
 
-        // @todo flush somehow
-        var pixelCache = {};
+        /** _availableQualities
+         *
+         * Cache available qualities by instanceId when a series are loaded,
+         * because available qualities are only retrieved in a series http request
+         * to avoid unnecessary http requests.
+         *
+         */
+        // @todo flush
+        var _availableQualities = {};
+
+        $rootScope.$on('SeriesHasBeenLoaded', function(evt, series) {
+            var instanceIds = series.listInstanceIds();
+            instanceIds.forEach(function(instanceId) {
+                _availableQualities[instanceId] = series.availableQualities;
+            });
+        });
 
         return service;
 
@@ -31,16 +45,19 @@
         // @input id: string <slice-id>[|<processor>...]
         //    <slice-id>: *:\d+ (_instance_:_slice_)
         //    <processor>: <string>[~<string>...] (_name_~_param1_~_param2_...)
+        // 
+        // @pre the image's series has been loaded via wvSeriesManager
+        // 
         function get(id) {
             var _this = this;
 
-            if (!modelCache.hasOwnProperty(id)) {
-                // split between image id and postProcesses
+            if (!_modelCache.hasOwnProperty(id)) {
+                // Split between image id and postProcesses
                 var splitted = id.split('|');
                 id = splitted[0];
                 var postProcessesStrings = splitted.splice(1);
                 var postProcesses = postProcessesStrings.map(function (processString) {
-                    // split processString between process name and its arguments
+                    // Split processString between process name and its arguments
                     splitted = processString.split('~');
                     var processName = splitted[0];
                     var processArgs = splitted.splice(1);
@@ -53,21 +70,28 @@
                     return postProcessObject;
                 });
 
-                // split between dicom instance id and frame index
+                // Split between dicom instance id and frame index
                 splitted = id.split(':');
                 var instanceId = splitted[0];
                 var frameIndex = splitted[1] || 0;
+
+                // Retrieve available qualities
+                var availableQualities = _availableQualities[instanceId];
+                if (!availableQualities) {
+                    throw new Error("Image availableQualities is unavalaible: image's series has not been loaded.");
+                }
                 
-                // return results
-                modelCache[id] = $http
-                    .get(wvConfig.orthancApiURL + '/instances/'+instanceId+'/simplified-tags', {cache: true})
+                // Create & return image model based on request results
+                _modelCache[id] = $http
+                    .get(wvConfig.orthancApiURL + '/instances/'+instanceId+'/simplified-tags', {cache: false}) // already cached at upper level
                     .then(function(response) {
                         var tags = response.data;
-                        return new WvImage(_this, id, tags, postProcesses);
+
+                        return new WvImage(_this, id, tags, availableQualities, postProcesses);
                     });
             };
 
-            return modelCache[id];
+            return _modelCache[id];
         };
 
         function registerPostProcessor(name, PostProcessor) {
