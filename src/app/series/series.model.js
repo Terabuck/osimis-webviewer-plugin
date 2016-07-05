@@ -70,6 +70,24 @@
             return instanceIds;
         };
 
+        /** WvSeries#hasQuality(quality: int)
+         *
+         * @return bool
+         *
+         */
+        WvSeries.prototype.hasQuality = function(quality) {
+            // Seek quality in this.availableQualities
+            for (var i=0; i<this.availableQualities.length; ++i) {
+                var availableQuality = this.availableQualities[i];
+                if (availableQuality === quality) {
+                    return true;
+                }
+            }
+
+            // Quality not found
+            return false;
+        };
+
         /** WvSeries#getCachedImageBinaries()
          *
          * @return [<image-index>: [<quality-value>, ...], ...]
