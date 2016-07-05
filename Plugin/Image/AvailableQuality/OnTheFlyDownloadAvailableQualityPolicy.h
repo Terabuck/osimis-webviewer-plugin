@@ -15,7 +15,14 @@ public:
   OnTheFlyDownloadAvailableQualityPolicy(DicomRepository* dicomRepository)
       : IAvailableQualityPolicy(dicomRepository) {}
       
-  virtual std::set<EImageQuality> RetrieveByImage(const OrthancPluginMemoryBuffer& dicom, unsigned int frameIndex) {
+  virtual std::set<ImageQuality> RetrieveByTags(const Orthanc::DicomMap& tags) {
 
+    std::set<ImageQuality> result;
+
+    result.insert(ImageQuality(ImageQuality::LOW));
+    // result.insert(ImageQuality(ImageQuality::MEDIUM));
+    result.insert(ImageQuality(ImageQuality::LOSSLESS));
+
+    return result;
   }
 };
