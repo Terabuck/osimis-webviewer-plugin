@@ -75,7 +75,7 @@
                 });
                 // @todo close on destroy
 
-                // Retrieve already cached seriess' image list
+                // Retrieve already cached series' image list
                 _this.imageQualities = newSeries.listCachedImageBinaries();
 
                 // Get the best quality of each image so we can draw its color

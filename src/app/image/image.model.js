@@ -32,6 +32,11 @@
             _feedBinaryLoadedEvents(this);
         }
 
+        /** WvImage#getAvailableQualities()
+         *
+         * @return available qualities as {<string>: <int>} array
+         *
+         */
         WvImage.prototype.getAvailableQualities = function() {
             return this._availableQualities;
         };

@@ -48,19 +48,19 @@
                 var seriesId = droppedElement.data('series-id');
                 $scope.$apply(function() {
                     _wvSeriesIdViewModels.forEach(function(viewmodel) {
-                        // Trigger old seriess removed UX global event
+                        // Trigger old series removed UX global event
                         var oldSeries = viewmodel.getSeries();
                         if (oldSeries) {
-                            $rootScope.$emit('UserUnSelectedSeriess', oldSeries);
+                            $rootScope.$emit('UserUnSelectedSeries', oldSeries);
                         }
 
                         // Set new series
                         viewmodel
                             .setSeries(seriesId)
                             .then(function(newSeries) {
-                                // Trigger new seriess UX global event
+                                // Trigger new series UX global event
                                 if (newSeries) {
-                                    $rootScope.$emit('UserSelectedSeriess', newSeries);
+                                    $rootScope.$emit('UserSelectedSeries', newSeries);
                                 }
                             });
                     });
