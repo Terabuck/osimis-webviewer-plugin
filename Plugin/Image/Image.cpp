@@ -23,13 +23,6 @@ Image::Image(const std::string& instanceId, uint32_t frameIndex, CornerstoneKLVC
   data_ = data;
 }
 
-const char* Image::GetBinary() {
-  return data_->GetBinary();
-}
-uint32_t Image::GetBinarySize() {
-  return data_->GetBinarySize();
-}
-
 void Image::ApplyProcessing(IImageProcessingPolicy* policy)
 {
   IImageContainer* oldData = data_;

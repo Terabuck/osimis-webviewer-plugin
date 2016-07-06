@@ -26,10 +26,52 @@ ImageRepository::ImageRepository(DicomRepository* dicomRepository)
 {
 }
 
-Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIndex, bool enableCache) const
-{
-  // @todo activate cache
 
+Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy, bool enableCache) const
+{
+  // Return uncached image
+  if (!enableCache || !isCachedImageStorageEnabled()) {
+    return this->_LoadImage(instanceId, frameIndex, policy);
+  }
+  // Return cached image (& save in cache if uncached)
+  else {
+    // Define attachment name based upon policy
+    std::string attachmentNumber = _getAttachmentNumber(frameIndex, policy);
+
+    // Retrieve cached image
+    Image* image = this->_GetProcessedImageFromCache(attachmentNumber, instanceId, frameIndex);
+    
+    // Load & cache image if not found
+    if (image == 0) {
+      // Load image
+      image = this->_LoadImage(instanceId, frameIndex, policy);
+
+      // Cache image
+      this->_CacheProcessedImage(attachmentNumber, image);
+    }
+
+    // Return image
+    return image;
+  }
+
+}
+
+void ImageRepository::CleanImageCache(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const
+{
+  // set cache path
+  std::string attachmentNumber = _getAttachmentNumber(frameIndex, policy);
+  std::string path = "/instances/" + instanceId + "/attachments/" + attachmentNumber;
+
+  // send clean path request
+  OrthancPluginErrorCode error;
+  {
+    BENCH(FILE_CACHE_CLEAN);
+    error = OrthancPluginRestApiDelete(OrthancContextManager::Get(), path.c_str());
+    // @todo manage error
+  }
+}
+
+Image* ImageRepository::_LoadImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const {
   BENCH_LOG(IMAGE_FORMATING, "");
   // boost::lock_guard<boost::mutex> guard(mutex_); // make sure the memory amount doesn't overrise
 
@@ -53,22 +95,16 @@ Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIn
   // @todo call on exception
   _dicomRepository->decrefDicomFile(instanceId);
 
-  return image;
-}
-
-Image* ImageRepository::_GetImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const {
-  // create file
-  Image* image = this->GetImage(instanceId, frameIndex, false);
-
-  image->ApplyProcessing(policy);
+  if (policy != 0) {
+    image->ApplyProcessing(policy);
+  }
 
   return image;
 }
 
-Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const {
+Image* ImageRepository::_GetProcessedImageFromCache(const std::string &attachmentNumber, const std::string& instanceId, uint32_t frameIndex) const {
   // if not found - create
   // if found - retrieve
-  Image* image;
   OrthancPluginMemoryBuffer getResultBuffer; // will be adopted by CornerstoneKLVContainer if the request succeeds
   getResultBuffer.data = NULL;
 
@@ -78,89 +114,57 @@ Image* ImageRepository::_GetImageFromCache(const std::string& instanceId, uint32
   // -> data : Unknown Resource
   // -> unregistered attachment name : inexistent item
 
-  // Define attachment name based upon policy
-  std::string attachmentName = _getAttachmentNumber(frameIndex, policy);
-
   // Get attachment content
   OrthancPluginErrorCode error;
-  std::string path = "/instances/" + instanceId + "/attachments/" + attachmentName + "/data";
+  std::string path = "/instances/" + instanceId + "/attachments/" + attachmentNumber + "/data";
   {
     BENCH(FILE_CACHE_RETRIEVAL);
     error = OrthancPluginRestApiGet(OrthancContextManager::Get(), &getResultBuffer, path.c_str());
   }
 
-  // Except Orthanc to accept attachmentName (it should be a number > 1024)
+  // Except Orthanc to accept attachmentNumber (it should be a number > 1024)
   assert(error != OrthancPluginErrorCode_InexistentItem);
 
-  // No cache available - Create content & save cache
-  if (error == OrthancPluginErrorCode_UnknownResource)
-  {
-    // Make sure there won't be any leak since getResultBuffer is not deleted if not adopted by the KLV Container
-    assert(getResultBuffer.data == NULL);
-
-    BENCH(FILE_CACHE_CREATION); // @todo Split in two when refactoring. This contains the file processing..
-    image = _GetImage(instanceId, frameIndex, policy);
-
-    // Save file
-    ScopedOrthancPluginMemoryBuffer putResultBuffer(OrthancContextManager::Get());
-    path = "/instances/" + instanceId + "/attachments/" + attachmentName; // no "/data"
-    // @todo avoid Orthanc throwing PluginsManager.cpp:194] Exception while invoking plugin service 3001: Unknown resource
-    error = OrthancPluginRestApiPut(OrthancContextManager::Get(), putResultBuffer.getPtr(), path.c_str(), image->GetBinary(), image->GetBinarySize());
-    if (error != OrthancPluginErrorCode_Success)
-    {
-      throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(error));
-    }
-    else
-    {
-      return image;
-    }
-  }
   // Cache available - send retrieved file
-  else if (error == OrthancPluginErrorCode_Success)
+  if (error == OrthancPluginErrorCode_Success)
   {
     // NO METADATA ?
     // unstable...
     CornerstoneKLVContainer* data = new CornerstoneKLVContainer(getResultBuffer); // takes getResultBuffer memory ownership
-    image = new Image(instanceId, frameIndex, data); // takes data memory ownership
+    Image* image = new Image(instanceId, frameIndex, data); // takes data memory ownership
     
     return image;
   }
+  // No cache available
+  else if (error == OrthancPluginErrorCode_UnknownResource) {
+    // Make sure there won't be any leak since getResultBuffer is not deleted if not adopted by the KLV Container
+    assert(getResultBuffer.data == NULL);
+    return 0;
+  }
+  // Unknown error - throw
   else
   {
+    // Make sure there won't be any leak since getResultBuffer is not deleted if not adopted by the KLV Container
+    assert(getResultBuffer.data == NULL);
     throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(error));
   }
 }
 
-Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy, bool enableCache) const
-{
-  if (enableCache && isCachedImageStorageEnabled()) {
-    return _GetImageFromCache(instanceId, frameIndex, policy);
-  }
-  else {
-    return _GetImage(instanceId, frameIndex, policy);
-  }
+void ImageRepository::_CacheProcessedImage(const std::string &attachmentNumber, const Image* image) const {
+  // Create content & save cache
+  BENCH(FILE_CACHE_CREATION);
 
-}
+  // Save file
+  ScopedOrthancPluginMemoryBuffer putResultBuffer(OrthancContextManager::Get());
+  std::string path = "/instances/" + image->GetId() + "/attachments/" + attachmentNumber; // no "/data"
+  // @todo avoid Orthanc throwing PluginsManager.cpp:194] Exception while invoking plugin service 3001: Unknown resource
+  OrthancPluginErrorCode error = OrthancPluginRestApiPut(OrthancContextManager::Get(), putResultBuffer.getPtr(), path.c_str(), image->GetBinary(), image->GetBinarySize());
 
-void ImageRepository::CleanImageCache(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const
-{
-  // set cache path
-  std::string attachmentName = "frame:" + boost::lexical_cast<std::string>(frameIndex);
-  if (policy)
-  {
-    attachmentName += "~" + policy->ToString();
-  }
-  std::string path = "/instances/" + instanceId + "/attachments/" + attachmentName;
-
-  // send clean path request
-  OrthancPluginErrorCode error;
-  {
-    BENCH(FILE_CACHE_CLEAN);
-    error = OrthancPluginRestApiDelete(OrthancContextManager::Get(), path.c_str());
-    // @todo manage error
+  // Throw exception on error
+  if (error != OrthancPluginErrorCode_Success) {
+    throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(error));
   }
 }
-
 
 namespace
 {
@@ -183,6 +187,8 @@ void _getFrame(OrthancPluginImage** frameOutput, const void* dicomData, uint32_t
 
 std::string _getAttachmentNumber(int frameIndex, const IImageProcessingPolicy* policy)
 {
+  assert(policy != 0);
+
   std::string attachmentNumber;
   std::string policyString = policy->ToString();
   int attachmentPrefix = 10000;

@@ -52,7 +52,7 @@ ImageController::ImageController(OrthancPluginRestOutput* response, const std::s
 OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlPostfix) {
   BENCH(URL_PARSING);
   // <instance_uid>/<frame_index>/<processing-policy>
-  boost::regex regexp("^(nocache/|cleancache/)?([^/]+)/(\\d+)(?:/(.+))?$");
+  boost::regex regexp("^(nocache/|cleancache/)?([^/]+)/(\\d+)(?:/(.+))$");
 
   boost::cmatch matches;
   if (!boost::regex_match(urlPostfix.c_str(), matches, regexp)) {
@@ -108,14 +108,12 @@ OrthancPluginErrorCode ImageController::_ProcessRequest()
       return this->_AnswerBuffer(answer, "application/json");
     }
 
+    // all routes point to a processing policy, check there is one
+    assert(this->processingPolicy_.get() != NULL);
+
     // retrieve processed image
     std::auto_ptr<Image> image;
-    if (this->processingPolicy_.get() == NULL) {
-      image.reset(imageRepository_->GetImage(this->instanceId_, this->frameIndex_, !this->disableCache_));
-    }
-    else {
-      image.reset(imageRepository_->GetImage(this->instanceId_, this->frameIndex_, this->processingPolicy_.get(), !this->disableCache_));
-    }
+    image.reset(imageRepository_->GetImage(this->instanceId_, this->frameIndex_, this->processingPolicy_.get(), !this->disableCache_));
     
     if (image.get() != NULL)
     {

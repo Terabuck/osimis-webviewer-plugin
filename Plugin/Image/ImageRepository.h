@@ -22,23 +22,22 @@ public:
   ImageRepository(DicomRepository* dicomRepository);
 
   // gives memory ownership
-  Image* GetImage(const std::string& instanceId, uint32_t frameIndex, bool enableCache) const;
-
-  // gives memory ownership
   Image* GetImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy, bool enableCache) const;
-
   void CleanImageCache(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const;
 
   void enableCachedImageStorage(bool enable) {_cachedImageStorageEnabled = enable;}
   bool isCachedImageStorageEnabled() const {return _cachedImageStorageEnabled;}
 
 private:
+   // _imageLoadingPolicy;
+
   DicomRepository* _dicomRepository;
   bool _cachedImageStorageEnabled;
   mutable boost::mutex mutex_;
 
-  Image* _GetImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const;
-  Image* _GetImageFromCache(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const;
+  Image* _LoadImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const; // Factory method
+  void _CacheProcessedImage(const std::string &attachmentNumber, const Image* image) const;
+  Image* _GetProcessedImageFromCache(const std::string &attachmentNumber, const std::string& instanceId, uint32_t frameIndex) const; // Return 0 when no cache found
 };
 
 #endif // IMAGE_REPOSITORY_H

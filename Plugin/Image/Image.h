@@ -1,5 +1,4 @@
-#ifndef IMAGE_H
-#define IMAGE_H
+#pragma once
 
 #include <string>
 #include <json/writer.h> // for Json::Value
@@ -25,8 +24,9 @@ public:
   // destruction is done by end-user
   ~Image();
 
-  const char* GetBinary(); // @todo const correctness
-  uint32_t GetBinarySize(); // @todo const correctness
+  inline std::string GetId() const;
+  inline const char* GetBinary() const;
+  inline uint32_t GetBinarySize() const;
 
 private:
   // creation is done by ImageRepository
@@ -45,4 +45,12 @@ private:
   ImageMetaData metaData_;
 };
 
-#endif // IMAGE_H
+inline std::string Image::GetId() const {
+  return instanceId_;
+}
+inline const char* Image::GetBinary() const {
+  return data_->GetBinary();
+}
+inline uint32_t Image::GetBinarySize() const {
+  return data_->GetBinarySize();
+}
