@@ -1,5 +1,6 @@
 #pragma once
 
+#include <boost/lexical_cast.hpp>
 #include "IAvailableQualityPolicy.h"
 
 /** OnTheFlyDownloadAvailableQualityPolicy
@@ -12,7 +13,7 @@
  */
 class OnTheFlyDownloadAvailableQualityPolicy : public IAvailableQualityPolicy {
 public:
-  virtual std::set<ImageQuality> RetrieveByTags(const Orthanc::DicomMap& tags) {
+  virtual std::set<ImageQuality> RetrieveByTags(const Orthanc::DicomMap& headerTags, const Json::Value& otherTags) {
   //   // Retrieve transfer syntax
   //   const DicomValue* transfertSyntaxValue = tags.TestAndGetValue(0x0002, 0x0010);
   //   std::string transferSyntax;
@@ -34,9 +35,16 @@ public:
   //   // @todo policy?
     std::set<ImageQuality> result;
 
-    result.insert(ImageQuality(ImageQuality::LOW));
-    // result.insert(ImageQuality(ImageQuality::MEDIUM));
-    result.insert(ImageQuality(ImageQuality::LOSSLESS));
+    // Add qualities base on image size
+    int columns = boost::lexical_cast<int>(otherTags["Columns"].asString());
+    int rows = boost::lexical_cast<int>(otherTags["Rows"].asString());
+    if (rows > 512 && columns > 512) {
+      result.insert(ImageQuality(ImageQuality::LOW)); // 150x150 jpeg80
+    }
+    if (rows > 1000 && columns > 1000) {
+      result.insert(ImageQuality(ImageQuality::MEDIUM)); // 1000x1000 jpeg80
+    }
+    result.insert(ImageQuality(ImageQuality::LOSSLESS)); // lossless png
 
     return result;
   }
