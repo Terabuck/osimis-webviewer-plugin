@@ -9,6 +9,7 @@
 #include "ImageProcessingPolicy/LowQualityPolicy.h"
 #include "ImageProcessingPolicy/MediumQualityPolicy.h"
 #include "ImageProcessingPolicy/HighQualityPolicy.h"
+#include "ImageProcessingPolicy/PixelDataQualityPolicy.h"
 
 #if PLUGIN_ENABLE_DEBUG_ROUTE == 1
 #include "ImageProcessingPolicy/CompositePolicy.h"
@@ -36,6 +37,7 @@ ImageController::ImageController(OrthancPluginRestOutput* response, const std::s
   imageProcessingRouteParser_.RegisterRoute<LowQualityPolicy>("^low-quality$");
   imageProcessingRouteParser_.RegisterRoute<MediumQualityPolicy>("^medium-quality$");
   imageProcessingRouteParser_.RegisterRoute<HighQualityPolicy>("^high-quality$");
+  imageProcessingRouteParser_.RegisterRoute<PixelDataQualityPolicy>("^pixeldata-quality$");
 
 #if PLUGIN_ENABLE_DEBUG_ROUTE == 1
   imageProcessingRouteParser_.RegisterRoute<CompositePolicy>("^(.+/.+)$"); // regex: at least a single "/"

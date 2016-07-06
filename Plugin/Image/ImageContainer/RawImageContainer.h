@@ -1,5 +1,5 @@
-#ifndef RAW_IMAGE_CONTAINER_H
-#define RAW_IMAGE_CONTAINER_H
+#ifndef PIXELDATA_IMAGE_CONTAINER_H
+#define PIXELDATA_IMAGE_CONTAINER_H
 
 #include <boost/gil/gil_all.hpp>
 #include <boost/mpl/vector.hpp> // for mpl::vector
@@ -43,4 +43,4 @@ private:
   Orthanc::ImageAccessor accessor_;
 };
 
-#endif // RAW_IMAGE_CONTAINER_H
+#endif // PIXELDATA_IMAGE_CONTAINER_H

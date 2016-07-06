@@ -15,7 +15,8 @@ struct ImageQuality {
   enum EImageQuality {
     LOW,
     MEDIUM,
-    LOSSLESS
+    LOSSLESS, // lossless PNG compressed
+    PIXELDATA // Without transcoding (pixeldata from dicomfile)
   };
 
   ImageQuality(EImageQuality quality) : _quality(quality) {}
@@ -32,12 +33,14 @@ struct ImageQuality {
   }
   inline std::string toString() const {
     switch(_quality) {
-    case LOSSLESS:
-      return "lossless";
-    case MEDIUM:
-      return "medium";
     case LOW:
       return "low";
+    case MEDIUM:
+      return "medium";
+    case LOSSLESS:
+      return "lossless";
+    case PIXELDATA:
+      return "pixeldata";
     }
   }
 

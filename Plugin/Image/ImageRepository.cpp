@@ -50,6 +50,7 @@ Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIn
   RawImageContainer* data = new RawImageContainer(frame);
   Image* image = new Image(instanceId, frameIndex, data, dicomTags);
 
+  // @todo call on exception
   _dicomRepository->decrefDicomFile(instanceId);
 
   return image;
@@ -188,9 +189,13 @@ std::string _getAttachmentNumber(int frameIndex, const IImageProcessingPolicy* p
   int maxFrameCount = 1000; // @todo use adaptative maxFrameCount !
 
   // Except to cache only specified policies
-  assert(policyString == "high-quality" || policyString == "medium-quality" || policyString == "low-quality");
+  assert(policyString == "pixeldata-quality" || policyString == "high-quality" || policyString == "medium-quality" ||
+         policyString == "low-quality");
 
-  if (policyString == "high-quality") {
+  if (policyString == "pixeldata-quality") {
+    attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 3 + frameIndex);
+  }
+  else if (policyString == "high-quality") {
     attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 0 + frameIndex);
   }
   else if (policyString == "medium-quality") {

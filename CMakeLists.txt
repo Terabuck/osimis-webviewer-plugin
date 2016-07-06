@@ -206,6 +206,7 @@ add_library(OsimisWebViewer
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/CompressedImageContainer.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/CornerstoneKLVContainer.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/CompositePolicy.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/PixelDataQualityPolicy.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/HighQualityPolicy.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/MediumQualityPolicy.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/LowQualityPolicy.cpp
