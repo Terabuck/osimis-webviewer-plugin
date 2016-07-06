@@ -90,7 +90,15 @@
      */
     ImageDisplayer.prototype.setLosslessQuality = function() {
         var availableQualities = this._image.getAvailableQualities();
-        this._desiredQuality = availableQualities.LOSSLESS;
+        if (availableQualities.hasOwnProperty('RAW')) {
+            this._desiredQuality = availableQualities.RAW;
+        }
+        else if (availableQualities.hasOwnProperty('LOSSLESS')) {
+            this._desiredQuality = availableQualities.LOSSLESS;
+        }
+        else {
+            throw new Error('Image doesn\'t have Lossless quality');
+        }
     };
 
     /** ImageDisplayer#setLosslessQuality
@@ -104,14 +112,22 @@
 
         // chose quality depending of viewport size
         var quality = null;
-        if (this._canvasWidth <= 150 || this._canvasHeight <= 150) {
+        if ((this._canvasWidth <= 150 || this._canvasHeight <= 150)
+            && availableQualities.hasOwnProperty('LOW')) {
             quality = availableQualities.LOW;
         }
-        else if (this._canvasWidth <= 1000 || this._canvasHeight <= 1000) {
+        else if ((this._canvasWidth <= 1000 || this._canvasHeight <= 1000)
+            && availableQualities.hasOwnProperty('MEDIUM')) {
             quality = availableQualities.MEDIUM;
         }
-        else {
+        else if (availableQualities.hasOwnProperty('RAW')) {
+            quality = availableQualities.RAW;
+        }
+        else  if (availableQualities.hasOwnProperty('LOSSLESS')) {
             quality = availableQualities.LOSSLESS;
+        }
+        else {
+            throw new Error('no supported image quality available in ' + availableQualities);
         }
 
         this._desiredQuality = quality;
@@ -128,7 +144,6 @@
         var minimumQuality = image.getBestQualityInCache() || 0;
 
         // Override desired quality to a better one if already in cache
-        // @todo @warning make sure desiredQuality is in availableQualities !
         var maximumQuality = this._desiredQuality > minimumQuality ? this._desiredQuality : minimumQuality;
 
         // Start loading binaries from the highest cached quality to the desired quality

@@ -6,9 +6,10 @@
         .factory('wvImageBinaryManager', wvImageBinaryManager)
         .constant('WvImageQualities', {
             // 0 is reserved as none..
-        	LOSSLESS: 100,
-			LOW: 1, // resampling to 150 px + compressed to jpeg100
-			MEDIUM: 2 // resampling to 1000 px + compressed to jpeg100
+            RAW: 101,
+            LOSSLESS: 100,
+            LOW: 1, // resampling to 150 px + compressed to jpeg100
+            MEDIUM: 2 // resampling to 1000 px + compressed to jpeg100
         });
 
     /* @ngInject */
@@ -315,11 +316,11 @@
          *
          */
         function getBestQualityInCache(id) {
-        	if (!_loadedCacheIndex[id]) {
-        		return null;
-        	}
+            if (!_loadedCacheIndex[id]) {
+                return null;
+            }
 
-        	var highestQuality = _.max(_.keys(_loadedCacheIndex[id]));
+            var highestQuality = _.max(_.keys(_loadedCacheIndex[id]));
 
             return highestQuality;
         }

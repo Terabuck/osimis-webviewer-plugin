@@ -31,7 +31,7 @@
             var quality = task.options.quality;
             var request = requestQueue[id][quality];
             var priority = request.getPriority();
-            
+
             switch(priority) {
             case 0:
                 loadingHighPriorityQueue.push({
@@ -58,6 +58,7 @@
         // - 1 lowest
         // - 2 medium
         // - 100 lossless
+        // - 101 raw
 
         /** loading high priority **/
 
@@ -76,7 +77,15 @@
             
             if (request.quality === 2) return task;
         }
-   
+        
+        // Process loading high priority first - raw quality
+        for (i=0; i<loadingHighPriorityQueue.length; ++i) {
+            var task = loadingHighPriorityQueue[0].task;
+            var request = loadingHighPriorityQueue[0].request;
+            
+            if (request.quality === 101) return task;
+        }
+
         // Process loading high priority first - lossless quality
         for (i=0; i<loadingHighPriorityQueue.length; ++i) {
             var task = loadingHighPriorityQueue[0].task;
@@ -106,6 +115,14 @@
             if (request.quality === 2) return task;
         }
 
+        // Process loading high priority first - raw quality
+        for (i=0; i<preloadingHighPriorityQueue.length; ++i) {
+            var task = preloadingHighPriorityQueue[0].task;
+            var request = preloadingHighPriorityQueue[0].request;
+            
+            if (request.quality === 101) return task;
+        }
+
         // Process preloading high priority in second - lossless quality
         for (i=0; i<preloadingHighPriorityQueue.length; ++i) {
             var task = preloadingHighPriorityQueue[0].task;
@@ -132,6 +149,14 @@
             if (request.quality === 2) return task;
         }
 
+        // Process loading high priority first - raw quality
+        for (i=0; i<preloadingLowPriorityQueue.length; ++i) {
+            var task = preloadingLowPriorityQueue[0].task;
+            var request = preloadingLowPriorityQueue[0].request;
+            
+            if (request.quality === 101) return task;
+        }
+
         // Process preloading low priority in second - lossless quality
         for (i=0; i<preloadingLowPriorityQueue.length; ++i) {
             var task = preloadingLowPriorityQueue[0].task;
@@ -140,17 +165,8 @@
             if (request.quality === 100) return task;
         }
 
-
         return tasksToProcess[0] || null;
     };
-
-    function _in(requestQueue, taskQueue) {
-        // Sort by priority
-
-        var taskInfo = taskQueue[0].options;
-        var requestInfo = requestQueue[imageId][quality].options;
-        console.log(requestQueue, taskQueue);
-    }
 
     module.TaskPriorityPolicy = TaskPriorityPolicy;
 

@@ -64,6 +64,11 @@
                 return false;
             });
 
+            // Throw exception on unknown quality
+            if (_.size(availableQualities) !== orthancSeries.availableQualities.length) {
+                throw new Error('unknown available quality in ' + orthancSeries.availableQualities);
+            }
+
             // Instantiate series objects
             var seriesList = imagesBySeries.map(function(imageIds, seriesIndex) {
                 var id = orthancSeries.id + ':' + seriesIndex;
