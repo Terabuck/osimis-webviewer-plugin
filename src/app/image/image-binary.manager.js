@@ -6,7 +6,7 @@
         .factory('wvImageBinaryManager', wvImageBinaryManager)
         .constant('WvImageQualities', {
             // 0 is reserved as none..
-            RAW: 101,
+            PIXELDATA: 101,
             LOSSLESS: 100,
             LOW: 1, // resampling to 150 px + compressed to jpeg100
             MEDIUM: 2 // resampling to 1000 px + compressed to jpeg100

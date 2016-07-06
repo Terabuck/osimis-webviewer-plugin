@@ -64,7 +64,7 @@ function setImageApiUrl(rootUrl) {
 // @todo out..
 var Qualities = {
     // 0 is reserved as none..
-    RAW: 101,
+    PIXELDATA: 101,
     LOSSLESS: 100,
     LOW: 1, // resampling to 150 px + compressed to jpeg100
     MEDIUM: 2 // resampling to 1000 px + compressed to jpeg100
@@ -132,8 +132,8 @@ function BinaryRequest(id, quality) {
     
     var url = null;
     switch (quality) {
-    case Qualities.RAW:
-        url = ImageApiURL + instanceId + '/' + frameIndex + '/raw-quality';
+    case Qualities.PIXELDATA:
+        url = ImageApiURL + instanceId + '/' + frameIndex + '/pixeldata-quality';
         break;
     case Qualities.LOSSLESS:
         url = ImageApiURL + instanceId + '/' + frameIndex + '/high-quality';

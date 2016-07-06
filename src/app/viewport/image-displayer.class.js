@@ -90,8 +90,8 @@
      */
     ImageDisplayer.prototype.setLosslessQuality = function() {
         var availableQualities = this._image.getAvailableQualities();
-        if (availableQualities.hasOwnProperty('RAW')) {
-            this._desiredQuality = availableQualities.RAW;
+        if (availableQualities.hasOwnProperty('PIXELDATA')) {
+            this._desiredQuality = availableQualities.PIXELDATA;
         }
         else if (availableQualities.hasOwnProperty('LOSSLESS')) {
             this._desiredQuality = availableQualities.LOSSLESS;
@@ -120,8 +120,8 @@
             && availableQualities.hasOwnProperty('MEDIUM')) {
             quality = availableQualities.MEDIUM;
         }
-        else if (availableQualities.hasOwnProperty('RAW')) {
-            quality = availableQualities.RAW;
+        else if (availableQualities.hasOwnProperty('PIXELDATA')) {
+            quality = availableQualities.PIXELDATA;
         }
         else  if (availableQualities.hasOwnProperty('LOSSLESS')) {
             quality = availableQualities.LOSSLESS;

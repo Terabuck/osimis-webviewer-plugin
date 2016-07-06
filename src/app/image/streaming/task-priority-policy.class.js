@@ -58,7 +58,7 @@
         // - 1 lowest
         // - 2 medium
         // - 100 lossless
-        // - 101 raw
+        // - 101 pixeldata
 
         /** loading high priority **/
 
@@ -78,7 +78,7 @@
             if (request.quality === 2) return task;
         }
         
-        // Process loading high priority first - raw quality
+        // Process loading high priority first - pixeldata quality
         for (i=0; i<loadingHighPriorityQueue.length; ++i) {
             var task = loadingHighPriorityQueue[0].task;
             var request = loadingHighPriorityQueue[0].request;
@@ -115,7 +115,7 @@
             if (request.quality === 2) return task;
         }
 
-        // Process loading high priority first - raw quality
+        // Process loading high priority first - pixeldata quality
         for (i=0; i<preloadingHighPriorityQueue.length; ++i) {
             var task = preloadingHighPriorityQueue[0].task;
             var request = preloadingHighPriorityQueue[0].request;
@@ -149,7 +149,7 @@
             if (request.quality === 2) return task;
         }
 
-        // Process loading high priority first - raw quality
+        // Process loading high priority first - pixeldata quality
         for (i=0; i<preloadingLowPriorityQueue.length; ++i) {
             var task = preloadingLowPriorityQueue[0].task;
             var request = preloadingLowPriorityQueue[0].request;
