@@ -77,8 +77,8 @@
          */
         WvSeries.prototype.hasQuality = function(quality) {
             // Seek quality in this.availableQualities
-            for (var i=0; i<this.availableQualities.length; ++i) {
-                var availableQuality = this.availableQualities[i];
+            for (var name in this.availableQualities) {
+                var availableQuality = this.availableQualities[name];
                 if (availableQuality === quality) {
                     return true;
                 }

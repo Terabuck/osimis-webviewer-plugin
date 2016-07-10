@@ -24,7 +24,7 @@
         /** _availableQualities
          *
          * Cache available qualities by instanceId when a series are loaded,
-         * because available qualities are only retrieved in a series http request
+         * because all images' available qualities are only retrieved in one single series http request
          * to avoid unnecessary http requests.
          *
          */

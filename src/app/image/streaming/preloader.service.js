@@ -64,7 +64,7 @@
                 }
 
                 // Preload lossless studies images
-                quality = Math.max(_.toArray(series.availableQualities));
+                quality = Math.max.apply(Math, _.toArray(series.availableQualities));
                 for (var i=0; i<series.imageIds.length; ++i) {
                     var imageId = series.imageIds[i];
 
@@ -93,7 +93,7 @@
                 }
 
                 // Abort lossless studies images preloading
-                quality = Math.max(_.toArray(series.availableQualities));
+                quality = Math.max.apply(Math, _.toArray(series.availableQualities));
                 for (var i=0; i<series.imageIds.length; ++i) {
                     var imageId = series.imageIds[i];
 
