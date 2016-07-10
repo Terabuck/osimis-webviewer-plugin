@@ -13,6 +13,14 @@ Image::Image(const std::string& instanceId, uint32_t frameIndex, RawImageContain
   data_ = data;
 }
 
+Image::Image(const std::string& instanceId, uint32_t frameIndex, IImageContainer* data, const Orthanc::DicomMap& headerTags, const Json::Value& dicomTags)
+  : metaData_(headerTags, dicomTags)
+{
+  instanceId_ = instanceId;
+  frameIndex_ = frameIndex;
+  data_ = data;
+}
+
 Image::Image(const std::string& instanceId, uint32_t frameIndex, CornerstoneKLVContainer* data)
   : metaData_()
 {

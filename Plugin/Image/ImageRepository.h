@@ -35,7 +35,7 @@ private:
   bool _cachedImageStorageEnabled;
   mutable boost::mutex mutex_;
 
-  Image* _LoadImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const; // Factory method
+  Image* _LoadImageFromOrthanc(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const; // Factory method
   void _CacheProcessedImage(const std::string &attachmentNumber, const Image* image) const;
   Image* _GetProcessedImageFromCache(const std::string &attachmentNumber, const std::string& instanceId, uint32_t frameIndex) const; // Return 0 when no cache found
 };

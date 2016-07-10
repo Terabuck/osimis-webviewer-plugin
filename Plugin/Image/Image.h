@@ -3,6 +3,7 @@
 #include <string>
 #include <json/writer.h> // for Json::Value
 
+#include "../../Orthanc/Core/DicomFormat/DicomMap.h"
 #include "../OrthancContextManager.h"
 #include "ImageContainer/IImageContainer.h"
 #include "ImageContainer/RawImageContainer.h"
@@ -29,9 +30,13 @@ public:
   inline uint32_t GetBinarySize() const;
 
 private:
-  // creation is done by ImageRepository
+  // instantiation is done by ImageRepository
+
   // takes memory ownership
   Image(const std::string& instanceId, uint32_t frameIndex, RawImageContainer* data, const Json::Value& dicomTags);
+
+  // takes memory ownership
+  Image(const std::string& instanceId, uint32_t frameIndex, IImageContainer* data, const Orthanc::DicomMap& headerTags, const Json::Value& dicomTags);
 
   // takes memory ownership
   Image(const std::string& instanceId, uint32_t frameIndex, CornerstoneKLVContainer* data);
