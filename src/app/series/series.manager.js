@@ -12,18 +12,27 @@
             listFromOrthancSeriesId: listFromOrthancSeriesId,
             listFromOrthancStudyId: listFromOrthancStudyId
         };
+    
+        // { <id>: <WvSeries>, ...};
+        var _cache = {};
 
         ////////////////
 
         function get(id) {
-            var idHash = id.split(':');
-            var orthancSeriesId = idHash[0];
-            var subSeriesIndex = idHash[1] || 0;
+            // Generate & cache series' promise if required
+            if (!_cache.hasOwnProperty(id)) {
+                var idHash = id.split(':');
+                var orthancSeriesId = idHash[0];
+                var subSeriesIndex = idHash[1] || 0;
 
-            return service.listFromOrthancSeriesId(orthancSeriesId)
-                .then(function(seriesList) {
-                    return seriesList[subSeriesIndex];
-                });
+                _cache[id] = service.listFromOrthancSeriesId(orthancSeriesId)
+                    .then(function(seriesList) {
+                        return seriesList[subSeriesIndex];
+                    });
+            }
+
+            // Return series' promise
+            return _cache[id];
         }
 
         function listFromOrthancSeriesId(id) {
