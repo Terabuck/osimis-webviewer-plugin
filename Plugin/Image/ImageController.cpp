@@ -22,6 +22,7 @@
 
 #include "ImageController.h"
 #include <iostream>
+
 ImageRepository* ImageController::imageRepository_ = NULL;
 
 template<>
@@ -56,6 +57,8 @@ OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlP
 
   boost::cmatch matches;
   if (!boost::regex_match(urlPostfix.c_str(), matches, regexp)) {
+    std::cerr << "BAD REGEX";
+
     // Return 404 error on badly formatted URL - @todo use ErrorCode_UriSyntax instead
     return this->_AnswerError(404);
   }
@@ -70,18 +73,25 @@ OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlP
       BENCH_LOG(INSTANCE, instanceId_);
       BENCH_LOG(FRAME_INDEX, frameIndex_);
     }
-    catch (const std::invalid_argument&) {
+    catch (const std::invalid_argument& exc) {
+      std::cerr << exc.what();
+
       // probably because processingPolicy has not been found
       return this->_AnswerError(404);
     }
-    catch (const boost::bad_lexical_cast&) {
+    catch (const boost::bad_lexical_cast& exc) {
+      std::cerr << exc.what();
+
       // should be prevented by the regex
       return this->_AnswerError(500);
     }
     catch (const Orthanc::OrthancException& exc) {
+      std::cerr << exc.What();
+
       return this->_AnswerError(exc.GetHttpStatus());
     }
-    catch (...) {
+    catch (const std::exception& exc) {
+      std::cerr << exc.what();
       // @note if the exception has been thrown from some constructor,
       // memory leaks may happen. we should fix the bug instead of focusing on those memory leaks.
       // however, in case of memory leak due to bad alloc, we should clean memory.
@@ -131,7 +141,8 @@ OrthancPluginErrorCode ImageController::_ProcessRequest()
   catch (const Orthanc::OrthancException& exc) {
     return this->_AnswerError(exc.GetHttpStatus());
   }
-  catch (...) {
+  catch (const std::exception& exc) {
+    std::cerr << exc.what();
     return this->_AnswerError(500);
   }
 }

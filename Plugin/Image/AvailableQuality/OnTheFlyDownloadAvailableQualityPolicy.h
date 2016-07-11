@@ -5,6 +5,7 @@
 #include "IAvailableQualityPolicy.h"
 #include "../../Orthanc/Core/OrthancException.h"
 #include "../../Orthanc/Core/Toolbox.h"
+#include "../../BenchmarkHelper.h"
 
 /** OnTheFlyDownloadAvailableQualityPolicy
  *
@@ -26,9 +27,11 @@ public:
     int rows = boost::lexical_cast<int>(otherTags["Rows"].asString());
     if (rows > 512 && columns > 512) {
       result.insert(ImageQuality(ImageQuality::LOW)); // 150x150 jpeg80
+      BENCH_LOG("QUALITY", "low");
     }
     if (rows > 1000 && columns > 1000) {
       result.insert(ImageQuality(ImageQuality::MEDIUM)); // 1000x1000 jpeg80
+      BENCH_LOG("QUALITY", "medium");
     }
 
     // Choose either PIXELDATA or LOSSLESS based on transferSyntax
@@ -50,6 +53,8 @@ public:
       // core, but let's be careful...
       transferSyntax = Toolbox::StripSpaces(transfertSyntaxValue->GetContent());
     }
+
+    BENCH_LOG("TRANSFER_SYNTAX", transferSyntax);
 
     // Add either PIXELDATA or LOSSLESS quality based on transfer syntax
     boost::regex regexp("^1\\.2\\.840\\.10008\\.1\\.2\\.4\\.(\\d\\d)$");
@@ -73,10 +78,12 @@ public:
           boost::lexical_cast<uint32_t>(matches[1]) == 95 )  // JPIP Referenced Deflate
       ) {
         result.insert(ImageQuality(ImageQuality::PIXELDATA)); // raw file (unknown format)
+        BENCH_LOG("QUALITY", "pixeldata");
       }
       // Compress data manually if the raw format is not supported
       else {
         result.insert(ImageQuality(ImageQuality::LOSSLESS)); // lossless png
+        BENCH_LOG("QUALITY", "lossless");
       }
     }
     catch (const boost::bad_lexical_cast&) {

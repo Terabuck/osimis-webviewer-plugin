@@ -90,7 +90,7 @@ Image* ImageRepository::_LoadImageFromOrthanc(const std::string& instanceId, uin
   // Load already compressed instance frame (if the policy type is PixelDataQuality, because it's faster
   // then loading the dicom file & checking the transferSyntax tag)
   if (dynamic_cast<PixelDataQualityPolicy*>(policy) != 0) {
-    BENCH(GET_FRAME_FROM_DICOM);
+    BENCH(GET_FRAME_FROM_DICOM__RAW);
     //boost::lock_guard<boost::mutex> guard(mutex_); // check what happens if only one thread asks for frame at a time
 
     // Retrieve dicom header tags (for transferSyntax which determine PixelData format)
