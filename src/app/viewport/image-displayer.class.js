@@ -67,11 +67,10 @@
         this.onImageLoaded.close();
         this.onParametersResetting.close();
 
-        // Free listeners
-        this._image.onAnnotationChanged.close(_this);
-
         // Free image binary
         if (this._lastLoadedImageQuality) {
+            // Free listeners
+            this._image.onAnnotationChanged.close(_this);
             this._image.freeBinary(this._lastLoadedImageQuality);
             this._image = null;
             this._lastLoadedImageQuality = null;
