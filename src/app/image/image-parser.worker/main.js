@@ -12,6 +12,8 @@
 // @todo move jpgjs & pngjs out of bower_components
 
 /* @inline: */ importScripts('/app/image/image-parser.worker/klvreader.class.js');
+
+// Import jpeg lib
 /* @inline: */ importScripts('/bower_components/jpgjs/jpg.js');
 
 // Make png.js & config.js worker compatible
@@ -170,12 +172,12 @@ BinaryRequest.prototype.execute = function() {
                 var arraybuffer = xhr.response;
                 var data = parseKLV(arraybuffer);
 
-                if (data.decompression.compression === 'Jpeg') {
+                if (data.decompression.compression.toLowerCase() === 'jpeg') {
                     // Decompress lossy jpeg into 16bit
                     var pixelArray = parseJpeg(data.decompression);
                     pixelArray = convertBackTo16bit(pixelArray, data.decompression);
                 }
-                else if (data.decompression.compression === 'Png') {
+                else if (data.decompression.compression.toLowerCase() === 'png') {
                     // Decompress lossless png
                     var pixelArray = parsePng(data.decompression)
                 }
@@ -296,9 +298,10 @@ function parseKLV(arraybuffer) {
     };
 
     var compression = klvReader.getString(keys.Compression);
-    if (compression !== 'Jpeg' && compression !== 'Png') {
+    console.log('compression:' + compression);
+    if (compression.toLowerCase() !== 'jpeg' && compression.toLowerCase() !== 'png') {
         _processingRequest = null; // cleaning request
-        throw new Error('unknown compression');
+        throw new Error('unknown compression: ' + compression);
     }
 
     var decompressionMetaData = {
@@ -344,8 +347,6 @@ function parsePng(config) {
 
     var s = png.decodePixels(); // returns Uint8 array
 
-    var bytePerPixel = png.bits;
-    
     if (config.hasColor) {
         // Convert png24 to rgb32
 
