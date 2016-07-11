@@ -38,7 +38,7 @@ IImageContainer* PngConversionPolicy::Apply(IImageContainer* input, ImageMetaDat
 
   BENCH_LOG(COMPRESSION_PNG_SIZE, buffer.size);
 
-  metaData->compression = "Png";
+  metaData->compression = "png";
   
   return new CompressedImageContainer(buffer);
 }

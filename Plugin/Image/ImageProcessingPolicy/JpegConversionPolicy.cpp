@@ -52,7 +52,7 @@ IImageContainer* JpegConversionPolicy::Apply(IImageContainer* input, ImageMetaDa
   BENCH_LOG(COMPRESSION_JPEG_QUALITY, (int) quality_);
   BENCH_LOG(COMPRESSION_JPEG_SIZE, buffer.size);
 
-  metaData->compression = "Jpeg";
+  metaData->compression = "jpeg";
   
   return new CompressedImageContainer(buffer);
 }
