@@ -1,6 +1,7 @@
 #ifndef IMAGE_ROUTE_H
 #define IMAGE_ROUTE_H
 
+#include <memory>
 #include <string>
 
 #include "../BaseController.h"

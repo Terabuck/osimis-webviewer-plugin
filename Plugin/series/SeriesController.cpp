@@ -1,5 +1,6 @@
 #include "SeriesController.h"
 
+#include <memory>
 #include <boost/regex.hpp>
 #include "../../Orthanc/Core/OrthancException.h"
 

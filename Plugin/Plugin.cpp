@@ -19,6 +19,7 @@
 
 #include <typeinfo> // Fix gil 'bad_cast' not member of 'std' https://svn.boost.org/trac/boost/ticket/2483
 
+#include <memory>
 #include <boost/thread.hpp>
 #include <boost/lexical_cast.hpp>
 #include <EmbeddedResources.h>

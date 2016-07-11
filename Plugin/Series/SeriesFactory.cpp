@@ -1,5 +1,6 @@
 #include "SeriesFactory.h"
 
+#include <memory>
 #include <boost/foreach.hpp>
 // #include <json/value.h>
 #include <json/json.h>

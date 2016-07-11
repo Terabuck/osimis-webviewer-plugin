@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <json/value.h>
 #include "../../Orthanc/Core/DicomFormat/DicomMap.h"
 #include "../AvailableQuality/IAvailableQualityPolicy.h"

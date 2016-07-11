@@ -20,6 +20,12 @@
 
 #include "DecodedImageAdapter.h"
 
+#include <memory>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <json/writer.h>
+#include <boost/regex.hpp>
+
 #include "../../Orthanc/Core/Images/ImageBuffer.h"
 #include "../../Orthanc/Core/Images/ImageProcessing.h"
 #include "../../Orthanc/Core/OrthancException.h"
@@ -30,11 +36,6 @@
 #include "../BenchmarkHelper.h"
 #include "Utilities/KLVWriter.h"
 #include "Utilities/ScopedBuffers.h"
-
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string/predicate.hpp>
-#include <json/writer.h>
-#include <boost/regex.hpp>
 
 namespace OrthancPlugins
 {

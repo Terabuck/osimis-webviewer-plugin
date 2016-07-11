@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../instance/DicomRepository.h"
+#include <memory>
+#include "../Instance/DicomRepository.h"
 #include "Series.h"
 #include "SeriesFactory.h"
 

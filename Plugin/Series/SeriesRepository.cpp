@@ -1,5 +1,6 @@
 #include "SeriesRepository.h"
 
+#include <memory>
 #include <string>
 #include <json/value.h>
 #include <boost/scope_exit.hpp>
