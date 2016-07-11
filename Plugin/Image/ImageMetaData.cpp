@@ -12,11 +12,11 @@
 namespace
 {
   float GetFloatTag(const Json::Value& dicomTags,
-                           const std::string& tagId,
+                           const std::string& tagName,
                            float defaultValue);
   bool GetStringTag(std::string& result,
                            const Json::Value& dicomTags,
-                           const std::string& tagId);
+                           const std::string& tagName);
 }
 
 using namespace Orthanc;
@@ -107,17 +107,17 @@ ImageMetaData::ImageMetaData(RawImageContainer* rawImage, const Json::Value& dic
   sizeInBytes = accessor->GetSize();
 
   // set slope/intercept
-  slope = GetFloatTag(dicomTags, "0028,1053", 1.0f);
-  intercept = GetFloatTag(dicomTags, "0028,1052", 0.0f);
+  slope = GetFloatTag(dicomTags, "RescaleSlope", 1.0f);
+  intercept = GetFloatTag(dicomTags, "RescaleIntercept", 0.0f);
 
   // set windowCenter & windowWidth (image specific)
-  windowCenter = GetFloatTag(dicomTags, "0028,1050", windowCenter * slope + intercept);
-  windowWidth = GetFloatTag(dicomTags, "0028,1051", windowWidth * slope);
+  windowCenter = GetFloatTag(dicomTags, "WindowCenter", windowCenter * slope + intercept);
+  windowWidth = GetFloatTag(dicomTags, "WindowWidth", windowWidth * slope);
 
   // set rowPixelSpacing/columnPixelSpacing
   bool dicomHasPixelSpacing = false;
   std::string pixelSpacing;
-  if (GetStringTag(pixelSpacing, dicomTags, "0028,0030"))
+  if (GetStringTag(pixelSpacing, dicomTags, "PixelSpacing"))
   {
     std::vector<std::string> tokens;
     Toolbox::TokenizeString(tokens, pixelSpacing, '\\');
@@ -159,7 +159,7 @@ ImageMetaData::ImageMetaData(const DicomMap& headerTags, const Json::Value& dico
   BENCH(CALCULATE_METADATA)
 
   // define color
-  std::string photometricInterpretation = dicomTags["PhotometricInterpretation"].asString();
+  std::string photometricInterpretation = Toolbox::StripSpaces(dicomTags["PhotometricInterpretation"].asString());
   if (photometricInterpretation == "MONOCHROME1" || photometricInterpretation == "MONOCHROME2") {
     color = false;
   }
@@ -167,32 +167,31 @@ ImageMetaData::ImageMetaData(const DicomMap& headerTags, const Json::Value& dico
     color = true;
   }
 
-
   // set minPixelValue & maxPixelValue
-  int bitsStored = boost::lexical_cast<int>(dicomTags["BitsStored"]);
+  int bitsStored = boost::lexical_cast<int>(Toolbox::StripSpaces(dicomTags["BitsStored"].asString()));
   minPixelValue = 0; // approximative value
   maxPixelValue = std::pow(2, bitsStored); // approximative value
 
   // set width/height
-  width = boost::lexical_cast<uint32_t>(dicomTags["Rows"].asString());
-  height = boost::lexical_cast<uint32_t>(dicomTags["Columns"].asString());
+  width = boost::lexical_cast<uint32_t>(Toolbox::StripSpaces(dicomTags["Rows"].asString()));
+  height = boost::lexical_cast<uint32_t>(Toolbox::StripSpaces(dicomTags["Columns"].asString()));
 
   // set sizeInBytes
-  int bitsAllocated = boost::lexical_cast<int>(dicomTags["BitsAllocated"]) * (color ? 3 : 1);
+  int bitsAllocated = boost::lexical_cast<int>(Toolbox::StripSpaces(dicomTags["BitsAllocated"].asString())) * (color ? 3 : 1);
   sizeInBytes = width * height * bitsAllocated;
 
   // set slope/intercept
-  slope = GetFloatTag(dicomTags, "0028,1053", 1.0f);
-  intercept = GetFloatTag(dicomTags, "0028,1052", 0.0f);
+  slope = GetFloatTag(dicomTags, "RescaleSlope", 1.0f);
+  intercept = GetFloatTag(dicomTags, "RescaleIntercept", 0.0f);
 
   // set windowCenter & windowWidth (image specific)
-  windowCenter = GetFloatTag(dicomTags, "0028,1050", 127.5f * slope + intercept);
-  windowWidth = GetFloatTag(dicomTags, "0028,1051", 256.0f * slope);
+  windowCenter = GetFloatTag(dicomTags, "WindowCenter", 127.5f * slope + intercept);
+  windowWidth = GetFloatTag(dicomTags, "WindowWidth", 256.0f * slope);
 
   // set rowPixelSpacing/columnPixelSpacing
   bool dicomHasPixelSpacing = false;
   std::string pixelSpacing;
-  if (GetStringTag(pixelSpacing, dicomTags, "0028,0030"))
+  if (GetStringTag(pixelSpacing, dicomTags, "PixelSpacing"))
   {
     std::vector<std::string> tokens;
     Toolbox::TokenizeString(tokens, pixelSpacing, '\\');
@@ -220,7 +219,7 @@ ImageMetaData::ImageMetaData(const DicomMap& headerTags, const Json::Value& dico
   // frontend webviewer related
 
   // set signed pixels
-  isSigned = boost::lexical_cast<bool>(dicomTags["PixelRepresentation"].asString());
+  isSigned = boost::lexical_cast<bool>(Toolbox::StripSpaces(dicomTags["PixelRepresentation"].asString()));
 
   // set stretched image (16bit -> 8bit dynamic compression)
   stretched = false;
@@ -255,10 +254,10 @@ ImageMetaData::ImageMetaData(const DicomMap& headerTags, const Json::Value& dico
       compression = "jpeg";
       break;
     case 57: // JPEG Lossless, Nonhierarchical (Processes 14)
-      compression = "jpeg";
+      compression = "jpeg-lossless";
       break;
     case 70: // JPEG Lossless, Nonhierarchical, First-Order Prediction (Default Transfer Syntax for Lossless JPEG Image Compression)
-      compression = "jpeg";
+      compression = "jpeg-lossless";
       break;
     case 80: // JPEG-LS Lossless Image Compression
       compression = "jpeg";
@@ -296,8 +295,8 @@ ImageMetaData::ImageMetaData(const DicomMap& headerTags, const Json::Value& dico
   }
 
   // set original height & width
-  originalHeight = boost::lexical_cast<uint32_t>(dicomTags["Rows"].asString());
-  originalWidth = boost::lexical_cast<uint32_t>(dicomTags["Columns"].asString());
+  originalHeight = boost::lexical_cast<uint32_t>(Toolbox::StripSpaces(dicomTags["Rows"].asString()));
+  originalWidth = boost::lexical_cast<uint32_t>(Toolbox::StripSpaces(dicomTags["Columns"].asString()));
 
   BENCH_LOG(IMAGE_WIDTH, width);
   BENCH_LOG(IMAGE_HEIGHT, height);
@@ -305,11 +304,11 @@ ImageMetaData::ImageMetaData(const DicomMap& headerTags, const Json::Value& dico
 
 namespace {
   float GetFloatTag(const Json::Value& dicomTags,
-                           const std::string& tagId,
+                           const std::string& tagName,
                            float defaultValue)
   {
     std::string tmp;
-    if (GetStringTag(tmp, dicomTags, tagId))
+    if (GetStringTag(tmp, dicomTags, tagName))
     {
       try
       {
@@ -325,18 +324,13 @@ namespace {
 
   bool GetStringTag(std::string& result,
                            const Json::Value& dicomTags,
-                           const std::string& tagId)
+                           const std::string& tagName)
   {
     if (dicomTags.type() == Json::objectValue &&
-        dicomTags.isMember(tagId) &&
-        dicomTags[tagId].type() == Json::objectValue &&
-        dicomTags[tagId].isMember("Type") &&
-        dicomTags[tagId].isMember("Value") &&
-        dicomTags[tagId]["Type"].type() == Json::stringValue &&
-        dicomTags[tagId]["Value"].type() == Json::stringValue &&
-        dicomTags[tagId]["Type"].asString() == "String")
+        dicomTags.isMember(tagName) &&
+        dicomTags[tagName].type() == Json::stringValue)
     {
-      result = dicomTags[tagId]["Value"].asString();
+      result = dicomTags[tagName].asString();
       return true;
     }        
     else

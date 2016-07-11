@@ -227,7 +227,7 @@ using namespace OrthancPlugins;
 void _loadDicomTags(Json::Value& jsonOutput, const std::string& instanceId)
 {
   BENCH(LOAD_JSON);
-  if (!GetJsonFromOrthanc(jsonOutput, OrthancContextManager::Get(), "/instances/" + instanceId + "/tags")) {
+  if (!GetJsonFromOrthanc(jsonOutput, OrthancContextManager::Get(), "/instances/" + instanceId + "/simplified-tags")) {
     throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
   }
 }
