@@ -5,16 +5,28 @@ Simple unit test runner,
 - launch karma (unit test runner) and start testing
 
 Install:
-- pyvenv env
-- . env/bin/activate
-- pip install -r requirements.txt
+	pyvenv env
+	. env/bin/activate
+	pip install -r requirements.txt
 
 Usage:
-- . env/bin/activate
-- python osimis-test-runner.py [--auto-watch|-w] [--orthanc-path=|-p=]
+	. env/bin/activate
+	python osimis-test-runner.py [--auto-watch|-w] [--orthanc-path=|-p=]
 
 Example:
-- python osimis-test-runner.py -w -p ../../osimis-webviewer-plugin/BuildDev/
+	python osimis-test-runner.py -w -p ../../osimis-webviewer-plugin/BuildDev/
+
+Capture Orthanc (lldb + output):
+	# retrieve orthanc pid
+	export ORT_PID=`ps aux | grep Orthanc | awk '{ if ($11 ~ /Build[^\/]*\/Orthanc$/) print $2}'` 
+	# attach lldb
+	lldb -p $ORT_PID
+	proc handle SIGPIPE -s FALSE
+	c
+	# ... see
+	# http://stackoverflow.com/questions/3425340/how-can-i-capture-the-stdout-from-a-process-that-is-already-running 
+	# & make sure to replace arg0 == 1 w/ ( arg0 == 1 || arg0 == 2 ) (for stderr listening)
+	capture $ORT_PID
 """
 
 from orthancServer import OrthancServer, OrthancServerVersion
@@ -28,8 +40,10 @@ import os, sys, getopt, shlex, subprocess, json
 argv = sys.argv[1:]
 orthancFolder = os.path.realpath('./orthanc')
 singleRun = True
+launchOrthanc = True
+orthancHTTPPort = 8042
 try:
-	opts, args = getopt.getopt(argv, "hwp:", ["auto-watch", "orthanc-path="])
+	opts, args = getopt.getopt(argv, "hwp:m", ["auto-watch", "orthanc-path=", "manual-orthanc"])
 except getopt.GetoptError:
 	print('osimis-test-runner.py -w')
 	sys.exit(2)
@@ -41,36 +55,37 @@ for opt, arg in opts:
 		singleRun = False
 	elif opt in ("-p", "--orthanc-path"):
 		orthancFolder = os.path.realpath(arg)
-
-dicomSamplesFolder = 'dicom-samples/'
-orthancPort1 = 7414
-orthancPort2 = 8042 # http port
-
-# Download Orthanc server (if not in path)
-OrthancServer.loadExecutable(orthancFolder, OrthancServerVersion.NIGHTLY)
-
-# Init Orthanc server
-OrthancServer.executableFolder = orthancFolder
-server = OrthancServer('Files', 'Files', orthancPort1, orthancPort2)
-server.config['HttpCompressionEnabled'] = False
-# server.setStdoutCallback(lambda msg: print('[ORT] ' + msg))
-server.addPlugin('OsimisWebViewer')
-server.launch()
+	elif opt in ("-m", "--manual-orthanc"):
+		launchOrthanc = False
 
 # Init Orthanc client
-client = OrthancClient('http://127.0.0.1:' + str(orthancPort2))
+client = OrthancClient('http://127.0.0.1:' + str(orthancHTTPPort))
 
-# Uploading dicom files
-# @todo use instances = client.uploadFolder(dicomSamplesFolder) once fixed
-instancesIds = []
-for path in os.listdir(dicomSamplesFolder):
-    imagePath = os.path.join(dicomSamplesFolder, path)
-    if os.path.isfile(imagePath) and '/.' not in imagePath:
-        instancesIds.append(client.uploadDicomFile(imagePath))
+if launchOrthanc is True:
+	dicomSamplesFolder = 'dicom-samples/'
 
-# List instances for testing purpose
-print(colored('Instances:', 'blue'));
-print(colored(json.dumps(instancesIds, sort_keys=True, indent=4), 'blue'));
+	# Download Orthanc server (if not in path)
+	OrthancServer.loadExecutable(orthancFolder, OrthancServerVersion.NIGHTLY)
+
+	# Init Orthanc server
+	OrthancServer.executableFolder = orthancFolder
+	server = OrthancServer('Files', 'Files', 7414, orthancHTTPPort)
+	server.config['HttpCompressionEnabled'] = False
+	# server.setStdoutCallback(lambda msg: print('[ORT] ' + msg))
+	server.addPlugin('OsimisWebViewer')
+	server.launch()
+
+	# Uploading dicom files
+	# @todo use instances = client.uploadFolder(dicomSamplesFolder) once fixed
+	instancesIds = []
+	for path in os.listdir(dicomSamplesFolder):
+	    imagePath = os.path.join(dicomSamplesFolder, path)
+	    if os.path.isfile(imagePath) and '/.' not in imagePath:
+	        instancesIds.append(client.uploadDicomFile(imagePath))
+
+	# List instances for testing purpose
+	print(colored('Instances:', 'blue'));
+	print(colored(json.dumps(instancesIds, sort_keys=True, indent=4), 'blue'));
 
 # Launch karma
 karma = subprocess.Popen(
@@ -84,11 +99,13 @@ try:
 	karmaReturnCode = karma.wait(timeout = 60*5 if singleRun else None) # kill after 5 min
 except:
 	print(colored('error: karma timeout expired', 'red'))
-	server.stop()
+	if launchOrthanc is True:
+		server.stop()
 	karma.kill()
 	sys.exit(1)
 
-server.stop()
+if launchOrthanc is True:
+	server.stop()
 
 # Exit the script with error if karma failed (for CI purpose)
 if karmaReturnCode != 0:
