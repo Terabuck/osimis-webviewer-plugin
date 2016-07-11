@@ -1,6 +1,6 @@
 describe('backend', function() {
 
-    this.timeout(30000); // Set a long timeout because image compression can takes longer than the default 2s timeout
+    this.timeout(10000); // Set a long timeout because image compression can takes longer than the default 2s timeout
 
     beforeEach(function() {
         bard.asyncModule('webviewer', function(wvConfigProvider) {
@@ -87,9 +87,9 @@ describe('backend', function() {
       "f29eff5d-ab208b3c-fa1735d3-ebc4aa2f-284fa0cc:0",
       "2b22dad1-5b26015e-68493e3d-83a9854b-91a16d53:0"
     ];
-    var seriesAvailableImageQualities = [
-        'LOSSLESS', 'MEDIUM', 'LOW'
-    ];
+    var seriesAvailableImageQualities = {
+        'PIXELDATA': 101, 'MEDIUM': 2, 'LOW': 1
+    };
 
     describe('route /series/<instance>', function() {
 
