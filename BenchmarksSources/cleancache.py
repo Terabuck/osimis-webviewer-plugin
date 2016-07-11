@@ -8,6 +8,7 @@ instanceIds = client.getRequest('/instances')
 for instanceId in instanceIds:
 	frameIndexes = client.getRequest('/instances/' + instanceId + '/frames')
 	for frameIndex in frameIndexes:
-		client.getRequest('/nuks/cleancache/'+str(instanceId)+'/'+str(frameIndex)+'/resize:150/8bit/jpeg:100/klv')
-		client.getRequest('/nuks/cleancache/'+str(instanceId)+'/'+str(frameIndex)+'/resize:1000/8bit/jpeg:100/klv')
-		client.getRequest('/nuks/cleancache/'+str(instanceId)+'/'+str(frameIndex)+'/8bit/jpeg:100/klv')
+		client.getRequest('/osimis-viewer/images/cleancache/'+str(instanceId)+'/'+str(frameIndex)+'/high-quality')
+		client.getRequest('/osimis-viewer/images/cleancache/'+str(instanceId)+'/'+str(frameIndex)+'/medium-quality')
+		client.getRequest('/osimis-viewer/images/cleancache/'+str(instanceId)+'/'+str(frameIndex)+'/low-quality')
+		client.getRequest('/osimis-viewer/images/cleancache/'+str(instanceId)+'/'+str(frameIndex)+'/pixeldata-quality')
