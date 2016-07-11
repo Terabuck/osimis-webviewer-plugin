@@ -11,7 +11,7 @@ MediumQualityPolicy::MediumQualityPolicy()
   resampleAndJpegPolicy_.AddPolicy(new JpegConversionPolicy(80));
   resampleAndJpegPolicy_.AddPolicy(new KLVEmbeddingPolicy());
 
-  // @todo try/catch and clean memory on exception
+  // @todo move instantiation out of controller
 }
 
 MediumQualityPolicy::~MediumQualityPolicy()

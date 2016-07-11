@@ -19,23 +19,20 @@ namespace {
 
 IImageContainer* Uint8ConversionPolicy::Apply(IImageContainer* input, ImageMetaData* metaData)
 {
+  // Except *raw* image
   RawImageContainer* rawInputImage = dynamic_cast<RawImageContainer*>(input);
-  if (!rawInputImage)
-  {
-    throw std::invalid_argument("Input is not raw");
-    return NULL;
-  }
+  assert(rawInputImage != 0);
 
   Orthanc::ImageAccessor* inAccessor = rawInputImage->GetOrthancImageAccessor();
   Orthanc::PixelFormat pixelFormat = inAccessor->GetFormat();
 
+  // When input is 8bit, return it - no conversion required
   if (pixelFormat == Orthanc::PixelFormat_Grayscale8 || pixelFormat == Orthanc::PixelFormat_RGB24)
   {
-    // @todo OUT OF THE POLICY !
-    // already Uint8 or RGB24 (uint8 * 3)
     return input;
   }
 
+  // Except 16bit image
   if (pixelFormat != Orthanc::PixelFormat_Grayscale16 &&
       pixelFormat != Orthanc::PixelFormat_SignedGrayscale16)
   {
@@ -45,6 +42,7 @@ IImageContainer* Uint8ConversionPolicy::Apply(IImageContainer* input, ImageMetaD
 
   BENCH(CONVERT_TO_UINT8);
 
+  // Convert 8bit image to 16bit
   Orthanc::ImageBuffer* outBuffer = new Orthanc::ImageBuffer;
   outBuffer->SetMinimalPitchForced(true);
   outBuffer->SetFormat(Orthanc::PixelFormat_Grayscale8);
@@ -61,6 +59,7 @@ IImageContainer* Uint8ConversionPolicy::Apply(IImageContainer* input, ImageMetaD
     ChangeDynamics<uint8_t, int16_t>(outAccessor, *inAccessor, metaData->minPixelValue, 0, metaData->maxPixelValue, 255);
   }
 
+  // Update metadata
   metaData->stretched = true;
   metaData->sizeInBytes = outAccessor.GetSize();
   
@@ -77,11 +76,8 @@ namespace {
                              SourceType source1, TargetType target1,
                              SourceType source2, TargetType target2)
   {
-    if (source.GetWidth() != target.GetWidth() ||
-        source.GetHeight() != target.GetHeight())
-    {
-      throw Orthanc::OrthancException(Orthanc::ErrorCode_IncompatibleImageSize);
-    }
+    // Except target image to be compatible with source image
+    assert(source.GetWidth() == target.GetWidth() && source.GetHeight() == target.GetHeight());
 
     float scale = static_cast<float>(target2 - target1) / static_cast<float>(source2 - source1);
     float offset = static_cast<float>(target1) - scale * static_cast<float>(source1);

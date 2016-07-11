@@ -1,6 +1,7 @@
 #ifndef IMAGE_ROUTE_H
 #define IMAGE_ROUTE_H
 
+#include <memory>
 #include <string>
 
 #include "../BaseController.h"
@@ -10,8 +11,7 @@
 
 
 // .../<instance_id>/<frame_index>/<compression_policy>
-
-class ImageController : public BaseController {
+class ImageController : public BaseController, public boost::noncopyable {
 public:
   ImageController(OrthancPluginRestOutput* response, const std::string& url, const OrthancPluginHttpRequest* request);
 

@@ -1,6 +1,6 @@
 /**
  * Orthanc - A Lightweight, RESTful DICOM Store
- * Copyright (C) 2012-2015 Sebastien Jodogne, Medical Physics
+ * Copyright (C) 2012-2016 Sebastien Jodogne, Medical Physics
  * Department, University Hospital of Liege, Belgium
  *
  * This program is free software: you can redistribute it and/or
@@ -30,4 +30,63 @@
  **/
 
 
-#include "PrecompiledHeaders.h"
+#pragma once
+
+#include "DicomValue.h"
+#include "DicomTag.h"
+
+namespace Orthanc
+{
+  class DicomElement : public boost::noncopyable
+  {
+  private:
+    DicomTag tag_;
+    DicomValue* value_;
+
+  public:
+    DicomElement(uint16_t group,
+                 uint16_t element,
+                 const DicomValue& value) :
+      tag_(group, element),
+      value_(value.Clone())
+    {
+    }
+
+    DicomElement(const DicomTag& tag,
+                 const DicomValue& value) :
+      tag_(tag),
+      value_(value.Clone())
+    {
+    }
+
+    ~DicomElement()
+    {
+      delete value_;
+    }
+
+    const DicomTag& GetTag() const
+    {
+      return tag_;
+    }
+
+    const DicomValue& GetValue() const
+    {
+      return *value_;
+    }
+
+    uint16_t GetTagGroup() const
+    {
+      return tag_.GetGroup();
+    }
+
+    uint16_t GetTagElement() const
+    {
+      return tag_.GetElement();
+    }
+
+    bool operator< (const DicomElement& other) const
+    {
+      return GetTag() < other.GetTag();
+    }
+  };
+}

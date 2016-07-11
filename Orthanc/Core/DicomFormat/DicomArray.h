@@ -1,6 +1,6 @@
 /**
  * Orthanc - A Lightweight, RESTful DICOM Store
- * Copyright (C) 2012-2015 Sebastien Jodogne, Medical Physics
+ * Copyright (C) 2012-2016 Sebastien Jodogne, Medical Physics
  * Department, University Hospital of Liege, Belgium
  *
  * This program is free software: you can redistribute it and/or
@@ -32,21 +32,35 @@
 
 #pragma once
 
-#include <boost/noncopyable.hpp>
+#include "DicomElement.h"
+#include "DicomMap.h"
+
+#include <vector>
 
 namespace Orthanc
 {
-  /**
-   * This class should be the ancestor to any class whose type is
-   * determined at the runtime, and that can be dynamically allocated.
-   * Being a child of IDynamicObject only implies the existence of a
-   * virtual destructor.
-   **/
-  class IDynamicObject : public boost::noncopyable
+  class DicomArray : public boost::noncopyable
   {
+  private:
+    typedef std::vector<DicomElement*>  Elements;
+
+    Elements  elements_;
+
   public:
-    virtual ~IDynamicObject()
+    DicomArray(const DicomMap& map);
+
+    ~DicomArray();
+
+    size_t GetSize() const
     {
+      return elements_.size();
     }
+
+    const DicomElement& GetElement(size_t i) const
+    {
+      return *elements_[i];
+    }
+
+    void Print(FILE* fp) const;
   };
 }

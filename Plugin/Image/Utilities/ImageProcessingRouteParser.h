@@ -50,7 +50,7 @@ private:
   // Basic Factory Function
   // Can be overloaded using template specialization 
   template<typename T>
-  static inline T* _Instanciate(boost::cmatch& regexpMatches) {
+  static inline T* _Instantiate(boost::cmatch& regexpMatches) {
     return new T();
   }
 
@@ -63,7 +63,7 @@ private:
 template<typename T>
 inline void ImageProcessingRouteParser::RegisterRoute(const std::string& routeRegex)
 {
-  return RegisterRoute<T>(routeRegex, &ImageProcessingRouteParser::_Instanciate<T>);
+  return RegisterRoute<T>(routeRegex, &ImageProcessingRouteParser::_Instantiate<T>);
 }
 
 template<typename T>

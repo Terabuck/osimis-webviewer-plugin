@@ -19,6 +19,7 @@
 
 #include <typeinfo> // Fix gil 'bad_cast' not member of 'std' https://svn.boost.org/trac/boost/ticket/2483
 
+#include <memory>
 #include <boost/thread.hpp>
 #include <boost/lexical_cast.hpp>
 #include <EmbeddedResources.h>
@@ -31,6 +32,10 @@
 
 #include "OrthancContextManager.h"
 #include "BaseController.h"
+#include "Instance/DicomRepository.h"
+#include "Series/SeriesRepository.h"
+#include "Series/SeriesController.h"
+#include "Image/ImageRepository.h"
 #include "Image/ImageController.h"
 #include "DecodedImageAdapter.h"
 #include "../Orthanc/Plugins/Samples/GdcmDecoder/GdcmDecoderCache.h"
@@ -341,6 +346,12 @@ void ParseConfiguration(bool& enableGdcm,
 
 }
 
+
+DicomRepository* dicomRepository;
+ImageRepository* imageRepository;
+SeriesRepository* seriesRepository;
+
+
 extern "C"
 {
   ORTHANC_PLUGINS_API int32_t OrthancPluginInitialize(OrthancPluginContext* context)
@@ -426,18 +437,22 @@ extern "C"
     }
 
 
-    /* Install the callbacks */
-    // OrthancPluginRegisterRestCallbackNoLock(context_, "/osimis-viewer/is-stable-series/(.*)", IsStableSeries);
-
-    // @todo free
-    ImageRepository* imageRepository = new ImageRepository;
+    // Instantiate repositories
+    DicomRepository* dicomRepository = new DicomRepository;
+    ImageRepository* imageRepository = new ImageRepository(dicomRepository);
+    SeriesRepository* seriesRepository = new SeriesRepository(dicomRepository);
     imageRepository->enableCachedImageStorage(cachedImageStorageEnabled);
 
-    // @todo free
     ImageController::Inject(imageRepository);
+    SeriesController::Inject(seriesRepository);
 
+    // Register routes & controllers
     RegisterRoute<ImageController>("/osimis-viewer/images/");
+    RegisterRoute<SeriesController>("/osimis-viewer/series/");
 
+    // OrthancPluginRegisterRestCallbackNoLock(context_, "/osimis-viewer/is-stable-series/(.*)", IsStableSeries);
+
+    // @todo use common interface with RegisterRoute
 #if ORTHANC_STANDALONE == 1
     OrthancPluginRegisterRestCallbackNoLock(context, "/osimis-viewer/app/(.*)", ServeEmbeddedFolder<Orthanc::EmbeddedResources::WEB_VIEWER>);
 #else
@@ -456,6 +471,11 @@ extern "C"
   ORTHANC_PLUGINS_API void OrthancPluginFinalize()
   {
     OrthancPluginLogWarning(context_, "Finalizing the Web viewer");
+
+    // Free repositories
+    delete seriesRepository;
+    delete imageRepository;
+    delete dicomRepository;
   }
 
 

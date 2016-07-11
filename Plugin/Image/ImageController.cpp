@@ -1,11 +1,15 @@
 #include <boost/regex.hpp>
+#include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp> // for boost::split
+
+#include "../../Orthanc/Core/OrthancException.h" // for OrthancException(UnknownResource) catch
 
 #include "../BenchmarkHelper.h" // for BENCH(*)
 #include "ImageProcessingPolicy/LowQualityPolicy.h"
 #include "ImageProcessingPolicy/MediumQualityPolicy.h"
 #include "ImageProcessingPolicy/HighQualityPolicy.h"
+#include "ImageProcessingPolicy/PixelDataQualityPolicy.h"
 
 #if PLUGIN_ENABLE_DEBUG_ROUTE == 1
 #include "ImageProcessingPolicy/CompositePolicy.h"
@@ -18,6 +22,7 @@
 
 #include "ImageController.h"
 #include <iostream>
+
 ImageRepository* ImageController::imageRepository_ = NULL;
 
 template<>
@@ -33,6 +38,7 @@ ImageController::ImageController(OrthancPluginRestOutput* response, const std::s
   imageProcessingRouteParser_.RegisterRoute<LowQualityPolicy>("^low-quality$");
   imageProcessingRouteParser_.RegisterRoute<MediumQualityPolicy>("^medium-quality$");
   imageProcessingRouteParser_.RegisterRoute<HighQualityPolicy>("^high-quality$");
+  imageProcessingRouteParser_.RegisterRoute<PixelDataQualityPolicy>("^pixeldata-quality$");
 
 #if PLUGIN_ENABLE_DEBUG_ROUTE == 1
   imageProcessingRouteParser_.RegisterRoute<CompositePolicy>("^(.+/.+)$"); // regex: at least a single "/"
@@ -47,10 +53,13 @@ ImageController::ImageController(OrthancPluginRestOutput* response, const std::s
 OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlPostfix) {
   BENCH(URL_PARSING);
   // <instance_uid>/<frame_index>/<processing-policy>
-  boost::regex regexp("^(nocache/|cleancache/)?([^/]+)/(\\d+)(?:/(.+))?$");
+  boost::regex regexp("^(nocache/|cleancache/)?([^/]+)/(\\d+)(?:/(.+))$");
 
   boost::cmatch matches;
   if (!boost::regex_match(urlPostfix.c_str(), matches, regexp)) {
+    std::cerr << "BAD REGEX";
+
+    // Return 404 error on badly formatted URL - @todo use ErrorCode_UriSyntax instead
     return this->_AnswerError(404);
   }
   else {
@@ -64,15 +73,30 @@ OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlP
       BENCH_LOG(INSTANCE, instanceId_);
       BENCH_LOG(FRAME_INDEX, frameIndex_);
     }
-    catch (const std::invalid_argument&) {
+    catch (const std::invalid_argument& exc) {
+      std::cerr << exc.what();
+
       // probably because processingPolicy has not been found
       return this->_AnswerError(404);
     }
-    catch (const boost::bad_lexical_cast&) {
+    catch (const boost::bad_lexical_cast& exc) {
+      std::cerr << exc.what();
+
       // should be prevented by the regex
       return this->_AnswerError(500);
     }
-    catch (...) {
+    catch (const Orthanc::OrthancException& exc) {
+      std::cerr << exc.What();
+
+      return this->_AnswerError(exc.GetHttpStatus());
+    }
+    catch (const std::exception& exc) {
+      std::cerr << exc.what();
+      // @note if the exception has been thrown from some constructor,
+      // memory leaks may happen. we should fix the bug instead of focusing on those memory leaks.
+      // however, in case of memory leak due to bad alloc, we should clean memory.
+      // @todo avoid memory allocation within constructor
+
       // @todo better control
       return this->_AnswerError(500);
     }
@@ -94,14 +118,12 @@ OrthancPluginErrorCode ImageController::_ProcessRequest()
       return this->_AnswerBuffer(answer, "application/json");
     }
 
+    // all routes point to a processing policy, check there is one
+    assert(this->processingPolicy_.get() != NULL);
+
     // retrieve processed image
     std::auto_ptr<Image> image;
-    if (this->processingPolicy_.get() == NULL) {
-      image.reset(imageRepository_->GetImage(this->instanceId_, this->frameIndex_, !this->disableCache_));
-    }
-    else {
-      image.reset(imageRepository_->GetImage(this->instanceId_, this->frameIndex_, this->processingPolicy_.get(), !this->disableCache_));
-    }
+    image.reset(imageRepository_->GetImage(this->instanceId_, this->frameIndex_, this->processingPolicy_.get(), !this->disableCache_));
     
     if (image.get() != NULL)
     {
@@ -116,20 +138,24 @@ OrthancPluginErrorCode ImageController::_ProcessRequest()
       return this->_AnswerError(500);
     }
   }
-  catch (...) {
+  catch (const Orthanc::OrthancException& exc) {
+    return this->_AnswerError(exc.GetHttpStatus());
+  }
+  catch (const std::exception& exc) {
+    std::cerr << exc.what();
     return this->_AnswerError(500);
   }
 }
 
 #if PLUGIN_ENABLE_DEBUG_ROUTE == 1
 // Parse JpegConversionPolicy compression parameter from its route regex matches
+// may throws lexical_cast on bad route
 template<>
-inline JpegConversionPolicy* ImageProcessingRouteParser::_Instanciate<JpegConversionPolicy>(boost::cmatch& regexpMatches)
+inline JpegConversionPolicy* ImageProcessingRouteParser::_Instantiate<JpegConversionPolicy>(boost::cmatch& regexpMatches)
 {
   int compression = 100;
   
   if (regexpMatches[1].length()) {
-    // @todo catch lexical_cast
     compression = boost::lexical_cast<int>(regexpMatches[1]);
   }
 
@@ -137,13 +163,13 @@ inline JpegConversionPolicy* ImageProcessingRouteParser::_Instanciate<JpegConver
 };
 
 // Parse ResizePolicy compression parameter from its route regex matches
+// may throws lexical_cast on bad route
 template<>
-inline ResizePolicy* ImageProcessingRouteParser::_Instanciate<ResizePolicy>(boost::cmatch& regexpMatches)
+inline ResizePolicy* ImageProcessingRouteParser::_Instantiate<ResizePolicy>(boost::cmatch& regexpMatches)
 {
   unsigned int maxWidthHeight = 0;
   
   if (regexpMatches[1].length()) {
-    // @todo catch lexical_cast
     maxWidthHeight = boost::lexical_cast<unsigned int>(regexpMatches[1]);
   }
 
@@ -152,7 +178,7 @@ inline ResizePolicy* ImageProcessingRouteParser::_Instanciate<ResizePolicy>(boos
 
 // Parse a route containing multiple policies into a single CompositePolicy
 template<>
-inline CompositePolicy* ImageProcessingRouteParser::_Instanciate<CompositePolicy>(boost::cmatch& regexpMatches)
+inline CompositePolicy* ImageProcessingRouteParser::_Instantiate<CompositePolicy>(boost::cmatch& regexpMatches)
 {
   ImageProcessingRouteParser imageProcessingRouteParser;
   imageProcessingRouteParser.RegisterRoute<ResizePolicy>("^resize:(\\d+)$"); // resize:<maximal height/width: uint>

@@ -12,6 +12,7 @@ public:
 
   // in: RawImageContainer<8bit>
   // out: JpegImageContainer
+  // @throws Orthanc::OrthancException
   virtual IImageContainer* Apply(IImageContainer* input, ImageMetaData* metaData);
 
   virtual std::string ToString() const 

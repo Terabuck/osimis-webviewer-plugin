@@ -1,6 +1,6 @@
 /**
  * Orthanc - A Lightweight, RESTful DICOM Store
- * Copyright (C) 2012-2015 Sebastien Jodogne, Medical Physics
+ * Copyright (C) 2012-2016 Sebastien Jodogne, Medical Physics
  * Department, University Hospital of Liege, Belgium
  *
  * This program is free software: you can redistribute it and/or
@@ -30,41 +30,42 @@
  **/
 
 
-#pragma once
+#include "../PrecompiledHeaders.h"
+#include "DicomArray.h"
 
-#include "Enumerations.h"
-
-#include <stdint.h>
-#include <vector>
-#include <string>
-#include <json/json.h>
+#include <stdio.h>
 
 namespace Orthanc
 {
-  typedef std::vector<std::string> UriComponents;
-
-  namespace Toolbox
+  DicomArray::DicomArray(const DicomMap& map)
   {
-    Endianness DetectEndianness();
+    elements_.reserve(map.map_.size());
+    
+    for (DicomMap::Map::const_iterator it = 
+           map.map_.begin(); it != map.map_.end(); ++it)
+    {
+      elements_.push_back(new DicomElement(it->first, *it->second));
+    }
+  }
 
-    void TokenizeString(std::vector<std::string>& result,
-                        const std::string& source,
-                        char separator);
 
-    void CreateNewDirectory(const std::string& path);
+  DicomArray::~DicomArray()
+  {
+    for (size_t i = 0; i < elements_.size(); i++)
+    {
+      delete elements_[i];
+    }
+  }
 
-    bool IsExistingFile(const std::string& path);
 
-    void ReadFile(std::string& content,
-                  const std::string& path);
-
-    void WriteFile(const std::string& content,
-                   const std::string& path);
-
-    void USleep(uint64_t microSeconds);
-
-    void RemoveFile(const std::string& path);
-
-    std::string StripSpaces(const std::string& source);
+  void DicomArray::Print(FILE* fp) const
+  {
+    for (size_t  i = 0; i < elements_.size(); i++)
+    {
+      DicomTag t = elements_[i]->GetTag();
+      const DicomValue& v = elements_[i]->GetValue();
+      std::string s = v.IsNull() ? "(null)" : v.GetContent();
+      printf("0x%04x 0x%04x [%s]\n", t.GetGroup(), t.GetElement(), s.c_str());
+    }
   }
 }

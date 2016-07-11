@@ -25,6 +25,7 @@
 #include <orthanc/OrthancCPlugin.h>
 
 #include "../Orthanc/Core/Images/ImageAccessor.h"
+#include "../Orthanc/Core/DicomFormat/DicomMap.h"
 
 namespace OrthancPlugins
 {
@@ -34,6 +35,9 @@ namespace OrthancPlugins
     CacheBundle_InstanceInformation = 2,
     CacheBundle_SeriesInformation = 3
   };
+
+  std::string GetTagName(const Orthanc::DicomTag& tag); // Throws exception when tag is unknown
+  Json::Value ConvertDicomMapToJson(const Orthanc::DicomMap &map);
 
   bool GetStringFromOrthanc(std::string& content,
                             OrthancPluginContext* context,

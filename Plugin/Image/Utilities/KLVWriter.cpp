@@ -9,16 +9,19 @@ KLVWriter::KLVWriter()
 
 void KLVWriter::setValue(uint32_t key, size_t length, const char* value)
 {
-  // @todo catch  bad_numeric_cast, (negative_overflow) and positive_overflow std::bad_cast 
-
-  KLVTuple klvTuple(key, boost::numeric_cast<uint32_t>(length), reinterpret_cast<const uint8_t *>(value), false);
-  klv_tuples_.push_back(klvTuple);
+  try {
+    KLVTuple klvTuple(key, boost::numeric_cast<uint32_t>(length), reinterpret_cast<const uint8_t *>(value), false);
+    klv_tuples_.push_back(klvTuple);
+  }
+  catch (const boost::bad_numeric_cast&) {
+    // Except length & value to be numeric
+    assert(true);
+  }
 
   total_size_ += 4 + 4 + length; // key byte + length byte + value length
 }
 
 std::string KLVWriter::write() {
-  // @todo catch BadAlloc (string)
   std::string result;
   result.reserve(total_size_);
 

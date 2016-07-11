@@ -174,6 +174,7 @@ set(CORE_SOURCES
   ${CMAKE_SOURCE_DIR}/Orthanc/Core/DicomFormat/DicomMap.cpp
   ${CMAKE_SOURCE_DIR}/Orthanc/Core/DicomFormat/DicomTag.cpp
   ${CMAKE_SOURCE_DIR}/Orthanc/Core/DicomFormat/DicomValue.cpp
+  ${CMAKE_SOURCE_DIR}/Orthanc/Core/DicomFormat/DicomArray.cpp
   ${CMAKE_SOURCE_DIR}/Orthanc/Resources/ThirdParty/base64/base64.cpp
   )
 
@@ -193,6 +194,11 @@ add_library(OsimisWebViewer
   
   ${CMAKE_SOURCE_DIR}/Plugin/OrthancContextManager.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/BaseController.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Instance/DicomRepository.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Series/SeriesFactory.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Series/SeriesRepository.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Series/Series.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Series/SeriesController.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/Utilities/KLVWriter.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/Utilities/ImageProcessingRouteParser.h
   ${CMAKE_SOURCE_DIR}/Plugin/Image/Utilities/ScopedBuffers.h
@@ -200,6 +206,7 @@ add_library(OsimisWebViewer
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/CompressedImageContainer.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/CornerstoneKLVContainer.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/CompositePolicy.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/PixelDataQualityPolicy.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/HighQualityPolicy.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/MediumQualityPolicy.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/LowQualityPolicy.cpp

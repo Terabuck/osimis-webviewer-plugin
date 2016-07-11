@@ -14,13 +14,9 @@ IImageContainer* ResizePolicy::Apply(IImageContainer* input, ImageMetaData* meta
 {
   BENCH(RESIZE_IMAGE)
 
+  // Except *raw* image
   RawImageContainer* inRawImage = dynamic_cast<RawImageContainer*>(input);
-  if (!inRawImage)
-  {
-    throw std::invalid_argument("Input is not raw");
-    // @todo Throw exception : input is not a raw image
-    return NULL;
-  }
+  assert(inRawImage != 0);
 
   Orthanc::ImageAccessor* accessor = inRawImage->GetOrthancImageAccessor();
 
@@ -41,7 +37,7 @@ IImageContainer* ResizePolicy::Apply(IImageContainer* input, ImageMetaData* meta
   }
   
   // Create output image buffer
-  Orthanc::ImageBuffer* outBuffer = new Orthanc::ImageBuffer;
+  Orthanc::ImageBuffer* outBuffer = new Orthanc::ImageBuffer; // memory ownership taken by outRawImage
 
   // Use the input format for output
   outBuffer->SetFormat(accessor->GetFormat());
@@ -53,8 +49,7 @@ IImageContainer* ResizePolicy::Apply(IImageContainer* input, ImageMetaData* meta
   // Resize the input and put the result in the output
   RawImageContainer::gil_image_view_t inGILView = inRawImage->GetGILImageView();
   RawImageContainer::gil_image_view_t outGILView = outRawImage->GetGILImageView();
-//  boost::gil::resize_view(inGILView, outGILView, boost::gil::bilinear_sampler());
-  boost::gil::resize_view(inGILView, outGILView, boost::gil::nearest_neighbor_sampler());
+  boost::gil::resize_view(inGILView, outGILView, boost::gil::nearest_neighbor_sampler()); // boost::gil::bilinear_sampler() also available
 
   // Update image metadata
   metaData->width = outWidth;

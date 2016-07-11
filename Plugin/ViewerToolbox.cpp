@@ -22,7 +22,9 @@
 
 #include "../Orthanc/Core/OrthancException.h"
 #include "../Orthanc/Core/Toolbox.h"
+#include "../Orthanc/Core/DicomFormat/DicomArray.h"
 
+#include <string>
 #include <json/reader.h>
 #include <stdexcept>
 #include <boost/lexical_cast.hpp>
@@ -30,6 +32,135 @@
 
 namespace OrthancPlugins
 {
+  // Throws exception when tag is unknown
+  std::string GetTagName(const Orthanc::DicomTag& tag)
+  {
+      using namespace Orthanc;
+
+      if (tag == DicomTag(0x0002, 0x0010)) return "TransferSyntax";
+
+      // Aliases for the most useful tags
+      else if (tag == Orthanc::DICOM_TAG_ACCESSION_NUMBER) return "AccessionNumber";
+      else if (tag == Orthanc::DICOM_TAG_SOP_INSTANCE_UID) return "SopInstanceUid";
+      else if (tag == Orthanc::DICOM_TAG_PATIENT_ID) return "PatientID";
+      else if (tag == Orthanc::DICOM_TAG_SERIES_INSTANCE_UID) return "SeriesInstanceUid";
+      else if (tag == Orthanc::DICOM_TAG_STUDY_INSTANCE_UID) return "StudyInstanceUid";
+      else if (tag == Orthanc::DICOM_TAG_PIXEL_DATA) return "PixelData";
+
+      else if (tag == Orthanc::DICOM_TAG_IMAGE_INDEX) return "ImageIndex";
+      else if (tag == Orthanc::DICOM_TAG_INSTANCE_NUMBER) return "InstanceNumber";
+
+      else if (tag == Orthanc::DICOM_TAG_NUMBER_OF_SLICES) return "NumberOfSlices";
+      else if (tag == Orthanc::DICOM_TAG_NUMBER_OF_TIME_SLICES) return "NumberOfTimeSlices";
+      else if (tag == Orthanc::DICOM_TAG_NUMBER_OF_FRAMES) return "NumberOfFrames";
+      else if (tag == Orthanc::DICOM_TAG_CARDIAC_NUMBER_OF_IMAGES) return "CardiacNumberOfImages";
+      else if (tag == Orthanc::DICOM_TAG_IMAGES_IN_ACQUISITION) return "ImagesInAcquisition";
+      else if (tag == Orthanc::DICOM_TAG_PATIENT_NAME) return "PatientName";
+      else if (tag == Orthanc::DICOM_TAG_ENCAPSULATED_DOCUMENT) return "EncapsulatedDocument";
+
+      else if (tag == Orthanc::DICOM_TAG_STUDY_DESCRIPTION) return "StudyDescription";
+      else if (tag == Orthanc::DICOM_TAG_SERIES_DESCRIPTION) return "SeriesDescription";
+      else if (tag == Orthanc::DICOM_TAG_MODALITY) return "Modality";
+
+      // The following is used for "modify/anonymize" operations
+      else if (tag == Orthanc::DICOM_TAG_SOP_CLASS_UID) return "SopClassUid";
+      else if (tag == Orthanc::DICOM_TAG_MEDIA_STORAGE_SOP_CLASS_UID) return "MediaStorageSopClassUid";
+      else if (tag == Orthanc::DICOM_TAG_MEDIA_STORAGE_SOP_INSTANCE_UID) return "MediaStorageSopInstanceUid";
+      else if (tag == Orthanc::DICOM_TAG_DEIDENTIFICATION_METHOD) return "DeidentificationMethod";
+
+      // DICOM tags used for fMRI (thanks to Will Ryder)
+      else if (tag == Orthanc::DICOM_TAG_NUMBER_OF_TEMPORAL_POSITIONS) return "NumberOfTemporalPositions";
+      else if (tag == Orthanc::DICOM_TAG_TEMPORAL_POSITION_IDENTIFIER) return "TemporalPositionIdentifier";
+
+      // Tags for C-FIND and C-MOVE
+      else if (tag == Orthanc::DICOM_TAG_SPECIFIC_CHARACTER_SET) return "SpecificCharacterSet";
+      else if (tag == Orthanc::DICOM_TAG_QUERY_RETRIEVE_LEVEL) return "QueryRetrieveLevel";
+      else if (tag == Orthanc::DICOM_TAG_MODALITIES_IN_STUDY) return "ModalitiesInStudy";
+
+      // Tags for images
+      else if (tag == Orthanc::DICOM_TAG_COLUMNS) return "Columns";
+      else if (tag == Orthanc::DICOM_TAG_ROWS) return "Rows";
+      else if (tag == Orthanc::DICOM_TAG_SAMPLES_PER_PIXEL) return "SamplesPerPixel";
+      else if (tag == Orthanc::DICOM_TAG_BITS_ALLOCATED) return "BitsAllocated";
+      else if (tag == Orthanc::DICOM_TAG_BITS_STORED) return "BitsStored";
+      else if (tag == Orthanc::DICOM_TAG_HIGH_BIT) return "HighBit";
+      else if (tag == Orthanc::DICOM_TAG_PIXEL_REPRESENTATION) return "PixelRepresentation";
+      else if (tag == Orthanc::DICOM_TAG_PLANAR_CONFIGURATION) return "PlanarConfiguration";
+      else if (tag == Orthanc::DICOM_TAG_PHOTOMETRIC_INTERPRETATION) return "PhotometricInterpretation";
+      else if (tag == Orthanc::DICOM_TAG_IMAGE_ORIENTATION_PATIENT) return "ImageOrientationPatient";
+      else if (tag == Orthanc::DICOM_TAG_IMAGE_POSITION_PATIENT) return "ImagePositionPatient";
+
+      // Tags related to date and time
+      else if (tag == Orthanc::DICOM_TAG_ACQUISITION_DATE) return "AcquisitionDate";
+      else if (tag == Orthanc::DICOM_TAG_ACQUISITION_TIME) return "AcquisitionTime";
+      else if (tag == Orthanc::DICOM_TAG_CONTENT_DATE) return "ContentDate";
+      else if (tag == Orthanc::DICOM_TAG_CONTENT_TIME) return "ContentTime";
+      else if (tag == Orthanc::DICOM_TAG_INSTANCE_CREATION_DATE) return "InstanceCreationDate";
+      else if (tag == Orthanc::DICOM_TAG_INSTANCE_CREATION_TIME) return "InstanceCreationTime";
+      else if (tag == Orthanc::DICOM_TAG_PATIENT_BIRTH_DATE) return "PatientBirthDate";
+      else if (tag == Orthanc::DICOM_TAG_PATIENT_BIRTH_TIME) return "PatientBirthTime";
+      else if (tag == Orthanc::DICOM_TAG_SERIES_DATE) return "SeriesDate";
+      else if (tag == Orthanc::DICOM_TAG_SERIES_TIME) return "SeriesTime";
+      else if (tag == Orthanc::DICOM_TAG_STUDY_DATE) return "StudyDate";
+      else if (tag == Orthanc::DICOM_TAG_STUDY_TIME) return "StudyTime";
+
+      // Various tags
+      else if (tag == Orthanc::DICOM_TAG_SERIES_TYPE) return "SeriesType";
+      else if (tag == Orthanc::DICOM_TAG_REQUESTED_PROCEDURE_DESCRIPTION) return "RequestedProcedureDescription";
+      else if (tag == Orthanc::DICOM_TAG_INSTITUTION_NAME) return "InstitutionName";
+      else if (tag == Orthanc::DICOM_TAG_REQUESTING_PHYSICIAN) return "RequestingPhysician";
+      else if (tag == Orthanc::DICOM_TAG_REFERRING_PHYSICIAN_NAME) return "ReferringPhysicianName";
+      else if (tag == Orthanc::DICOM_TAG_OPERATOR_NAME) return "OperatorName";
+      else if (tag == Orthanc::DICOM_TAG_PERFORMED_PROCEDURE_STEP_DESCRIPTION) return "PerformedProcedureStepDescription";
+      else if (tag == Orthanc::DICOM_TAG_IMAGE_COMMENTS) return "ImageComments";
+      else if (tag == Orthanc::DICOM_TAG_ACQUISITION_DEVICE_PROCESSING_DESCRIPTION) return "AcquisitionDeviceProcessingDescription";
+      else if (tag == Orthanc::DICOM_TAG_CONTRAST_BOLUS_AGENT) return "ContrastBolusAgent";
+
+      // Counting patients, studies and series
+      // https://www.medicalconnections.co.uk/kb/Counting_Studies_Series_and_Instances
+      else if (tag == Orthanc::DICOM_TAG_NUMBER_OF_PATIENT_RELATED_STUDIES) return "NumberOfPatientRelatedStudies";
+      else if (tag == Orthanc::DICOM_TAG_NUMBER_OF_PATIENT_RELATED_SERIES) return "NumberOfPatientRelatedSeries";
+      else if (tag == Orthanc::DICOM_TAG_NUMBER_OF_PATIENT_RELATED_INSTANCES) return "NumberOfPatientRelatedInstances";
+      else if (tag == Orthanc::DICOM_TAG_NUMBER_OF_STUDY_RELATED_SERIES) return "NumberOfStudyRelatedSeries";
+      else if (tag == Orthanc::DICOM_TAG_NUMBER_OF_STUDY_RELATED_INSTANCES) return "NumberOfStudyRelatedInstances";
+      else if (tag == Orthanc::DICOM_TAG_NUMBER_OF_SERIES_RELATED_INSTANCES) return "NumberOfSeriesRelatedInstances";
+      else if (tag == Orthanc::DICOM_TAG_SOP_CLASSES_IN_STUDY) return "SopClassesInStudy";
+
+      // throw exception when tag is unknown
+      else throw std::invalid_argument("unknown tag");
+  }
+
+  Json::Value ConvertDicomMapToJson(const Orthanc::DicomMap& map)
+  {
+    Json::Value json;
+    Orthanc::DicomArray array(map);
+
+    for(int i=0; i<array.GetSize(); ++i) {
+      const Orthanc::DicomElement& element = array.GetElement(i);
+      const Orthanc::DicomTag& tag = element.GetTag();
+      const Orthanc::DicomValue& value = element.GetValue();
+
+      // Retrieve tag name & ignore unknown tags
+      std::string tagName;
+      try {
+        tagName = GetTagName(tag);
+      }
+      catch (const std::invalid_argument&) {
+        continue;
+      }
+
+      // Ignore binary tags and null values
+      if (value.IsBinary() || value.IsNull()) {
+        continue;
+      }
+
+      // Set the json tag
+      json[tagName] = Orthanc::Toolbox::StripSpaces(value.GetContent());
+    }
+
+    return json;
+  }
+
   bool GetStringFromOrthanc(std::string& content,
                             OrthancPluginContext* context,
                             const std::string& uri)

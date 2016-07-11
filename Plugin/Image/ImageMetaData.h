@@ -5,16 +5,20 @@
 #include <boost/cstdint.hpp> // for uint32_t
 #include <json/writer.h> // for Json::Value
 
+#include "../../Orthanc/Core/DicomFormat/DicomMap.h"
 #include "ImageContainer/RawImageContainer.h"
+#include "ImageContainer/IImageContainer.h"
 
 /** ImageMetaData [@Entity]
  *
  */
-struct ImageMetaData {
+struct ImageMetaData : public boost::noncopyable {
   ImageMetaData();
 
   // @todo const RawImageContainer
   ImageMetaData(RawImageContainer* rawImage, const Json::Value& dicomTags);
+
+  ImageMetaData(const Orthanc::DicomMap& headerTags, const Json::Value& dicomTags);
 
   // - Cornerstone (frontend) related
 

@@ -13,6 +13,14 @@ Image::Image(const std::string& instanceId, uint32_t frameIndex, RawImageContain
   data_ = data;
 }
 
+Image::Image(const std::string& instanceId, uint32_t frameIndex, IImageContainer* data, const Orthanc::DicomMap& headerTags, const Json::Value& dicomTags)
+  : metaData_(headerTags, dicomTags)
+{
+  instanceId_ = instanceId;
+  frameIndex_ = frameIndex;
+  data_ = data;
+}
+
 Image::Image(const std::string& instanceId, uint32_t frameIndex, CornerstoneKLVContainer* data)
   : metaData_()
 {
@@ -21,13 +29,6 @@ Image::Image(const std::string& instanceId, uint32_t frameIndex, CornerstoneKLVC
   instanceId_ = instanceId;
   frameIndex_ = frameIndex;
   data_ = data;
-}
-
-const char* Image::GetBinary() {
-  return data_->GetBinary();
-}
-uint32_t Image::GetBinarySize() {
-  return data_->GetBinarySize();
 }
 
 void Image::ApplyProcessing(IImageProcessingPolicy* policy)
