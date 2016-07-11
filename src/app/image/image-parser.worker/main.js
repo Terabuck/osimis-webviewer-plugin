@@ -63,7 +63,7 @@ function setImageApiUrl(rootUrl) {
     }
 
     // Set the route
-    ImageApiURL = orthancUrl + '/osimis-viewer/images/nocache/';
+    ImageApiURL = orthancUrl + '/osimis-viewer/images/';
 }
 
 // @todo out..
