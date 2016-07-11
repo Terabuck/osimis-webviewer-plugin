@@ -64,18 +64,18 @@ public:
       if (boost::regex_match(transferSyntax.c_str(), matches, regexp) && (
           // see http://www.dicomlibrary.com/dicom/transfer-syntax/
           boost::lexical_cast<uint32_t>(matches[1]) == 50 || // Lossy JPEG 8-bit Image Compression
-          boost::lexical_cast<uint32_t>(matches[1]) == 51 || // Lossy JPEG 12-bit Image Compression
-          boost::lexical_cast<uint32_t>(matches[1]) == 57 || // JPEG Lossless, Nonhierarchical (Processes 14) 
-          boost::lexical_cast<uint32_t>(matches[1]) == 70 || // JPEG Lossless, Nonhierarchical, First-Order Prediction (Default Transfer Syntax for Lossless JPEG Image Compression)
-          boost::lexical_cast<uint32_t>(matches[1]) == 80 || // JPEG-LS Lossless Image Compression
-          boost::lexical_cast<uint32_t>(matches[1]) == 81 || // JPEG-LS Lossy (Near- Lossless) Image Compression
-          boost::lexical_cast<uint32_t>(matches[1]) == 90 || // JPEG 2000 Image Compression (Lossless Only)
-          boost::lexical_cast<uint32_t>(matches[1]) == 91 || // JPEG 2000 Image Compression
-          boost::lexical_cast<uint32_t>(matches[1]) == 92 || // JPEG 2000 Part 2 Multicomponent Image Compression (Lossless Only)
-          boost::lexical_cast<uint32_t>(matches[1]) == 93 || // JPEG 2000 Part 2 Multicomponent Image Compression
+          // boost::lexical_cast<uint32_t>(matches[1]) == 51 || // Lossy JPEG 12-bit Image Compression
+          // boost::lexical_cast<uint32_t>(matches[1]) == 57 || // JPEG Lossless, Nonhierarchical (Processes 14) 
+          boost::lexical_cast<uint32_t>(matches[1]) == 70 )// || // JPEG Lossless, Nonhierarchical, First-Order Prediction (Default Transfer Syntax for Lossless JPEG Image Compression)
+          // boost::lexical_cast<uint32_t>(matches[1]) == 80 || // JPEG-LS Lossless Image Compression
+          // boost::lexical_cast<uint32_t>(matches[1]) == 81 || // JPEG-LS Lossy (Near- Lossless) Image Compression
+          // boost::lexical_cast<uint32_t>(matches[1]) == 90 || // JPEG 2000 Image Compression (Lossless Only)
+          // boost::lexical_cast<uint32_t>(matches[1]) == 91 || // JPEG 2000 Image Compression
+          // boost::lexical_cast<uint32_t>(matches[1]) == 92 || // JPEG 2000 Part 2 Multicomponent Image Compression (Lossless Only)
+          // boost::lexical_cast<uint32_t>(matches[1]) == 93 ) // JPEG 2000 Part 2 Multicomponent Image Compression
 
-          boost::lexical_cast<uint32_t>(matches[1]) == 94 || // JPIP Referenced 
-          boost::lexical_cast<uint32_t>(matches[1]) == 95 )  // JPIP Referenced Deflate
+          // boost::lexical_cast<uint32_t>(matches[1]) == 94 || // JPIP Referenced 
+          // boost::lexical_cast<uint32_t>(matches[1]) == 95 )  // JPIP Referenced Deflate
       ) {
         result.insert(ImageQuality(ImageQuality::PIXELDATA)); // raw file (unknown format)
         BENCH_LOG("QUALITY", "pixeldata");

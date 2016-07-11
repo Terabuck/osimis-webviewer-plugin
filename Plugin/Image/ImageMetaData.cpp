@@ -250,42 +250,43 @@ ImageMetaData::ImageMetaData(const DicomMap& headerTags, const Json::Value& dico
     case 50: // Lossy JPEG 8-bit Image Compression
       compression = "jpeg";
       break;
-    case 51: // Lossy JPEG 12-bit Image Compression
-      compression = "jpeg";
-      break;
-    case 57: // JPEG Lossless, Nonhierarchical (Processes 14)
-      compression = "jpeg-lossless";
-      break;
+    // case 51: // Lossy JPEG 12-bit Image Compression
+    //   compression = "jpeg";
+    //   break;
+    // case 57: // JPEG Lossless, Nonhierarchical (Processes 14)
+    //   compression = "jpeg-lossless";
+    //   break;
     case 70: // JPEG Lossless, Nonhierarchical, First-Order Prediction (Default Transfer Syntax for Lossless JPEG Image Compression)
       compression = "jpeg-lossless";
       break;
-    case 80: // JPEG-LS Lossless Image Compression
-      compression = "jpeg";
-      break;
-    case 81: // JPEG-LS Lossy (Near- Lossless) Image Compression
-      compression = "jpeg";
-      break;
-    case 90: // JPEG 2000 Image Compression (Lossless Only)
-      compression = "jpeg2000";
-      break;
-    case 91: // JPEG 2000 Image Compression
-      compression = "jpeg2000";
-      break;
-    case 92: // JPEG 2000 Part 2 Multicomponent Image Compression (Lossless Only)
-      compression = "jpeg2000";
-      break;
-    case 93: // JPEG 2000 Part 2 Multicomponent Image Compression
-      compression = "jpeg2000";
-      break;
+    // case 80: // JPEG-LS Lossless Image Compression
+    //   compression = "jpeg";
+    //   break;
+    // case 81: // JPEG-LS Lossy (Near- Lossless) Image Compression
+    //   compression = "jpeg";
+    //   break;
+    // case 90: // JPEG 2000 Image Compression (Lossless Only)
+    //   compression = "jpeg2000";
+    //   break;
+    // case 91: // JPEG 2000 Image Compression
+    //   compression = "jpeg2000";
+    //   break;
+    // case 92: // JPEG 2000 Part 2 Multicomponent Image Compression (Lossless Only)
+    //   compression = "jpeg2000";
+    //   break;
+    // case 93: // JPEG 2000 Part 2 Multicomponent Image Compression
+    //   compression = "jpeg2000";
+    //   break;
 
-    case 94: // JPIP Referenced
-      compression = "jpip";
-      break;
-    case 95: // JPIP Referenced Deflate
-      compression = "jpip";
-      break;
+    // case 94: // JPIP Referenced
+    //   compression = "jpip";
+    //   break;
+    // case 95: // JPIP Referenced Deflate
+    //   compression = "jpip";
+    //   break;
 
     default:
+      // @todo @warning can be called via route pixeldata! throw exception instead (may change in long term)
       assert(true);
       break;
     }
