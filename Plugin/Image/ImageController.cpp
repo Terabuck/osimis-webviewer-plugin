@@ -140,7 +140,7 @@ OrthancPluginErrorCode ImageController::_ProcessRequest()
 // Parse JpegConversionPolicy compression parameter from its route regex matches
 // may throws lexical_cast on bad route
 template<>
-inline JpegConversionPolicy* ImageProcessingRouteParser::_Instanciate<JpegConversionPolicy>(boost::cmatch& regexpMatches)
+inline JpegConversionPolicy* ImageProcessingRouteParser::_Instantiate<JpegConversionPolicy>(boost::cmatch& regexpMatches)
 {
   int compression = 100;
   
@@ -154,7 +154,7 @@ inline JpegConversionPolicy* ImageProcessingRouteParser::_Instanciate<JpegConver
 // Parse ResizePolicy compression parameter from its route regex matches
 // may throws lexical_cast on bad route
 template<>
-inline ResizePolicy* ImageProcessingRouteParser::_Instanciate<ResizePolicy>(boost::cmatch& regexpMatches)
+inline ResizePolicy* ImageProcessingRouteParser::_Instantiate<ResizePolicy>(boost::cmatch& regexpMatches)
 {
   unsigned int maxWidthHeight = 0;
   
@@ -167,7 +167,7 @@ inline ResizePolicy* ImageProcessingRouteParser::_Instanciate<ResizePolicy>(boos
 
 // Parse a route containing multiple policies into a single CompositePolicy
 template<>
-inline CompositePolicy* ImageProcessingRouteParser::_Instanciate<CompositePolicy>(boost::cmatch& regexpMatches)
+inline CompositePolicy* ImageProcessingRouteParser::_Instantiate<CompositePolicy>(boost::cmatch& regexpMatches)
 {
   ImageProcessingRouteParser imageProcessingRouteParser;
   imageProcessingRouteParser.RegisterRoute<ResizePolicy>("^resize:(\\d+)$"); // resize:<maximal height/width: uint>
