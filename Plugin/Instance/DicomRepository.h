@@ -26,9 +26,7 @@ class DicomRepository : public boost::noncopyable {
   };
 
 public:
-  // @return false if the cache has been recreated
-  // @todo use exception instead of boolean return - (await alain confirmation)
-  bool getDicomFile(const std::string instanceId, OrthancPluginMemoryBuffer& buffer) const; // throws Orthanc::ErrorCode_UnknownResource
+  void getDicomFile(const std::string instanceId, OrthancPluginMemoryBuffer& buffer) const; // throws Orthanc::ErrorCode_UnknownResource
 //  void increfDicomFile(const std::string instanceId);
   void decrefDicomFile(const std::string instanceId) const;
 //  void addDicomFile(const std::string instanceId, OrthancPluginMemoryBuffer& buffer);

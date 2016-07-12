@@ -12,17 +12,18 @@ namespace
 void _loadDICOM(OrthancPluginMemoryBuffer& dicomOutput, const std::string& instanceId);
 }
 
-bool DicomRepository::getDicomFile(const std::string instanceId, OrthancPluginMemoryBuffer& dicomFileBuffer) const
+void DicomRepository::getDicomFile(const std::string instanceId, OrthancPluginMemoryBuffer& dicomFileBuffer) const
 {
   boost::lock_guard<boost::mutex> guard(_dicomFilesMutex);
 
+  // Retrieve dicom file if cached
   BOOST_FOREACH(DicomFile& dicomFile, _dicomFiles)
   {
     if (dicomFile.instanceId == instanceId)
     {
       dicomFileBuffer = dicomFile.dicomFileBuffer;
       dicomFile.refCount++;
-      return true;
+      return;
     }
   }
 
@@ -46,8 +47,6 @@ bool DicomRepository::getDicomFile(const std::string instanceId, OrthancPluginMe
   dicomFile.instanceId = instanceId;
   dicomFile.dicomFileBuffer = dicomFileBuffer;
   _dicomFiles.push_back(dicomFile);
-
-  return false;
 }
 
 void DicomRepository::decrefDicomFile(const std::string instanceId) const
