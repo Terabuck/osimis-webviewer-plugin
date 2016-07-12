@@ -7,7 +7,7 @@
 
 /** IAvailableQualityPolicy
  *
- * Interface made to suggest which quality Qualitys are available for images
+ * Interface made to suggest which qualities are available for images
  *   based on instance tags and server configuration
  *
  */
