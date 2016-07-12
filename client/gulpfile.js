@@ -8,7 +8,7 @@ var path = require('path');
 var _ = require('lodash');
 var $ = require('gulp-load-plugins')({lazy: true});
 var osisync = require('osisync');
-$.injectInlineWorker = require('../gulp-injectInlineWorker/index.js');
+$.injectInlineWorker = require('gulp-injectInlineWorker/index.js');
 
 var colors = $.util.colors;
 var envenv = $.util.env;

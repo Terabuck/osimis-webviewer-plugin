@@ -28,6 +28,7 @@ set(BENCHMARK OFF CACHE BOOL "Send benchmark informations to stdout")
 set(STATIC_BUILD ON CACHE BOOL "Static build of the third-party libraries (necessary for Windows)")
 SET(STANDALONE_BUILD ON CACHE BOOL "Standalone build (all the resources are embedded, necessary for releases)")
 set(ALLOW_DOWNLOADS ON CACHE BOOL "Allow CMake to download packages")
+set(JS_CLIENT_PATH ${CMAKE_SOURCE_DIR}/../client/build)
 
 # Advanced parameters to fine-tune linking against system libraries
 set(USE_SYSTEM_BOOST ON CACHE BOOL "Use the system version of Boost")
@@ -105,12 +106,12 @@ if (STANDALONE_BUILD)
     -DORTHANC_STANDALONE=1
     )
   set(EMBEDDED_RESOURCES
-    WEB_VIEWER  ${CMAKE_SOURCE_DIR}/subtrees/webViewer.git
+    WEB_VIEWER  ${JS_CLIENT_PATH}
     )
 else()
   add_definitions(
     -DORTHANC_STANDALONE=0
-    -DWEB_VIEWER_PATH="${CMAKE_SOURCE_DIR}/subtrees/webViewer.git/"
+    -DWEB_VIEWER_PATH="${JS_CLIENT_PATH}/"
     )
 endif()
 
