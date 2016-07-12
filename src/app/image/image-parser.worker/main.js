@@ -12,7 +12,12 @@
 // @todo move jpgjs & pngjs out of bower_components
 
 /* @inline: */ importScripts('/app/image/image-parser.worker/klvreader.class.js');
+
+// Import jpeg lib
 /* @inline: */ importScripts('/bower_components/jpgjs/jpg.js');
+
+// Import jpeg FFC3 lib
+/* @inline: */ importScripts('/bower_components/jpeg-lossless-decoder-js/release/current/lossless-min.js');
 
 // Make png.js & config.js worker compatible
 var document = {
@@ -37,6 +42,7 @@ if (!location || !location.origin) {
 var ImageApiURL = undefined;
 function setImageApiUrl(rootUrl) {
     // Import config.js for window.orthancUrl
+    // @todo configure via wvConfigProvider.setApiURL instead
     importScripts(rootUrl + '/config.js');
     var orthancUrl = window.orthancUrl;
     
@@ -63,6 +69,7 @@ function setImageApiUrl(rootUrl) {
 // @todo out..
 var Qualities = {
     // 0 is reserved as none..
+    PIXELDATA: 101,
     LOSSLESS: 100,
     LOW: 1, // resampling to 150 px + compressed to jpeg100
     MEDIUM: 2 // resampling to 1000 px + compressed to jpeg100
@@ -130,6 +137,9 @@ function BinaryRequest(id, quality) {
     
     var url = null;
     switch (quality) {
+    case Qualities.PIXELDATA:
+        url = ImageApiURL + instanceId + '/' + frameIndex + '/pixeldata-quality';
+        break;
     case Qualities.LOSSLESS:
         url = ImageApiURL + instanceId + '/' + frameIndex + '/high-quality';
         break;
@@ -165,14 +175,18 @@ BinaryRequest.prototype.execute = function() {
                 var arraybuffer = xhr.response;
                 var data = parseKLV(arraybuffer);
 
-                if (data.decompression.compression === 'Jpeg') {
+                if (data.decompression.compression.toLowerCase() === 'jpeg') {
                     // Decompress lossy jpeg into 16bit
                     var pixelArray = parseJpeg(data.decompression);
                     pixelArray = convertBackTo16bit(pixelArray, data.decompression);
                 }
-                else if (data.decompression.compression === 'Png') {
+                else if (data.decompression.compression.toLowerCase() === 'png') {
                     // Decompress lossless png
                     var pixelArray = parsePng(data.decompression)
+                }
+                else if (data.decompression.compression.toLowerCase() === 'jpeg-lossless') { // jpeg FFC3       
+                    // Decompress lossless jpeg
+                    var pixelArray = parseJpegLossless(data.decompression);
                 }
             }
             catch (e) {
@@ -291,9 +305,10 @@ function parseKLV(arraybuffer) {
     };
 
     var compression = klvReader.getString(keys.Compression);
-    if (compression !== 'Jpeg' && compression !== 'Png') {
+    console.log('compression:' + compression);
+    if (compression.toLowerCase() !== 'jpeg' && compression.toLowerCase() !== 'jpeg-lossless' && compression.toLowerCase() !== 'png') {
         _processingRequest = null; // cleaning request
-        throw new Error('unknown compression');
+        throw new Error('unknown compression: ' + compression);
     }
 
     var decompressionMetaData = {
@@ -315,20 +330,74 @@ function parseKLV(arraybuffer) {
     };
 }
 
-// if hasColor
-//  -> Uint32 == Uint8 * 4 (RGBA)
-// 
-// if !hasColor && IsSigned
-//  -> Int16
-// 
-// if !hasColor && !IsSigned
-//  -> Uint16
-// 
 function parseJpeg(config) {
     var jpegReader = new JpegImage();
     jpegReader.parse(config.binary);
     var s = jpegReader.getData(config.width, config.height);
     return s;
+}
+
+function parseJpegLossless(config) {
+    var pixels;
+    var decoder = new jpeg.lossless.Decoder();
+    var s = new Uint8Array(decoder.decompress(config.binary.buffer));
+    
+    // decoder.numComp === 3 -> rgb
+    // decoder.numComp === 1 -> grayscale
+    // decoder.numBytes === 1/2 -> 8bit/16bit
+    var bitCount = decoder.numBytes * 8;
+    if (bitCount !== 8 && bitCount !== 16) {
+        throw new Error("unsupported jpeg-lossless byte count: "+bitCount);
+    }
+
+    var isSigned = config.isSigned;
+    //if (config.isSigned == true) { // config.isSigned != isSigned
+    //    throw new Error("unexpected signed jpeg-lossless");
+    //}
+
+    var hasColor;
+    if (decoder.numComp === 1) {
+        hasColor = false;
+    }
+    else if (decoder.numComp === 3) {
+        hasColor = true;
+    }
+    else { // maybe rgba ? probably not.
+        throw new Error("unsupported jpeg-lossless component number: "+decoder.numComp)
+    }
+
+    if (hasColor) {
+        // Convert rgb24 to rgb32
+
+        buf = new ArrayBuffer(s.length / 3 * 4); // RGB32
+        pixels = new Uint8Array(buf); // RGB24
+        index = 0;
+        for (i = 0; i < s.length; i += 3) {
+            pixels[index++] = s[i];
+            pixels[index++] = s[i + 1];
+            pixels[index++] = s[i + 2];
+            pixels[index++] = 255;  // Alpha channel
+        }
+    }
+    else if (bitCount === 8 && !isSigned) {
+        pixels = new Uint8Array(s.buffer);
+    }
+    else if (bitCount === 8 && isSigned) {
+        pixels = new Int8Array(s.buffer);
+    }
+    else if (bitCount === 16 && !isSigned) {
+        // except jpeg to be little endian
+        pixels = new Uint16Array(s.buffer);
+    }
+    else if (bitCount === 16 && isSigned) {
+        // except jpeg to be little endian
+        pixels = new Int16Array(s.buffer);
+    }
+    else {
+        throw new error("unsupported jpeg-lossless format");
+    }
+
+    return pixels;
 }
 
 function parsePng(config) {
@@ -339,8 +408,6 @@ function parsePng(config) {
 
     var s = png.decodePixels(); // returns Uint8 array
 
-    var bytePerPixel = png.bits;
-    
     if (config.hasColor) {
         // Convert png24 to rgb32
 
@@ -397,6 +464,15 @@ function _convertPngEndianness(s, config) {
     return pixels;
 }
 
+// if hasColor
+//  -> Uint32 == Uint8 * 4 (RGBA)
+// 
+// if !hasColor && IsSigned
+//  -> Int16
+// 
+// if !hasColor && !IsSigned
+//  -> Uint16
+// 
 function convertBackTo16bit(s, config) {
     var pixels = null;
     var buf, index, i;

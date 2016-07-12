@@ -3,18 +3,18 @@
 
     angular
         .module('webviewer')
-        .directive('wvDroppableSerieExt', wvDroppableSerieExt)
+        .directive('wvDroppableSeriesExt', wvDroppableSeriesExt)
         .config(function($provide) {
-            $provide.decorator('wvSerieIdDirective', function($delegate) {
+            $provide.decorator('wvSeriesIdDirective', function($delegate) {
                 var directive = $delegate[0];
-                directive.require['wvDroppableSerieExt'] = '?^wvDroppableSerieExt';
+                directive.require['wvDroppableSeriesExt'] = '?^wvDroppableSeriesExt';
 
                 return $delegate;
             });
         });
 
     /* @ngInject */
-    function wvDroppableSerieExt() {
+    function wvDroppableSeriesExt() {
         // Usage:
         //
         // Creates:
@@ -33,34 +33,34 @@
 
     /* @ngInject */
     function Controller($rootScope, $scope, $element) {
-        var _wvSerieIdViewModels = [];
+        var _wvSeriesIdViewModels = [];
         this.register = function(viewmodel) {
-            _wvSerieIdViewModels.push(viewmodel);
+            _wvSeriesIdViewModels.push(viewmodel);
         };
         this.unregister = function(viewmodel) {
-            _.pull(_wvSerieIdViewModels, viewmodel);
+            _.pull(_wvSeriesIdViewModels, viewmodel);
         };
 
         $element.droppable({
-            accept: '[wv-draggable-serie-ext]',
+            accept: '[wv-draggable-series-ext]',
             drop: function(evt, ui) {
                 var droppedElement = $(ui.helper);
-                var serieId = droppedElement.data('serie-id');
+                var seriesId = droppedElement.data('series-id');
                 $scope.$apply(function() {
-                    _wvSerieIdViewModels.forEach(function(viewmodel) {
+                    _wvSeriesIdViewModels.forEach(function(viewmodel) {
                         // Trigger old series removed UX global event
-                        var oldSerie = viewmodel.getSerie();
-                        if (oldSerie) {
-                            $rootScope.$emit('UserUnSelectedSeries', oldSerie);
+                        var oldSeries = viewmodel.getSeries();
+                        if (oldSeries) {
+                            $rootScope.$emit('UserUnSelectedSeries', oldSeries);
                         }
 
-                        // Set new serie
+                        // Set new series
                         viewmodel
-                            .setSerie(serieId)
-                            .then(function(newSerie) {
+                            .setSeries(seriesId)
+                            .then(function(newSeries) {
                                 // Trigger new series UX global event
-                                if (newSerie) {
-                                    $rootScope.$emit('UserSelectedSeries', newSerie);
+                                if (newSeries) {
+                                    $rootScope.$emit('UserSelectedSeries', newSeries);
                                 }
                             });
                     });

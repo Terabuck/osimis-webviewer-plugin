@@ -1,5 +1,5 @@
 @import "wv-overlay.scss";
-@import "wv-serielist.scss";
+@import "wv-serieslist.scss";
 @import "wv-toolbar.scss";
 @import "wv-studylist.scss";
 @import "wv-splitpane.scss";
@@ -11,7 +11,7 @@ wv-toolbar {
   display: block;
 }
 wv-toolbar ~ wv-splitpane,
-wv-toolbar ~ wv-serie-viewport,
+wv-toolbar ~ wv-series-viewport,
 wv-toolbar ~ .after-toolbar {
   display: block;
   height: calc(100% - 40px);

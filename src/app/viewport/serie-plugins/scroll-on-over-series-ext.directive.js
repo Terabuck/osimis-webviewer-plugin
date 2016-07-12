@@ -3,18 +3,18 @@
 
     angular
         .module('webviewer')
-        .directive('wvScrollOnOverSerieExt', wvScrollOnOverSerieExt)
+        .directive('wvScrollOnOverSeriesExt', wvScrollOnOverSeriesExt)
         .config(function($provide) {
-        	$provide.decorator('wvSerieIdDirective', function($delegate) {
+        	$provide.decorator('wvSeriesIdDirective', function($delegate) {
 			    var directive = $delegate[0];
-		    	directive.require['wvScrollOnOverSerieExt'] = '?^wvScrollOnOverSerieExt';
+		    	directive.require['wvScrollOnOverSeriesExt'] = '?^wvScrollOnOverSeriesExt';
 
                 return $delegate;
         	});
         });
 
     /* @ngInject */
-    function wvScrollOnOverSerieExt() {
+    function wvScrollOnOverSeriesExt() {
         // Usage:
         //
         // Creates:
@@ -33,12 +33,12 @@
 
     /* @ngInject */
     function Controller($scope, $element, $attrs) {
-        var _wvSerieIdViewModels = [];
+        var _wvSeriesIdViewModels = [];
     	this.register = function(viewmodel) {
-            _wvSerieIdViewModels.push(viewmodel);
+            _wvSeriesIdViewModels.push(viewmodel);
     	};
     	this.unregister = function(viewmodel) {
-            _.pull(_wvSerieIdViewModels, viewmodel);
+            _.pull(_wvSeriesIdViewModels, viewmodel);
     	};
 
         $element
@@ -46,12 +46,12 @@
             .on('mouseout', mouseoutEvt);
 
         $scope.$on('$destroy', function() {
-            _wvSerieIdViewModels.forEach(function(viewmodel) {
-                var serie = viewmodel.getSerie();
-                if (!serie) {
+            _wvSeriesIdViewModels.forEach(function(viewmodel) {
+                var series = viewmodel.getSeries();
+                if (!series) {
                     return;
                 }
-                serie.pause();
+                series.pause();
             });
             $element.off('mouseover', mouseoverEvt);
             $element.off('mouseout', mouseoutEvt);
@@ -59,26 +59,26 @@
 
         function mouseoverEvt() {
             $scope.$apply(function() {
-                _wvSerieIdViewModels.forEach(function(viewmodel) {
-                    var serie = viewmodel.getSerie();
-                    if (!serie) {
+                _wvSeriesIdViewModels.forEach(function(viewmodel) {
+                    var series = viewmodel.getSeries();
+                    if (!series) {
                         return;
                     }
                     
-                    serie.play();
+                    series.play();
                 });
             });
         }
         function mouseoutEvt() {
             $scope.$apply(function() {
-                _wvSerieIdViewModels.forEach(function(viewmodel) {
-                    var serie = viewmodel.getSerie();
-                    if (!serie) {
+                _wvSeriesIdViewModels.forEach(function(viewmodel) {
+                    var series = viewmodel.getSeries();
+                    if (!series) {
                         return;
                     }
 
-                    serie.pause();
-                    serie.goToImage(0);
+                    series.pause();
+                    series.goToImage(0);
                 });
             });
         }

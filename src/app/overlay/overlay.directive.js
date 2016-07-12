@@ -20,12 +20,12 @@
             restrict: 'E',
             transclude: true,
             require: {
-                serie: '?^^wvSerieId'
+                series: '?^^wvSeriesId'
             },
             templateUrl: 'app/overlay/overlay.directive.html',
             scope: {
                 'wvTags': '=?',
-            	'wvSerie': '=?',
+            	'wvSeries': '=?',
             	'wvViewport': '=?',
             	'wvShowTimeline': '=?'
             }
@@ -49,14 +49,14 @@
             scope.vm.wvShowTimeline = typeof scope.vm.wvShowTimeline === 'undefined' ? true : scope.vm.wvShowTimeline;
             scope.vm.showTimeline = false;
 
-            // auto grab serie model
-            if (scope.vm.wvShowTimeline && ctrls.serie) {
-                ctrls.serie.onSerieChanged(_this, function(serie) {
-                    scope.vm.wvSerie = serie;
-                    scope.vm.showTimeline = scope.vm.wvShowTimeline && !!serie.imageCount;
+            // auto grab series model
+            if (scope.vm.wvShowTimeline && ctrls.series) {
+                ctrls.series.onSeriesChanged(_this, function(series) {
+                    scope.vm.wvSeries = series;
+                    scope.vm.showTimeline = scope.vm.wvShowTimeline && !!series.imageCount;
                 });
                 scope.$on('$destroy', function() {
-                    ctrls.serie.onSerieChanged.close(_this);
+                    ctrls.series.onSeriesChanged.close(_this);
                 });
             }
 

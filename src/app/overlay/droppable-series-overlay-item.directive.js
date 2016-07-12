@@ -1,17 +1,17 @@
 (function() {
     'use strict';
     
-    /** <wvDroppableSerieOverlayItem><wvDroppableSerieOverlayItem/>
+    /** <wvDroppableSeriesOverlayItem><wvDroppableSeriesOverlayItem/>
      *
      * Shows a notice if the overlay can be dropped.
      * Only show the notice when ^^wvDroppableSerieExt is present
      */
     angular
         .module('webviewer')
-        .directive('wvDroppableSerieOverlayItem', wvDroppableSerieOverlayItem);
+        .directive('wvDroppableSeriesOverlayItem', wvDroppableSeriesOverlayItem);
 
     /* @ngInject */
-    function wvDroppableSerieOverlayItem() {
+    function wvDroppableSeriesOverlayItem() {
         // Usage:
         //
         // Creates:
@@ -24,10 +24,10 @@
             restrict: 'E',
             transclude: true,
             require: {
-                serie: '?^^wvSerieId',
+                series: '?^^wvSerieId',
                 droppableSerieExt: '?^^wvDroppableSerieExt'
             },
-            templateUrl: 'app/overlay/droppable-serie-overlay-item.directive.html',
+            templateUrl: 'app/overlay/droppable-series-overlay-item.directive.html',
             scope: {} // isolated scope is required to avoid scope.vm override
         };
         return directive;
@@ -35,18 +35,18 @@
         function link(scope, element, attrs, ctrls) {
             var _this = this;
 
-            if (!ctrls.serie || !ctrls.droppableSerieExt) {
+            if (!ctrls.series || !ctrls.droppableSeriesExt) {
                 // don't show notice has the viewport is not droppable
                 scope.show = false;
             }
             else {
-                scope.show = !ctrls.serie.hasSerie();
-                ctrls.serie.onSerieChanged(_this, function (serie) {
-                    scope.show = !ctrls.serie.hasSerie();
+                scope.show = !ctrls.series.hasSeries();
+                ctrls.series.onSeriesChanged(_this, function (series) {
+                    scope.show = !ctrls.series.hasSeries();
                 });
 
                 scope.$on('$destroy', function() {
-                    ctrls.serie.onSerieChanged.close(_this);
+                    ctrls.series.onSerieChanged.close(_this);
                 });
             }
         }

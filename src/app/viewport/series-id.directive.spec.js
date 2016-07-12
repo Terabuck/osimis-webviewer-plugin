@@ -1,6 +1,6 @@
-describe('serie', function() {
+describe('series', function() {
     
-    describe('serie-id directive', function() {
+    describe('series-id directive', function() {
 
         osi.beforeEach();
 
@@ -10,60 +10,60 @@ describe('serie', function() {
 
         osi.afterEach();
 
-        it('should draw the first image when a serie is set', function() {
+        it('should draw the first image when a series is set', function() {
             $scope.serieId = orthanc.series.with2SingleFrameInstances.ID + ':0';
             $scope.imageId = null;
             
-            // dispose a serie directive - set the wv-image-id to grab test datas
-            var element = osi.directive('<wv-viewport wv-image-id="imageId" wv-serie-id="serieId"></wv-viewport>');
-            var ctrl = osi.controller(element, 'wv-serie-id');
+            // dispose a series directive - set the wv-image-id to grab test datas
+            var element = osi.directive('<wv-viewport wv-image-id="imageId" wv-series-id="serieId"></wv-viewport>');
+            var ctrl = osi.controller(element, 'wv-series-id');
             var viewportCtrl = osi.controller(element, 'wv-viewport');
             
-            // check if the first image of the serie is shown
+            // check if the first image of the series is shown
             var firstImageId = orthanc.series.with2SingleFrameInstances.Instances[0] + ':0';
             expect($scope.imageId).to.equal(firstImageId);
 
-            // change the serie - test databinding
-            $scope.serieId = orthanc.series.with2MultiFrameInstances.ID + ':1'; // wv serie #1 = orthanc serie #0 instance #1
+            // change the series - test databinding
+            $scope.serieId = orthanc.series.with2MultiFrameInstances.ID + ':1'; // wv series #1 = orthanc series #0 instance #1
             osi.digest();
             
-            // check if the first image of the new serie is shown
+            // check if the first image of the new series is shown
             var imageId = orthanc.series.with2MultiFrameInstances.Instances[1] + ':0';
             expect($scope.imageId).to.equal(imageId);
         });
 
-        it('should share the serie model', function() {
+        it('should share the series model', function() {
             $scope.serieId = orthanc.series.with2SingleFrameInstances.ID + ':0';
-            $scope.$serie = null;
+            $scope.$series = null;
             
-            // dispose a serie directive
-            var element = osi.directive('<wv-viewport wv-serie-id="serieId" wv-serie="$serie"></wv-viewport>');
+            // dispose a series directive
+            var element = osi.directive('<wv-viewport wv-series-id="serieId" wv-series="$series"></wv-viewport>');
             
-            // check if the serie model is shared
-            expect($scope.$serie.id).to.equal(orthanc.series.with2SingleFrameInstances.ID + ':0');
+            // check if the series model is shared
+            expect($scope.$series.id).to.equal(orthanc.series.with2SingleFrameInstances.ID + ':0');
 
-            // change the serie
-            $scope.serieId = orthanc.series.with2MultiFrameInstances.ID + ':1'; // wv serie #1 = orthanc serie #0 instance #1
+            // change the series
+            $scope.serieId = orthanc.series.with2MultiFrameInstances.ID + ':1'; // wv series #1 = orthanc series #0 instance #1
             osi.digest();
 
-            // check if the serie model is shared
-            expect($scope.$serie.id).to.equal(orthanc.series.with2MultiFrameInstances.ID + ':1');
+            // check if the series model is shared
+            expect($scope.$series.id).to.equal(orthanc.series.with2MultiFrameInstances.ID + ':1');
         });
 
-        it('should keep the viewport image in sync with the serie\'s current image', function() {
+        it('should keep the viewport image in sync with the series\'s current image', function() {
             $scope.serieId = orthanc.series.with2MultiFrameInstances.ID + ':0';
-            $scope.$serie = null; // kept for tests
+            $scope.$series = null; // kept for tests
             $scope.imageId = null; // kept for tests
 
-            // dispose a serie directive
-            var element = osi.directive('<wv-viewport wv-image-id="imageId" wv-serie-id="serieId" wv-serie="$serie"></wv-viewport>');
+            // dispose a series directive
+            var element = osi.directive('<wv-viewport wv-image-id="imageId" wv-series-id="serieId" wv-series="$series"></wv-viewport>');
             
             // check the actual image
             var firstImageId = orthanc.series.with2MultiFrameInstances.Instances[0] + ':0';
             expect($scope.imageId).to.equal(firstImageId)
 
             // go to next image
-            $scope.$serie.goToNextImage();
+            $scope.$series.goToNextImage();
             osi.digest();
 
             // check the image has changed
@@ -71,19 +71,19 @@ describe('serie', function() {
             expect($scope.imageId).to.equal(secondImageId);
         });
 
-        it('should reset the viewport settings when the serie change', function() {
+        it('should reset the viewport settings when the series change', function() {
             $scope.serieId = orthanc.series.with2MultiFrameInstances.ID + ':0';
             $scope.$viewport = null; // kept for tests
 
-            // dispose a serie directive
-            var element = osi.directive('<wv-viewport wv-serie-id="serieId" wv-image-id="grsg" wv-viewport="$viewport"></wv-viewport>');
+            // dispose a series directive
+            var element = osi.directive('<wv-viewport wv-series-id="serieId" wv-image-id="grsg" wv-viewport="$viewport"></wv-viewport>');
             
             // check the actual image
             var firstImageId = orthanc.series.with2MultiFrameInstances.Instances[0] + ':0';
             expect($scope.$viewport.voi.windowCenter).to.equal(128);
             expect($scope.$viewport.voi.windowWidth).to.equal(256);
 
-            // change serie
+            // change series
             $scope.serieId = orthanc.series.with2SingleFrameInstances.ID + ':0';
             osi.digest();
 

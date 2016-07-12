@@ -10,9 +10,9 @@
         >  
          <ng-transclude></ng-transclude>
          <div ng-if="showDefaultContent">
-             <wv-viewport wv-serie-id="randomSerieId" wv-size="{width: '[wv-size-tag]', height:'[wv-size-tag]'}" wv-lossless="true"
-                 wv-droppable-serie-ext
-                 wv-scroll-on-wheel-serie-ext
+             <wv-viewport wv-series-id="randomSeriesId" wv-size="{width: '[wv-size-tag]', height:'[wv-size-tag]'}" wv-lossless="true"
+                 wv-droppable-series-ext
+                 wv-scroll-on-wheel-series-ext
                  wv-enable-overlay="!wvSettings || wvSettings.hasOwnProperty('overlay') == false || wvSettings.overlay"
 
                  wv-default-viewport-tool="wvSettings.windowing"
@@ -25,7 +25,7 @@
                  wv-rectangle-roi-viewport-tool="wvSettings.rectangleroi"
                  
                  wv-invert-contrast-viewport-tool="wvSettings.invert"
-                 wv-play-serie-ext="wvSettings.play"
+                 wv-play-series-ext="wvSettings.play"
 
                  wv-rotateright-viewport-tool="wvSettings.rotateright"
                  wv-rotateleft-viewport-tool="wvSettings.rotateleft"

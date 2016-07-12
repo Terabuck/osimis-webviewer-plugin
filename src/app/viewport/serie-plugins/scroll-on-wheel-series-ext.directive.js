@@ -3,18 +3,18 @@
 
     angular
         .module('webviewer')
-        .directive('wvScrollOnWheelSerieExt', wvScrollOnWheelSerieExt)
+        .directive('wvScrollOnWheelSeriesExt', wvScrollOnWheelSeriesExt)
         .config(function($provide) {
-        	$provide.decorator('wvSerieIdDirective', function($delegate) {
+        	$provide.decorator('wvSeriesIdDirective', function($delegate) {
 			    var directive = $delegate[0];
-		    	directive.require['wvScrollOnWheelSerieExt'] = '?^wvScrollOnWheelSerieExt';
+		    	directive.require['wvScrollOnWheelSeriesExt'] = '?^wvScrollOnWheelSeriesExt';
 
                 return $delegate;
         	});
         });
 
     /* @ngInject */
-    function wvScrollOnWheelSerieExt() {
+    function wvScrollOnWheelSeriesExt() {
         // Usage:
         //
         // Creates:
@@ -33,13 +33,13 @@
 
     /* @ngInject */
     function Controller($scope, $element, $attrs, hamster) {
-        var _wvSerieIdViewModels = [];
+        var _wvSeriesIdViewModels = [];
     	this.register = function(viewmodel) {
-            _wvSerieIdViewModels.push(viewmodel);
+            _wvSeriesIdViewModels.push(viewmodel);
             registerMobileEvents(viewmodel);
     	};
     	this.unregister = function(viewmodel) {
-            _.pull(_wvSerieIdViewModels, viewmodel);
+            _.pull(_wvSeriesIdViewModels, viewmodel);
             unregisterMobileEvents(viewmodel);
     	};
         
@@ -50,18 +50,18 @@
 
         hamster.wheel(function(event, delta, deltaX, deltaY) {
             $scope.$apply(function() {
-                _wvSerieIdViewModels.forEach(function(viewmodel) {
-                    var serie = viewmodel.getSerie();
+                _wvSeriesIdViewModels.forEach(function(viewmodel) {
+                    var series = viewmodel.getSeries();
                     
-                    if (!serie) {
+                    if (!series) {
                         return;
                     }
                     else if (deltaY < 0) {
-                        serie.goToPreviousImage();
+                        series.goToPreviousImage();
                     }
                     else if (deltaY > 0) {
                         // @todo calibrate the required speed and accuracy for the enduser
-                        serie.goToNextImage(false);
+                        series.goToNextImage(false);
                     }
                 });
             });
@@ -77,7 +77,7 @@
         /* mobile scrolling */
         
         var _hammertimeObjectsByViewport = {};
-        var _mobileEvtBySerieVM = {};
+        var _mobileEvtBySeriesVM = {};
 
         function registerMobileEvents(viewmodel) {
             // Configure the dom element
@@ -96,14 +96,14 @@
             _hammertimeObjectsByViewport[viewmodel] = hammertime;
 
             // Add the panning event
-            _mobileEvtBySerieVM[viewmodel] = onMobilePanning;
-            hammertime.on('pan', _mobileEvtBySerieVM[viewmodel]);
+            _mobileEvtBySeriesVM[viewmodel] = onMobilePanning;
+            hammertime.on('pan', _mobileEvtBySeriesVM[viewmodel]);
 
             // React to panning
             var _lastDistance = 0;
             function onMobilePanning(evt) {
-                var serie = viewmodel.getSerie();
-                if (!serie) {
+                var series = viewmodel.getSeries();
+                if (!series) {
                     return;
                 }
 
@@ -113,14 +113,14 @@
 
                 // each time the distance attains the required width
                 // switch image & reset the lastDistance
-                var requiredDistance = ($element.width() / serie.imageCount);
+                var requiredDistance = ($element.width() / series.imageCount);
                 if (_lastDistance >= requiredDistance) {
                     $scope.$apply(function() {
                         if (evt.direction === Hammer.DIRECTION_LEFT) {
-                            serie.goToPreviousImage();
+                            series.goToPreviousImage();
                         }
                         else if (evt.direction === Hammer.DIRECTION_RIGHT) {
-                            serie.goToNextImage(false);
+                            series.goToNextImage(false);
                         }
                     });
                     
@@ -136,7 +136,7 @@
         };
         function unregisterMobileEvents(viewmodel) {
             var hammertime = _hammertimeObjectsByViewport[viewmodel];
-            hammertime.off('pan', _mobileEvtBySerieVM[viewmodel])
+            hammertime.off('pan', _mobileEvtBySeriesVM[viewmodel])
             delete _hammertimeObjectsByViewport[viewmodel];
         }
 

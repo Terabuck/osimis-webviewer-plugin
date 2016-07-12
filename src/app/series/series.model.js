@@ -3,20 +3,21 @@
 
     angular
         .module('webviewer')
-        .factory('WvSerie', factory);
+        .factory('WvSeries', factory);
 
     /* @ngInject */
     function factory($rootScope, $timeout, wvAnnotationManager, WvAnnotationGroup, wvImageBinaryManager) {
 
-        function WvSerie(id, imageIds, tags) {
+        function WvSeries(id, imageIds, tags, availableQualities) {
             var _this = this;
 
-            this.id = id; // id == orthancId + ':' + subSerieIndex
+            this.id = id; // id == orthancId + ':' + subSeriesIndex
             this.imageIds = imageIds;
             this.imageCount = imageIds.length;
             this.currentIndex = 0; // real index of the image, waiting loading to be shown
             this.currentShownIndex = 0; // index shown at the moment
             this.tags = tags;
+            this.availableQualities = availableQualities;
             this.onCurrentImageIdChanged = new osimis.Listener();
             this.onAnnotationChanged = new osimis.Listener();
 
@@ -26,7 +27,7 @@
             // invalidate cache on change
             wvAnnotationManager.onAnnotationChanged(function(annotation) {
                 if (_this.imageIds.indexOf(annotation.imageId) !== -1) {
-                    // invalidate the cache if the serie is concerned by the changed annotation
+                    // invalidate the cache if the series is concerned by the changed annotation
                     _this._annotationGroup = null;
 
                     // trigger the change
@@ -39,35 +40,83 @@
             this._playTimeout = null;
         };
 
-        /** WvSerie#getCachedImageBinaries()
+        /** WvSeries#listInstanceIds()
+         *
+         * List instances (and not images)
+         *
+         * @return [instanceId: String, ...]
+         *
+         */
+        WvSeries.prototype.listInstanceIds = function() {
+            var instanceIds = [];
+            var previousInstanceId = null;
+
+            // Take instanceIds from imageIds
+            // @note this._imageIds is sorted
+            for (var i=0; i<this.imageIds.length; ++i) {
+                var imageId = this.imageIds[i];
+                var splittedId = imageId.split(':');
+                var instanceId = splittedId[0];
+
+                if (instanceId === previousInstanceId) {
+                    continue;
+                }
+                else {
+                    instanceIds.push(instanceId);
+                    previousInstanceId = instanceId;
+                }
+            }
+
+            return instanceIds;
+        };
+
+        /** WvSeries#hasQuality(quality: int)
+         *
+         * @return bool
+         *
+         */
+        WvSeries.prototype.hasQuality = function(quality) {
+            // Seek quality in this.availableQualities
+            for (var name in this.availableQualities) {
+                var availableQuality = this.availableQualities[name];
+                if (availableQuality === quality) {
+                    return true;
+                }
+            }
+
+            // Quality not found
+            return false;
+        };
+
+        /** WvSeries#getCachedImageBinaries()
          *
          * @return [<image-index>: [<quality-value>, ...], ...]
          *
          */
-        WvSerie.prototype.listCachedImageBinaries = function() {
+        WvSeries.prototype.listCachedImageBinaries = function() {
             var _this = this;
 
-            // For each image of the serie -> list binaries in cache
+            // For each image of the series -> list binaries in cache
             return this.imageIds
                 .map(function(imageId, imageIndex) {
                     return wvImageBinaryManager.listCachedBinaries(imageId);
                 });
         };
 
-        WvSerie.prototype.getAnnotedImageIds = function(type) {
+        WvSeries.prototype.getAnnotedImageIds = function(type) {
             return this._loadAnnotationGroup()
                 .filterByType(type)
                 .getImageIds();
         };
         
-        WvSerie.prototype.getAnnotationGroup = function(type) {
+        WvSeries.prototype.getAnnotationGroup = function(type) {
             return this._loadAnnotationGroup();
         };
         
-        /** $serie.getAnnotations([type: string])
+        /** $series.getAnnotations([type: string])
          *
          */
-        WvSerie.prototype.getAnnotations = function(type) {
+        WvSeries.prototype.getAnnotations = function(type) {
             var annotationGroup = this._loadAnnotationGroup();
 
             if (type) {
@@ -77,21 +126,21 @@
             return annotationGroup.toArray();
         };
 
-        WvSerie.prototype.getIndexOf = function(imageId) {
+        WvSeries.prototype.getIndexOf = function(imageId) {
             return this.imageIds.indexOf(imageId);
         }
 
-        WvSerie.prototype.setShownImage = function(id) {
+        WvSeries.prototype.setShownImage = function(id) {
             this.currentShownIndex = this.getIndexOf(id);
         };
-        WvSerie.prototype.getCurrentImageId = function() {
+        WvSeries.prototype.getCurrentImageId = function() {
            return this.imageIds[this.currentIndex];
         };
 
-        WvSerie.prototype.goToNextImage = function(restartWhenSerieEnd) {
-            restartWhenSerieEnd = restartWhenSerieEnd || false;
+        WvSeries.prototype.goToNextImage = function(restartWhenSeriesEnd) {
+            restartWhenSeriesEnd = restartWhenSeriesEnd || false;
 
-            if (this.currentIndex >= this.imageCount-1 && restartWhenSerieEnd) {
+            if (this.currentIndex >= this.imageCount-1 && restartWhenSeriesEnd) {
                 this.currentIndex = 0;
                 this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
             }
@@ -100,21 +149,21 @@
                 this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
             }
             else {
-                // Don't trigger event when nothing happens (the serie is already at its end)
+                // Don't trigger event when nothing happens (the series is already at its end)
             }
         };
 
-        WvSerie.prototype.goToPreviousImage = function() {
+        WvSeries.prototype.goToPreviousImage = function() {
             if (this.currentIndex > 0) {
                 this.currentIndex--;
                 this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
             }
             else {
-                // Don't trigger event when nothing happens (the serie is already at the first image)
+                // Don't trigger event when nothing happens (the series is already at the first image)
             }
         };
 
-        WvSerie.prototype.goToImage = function(newIndex) {
+        WvSeries.prototype.goToImage = function(newIndex) {
             if (newIndex < 0) {
               newIndex = 0;
             }
@@ -132,7 +181,7 @@
         };
 
         var _cancelAnimationId = null;
-        WvSerie.prototype.play = function() {
+        WvSeries.prototype.play = function() {
             var _this = this;
 
             // Do nothing when there is only one image
@@ -173,7 +222,7 @@
             
             this.isPlaying = true;
         };
-        WvSerie.prototype.pause = function() {
+        WvSeries.prototype.pause = function() {
             if (_cancelAnimationId) {
                 cancelAnimationFrame(_cancelAnimationId);
                 _cancelAnimationId = null;
@@ -182,11 +231,11 @@
             this.isPlaying = false;
         };
 
-        WvSerie.prototype._loadAnnotationGroup = function() {
+        WvSeries.prototype._loadAnnotationGroup = function() {
             var _this = this;
 
             if (!this._annotationGroup) {
-                // retrieve each kind of annotation for each image in the serie
+                // retrieve each kind of annotation for each image in the series
                 var annotations = [];
                 this.imageIds.forEach(function(imageId) {
                     annotations.push(wvAnnotationManager.getByImageId(imageId));
@@ -201,7 +250,7 @@
         
         ////////////////
 
-        return WvSerie;
+        return WvSeries;
     };
 
 })();

@@ -6,7 +6,7 @@
         .factory('WvImage', factory);
 
     /* @ngInject */
-    function factory(wvImageBinaryManager, wvAnnotationManager, WvAnnotationValueObject, WvImageQualities) {
+    function factory(wvImageBinaryManager, wvAnnotationManager, WvAnnotationValueObject) {
         /** class WvImage
          *
          * @RootAggregate
@@ -15,11 +15,12 @@
          * an image either account for a DICOM instance (if the instance is monoframe), or a frame.
          *
          */
-        function WvImage(wvImageManager, id, tags, postProcesses) {
+        function WvImage(wvImageManager, id, tags, availableQualities, postProcesses) {
             var _this = this;
 
             this.id = id;
             this.tags = tags;
+            this._availableQualities = availableQualities;
 
             // collection of postprocesses
             this.postProcesses = postProcesses || [];
@@ -31,8 +32,13 @@
             _feedBinaryLoadedEvents(this);
         }
 
+        /** WvImage#getAvailableQualities()
+         *
+         * @return available qualities as {<string>: <int>} array
+         *
+         */
         WvImage.prototype.getAvailableQualities = function() {
-            return WvImageQualities;
+            return this._availableQualities;
         };
 
         /** WvImage#getAnnotations(type)

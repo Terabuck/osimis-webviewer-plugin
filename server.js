@@ -23,6 +23,11 @@ console.log('NODE_ENV=' + environment);
 
 // setting proxies
 var orthancProxy = httpProxy.createProxyServer();
+
+// avoid crash on request cancel
+orthancProxy.on('error', function (err, req, res) {
+});
+
 app.all("/orthanc/*", function(req, res) {
     var orthancUrl = 'http://localhost:8042';
 
@@ -47,14 +52,8 @@ app.all("/orthanc/*", function(req, res) {
         }
         req.emit('end');
     });
-
-    try {
-        orthancProxy.web(req, res, {target: orthancUrl});
-    }
-    catch (e) {
-        
-    }
-
+    
+    orthancProxy.web(req, res, {target: orthancUrl});
 });
 
 switch (environment){

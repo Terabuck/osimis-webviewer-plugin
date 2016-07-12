@@ -21,7 +21,7 @@
             link: link,
             restrict: 'E',
             scope: {
-            	serie: '=wvSerie'
+            	series: '=wvSeries'
             }
         };
         return directive;
@@ -42,17 +42,17 @@
 
         this.QualityKeys = _.invert(WvImageQualities);
 
-        // $scope.$watch('vm.serie.id', function(serieId) {
+        // $scope.$watch('vm.series.id', function(seriesId) {
 
         // });
 
         // Show current loading image
         this.currentImageIndex = null;
-        $scope.$watch('vm.serie', function(newSerie, oldSerie) {
-            // Unbind the old serie if exists
-            if (oldSerie) {
+        $scope.$watch('vm.series', function(newSeries, oldSeries) {
+            // Unbind the old series if exists
+            if (oldSeries) {
                 // Close listeners
-                oldSerie.onCurrentImageIdChanged.close(_this);
+                oldSeries.onCurrentImageIdChanged.close(_this);
 
                 // Clean the datas
                 _this.imageQualities = [];
@@ -60,23 +60,23 @@
                 _this.imageBarWidth = 0;
             }
 
-            // Set the new serie if exists
-            if (newSerie) {
+            // Set the new series if exists
+            if (newSeries) {
                 // Set actual image
-                _this.currentImageIndex = newSerie.currentIndex;
+                _this.currentImageIndex = newSeries.currentIndex;
 
                 // Set bar size
-                _this.imageCount = newSerie.imageCount;
+                _this.imageCount = newSeries.imageCount;
                 _this.imageBarWidth = 100 / _this.imageCount; // in percentage
 
                 // Listen to actual image
-                newSerie.onCurrentImageIdChanged(_this, function(imageId) {
-                    _this.currentImageIndex = newSerie.getIndexOf(imageId);
+                newSeries.onCurrentImageIdChanged(_this, function(imageId) {
+                    _this.currentImageIndex = newSeries.getIndexOf(imageId);
                 });
                 // @todo close on destroy
 
                 // Retrieve already cached series' image list
-                _this.imageQualities = newSerie.listCachedImageBinaries();
+                _this.imageQualities = newSeries.listCachedImageBinaries();
 
                 // Get the best quality of each image so we can draw its color
                 _this.bestQualityByImage = _this
@@ -96,18 +96,18 @@
                     });
             }
 
-            // _this.serie is updated via databinding (_this.serie === $scope.vm.serie)
+            // _this.series is updated via databinding (_this.series === $scope.vm.series)
         });
 
         wvImageBinaryManager.onBinaryLoaded(_this, function(imageId, imageQuality) {
-            // Be sure a serie is available
-            var serie = _this.serie;
-            if (!serie) {
+            // Be sure a series is available
+            var series = _this.series;
+            if (!series) {
                 return;
             }
 
-            // Filter the current serie
-            var imageIndex = serie.getIndexOf(imageId);
+            // Filter the current series
+            var imageIndex = series.getIndexOf(imageId);
             if (imageIndex === -1) {
                 return;
             }
@@ -125,14 +125,14 @@
             }
         });
         wvImageBinaryManager.onBinaryUnLoaded(_this, function(imageId, imageQuality) {
-            // Be sure a serie is available
-            var serie = _this.serie;
-            if (!serie) {
+            // Be sure a series is available
+            var series = _this.series;
+            if (!series) {
                 return;
             }
 
-            // Filter the current serie
-            var imageIndex = serie.getIndexOf(imageId);
+            // Filter the current series
+            var imageIndex = series.getIndexOf(imageId);
             if (imageIndex === -1) {
                 return;
             }
@@ -164,11 +164,11 @@
 
     }
 
-    Controller.prototype._listenSerie = function() {
+    Controller.prototype._listenSeries = function() {
         // Register events
     };
 
-    Controller.prototype._unlistenSerie = function() {
+    Controller.prototype._unlistenSeries = function() {
         // Unregister events
     };
 })();

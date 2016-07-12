@@ -25,8 +25,8 @@
     <div ng-controller="OsimisWebViewer" class="wv-container">
         <wv-toolbar wv-items="vm.toolbar" ng-if="vm.minimize"></wv-toolbar>
         <div style="height: calc(100% - 40px)" wv-size-tag ng-if="vm.minimize">
-            <wv-viewport wv-serie-id="vm.serieId" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}" wv-lossless="true"
-                wv-scroll-on-wheel-serie-ext="true"
+            <wv-viewport wv-series-id="vm.seriesId" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}" wv-lossless="true"
+                wv-scroll-on-wheel-series-ext="true"
                 wv-enable-overlay="vm.toolbar.overlay"
 
                 wv-default-viewport-tool="vm.toolbar.windowing"
@@ -39,7 +39,7 @@
                 wv-rectangle-roi-viewport-tool="vm.toolbar.rectangleroi"
 
                 wv-invert-contrast-viewport-tool="vm.toolbar.invert"
-                wv-play-serie-ext="vm.toolbar.play"
+                wv-play-series-ext="vm.toolbar.play"
 
                 wv-rotateleft-viewport-tool="vm.toolbar.rotateleft"
                 wv-rotateright-viewport-tool="vm.toolbar.rotateright"
@@ -49,7 +49,7 @@
         </div>
 
         <div class="wv-menu" ng-if="!vm.minimize">
-            <wv-serielist wv-study="vm.study"></wv-serielist>
+            <wv-serieslist wv-study="vm.study"></wv-serieslist>
         </div>
         <div class="wv-main" ng-if="!vm.minimize">
             <wv-toolbar wv-items="vm.toolbar"></wv-toolbar>
@@ -87,7 +87,7 @@
         .controller('OsimisWebViewer', function($scope, $location) {
             $scope.vm = {};
 
-            $scope.vm.serieId = $location.search().series;
+            $scope.vm.seriesId = $location.search().series;
 
             $scope.vm.study = {
                 id: $location.search().study

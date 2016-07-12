@@ -67,11 +67,10 @@
         this.onImageLoaded.close();
         this.onParametersResetting.close();
 
-        // Free listeners
-        this._image.onAnnotationChanged.close(_this);
-
         // Free image binary
         if (this._lastLoadedImageQuality) {
+            // Free listeners
+            this._image.onAnnotationChanged.close(_this);
             this._image.freeBinary(this._lastLoadedImageQuality);
             this._image = null;
             this._lastLoadedImageQuality = null;
@@ -90,7 +89,15 @@
      */
     ImageDisplayer.prototype.setLosslessQuality = function() {
         var availableQualities = this._image.getAvailableQualities();
-        this._desiredQuality = availableQualities.LOSSLESS;
+        if (availableQualities.hasOwnProperty('PIXELDATA')) {
+            this._desiredQuality = availableQualities.PIXELDATA;
+        }
+        else if (availableQualities.hasOwnProperty('LOSSLESS')) {
+            this._desiredQuality = availableQualities.LOSSLESS;
+        }
+        else {
+            throw new Error('Image doesn\'t have Lossless quality');
+        }
     };
 
     /** ImageDisplayer#setLosslessQuality
@@ -104,14 +111,22 @@
 
         // chose quality depending of viewport size
         var quality = null;
-        if (this._canvasWidth <= 150 || this._canvasHeight <= 150) {
+        if ((this._canvasWidth <= 150 || this._canvasHeight <= 150)
+            && availableQualities.hasOwnProperty('LOW')) {
             quality = availableQualities.LOW;
         }
-        else if (this._canvasWidth <= 1000 || this._canvasHeight <= 1000) {
+        else if ((this._canvasWidth <= 1000 || this._canvasHeight <= 1000)
+            && availableQualities.hasOwnProperty('MEDIUM')) {
             quality = availableQualities.MEDIUM;
         }
-        else {
+        else if (availableQualities.hasOwnProperty('PIXELDATA')) {
+            quality = availableQualities.PIXELDATA;
+        }
+        else  if (availableQualities.hasOwnProperty('LOSSLESS')) {
             quality = availableQualities.LOSSLESS;
+        }
+        else {
+            throw new Error('no supported image quality available in ' + availableQualities);
         }
 
         this._desiredQuality = quality;
@@ -412,7 +427,7 @@
                 /** Draw the binary
                  * Use Cases:
                  *   (1. Window Resize -> Reset Canvas : reset scale & translation) on ImageDisplayer#resizeCanvas call - not when onBinaryLoaded
-                 *   2. Serie change or manual reset -> Reset Parameters : reset scale, translation & everything else (windowing, ...)
+                 *   2. Series change or manual reset -> Reset Parameters : reset scale, translation & everything else (windowing, ...)
                  *   3. Image change -> Convert Parameters to new Image Resolution
                  *   4. Resolution change -> Convert Parameters to new Image Resolution
                  */
