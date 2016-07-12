@@ -14,8 +14,8 @@ void KLVWriter::setValue(uint32_t key, size_t length, const char* value)
     klv_tuples_.push_back(klvTuple);
   }
   catch (const boost::bad_numeric_cast&) {
-    // Except length & value to be numeric
-    assert(true);
+    // Except length & value to be numeric - will never throw (could throw on 64bit systems, but KLV should not embed >4go values)
+    assert(false);
   }
 
   total_size_ += 4 + 4 + length; // key byte + length byte + value length
