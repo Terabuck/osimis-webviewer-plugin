@@ -89,7 +89,7 @@ Image* ImageRepository::_LoadImageFromOrthanc(const std::string& instanceId, uin
 
   // Load already compressed instance frame (if the policy type is PixelDataQuality, because it's faster
   // then loading the dicom file & checking the transferSyntax tag)
-  if (dynamic_cast<PixelDataQualityPolicy*>(policy) != 0) {
+  if (dynamic_cast<PixelDataQualityPolicy*>(policy) != NULL) {
     BENCH(GET_FRAME_FROM_DICOM__RAW);
     //boost::lock_guard<boost::mutex> guard(mutex_); // check what happens if only one thread asks for frame at a time
 
@@ -149,7 +149,7 @@ Image* ImageRepository::_LoadImageFromOrthanc(const std::string& instanceId, uin
     image = new Image(instanceId, frameIndex, data, dicomTags);
   }
 
-  if (policy != 0) {
+  if (policy != NULL) {
     image->ApplyProcessing(policy);
   }
 
@@ -234,7 +234,7 @@ void _loadDicomTags(Json::Value& jsonOutput, const std::string& instanceId)
 
 std::string _getAttachmentNumber(int frameIndex, const IImageProcessingPolicy* policy)
 {
-  assert(policy != 0);
+  assert(policy != NULL);
 
   std::string attachmentNumber;
   std::string policyString = policy->ToString();

@@ -21,7 +21,7 @@ IImageContainer* Uint8ConversionPolicy::Apply(IImageContainer* input, ImageMetaD
 {
   // Except *raw* image
   RawImageContainer* rawInputImage = dynamic_cast<RawImageContainer*>(input);
-  assert(rawInputImage != 0);
+  assert(rawInputImage != NULL);
 
   Orthanc::ImageAccessor* inAccessor = rawInputImage->GetOrthancImageAccessor();
   Orthanc::PixelFormat pixelFormat = inAccessor->GetFormat();

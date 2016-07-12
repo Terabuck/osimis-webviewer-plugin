@@ -16,7 +16,7 @@ IImageContainer* ResizePolicy::Apply(IImageContainer* input, ImageMetaData* meta
 
   // Except *raw* image
   RawImageContainer* inRawImage = dynamic_cast<RawImageContainer*>(input);
-  assert(inRawImage != 0);
+  assert(inRawImage != NULL);
 
   Orthanc::ImageAccessor* accessor = inRawImage->GetOrthancImageAccessor();
 

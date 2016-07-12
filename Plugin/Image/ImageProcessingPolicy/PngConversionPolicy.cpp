@@ -15,7 +15,7 @@ IImageContainer* PngConversionPolicy::Apply(IImageContainer* input, ImageMetaDat
 
   // Except *raw* image
   RawImageContainer* rawImage = dynamic_cast<RawImageContainer*>(input);
-  assert(rawImage != 0);
+  assert(rawImage != NULL);
 
   Orthanc::ImageAccessor* accessor = rawImage->GetOrthancImageAccessor();
 
