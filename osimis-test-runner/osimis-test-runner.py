@@ -102,11 +102,10 @@ except:
 	if launchOrthanc is True:
 		server.stop()
 	karma.kill()
-	sys.exit(1)
+	sys.exit(051)
 
 if launchOrthanc is True:
 	server.stop()
 
-# Exit the script with error if karma failed (for CI purpose)
-if karmaReturnCode != 0:
-	sys.exit(1)
+# Return karma exit status (for CI purpose)
+sys.exit(karmaReturnCode)
