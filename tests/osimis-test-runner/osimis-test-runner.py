@@ -105,7 +105,7 @@ except:
 	if launchOrthanc is True:
 		server.stop()
 	karma.kill()
-	sys.exit(051)
+	sys.exit(51)
 
 if launchOrthanc is True:
 	server.stop()
