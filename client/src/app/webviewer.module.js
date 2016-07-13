@@ -23,8 +23,7 @@
   .provider('wvConfig', function() {
     var _config = {
       version: version,
-      orthancApiURL: '',
-      defaultCompression: '95'
+      orthancApiURL: ''
     };
 
     this.setApiURL = function(url) {

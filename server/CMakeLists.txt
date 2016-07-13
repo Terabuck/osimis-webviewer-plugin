@@ -117,7 +117,6 @@ endif()
 
 EmbedResources(
   ORTHANC_EXPLORER  ${CMAKE_SOURCE_DIR}/Resources/OrthancExplorer.js
-  JAVASCRIPT_LIBS   ${JAVASCRIPT_LIBS_DIR}
   ${EMBEDDED_RESOURCES}
   )
 
