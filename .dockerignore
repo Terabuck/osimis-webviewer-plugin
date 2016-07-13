@@ -1,6 +1,4 @@
-backend/Build/
-backend/ThirdPartyDownloads/
-backend/CMakeLists.txt.user
-
-frontend/build/
-
+.git
+.gitattributes
+Dockerfile
+.dockerignore
