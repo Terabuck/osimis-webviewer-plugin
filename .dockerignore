@@ -1,4 +1,6 @@
-Build/
-ThirdPartyDownloads/
+backend/Build/
+backend/ThirdPartyDownloads/
+backend/CMakeLists.txt.user
 
-CMakeLists.txt.user
+frontend/build/
+

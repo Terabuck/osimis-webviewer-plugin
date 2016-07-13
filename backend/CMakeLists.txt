@@ -28,7 +28,7 @@ set(BENCHMARK OFF CACHE BOOL "Send benchmark informations to stdout")
 set(STATIC_BUILD ON CACHE BOOL "Static build of the third-party libraries (necessary for Windows)")
 SET(STANDALONE_BUILD ON CACHE BOOL "Standalone build (all the resources are embedded, necessary for releases)")
 set(ALLOW_DOWNLOADS ON CACHE BOOL "Allow CMake to download packages")
-set(JS_CLIENT_PATH ${CMAKE_SOURCE_DIR}/../client/build)
+set(JS_CLIENT_PATH ${CMAKE_SOURCE_DIR}/../frontend/build)
 
 # Advanced parameters to fine-tune linking against system libraries
 set(USE_SYSTEM_BOOST ON CACHE BOOL "Use the system version of Boost")
@@ -57,7 +57,6 @@ include(${CMAKE_SOURCE_DIR}/Orthanc/Resources/CMake/JsonCppConfiguration.cmake)
 include(${CMAKE_SOURCE_DIR}/Orthanc/Resources/CMake/SQLiteConfiguration.cmake)
 
 include(${CMAKE_SOURCE_DIR}/Resources/CMake/GdcmConfiguration.cmake)
-include(${CMAKE_SOURCE_DIR}/Resources/CMake/JavaScriptLibraries.cmake)
 
 # include GIL boost library - adobe version with numeric extensions
 # help debug boost GIL templates
