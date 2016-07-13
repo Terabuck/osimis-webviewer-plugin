@@ -17,7 +17,7 @@
 /* @inline: */ importScripts('/bower_components/jpgjs/jpg.js');
 
 // Import jpeg FFC3 lib
-/* @inline: */ importScripts('/bower_components/jpeg-lossless-decoder-js/release/current/lossless-min.js');
+/* @inline: */ importScripts('/bower_components/jpeg-lossless-decoder-js/release/current/lossless.js');
 
 // Make png.js & config.js worker compatible
 var document = {

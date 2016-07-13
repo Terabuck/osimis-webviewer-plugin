@@ -185,9 +185,7 @@ module.exports = function() {
 
                 clientApp + '**/*.module.js',
                 clientApp + '**/!(*.worker)/*.js',
-                temp + config.templateCache.file,
-
-                './integration-tests/**/*.spec.js'
+                temp + config.templateCache.file
             ),
             exclude: [
                 // Exclude worker code uncompatible with mocha

@@ -14,7 +14,7 @@ Usage:
 	python osimis-test-runner.py [--auto-watch|-w] [--orthanc-path=|-p=]
 
 Example:
-	python osimis-test-runner.py -w -p ../../osimis-webviewer-plugin/BuildDev/
+	python osimis-test-runner.py -w -p ../../backend/Build/
 
 Capture Orthanc (lldb + output):
 	# retrieve orthanc pid
@@ -42,6 +42,9 @@ orthancFolder = os.path.realpath('./orthanc')
 singleRun = True
 launchOrthanc = True
 orthancHTTPPort = 8042
+karmaExec = os.path.realpath('../../frontend/node_modules/karma/bin/karma')
+karmaConf = os.path.realpath('./karma.conf.js')
+karmaCwd = os.path.realpath('../../frontend/')
 try:
 	opts, args = getopt.getopt(argv, "hwp:m", ["auto-watch", "orthanc-path=", "manual-orthanc"])
 except getopt.GetoptError:
@@ -89,8 +92,8 @@ if launchOrthanc is True:
 
 # Launch karma
 karma = subprocess.Popen(
-	shlex.split('./node_modules/karma/bin/karma start karma.conf.js' + (' --single-run' if singleRun else '')),
-	cwd = '..' # set cwd path to ../ so bower.json can be found by karma.conf.js
+	shlex.split(karmaExec + ' start ' + karmaConf + (' --single-run' if singleRun else '')),
+	cwd = karmaCwd # set cwd path so bower.json can be found by karma.conf.js
 )
 
 # Stop Orthanc once karma has fininshed
