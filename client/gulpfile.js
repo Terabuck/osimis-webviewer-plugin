@@ -9,6 +9,7 @@ var _ = require('lodash');
 var $ = require('gulp-load-plugins')({lazy: true});
 var osisync = require('osisync');
 $.injectInlineWorker = require('gulp-injectInlineWorker/index.js');
+var mergeStream = require('merge-stream')
 
 var colors = $.util.colors;
 var envenv = $.util.env;
@@ -272,8 +273,15 @@ gulp.task('optimize', ['inject'], function() {
         function (a) { return a.replace(/^(.*)(\.[^.\/]*)$/i, '$1.css'); }
     );
 
-    return gulp
-        .src(config.tempIndexes.concat(['./bower.json', config.config]))
+    // Copy config file (src/config.js.embedded)
+    var configStream = gulp
+        .src(config.config)
+        .pipe($.rename('config.js'))
+        .pipe(gulp.dest(config.build));
+
+    // Build/Optimise js, css & html
+    var buildStream = gulp
+        .src(config.tempIndexes.concat(['./bower.json']))
         .pipe($.plumber())
         .pipe(inject(templateCache, 'templates'))
         // Replace the font .css locations
@@ -289,8 +297,7 @@ gulp.task('optimize', ['inject'], function() {
         .pipe($.injectInlineWorker({ // Inlines worker scripts' path to BLOB
             pathRouter: {
                 '/app/': './src/app/',
-                '/bower_components/': './bower_components/',
-                '/config.js': './src/config.js',
+                '/bower_components/': './bower_components/'
             }
         }))
         .pipe($.ngAnnotate({add: true}))
@@ -314,6 +321,8 @@ gulp.task('optimize', ['inject'], function() {
         // Write the rev-manifest.json - used by @osisync
         // .pipe($.rev.manifest())
         // .pipe(gulp.dest(config.build));
+
+    return mergeStream(configStream, buildStream);
 });
 
 /**

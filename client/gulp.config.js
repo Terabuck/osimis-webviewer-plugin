@@ -40,7 +40,7 @@ module.exports = function() {
             client + 'index.html',
             client + 'plugin-entrypoint.html'
         ],
-        config: client + 'config.js',
+        config: client + 'config.js.embedded', // config file to copy in build
         // app js, with no specs
         js: [
             clientApp + '**/*.module.js',
@@ -178,7 +178,7 @@ module.exports = function() {
             files: [].concat(
                 bowerFiles,
                 config.specHelpers,
-                client + 'config.js',
+                client + 'config.js', // config file used to run tests
 
                 // Make sure worker files aren't included
                 {pattern: clientApp + '**/*.worker/*.js', included: false, served: true},
