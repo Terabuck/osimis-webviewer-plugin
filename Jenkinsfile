@@ -5,6 +5,9 @@ node('docker') {
 	stage 'Build Frontend'
 	sh 'scripts/ciBuildFrontend.sh ${BRANCH_NAME}'
 
+	stage 'Push Frontend lib to AWS'
+	sh 'scripts/ciPushFrontend.sh ${BRANCH_NAME}'
+
 	stage 'Build Docker Image'
 	sh 'scripts/ciBuildDockerImage.sh ${BRANCH_NAME}'
 
