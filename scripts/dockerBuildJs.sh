@@ -10,8 +10,8 @@ cd /root/osimis-webviewer/frontend
 # npm cache clean # make sure install is fine
 npm install --unsafe-perm --python=python2.7
 
-# install 2 times (for phantom_js issues)
-# npm install --unsafe-perm --python=python2.7
+# install 2 times (for random phantom_js download issues)
+npm install --unsafe-perm --python=python2.7
 
 bower install --allow-root
 
