@@ -39,7 +39,7 @@ docker build --tag=osimis/frontend-builder --file=DockerfileFrontEndBuilder .
 
 # we first need to create the container before we can copy files to it
 export versionNumber
-webAppBuilderContainerId=$(docker create --entrypoint=/bin/bash osimis/frontend-builder -c "cd /frontend && ls -al && gulp build && ls -al")
+webAppBuilderContainerId=$(docker create --name webviewer-frontend-builder --entrypoint=/bin/bash osimis/frontend-builder -c "cd /frontend && ls -al && gulp build && ls -al")
 
 # copy the frontendToolbox files in the container
 docker cp $(pwd)/ $webAppBuilderContainerId:/
