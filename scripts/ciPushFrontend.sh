@@ -9,9 +9,9 @@ source scripts/setBuildVariables.sh
 
 pushOnlyCommitId=${2:-true}  # before the code is validate, we don't wan't to push code with a branch name that could overwrite a valid one that is already on AWS server.  So, only push the commit id
 if [[ $pushOnlyCommitId ]]; then
-    zipFileToUpload=releaseCommitId
+    zipFileToUpload=$releaseCommitId
 else
-    zipFileToUpload=releaseTag
+    zipFileToUpload=$releaseTag
 fi
 
 # upload to AWS.  
@@ -36,5 +36,5 @@ docker rm $awsContainerId
 echo '------------------------'
 echo 'File uploaded.'
 echo 'File is downloadable at:'
-echo 'http://orthanc.osimis.io/private/frontEndToolbox/'$zipFileToUpload'.zip'
+echo 'http://orthanc.osimis.io/public/osimisWebViewer/'$zipFileToUpload'.zip'
 echo '------------------------'
