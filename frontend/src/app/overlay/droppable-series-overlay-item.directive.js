@@ -24,8 +24,8 @@
             restrict: 'E',
             transclude: true,
             require: {
-                series: '?^^wvSerieId',
-                droppableSerieExt: '?^^wvDroppableSerieExt'
+                series: '?^^wvSeriesId',
+                droppableSeriesExt: '?^^wvDroppableSeriesExt'
             },
             templateUrl: 'app/overlay/droppable-series-overlay-item.directive.html',
             scope: {} // isolated scope is required to avoid scope.vm override
@@ -36,13 +36,13 @@
             var _this = this;
 
             if (!ctrls.series || !ctrls.droppableSeriesExt) {
-                // don't show notice has the viewport is not droppable
-                scope.show = false;
+                // don't show notice because the viewport is not droppable
+                scope.vm.show = false;
             }
             else {
-                scope.show = !ctrls.series.hasSeries();
+                scope.vm.show = !ctrls.series.hasSeries();
                 ctrls.series.onSeriesChanged(_this, function (series) {
-                    scope.show = !ctrls.series.hasSeries();
+                    scope.vm.show = !ctrls.series.hasSeries();
                 });
 
                 scope.$on('$destroy', function() {
