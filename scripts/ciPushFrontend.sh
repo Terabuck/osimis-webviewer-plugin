@@ -7,11 +7,11 @@ cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"/
 
 source scripts/setBuildVariables.sh
 
-pushOnlyCommitId=${2:-true}  # before the code is validate, we don't wan't to push code with a branch name that could overwrite a valid one that is already on AWS server.  So, only push the commit id
-if [[ $pushOnlyCommitId ]]; then
-    zipFileToUpload=$releaseCommitId
-else
+tagType=${2:-tagWithCommitId}  # before the code is validate, we don't wan't to push code with a branch name that could overwrite a valid one that is already on AWS server.  So, only push the commit id
+if [[ $tagType == "tagWithReleaseTag" ]]; then
     zipFileToUpload=$releaseTag
+else
+    zipFileToUpload=$releaseCommitId
 fi
 
 # upload to AWS.  

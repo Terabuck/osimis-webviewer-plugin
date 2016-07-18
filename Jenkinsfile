@@ -6,7 +6,7 @@ node('docker') {
 	sh 'scripts/ciBuildFrontend.sh ${BRANCH_NAME}'
 
 	stage 'Push Frontend lib to AWS (commitId tag)'
-	sh 'scripts/ciPushFrontend.sh ${BRANCH_NAME} true'
+	sh 'scripts/ciPushFrontend.sh ${BRANCH_NAME} tagWithCommitId'
 
 	stage 'Build Docker Image'
 	sh 'scripts/ciBuildDockerImage.sh ${BRANCH_NAME}'
@@ -14,7 +14,7 @@ node('docker') {
 	stage 'Run tests (TODO)'
 
 	stage 'Push Frontend lib to AWS (releaseTag)'
-	sh 'scripts/ciPushFrontend.sh ${BRANCH_NAME} false'
+	sh 'scripts/ciPushFrontend.sh ${BRANCH_NAME} tagWithReleaseTag'
 
 	docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkinsosimis') {
 
