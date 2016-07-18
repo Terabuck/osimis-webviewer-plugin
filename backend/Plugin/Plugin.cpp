@@ -394,7 +394,7 @@ extern "C"
     int cacheSize = 100; 
 
     /* By default, enable storage attachment cache */
-    bool cachedImageStorageEnabled = true;
+    bool cachedImageStorageEnabled = false;
 
     try
     {
