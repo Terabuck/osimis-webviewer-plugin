@@ -40,7 +40,6 @@ else
 fi
 
 #build and push to docker hub
-docker build -t $imageName:$imageTag .
 docker push $imageName:$imageTag
 
 #if in master branch, the current tag should also be marked as the latest
