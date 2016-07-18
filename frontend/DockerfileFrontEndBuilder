@@ -15,3 +15,5 @@ RUN npm install --unsafe-perm --python=python2.7
 
 RUN bower install --allow-root
 
+ENTRYPOINT [ "bash",  "/frontend/scripts/buildFrontendFromDocker.sh" ]
+CMD [ "0000000" ]
