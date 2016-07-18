@@ -8,7 +8,7 @@ set -x
 COUNT_CORES=`grep -c ^processor /proc/cpuinfo`
 echo "Will use $COUNT_CORES parallel jobs to build Orthanc"
 
-cd /root/osimis-webviewer/
+cd /root/osimis-webviewer/backend
 
 # Build the plugin
 mkdir Build

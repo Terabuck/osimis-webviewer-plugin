@@ -1,0 +1,27 @@
+.wv-serieslist {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wv-serieslist-item {
+  padding: 0;
+  text-align: center;
+  
+  width: 150px;
+  height: 150px;
+  margin: auto;
+  margin-bottom: 0.5rem;
+}
+
+.wv-serieslist-overlay {
+  position: absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  color: #CCC;
+  background-color: rgba(0,0,0,0.5);
+  text-align: center;
+  padding: 0.5em;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+}

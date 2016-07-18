@@ -1,0 +1,17 @@
+# Dependency directory
+# https://docs.npmjs.com/misc/faq#should-i-check-my-node-modules-folder-into-git
+node_modules/*
+!node_modules/gulp-injectInlineWorker     # this folder is the only one in the git repo and it must be copied to the container
+bower_components/
+
+# Build directory
+build/
+
+# other
+report/
+.tmp/
+.sass-cache/
+.osisync/
+.idea/
+.DS_Store
+npm-debug.log
