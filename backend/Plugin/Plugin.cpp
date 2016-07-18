@@ -393,7 +393,7 @@ extern "C"
     /* By default, a cache of 100 MB is used */
     int cacheSize = 100; 
 
-    /* By default, enable storage attachment cache */
+    /* By default, disable storage attachment cache */
     bool cachedImageStorageEnabled = false;
 
     try
