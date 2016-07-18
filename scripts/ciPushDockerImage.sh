@@ -21,7 +21,7 @@ docker push $imageName:$releaseCommitId
 
 # push to docker hub (with the branch name)
 docker tag $imageName:$releaseCommitId $imageName:$releaseTag
-docker push $imageName:releaseTag
+docker push $imageName:$releaseTag
 
 #if in master branch, the current tag should also be marked as the latest
 if [[ $branchName == "master" ]]; then
