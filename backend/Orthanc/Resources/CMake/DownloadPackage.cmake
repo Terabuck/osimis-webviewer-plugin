@@ -54,7 +54,7 @@ else()
 endif()
 
 
-macro(DownloadPackage MD5 Url TargetDirectory)
+macro(DownloadPackage MD5 Url TargetDirectory EnableTargetDirectory)
   if (NOT IS_DIRECTORY "${TargetDirectory}")
     GetUrlFilename(TMP_FILENAME "${Url}")
 
@@ -128,11 +128,19 @@ macro(DownloadPackage MD5 Url TargetDirectory)
 
     else()
       if ("${TMP_EXTENSION}" STREQUAL "zip")
-        execute_process(
-          COMMAND sh -c "${UNZIP_EXECUTABLE} -q ${TMP_PATH} -d${TargetDirectory}"
-          WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-          RESULT_VARIABLE Failure
-        )
+        if (EnableTargetDirectory)
+          execute_process(
+            COMMAND sh -c "${UNZIP_EXECUTABLE} -q ${TMP_PATH} -d${TargetDirectory}"
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            RESULT_VARIABLE Failure
+          )
+        else()
+          execute_process(
+            COMMAND sh -c "${UNZIP_EXECUTABLE} -q ${TMP_PATH}"
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            RESULT_VARIABLE Failure
+          )
+        endif()
       elseif (("${TMP_EXTENSION}" STREQUAL "gz") OR ("${TMP_EXTENSION}" STREQUAL "tgz"))
         #message("tar xvfz ${TMP_PATH}")
         execute_process(
