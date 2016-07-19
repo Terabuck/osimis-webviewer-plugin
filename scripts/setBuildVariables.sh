@@ -30,3 +30,6 @@ else
 	# replace / by -
 	releaseTag=${releaseTag//\//-}
 fi
+
+# display what has changed in git
+git status
