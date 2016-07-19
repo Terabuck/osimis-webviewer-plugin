@@ -70,7 +70,11 @@ macro(DownloadPackage MD5 Url TargetDirectory)
 	message(FATAL_ERROR "CMake is not allowed to download from Internet. Please set the ALLOW_DOWNLOADS option to ON")
       endif()
 
-      file(DOWNLOAD "${Url}" "${TMP_PATH}" SHOW_PROGRESS EXPECTED_MD5 "${MD5}")
+      if (MD5)
+        file(DOWNLOAD "${Url}" "${TMP_PATH}" SHOW_PROGRESS EXPECTED_MD5 "${MD5}")
+      else()
+        file(DOWNLOAD "${Url}" "${TMP_PATH}" SHOW_PROGRESS)
+      endif()
     else()
       message("Using local copy of ${Url}")
     endif()
@@ -113,7 +117,7 @@ macro(DownloadPackage MD5 Url TargetDirectory)
           )
       elseif ("${TMP_EXTENSION}" STREQUAL "zip")
         execute_process(
-          COMMAND ${ZIP_EXECUTABLE} x -y ${TMP_PATH}
+          COMMAND ${ZIP_EXECUTABLE} x -y ${TMP_PATH} -o${TargetDirectory}
           WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
           RESULT_VARIABLE Failure
           OUTPUT_QUIET
@@ -125,7 +129,7 @@ macro(DownloadPackage MD5 Url TargetDirectory)
     else()
       if ("${TMP_EXTENSION}" STREQUAL "zip")
         execute_process(
-          COMMAND sh -c "${UNZIP_EXECUTABLE} -q ${TMP_PATH}"
+          COMMAND sh -c "${UNZIP_EXECUTABLE} -q ${TMP_PATH} -d${TargetDirectory}"
           WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
           RESULT_VARIABLE Failure
         )
