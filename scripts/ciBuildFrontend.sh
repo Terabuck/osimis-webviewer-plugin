@@ -13,6 +13,7 @@ cd frontend/
 
 #remove libs from previous builds
 rm -f *.zip
+rm -rf build/
 
 docker build --tag=osimis/frontend-builder --file=DockerfileFrontEndBuilder .
 
