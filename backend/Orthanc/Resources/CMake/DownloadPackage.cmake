@@ -129,7 +129,7 @@ macro(DownloadPackage MD5 Url TargetDirectory)
     else()
       if ("${TMP_EXTENSION}" STREQUAL "zip")
         execute_process(
-          COMMAND sh -c "${UNZIP_EXECUTABLE} -q ${TMP_PATH}"
+          COMMAND sh -c "${UNZIP_EXECUTABLE} -q ${TMP_PATH} -d${TargetDirectory}"
           WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
           RESULT_VARIABLE Failure
         )
