@@ -25,7 +25,7 @@ docker tag $imageName:$releaseCommitId $imageName:$releaseTag
 docker push $imageName:$releaseTag
 
 #cleanup space, 
-if [[ $cleanupType != "noCleanup"]]; then
+if [[ $cleanupType != "noCleanup" ]]; then
 	docker rmi $imageName:$releaseCommitId
 	docker rmi $imageName:$releaseTag
 fi
@@ -35,7 +35,7 @@ if [[ $branchName == "master" ]]; then
 	docker tag $imageName:$releaseCommitId $imageName:latest
 	docker push $imageName:latest
 	
-	if [[ $cleanupType != "noCleanup"]]; then
+	if [[ $cleanupType != "noCleanup" ]]; then
     	docker rmi $imageName:latest
     fi
 fi
