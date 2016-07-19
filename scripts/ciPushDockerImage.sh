@@ -13,7 +13,7 @@ set -x
 cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"/
 
 source scripts/setBuildVariables.sh
-cleanupType=${2:-noCleanup}  # should we delete docker images at the end ?
+cleanupType=${2:-noCleanup}  # argument that specifies if we should delete docker images at the end
 
 imageName='osimis/orthanc-webviewer-plugin'
 
