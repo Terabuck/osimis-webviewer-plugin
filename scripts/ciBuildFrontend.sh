@@ -11,6 +11,9 @@ source scripts/setBuildVariables.sh
 # -------------
 cd frontend/
 
+#remove libs from previous builds
+rm *.zip
+
 docker build --tag=osimis/frontend-builder --file=DockerfileFrontEndBuilder .
 
 # we first need to create the container before we can copy files to it

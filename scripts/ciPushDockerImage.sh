@@ -13,6 +13,7 @@ set -x
 cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"/
 
 source scripts/setBuildVariables.sh
+cleanupType=${2:-noCleanup}  # should we delete docker images at the end ?
 
 imageName='osimis/orthanc-webviewer-plugin'
 
@@ -23,8 +24,18 @@ docker push $imageName:$releaseCommitId
 docker tag $imageName:$releaseCommitId $imageName:$releaseTag
 docker push $imageName:$releaseTag
 
+#cleanup space, 
+if [[ $cleanupType != "noCleanup"]]; then
+	docker rmi $imageName:$releaseCommitId
+	docker rmi $imageName:$releaseTag
+fi
+
 #if in master branch, the current tag should also be marked as the latest
 if [[ $branchName == "master" ]]; then
 	docker tag $imageName:$releaseCommitId $imageName:latest
 	docker push $imageName:latest
+	
+	if [[ $cleanupType != "noCleanup"]]; then
+    	docker rmi $imageName:latest
+    fi
 fi
