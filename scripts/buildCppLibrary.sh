@@ -18,6 +18,8 @@ cmake -DALLOW_DOWNLOADS:BOOL=ON \
     -DUSE_GTEST_DEBIAN_SOURCE_PACKAGE:BOOL=ON \
     -DUSE_SYSTEM_JSONCPP:BOOL=OFF \
     ..
+
+git status
 make -j$COUNT_CORES
 ./UnitTests
 cp -L libOsimisWebViewer.so /usr/share/orthanc/plugins/
