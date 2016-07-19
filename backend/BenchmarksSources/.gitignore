@@ -1,5 +1,6 @@
 env/
+src/
 orthancDb2/
 WebViewerCache/
-Orthanc_ORTHANC_BCM/
-Orthanc_POPULATE/
+Orthanc_*/
+*.pyc

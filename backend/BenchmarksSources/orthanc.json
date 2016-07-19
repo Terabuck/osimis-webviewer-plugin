@@ -5,16 +5,16 @@
 
   // The logical name of this instance of Orthanc. This one is
   // displayed in Orthanc Explorer and at the URI "/system".
-  "Name" : "ORTHANC_BCM",
+  "Name" : "Orthanc inside Docker",
 
   // Path to the directory that holds the heavyweight files
   // (i.e. the raw DICOM instances)
-  "StorageDirectory" : "../../orthanc_data_2",
+  "StorageDirectory" : "../../../orthanc_data_2",
 
   // Path to the directory that holds the SQLite index (if unset,
   // the value of StorageDirectory is used). This index could be
   // stored on a RAM-drive or a SSD device for performance reasons.
-  "IndexDirectory" : "../../orthanc_data_2",
+  "IndexDirectory" : "../../../orthanc_data_2",
 
   // Enable the transparent compression of the DICOM instances
   "StorageCompression" : false,
@@ -38,15 +38,9 @@
   // "./PluginTest.dll" for Windows). These paths can refer to
   // folders, in which case they will be scanned non-recursively to
   // find shared libraries.
-  "Plugins" : [
-	  "../Build/libOsimisWebViewer.dylib"
+  "Plugins" : [ 
+    "../build/libOsimisWebViewer.dylib"
   ],
-
-  "WebViewer" : {
-    "CachePath" : "WebViewerCache",
-    "CacheSize" : 0,
-    "Threads" : 1
-  },
 
 
 
@@ -75,26 +69,30 @@
 
 
 
-
   /**
    * Configuration of the DICOM server
    **/
 
+  // Enable the DICOM server. If this parameter is set to "false",
+  // Orthanc acts as a pure REST server. It will not be possible to
+  // receive files or to do query/retrieve through the DICOM protocol.
+  "DicomServerEnabled" : true,
+
   // The DICOM Application Entity Title
-  "DicomAet" : "ORTHANC_BCM",
+  "DicomAet" : "ORTHANC",
 
   // Check whether the called AET corresponds during a DICOM request
   "DicomCheckCalledAet" : false,
 
   // The DICOM port
-  "DicomPort" : 5111,
+  "DicomPort" : 4242,
 
   // The default encoding that is assumed for DICOM files without
   // "SpecificCharacterSet" DICOM tag. The allowed values are "Ascii",
   // "Utf8", "Latin1", "Latin2", "Latin3", "Latin4", "Latin5",
   // "Cyrillic", "Windows1251", "Arabic", "Greek", "Hebrew", "Thai",
   // "Japanese", and "Chinese".
-  "DefaultEncoding" : "Utf8",
+  "DefaultEncoding" : "Latin1",
 
   // The transfer syntaxes that are accepted by Orthanc C-Store SCP
   "DeflatedTransferSyntaxAccepted"     : true,
@@ -105,18 +103,30 @@
   "Mpeg2TransferSyntaxAccepted"        : true,
   "RleTransferSyntaxAccepted"          : true,
 
+  // Whether Orthanc accepts to act as C-Store SCP for unknown storage
+  // SOP classes (aka. "promiscuous mode")
+  "UnknownSopClassAccepted"            : false,
+
+
 
   /**
    * Security-related options for the HTTP server
    **/
 
   // Whether remote hosts can connect to the HTTP server
-  "RemoteAccessAllowed" : false,
+  "RemoteAccessAllowed" : true,
+
+  "WebViewer": {
+    "CacheEnabled": false,
+    "EnableGdcm": true,
+    "RestrictTransferSyntaxes": []
+  },
 
   // Whether or not SSL is enabled
   "SslEnabled" : false,
 
-  // Path to the SSL certificate (meaningful only if SSL is enabled)
+  // Path to the SSL certificate in the PEM format (meaningful only if
+  // SSL is enabled)
   "SslCertificate" : "certificate.pem",
 
   // Whether or not the password protection is enabled
@@ -125,6 +135,7 @@
   // The list of the registered users. Because Orthanc uses HTTP
   // Basic Authentication, the passwords are stored as plain text.
   "RegisteredUsers" : {
+    // "orthanc" : "orthanc"
     // "alice" : "alicePassword"
   },
 
@@ -142,14 +153,15 @@
      * store (shipped in the DCMTK distribution) started by the
      * command line "storescp 2000".
      **/
-    //"osirix" : [ "OSIRIX", "192.168.0.6", 11112 ],
+    // "sample" : [ "STORESCP", "127.0.0.1", 2000 ]
 
     /**
      * A fourth parameter is available to enable patches for a
      * specific PACS manufacturer. The allowed values are currently
      * "Generic" (default value), "StoreScp" (storescp tool from
-     * DCMTK), "ClearCanvas", "MedInria", "Dcm4Chee" and
-     * "SyngoVia". This parameter is case-sensitive.
+     * DCMTK), "ClearCanvas", "MedInria", "Dcm4Chee", "SyngoVia",
+     * "AgfaImpax" (Agfa IMPAX), "EFilm2" (eFilm version 2), and
+     * "Vitrea". This parameter is case-sensitive.
      **/
     // "clearcanvas" : [ "CLEARCANVAS", "192.168.1.1", 104, "ClearCanvas" ]
   },
@@ -161,7 +173,24 @@
      * followed by the username/password pair (if the password
      * protection is enabled on the peer).
      **/
-    // "peer2" : [ "http://localhost:8044/" ]
+    // "peer"  : [ "http://127.0.0.1:8043/", "alice", "alicePassword" ]
+    // "peer2" : [ "http://127.0.0.1:8044/" ]
+
+    /**
+     * This is another, more advanced format to define Orthanc
+     * peers. It notably allows to specify a HTTPS client certificate
+     * in the PEM format (as in the "--cert" option of curl), or to
+     * enable PKCS#11 authentication for smart cards.
+     **/
+    // "peer" : {
+    //   "Url" : "http://127.0.0.1:8043/",
+    //   "Username" : "alice",
+    //   "Password" : "alicePassword",
+    //   "CertificateFile" : "client.crt",
+    //   "CertificateKeyFile" : "client.key",
+    //   "CertificateKeyPassword" : "certpass",
+    //   "Pkcs11" : false
+    // }
   },
 
   // Parameters of the HTTP proxy to be used by Orthanc. If set to the
@@ -170,38 +199,48 @@
   //   "HttpProxy" : "proxyUser:proxyPassword@192.168.0.1:3128"
   "HttpProxy" : "",
 
+  // Set the timeout for HTTP requests issued by Orthanc (in seconds).
+  "HttpTimeout" : 10,
+
+  // Enable the verification of the peers during HTTPS requests. This
+  // option must be set to "false" if using self-signed certificates.
+  // Pay attention that setting this option to "false" results in
+  // security risks!
+  // Reference: http://curl.haxx.se/docs/sslcerts.html
+  "HttpsVerifyPeers" : true,
+
+  // Path to the CA (certification authority) certificates to validate
+  // peers in HTTPS requests. From curl documentation ("--cacert"
+  // option): "Tells curl to use the specified certificate file to
+  // verify the peers. The file may contain multiple CA
+  // certificates. The certificate(s) must be in PEM format."
+  "HttpsCACertificates" : "",
+
+
 
   /**
    * Advanced options
    **/
 
   // Dictionary of symbolic names for the user-defined metadata. Each
-  // entry must map a number between 1024 and 65535 to an unique
-  // string.
+  // entry must map an unique string to an unique number between 1024
+  // and 65535.
   "UserMetadata" : {
     // "Sample" : 1024
   },
 
   // Dictionary of symbolic names for the user-defined types of
-  // attached files. Each entry must map a number between 1024 and
-  // 65535 to an unique string.
+  // attached files. Each entry must map an unique string to an unique
+  // number between 1024 and 65535. Optionally, a second argument can
+  // provided to specify a MIME content type for the attachment.
   "UserContentType" : {
     // "sample" : 1024
+    // "sample2" : [ 1025, "application/pdf" ]
   },
 
   // Number of seconds without receiving any instance before a
   // patient, a study or a series is considered as stable.
   "StableAge" : 60,
-
-  // Enable the HTTP server. If this parameter is set to "false",
-  // Orthanc acts as a pure DICOM server. The REST API and Orthanc
-  // Explorer will not be available.
-  "HttpServerEnabled" : true,
-
-  // Enable the DICOM server. If this parameter is set to "false",
-  // Orthanc acts as a pure REST server. It will not be possible to
-  // receive files or to do query/retrieve through the DICOM protocol.
-  "DicomServerEnabled" : true,
 
   // By default, Orthanc compares AET (Application Entity Titles) in a
   // case-insensitive way. Setting this option to "true" will enable
@@ -239,7 +278,8 @@
   "KeepAlive" : false,
 
   // If this option is set to "false", Orthanc will run in index-only
-  // mode. The DICOM files will not be stored on the drive.
+  // mode. The DICOM files will not be stored on the drive. Note that
+  // this option might prevent the upgrade to newer versions of Orthanc.
   "StoreDicom" : true,
 
   // DICOM associations are kept open as long as new DICOM commands
@@ -253,8 +293,35 @@
   // deleted as new requests are issued.
   "QueryRetrieveSize" : 10,
 
-  // When handling a C-Find SCP request, setting this flag to "false"
-  // will enable case-insensitive match for PN value representation
-  // (such as PatientName). By default, the search is case-insensitive.
-  "CaseSensitivePN" : false
+  // When handling a C-Find SCP request, setting this flag to "true"
+  // will enable case-sensitive match for PN value representation
+  // (such as PatientName). By default, the search is
+  // case-insensitive, which does not follow the DICOM standard.
+  "CaseSensitivePN" : false,
+
+  // Configure PKCS#11 to use hardware security modules (HSM) and
+  // smart cards when carrying on HTTPS client authentication.
+  /**
+     "Pkcs11" : {
+       "Module" : "/usr/local/lib/libbeidpkcs11.so",
+       "Module" : "C:/Windows/System32/beidpkcs11.dll",
+       "Pin" : "1234",
+       "Verbose" : true
+     }
+   **/
+  
+  // If set to "true", Orthanc will handle "SOP Classes in Study"
+  // (0008,0062) in C-FIND requests. This option is turned off by
+  // default, as it requires intensive accesses to the hard drive.
+  "AllowFindSopClassesInStudy" : false,
+
+  // Register a new tag in the dictionary of DICOM tags that are known
+  // to Orthanc. Each line must contain the tag (formatted as 2
+  // hexadecimal numbers), the value representation (2 upcase
+  // characters), a nickname for the tag, possibly the minimum
+  // multiplicity (> 0 with defaults to 1), and possibly the maximum
+  // multiplicity (0 means arbitrary multiplicity, defaults to 1).
+  "Dictionary" : {
+    // "0014,1020" : [ "DA", "ValidationExpiryDate", 1, 1 ]
+  }
 }

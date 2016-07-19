@@ -5,7 +5,7 @@ from orthancRestApi import OrthancClient
 from orthancServer import OrthancServer
 from .benchmarkCase import BenchmarkCase
 
-OrthancServer.executablePath = './Orthanc';
+OrthancServer.executableFolder = '../build/';
 
 
 class BenchmarkManager:
@@ -17,16 +17,16 @@ class BenchmarkManager:
         self._server.launch('orthanc.json')
 
         # load orthanc rest client
-        self._client = OrthancClient('http://127.0.0.1:5080')
+        self._client = OrthancClient('http://localhost:5080/')
 
         # self.cache = cache
         self._trialCount = trialCount
 
         self._benchmarkCases = []
 
-    def add(self, instance, frame, compression, comment, gzip):
-        relativeURL = "/web-viewer/instances/{compression}-{instance}_{frame}" \
-            .format(compression=compression, instance=instance, frame=frame)
+    def add(self, instance, frame, quality, comment, gzip):
+        relativeURL = "/osimis-viewer/images/{instance}/{frame}/{quality}" \
+            .format(quality=quality, instance=instance, frame=frame)
 
         case = BenchmarkCase(
             server = self._server,
