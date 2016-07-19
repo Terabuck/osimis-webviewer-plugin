@@ -116,12 +116,21 @@ macro(DownloadPackage MD5 Url TargetDirectory EnableTargetDirectory)
           OUTPUT_QUIET
           )
       elseif ("${TMP_EXTENSION}" STREQUAL "zip")
-        execute_process(
-          COMMAND ${ZIP_EXECUTABLE} x -y ${TMP_PATH} -o${TargetDirectory}
-          WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-          RESULT_VARIABLE Failure
-          OUTPUT_QUIET
-          )
+        if (${EnableTargetDirectory})
+          execute_process(
+            COMMAND ${ZIP_EXECUTABLE} x -y ${TMP_PATH} -o${TargetDirectory}
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            RESULT_VARIABLE Failure
+            OUTPUT_QUIET
+            )
+        else()
+          execute_process(
+            COMMAND ${ZIP_EXECUTABLE} x -y ${TMP_PATH}
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            RESULT_VARIABLE Failure
+            OUTPUT_QUIET
+            )
+        endif()
       else()
         message(FATAL_ERROR "Support your platform here")
       endif()
