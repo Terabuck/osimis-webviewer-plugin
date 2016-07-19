@@ -12,7 +12,7 @@ source scripts/setBuildVariables.sh
 cd frontend/
 
 #remove libs from previous builds
-rm *.zip
+rm -f *.zip
 
 docker build --tag=osimis/frontend-builder --file=DockerfileFrontEndBuilder .
 
