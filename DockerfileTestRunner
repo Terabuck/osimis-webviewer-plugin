@@ -1,0 +1,38 @@
+# PRE:
+# 	require an orthanc docker container to be linked with port 8042 exposed
+#	(use test/docker-compose.yml to achieve this)
+FROM markadams/chromium-xvfb
+
+# install required dev tools
+RUN apt-get update && apt-get install -y \
+    python3 python3-pip curl unzip libgconf-2-4
+
+RUN apt-get update && apt-get install -y curl git # git is used by bower & npm for source retrieval
+
+RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -
+RUN apt-get install -y nodejs && npm install -g npm@latest
+
+RUN npm install -g bower gulp
+
+# install source dependencies
+# @todo either steal npm & bower dependencies from the previously built docker images or use a common docker image
+COPY tests/osimis-test-runner/requirements.txt /tests/osimis-test-runner/requirements.txt
+WORKDIR /tests/osimis-test-runner
+RUN pip3 install -r requirements.txt
+
+WORKDIR /frontend
+COPY frontend/package.json /frontend/package.json
+RUN npm install
+COPY frontend/bower.json /frontend/bower.json
+RUN bower install --allow-root
+
+# copy app content
+WORKDIR /
+COPY scripts/ /scripts/
+COPY tests/ /tests/
+COPY frontend/ /frontend/
+
+# set command
+ENV ORTHANC_URL=http://localhost:8042/
+WORKDIR /tests/osimis-test-runner
+ENTRYPOINT bash python3 osimis-test-runner.py --manual-orthanc=$ORTHANC_URL "default" # use sh -c to process ENV

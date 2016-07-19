@@ -18,11 +18,11 @@ cd frontend/
 rm -f *.zip
 rm -rf build/
 
-docker build --tag=osimis/frontend-builder --file=DockerfileFrontEndBuilder .
+docker build --tag=osimis/webviewer-frontend-builder --file=DockerfileFrontEndBuilder .
 
 # we first need to create the container before we can copy files to it
 export releaseCommitId
-WEBAPP_BUILDER_CONTAINER_ID=$(docker create --name webviewer-frontend-builder-$releaseCommitId osimis/frontend-builder $releaseCommitId)
+WEBAPP_BUILDER_CONTAINER_ID=$(docker create --name webviewer-frontend-builder-$releaseCommitId osimis/webviewer-frontend-builder $releaseCommitId)
 export WEBAPP_BUILDER_CONTAINER_ID # export the variable to be able to remove the container later in case of error
 
 # copy the frontend files in the container

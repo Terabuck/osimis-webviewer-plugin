@@ -23,7 +23,7 @@ module.exports = function(config) {
 
         proxies: {
             // Add orthanc route
-            '/orthanc/': 'http://localhost:8042/',
+            '/orthanc/': process.env.ORTHANC_URL || 'http://localhost:8042/',
             // Proxy for web worker to work with mocha
             '/app/': '/base/src/app/',
             '/bower_components/': '/base/bower_components/',
@@ -66,7 +66,17 @@ module.exports = function(config) {
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
         //        browsers: ['Chrome', 'ChromeCanary', 'FirefoxAurora', 'Safari', 'PhantomJS', 'Firefox', 'SlimerJS'],
-        browsers: ['Chrome'],
+        browsers: ['Docker_Chrome'],
+
+        // Add custom chrome flag for work within docker (specifically with fake window server Xvfb)
+        customLaunchers: {
+          Docker_Chrome: {
+            base: 'Chrome',
+            // see http://stackoverflow.com/questions/33820098/headless-chrome-in-docker-using-xvfb
+            flags: ['--no-sandbox', '--disable-gpu', '--single-process'] // with sandbox it fails under Docker
+          }
+        },
+
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits

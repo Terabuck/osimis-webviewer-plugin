@@ -13,7 +13,8 @@ node('docker') {
 	stage 'Build Docker Image'
 	sh 'scripts/ciBuildDockerImage.sh ${BRANCH_NAME}'
 
-	stage 'Run tests (TODO)'
+	stage 'Run tests'
+	sh 'scripts/ciRunKarmaTests.sh ${BRANCH_NAME}'
 
 	withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
 		stage 'Push Frontend lib to AWS (releaseTag)'

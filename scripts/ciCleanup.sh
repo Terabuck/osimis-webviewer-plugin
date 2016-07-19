@@ -42,4 +42,7 @@ if [[ "${WEBAPP_BUILDER_CONTAINER_ID}" != "" ]]; then
 	fi
 fi
 
+# remove test runner docker container if exists
+docker-compose -p wv_tests down --rmi all --volumes || true
+
 echo "...cleaned up"
