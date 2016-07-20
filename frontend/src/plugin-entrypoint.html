@@ -82,16 +82,42 @@
                 requireBase: false
             });
         })
-        .controller('OsimisWebViewer', function($scope, $location) {
+        .controller('OsimisWebViewer', function($scope, $location, $rootScope, $http, wvConfig, wvSeriesManager) {
             $scope.vm = {};
 
-            $scope.vm.seriesId = $location.search().series;
+            var orthancStudyId = $location.search().study;
+            var orthancSeriesId = $location.search().series;
 
-            $scope.vm.study = {
-                id: $location.search().study
-            };
+            // Display orthanc study
+            if (orthancStudyId) {
+                $scope.vm.minimize = false;
+                $scope.vm.study = {id: orthancStudyId};
+            }
+            // Display & convert orthanc series id (from url parameter) into frontend series id
+            else {
+                wvSeriesManager
+                    .listFromOrthancSeriesId(orthancSeriesId)
+                    .then(function(seriesList) {
+                        // When singleframe, display the frontend series
+                        if (seriesList.length === 1) {
+                            $scope.vm.minimize = true;
+                            $scope.vm.seriesId = seriesList[0].id;
+                        }
+                        // When multiframe, consider series as a study
+                        else if (!$scope.vm.study) {
+                            $http
+                                .get(wvConfig.orthancApiURL + '/series/'+orthancSeriesId+'/study', {cache: false})
+                                .then(function(study) {
+                                    $scope.vm.minimize = false;
+                                    $scope.vm.study = {id: study.data.ID};
+                                });
+                        }
+                        else {
+                            throw new Error('Invalid URL parameters');
+                        }
+                    });
+            }
 
-            $scope.vm.minimize = !$scope.vm.study.id;
         })
         ;
     </script>
