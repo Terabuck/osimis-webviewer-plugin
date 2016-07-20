@@ -202,6 +202,11 @@
 
             var _lastTimeInMs = null;
 
+            // Benchmark play loop
+            if (console.time && console.timeEnd) {
+                console.time('play');
+            }
+
             // Create recursive closure to display each images
             (function loop() {
                 // Wait for desired framerate to be loaded
@@ -214,6 +219,12 @@
                                 // Go to next image
                                 _this.goToNextImage(true);
 
+                                // Benchmark play loop
+                                if (console.time && console.timeEnd) {
+                                    console.timeEnd('play');
+                                    console.time('play');
+                                }
+                                
                                 // Update desired Frame Rate
                                 _desiredFrameRatePromise = _getDesiredFrameRate(_this);
 
@@ -252,6 +263,11 @@
             if (_cancelAnimationId) {
                 cancelAnimationFrame(_cancelAnimationId);
                 _cancelAnimationId = null;
+
+                // Stop benchmarking play loop
+                if (console.time && console.timeEnd) {
+                    console.timeEnd('play');
+                }
             }
 
             this.isPlaying = false;
