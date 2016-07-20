@@ -92,6 +92,9 @@
             if (orthancStudyId) {
                 $scope.vm.minimize = false;
                 $scope.vm.study = {id: orthancStudyId};
+
+                // Preload study
+                $rootScope.$emit('UserSelectedStudyId', $scope.vm.study.id);
             }
             // Display & convert orthanc series id (from url parameter) into frontend series id
             else {
@@ -102,6 +105,9 @@
                         if (seriesList.length === 1) {
                             $scope.vm.minimize = true;
                             $scope.vm.seriesId = seriesList[0].id;
+
+                            // Preload series
+                            $rootScope.$emit('UserSelectedSeries', seriesList[0]);
                         }
                         // When multiframe, consider series as a study
                         else if (!$scope.vm.study) {
@@ -110,6 +116,9 @@
                                 .then(function(study) {
                                     $scope.vm.minimize = false;
                                     $scope.vm.study = {id: study.data.ID};
+
+                                    // Preload study
+                                    $rootScope.$emit('UserSelectedStudyId', $scope.vm.study.id);
                                 });
                         }
                         else {
