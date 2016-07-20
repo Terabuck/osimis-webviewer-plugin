@@ -6,7 +6,7 @@
         .factory('WvSeries', factory);
 
     /* @ngInject */
-    function factory($rootScope, $timeout, wvAnnotationManager, WvAnnotationGroup, wvImageBinaryManager) {
+    function factory($rootScope, $timeout, wvImageManager, wvAnnotationManager, WvAnnotationGroup, wvImageBinaryManager) {
 
         function WvSeries(id, imageIds, tags, availableQualities) {
             var _this = this;
@@ -137,6 +137,11 @@
            return this.imageIds[this.currentIndex];
         };
 
+        WvSeries.prototype.getCurrentImage = function() {
+            var imageId = this.getCurrentImageId();
+            return wvImageManager.get(imageId);
+        };
+
         WvSeries.prototype.goToNextImage = function(restartWhenSeriesEnd) {
             restartWhenSeriesEnd = restartWhenSeriesEnd || false;
 
@@ -189,39 +194,60 @@
                 return;
             }
 
-            var speed = 1000 / this.tags.RecommendedDisplayFrameRate || 1000 / 30; // 30 fps by default
+            var _desiredFrameRatePromise = _getDesiredFrameRate(_this); // 30 fps by default
 
             if (this.isPlaying) {
                 return;
             }
 
-            var _lastMsTime = null;
-            var _toSkip = 0;
+            var _lastTimeInMs = null;
+
+            // Create recursive closure to display each images
             (function loop() {
-                _cancelAnimationId = requestAnimationFrame(function(msTime) {
-                    // force skipping useless frames
-                    if (_toSkip) {
-                        --_toSkip;
-                    }
-                    else {
-                        var fps = 1000 / (msTime - _lastMsTime);
-                        _toSkip = Math.floor(fps / speed);
+                // Wait for desired framerate to be loaded
+                _desiredFrameRatePromise.then(function(desiredFrameRateInMs) {
+                    // Wait for monitor to attempt refresh
+                    _cancelAnimationId = requestAnimationFrame(function(currentTimeInMs) {
+                        // Draw series at desired framerate
+                        if (currentTimeInMs - _lastTimeInMs >= desiredFrameRateInMs) {
+                            $rootScope.$apply(function() {
+                                // Go to next image
+                                _this.goToNextImage(true);
 
-                        $rootScope.$apply(function() {
-                            _this.goToNextImage(true);
-                        });
-                    }
+                                // Update desired Frame Rate
+                                _desiredFrameRatePromise = _getDesiredFrameRate(_this);
 
-                    _lastMsTime = msTime;
-                    
-                    if (_this.isPlaying) {
-                        loop();
-                    }
+                                // Track current Frame Rate
+                                _lastTimeInMs = currentTimeInMs;
+                            });
+                        }
+                        
+                        // Loop
+                        if (_this.isPlaying) {
+                            loop();
+                        }
+                    });
                 });
             })();
             
             this.isPlaying = true;
         };
+        function _getDesiredFrameRate(series) {
+            // Warning series.tags.RecommendedDisplayFrameRate cannot be used as
+            // it may be wrong due to the fact it is dependent of the instance and not the orthanc series.
+            // Use image tags instead (note instance tags would be enough)
+            return series
+                .getCurrentImage()
+                .then(function(image) {
+                    if (image.tags.RecommendedDisplayFrameRate) {
+                        return 1000 / image.tags.RecommendedDisplayFrameRate;
+                    }
+                    else {
+                        return 1000 / 30; // 30 fps by default
+                    }
+                });
+        }
+
         WvSeries.prototype.pause = function() {
             if (_cancelAnimationId) {
                 cancelAnimationFrame(_cancelAnimationId);
