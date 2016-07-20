@@ -205,7 +205,7 @@
                     }
                     else {
                         var fps = 1000 / (msTime - _lastMsTime);
-                        _toSkip = Math.round(fps / speed);
+                        _toSkip = Math.floor(fps / speed);
 
                         $rootScope.$apply(function() {
                             _this.goToNextImage(true);
