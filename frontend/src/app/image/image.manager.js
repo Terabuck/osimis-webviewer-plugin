@@ -83,7 +83,7 @@
                 
                 // Create & return image model based on request results
                 _modelCache[id] = $http
-                    .get(wvConfig.orthancApiURL + '/instances/'+instanceId+'/simplified-tags', {cache: false}) // already cached at upper level
+                    .get(wvConfig.orthancApiURL + '/instances/'+instanceId+'/simplified-tags', {cache: false}) // already cached at upper level (only useful for multiframe instance)
                     .then(function(response) {
                         var tags = response.data;
 
