@@ -1,0 +1,19 @@
+FROM osimis/webapp-builder:1.1.1
+
+RUN mkdir /frontend
+
+COPY package.json /frontend
+COPY bower.json /frontend
+
+WORKDIR /frontend
+
+# npm cache clean # make sure install is fine
+RUN npm install --unsafe-perm --python=python2.7
+
+# install 2 times (for random phantom_js download issues)
+RUN npm install --unsafe-perm --python=python2.7
+
+RUN bower install --allow-root
+
+ENTRYPOINT [ "bash",  "/frontend/scripts/buildFrontendFromDocker.sh" ]
+CMD [ "0000000" ]

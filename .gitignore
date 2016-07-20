@@ -1,6 +1,24 @@
-Build/
-build/
-ThirdPartyDownloads/
-CMakeLists.txt.user
-env/
-.idea
+# Dependency directory
+# https://docs.npmjs.com/misc/faq#should-i-check-my-node-modules-folder-into-git
+frontend/node_modules/*
+!frontend/node_modules/gulp-injectInlineWorker
+frontend/bower_components/
+
+# Build directory
+frontend/build/
+
+backend/Build/
+backend/build/
+backend/ThirdPartyDownloads/
+backend/CMakeLists.txt.user
+backend/env/
+
+# other
+report/
+.tmp/
+.sass-cache/
+.osisync/
+.idea/
+.DS_Store
+npm-debug.log
+build-*/

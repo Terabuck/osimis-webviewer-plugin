@@ -1,0 +1,8 @@
+BenchmarksSources/
+
+Build/
+build/
+ThirdPartyDownloads/
+CMakeLists.txt.user
+env/
+.idea
