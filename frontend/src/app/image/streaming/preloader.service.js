@@ -3,7 +3,7 @@
 
     angular
         .module('webviewer')
-        .run(function($rootScope, wvSeriesManager, wvImageBinaryManager, WvImageQualities) {
+        .run(function($rootScope, wvSeriesManager, wvImageManager, wvImageBinaryManager, WvImageQualities) {
             // @todo preload tags too ?
 
             // Preload thumbnail when user has selected a study (on left menu)
@@ -44,6 +44,13 @@
 
             // Preload series' when user has selected a series (dropped in a viewport)
             $rootScope.$on('UserSelectedSeries', function(evt, series) {
+                // Preload every series' tags
+                for (var i=0; i<series.imageIds.length; ++i) {
+                    var imageId = series.imageIds[i];
+
+                    wvImageManager.get(imageId);
+                }
+
                 // Select the lowest quality available
                 var quality = Math.min.apply(Math, _.toArray(series.availableQualities));
                 // Preload every series' thumbnails
