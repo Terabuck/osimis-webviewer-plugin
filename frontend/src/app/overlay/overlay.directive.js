@@ -51,6 +51,10 @@
 
             // auto grab series model
             if (scope.vm.wvShowTimeline && ctrls.series) {
+                var series = ctrls.series.getSeries();
+                scope.vm.wvSeries = series;
+                scope.vm.showTimeline = series && scope.vm.wvShowTimeline && !!series.imageCount;
+
                 ctrls.series.onSeriesChanged(_this, function(series) {
                     scope.vm.wvSeries = series;
                     scope.vm.showTimeline = scope.vm.wvShowTimeline && !!series.imageCount;
