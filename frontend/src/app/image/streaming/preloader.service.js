@@ -13,6 +13,13 @@
                     .then(function(seriesList) {
                         // Preload every series' thumbnails
                         seriesList.forEach(function(series) {
+                            // Preload every series' tags (for thumbnails' scroll-on-over / required for RecommendedFrameRate tag)
+                            for (var i=0; i<series.imageIds.length; ++i) {
+                                var imageId = series.imageIds[i];
+
+                                wvImageManager.get(imageId);
+                            }
+
                             // Select the lowest quality available
                             var quality = Math.min.apply(Math, _.toArray(series.availableQualities));
                             for (var i=0; i<series.imageIds.length; ++i) {
