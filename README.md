@@ -30,6 +30,11 @@ address={San Francisco, {CA}, {USA}}
 
 To use the docker container, follow [this procedure](https://bitbucket.org/snippets/osimis/eynLn).
 
+# For developers
+
+## Build & development
+
+
 ## Pulling changes back from orthanc-webviewer-plugin
 To retrieve changes from original mercurial repo to git fork, uses
 - https://github.com/fingolfin/git-remote-hg
@@ -42,6 +47,8 @@ until we change the dev workflow :-)
 - merge JS[dev] in JS[master] (but it's actually not very useful since JS[master] is not really used)
 - wait jenkins complete the generation of the JS[build-dev] branch ("compiled" JS) 
 - wait jenkins updates C++[dev]/subtrees/osimis-webviewer with JS[build-dev]
+- merge C++[dev] into C++[master] (keep in mind that the C++[master]/subtrees is actually pointing to JS[build-dev]
+<<<<<<< HEAD
 - merge C++[dev] into C++[master] (keep in mind that the C++[master]/subtrees is actually pointing to JS[build-dev]
 
 # JS build/
@@ -144,6 +151,4 @@ When you generate the project it should run these commands, but if you notice mi
     --type=pre
     --ver=1.2.3 // specific version
 
-## License
 
-MIT
