@@ -186,6 +186,7 @@
         };
 
         var _cancelAnimationId = null;
+        var _timeLog;
         WvSeries.prototype.play = function() {
             var _this = this;
 
@@ -204,7 +205,8 @@
 
             // Benchmark play loop
             if (console.time && console.timeEnd) {
-                console.time('play');
+                _timeLog = 'play (expect ? ms)';
+                console.time(_timeLog);
             }
 
             // Create recursive closure to display each images
@@ -221,8 +223,9 @@
 
                                 // Benchmark play loop
                                 if (console.time && console.timeEnd) {
-                                    console.timeEnd('play');
-                                    console.time('play');
+                                    console.timeEnd(_timeLog);
+                                    _timeLog = 'play (expect ' + Math.round(desiredFrameRateInMs) + 'ms)';
+                                    console.time(_timeLog);
                                 }
                                 
                                 // Update desired Frame Rate
@@ -266,7 +269,8 @@
 
                 // Stop benchmarking play loop
                 if (console.time && console.timeEnd) {
-                    console.timeEnd('play');
+                    console.timeEnd(_timeLog);
+                    _timeLog = 'play (expect ? ms)';
                 }
             }
 
