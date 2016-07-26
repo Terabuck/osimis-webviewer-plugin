@@ -1,19 +1,139 @@
-# Osimis Web Viewer plugin
+# Osimis Web Viewer Plugin
 
-This project is a fork from [Orthanc WebViewer plugin](http://www.orthanc-server.com/static.php?page=web-viewer).  It adds measure tools, multiple series view and split-pane.  You may try it [here](http://osimisviewer.osimis.io)
+The [Osimis'](htpp://www.osimis.io/) Web Viewer provides medical image visualization straight from the browser.
 
-This repo also contains a [Docker](https://www.docker.com/) container definition for Orthanc and all its main FOSS plugins including the Osimis WebViewer that you can find [here](https://hub.docker.com/r/osimis/orthanc-webviewer-plugin/builds/)
+It is distributed as a plugin to [Orthanc](http://www.orthanc-server.com/). In other words, the viewer can be connected to most modalities, but also leveraged through Orthanc's strong architectural extensibility.
+
+2D rendering is supported with the most usual tools:
+- Zooming
+- Panning
+- Windowing
+- Length Measurement
+- Angle Measurement
+- Point/Circle/Rectangle of Interest
+- Image Flipping/Rotation
+- Multiframe support
+
+You may try the latest stable version [here](http://osimisviewer.osimis.io).
+
+## What's new
+
+See the [release notes](https://bitbucket.org/osimis/osimis-webviewer-plugin/src/master/RELEASE_NOTES.txt).
+
+## Installation & Usage
+
+The last stable version is available on the [Osimis website](http://www.osimis.io/en/download.html). We recommend to download the binaries for Windows and Mac OS X & the docker image for Linux.
+
+Other versions (including unstables) are available [as docker images](https://hub.docker.com/r/osimis/orthanc-webviewer-plugin/builds/) as well.
+
+[This article](http://www.osimis.io/en/blog/2016/06/03/deploy-Orthanc-on-a-PC-in-38-seconds.html) details the installation process on Windows.
+
+[This procedure](https://bitbucket.org/snippets/osimis/eynLn) details the docker image installation process on Linux.
+
+For Mac OS X, the procedure is very similar to the windows' one. Unzip the downloaded folder and double click on the startOrthanc.command file. 
+
+## Configuration
+
+Orthanc is configurable via a [JSON file](https://orthanc.chu.ulg.ac.be/book/users/configuration.html). This plugin provide a few optional options as well.
+
+```json
+{
+  /**
+   * General configuration of Orthanc
+   **/
+
+  /* ... (see the Orthanc documentation for the other options) ... */
+
+  /**
+   * Orthanc options having significant impact on the Web Viewer
+   **/
+
+  // Enable the HTTP server. If this parameter is set to "false",
+  // Orthanc acts as a pure DICOM server. The REST API and Orthanc
+  // Explorer will not be available.
+  "HttpServerEnabled" : true,
+
+  // HTTP port for the REST services and for the GUI
+  "HttpPort" : 8042,
+
+  // When the following option is "true", if an error is encountered
+  // while calling the REST API, a JSON message describing the error
+  // is put in the HTTP answer. This feature can be disabled if the
+  // HTTP client does not properly handles such answers.
+  "HttpDescribeErrors" : true,
+
+  // Enable HTTP compression to improve network bandwidth utilization,
+  // at the expense of more computations on the server. Orthanc
+  // supports the "gzip" and "deflate" HTTP encodings.
+  // May be disabled to avoid useless image recompression overhead.
+  "HttpCompressionEnabled" : true,
+
+  // Set the timeout for HTTP requests issued by Orthanc (in seconds).
+  "HttpTimeout" : 10,
+
+  // Whether remote hosts can connect to the HTTP server
+  // In development mode, useful to set to true when using docker on OSX.
+  "RemoteAccessAllowed" : false,
+  
+  // The maximum number of active jobs in the Orthanc scheduler. When
+  // this limit is reached, the addition of new jobs is blocked until
+  // some job finishes.
+  "LimitJobs" : 10,
+
+  // Enable or disable HTTP Keep-Alive (deprecated). Set this option
+  // to "true" only in the case of high HTTP loads.
+  "KeepAlive" : false,
+
+  /**
+   * Osimis WebViewer Configuration
+   **/
+  "WebViewer" : {
+    // Cache the compressed images on the file system.
+    // Takes more disk space but allow faster image rendering when the
+    // image is viewed multiple times.
+    // Default: false
+    "CacheEnabled" : false,
+    
+    // Decode instances using GDCM instead of the builtin Orthanc decoder.
+    // GDCM may sometimes be slower but Orthanc's builtin decoder doesn't 
+    // support every format.
+    // Default: true
+    "GdcmEnabled" : true,
+
+    // When the RestrictTransferSyntaxes field is present: GDCM will be used
+    // to decode the transfer syntaxes listed in the array. All other transfer
+    // syntaxes will be decoded by the Orthanc's builtin decoder. When the
+    // RestrictTransferSyntaxes field is not present: GDCM will be used to
+    // decode all transfer syntaxes.
+    // Default: undefined
+    "RestrictTransferSyntaxes": [
+      /* Transfer Syntax UID Transfer Syntax name */
+      //  JPEG 2000 Image Compression (Lossless Only)
+      "1.2.840.10008.1.2.4.90",
+      //  JPEG 2000 Image Compression
+      "1.2.840.10008.1.2.4.91",
+      //  JPEG 2000 Part 2 Multicomponent Image Compression (Lossless Only)
+      "1.2.840.10008.1.2.4.92",
+      //  JPEG 2000 Part 2 Multicomponent Image Compression
+      "1.2.840.10008.1.2.4.93"
+    ]
+  }
+}
+```
 
 ## Licensing
 
 The Web viewer plugin for Orthanc is licensed under the AGPL license.
 
+See the COPYING file.
+
 We also kindly ask scientific works and clinical studies that make
 use of Orthanc to cite Orthanc in their associated publications.
 Similarly, we ask open-source and closed-source products that make
-use of Orthanc to warn us about this use. You can cite our work
+use of Orthanc to warn us about this use. You can cite S. Jodogne's work
 using the following BibTeX entry:
 
+```
 @inproceedings{Jodogne:ISBI2013,
 author = {Jodogne, S. and Bernard, C. and Devillers, M. and Lenaerts, E. and Coucke, P.},
 title = {Orthanc -- {A} Lightweight, {REST}ful {DICOM} Server for Healthcare and Medical Research},
@@ -25,149 +145,48 @@ month=apr,
 url={http://ieeexplore.ieee.org/xpl/articleDetails.jsp?tp=&arnumber=6556444},
 address={San Francisco, {CA}, {USA}}
 }
-
-## Usage
-
-To use the docker container, follow [this procedure](https://bitbucket.org/snippets/osimis/eynLn).
-
-## Configuration
-
-On top of [Orthanc's standard configuration option](https://orthanc.chu.ulg.ac.be/book/users/configuration.html), this plugin own its own optional options.
-
-```json
-{
-  /**
-   * General configuration of Orthanc
-   **/
-  
-  /* ... */
-
-  /**
-   * Osimis WebViewer Configuration
-   **/
-  "WebViewer" : {
-    // Cache the compressed images on the file system instead of recompressing
-    // them each time.
-    // It takes more disk space but allow faster image rendering when the image is viewed multiple times.
-    // Default: false
-    "CacheEnabled" : false,
-    
-    // Decode instances using GDCM instead of the builtin Orthanc decoder.
-    // GDCM may sometimes be slower but Orthanc's builtin decoder doesn't 
-    // support every format.
-    // Default: true
-    "EnableGDCM" : true,
-
-    // Select GDCM to read images only for the defined syntaxes (EnableGDCM must be true).
-    // When array: Use GDCM for the transfer syntaxes listed in the array
-    // When undefined: use GDCM for all the transfer syntaxes
-    // Default value: undefined
-    "RestrictTransferSyntaxes": [
-      /* Transfer Syntax UID Transfer Syntax name */
-      // Endian: Default Transfer Syntax for DICOM  
-      "1.2.840.10008.1.2 Implicit VR",
-      // VR Little Endian  
-      "1.2.840.10008.1.2.1 Explicit",
-      //  Deflated Explicit VR Little Endian   
-      "1.2.840.10008.1.2.1.99",
-      // VR Big Endian   
-      "1.2.840.10008.1.2.2 Explicit",
-       
-      /* Transfer Syntax UID Transfer Syntax name */
-      //  JPEG Baseline (Process 1): Default Transfer Syntax for Lossy JPEG 8-bit Image Compression   
-      "1.2.840.10008.1.2.4.50",
-      //  JPEG Baseline (Processes 2 & 4): Default Transfer Syntax for Lossy JPEG 12-bit Image Compression (Process 4 only)   
-      "1.2.840.10008.1.2.4.51",
-      //  JPEG Extended (Processes 3 & 5) Retired
-      "1.2.840.10008.1.2.4.52",
-      //  JPEG Spectral Selection, Nonhierarchical (Processes 6 & 8)  Retired
-      "1.2.840.10008.1.2.4.53",
-      //  JPEG Spectral Selection, Nonhierarchical (Processes 7 & 9)  Retired
-      "1.2.840.10008.1.2.4.54",
-      //  JPEG Full Progression, Nonhierarchical (Processes 10 & 12)  Retired
-      "1.2.840.10008.1.2.4.55",
-      //  JPEG Full Progression, Nonhierarchical (Processes 11 & 13)  Retired
-      "1.2.840.10008.1.2.4.56",
-      //  JPEG Lossless, Nonhierarchical (Processes 14)  
-      "1.2.840.10008.1.2.4.57",
-      //  JPEG Lossless, Nonhierarchical (Processes 15) Retired
-      "1.2.840.10008.1.2.4.58",
-      //  JPEG Extended, Hierarchical (Processes 16 & 18) Retired
-      "1.2.840.10008.1.2.4.59",
-      //  JPEG Extended, Hierarchical (Processes 17 & 19) Retired
-      "1.2.840.10008.1.2.4.60",
-      //  JPEG Spectral Selection, Hierarchical (Processes 20 & 22) Retired
-      "1.2.840.10008.1.2.4.61",
-      //  JPEG Spectral Selection, Hierarchical (Processes 21 & 23) Retired
-      "1.2.840.10008.1.2.4.62",
-      //  JPEG Full Progression, Hierarchical (Processes 24 & 26) Retired
-      "1.2.840.10008.1.2.4.63",
-      //  JPEG Full Progression, Hierarchical (Processes 25 & 27) Retired
-      "1.2.840.10008.1.2.4.64",
-      //  JPEG Lossless, Nonhierarchical (Process 28) Retired
-      "1.2.840.10008.1.2.4.65",
-      //  JPEG Lossless, Nonhierarchical (Process 29) Retired
-      "1.2.840.10008.1.2.4.66",
-      //  JPEG Lossless, Nonhierarchical, First- Order Prediction (Processes 14 [Selection Value 1]): Default Transfer Syntax for Lossless JPEG Image Compression  
-      "1.2.840.10008.1.2.4.70",
-      //  JPEG-LS Lossless Image Compression   
-      "1.2.840.10008.1.2.4.80",
-      //  JPEG-LS Lossy (Near- Lossless) Image Compression   
-      "1.2.840.10008.1.2.4.81",
-      //  JPEG 2000 Image Compression (Lossless Only)  
-      "1.2.840.10008.1.2.4.90",
-      //  JPEG 2000 Image Compression  
-      "1.2.840.10008.1.2.4.91",
-      //  JPEG 2000 Part 2 Multicomponent Image Compression (Lossless Only)
-      "1.2.840.10008.1.2.4.92",
-      //  JPEG 2000 Part 2 Multicomponent Image Compression  
-      "1.2.840.10008.1.2.4.93",
-       
-      /* Transfer Syntax UID Transfer Syntax name */
-      //  JPIP Referenced  
-      "1.2.840.10008.1.2.4.94",
-      //  JPIP Referenced Deflate  
-      "1.2.840.10008.1.2.4.95",
-      // Lossless   
-      "1.2.840.10008.1.2.5 RLE",
-      // RFC 2557 MIME Encapsulation  
-      "1.2.840.10008.1.2.6.1",
-       
-      /* Transfer Syntax UID Transfer Syntax name */
-      // MPEG2 Main Profile Main Level  
-      "1.2.840.10008.1.2.4.100",
-      // MPEG-4 AVC/H.264 High Profile / Level 4.1  
-      "1.2.840.10008.1.2.4.102",
-      // MPEG-4 AVC/H.264 BD-compatible High Profile / Level 4.1 
-      "1.2.840.10008.1.2.4.103"
-    ]
-  }
-}
 ```
 
-## Pulling changes back from orthanc-webviewer-plugin
-To retrieve changes from original mercurial repo to git fork, uses
-- https://github.com/fingolfin/git-remote-hg
+## Development
 
-### Merging dev into master:
+### Folder structure
 
-until we change the dev workflow :-)
+4 folders are available at the root:
+- backend/ contains the C++ plugin source code (& cmake build process)
+- frontend/ contains the HTML/JavaScript source code (& gulp build process)
+- scripts/ contains building scripts used by the continuous integration.
+- tests/ contains the integration tests.
 
-- after a push in JS[dev], jenkins triggers a gulp build.
-- merge JS[dev] in JS[master] (but it's actually not very useful since JS[master] is not really used)
-- wait jenkins complete the generation of the JS[build-dev] branch ("compiled" JS) 
-- wait jenkins updates C++[dev]/subtrees/osimis-webviewer with JS[build-dev]
-- merge C++[dev] into C++[master] (keep in mind that the C++[master]/subtrees is actually pointing to JS[build-dev]
-<<<<<<< HEAD
-- merge C++[dev] into C++[master] (keep in mind that the C++[master]/subtrees is actually pointing to JS[build-dev]
+### Backend Development Process 
 
-# JS build/
+For manual build instructions of the C++ plugin on Mac OS & Linux, the following commands provides the debug flag and add benchmark logs:
 
-**Generated from Osimis Angular**
+```shell
+$ cd backend/
+$ mkdir build
+$ cd build/
+$ cmake .. -DCMAKE_BUILD_TYPE=Debug -DALLOW_DOWNLOADS=ON -DSTANDALONE_BUILD=ON -DSTATIC_BUILD=ON -DBENCHMARK=1
+$ make -j2
+```
 
->*Opinionated Angular style guide for teams by [@john_papa](//twitter.com/john_papa)*
+You can also have a look at the _scripts/_ folder and the _backend/Resource/BuildInstructions.txt_ file.
 
-## Prerequisites
+The backend will embed the _frontend/build/_ folder or download it if unavailable.
+
+Known issues:
+- make sure the _frontend/build/_ folder is full (_js/app.js_ and _js/lib.js_ files must be available). The command _gulp serve-build_ may corrupt it (see _Frontend Development Process_ section).
+
+### Frontend Development Process
+
+Frontend can either be built or launch in development mode. 
+
+For build instructions, you can use docker. Please refer to _scripts/_ and _frontend/scripts/_ folders. You can also use the manual procedure.
+
+For development instructions, you must use the manual procedure.
+
+Manual procedure requires a few dependencies.
+
+#### Prerequisites
 
 1. Install [Node.js](http://nodejs.org)
  - on OSX use [homebrew](http://brew.sh) `brew install node`
@@ -177,88 +196,68 @@ until we change the dev workflow :-)
 
 3. Install compass
 
-    ```
+```shell
     gem update --system
     gem install compass
-    ```
+```
 
-4. Install Yeoman `npm install -g yo`
+4. Install these NPM packages globally
 
-5. Install these NPM packages globally
-
-    ```
+```shell
     npm install -g bower gulp
-    ```
+```
 
     >Refer to these [instructions on how to not require sudo](https://github.com/sindresorhus/guides/blob/master/npm-global-without-sudo.md)
 
-6. Install tests dependencies
+5. Install tests dependencies
 
-    ```
+```shell
     npm install -g nodemon marked jsonlint jshint eslint jscs phantomjs protractor karma-cli
     webdriver-manager update
-    ```
+```
 
-## Running OsimisAngular
+#### Build instructions
 
-### Running in dev mode
- - Run the project with `gulp serve-dev`
+As an alternative to docker, you can use the following commands to build the frontend.
 
- - opens it in a browser and updates the browser with any files changes.
+```shell
+cd frontend/
+# install npm & bower dependencies
+npm install
+bower install
+# generate build/ folder
+gulp build
+```
 
-### Building the project
- - Build the optimized project using `gulp build`
- - This create the optimized code for the project and puts it in the build folder
+#### Dev instructions
 
-### Running the optimized code
- - Run the optimize project from the build folder with `gulp serve-build`
+It is not required to rebuild the backend to develop the frontend. These commands launch the frontend development server outside of Orthanc.
 
-## Exploring OsimisAngular
-OsimisAngular starter project
+```shell
+cd frontend/
+# install npm & bower dependencies
+npm install
+bower install
+# launch development server 
+gulp serve-dev --nosync --novet
+```
 
-### Installing Packages
-When you generate the project it should run these commands, but if you notice missing packages, run these again:
+The file _frontend/server.js_ provides a proxy to the Orthanc server. You may want to change the defined port/ip. You can also use a CORS enabler plugin (for your browser) and change the Orthanc url in the _frontend/src/config.js_ file. 
 
- - `npm install`
- - `bower install`
+You may need to set the "RemoteAccessAllowed" configuration option to true in your Orthanc config.json file.
 
-## Gulp Tasks
+Known issues:
+- the serve-dev command erases the _build/_ folder content.
+- the server must be restarted to update index.html or plugin-entrypoint.html files.
 
-### Bower Files
+### Testing
 
-- `gulp wiredep`
+See comments for testing instruction in tests/osimis-test-runner/osimis-test-runner.py.
 
-    Looks up all bower components' main files and JavaScript source code, then adds them to the `index.html`.
+The prerequisites are detailled in the _Frontend Development Process_ section. 
 
-    The `.bowerrc` file also runs this as a postinstall task whenever `bower install` is run.
+### Pulling changes back from orthanc-webviewer-plugin
 
-### Serving Development Code
+This repository is a fork of orthanc-webviewer-plugin.
 
-- `gulp serve-dev --nosync --novet`
-
-    Serves the development code without using browsersync, jscs & jslint.
-
-### Building Production Code
-
-- `gulp build`
-
-    Copies all fonts, copies images and runs `gulp optimize` to build the production code to the build folder.
-
-### Serving Production Code
-
-- `gulp serve-build --nosync`
-
-    Serve the optimized code from the build folder and manually launch the browser.
-
-### Bumping Versions
-
-- `gulp bump`
-
-    Bump the minor version using semver.
-    --type=patch // default
-    --type=minor
-    --type=major
-    --type=pre
-    --ver=1.2.3 // specific version
-
-
+To retrieve changes from original mercurial repository, use [git-remote-hg](https://github.com/fingolfin/git-remote-hg)
