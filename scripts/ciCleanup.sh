@@ -10,7 +10,7 @@ source scripts/setBuildVariables.sh
 
 echo "Cleaning up..."
 
-# cleanup osimis/orthanc-webviewer-plugin related images & containers
+# cleanup osimis/orthanc-webviewer-plugin related images
 dockerImage=$(docker images -q $imageName:$releaseCommitId 2> /dev/null)
 if [[ $dockerImage != "" ]]; then
 	docker rmi $imageName:$releaseCommitId
@@ -34,9 +34,9 @@ if [[ "${AWS_DOCKER_CONTAINER_ID}" != "" ]]; then
 	fi
 fi
 
-# remove web app builder if exists
-if [[ "${WEB_APP_BUILDER_CONTAINER_ID}" != "" ]]; then
-	dockerContainer=$(docker ps -a -q --no-trunc | grep ${WEB_APP_BUILDER_CONTAINER_ID} 2> /dev/null)
+# remove webapp builder docker container if exists
+if [[ "${WEBAPP_BUILDER_CONTAINER_ID}" != "" ]]; then
+	dockerContainer=$(docker ps -a -q --no-trunc | grep ${WEBAPP_BUILDER_CONTAINER_ID} 2> /dev/null)
 	if [[ $dockerContainer != "" ]]; then
 		docker rm $dockerContainer
 	fi

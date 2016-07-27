@@ -25,7 +25,7 @@ export releaseCommitId
 WEBAPP_BUILDER_CONTAINER_ID=$(docker create --name webviewer-frontend-builder-$releaseCommitId osimis/frontend-builder $releaseCommitId)
 export WEBAPP_BUILDER_CONTAINER_ID # export the variable to be able to remove the container later in case of error
 
-# copy the frontendToolbox files in the container
+# copy the frontend files in the container
 docker cp $(pwd)/ $WEBAPP_BUILDER_CONTAINER_ID:/
 
 # run
