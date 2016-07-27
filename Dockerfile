@@ -1,6 +1,5 @@
-# Warning:
-# This docker file does not build the frontend but download the latest available one from aws
-# It does build the backend however
+# This docker file build the backend, not the frontend (the frontend build is downloaded to be embedded if not available).
+# The CI generate the frontend build, upload it to aws and then build this dockerfile.
 
 FROM jodogne/orthanc-plugins:1.1.0
 

@@ -22,9 +22,7 @@ See the [release notes](https://bitbucket.org/osimis/osimis-webviewer-plugin/src
 
 ## Installation & Usage
 
-The last stable version is available on the [Osimis website](http://www.osimis.io/en/download.html). We recommend to download the binaries for Windows and Mac OS X & the docker image for Linux.
-
-Other versions (including unstables) are available [as docker images](https://hub.docker.com/r/osimis/orthanc-webviewer-plugin/builds/) as well.
+The latest stable version is available on the [Osimis website](http://www.osimis.io/en/download.html). We recommend to download the binaries for Windows and Mac OS X & the docker image for Linux.
 
 [This article](http://www.osimis.io/en/blog/2016/06/03/deploy-Orthanc-on-a-PC-in-38-seconds.html) details the installation process on Windows.
 
@@ -255,6 +253,8 @@ Known issues:
 See comments for testing instruction in tests/osimis-test-runner/osimis-test-runner.py.
 
 The prerequisites are detailled in the _Frontend Development Process_ section. 
+
+Unstables may be tested directly from [docker images](https://hub.docker.com/r/osimis/orthanc-webviewer-plugin/builds/) as well.
 
 ### Pulling changes back from orthanc-webviewer-plugin
 
