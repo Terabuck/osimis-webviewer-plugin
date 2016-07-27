@@ -1,5 +1,5 @@
-# This docker file build the backend, not the frontend (the frontend build is downloaded to be embedded if not available).
-# The CI generate the frontend build, upload it to aws and then build this dockerfile.
+# This docker file builds the backend, not the frontend (the frontend build is downloaded to be embedded if not available).
+# The CI generates the frontend build, uploads it to aws and then builds this dockerfile.
 
 FROM jodogne/orthanc-plugins:1.1.0
 
