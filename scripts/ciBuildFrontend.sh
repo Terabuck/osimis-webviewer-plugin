@@ -5,6 +5,9 @@ set -x
 # start from the right place
 cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"/
 
+# handle errors
+source scripts/ciErrorHandler.sh
+
 source scripts/setBuildVariables.sh
 
 # build the lib

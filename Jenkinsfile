@@ -21,10 +21,11 @@ node('docker') {
 	}
 
 	docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkinsosimis') {
-
 		stage 'push Docker Image to DockerHub'
-		sh 'scripts/ciPushDockerImage.sh ${BRANCH_NAME} cleanup'
+		sh 'scripts/ciPushDockerImage.sh ${BRANCH_NAME}'
 	}
 
+	stage 'Cleanup'
+	sh 'scripts/ciCleanup.sh ${BRANCH_NAME}'
 }
 
