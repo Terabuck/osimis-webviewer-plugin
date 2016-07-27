@@ -22,10 +22,10 @@ cd frontend/
 export AWS_ACCESS_KEY_ID      # export these 2 environment variables that are defined in Jenkins master config
 export AWS_SECRET_ACCESS_KEY 
 export zipFileToUpload
-awsContainerId=$(docker create -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY anigeo/awscli s3 --region eu-west-1 cp /frontend/$zipFileToUpload.zip s3://orthanc.osimis.io/public/osimisWebViewer/)
+awsContainerId=$(docker create -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY anigeo/awscli s3 --region eu-west-1 cp /tmp/$zipFileToUpload.zip s3://orthanc.osimis.io/public/osimisWebViewer/)
 
 # copy the zip from the host to the AWS container
-docker cp $releaseCommitId.zip $awsContainerId:/frontend/$zipFileToUpload.zip
+docker cp $releaseCommitId.zip $awsContainerId:/tmp/$zipFileToUpload.zip
 
 # upload
 docker start -a $awsContainerId
