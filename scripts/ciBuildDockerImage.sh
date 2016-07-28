@@ -6,15 +6,14 @@
 #                             from a git command.  In a jenkins build context,
 #                             the branch name is not available through git so it must be
 #                             passed as an argument)
-set -e
-set -x
 
-#start from the right place
+# start from the right place
 cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"/
+
+# handle errors
+source scripts/ciErrorHandler.sh
 
 source scripts/setBuildVariables.sh
 
-imageName='osimis/orthanc-webviewer-plugin'
-
-#build the image
+# build the image
 docker build -t $imageName:$releaseCommitId .
