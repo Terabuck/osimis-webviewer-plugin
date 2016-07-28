@@ -14,11 +14,11 @@ Usage:
 	python osimis-test-runner.py [--auto-watch|-w] [--orthanc-path=|-p=]
 
 Example:
-	python osimis-test-runner.py -w -p ../../backend/Build/
+	python osimis-test-runner.py -w -p ../../backend/build/
 
 Capture Orthanc (lldb + output):
 	# retrieve orthanc pid
-	export ORT_PID=`ps aux | grep Orthanc | awk '{ if ($11 ~ /Build[^\/]*\/Orthanc$/) print $2}'` 
+	export ORT_PID=`ps aux | grep Orthanc | awk '{ if ($11 ~ /build[^\/]*\/Orthanc$/) print $2}'` 
 	# attach lldb
 	lldb -p $ORT_PID
 	proc handle SIGPIPE -s FALSE
