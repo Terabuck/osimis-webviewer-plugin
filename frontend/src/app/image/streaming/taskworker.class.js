@@ -1,6 +1,12 @@
 (function(module) {
     'use strict';
 
+    // Fix IE issue with window.location.origin
+    // see http://tosbourn.com/a-fix-for-window-location-origin-in-internet-explorer/
+    if (!window.location.origin) {
+        window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
+    }
+
     function TaskWorker(script) {
         var _this = this;
 
@@ -9,7 +15,7 @@
         // Send the current directory absolute path to allow file import
         this._workerThread.postMessage({
             type: 'setRootUrl',
-            url: window.location.origin + window.location.pathname.replace(/[\\\/][^\\\/]*$/, '')
+            url: window.location.origin + window.location.pathname.replace(/[\\\/][^\\\/]*$/, '') // remove current file from url (only keep the directory)
         });
 
         this._currentTask = null;
