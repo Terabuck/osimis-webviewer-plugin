@@ -32,15 +32,8 @@ var window = {};
 var PNG = window.PNG;
 var KLVReader = WorkerGlobalScope.KLVReader;
 
-// dirty FIX PhantomJS for unit tests
-if (!location || !location.origin) {
-    self.location = {
-        origin: 'http://localhost:9876'
-    };
-}
-
 var ImageApiURL = undefined;
-function setImageApiUrl(rootUrl) {
+function setImageApiUrl(rootUrl) { // rootUrl is the full directory path to the current page (including host)
     // Import config.js for window.orthancUrl
     // @todo configure via wvConfigProvider.setApiURL instead
     importScripts(rootUrl + '/config.js');
@@ -54,7 +47,12 @@ function setImageApiUrl(rootUrl) {
 
     // Prefix path with http://server:port (to wrong protocole issue due to blob url resolving to blob://server:port)
     if (orthancUrl.indexOf('://') === -1) {
-        orthancUrl = location.origin + orthancUrl;
+        // Since Safari has a bug, retrieve the origin from rootUrl instead of using location.origin.
+        var regex = /^([^:]*:\/\/)([^\/]*)/; // <1: protocol> (eg. https://) + <2: ip[:port]> (eg. orthanc.vivalife.be:3123)
+        var result = rootUrl.match(regex);
+        var locationOrigin = result[1] + result[2];
+
+        orthancUrl = locationOrigin + orthancUrl;
     }
 
     // Remove trailing slash
@@ -81,6 +79,7 @@ self.addEventListener('message', function(evt) {
     switch(type) {
     case 'setRootUrl':
         // Configure the ImageApiURl
+        // rootUrl must contain the protocol, host and IP.
         var rootUrl = evt.data.url;
 
         setImageApiUrl(rootUrl);
