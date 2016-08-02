@@ -6,7 +6,7 @@
         .factory('wvOrthancSeriesAdapter', wvOrthancSeriesAdapter);
 
     /* @ngInject */
-    function wvOrthancSeriesAdapter(WvSeries, WvImageQualities) {
+    function wvOrthancSeriesAdapter(_, WvSeries, WvImageQualities) {
         var service = {
             process: process
         };
