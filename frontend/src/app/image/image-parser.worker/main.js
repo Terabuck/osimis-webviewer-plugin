@@ -5,6 +5,14 @@
  * Can only process one request at a time.
  * User has to wait request end (or abort it using a command) to send a new one, otherwise it'll bug.
  *
+ * As this is a web worker, we must share any information through messages
+ * Therefore, 3 commands can be send from main thread (see the self.addEventListener call):
+ * - setOrthancUrl — Configure the Orthanc API Url
+ * - getBinary — Get an image binary
+ * - abort - Cancel a request
+ *
+ * Imported scripts must be inlined to avoid path loading issues when used as a library
+ *
  */
 
 'use strict';
@@ -32,6 +40,11 @@ var window = {};
 var PNG = window.PNG;
 var KLVReader = WorkerGlobalScope.KLVReader;
 
+/** setImageApiUrl(locationDirUrl, orthancApiUrl)
+ *
+ * Configure the Orthanc API Url
+ *
+ **/
 var ImageApiURL = undefined;
 function setImageApiUrl(locationDirUrl, orthancApiUrl) { // locationDirUrl is the full directory path to the current page (including host)
     // Check the path is absolute
@@ -68,6 +81,7 @@ var Qualities = {
     MEDIUM: 2 // resampling to 1000 px + compressed to jpeg100
 };
 
+/** Register commands from main thread **/
 self.addEventListener('message', function(evt) {
     var type = evt.data.type;
 
@@ -111,6 +125,7 @@ function abortCommand() {
     _processingRequest.abort();
 }
 
+/** Get & Decompress Image from Orthanc **/
 function getCommand(id, quality) {
     if (_processingRequest) {
         throw new Error('Another request is already in process within worker thread.');
@@ -131,6 +146,7 @@ function BinaryRequest(id, quality) {
     var frameIndex = splittedId[1] || 0;
     
     var url = null;
+    // Select the orthanc request url based on the desired image quality
     switch (quality) {
     case Qualities.PIXELDATA:
         url = ImageApiURL + instanceId + '/' + frameIndex + '/pixeldata-quality';
@@ -158,6 +174,7 @@ BinaryRequest.prototype.execute = function() {
     var xhr = this.xhr;
     var quality = this.quality;
 
+    // Process request on load (decompress the image)
     xhr.onreadystatechange = function() {
         // Only check finished requests
         if (xhr.readyState !== XMLHttpRequest.DONE) {
@@ -230,6 +247,7 @@ BinaryRequest.prototype.execute = function() {
         _processingRequest = null;
     };
 
+    // Trigger request
     xhr.send(); // async call
 };
 
