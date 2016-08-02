@@ -33,35 +33,30 @@ var PNG = window.PNG;
 var KLVReader = WorkerGlobalScope.KLVReader;
 
 var ImageApiURL = undefined;
-function setImageApiUrl(rootUrl) { // rootUrl is the full directory path to the current page (including host)
-    // Import config.js for window.orthancUrl
-    // @todo configure via wvConfigProvider.setApiURL instead
-    importScripts(rootUrl + '/config.js');
-    var orthancUrl = window.orthancUrl;
-    
+function setImageApiUrl(locationDirUrl, orthancApiUrl) { // locationDirUrl is the full directory path to the current page (including host)
     // Check the path is absolute
     // (because workers are built to blob strings, their' location is not relative to the js main thread one.)
-    if (orthancUrl.indexOf('://') === -1 && orthancUrl.indexOf('/') !== 0) {
+    if (orthancApiUrl.indexOf('://') === -1 && orthancApiUrl.indexOf('/') !== 0) {
         throw new Error('config.js should have absolute path');
     }
 
     // Prefix path with http://server:port (to wrong protocole issue due to blob url resolving to blob://server:port)
-    if (orthancUrl.indexOf('://') === -1) {
-        // Since Safari has a bug, retrieve the origin from rootUrl instead of using location.origin.
+    if (orthancApiUrl.indexOf('://') === -1) {
+        // Since Safari has a bug, retrieve the origin from locationDirUrl instead of using location.origin.
         var regex = /^([^:]*:\/\/)([^\/]*)/; // <1: protocol> (eg. https://) + <2: ip[:port]> (eg. orthanc.vivalife.be:3123)
-        var result = rootUrl.match(regex);
+        var result = locationDirUrl.match(regex);
         var locationOrigin = result[1] + result[2];
 
-        orthancUrl = locationOrigin + orthancUrl;
+        orthancApiUrl = locationOrigin + orthancApiUrl;
     }
 
     // Remove trailing slash
-    if (orthancUrl.lastIndexOf('/') === orthancUrl.length - 1) {
-        orthancUrl = orthancUrl.slice(0, -1);
+    if (orthancApiUrl.lastIndexOf('/') === orthancApiUrl.length - 1) {
+        orthancApiUrl = orthancApiUrl.slice(0, -1);
     }
 
     // Set the route
-    ImageApiURL = orthancUrl + '/osimis-viewer/images/';
+    ImageApiURL = orthancApiUrl + '/osimis-viewer/images/';
 }
 
 // @todo out..
@@ -77,12 +72,13 @@ self.addEventListener('message', function(evt) {
     var type = evt.data.type;
 
     switch(type) {
-    case 'setRootUrl':
+    case 'setOrthancUrl':
         // Configure the ImageApiURl
-        // rootUrl must contain the protocol, host and IP.
-        var rootUrl = evt.data.url;
+        // locationDirUrl must contain the protocol, host and IP & directory to current folder.
+        var locationDirUrl = evt.data.locationDirUrl;
+        var orthancApiUrl = evt.data.orthancApiUrl;
 
-        setImageApiUrl(rootUrl);
+        setImageApiUrl(locationDirUrl, orthancApiUrl);
         break;
     case 'getBinary':
         // Get an image binary

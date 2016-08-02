@@ -14,8 +14,9 @@
 
         // Send the current directory absolute path to allow file import
         this._workerThread.postMessage({
-            type: 'setRootUrl',
-            url: window.location.origin + window.location.pathname.replace(/[\\\/][^\\\/]*$/, '') // remove current file from url (only keep the directory)
+            type: 'setOrthancUrl',
+            locationDirUrl: window.location.origin + window.location.pathname.replace(/[\\\/][^\\\/]*$/, ''), // remove current file from url (only keep the directory)
+            orthancApiUrl: window.orthancUrl // @todo use wvConfig.orthancApiUrl instead - (we need to figure out a way to inject wvConfig in non angular code)
         });
 
         this._currentTask = null;
