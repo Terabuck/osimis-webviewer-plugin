@@ -1,15 +1,52 @@
+/**
+ * @ngdoc
+ * @name wvSeriesId
+ *
+ * @description
+ * The `wvSeriesId` directive is an extension of the `wvViewport` directive.
+ * It sets and updates the images displayed on the viewport, based on the one available in the series.
+ * The relative series model can be retrieved via attribute and therefore be controlled externaly.
+ * 
+ * This directive is also meant to be extended the same way `wvViewport` is.
+ * Have a look at the _series-plugins/_ folder for an exhaustive list of series-related features.
+ *
+ * @restrict A
+ *
+ * @require wvViewport
+ *
+ * @param {series_id} wvSeriesId (optional) The id of the displayed series.
+ *   It can also be set using inter-directive communication, therefore this attribute is optional and may
+ *   be changed by the directive itself.
+ *   series_id = <orthanc-series-id>:<instance-index> where instance-index = n ⊂ [0; Infinity]
+ *   In case of multiframe instances, multiple orthanc series can relates to multiple viewport
+ *   series_id (one multiframe instance is converted into one web viewer series).
+ *
+ * @param {series_model} wvSeries (optional, readonly) Share the series model instance.
+ *   The series-id directive handles the series model loading. Therefore, it also provide access to it.
+ *   This is done through this attribute, which should only be used to retrieve the model, not to set it.
+ *
+ * @param {callback} wvOnSeriesChange (optional, callback) Triggered when the series has changed
+ *   Available Callback Arguments:
+ *   * `$series` - series_model
+ *
+ * @example Display a specific series with some informations and a play button
+ * ```html
+ * <wv-viewport wv-series-id="'your-series-id'" wv-series="$series" wv-size="{width: '100px', height: '100px'}"
+ *              wv-image-id="imageId" wv-image="$image" wv-lossless="true"
+ * ></wv-viewport>
+ * <p>{{imageId}}: {{$image.tags.PatientName}}</p>
+ * <button ng-click="$series.play()">Play the series!</button>
+ * ```
+ * The imageId is defined by the wvSeriesId directive. However,
+ * you can still use wv-image-id to retrieve the imageId, and you can
+ * still access the image model via the wv-image attribute.
+ **/
 (function() {
     'use strict';
 
     angular
         .module('webviewer')
         .directive('vpSeriesId', vpSeriesId);
-
-    /** <wv-viewport wv-series-id="some_series_id"></wv-viewport>
-     * attributes:
-     * - vp:series="$series"
-     * - vp:on-series-change="youFunction($series)"
-     */
 
     /* @ngInject */
     function vpSeriesId($parse) {
