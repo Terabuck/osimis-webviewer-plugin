@@ -82,6 +82,17 @@ Orthanc is configurable via a [JSON file](https://orthanc.chu.ulg.ac.be/book/use
   // to "true" only in the case of high HTTP loads.
   "KeepAlive" : false,
 
+  "Plugins" : [
+    // Uncomment one of the following lines according to your platform.  
+    // Update the path to the DLL on your system.  The path is relative to the working folder
+    // Orthanc will start from.  If you are unsure what the working folder is,
+    // use and absolute path
+    
+    // "C:\\Program Files (x86)\\Orthanc\\Orthanc Server 1.1.0\\OsimisWebViewer.dll" // for Windows 
+    // "libOsimisWebViewer.so" // for Linux
+    // "libOsimisWebViewer.dylib" // for OSX
+  ],
+
   /**
    * Osimis WebViewer Configuration
    **/
