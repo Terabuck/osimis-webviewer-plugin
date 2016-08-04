@@ -22,7 +22,7 @@ SeriesController::SeriesController(OrthancPluginRestOutput* response, const std:
 }
 
 OrthancPluginErrorCode SeriesController::_ParseURLPostFix(const std::string& urlPostfix) {
-  // <series_uid>
+  // /osimis-viewer/series/<series_uid>
   boost::regex regexp("^([^/]+)$");
 
   // Parse URL
