@@ -272,3 +272,16 @@ Unstables may be tested directly from [docker images](https://hub.docker.com/r/o
 This repository is a fork of orthanc-webviewer-plugin.
 
 To retrieve changes from original mercurial repository, use [git-remote-hg](https://github.com/fingolfin/git-remote-hg)
+
+
+### Releasing (Osimis internal procedure)
+
+- merge all your changes in the dev branch
+- docker build will trigger automatically (:dev tag).  Win/OSX builds will trigger during the night.  You may trigger them by hand on Jenkins 1.  The OrthancMainline builds contain the OsimisWebViewer dev branch.  Note that the Win/OSX build slaves are very unstable, you might need to restart the builds ...
+- perform a smoke test of each version
+- if everything is fine, merge dev into master.  Make sur to merge the commit you have validated (someone might have merged another feature since you started your validation)
+- update the release notes in master (review all feature branch merges since the last merge from dev into master)
+- commit
+- create a new tag with 'git tag -a 0.4.1 -m "0.4.1"'
+- push
+- docker build will trigger automatically (:latest & :0.4.1 tags).  Win/OSX builds will trigger during the night.  You may trigger them by hand on Jenkins 1.  The OrthancStable builds contain the OsimisWebViewer master branch.
