@@ -10,7 +10,7 @@ angular.module('webviewer')
 .directive('wvSerieslist', ['wvSeriesManager', function(wvSeriesManager) {
 return {
   scope: {
-    wvStudy: '=',
+    wvStudyId: '=',
     wvClassTmp: '=?wvClass'
   },
   templateUrl: 'app/serieslist/serieslist.directive.html',
@@ -23,7 +23,7 @@ return {
       _setDefaultCssClasses();
     });
 
-    scope.$watch('wvStudy.id', _setStudy);
+    scope.$watch('wvStudyId', _setStudy);
     scope.seriesIds = []; // @todo allow user defined specific set
 
     function _setStudy(id, old) {
