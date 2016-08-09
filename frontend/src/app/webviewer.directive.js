@@ -136,6 +136,17 @@
                     $rootScope.$emit('UserSelectedStudyId', newStudyId);
                 }
             });
+
+            // Configure viewports by index
+            vm.viewports = [];
+            vm.configureViewport = function(index) {
+                vm.viewports[index] = {
+                    seriesId: vm.seriesId
+                };
+            };
+            vm.cleanupViewport = function(index) {
+                vm.viewports[index] = undefined; // don't use splice since it changes the indexes from the array
+            };
         }
     }
 
