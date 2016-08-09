@@ -1,14 +1,14 @@
 <div class="wv-splitpane">
     <div 
         ng-repeat="$y in y | range track by $index"
-      class="wv-splitpane-row" ng-style="{height: rowHeight}"
+        class="wv-splitpane-row" ng-style="{height: rowHeight}"
     >
         <div
             ng-repeat="$x in x | range track by $index"
-          class="wv-splitpane-cell" ng-style="{width: rowWidth}"
-          wv-size-tag
+            class="wv-splitpane-cell" ng-style="{width: rowWidth}"
+            wv-size-tag ng-transclude="panePolicy"
         >  
-         <ng-transclude ng-transclude-slot="panePolicy"></ng-transclude>
+            <ng-transclude ng-transclude-slot="panePolicy"></ng-transclude>
       </div>
     </div>
 </div>
