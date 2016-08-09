@@ -1,11 +1,11 @@
 <div class="wv-splitpane">
     <div 
-        ng-repeat="$y in y | range track by $index"
-        class="wv-splitpane-row" ng-style="{height: rowHeight}"
+        ng-repeat="$y in [vm.layout.y] | range track by $index"
+        class="wv-splitpane-row" ng-style="{height: vm.rowHeight}"
     >
         <div
-            ng-repeat="$x in x | range track by $index"
-            class="wv-splitpane-cell" ng-style="{width: rowWidth}"
+            ng-repeat="$x in [vm.layout.x] | range track by $index"
+            class="wv-splitpane-cell" ng-style="{width: vm.rowWidth}"
         >  
             <ng-transclude ng-transclude-slot="panePolicy"></ng-transclude>
       </div>
