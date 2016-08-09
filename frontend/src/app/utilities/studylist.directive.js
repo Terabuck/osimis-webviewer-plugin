@@ -45,15 +45,6 @@ angular.module('webviewer')
                 });
              });
         });
-
-        scope.$watch('wvSelectedStudy', function(newStudy, oldStudy) {
-            if (oldStudy && oldStudy.id && newStudy !== oldStudy) {
-                $rootScope.$emit('UserUnSelectedStudyId', oldStudy.id);
-            }
-            if (newStudy && newStudy.id) {
-                $rootScope.$emit('UserSelectedStudyId', newStudy.id);
-            }
-        });
       }
     };
   });

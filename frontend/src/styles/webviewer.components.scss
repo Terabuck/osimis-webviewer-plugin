@@ -10,16 +10,41 @@ wv-viewport { // make sure the element is sized when using with drag & drop
 wv-toolbar {
   display: block;
 }
-wv-toolbar ~ wv-splitpane,
-wv-toolbar ~ wv-series-viewport,
-wv-toolbar ~ .after-toolbar {
-  display: block;
-  height: calc(100% - 40px);
-  //margin-top: -5px;
-}
 
 .wv-draggable-clone {
   width: 150px;
   height: 150px;
   background-color: rgba(255,255,255,0.25);
+}
+
+wv-webviewer, .wv-webviewer-container {
+  height: 100%;
+  overflow: hidden;
+}
+.wv-webviewer-menu {
+  float: left;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+  text-align: center;
+  width: 200px;
+}
+
+.wv-webviewer-main {
+  float: left;
+  height: 100%;
+  width: 100%;
+
+  .wv-webviewer-menu + & {
+    // Let a bit of space left if the menu is also displayed
+    width: calc(100% - 200px);
+  }
+}
+
+.wv-webviewer-content {
+  height: 100%;
+  // Let a bit of space left when the toolbar is displayed
+  wv-toolbar + & {
+    height: calc(100% - 40px);
+  }
 }

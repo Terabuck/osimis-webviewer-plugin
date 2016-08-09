@@ -22,16 +22,7 @@
     <!-- endbuild -->
 </head>
 <body class="wv-body">
-    <div ng-controller="MultiViewportDemo" class="wv-container">
-        <div class="wv-menu">
-            <wv-studylist wv-selected-study="study"></wv-studylist>
-            <wv-serieslist wv-study="study"></wv-serieslist>
-        </div>
-        <div class="wv-main">
-            <wv-toolbar wv-items="toolbar"></wv-toolbar>
-            <wv-splitpane wv-layout="toolbar.layout" wv-settings="toolbar"></wv-splitpane>
-        </div>
-    </div>
+    <wv-webviewer></wv-webviewer>
 
     <!-- build:js js/lib.js -->
     <!-- bower:js -->
@@ -52,12 +43,6 @@
         angular.module('webviewer')
         .config(function (wvConfigProvider) {
             wvConfigProvider.setApiURL(window.orthancUrl || '/');
-        })
-        .controller('MultiViewportDemo', function($scope) {
-            $scope.toolbar = {};
-            $scope.study = {
-                id: undefined
-            }
         });
     </script>
 </body>
