@@ -22,6 +22,7 @@
         <div class="wv-webviewer-content">
             <wv-splitpane wv-layout="vm.tools.layout">
                 <wv-pane-policy
+                    wv-size-tag
                     wv-pane-index="$index" wv-pane-position="$position"
                     wv-on-pane-added="vm.configureViewport($index)" wv-on-pane-removed="vm.cleanupViewport($index)"
                 >
