@@ -51,7 +51,7 @@
                         // Trigger old series removed UX global event
                         var oldSeries = viewmodel.getSeries();
                         if (oldSeries) {
-                            $rootScope.$emit('UserUnSelectedSeries', oldSeries);
+                            $rootScope.$emit('UserUnSelectedSeriesId', oldSeries.id);
                         }
 
                         // Set new series
@@ -60,7 +60,7 @@
                             .then(function(newSeries) {
                                 // Trigger new series UX global event
                                 if (newSeries) {
-                                    $rootScope.$emit('UserSelectedSeries', newSeries);
+                                    $rootScope.$emit('UserSelectedSeriesId', seriesId);
                                 }
                             });
                     });

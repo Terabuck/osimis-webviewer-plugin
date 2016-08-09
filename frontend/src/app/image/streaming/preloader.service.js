@@ -50,69 +50,77 @@
             });
 
             // Preload series' when user has selected a series (dropped in a viewport)
-            $rootScope.$on('UserSelectedSeries', function(evt, series) {
-                // Preload every series' tags
-                for (var i=0; i<series.imageIds.length; ++i) {
-                    var imageId = series.imageIds[i];
+            $rootScope.$on('UserSelectedSeriesId', function(evt, seriesId) {
+                wvSeriesManager
+                    .get(seriesId)
+                    .then(function(series) {
+                        // Preload every series' tags
+                        for (var i=0; i<series.imageIds.length; ++i) {
+                            var imageId = series.imageIds[i];
 
-                    wvImageManager.get(imageId);
-                }
+                            wvImageManager.get(imageId);
+                        }
 
-                // Select the lowest quality available
-                var quality = Math.min.apply(Math, _.toArray(series.availableQualities));
-                // Preload every series' thumbnails
-                for (var i=0; i<series.imageIds.length; ++i) {
-                    var imageId = series.imageIds[i];
+                        // Select the lowest quality available
+                        var quality = Math.min.apply(Math, _.toArray(series.availableQualities));
+                        // Preload every series' thumbnails
+                        for (var i=0; i<series.imageIds.length; ++i) {
+                            var imageId = series.imageIds[i];
 
-                    wvImageBinaryManager.requestLoading(imageId, quality, 1);
-                }
+                            wvImageBinaryManager.requestLoading(imageId, quality, 1);
+                        }
 
-                // Preload whole 1000x1000 studies images
-                quality = WvImageQualities.MEDIUM;
-                if (series.hasQuality(quality)) {
-                    for (var i=0; i<series.imageIds.length; ++i) {
-                        var imageId = series.imageIds[i];
+                        // Preload whole 1000x1000 studies images
+                        quality = WvImageQualities.MEDIUM;
+                        if (series.hasQuality(quality)) {
+                            for (var i=0; i<series.imageIds.length; ++i) {
+                                var imageId = series.imageIds[i];
 
-                        wvImageBinaryManager.requestLoading(imageId, quality, 1);
-                    }
-                }
+                                wvImageBinaryManager.requestLoading(imageId, quality, 1);
+                            }
+                        }
 
-                // Preload lossless studies images
-                quality = Math.max.apply(Math, _.toArray(series.availableQualities));
-                for (var i=0; i<series.imageIds.length; ++i) {
-                    var imageId = series.imageIds[i];
+                        // Preload lossless studies images
+                        quality = Math.max.apply(Math, _.toArray(series.availableQualities));
+                        for (var i=0; i<series.imageIds.length; ++i) {
+                            var imageId = series.imageIds[i];
 
-                    wvImageBinaryManager.requestLoading(imageId, quality, 1);
-                }
+                            wvImageBinaryManager.requestLoading(imageId, quality, 1);
+                        }
+                    });
             });
 
             // Stop preloading when user has changed selected series (dropped in a viewport)
-            $rootScope.$on('UserUnSelectedSeries', function(evt, series) {
-                // Abort every series' thumbnails preloading
-                var quality = Math.min.apply(Math, _.toArray(series.availableQualities));
-                for (var i=0; i<series.imageIds.length; ++i) {
-                    var imageId = series.imageIds[i];
+            $rootScope.$on('UserUnSelectedSeriesId', function(evt, seriesId) {
+                wvSeriesManager
+                    .get(seriesId)
+                    .then(function(series) {
+                        // Abort every series' thumbnails preloading
+                        var quality = Math.min.apply(Math, _.toArray(series.availableQualities));
+                        for (var i=0; i<series.imageIds.length; ++i) {
+                            var imageId = series.imageIds[i];
 
-                    wvImageBinaryManager.abortLoading(imageId, quality, 1);
-                }
+                            wvImageBinaryManager.abortLoading(imageId, quality, 1);
+                        }
 
-                // Abort 1000x1000 studies images preloading
-                quality = WvImageQualities.MEDIUM;
-                if (series.hasQuality(quality)) {
-                    for (var i=0; i<series.imageIds.length; ++i) {
-                        var imageId = series.imageIds[i];
+                        // Abort 1000x1000 studies images preloading
+                        quality = WvImageQualities.MEDIUM;
+                        if (series.hasQuality(quality)) {
+                            for (var i=0; i<series.imageIds.length; ++i) {
+                                var imageId = series.imageIds[i];
 
-                        wvImageBinaryManager.abortLoading(imageId, quality, 1);
-                    }
-                }
+                                wvImageBinaryManager.abortLoading(imageId, quality, 1);
+                            }
+                        }
 
-                // Abort lossless studies images preloading
-                quality = Math.max.apply(Math, _.toArray(series.availableQualities));
-                for (var i=0; i<series.imageIds.length; ++i) {
-                    var imageId = series.imageIds[i];
+                        // Abort lossless studies images preloading
+                        quality = Math.max.apply(Math, _.toArray(series.availableQualities));
+                        for (var i=0; i<series.imageIds.length; ++i) {
+                            var imageId = series.imageIds[i];
 
-                    wvImageBinaryManager.abortLoading(imageId, quality, 1);
-                }
+                            wvImageBinaryManager.abortLoading(imageId, quality, 1);
+                        }
+                    });
             });
 
 
