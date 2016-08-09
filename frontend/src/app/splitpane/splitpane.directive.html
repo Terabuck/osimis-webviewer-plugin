@@ -8,31 +8,7 @@
           class="wv-splitpane-cell" ng-style="{width: rowWidth}"
           wv-size-tag
         >  
-         <ng-transclude></ng-transclude>
-         <div ng-if="showDefaultContent">
-             <wv-viewport wv-series-id="randomSeriesId" wv-size="{width: '[wv-size-tag]', height:'[wv-size-tag]'}" wv-lossless="true"
-                 wv-droppable-series-ext
-                 wv-scroll-on-wheel-series-ext
-                 wv-enable-overlay="!wvSettings || wvSettings.hasOwnProperty('overlay') == false || wvSettings.overlay"
-
-                 wv-default-viewport-tool="wvSettings.windowing"
-                 wv-angle-measure-viewport-tool="wvSettings.anglemeasure"
-                 wv-length-measure-viewport-tool="wvSettings.lengthmeasure"
-                 wv-elliptical-roi-viewport-tool="wvSettings.ellipticalroi"
-                 wv-zoom-viewport-tool="wvSettings.zoom"
-                 wv-pan-viewport-tool="wvSettings.pan"
-                 wv-pixel-probe-viewport-tool="wvSettings.pixelprobe"
-                 wv-rectangle-roi-viewport-tool="wvSettings.rectangleroi"
-                 
-                 wv-invert-contrast-viewport-tool="wvSettings.invert"
-                 wv-play-series-ext="wvSettings.play"
-
-                 wv-rotateright-viewport-tool="wvSettings.rotateright"
-                 wv-rotateleft-viewport-tool="wvSettings.rotateleft"
-                 wv-vflip-viewport-tool="wvSettings.vflip"
-                 wv-hflip-viewport-tool="wvSettings.hflip"
-             ></wv-viewport>
-         </div>
+         <ng-transclude ng-transclude-slot="panePolicy"></ng-transclude>
       </div>
     </div>
 </div>
