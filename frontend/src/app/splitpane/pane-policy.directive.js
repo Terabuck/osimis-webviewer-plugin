@@ -30,14 +30,6 @@
         function link(scope, element, attrs) {
             var vm = scope.vm;
             
-            // Avoid strange AngularJS dual initialisation (may be due
-            // to the use of transcluded slot of the same name of this
-            // directive)
-            if (element.parent().prop('tagName') === 'NG-TRANSCLUDE') {
-                scope.$destroy();
-                return;
-            }
-            
             // Retrieve the splitpane ng-repeat context scope to access the position of the pane within the splitpane
             //
             // Using $parent is the simplest way to retrieve the ng-repeat context scope from wvSplitpane
