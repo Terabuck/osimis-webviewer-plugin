@@ -37,7 +37,7 @@ angular.module('webviewer')
         scope.studies.forEach(function(v) {
             var studyId = v.value;
             $http
-                .get(wvConfig.orthancApiURL + '/studies/'+studyId, {cache: true})
+                .get(wvConfig.orthancApiURL + '/studies/' + studyId, {cache: true})
                 .then(function(response) {
                     var study = response.data;
                     v.label = study.MainDicomTags.StudyDescription;

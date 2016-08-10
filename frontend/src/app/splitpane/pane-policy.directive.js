@@ -112,7 +112,7 @@
             // The other way arounds to avoid using $parent are:
             // 1. make wvPanePolicy act as ng-repeat and share the desired context scope to
             //    wvSplitpane through inter-directive communication using `require`.
-            // 2. override the standad Transclusion scope behavior using a transclusion function in wvSplitpane
+            // 2. override the standard transclusion scope behavior using a transclusion function in wvSplitpane
             //    and don't use an isolate scope for the wvPanePolicy directive.
             var contextScope = scope.$parent.$parent;
             

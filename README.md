@@ -292,7 +292,7 @@ The plugin propose severals GET HTTP routes.
 
 These routes are considered unstable and may change often between MAJOR versions.
 
-- Retrieve an image (embedded in KLV format, see source code for detailed format informations).
+- Retrieve an image (embedded in KLV format, see source code for detailed format informations - use 0 for monoframe instances).
 
 ```
 /osimis-viewer/images/<instance_uid:str>/<frame_index:int>/{low|medium|high|pixeldata}-quality
