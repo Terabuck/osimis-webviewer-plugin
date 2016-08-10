@@ -1,0 +1,38 @@
+<div class="wv-timeline-controls">
+    <!--  @todo add tooltips -->
+
+    <!-- Previous Button -->
+    <span 
+        ng-if="vm.series.imageCount > 1"
+        title="Previous" 
+        osi-tooltip data-placement="top"
+        ng-click="vm.series.goToPreviousImage()"
+        class="wv-timeline-controls-button"
+    ><span class="fa fa-step-backward" class="wv-timeline-controls-vertical-sizing"></span></span>
+
+    <!-- Input Field -->
+    <span class="wv-timeline-controls-vertical-sizing">
+        <input class="wv-timeline-controls-input"
+            type="number" min="1" step="1" max="{{ vm.series.imageCount }}"
+            ng-model="vm.shownIndex" ng-model-options="{ debounce: 500, getterSetter: true }"
+        > of {{ vm.series.imageCount }}
+    </span>
+
+    <!-- Next Button -->
+    <label 
+        ng-if="vm.series.imageCount > 1"
+        osi-tooltip data-placement="top"
+        ng-click="vm.series.goToNextImage()"
+        class="wv-timeline-controls-button"
+    >
+        <span class="fa fa-step-forward" class="wv-timeline-controls-vertical-sizing"></span>
+    </label>
+
+    <!-- Play Button -->
+    <div
+        ng-if="vm.series.imageCount > 1"
+        class="wv-timeline-controls-play-button-wrapper"
+    >
+        <wv-play-button wv-series="vm.series"></wv-play-button>
+    </div>
+</div>

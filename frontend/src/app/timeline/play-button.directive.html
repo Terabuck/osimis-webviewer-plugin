@@ -1,0 +1,32 @@
+<span class="wv-play-button">
+    <!-- Play/Pause button -->
+    <label
+        title="Play" 
+        osi-tooltip data-placement="top"
+        ng-click="vm.series.play()"
+        ng-show="!vm.series.isPlaying"
+        class="wv-timeline-controls-button"
+    >
+        <span class="fa fa-play" class="wv-timeline-controls-vertical-sizing"></span>
+    </label>
+    <label
+        title="Paused" 
+        osi-tooltip data-placement="top"
+        ng-click="vm.series.pause()"
+        ng-show="vm.series.isPlaying"
+        class="wv-timeline-controls-button"
+    >
+        <span class="fa fa-pause" class="wv-timeline-controls-vertical-sizing"></span>
+    </label>
+    
+    <!--  Configuration options -->
+    <div class="wv-play-button-config-position-handler"> <!-- This is a 0x0 div to set the position -->
+        <div class="wv-play-button-config">
+            <label>
+                Frame rate<br/>
+                <input type="range" min="1" max="60" ng-model="vm.series.frameRate" />
+                {{vm.series.frameRate}} fps
+            </label>
+        </div>
+    </div>
+</span>

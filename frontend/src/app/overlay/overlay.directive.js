@@ -57,7 +57,7 @@
 
                 ctrls.series.onSeriesChanged(_this, function(series) {
                     scope.vm.wvSeries = series;
-                    scope.vm.showTimeline = scope.vm.wvShowTimeline && !!series.imageCount;
+                    scope.vm.showTimeline = scope.vm.wvShowTimeline && series && series.imageCount > 1;
                 });
                 scope.$on('$destroy', function() {
                     ctrls.series.onSeriesChanged.close(_this);

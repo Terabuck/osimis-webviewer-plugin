@@ -1,3 +1,8 @@
-<div style="height: 15px;">
-    <wv-loading-bar wv-series="vm.series"></wv-loading-bar>
+<div class="wv-timeline" ng-if="!!vm.series">
+    <div class="wv-timeline-controls-wrapper">
+        <wv-timeline-controls wv-series="vm.series"></wv-timeline-controls>
+    </div>
+    <div class="wv-timeline-loading-bar-wrapper">
+        <wv-loading-bar wv-series="vm.series"></wv-loading-bar>
+    </div>
 </div>

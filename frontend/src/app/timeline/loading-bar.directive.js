@@ -1,3 +1,8 @@
+/**
+ *
+ * @compatibility don't use html <base> tag, cf. http://www.chriskrycho.com/2015/html5-location-base-and-svg.html#fn1
+ *
+ */ 
 (function() {
     'use strict';
 
@@ -35,7 +40,7 @@
     function Controller($scope, wvImageBinaryManager, WvImageQualities) {
         var _this = this;
 
-        // [<image index>: [<image quality: int>,...] , ...] - image-index != image-id
+        // [<image index>: [<image quality: int>, ...], ...] - image-index != image-id
         this.imageQualities = [];
         // [<image index>: <image quality: int> , ...] - image-index != image-id
         this.bestQualityByImage = [];
