@@ -1,4 +1,25 @@
-(function() {
+/**
+ * @ngdoc directive
+ * @name wvTimelineControls
+ *
+ * @description
+ * The `wvTimelineControls` directive displays the following four controls:
+ *   * The previous and next buttons allow the user to switch image by image.
+ *   * An input field let the user specify the image index directly.
+ *   * A play button let the user play the series and configure a specific framerate.
+ *
+ * If the series only has one single image, the previous/next and play buttons are hidden, but the input field
+ * is still shown.
+ *
+ * This directive is used by the `wvTimeline` directive.
+ *
+ * @scope
+ *
+ * @restrict E
+ *
+ * @param {series_model} wvSeries (required) The model of the series, as provided by the `wvSeriesId` directive.
+ **/
+ (function() {
     'use strict';
 
     angular
@@ -7,10 +28,6 @@
 
     /* @ngInject */
     function wvTimelineControls() {
-        // Usage:
-        //
-        // Creates:
-        //
         var directive = {
             bindToController: true,
             controller: Controller,
