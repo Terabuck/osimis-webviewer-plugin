@@ -20,7 +20,7 @@
             restrict: 'E',
             transclude: true,
             require: {
-                series: '?^^wvSeriesId'
+                series: '?^^vpSeriesId'
             },
             templateUrl: 'app/overlay/overlay.directive.html',
             scope: {

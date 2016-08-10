@@ -285,3 +285,32 @@ To retrieve changes from original mercurial repository, use [git-remote-hg](http
 - create a new tag with 'git tag -a 0.4.1 -m "0.4.1"'
 - push
 - docker build will trigger automatically (:latest & :0.4.1 tags).  Win/OSX builds will trigger during the night.  You may trigger them by hand on Jenkins 1.  The OrthancStable builds contain the OsimisWebViewer master branch.
+
+### Plugin's routes
+
+The plugin propose severals GET HTTP routes.
+
+These routes are considered unstable and may change often between MAJOR versions.
+
+- Retrieve an image (embedded in KLV format, see source code for detailed format informations - use 0 for monoframe instances).
+
+```
+/osimis-viewer/images/<instance_uid:str>/<frame_index:int>/{low|medium|high|pixeldata}-quality
+```
+
+- Provide informations about a series:
+
+```
+/osimis-viewer/series/<series_uid:str>
+```
+
+The following Orthanc routes are also used:
+
+```
+/studies/
+/studies/<uid>
+/instances/<uid>/simplified-tags
+/plugins/osimis-web-viewer
+/system
+/series/<uid>/study
+```

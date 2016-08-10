@@ -22,39 +22,17 @@
     <!-- endbuild -->
   </head>
   <body ng-app="orthanc" class="wv-body">
-    <div ng-controller="OsimisWebViewer" class="wv-container">
-        <wv-toolbar wv-items="vm.toolbar" ng-if="vm.minimize"></wv-toolbar>
-        <div style="height: calc(100% - 40px)" wv-size-tag ng-if="vm.minimize">
-            <wv-viewport wv-series-id="vm.seriesId" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}" wv-lossless="true"
-                wv-scroll-on-wheel-series-ext="true"
-                wv-enable-overlay="vm.toolbar.overlay"
+    <div ng-controller="OsimisWebViewer as vm" class="wv-container">
+        <wv-webviewer
+            wv-studylist-enabled="false"
+            wv-toolbar-enabled="true"
+            wv-play-series-ext="vm.toolbar.play"
+            
+            wv-study-id="vm.studyId"
+            wv-serieslist-enabled="vm.mode === 'study'" 
 
-                wv-default-viewport-tool="vm.toolbar.windowing"
-                wv-angle-measure-viewport-tool="vm.toolbar.anglemeasure"
-                wv-length-measure-viewport-tool="vm.toolbar.lengthmeasure"
-                wv-elliptical-roi-viewport-tool="vm.toolbar.ellipticalroi"
-                wv-zoom-viewport-tool="vm.toolbar.zoom"
-                wv-pan-viewport-tool="vm.toolbar.pan"
-                wv-pixel-probe-viewport-tool="vm.toolbar.pixelprobe"
-                wv-rectangle-roi-viewport-tool="vm.toolbar.rectangleroi"
-
-                wv-invert-contrast-viewport-tool="vm.toolbar.invert"
-                wv-play-series-ext="vm.toolbar.play"
-
-                wv-rotateleft-viewport-tool="vm.toolbar.rotateleft"
-                wv-rotateright-viewport-tool="vm.toolbar.rotateright"
-                wv-vflip-viewport-tool="vm.toolbar.vflip"
-                wv-hflip-viewport-tool="vm.toolbar.hflip"
-            ></wv-viewport>
-        </div>
-
-        <div class="wv-menu" ng-if="!vm.minimize">
-            <wv-serieslist wv-study="vm.study"></wv-serieslist>
-        </div>
-        <div class="wv-main" ng-if="!vm.minimize">
-            <wv-toolbar wv-items="vm.toolbar"></wv-toolbar>
-            <wv-splitpane wv-layout="vm.toolbar.layout" wv-settings="vm.toolbar"></wv-splitpane>
-        </div>
+            wv-series-id="vm.seriesId"
+        ></wv-webviewer>
     </div>
 
     <!-- build:js js/lib.js -->
@@ -83,18 +61,18 @@
             });
         })
         .controller('OsimisWebViewer', function($scope, $location, $rootScope, $http, wvConfig, wvSeriesManager) {
-            $scope.vm = {};
+            var vm = this;
 
             var orthancStudyId = $location.search().study;
             var orthancSeriesId = $location.search().series;
 
+            vm.studyId = undefined;
+            vm.seriesId = undefined;
+
             // Display orthanc study
             if (orthancStudyId) {
-                $scope.vm.minimize = false;
-                $scope.vm.study = {id: orthancStudyId};
-
-                // Preload study
-                $rootScope.$emit('UserSelectedStudyId', $scope.vm.study.id);
+                vm.mode = 'study';
+                vm.studyId = orthancStudyId;
             }
             // Display & convert orthanc series id (from url parameter) into frontend series id
             else {
@@ -103,22 +81,17 @@
                     .then(function(seriesList) {
                         // When singleframe, display the frontend series
                         if (seriesList.length === 1) {
-                            $scope.vm.minimize = true;
-                            $scope.vm.seriesId = seriesList[0].id;
-
-                            // Preload series
-                            $rootScope.$emit('UserSelectedSeries', seriesList[0]);
+                            vm.mode = 'series';
+                            vm.seriesId = seriesList[0].id;
                         }
                         // When multiframe, consider series as a study
-                        else if (!$scope.vm.study) {
+                        else if (!vm.studyId) {
+                            // @todo @warning multiple series may be shown instead of a single one... study id should also be split...
                             $http
                                 .get(wvConfig.orthancApiURL + '/series/'+orthancSeriesId+'/study', {cache: false})
                                 .then(function(study) {
-                                    $scope.vm.minimize = false;
-                                    $scope.vm.study = {id: study.data.ID};
-
-                                    // Preload study
-                                    $rootScope.$emit('UserSelectedStudyId', $scope.vm.study.id);
+                                    vm.mode = 'study';
+                                    vm.studyId = study.data.ID;
                                 });
                         }
                         else {

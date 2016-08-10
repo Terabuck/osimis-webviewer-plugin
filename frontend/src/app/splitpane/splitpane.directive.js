@@ -1,55 +1,85 @@
-'use strict';
-
 /**
- * @ngdoc directive
- * @name webviewer.directive:wvSplitpane
+ * @ngdoc
+ *
+ * @name wvSplitpane
+ *
  * @description
- * # wvSplitpane
- */
-angular.module('webviewer')
-  .directive('wvSplitpane', function ($, $timeout) {
-    return {
-      scope: {
-        wvLayout: '=?',
-        wvSettings: '=?' // used by transcluded directives
-      },
-      // @todo add template path angular constant
-      templateUrl: 'app/splitpane/splitpane.directive.html',
-      restrict: 'E',
-      transclude: true,
-      link: function postLink(scope, element, attrs, ctrls, transcludeFn) {
-          // make sure default content is not created if there is transclusion
-          // I don't use angular transclude fallback because its buggy
-          scope.showDefaultContent = false;
-          transcludeFn(function(trancludedContent) {
-              // ignore empty strings
-              if (!_.filter(trancludedContent, function(v) {return v instanceof HTMLElement || _.trim(v.textContent).length}).length) {
-                  scope.showDefaultContent = true
-              }
-          });
-          
+ * The `wvSplitpane` directive provides multiple pane organized on a grid.
+ * The pane quantity depends on its configuration. Panes must be configured
+ * using the `wvPanePolicy` directive. See the example.
+ * It triggers $(window).resize() on layout change.
+ * For additional configuration option, see the specific `wvPanePolicy` source code.
+ *
+ * @scope
+ * 
+ * @restrict E
+ *
+ * @param {object} wvLayout (optional) Define the quantity of row and column
+ *   * `x` The number of row
+ *   * `y` The number of column
+ *   Default: {x: 1, y: 1}
+ *
+ * @example
+ * ```html
+ * <wv-splitpane wv-layout="{x: 2, y: 2}">
+ *     <wv-pane-policy>
+ *         This will be repeated 4 times.
+ *     </wv-pane-policy>
+ * </wv-splitpane>
+ * ```
+ **/
+ (function() {
+    'use strict';
+
+    angular
+        .module('webviewer')
+        .directive('wvSplitpane', wvSplitpane);
+
+    /* @ngInject */
+    function wvSplitpane() {
+        var directive = {
+            bindToController: true,
+            controller: Controller,
+            controllerAs: 'vm',
+            link: link,
+            restrict: 'E',
+            scope: {
+                layout: '=?wvLayout'
+            },
+            templateUrl: 'app/splitpane/splitpane.directive.html',
+            transclude: {
+                panePolicy: 'wvPanePolicy'
+            }
+        };
+        return directive;
+
+        function link(scope, element, attrs) {
+
+        }
+    }
+
+    /* @ngInject */
+    function Controller($scope) {
+        var vm = this;
+
         /* jshint -W116 */
-          scope.wvLayout = scope.wvLayout || scope.wvSettings && scope.wvSettings.layout || {
+        vm.layout = vm.layout || {
             x: 1,
             y: 1
-          };
+        };
         /* jshint +W116 */
 
-        scope.$watch('wvLayout', _updateLayout, true);
+        // Trigger $(window).resize() on layout change & set row & columns width
+        $scope.$watch('vm.layout', _updateLayout, true);
+        function _updateLayout(newLayout) {
+            if (!newLayout) return;
 
-        function _updateLayout(layout, old) {
-          if (!layout) return;
-          
-          scope.x = [layout.x];
-          scope.y = [layout.y];
-          scope.rowHeight = 100 / layout.y + '%';
-          scope.rowWidth = 100 / layout.x + '%';
+            vm.rowHeight = 100 / newLayout.y + '%';
+            vm.rowWidth = 100 / newLayout.x + '%';
 
-          // @note trigger this after reflow
-          $timeout(function() {
-              $(window).resize();
-          });
+            $scope.$evalAsync(function() {
+                $(window).resize();
+            });
         }
-      }
-    };
-  });
+    }
+})();

@@ -3,16 +3,16 @@
 
     angular
         .module('webviewer')
-        .directive('wvSeriesId', wvSeriesId);
+        .directive('vpSeriesId', vpSeriesId);
 
     /** <wv-viewport wv-series-id="some_series_id"></wv-viewport>
      * attributes:
-     * - wv-series="$series"
-     * - wv-on-series-change="youFunction($series)"
+     * - vp:series="$series"
+     * - vp:on-series-change="youFunction($series)"
      */
 
     /* @ngInject */
-    function wvSeriesId($parse) {
+    function vpSeriesId($parse) {
         // Usage:
         //
         // Creates:
@@ -20,7 +20,7 @@
         var directive = {
             // bindToController: true,
             require: {
-                'wvSeriesId': 'wvSeriesId',
+                'vpSeriesId': 'vpSeriesId',
                 'wvViewport': 'wvViewport'
             },
             controller: SeriesViewModel,
@@ -33,11 +33,11 @@
         return directive;
 
         function link(scope, element, attrs, ctrls) {
-            var viewmodel = ctrls.wvSeriesId;
+            var viewmodel = ctrls.vpSeriesId;
             var viewportController = ctrls.wvViewport;
 
             // Provide access to the viewport controller through the seriesId
-            ctrls.wvSeriesId.getViewport = function() {
+            ctrls.vpSeriesId.getViewport = function() {
                 return viewportController.getModel();
             };
 
@@ -59,8 +59,8 @@
             });
 
             // bind attributes -> view model
-            var wvSeriesIdParser = $parse(attrs.wvSeriesId);
-            scope.$watch(wvSeriesIdParser, function(id) {
+            var vpSeriesIdParser = $parse(attrs.vpSeriesId);
+            scope.$watch(vpSeriesIdParser, function(id) {
                 if (!id) {
                     viewmodel.clearSeries();
                 }
@@ -70,7 +70,7 @@
             });
 
             // bind view model -> attributes
-            var wvOnSeriesChangeParser = $parse(attrs.wvOnSeriesChange);
+            var vpOnSeriesChangeParser = $parse(attrs.vpOnSeriesChange);
             var wvSeriesParser = $parse(attrs.wvSeries);
             viewmodel.onSeriesChanged(function(series) {
                 if (!wvSeriesParser || !wvSeriesParser.assign) {
@@ -79,8 +79,8 @@
 
                 wvSeriesParser.assign(scope, series);
 
-                if (wvOnSeriesChangeParser) {
-                    wvOnSeriesChangeParser(scope, {$series: series});
+                if (vpOnSeriesChangeParser) {
+                    vpOnSeriesChangeParser(scope, {$series: series});
                 }
             });
 

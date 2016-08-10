@@ -18,19 +18,3 @@
   height: 100%;
   overflow: hidden;
 }
-.wv-menu {
-  display: block;
-  float: left;
-  overflow-y: auto;
-  overflow-x: hidden;
-  height: 100%;
-  text-align: center;
-  width: 200px;
-}
-
-.wv-main {
-  display: block;
-  float: left;
-  height: 100%;
-  width: calc(100% - 200px);
-}

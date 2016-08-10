@@ -1,0 +1,57 @@
+<div class="wv-webviewer-container">
+    
+    <div class="wv-webviewer-menu" ng-if="vm.studylistEnabled || vm.serieslistEnabled">
+        <!-- Studylist -->
+        <wv-studylist ng-if="vm.studylistEnabled"
+            wv-selected-study-id="vm.studyId"
+        ></wv-studylist>
+
+        <!-- drag & drop Serieslist -->
+        <wv-serieslist ng-if="vm.serieslistEnabled"
+            wv-study-id="vm.studyId"
+        ></wv-serieslist>
+    </div>
+
+    <div class="wv-webviewer-main">
+        <!-- Toolbar -->
+        <wv-toolbar ng-if="vm.toolbarEnabled"
+            wv-items="vm.tools"
+        ></wv-toolbar>
+
+        <!-- Splitpane & Viewports -->
+        <div class="wv-webviewer-content">
+            <wv-splitpane wv-layout="vm.tools.layout">
+                <wv-pane-policy
+                    wv-size-tag
+                    wv-pane-index="$index" wv-pane-position="$position"
+                    wv-on-pane-added="vm.configureViewport($index)" wv-on-pane-removed="vm.cleanupViewport($index)"
+                >
+                    <wv-viewport 
+                        vp:series-id="vm.viewports[$index].seriesId" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}" wv-lossless="true"
+                        wv-droppable-series-ext="vm.serieslistEnabled"
+                        wv-scroll-on-wheel-series-ext="true"
+                        wv-enable-overlay="vm.tools.overlay"
+
+                        wv-default-viewport-tool="vm.tools.windowing"
+                        wv-angle-measure-viewport-tool="vm.tools.anglemeasure"
+                        wv-length-measure-viewport-tool="vm.tools.lengthmeasure"
+                        wv-elliptical-roi-viewport-tool="vm.tools.ellipticalroi"
+                        wv-zoom-viewport-tool="vm.tools.zoom"
+                        wv-pan-viewport-tool="vm.tools.pan"
+                        wv-pixel-probe-viewport-tool="vm.tools.pixelprobe"
+                        wv-rectangle-roi-viewport-tool="vm.tools.rectangleroi"
+
+                        wv-invert-contrast-viewport-tool="vm.tools.invert"
+                        wv-play-series-ext="vm.tools.play"
+
+                        wv-rotateleft-viewport-tool="vm.tools.rotateleft"
+                        wv-rotateright-viewport-tool="vm.tools.rotateright"
+                        wv-vflip-viewport-tool="vm.tools.vflip"
+                        wv-hflip-viewport-tool="vm.tools.hflip"
+                    ></wv-viewport>
+                </wv-pane-policy>
+            </wv-splitpane>
+        </div>
+    </div>
+
+</div>
