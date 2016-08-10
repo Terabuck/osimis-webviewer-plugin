@@ -1,4 +1,4 @@
-<span class="wv-play-button">
+<div class="wv-play-button">
     <!--  @todo add tooltips -->
 
     <!-- Play/Pause button -->
@@ -23,10 +23,12 @@
     <div class="wv-play-button-config-position-handler"> <!-- This is a 0x0 div to set the position -->
         <div class="wv-play-button-config">
             <label>
-                Frame rate<br/>
-                <input type="range" min="1" max="60" ng-model="vm.series.frameRate" />
+                Frame rate
+                <span class="wv-play-button-config-framerate-wrapper">
+                    <input type="range" min="1" max="60" ng-model="vm.series.frameRate" class="wv-play-button-config-framerate" />
+                </span>
                 {{vm.series.frameRate}} fps
             </label>
         </div>
     </div>
-</span>
+</div>
