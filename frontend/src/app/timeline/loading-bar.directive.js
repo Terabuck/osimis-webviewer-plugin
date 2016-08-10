@@ -14,7 +14,7 @@
         var directive = {
             templateNamespace: 'svg',
             replace: true, // required for svg databinding
-            templateUrl: 'app/overlay/loading-bar.directive.html',
+            templateUrl: 'app/timeline/loading-bar.directive.html',
             bindToController: true,
             controller: Controller,
             controllerAs: 'vm',
