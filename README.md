@@ -308,9 +308,9 @@ The following Orthanc routes are also used:
 
 ```
 /studies/
-/studies/<id>
-/instances/<id>/simplified-tags
+/studies/<uid>
+/instances/<uid>/simplified-tags
 /plugins/osimis-web-viewer
-/sytem
-/series/<id>/study
+/system
+/series/<uid>/study
 ```
