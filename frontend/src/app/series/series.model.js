@@ -24,8 +24,18 @@
             // Set the framerate
             $timeout(function() {
                 _this.frameRate = 30; // 30 FPS by default
+                // Retrieve the image from the center of the series (to be sure the framerate is defined)
                 var middleImageId = _this.imageIds[Math.floor(_this.imageIds.length/2)];
-                wvImageManager
+
+                // Put the request within a $timeout since the imageManager requires the series to be loaded
+                // for optimization reason, and the series requires the image to be loaded to gather
+                // its DICOM tag.
+                // It is a temporary fix due to the osimis-viewer series requests returning the tags
+                // of the middle instance of an orthanc series.
+                // Due to the multiframe DICOM instance differences with monoframe DICOM instances, 
+                // osimis-viewer uses an alternative model working for both.
+                // @todo series route should return the tags of the middle instance of a osimis-viewer series instead
+                wvImageManager 
                     .get(middleImageId)
                     .then(function(image) {
                         if (image.tags.RecommendedDisplayFrameRate) {
@@ -222,10 +232,11 @@
 
             // Create recursive closure to display each images
             (function loop() {
-                var desiredFrameRateInMs = 1000 / _this.frameRate;
-                // Wait for monitor to attempt refresh
+                var desiredFrameRateInMs = 1000 / _this.frameRate; // Convert framerate FPS into MS
+                // Wait for the monitor to attempt refresh
                 _cancelAnimationId = requestAnimationFrame(function(currentTimeInMs) {
-                    // Draw series at desired framerate
+                    // Draw series at desired framerate (wait for the desired framerate ms time to be passed,
+                    // skip displaying till it has not passed)
                     if (currentTimeInMs - _lastTimeInMs >= desiredFrameRateInMs) {
                         $rootScope.$apply(function() {
                             // Go to next image
@@ -238,7 +249,7 @@
                                 console.time(_timeLog);
                             }
                             
-                            // Track current Frame Rate
+                            // Track current time to calculate Frame Rate
                             _lastTimeInMs = currentTimeInMs;
                         });
                     }

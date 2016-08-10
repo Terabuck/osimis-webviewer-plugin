@@ -1,8 +1,9 @@
 <span class="wv-play-button">
+    <!--  @todo add tooltips -->
+
     <!-- Play/Pause button -->
     <label
         title="Play" 
-        osi-tooltip data-placement="top"
         ng-click="vm.series.play()"
         ng-show="!vm.series.isPlaying"
         class="wv-timeline-controls-button"
@@ -11,7 +12,6 @@
     </label>
     <label
         title="Paused" 
-        osi-tooltip data-placement="top"
         ng-click="vm.series.pause()"
         ng-show="vm.series.isPlaying"
         class="wv-timeline-controls-button"
