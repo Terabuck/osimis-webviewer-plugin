@@ -156,7 +156,7 @@
                 $timeout(function() {
                     var image = null;
 
-                    // save the image to base64 data
+                    // save the image to base64 data (96 dpi png image)
                     var canvas = fakeViewport.find('canvas').get(0);
                     image = canvas.toDataURL();
 
