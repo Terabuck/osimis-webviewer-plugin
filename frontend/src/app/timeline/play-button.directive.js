@@ -32,7 +32,7 @@
             scope: {
                 series: '=wvSeries'
             },
-            templateUrl: '/app/timeline/play-button.directive.html'
+            templateUrl: 'app/timeline/play-button.directive.html'
         };
         return directive;
 
