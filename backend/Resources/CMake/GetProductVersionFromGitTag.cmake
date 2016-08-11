@@ -18,6 +18,17 @@ if(NOT res EQUAL 0)
     message(FATAL_ERROR "could not describe git tag.  Make sure you have already tagged your repo with a command like 'git tag -a \"0.1.0\".  ' ${gitRepoVersion}-${res}")
 endif()
 
+# get git branch
+execute_process(COMMAND
+  "${GIT_EXECUTABLE}"
+  rev-parse --abbrev-ref HEAD
+  WORKING_DIRECTORY
+  "${CMAKE_SOURCE_DIR}"
+  OUTPUT_VARIABLE
+  PRODUCT_VERSION_BRANCH
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
 message("CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
 message("Git version = ${gitRepoVersion}")
 
@@ -39,6 +50,7 @@ message(${PRODUCT_VERSION_COMMIT_SHA1_STRING})
 message(${PRODUCT_VERSION_SHORT_STRING})
 
 #define macros that can be reused inside the C++ code (i.e, in the resources.rc file when building a windows DLL)
+add_definitions(-DPRODUCT_VERSION_BRANCH=${PRODUCT_VERSION_BRANCH})
 add_definitions(-DPRODUCT_VERSION_MAJOR=${PRODUCT_VERSION_MAJOR})
 add_definitions(-DPRODUCT_VERSION_MINOR=${PRODUCT_VERSION_MINOR})
 add_definitions(-DPRODUCT_VERSION_PATCH=${PRODUCT_VERSION_PATCH})
