@@ -29,7 +29,7 @@ set(STATIC_BUILD ON CACHE BOOL "Static build of the third-party libraries (neces
 SET(STANDALONE_BUILD ON CACHE BOOL "Standalone build (all the resources are embedded, necessary for releases)")
 set(ALLOW_DOWNLOADS ON CACHE BOOL "Allow CMake to download packages")
 set(JS_CLIENT_PATH ${CMAKE_SOURCE_DIR}/../frontend/build)
-set(JS_FRONTEND_VERSION ${PRODUCT_VERSION_SHORT_STRING} CACHE BOOL "the version of the frontend package to download") # by default, the JS frontend version is the same as this version
+set(JS_FRONTEND_VERSION ${PRODUCT_VERSION_SHORT_STRING} CACHE STRING "the version of the frontend package to download") # by default, the JS frontend version is the same as this version
 
 # Advanced parameters to fine-tune linking against system libraries
 set(USE_SYSTEM_BOOST ON CACHE BOOL "Use the system version of Boost")
