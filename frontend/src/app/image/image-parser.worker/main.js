@@ -203,6 +203,11 @@ BinaryRequest.prototype.execute = function() {
             }
             catch (e) {
                 _processingRequest = null; // cleaning request
+                
+                // Log the stacktrace before rethrowing
+                if (e.stack) {
+                    console.log(e.stack);
+                }
                 throw e;
             }
 
