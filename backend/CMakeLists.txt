@@ -54,7 +54,10 @@ include(${CMAKE_SOURCE_DIR}/Orthanc/Resources/CMake/DownloadPackage.cmake)
 
 #download the frontend lib  (TODO: download the one from the branch we are in)
 if(NOT EXISTS ${JS_CLIENT_PATH}) # when building inside the docker container, the frontend/build folder is already there and we don't want to override it.
-   DownloadPackage(FALSE "http://orthanc.osimis.io/public/osimisWebViewer/${JS_FRONTEND_VERSION}.zip" ${JS_CLIENT_PATH} TRUE)
+  MESSAGE( STATUS "JS_FRONTEND_VERSION:         " ${JS_FRONTEND_VERSION} )
+  DownloadPackage(FALSE "http://orthanc.osimis.io/public/osimisWebViewer/${JS_FRONTEND_VERSION}.zip" ${JS_CLIENT_PATH} TRUE)
+else()
+  MESSAGE( STATUS "JS_FRONTEND_VERSION:         LOCAL" )
 endif()
 
 include(${CMAKE_SOURCE_DIR}/Orthanc/Resources/CMake/BoostConfiguration.cmake)
