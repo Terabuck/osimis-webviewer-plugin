@@ -19,16 +19,24 @@
 
 .wv-overlay-bottomright {
     position: absolute;
-    bottom: 0rem;
+    bottom: 2em; // save 2em for the timeline
     right: 0rem;
     text-align: right;
 }
 
 .wv-overlay-bottomleft {
     position: absolute;
-    bottom: 0rem;
+    bottom: 2em; // save 2em for the timeline
     left: 0rem;
     text-align: left;
+}
+
+.wv-overlay-timeline-wrapper {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1; // Make sure the representation of the selected image on the timeline appear on top of other overlay panels
 }
 
 .wv-overlay-topleft, .wv-overlay-topright, .wv-overlay-bottomright, .wv-overlay-bottomleft {

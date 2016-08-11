@@ -1,3 +1,32 @@
+/**
+ * @ngdoc directive
+ * @name wvLoadingBar
+ *
+ * @description
+ * The `wvLoadingBar` directive displays a timeline relative to a shown series.
+ *
+ * Every series' images are represented on the loading bar. The user can clicked upon one of them to 
+ * select it. The displayed images also provide the actual status of the download: 
+ *   * `grey` - The image has not been downloaded at all
+ *   * `red` - The image thumbnail has been downloaded
+ *   * `orange` - The low-quality version of the image has been downloaded
+ *   * `green` - The lossless-quality version of the image has been downloaded
+ *               Note the green quality does not always mean the image is lossless:
+ *               an image saved in the PACS as compressed appears green even, since the best quality
+ *               available has been provided.
+ *
+ * This directive is used by the `wvTimeline` directive.
+ *
+ * @compatibility Do not use html <base> tag! cf. http://www.chriskrycho.com/2015/html5-location-base-and-svg.html#fn1
+ *                Check the `wvLoadingBar` directive source code for more information.
+ *
+ * @scope
+ *
+ * @restrict E
+ *
+ * @param {series_model} wvSeries (required) The model of the series, as provided by the `wvSeriesId` directive.
+ *
+ */ 
 (function() {
     'use strict';
 
@@ -7,14 +36,10 @@
 
     /* @ngInject */
     function wvLoadingBar() {
-        // Usage:
-        //
-        // Creates:
-        //
         var directive = {
             templateNamespace: 'svg',
             replace: true, // required for svg databinding
-            templateUrl: 'app/overlay/loading-bar.directive.html',
+            templateUrl: 'app/timeline/loading-bar.directive.html',
             bindToController: true,
             controller: Controller,
             controllerAs: 'vm',
@@ -35,7 +60,7 @@
     function Controller($scope, wvImageBinaryManager, WvImageQualities) {
         var _this = this;
 
-        // [<image index>: [<image quality: int>,...] , ...] - image-index != image-id
+        // [<image index>: [<image quality: int>, ...], ...] - image-index != image-id
         this.imageQualities = [];
         // [<image index>: <image quality: int> , ...] - image-index != image-id
         this.bestQualityByImage = [];

@@ -21,6 +21,29 @@
             this.onCurrentImageIdChanged = new osimis.Listener();
             this.onAnnotationChanged = new osimis.Listener();
 
+            // Set the framerate
+            $timeout(function() {
+                _this.frameRate = 30; // 30 FPS by default
+                // Retrieve the image from the center of the series (to be sure the framerate is defined)
+                var middleImageId = _this.imageIds[Math.floor(_this.imageIds.length/2)];
+
+                // Put the request within a $timeout since the imageManager requires the series to be loaded
+                // for optimization reason, and the series requires the image to be loaded to gather
+                // its DICOM tag.
+                // It is a temporary fix due to the osimis-viewer series requests returning the tags
+                // of the middle instance of an orthanc series.
+                // Due to the multiframe DICOM instance differences with monoframe DICOM instances, 
+                // osimis-viewer uses an alternative model working for both.
+                // @todo series route should return the tags of the middle instance of a osimis-viewer series instead
+                wvImageManager 
+                    .get(middleImageId)
+                    .then(function(image) {
+                        if (image.tags.RecommendedDisplayFrameRate) {
+                            _this.frameRate = image.tags.RecommendedDisplayFrameRate;
+                        }
+                    });
+            });
+
             // @note _annotationGroup is just a local cache for filtering
             // the real cache is handled by the wvAnnotationManager service
             this._annotationGroup = null;
@@ -195,8 +218,6 @@
                 return;
             }
 
-            var _desiredFrameRatePromise = _getDesiredFrameRate(_this); // 30 fps by default
-
             if (this.isPlaying) {
                 return;
             }
@@ -211,56 +232,37 @@
 
             // Create recursive closure to display each images
             (function loop() {
-                // Wait for desired framerate to be loaded
-                _desiredFrameRatePromise.then(function(desiredFrameRateInMs) {
-                    // Wait for monitor to attempt refresh
-                    _cancelAnimationId = requestAnimationFrame(function(currentTimeInMs) {
-                        // Draw series at desired framerate
-                        if (currentTimeInMs - _lastTimeInMs >= desiredFrameRateInMs) {
-                            $rootScope.$apply(function() {
-                                // Go to next image
-                                _this.goToNextImage(true);
+                var desiredFrameRateInMs = 1000 / _this.frameRate; // Convert framerate FPS into MS
+                // Wait for the monitor to attempt refresh
+                _cancelAnimationId = requestAnimationFrame(function(currentTimeInMs) {
+                    // Draw series at desired framerate (wait for the desired framerate ms time to be passed,
+                    // skip displaying till it has not passed)
+                    if (currentTimeInMs - _lastTimeInMs >= desiredFrameRateInMs) {
+                        $rootScope.$apply(function() {
+                            // Go to next image
+                            _this.goToNextImage(true);
 
-                                // Benchmark play loop
-                                if (console.time && console.timeEnd) {
-                                    console.timeEnd(_timeLog);
-                                    _timeLog = 'play (expect ' + Math.round(desiredFrameRateInMs) + 'ms)';
-                                    console.time(_timeLog);
-                                }
-                                
-                                // Update desired Frame Rate
-                                _desiredFrameRatePromise = _getDesiredFrameRate(_this);
-
-                                // Track current Frame Rate
-                                _lastTimeInMs = currentTimeInMs;
-                            });
-                        }
-                        
-                        // Loop
-                        if (_this.isPlaying) {
-                            loop();
-                        }
-                    });
+                            // Benchmark play loop
+                            if (console.time && console.timeEnd) {
+                                console.timeEnd(_timeLog);
+                                _timeLog = 'play (expect ' + Math.round(desiredFrameRateInMs) + 'ms)';
+                                console.time(_timeLog);
+                            }
+                            
+                            // Track current time to calculate Frame Rate
+                            _lastTimeInMs = currentTimeInMs;
+                        });
+                    }
+                    
+                    // Loop
+                    if (_this.isPlaying) {
+                        loop();
+                    }
                 });
             })();
             
             this.isPlaying = true;
         };
-        function _getDesiredFrameRate(series) {
-            // Warning series.tags.RecommendedDisplayFrameRate cannot be used as
-            // it may be wrong due to the fact it is dependent of the instance and not the orthanc series.
-            // Use image tags instead (note instance tags would be enough)
-            return series
-                .getCurrentImage()
-                .then(function(image) {
-                    if (image.tags.RecommendedDisplayFrameRate) {
-                        return 1000 / image.tags.RecommendedDisplayFrameRate;
-                    }
-                    else {
-                        return 1000 / 30; // 30 fps by default
-                    }
-                });
-        }
 
         WvSeries.prototype.pause = function() {
             if (_cancelAnimationId) {

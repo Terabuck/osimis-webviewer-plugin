@@ -1,4 +1,12 @@
 <div class="wv-overlay" ng-transclude>
+    <!-- Always show the timeline — even if there is only one image — until we (@todo) develop
+         a specific component to display the image quality -->
+    <div class="wv-overlay-timeline-wrapper">
+        <wv-timeline wv-series="vm.wvSeries"></wv-timeline>
+    </div>
+
+    <wv-droppable-series-overlay-item></wv-droppable-series-overlay-item>
+
     <div class="wv-overlay-topleft" ng-if="vm.showTopLeftArea()">
         {{vm.wvTags.PatientName}}<br/>
         {{vm.wvTags.PatientID}}
@@ -10,16 +18,9 @@
     </div>
     
     <div class="wv-overlay-bottomright" ng-if="vm.showBottomRightArea()">
+        series: {{vm.wvSeries.id}}<br/>
         <span ng-if="vm.wvSeries.currentShownIndex != vm.wvSeries.currentIndex">(image {{vm.wvSeries.currentIndex}} in loading)</br></span>
-        <span ng-if="vm.wvSeries">image: {{vm.wvSeries.currentShownIndex}}<br/></span>
         zoom: {{vm.wvViewport.scale|number:2}}<br/>
         ww/wc: {{vm.wvViewport.voi.windowWidth|number:0}}/{{vm.wvViewport.voi.windowCenter|number:0}}
     </div>
-    
-    <div style="display:block; position: absolute; right:0; bottom:0; left:0; height: 15px;">
-        <wv-loading-bar wv-series="vm.wvSeries"></wv-loading-bar>
-    </div>
-    
-    <!-- <wv-scrollbar-overlay-item wv-image-count="vm.wvSeries.imageCount" wv-image-index="vm.wvSeries.currentIndex" wv-shown-image-index="vm.wvSeries.currentShownIndex" ng-if="vm.showTimeline"></wv-scrollbar-overlay-item> -->
-    <wv-droppable-series-overlay-item></wv-droppable-series-overlay-item>
 </div>

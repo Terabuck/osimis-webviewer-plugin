@@ -1,3 +1,6 @@
+/**
+ * @deprecated we use series.play() method instead
+ */
 (function() {
     'use strict';
 
