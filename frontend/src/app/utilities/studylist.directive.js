@@ -10,11 +10,11 @@ angular.module('webviewer')
   .directive('wvStudylist', function ($rootScope, $http, wvConfig) {
     return {
       scope: {
-        wvSelectedStudy: '='
+        wvSelectedStudyId: '='
       },
       template: [
         '<button type="button" class="btn btn-default wv-studylist" ',
-        'ng-model="wvSelectedStudy" placeholder="Study.." ',
+        'ng-model="wvSelectedStudyId" placeholder="Study.." ',
         'bs-options="study.value as study.label for study in studies"',
         ' bs-select>',
         '</button>'
@@ -30,29 +30,19 @@ angular.module('webviewer')
             scope.studies = studyIds.map(function(studyId) {
                 return {
                   label: '?',
-                  value: {
-                    id: studyId
-                  }
+                  value: studyId
                 };
             });
           
         scope.studies.forEach(function(v) {
+            var studyId = v.value;
             $http
-                .get(wvConfig.orthancApiURL + '/studies/'+v.value.id, {cache: true})
+                .get(wvConfig.orthancApiURL + '/studies/' + studyId, {cache: true})
                 .then(function(response) {
                     var study = response.data;
                     v.label = study.MainDicomTags.StudyDescription;
                 });
              });
-        });
-
-        scope.$watch('wvSelectedStudy', function(newStudy, oldStudy) {
-            if (oldStudy && oldStudy.id && newStudy !== oldStudy) {
-                $rootScope.$emit('UserUnSelectedStudyId', oldStudy.id);
-            }
-            if (newStudy && newStudy.id) {
-                $rootScope.$emit('UserSelectedStudyId', newStudy.id);
-            }
         });
       }
     };

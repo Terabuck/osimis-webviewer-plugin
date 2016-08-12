@@ -1,10 +1,10 @@
-#!/bin/bash
-set -e
-set -x
+# Set build variables.
+# File has to be sourced.
 
 # start from the right place
 cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"/
 
+imageName='osimis/orthanc-webviewer-plugin'
 
 gitLongTag=$(git describe --long --dirty)
 branchName=${1:-$(git rev-parse --abbrev-ref HEAD)} #if no argument defined, get the branch name from git

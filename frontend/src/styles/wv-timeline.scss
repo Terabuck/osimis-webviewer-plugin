@@ -1,0 +1,21 @@
+.wv-timeline {
+    position: relative;
+    height: 2em; // save 2px to display the "upper part of the currently selected image on the timeline"
+}
+
+.wv-timeline-controls-wrapper {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 12em;
+    height: 100%; 
+    color: white;
+}
+
+.wv-timeline-loading-bar-wrapper {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: calc(100% - 12em);
+    height: calc(100% + 2px); 
+}

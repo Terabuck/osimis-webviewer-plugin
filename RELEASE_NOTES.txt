@@ -1,0 +1,18 @@
+Pending changes in the mainline
+===============================
+
+
+Version 0.4
+========================
+
+=> Minimum Orthanc version: 1.1.0 <=
+
+* Initial release based on Orthanc WebViewer version 2.2
+* Complete rewrite of the frontend code
+* Implement frontend image caching & preloading
+* Add standard tools
+* Implement progressive image loading
+* Bypass plugin compression when the dicom pixeldata are already compressed
+* Support of multiple viewport
+* Replace the backend memory-located cache by a backend disk-located cache
+* Upgrade to Boost 1.60.0 for static builds

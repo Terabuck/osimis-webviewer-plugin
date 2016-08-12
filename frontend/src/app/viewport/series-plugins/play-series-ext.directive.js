@@ -1,3 +1,6 @@
+/**
+ * @deprecated we use series.play() method instead
+ */
 (function() {
     'use strict';
 
@@ -5,7 +8,7 @@
         .module('webviewer')
         .directive('wvPlaySeriesExt', wvPlaySeriesExt)
         .config(function($provide) {
-            $provide.decorator('wvSeriesIdDirective', function($delegate) {
+            $provide.decorator('vpSeriesIdDirective', function($delegate) {
                 var directive = $delegate[0];
                 directive.require['wvPlaySeriesExt'] = '?^wvPlaySeriesExt';
 

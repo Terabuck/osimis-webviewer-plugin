@@ -5,7 +5,7 @@
         .module('webviewer')
         .directive('wvScrollOnOverSeriesExt', wvScrollOnOverSeriesExt)
         .config(function($provide) {
-        	$provide.decorator('wvSeriesIdDirective', function($delegate) {
+        	$provide.decorator('vpSeriesIdDirective', function($delegate) {
 			    var directive = $delegate[0];
 		    	directive.require['wvScrollOnOverSeriesExt'] = '?^wvScrollOnOverSeriesExt';
 

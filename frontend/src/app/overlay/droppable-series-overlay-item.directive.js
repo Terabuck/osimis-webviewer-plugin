@@ -46,7 +46,7 @@
                 });
 
                 scope.$on('$destroy', function() {
-                    ctrls.series.onSerieChanged.close(_this);
+                    ctrls.series.onSeriesChanged.close(_this);
                 });
             }
         }

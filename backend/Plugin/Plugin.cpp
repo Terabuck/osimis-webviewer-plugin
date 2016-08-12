@@ -270,7 +270,7 @@ static OrthancPluginErrorCode DecodeImageCallback(OrthancPluginImage** target,
   }
 }
 
-void ParseConfiguration(bool& enableGdcm,
+void ParseConfiguration(bool& gdcmEnabled,
                         int& decodingThreads,
                         boost::filesystem::path& cachePath,
                         int& cacheSize,
@@ -289,16 +289,16 @@ void ParseConfiguration(bool& enableGdcm,
 
     decodingThreads = OrthancPlugins::GetIntegerValue(configuration[CONFIG_WEB_VIEWER], "Threads", decodingThreads);
 
-    static const char* CONFIG_ENABLE_GDCM = "EnableGdcm";
-    if (configuration[CONFIG_WEB_VIEWER].isMember(CONFIG_ENABLE_GDCM))
+    static const char* CONFIG_GDCM_ENABLED = "GdcmEnabled";
+    if (configuration[CONFIG_WEB_VIEWER].isMember(CONFIG_GDCM_ENABLED))
     {
-      if (configuration[CONFIG_WEB_VIEWER][CONFIG_ENABLE_GDCM].type() != Json::booleanValue)
+      if (configuration[CONFIG_WEB_VIEWER][CONFIG_GDCM_ENABLED].type() != Json::booleanValue)
       {
         throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
       }
       else
       {
-        enableGdcm = configuration[CONFIG_WEB_VIEWER][CONFIG_ENABLE_GDCM].asBool();
+        gdcmEnabled = configuration[CONFIG_WEB_VIEWER][CONFIG_GDCM_ENABLED].asBool();
       }
     }
     
@@ -309,7 +309,7 @@ void ParseConfiguration(bool& enableGdcm,
     }
 
     static const char* CONFIG_RESTRICT_TRANSFER_SYNTAXES = "RestrictTransferSyntaxes";
-    if (enableGdcm)
+    if (gdcmEnabled)
     {
       if (configuration[CONFIG_WEB_VIEWER].isMember(CONFIG_RESTRICT_TRANSFER_SYNTAXES))
       {
@@ -389,7 +389,7 @@ extern "C"
     }
 
     /* By default, use GDCM */
-    bool enableGdcm = true;
+    bool gdcmEnabled = true;
     /* By default, a cache of 100 MB is used */
     int cacheSize = 100; 
 
@@ -399,7 +399,7 @@ extern "C"
     try
     {
       boost::filesystem::path cachePath;
-      ParseConfiguration(enableGdcm, decodingThreads, cachePath, cacheSize, cachedImageStorageEnabled);
+      ParseConfiguration(gdcmEnabled, decodingThreads, cachePath, cacheSize, cachedImageStorageEnabled);
 
       std::string message = ("Web viewer using " + boost::lexical_cast<std::string>(decodingThreads) + 
                              " threads for the decoding of the DICOM images");
@@ -425,7 +425,7 @@ extern "C"
 
 
     /* Configure the DICOM decoder */
-    if (enableGdcm)
+    if (gdcmEnabled)
     {
       // Replace the default decoder of DICOM images that is built in Orthanc
       OrthancPluginLogWarning(context_, "Using GDCM instead of the DICOM decoder that is built in Orthanc");

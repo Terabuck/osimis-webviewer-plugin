@@ -20,7 +20,7 @@
             restrict: 'E',
             transclude: true,
             require: {
-                series: '?^^wvSeriesId'
+                series: '?^^vpSeriesId'
             },
             templateUrl: 'app/overlay/overlay.directive.html',
             scope: {
@@ -51,9 +51,13 @@
 
             // auto grab series model
             if (scope.vm.wvShowTimeline && ctrls.series) {
+                var series = ctrls.series.getSeries();
+                scope.vm.wvSeries = series;
+                scope.vm.showTimeline = series && scope.vm.wvShowTimeline && !!series.imageCount;
+
                 ctrls.series.onSeriesChanged(_this, function(series) {
                     scope.vm.wvSeries = series;
-                    scope.vm.showTimeline = scope.vm.wvShowTimeline && !!series.imageCount;
+                    scope.vm.showTimeline = scope.vm.wvShowTimeline && series && series.imageCount > 1;
                 });
                 scope.$on('$destroy', function() {
                     ctrls.series.onSeriesChanged.close(_this);
