@@ -18,7 +18,6 @@
     </div>
     
     <div class="wv-overlay-bottomright" ng-if="vm.showBottomRightArea()">
-        series: {{vm.wvSeries.id}}<br/>
         <span ng-if="vm.wvSeries.currentShownIndex != vm.wvSeries.currentIndex">(image {{vm.wvSeries.currentIndex}} in loading)</br></span>
         zoom: {{vm.wvViewport.scale|number:2}}<br/>
         ww/wc: {{vm.wvViewport.voi.windowWidth|number:0}}/{{vm.wvViewport.voi.windowCenter|number:0}}
