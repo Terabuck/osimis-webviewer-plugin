@@ -1,6 +1,14 @@
 Pending changes in the mainline
 ===============================
 
+Version 0.5.1
+========================
+
+=> Minimum Orthanc version: 1.1.0 <=
+
+* Adapt front-end versions
+* Remove the series id from overlay
+
 Version 0.5
 ========================
 
