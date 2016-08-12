@@ -1,6 +1,37 @@
 Pending changes in the mainline
 ===============================
 
+Version 0.5
+========================
+
+=> Minimum Orthanc version: 1.1.0 <=
+
+* Support of Safari
+* Move the play button to timelines
+* Provide play framerate configuration via a panel appearing when the mouse is 
+  on top of the play button
+* Rename the JSON configuration file option "EnableGdcm" to "GdcmEnabled"
+* Fix hidden timeline when using Orthanc's "Osimis Web Viewer" button on series
+* Minor optimizations
+* Minor memory optimization
+
+Internal API changes
+* Add a wv-webviewer component to simplify the use of the web viewer as a library
+* config.js no longer need to be embeded at the root of projects using osimis-webviewer
+  as a JavaScript library
+* event renamed from "UserSelectedSeries" to "UserSelectedSeriesId", now takes an id
+  instead of a series as a parameter
+* event renamed from "UserUnSelectedSeries" to "UserUnSelectedSeriesId", now takes an id
+  instead of a series as a parameter
+* wv-serieslist and wv-studylist components now takes "study-id" instead of "study"
+  as a parameter
+* wv-splitpane no longer provide a viewport by default
+* wv-splitpane no longer wait for timeout before changing its layout
+* wv-splitpane interface has been completely rewritten (see source code)
+* wv-series-id viewport argument has been temporary renamed into vp-series-id
+  due to name collision
+* wv-scrollbar-overlay-item has been removed in favor of wv-loadingbar and
+  wv-timeline
 
 Version 0.4
 ========================
