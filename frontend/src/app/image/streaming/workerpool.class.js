@@ -12,13 +12,23 @@
 (function(module) {
     'use strict';
 
-    /** new WorkerPool(options)
+    /**
      *
+     * @class WorkerPool
      * 
-     * @param options.path 
-     * @param options.workerCount int - minimum 2 (one is always kept for high priority displays)
-     * @param options.createPromiseFn function(wrappedFunction: (resolve, reject)=>Any): Promise
+     * @param options {object}
+     *   `path` {string} - the path to the script of the worker.
+     *      script may be inlined here using either Osimis' gulp-inline-worker script or URL Blob Workers.
+     *   `workerCount` {number} - minimum 2 (one is always kept for high priority displays)
+     *   `createPromiseFn` {function} - function(wrappedFunction: (resolve, reject)=>Any): Promise
+     *   `taskPriorityPolicy` {function} - a configurable to set the priority of the task. see task-priority-policy.class.js for an example.
      * 
+     * @description
+     * The `WorkerPool` instantiate multiple TaskWorkers (~= threads),
+     * the WorkerPool's user can either assign task to the pool or broadcast message to every TaskWorkers.
+     * When a task is assigned to the pool, the WorkerPool waits for an available TaskWorker and assign the
+     * task as soon as possible.
+     *
      */
     function WorkerPool(options) {
         var _this = this;
@@ -128,6 +138,24 @@
                 // Reject
                 reject(reason);
             });
+        });
+    };
+
+    /** WorkerPool#broadcast(message)
+     * 
+     * @method broadcast
+     *
+     * @param {object} message - any object sent as a message to every of the threads
+     *
+     * @description
+     * Send a message to every existing threads, used mainly for configuration purpose
+     *
+     */
+    WorkerPool.prototype.broadcastMessage = function(message) {
+        var taskWorkers = _.concat(this._availableTaskWorkers, this._busyTaskWorkers);
+
+        taskWorkers.forEach(function(worker) {
+            worker.postMessage(message);
         });
     };
 

@@ -1,5 +1,5 @@
 /**
- * @ngdoc
+ * @ngdoc directive
  *
  * @name wvWebviewer
  *

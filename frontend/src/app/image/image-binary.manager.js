@@ -67,6 +67,12 @@
             taskPriorityPolicy: new osimis.TaskPriorityPolicy(_cache)
         });
 
+        // Send the orthanc API URL to each threads
+        pool.broadcastMessage({
+            type: 'setOrthancUrl',
+            orthancApiUrl: wvConfig.orthancApiURL
+        });
+
         // @todo Free inline-worker's ObjectUrl
         
         function requestLoading(id, quality, priority) {

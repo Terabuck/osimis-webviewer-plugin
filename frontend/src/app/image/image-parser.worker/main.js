@@ -40,34 +40,13 @@ var window = {};
 var PNG = window.PNG;
 var KLVReader = WorkerGlobalScope.KLVReader;
 
-/** setImageApiUrl(locationDirUrl, orthancApiUrl)
+/** setImageApiUrl(locationUrl, orthancApiUrl)
  *
  * Configure the Orthanc API Url
  *
  **/
 var ImageApiURL = undefined;
-function setImageApiUrl(locationDirUrl, orthancApiUrl) { // locationDirUrl is the full directory path to the current page (including host)
-    // Check the path is absolute
-    // (because workers are built to blob strings, their' location is not relative to the js main thread one.)
-    if (orthancApiUrl.indexOf('://') === -1 && orthancApiUrl.indexOf('/') !== 0) {
-        throw new Error('config.js should have absolute path');
-    }
-
-    // Prefix path with http://server:port (to wrong protocole issue due to blob url resolving to blob://server:port)
-    if (orthancApiUrl.indexOf('://') === -1) {
-        // Since Safari has a bug, retrieve the origin from locationDirUrl instead of using location.origin.
-        var regex = /^([^:]*:\/\/)([^\/]*)/; // <1: protocol> (eg. https://) + <2: ip[:port]> (eg. orthanc.vivalife.be:3123)
-        var result = locationDirUrl.match(regex);
-        var locationOrigin = result[1] + result[2];
-
-        orthancApiUrl = locationOrigin + orthancApiUrl;
-    }
-
-    // Remove trailing slash
-    if (orthancApiUrl.lastIndexOf('/') === orthancApiUrl.length - 1) {
-        orthancApiUrl = orthancApiUrl.slice(0, -1);
-    }
-
+function setImageApiUrl(orthancApiUrl) {
     // Set the route
     ImageApiURL = orthancApiUrl + '/osimis-viewer/images/';
 }
@@ -88,11 +67,9 @@ self.addEventListener('message', function(evt) {
     switch(type) {
     case 'setOrthancUrl':
         // Configure the ImageApiURl
-        // locationDirUrl must contain the protocol, host and IP & directory to current folder.
-        var locationDirUrl = evt.data.locationDirUrl;
         var orthancApiUrl = evt.data.orthancApiUrl;
 
-        setImageApiUrl(locationDirUrl, orthancApiUrl);
+        setImageApiUrl(orthancApiUrl);
         break;
     case 'getBinary':
         // Get an image binary
