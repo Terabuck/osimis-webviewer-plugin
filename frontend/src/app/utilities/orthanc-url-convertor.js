@@ -44,12 +44,12 @@
             throw new Error('should be an absolute path');
         }
 
-        // Prefix protocol explicitely for network path reference / RFC 3986 (to fix wrong protocole issue due to blob url resolving to blob://server:port)
+        // Prefix protocol explicitely for network path reference / RFC 3986 (to fix wrong protocol issue due to blob url resolving to blob://server:port)
         if (url.indexOf('//') === 0) {
             url = this.protocol + url;
         }
 
-        // Prefix relative path with http://server:port/[...] (to fix wrong protocole issue due to blob url resolving to blob://server:port)
+        // Prefix relative path with http://server:port/[...] (to fix wrong protocol issue due to blob url resolving to blob://server:port)
         if (url.indexOf('://') === -1) {
             var locationUrl = this.origin + this.pathname;
             var regex = /^([^:]*:\/\/)([^\/]*)(\/?.*)$/; // <1: protocol> (eg. https://) + <2: ip[:port]> + <3: /...> (eg. orthanc.vivalife.be:3123/...)
