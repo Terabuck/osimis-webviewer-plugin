@@ -7,8 +7,8 @@
      * @description
      * The `OrthancUrlConvertor` class is used to generate an absolute URL
      * from a relative URL based on the current page.
-     * It aims to provides orthanc paths instead of local path, it therefore
-     * detects and remove '/osimis-viewer/app/...' from actual location.
+     * It aims to provide orthanc paths instead of local paths, it therefore
+     * detects and removes '/osimis-viewer/app/...' from the actual location.
      *
      * Location parameters need to be manually filled at the instantiation for
      * testing reasons.
