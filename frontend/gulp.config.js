@@ -184,14 +184,13 @@ module.exports = function() {
                 {pattern: clientApp + '**/*.worker/*.js', included: false, served: true},
 
                 clientApp + '**/*.module.js',
+                clientApp + '*.js',
                 clientApp + '**/!(*.worker)/*.js',
                 temp + config.templateCache.file
             ),
             exclude: [
                 // Exclude worker code uncompatible with mocha
                 // clientApp + '**/*.worker/main.js',
-                // Ignore specs for now - @todo fix back old specs
-                clientApp + '**/*.spec.js'
             ],
             client: {
                 // Load workers-related files in web workers

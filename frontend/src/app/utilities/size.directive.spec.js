@@ -1,6 +1,6 @@
 chai.config.includeStack = true;;
 
-describe('size', function() {
+xdescribe('size', function() {
 
     describe('directive', function() {
         

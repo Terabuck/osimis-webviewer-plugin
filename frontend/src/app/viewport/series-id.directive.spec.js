@@ -1,4 +1,4 @@
-describe('series', function() {
+xdescribe('series', function() {
     
     describe('series-id directive', function() {
 

@@ -1,4 +1,4 @@
-describe('image', function() {
+xdescribe('image', function() {
 
 	describe('manager', function() {
 
