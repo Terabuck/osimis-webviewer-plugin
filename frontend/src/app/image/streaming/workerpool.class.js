@@ -35,7 +35,12 @@
         
         this._path = options.path;
 
-        this._workerCount = options.workerCount || 1;
+        if (options.workerCount < 2) {
+            throw new Error('WorkerPool must have at least 2 workers');
+        }
+        else {
+            this._workerCount = options.workerCount || 1;
+        }
 
         if (!options.createPromiseFn) {
             throw new Error('createPromiseFn argument required');
