@@ -39,7 +39,7 @@
      */
     OrthancUrlConvertor.prototype.toAbsoluteURL = function(url) {
         // Check the path is absolute
-        // (because workers are built to blob strings, their' location is not relative to the js main thread one.)
+        // (because workers are built to blob strings, their location is not relative to the js main thread one.)
         if (url.indexOf('://') === -1 && url.indexOf('/') !== 0) {
             throw new Error('should be an absolute path');
         }
