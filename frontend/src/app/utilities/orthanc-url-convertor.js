@@ -10,7 +10,7 @@
      * It aims to provides orthanc paths instead of local path, it therefore
      * detects and remove '/osimis-viewer/app/...' from actual location.
      *
-     * Location parameters need to be manualy filled at the instantiation for
+     * Location parameters need to be manually filled at the instantiation for
      * testing reasons.
      *
      * @param {string} protocol - window.location.protocol (eg: "http:" - double point included!)

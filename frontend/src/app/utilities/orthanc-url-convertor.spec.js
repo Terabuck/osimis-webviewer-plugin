@@ -170,7 +170,7 @@ describe('utilities', function() {
 
         it('should keep "/stg/" path when no reverse proxy is detected', function() {
             // When the front end is *not* served by the C++ back-end server
-            // (implies wvConfig.orthancUrl is manualy set)
+            // (implies wvConfig.orthancUrl is manually set)
 
             // Relative orthanc URL setting
             var orthancConfigUrl = '/stg/';
@@ -228,7 +228,7 @@ describe('utilities', function() {
 
         it('should always keep "stg1://stg2/stg3" absolute path', function() {
             // When the front end is *not* served by the C++ back-end server
-            // (implies wvConfig.orthancUrl is manualy set)
+            // (implies wvConfig.orthancUrl is manually set)
 
             /** Test with default port **/
 
@@ -284,7 +284,7 @@ describe('utilities', function() {
 
         it('should convert "//stg2/stg3" absolute path to "stg1://stg2/stg3" (network path reference - RFC 3986)', function() {
             // When the front end is *not* served by the C++ back-end server
-            // (implies wvConfig.orthancUrl is manualy set)
+            // (implies wvConfig.orthancUrl is manually set)
             // Useful to make config parameter both compatible with http and https.
 
             /** Test with default port **/
