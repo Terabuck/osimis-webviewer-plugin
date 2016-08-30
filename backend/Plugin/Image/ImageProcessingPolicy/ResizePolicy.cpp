@@ -3,6 +3,7 @@
 #include <boost/gil/extension/resample.hpp>
 #include <boost/gil/extension/sampler.hpp>
 
+#include "../../Logging.h"
 #include "../../BenchmarkHelper.h"
 
 ResizePolicy::ResizePolicy(unsigned int maxWidthHeight)
@@ -13,6 +14,7 @@ ResizePolicy::ResizePolicy(unsigned int maxWidthHeight)
 std::auto_ptr<IImageContainer> ResizePolicy::Apply(std::auto_ptr<IImageContainer> input, ImageMetaData* metaData)
 {
   BENCH(RESIZE_IMAGE)
+  OrthancPluginLogDebug(OrthancContextManager::Get(), "ImageProcessingPolicy: ResizePolicy");
 
   // Except *raw* image
   // @todo real cast

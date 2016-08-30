@@ -1,6 +1,7 @@
 #include "CompositePolicy.h"
 
 #include <boost/foreach.hpp>
+#include "../../Logging.h"
 
 CompositePolicy::~CompositePolicy()
 {
@@ -13,6 +14,7 @@ CompositePolicy::~CompositePolicy()
  
 std::auto_ptr<IImageContainer> CompositePolicy::Apply(std::auto_ptr<IImageContainer> input, ImageMetaData* metaData)
 {
+  OrthancPluginLogDebug(OrthancContextManager::Get(), "ImageProcessingPolicy: CompositePolicy");
   std::auto_ptr<IImageContainer> output = input; // note input == NULL after the copy
 
   BOOST_FOREACH(IImageProcessingPolicy* policy, policyChain_)

@@ -3,6 +3,7 @@
 #include "../../Orthanc/Core/Images/ImageBuffer.h" // for ImageBuffer
 #include "../../Orthanc/Core/Images/ImageProcessing.h" // for ImageProcessing::GetMinMaxValue
 #include "../../Orthanc/Core/OrthancException.h"
+#include "../../Logging.h"
 #include "../../BenchmarkHelper.h"
 
 #include "../ImageContainer/RawImageContainer.h"
@@ -19,6 +20,8 @@ namespace {
 
 std::auto_ptr<IImageContainer> Uint8ConversionPolicy::Apply(std::auto_ptr<IImageContainer> input, ImageMetaData* metaData)
 {
+  OrthancPluginLogDebug(OrthancContextManager::Get(), "ImageProcessingPolicy: Uint8ConversionPolicy");
+
   // Except *raw* image
   RawImageContainer* rawInputImage = dynamic_cast<RawImageContainer*>(input.get());
   assert(rawInputImage != NULL);

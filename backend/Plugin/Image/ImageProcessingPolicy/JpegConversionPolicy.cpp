@@ -3,6 +3,7 @@
 #include <orthanc/OrthancCPlugin.h> // for OrthancPluginMemoryBuffer
 #include "../../Orthanc/Core/Images/ImageBuffer.h"
 #include "../../Orthanc/Core/OrthancException.h"
+#include "../../Logging.h"
 #include "../../BenchmarkHelper.h"
 
 #include "../ImageContainer/RawImageContainer.h"
@@ -21,6 +22,7 @@ JpegConversionPolicy::~JpegConversionPolicy()
 
 std::auto_ptr<IImageContainer> JpegConversionPolicy::Apply(std::auto_ptr<IImageContainer> input, ImageMetaData* metaData) {
   BENCH(COMPRESS_FRAME_IN_JPEG);
+  OrthancPluginLogDebug(OrthancContextManager::Get(), "ImageProcessingPolicy: JpegConversionPolicy");
 
   // Except *raw* image
   RawImageContainer* rawImage = dynamic_cast<RawImageContainer*>(input.get());

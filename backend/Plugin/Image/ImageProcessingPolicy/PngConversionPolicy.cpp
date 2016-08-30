@@ -3,6 +3,7 @@
 #include <orthanc/OrthancCPlugin.h> // for OrthancPluginMemoryBuffer & OrthancPluginCompressPngImage
 #include "../../Orthanc/Core/Images/ImageBuffer.h"
 #include "../../Orthanc/Core/OrthancException.h"
+#include "../../Logging.h"
 #include "../../BenchmarkHelper.h"
 
 #include "../ImageContainer/RawImageContainer.h"
@@ -12,6 +13,7 @@
 
 std::auto_ptr<IImageContainer> PngConversionPolicy::Apply(std::auto_ptr<IImageContainer> input, ImageMetaData* metaData) {
   BENCH(COMPRESS_FRAME_IN_PNG);
+  OrthancPluginLogDebug(OrthancContextManager::Get(), "ImageProcessingPolicy: PngConversionPolicy");
 
   // Except *raw* image
   RawImageContainer* rawImage = dynamic_cast<RawImageContainer*>(input.get());

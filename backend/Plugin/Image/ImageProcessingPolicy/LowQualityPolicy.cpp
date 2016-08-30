@@ -1,8 +1,9 @@
 #include "LowQualityPolicy.h"
-#include "ImageProcessingPolicy/ResizePolicy.h"
-#include "ImageProcessingPolicy/Uint8ConversionPolicy.h"
-#include "ImageProcessingPolicy/JpegConversionPolicy.h"
-#include "ImageProcessingPolicy/KLVEmbeddingPolicy.h"
+#include "ResizePolicy.h"
+#include "Uint8ConversionPolicy.h"
+#include "JpegConversionPolicy.h"
+#include "KLVEmbeddingPolicy.h"
+#include "../../Logging.h"
 
 LowQualityPolicy::LowQualityPolicy()
 {
@@ -20,5 +21,6 @@ LowQualityPolicy::~LowQualityPolicy()
 
 std::auto_ptr<IImageContainer> LowQualityPolicy::Apply(std::auto_ptr<IImageContainer> input, ImageMetaData* metaData)
 {
+  OrthancPluginLogDebug(OrthancContextManager::Get(), "ImageProcessingPolicy: LowQualityPolicy");
   return resampleAndJpegPolicy_.Apply(input, metaData);
 }
