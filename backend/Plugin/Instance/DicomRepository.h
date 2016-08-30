@@ -30,6 +30,7 @@ public:
 //  void increfDicomFile(const std::string instanceId);
   void decrefDicomFile(const std::string instanceId) const;
 //  void addDicomFile(const std::string instanceId, OrthancPluginMemoryBuffer& buffer);
+  ~DicomRepository();
 
 private:
   mutable std::deque<DicomFile> _dicomFiles; //keep a few of the last dicomFile in memory to avoid reloading them many times when requesting different frames or different image quality

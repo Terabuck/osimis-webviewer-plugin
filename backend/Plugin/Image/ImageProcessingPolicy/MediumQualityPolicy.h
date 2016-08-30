@@ -13,7 +13,7 @@ class MediumQualityPolicy : public IImageProcessingPolicy {
 public:
   MediumQualityPolicy();
   virtual ~MediumQualityPolicy();
-  virtual IImageContainer* Apply(IImageContainer* input, ImageMetaData* metaData);
+  virtual std::auto_ptr<IImageContainer> Apply(std::auto_ptr<IImageContainer> input, ImageMetaData* metaData);
 
   virtual std::string ToString() const
   {

@@ -122,8 +122,7 @@ OrthancPluginErrorCode ImageController::_ProcessRequest()
     assert(this->processingPolicy_.get() != NULL);
 
     // retrieve processed image
-    std::auto_ptr<Image> image;
-    image.reset(imageRepository_->GetImage(this->instanceId_, this->frameIndex_, this->processingPolicy_.get(), !this->disableCache_));
+    std::auto_ptr<Image> image = imageRepository_->GetImage(this->instanceId_, this->frameIndex_, this->processingPolicy_.get(), !this->disableCache_);
     
     if (image.get() != NULL)
     {

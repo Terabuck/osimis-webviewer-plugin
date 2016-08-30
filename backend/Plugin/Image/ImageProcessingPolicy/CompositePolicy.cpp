@@ -10,13 +10,16 @@ CompositePolicy::~CompositePolicy()
   }
 }
 
-IImageContainer* CompositePolicy::Apply(IImageContainer* input, ImageMetaData* metaData)
+ 
+std::auto_ptr<IImageContainer> CompositePolicy::Apply(std::auto_ptr<IImageContainer> input, ImageMetaData* metaData)
 {
-  IImageContainer* output = input;
-  
+  std::auto_ptr<IImageContainer> output = input; // note input == NULL after the copy
+
   BOOST_FOREACH(IImageProcessingPolicy* policy, policyChain_)
   {
+    assert(output.get() != NULL);
     output = policy->Apply(output, metaData);
+    assert(output.get() != NULL);
   }
 
   return output;

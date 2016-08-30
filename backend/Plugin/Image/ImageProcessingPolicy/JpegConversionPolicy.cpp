@@ -19,11 +19,11 @@ JpegConversionPolicy::~JpegConversionPolicy()
 {
 }
 
-IImageContainer* JpegConversionPolicy::Apply(IImageContainer* input, ImageMetaData* metaData) {
+std::auto_ptr<IImageContainer> JpegConversionPolicy::Apply(std::auto_ptr<IImageContainer> input, ImageMetaData* metaData) {
   BENCH(COMPRESS_FRAME_IN_JPEG);
 
   // Except *raw* image
-  RawImageContainer* rawImage = dynamic_cast<RawImageContainer*>(input);
+  RawImageContainer* rawImage = dynamic_cast<RawImageContainer*>(input.get());
   assert(rawImage != NULL);
 
   Orthanc::ImageAccessor* accessor = rawImage->GetOrthancImageAccessor();
@@ -54,5 +54,5 @@ IImageContainer* JpegConversionPolicy::Apply(IImageContainer* input, ImageMetaDa
 
   metaData->compression = "jpeg";
   
-  return new CompressedImageContainer(buffer);
+  return std::auto_ptr<IImageContainer>(new CompressedImageContainer(buffer));
 }

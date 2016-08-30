@@ -3,9 +3,10 @@
 #include "../../BenchmarkHelper.h"
 #include "../ImageContainer/CornerstoneKLVContainer.h"
 
-IImageContainer* KLVEmbeddingPolicy::Apply(IImageContainer* data, ImageMetaData* metaData)
+std::auto_ptr<IImageContainer> KLVEmbeddingPolicy::Apply(std::auto_ptr<IImageContainer> data, ImageMetaData* metaData)
 {
   BENCH(EMBED_IN_KLV)
-  CornerstoneKLVContainer* klvContainer = new CornerstoneKLVContainer(data, metaData);
+  std::auto_ptr<IImageContainer> klvContainer(new CornerstoneKLVContainer(data, metaData));
+  assert(klvContainer.get() != NULL);
   return klvContainer;
 }

@@ -12,7 +12,7 @@ HighQualityPolicy::~HighQualityPolicy()
 {
 }
 
-IImageContainer* HighQualityPolicy::Apply(IImageContainer* input, ImageMetaData* metaData)
+std::auto_ptr<IImageContainer> HighQualityPolicy::Apply(std::auto_ptr<IImageContainer> input, ImageMetaData* metaData)
 {
   return pngAndKlvPolicy_.Apply(input, metaData);
 }

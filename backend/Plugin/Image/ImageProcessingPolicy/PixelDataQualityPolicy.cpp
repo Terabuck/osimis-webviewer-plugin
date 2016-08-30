@@ -8,7 +8,7 @@ PixelDataQualityPolicy::~PixelDataQualityPolicy()
 {
 }
 
-IImageContainer* PixelDataQualityPolicy::Apply(IImageContainer* input, ImageMetaData* metaData)
+std::auto_ptr<IImageContainer> PixelDataQualityPolicy::Apply(std::auto_ptr<IImageContainer> input, ImageMetaData* metaData)
 {
   return _klvPolicy.Apply(input, metaData);
 }

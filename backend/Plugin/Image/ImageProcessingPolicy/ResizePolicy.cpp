@@ -10,12 +10,13 @@ ResizePolicy::ResizePolicy(unsigned int maxWidthHeight)
   maxWidthHeight_ = maxWidthHeight;
 }
 
-IImageContainer* ResizePolicy::Apply(IImageContainer* input, ImageMetaData* metaData)
+std::auto_ptr<IImageContainer> ResizePolicy::Apply(std::auto_ptr<IImageContainer> input, ImageMetaData* metaData)
 {
   BENCH(RESIZE_IMAGE)
 
   // Except *raw* image
-  RawImageContainer* inRawImage = dynamic_cast<RawImageContainer*>(input);
+  // @todo real cast
+  RawImageContainer* inRawImage = dynamic_cast<RawImageContainer*>(input.get());
   assert(inRawImage != NULL);
 
   Orthanc::ImageAccessor* accessor = inRawImage->GetOrthancImageAccessor();
@@ -56,7 +57,7 @@ IImageContainer* ResizePolicy::Apply(IImageContainer* input, ImageMetaData* meta
   metaData->height = outHeight;
   metaData->sizeInBytes = outAccessor.GetSize();
 
-  return outRawImage;
+  return std::auto_ptr<IImageContainer>(outRawImage);
 }
 
 std::string ResizePolicy::ToString() const 

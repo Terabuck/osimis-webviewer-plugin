@@ -8,7 +8,7 @@
 class IImageProcessingPolicy {
 public:
   virtual ~IImageProcessingPolicy() {};
-  virtual IImageContainer* Apply(IImageContainer* container, ImageMetaData* metaData) = 0;
+  virtual std::auto_ptr<IImageContainer> Apply(std::auto_ptr<IImageContainer> container, ImageMetaData* metaData) = 0;
 
   // to create a generic route based on composed policies
   virtual std::string ToString() const = 0;

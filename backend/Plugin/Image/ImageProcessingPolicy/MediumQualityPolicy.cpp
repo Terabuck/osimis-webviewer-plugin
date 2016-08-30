@@ -18,7 +18,7 @@ MediumQualityPolicy::~MediumQualityPolicy()
 {
 }
 
-IImageContainer* MediumQualityPolicy::Apply(IImageContainer* input, ImageMetaData* metaData)
+std::auto_ptr<IImageContainer> MediumQualityPolicy::Apply(std::auto_ptr<IImageContainer> input, ImageMetaData* metaData)
 {
   return resampleAndJpegPolicy_.Apply(input, metaData);
 }

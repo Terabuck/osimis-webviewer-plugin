@@ -12,7 +12,7 @@
 class CompositePolicy : public IImageProcessingPolicy {
 public:
   virtual ~CompositePolicy();
-  virtual IImageContainer* Apply(IImageContainer* input, ImageMetaData* metaData);
+  virtual std::auto_ptr<IImageContainer> Apply(std::auto_ptr<IImageContainer> input, ImageMetaData* metaData);
 
   // takes ownership
   void AddPolicy(IImageProcessingPolicy* policy);

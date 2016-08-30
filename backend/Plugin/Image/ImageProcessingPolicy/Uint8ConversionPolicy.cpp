@@ -17,10 +17,10 @@ namespace {
                              SourceType source2, TargetType target2);
 }
 
-IImageContainer* Uint8ConversionPolicy::Apply(IImageContainer* input, ImageMetaData* metaData)
+std::auto_ptr<IImageContainer> Uint8ConversionPolicy::Apply(std::auto_ptr<IImageContainer> input, ImageMetaData* metaData)
 {
   // Except *raw* image
-  RawImageContainer* rawInputImage = dynamic_cast<RawImageContainer*>(input);
+  RawImageContainer* rawInputImage = dynamic_cast<RawImageContainer*>(input.get());
   assert(rawInputImage != NULL);
 
   Orthanc::ImageAccessor* inAccessor = rawInputImage->GetOrthancImageAccessor();
@@ -37,7 +37,7 @@ IImageContainer* Uint8ConversionPolicy::Apply(IImageContainer* input, ImageMetaD
       pixelFormat != Orthanc::PixelFormat_SignedGrayscale16)
   {
     throw std::invalid_argument("Input is not 16bit");
-    return 0;
+    return std::auto_ptr<IImageContainer>(0);
   }
 
   BENCH(CONVERT_TO_UINT8);
@@ -66,7 +66,7 @@ IImageContainer* Uint8ConversionPolicy::Apply(IImageContainer* input, ImageMetaD
   BENCH_LOG(SIZE_IN_BYTES, metaData->sizeInBytes);
 
   RawImageContainer* rawOutputImage = new RawImageContainer(outBuffer);
-  return rawOutputImage;
+  return std::auto_ptr<IImageContainer>(rawOutputImage);
 }
 
 namespace {
