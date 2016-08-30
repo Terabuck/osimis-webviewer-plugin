@@ -11,7 +11,7 @@
      * detects and removes '/osimis-viewer/app/...' from the actual location.
      *
      * Location parameters need to be manually filled at the instantiation for
-     * testing reasons.
+     * testing reasons (as opposed to grabbing the global window.location object).
      *
      * @param {string} protocol - window.location.protocol (eg: "http:" - double point included!)
      * @param {string} hostname - window.location.hostname (eg: localhost)
