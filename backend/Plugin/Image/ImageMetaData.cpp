@@ -54,6 +54,8 @@ ImageMetaData::ImageMetaData()
 
 ImageMetaData::ImageMetaData(RawImageContainer* rawImage, const Json::Value& dicomTags)
 {
+  // Generate metadata from an image and its tags
+
   BENCH(CALCULATE_METADATA)
   ImageAccessor* accessor = rawImage->GetOrthancImageAccessor();
 
@@ -163,6 +165,10 @@ ImageMetaData::ImageMetaData(RawImageContainer* rawImage, const Json::Value& dic
 
 ImageMetaData::ImageMetaData(const DicomMap& headerTags, const Json::Value& dicomTags)
 {
+  // Generate metadata from tags only (a bit less accurate than the other constructor - maxPixelValue can't be processed from image)
+  // headerTags retrieved from dicom file
+  // dicomTags retrived from Orthanc sqlite
+
   BENCH(CALCULATE_METADATA)
 
   // define color
@@ -236,7 +242,7 @@ ImageMetaData::ImageMetaData(const DicomMap& headerTags, const Json::Value& dico
   const DicomValue* transfertSyntaxValue = headerTags.TestAndGetValue(0x0002, 0x0010);
   std::string transferSyntax;
 
-  if (transfertSyntaxValue->IsBinary()) {
+  if (transfertSyntaxValue != NULL && transfertSyntaxValue->IsBinary()) {
     throw OrthancException(static_cast<ErrorCode>(OrthancPluginErrorCode_CorruptedFile));
   }
   else if (transfertSyntaxValue == NULL || transfertSyntaxValue->IsNull()) {
