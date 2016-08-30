@@ -280,7 +280,7 @@ To retrieve changes from original mercurial repository, use [git-remote-hg](http
 - docker build will trigger automatically (:dev tag).  Win/OSX builds will trigger during the night.  You may trigger them by hand on Jenkins 1.  The OrthancMainline builds contain the OsimisWebViewer dev branch.  Note that the Win/OSX build slaves are very unstable, you might need to restart the builds ...
 - perform a smoke test of each version
 - if everything is fine, merge dev into master.  Make sur to merge the commit you have validated (someone might have merged another feature since you started your validation)
-- update the versions in `frontend/bower.json`, `frontend/package.js` and `frontend/src/app/webviewer.module.js`
+- update the versions in `frontend/bower.json`, `frontend/package.js` and `frontend/src/app/config.provider.js`
 - update the release notes in master (review all feature branch merges since the last merge from dev into master)
 - commit
 - create a new tag with 'git tag -a 0.4.1 -m "0.4.1"'
