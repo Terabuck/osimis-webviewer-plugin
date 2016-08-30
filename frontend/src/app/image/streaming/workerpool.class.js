@@ -39,7 +39,7 @@
             throw new Error('WorkerPool must have at least 2 workers');
         }
         else {
-            this._workerCount = options.workerCount || 1;
+            this._workerCount = options.workerCount || 2;
         }
 
         if (!options.createPromiseFn) {
