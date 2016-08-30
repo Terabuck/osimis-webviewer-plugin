@@ -1,7 +1,7 @@
 #include <boost/regex.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp> // for boost::split
+#include <boost/algorithm/string.hpp> // for boost::algorithm::split
 
 #include "../../Orthanc/Core/OrthancException.h" // for OrthancException(UnknownResource) catch
 
