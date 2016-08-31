@@ -22,9 +22,6 @@ class Image : public boost::noncopyable {
   friend class ImageRepository;
 
 public:
-  // destruction is done by end-user
-  ~Image();
-
   inline std::string GetId() const;
   inline const char* GetBinary() const;
   inline uint32_t GetBinarySize() const;
@@ -33,21 +30,21 @@ private:
   // instantiation is done by ImageRepository
 
   // takes memory ownership
-  Image(const std::string& instanceId, uint32_t frameIndex, RawImageContainer* data, const Json::Value& dicomTags);
+  Image(const std::string& instanceId, uint32_t frameIndex, std::auto_ptr<RawImageContainer> data, const Json::Value& dicomTags);
 
   // takes memory ownership
-  Image(const std::string& instanceId, uint32_t frameIndex, IImageContainer* data, const Orthanc::DicomMap& headerTags, const Json::Value& dicomTags);
+  Image(const std::string& instanceId, uint32_t frameIndex, std::auto_ptr<IImageContainer> data, const Orthanc::DicomMap& headerTags, const Json::Value& dicomTags);
 
   // takes memory ownership
-  Image(const std::string& instanceId, uint32_t frameIndex, CornerstoneKLVContainer* data);
+  Image(const std::string& instanceId, uint32_t frameIndex, std::auto_ptr<CornerstoneKLVContainer> data);
 
   void ApplyProcessing(IImageProcessingPolicy* policy);
 
 private:
   std::string instanceId_;
   uint32_t frameIndex_;
-  IImageContainer* data_;
-  ImageMetaData metaData_;
+  ImageMetaData metaData_; // should always be defined prior to 'data_' due to constructor initialization order
+  std::auto_ptr<IImageContainer> data_;
 };
 
 inline std::string Image::GetId() const {

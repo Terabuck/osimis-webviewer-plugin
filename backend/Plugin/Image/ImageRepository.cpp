@@ -30,7 +30,7 @@ ImageRepository::ImageRepository(DicomRepository* dicomRepository)
 }
 
 
-Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy, bool enableCache) const
+std::auto_ptr<Image> ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy, bool enableCache) const
 {
   // Return uncached image
   if (!enableCache || !isCachedImageStorageEnabled()) {
@@ -42,15 +42,15 @@ Image* ImageRepository::GetImage(const std::string& instanceId, uint32_t frameIn
     std::string attachmentNumber = _getAttachmentNumber(frameIndex, policy);
 
     // Retrieve cached image
-    Image* image = this->_GetProcessedImageFromCache(attachmentNumber, instanceId, frameIndex);
+    std::auto_ptr<Image> image = this->_GetProcessedImageFromCache(attachmentNumber, instanceId, frameIndex);
     
     // Load & cache image if not found
-    if (image == 0) {
+    if (image.get() == 0) {
       // Load image
       image = this->_LoadImageFromOrthanc(instanceId, frameIndex, policy);
 
       // Cache image
-      this->_CacheProcessedImage(attachmentNumber, image);
+      this->_CacheProcessedImage(attachmentNumber, image.get());
     }
 
     // Return image
@@ -74,7 +74,7 @@ void ImageRepository::CleanImageCache(const std::string& instanceId, uint32_t fr
   }
 }
 
-Image* ImageRepository::_LoadImageFromOrthanc(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const {
+std::auto_ptr<Image> ImageRepository::_LoadImageFromOrthanc(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const {
   BENCH_LOG(IMAGE_FORMATING, "");
 
   // boost::lock_guard<boost::mutex> guard(mutex_); // make sure the memory amount doesn't overrise
@@ -85,7 +85,7 @@ Image* ImageRepository::_LoadImageFromOrthanc(const std::string& instanceId, uin
 
   // Load frame - Either directly from orthanc (without decompression/recompression; when PixelData route is called),
   // or with a compression done by the plugin (when Policy is not PixelData; slower)
-  Image* image = 0;
+  std::auto_ptr<Image> image;
 
   // Load already compressed instance frame (if the policy type is PixelDataQuality, because it's faster
   // then loading the dicom file & checking the transferSyntax tag)
@@ -120,9 +120,9 @@ Image* ImageRepository::_LoadImageFromOrthanc(const std::string& instanceId, uin
     }
 
     // Store the frame inside
-    CompressedImageContainer* data = new CompressedImageContainer(frame);
+    std::auto_ptr<IImageContainer> data(new CompressedImageContainer(frame));
  
-    image = new Image(instanceId, frameIndex, data, headerTags, dicomTags);
+    image.reset(new Image(instanceId, frameIndex, data, headerTags, dicomTags));
   }
   // Load bitmap orthanc instance frame
   else {
@@ -144,9 +144,9 @@ Image* ImageRepository::_LoadImageFromOrthanc(const std::string& instanceId, uin
     _dicomRepository->decrefDicomFile(instanceId);
 
     // Store the frame inside a container
-    RawImageContainer* data = new RawImageContainer(frame);
+    std::auto_ptr<RawImageContainer> data(new RawImageContainer(frame));
 
-    image = new Image(instanceId, frameIndex, data, dicomTags);
+    image.reset(new Image(instanceId, frameIndex, data, dicomTags));
   }
 
   if (policy != NULL) {
@@ -156,7 +156,7 @@ Image* ImageRepository::_LoadImageFromOrthanc(const std::string& instanceId, uin
   return image;
 }
 
-Image* ImageRepository::_GetProcessedImageFromCache(const std::string &attachmentNumber, const std::string& instanceId, uint32_t frameIndex) const {
+std::auto_ptr<Image> ImageRepository::_GetProcessedImageFromCache(const std::string &attachmentNumber, const std::string& instanceId, uint32_t frameIndex) const {
   // if not found - create
   // if found - retrieve
   OrthancPluginMemoryBuffer getResultBuffer; // will be adopted by CornerstoneKLVContainer if the request succeeds
@@ -184,8 +184,8 @@ Image* ImageRepository::_GetProcessedImageFromCache(const std::string &attachmen
   {
     // NO METADATA ?
     // unstable...
-    CornerstoneKLVContainer* data = new CornerstoneKLVContainer(getResultBuffer); // takes getResultBuffer memory ownership
-    Image* image = new Image(instanceId, frameIndex, data); // takes data memory ownership
+    std::auto_ptr<CornerstoneKLVContainer> data(new CornerstoneKLVContainer(getResultBuffer)); // takes getResultBuffer memory ownership
+    std::auto_ptr<Image> image(new Image(instanceId, frameIndex, data)); // takes data memory ownership
     
     return image;
   }
@@ -193,7 +193,7 @@ Image* ImageRepository::_GetProcessedImageFromCache(const std::string &attachmen
   else if (error == OrthancPluginErrorCode_UnknownResource) {
     // Make sure there won't be any leak since getResultBuffer is not deleted if not adopted by the KLV Container
     assert(getResultBuffer.data == NULL);
-    return 0;
+    return std::auto_ptr<Image>(0);
   }
   // Unknown error - throw
   else

@@ -438,9 +438,9 @@ extern "C"
 
 
     // Instantiate repositories
-    DicomRepository* dicomRepository = new DicomRepository;
-    ImageRepository* imageRepository = new ImageRepository(dicomRepository);
-    SeriesRepository* seriesRepository = new SeriesRepository(dicomRepository);
+    dicomRepository = new DicomRepository;
+    imageRepository = new ImageRepository(dicomRepository);
+    seriesRepository = new SeriesRepository(dicomRepository);
     imageRepository->enableCachedImageStorage(cachedImageStorageEnabled);
 
     ImageController::Inject(imageRepository);

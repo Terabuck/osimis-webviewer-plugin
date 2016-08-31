@@ -65,6 +65,14 @@ void DicomRepository::decrefDicomFile(const std::string instanceId) const
   assert(false); //it means we did not find the file
 }
 
+DicomRepository::~DicomRepository()
+{
+  for (std::deque<DicomFile>::iterator it = _dicomFiles.begin(); it != _dicomFiles.end(); it++)
+  {
+    OrthancPluginFreeMemoryBuffer(OrthancContextManager::Get(), &(it->dicomFileBuffer));
+  }
+}
+
 namespace
 {
 using namespace OrthancPlugins;

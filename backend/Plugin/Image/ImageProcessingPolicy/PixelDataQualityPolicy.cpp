@@ -1,4 +1,5 @@
 #include "PixelDataQualityPolicy.h"
+#include "../../Logging.h"
 
 PixelDataQualityPolicy::PixelDataQualityPolicy()
 {
@@ -8,7 +9,8 @@ PixelDataQualityPolicy::~PixelDataQualityPolicy()
 {
 }
 
-IImageContainer* PixelDataQualityPolicy::Apply(IImageContainer* input, ImageMetaData* metaData)
+std::auto_ptr<IImageContainer> PixelDataQualityPolicy::Apply(std::auto_ptr<IImageContainer> input, ImageMetaData* metaData)
 {
+  OrthancPluginLogDebug(OrthancContextManager::Get(), "ImageProcessingPolicy: PixelDataQualityPolicy");
   return _klvPolicy.Apply(input, metaData);
 }

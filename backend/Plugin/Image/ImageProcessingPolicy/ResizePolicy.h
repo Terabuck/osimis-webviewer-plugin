@@ -6,7 +6,7 @@
 class ResizePolicy : public IImageProcessingPolicy {
 public:
   ResizePolicy(unsigned int maxWidthHeight);
-  virtual IImageContainer* Apply(IImageContainer* data, ImageMetaData* metaData);
+  virtual std::auto_ptr<IImageContainer> Apply(std::auto_ptr<IImageContainer> data, ImageMetaData* metaData);
 
   virtual std::string ToString() const;
 

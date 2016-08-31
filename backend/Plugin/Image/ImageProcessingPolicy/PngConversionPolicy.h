@@ -5,7 +5,7 @@
 class PngConversionPolicy : public IImageProcessingPolicy {
 public:
   // @throws Orthanc::OrthancException
-  virtual IImageContainer* Apply(IImageContainer* data, ImageMetaData* metaData);
+  virtual std::auto_ptr<IImageContainer> Apply(std::auto_ptr<IImageContainer> data, ImageMetaData* metaData);
 
   virtual std::string ToString() const 
   { 

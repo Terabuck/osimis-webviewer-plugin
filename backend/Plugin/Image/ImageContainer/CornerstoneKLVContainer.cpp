@@ -3,8 +3,11 @@
 #include "../Utilities/KLVWriter.h"
 #include "OrthancContextManager.h"
 
-CornerstoneKLVContainer::CornerstoneKLVContainer(IImageContainer* data, const ImageMetaData* metaData) : dataAsMemoryBuffer_(OrthancContextManager::Get())
+CornerstoneKLVContainer::CornerstoneKLVContainer(std::auto_ptr<IImageContainer> data, const ImageMetaData* metaData) : dataAsMemoryBuffer_(OrthancContextManager::Get())
 {
+  assert(data.get() != NULL);
+  assert(metaData != NULL);
+
   KLVWriter klvWriter;
 
   // set metadata

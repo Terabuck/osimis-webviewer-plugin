@@ -12,7 +12,7 @@ class LowQualityPolicy : public IImageProcessingPolicy {
 public:
   LowQualityPolicy();
   virtual ~LowQualityPolicy();
-  virtual IImageContainer* Apply(IImageContainer* input, ImageMetaData* metaData);
+  virtual std::auto_ptr<IImageContainer> Apply(std::auto_ptr<IImageContainer> input, ImageMetaData* metaData);
 
   virtual std::string ToString() const
   {

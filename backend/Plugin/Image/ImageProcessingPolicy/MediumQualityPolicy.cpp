@@ -1,8 +1,9 @@
 #include "MediumQualityPolicy.h"
-#include "ImageProcessingPolicy/ResizePolicy.h"
-#include "ImageProcessingPolicy/Uint8ConversionPolicy.h"
-#include "ImageProcessingPolicy/JpegConversionPolicy.h"
-#include "ImageProcessingPolicy/KLVEmbeddingPolicy.h"
+#include "ResizePolicy.h"
+#include "Uint8ConversionPolicy.h"
+#include "JpegConversionPolicy.h"
+#include "KLVEmbeddingPolicy.h"
+#include "../../Logging.h"
 
 MediumQualityPolicy::MediumQualityPolicy()
 {
@@ -18,7 +19,8 @@ MediumQualityPolicy::~MediumQualityPolicy()
 {
 }
 
-IImageContainer* MediumQualityPolicy::Apply(IImageContainer* input, ImageMetaData* metaData)
+std::auto_ptr<IImageContainer> MediumQualityPolicy::Apply(std::auto_ptr<IImageContainer> input, ImageMetaData* metaData)
 {
+  OrthancPluginLogDebug(OrthancContextManager::Get(), "ImageProcessingPolicy: MediumQualityPolicy");
   return resampleAndJpegPolicy_.Apply(input, metaData);
 }

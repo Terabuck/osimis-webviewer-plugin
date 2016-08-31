@@ -9,7 +9,7 @@
 class CornerstoneKLVContainer : public IImageContainer {
 public:
   // does not take ownership
-  CornerstoneKLVContainer(IImageContainer* data, const ImageMetaData* metaData);
+  CornerstoneKLVContainer(std::auto_ptr<IImageContainer> data, const ImageMetaData* metaData);
   // takes ownership
   CornerstoneKLVContainer(OrthancPluginMemoryBuffer& data);
   virtual ~CornerstoneKLVContainer() {}
