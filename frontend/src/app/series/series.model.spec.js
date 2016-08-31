@@ -1,5 +1,5 @@
 /* jshint -W117, -W030 */
-describe('series', function () {
+xdescribe('series', function () {
     var _apiUrl = 'http://localhost:8042';
     var _study;
 

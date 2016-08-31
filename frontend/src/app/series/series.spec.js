@@ -1,5 +1,5 @@
 /* jshint -W117, -W030 */
-describe('series', function() {
+xdescribe('series', function() {
   describe('repository', function () {
 
     beforeEach(function() {

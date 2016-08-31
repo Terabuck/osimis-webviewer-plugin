@@ -1,4 +1,4 @@
-describe('viewport', function() {
+xdescribe('viewport', function() {
     
     //beforeEach(module('webviewer', 'ngMock'));
 

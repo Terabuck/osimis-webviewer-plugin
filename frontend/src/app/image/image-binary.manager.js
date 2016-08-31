@@ -62,9 +62,15 @@
 
         var pool = new window.osimis.WorkerPool({
             path: /* @inline-worker: */ '/app/image/image-parser.worker/main.js',
-            workerCount: 6, // @todo throw exception if workerCount < 2
+            workerCount: 6,
             createPromiseFn: $q,
             taskPriorityPolicy: new osimis.TaskPriorityPolicy(_cache)
+        });
+
+        // Send the orthanc API URL to each threads
+        pool.broadcastMessage({
+            type: 'setOrthancUrl',
+            orthancApiUrl: wvConfig.orthancApiURL
         });
 
         // @todo Free inline-worker's ObjectUrl

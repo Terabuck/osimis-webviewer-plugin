@@ -1,6 +1,6 @@
-describe('overlay', function() {
+xdescribe('overlay', function() {
 
-	xdescribe('directive', function() {
+	describe('directive', function() {
 
 		it('should show instances dicom tags informations', function() {
 			

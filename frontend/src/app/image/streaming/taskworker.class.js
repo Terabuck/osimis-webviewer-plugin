@@ -1,23 +1,23 @@
 (function(module) {
     'use strict';
 
-    // Fix IE issue with window.location.origin
-    // see http://tosbourn.com/a-fix-for-window-location-origin-in-internet-explorer/
-    if (!window.location.origin) {
-        window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
-    }
-
+    /**
+     * @class TaskWorker
+     *
+     * @param {string} script - the script URL used to initialize the worker.
+     *    the script content may be inlined here using either Osimis' gulp-inline-worker script or URL Blob Workers.
+     *
+     * @description
+     * A wrapper for Web Workers simplifying communication from the main thread.
+     * TaskWorker's user may either ask the thread to process a task or to receive a message
+     * Should only be used with the WorkerPool class because, unlike the WorkerPool, it doesn't contains communication-safe mechanism
+     * (one task may be started while another one is still executing).
+     *
+     **/
     function TaskWorker(script) {
         var _this = this;
 
         this._workerThread = new Worker(script);
-
-        // Send the current directory absolute path to allow file import
-        this._workerThread.postMessage({
-            type: 'setOrthancUrl',
-            locationDirUrl: window.location.origin + window.location.pathname.replace(/[\\\/][^\\\/]*$/, ''), // remove current file from url (only keep the directory)
-            orthancApiUrl: window.orthancUrl // @todo use wvConfig.orthancApiUrl instead - (we need to figure out a way to inject wvConfig in non angular code)
-        });
 
         this._currentTask = null;
 
@@ -60,6 +60,10 @@
             _this.onAvailable.trigger();
         }, false);
     }
+
+    TaskWorker.prototype.postMessage = function(message) {
+        this._workerThread.postMessage(message);
+    };
     
     TaskWorker.prototype.processTask = function(task) {
         var _this = this;
