@@ -276,4 +276,8 @@ add_executable(UnitTests
   UnitTestsSources/UnitTestsMain.cpp
   )
 
+if (STATIC_BUILD OR NOT USE_SYSTEM_GDCM)
+  add_dependencies(UnitTests GDCM)
+endif()
+
 target_link_libraries(UnitTests ${GDCM_LIBRARIES})
