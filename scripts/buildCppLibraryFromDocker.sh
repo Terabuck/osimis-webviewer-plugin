@@ -27,3 +27,6 @@ cp -L libOsimisWebViewer.so /usr/share/orthanc/plugins/
 # Remove the build directory to recover space
 cd /root/
 rm -rf /root/osimis-webviewer
+
+# Remove the Orthanc viewer to avoid conflicts with the Osimis Viewer (2 buttons to open 2 viewers)
+rm -rf /usr/share/orthanc/plugins/libOrthancWebViewer.so
