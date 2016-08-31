@@ -129,6 +129,8 @@ ImageMetaData::ImageMetaData(RawImageContainer* rawImage, const Json::Value& dic
   if (GetStringTag(pixelSpacing, dicomTags, "PixelSpacing"))
   {
     std::vector<std::string> tokens;
+    // '\' is the standard separator in dicom string
+    // see http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html
     Toolbox::TokenizeString(tokens, pixelSpacing, '\\');
 
     if (tokens.size() >= 2)
