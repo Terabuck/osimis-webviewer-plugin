@@ -1,8 +1,11 @@
 #include "ImageMetaData.h"
 
 #include <cmath> // for std::pow
+#include <vector>
+#include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
+#include <boost/algorithm/string.hpp> // for boost::algorithm::split
 
 #include "../BenchmarkHelper.h"
 #include "../../Orthanc/Core/Toolbox.h" // for TokenizeString && StripSpaces
@@ -12,6 +15,9 @@
 namespace
 {
   float GetFloatTag(const Json::Value& dicomTags,
+                           const std::string& tagName,
+                           float defaultValue);
+  std::vector<float> GetFloatListTag(const Json::Value& dicomTags,
                            const std::string& tagName,
                            float defaultValue);
   bool GetStringTag(std::string& result,
@@ -48,6 +54,8 @@ ImageMetaData::ImageMetaData()
 
 ImageMetaData::ImageMetaData(RawImageContainer* rawImage, const Json::Value& dicomTags)
 {
+  // Generate metadata from an image and its tags
+
   BENCH(CALCULATE_METADATA)
   ImageAccessor* accessor = rawImage->GetOrthancImageAccessor();
 
@@ -111,8 +119,9 @@ ImageMetaData::ImageMetaData(RawImageContainer* rawImage, const Json::Value& dic
   intercept = GetFloatTag(dicomTags, "RescaleIntercept", 0.0f);
 
   // set windowCenter & windowWidth (image specific)
-  windowCenter = GetFloatTag(dicomTags, "WindowCenter", windowCenter * slope + intercept);
-  windowWidth = GetFloatTag(dicomTags, "WindowWidth", windowWidth * slope);
+  // @todo manage multiple ww/wc (this requires specific UI - we only consider the first one at the moment)
+  windowCenter = GetFloatListTag(dicomTags, "WindowCenter", windowCenter * slope + intercept)[0];
+  windowWidth = GetFloatListTag(dicomTags, "WindowWidth", windowWidth * slope)[0];
 
   // set rowPixelSpacing/columnPixelSpacing
   bool dicomHasPixelSpacing = false;
@@ -120,6 +129,8 @@ ImageMetaData::ImageMetaData(RawImageContainer* rawImage, const Json::Value& dic
   if (GetStringTag(pixelSpacing, dicomTags, "PixelSpacing"))
   {
     std::vector<std::string> tokens;
+    // '\' is the standard separator in dicom string
+    // see http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html
     Toolbox::TokenizeString(tokens, pixelSpacing, '\\');
 
     if (tokens.size() >= 2)
@@ -156,6 +167,10 @@ ImageMetaData::ImageMetaData(RawImageContainer* rawImage, const Json::Value& dic
 
 ImageMetaData::ImageMetaData(const DicomMap& headerTags, const Json::Value& dicomTags)
 {
+  // Generate metadata from tags only (a bit less accurate than the other constructor - maxPixelValue can't be processed from image)
+  // headerTags retrieved from dicom file
+  // dicomTags retrived from Orthanc sqlite
+
   BENCH(CALCULATE_METADATA)
 
   // define color
@@ -185,8 +200,9 @@ ImageMetaData::ImageMetaData(const DicomMap& headerTags, const Json::Value& dico
   intercept = GetFloatTag(dicomTags, "RescaleIntercept", 0.0f);
 
   // set windowCenter & windowWidth (image specific)
-  windowCenter = GetFloatTag(dicomTags, "WindowCenter", 127.5f * slope + intercept);
-  windowWidth = GetFloatTag(dicomTags, "WindowWidth", 256.0f * slope);
+  // @todo manage multiple ww/wc (this requires specific UI - we only consider the first one at the moment)
+  windowCenter = GetFloatListTag(dicomTags, "WindowCenter", 127.5f * slope + intercept)[0];
+  windowWidth = GetFloatListTag(dicomTags, "WindowWidth", 256.0f * slope)[0];
 
   // set rowPixelSpacing/columnPixelSpacing
   bool dicomHasPixelSpacing = false;
@@ -228,7 +244,7 @@ ImageMetaData::ImageMetaData(const DicomMap& headerTags, const Json::Value& dico
   const DicomValue* transfertSyntaxValue = headerTags.TestAndGetValue(0x0002, 0x0010);
   std::string transferSyntax;
 
-  if (transfertSyntaxValue->IsBinary()) {
+  if (transfertSyntaxValue != NULL && transfertSyntaxValue->IsBinary()) {
     throw OrthancException(static_cast<ErrorCode>(OrthancPluginErrorCode_CorruptedFile));
   }
   else if (transfertSyntaxValue == NULL || transfertSyntaxValue->IsNull()) {
@@ -321,6 +337,41 @@ namespace {
     }
 
     return defaultValue;
+  }
+
+  std::vector<float> GetFloatListTag(const Json::Value& dicomTags,
+                           const std::string& tagName,
+                           float defaultValue)
+  {
+    std::string fullStr;
+    std::vector<float> floatList;
+
+    if(GetStringTag(fullStr, dicomTags, tagName)) {
+      // Split tags content by "\" character
+      std::vector<std::string> strs;
+      boost::algorithm::split(strs, fullStr, boost::is_any_of("\\"));
+
+      // Convert each part of the string to float
+      BOOST_FOREACH(const std::string& str, strs)
+      {
+        try
+        {
+          float value = boost::lexical_cast<float>(Toolbox::StripSpaces(str));
+          floatList.push_back(value);
+        }
+        catch (boost::bad_lexical_cast&)
+        {
+        }
+      }
+    }
+
+    // Set the default value if none has been found
+    if (floatList.size() == 0)
+    {
+      floatList.push_back(defaultValue);
+    }
+    
+    return floatList;
   }
 
   bool GetStringTag(std::string& result,
