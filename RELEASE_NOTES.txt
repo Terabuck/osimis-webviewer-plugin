@@ -1,6 +1,12 @@
 Pending changes in the mainline
 ===============================
 
+=> Minimum Orthanc version: 1.1.0 <=
+
+* Enhance compatibility with reverse proxies
+* Remove memory leaks
+* Handle multiple-value DICOM tags for WindowWidth and WindowCenter: use the first value of each one
+
 Version 0.5.1
 ========================
 
