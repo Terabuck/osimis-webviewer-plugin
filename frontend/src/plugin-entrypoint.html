@@ -96,6 +96,8 @@
                         else {
                             throw new Error('Invalid URL parameters');
                         }
+                    }, function(err) {
+                        console.error('err', err);
                     });
             }
 

@@ -149,13 +149,11 @@
             };
             // Adapt the viewports to new seriesId if the viewports had no prior configurations.
             scope.$watch('vm.seriesId', function(newSeriesId, oldSeriesId) {
-                if (newSeriesId === oldSeriesId) {
-                    vm.viewports.forEach(function(viewport) {
-                        if (typeof viewport.seriesId === 'undefined') {
-                            viewport.seriesId = newSeriesId;
-                        }
-                    });
-                }
+                vm.viewports.forEach(function(viewport) {
+                    if (typeof viewport.seriesId === 'undefined') {
+                        viewport.seriesId = newSeriesId;
+                    }
+                });
             });
         }
     }
