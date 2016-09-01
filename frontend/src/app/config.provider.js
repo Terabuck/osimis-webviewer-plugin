@@ -72,6 +72,9 @@
                 _config.version.orthanc = orthanc.data.Version;
                 _config.version.db = orthanc.data.DatabaseVersion;
 
+                // Log versions and orthanc path
+                console.log(_config);
+
                 // Compare minor and major versions
                 var semverRegex = /^v?(\d+)\.(\d+)\.\d+/;
                 var frontendVersionMatch = semverRegex.exec(_config.version.frontend);
