@@ -22,19 +22,20 @@ docker build --tag=osimis/frontend-builder --file=DockerfileFrontEndBuilder .
 
 # we first need to create the container before we can copy files to it
 export releaseCommitId
-webAppBuilderContainerId=$(docker create --name webviewer-frontend-builder-$releaseCommitId osimis/frontend-builder $releaseCommitId)
+WEBAPP_BUILDER_CONTAINER_ID=$(docker create --name webviewer-frontend-builder-$releaseCommitId osimis/frontend-builder $releaseCommitId)
+export WEBAPP_BUILDER_CONTAINER_ID # export the variable to be able to remove the container later in case of error
 
 # copy the frontendToolbox files in the container
-docker cp $(pwd)/ $webAppBuilderContainerId:/
+docker cp $(pwd)/ $WEBAPP_BUILDER_CONTAINER_ID:/
 
 # run
-docker start -a $webAppBuilderContainerId
+docker start -a $WEBAPP_BUILDER_CONTAINER_ID
 
 # copy the build output folder to the host
-docker cp $webAppBuilderContainerId:/frontend/build/ $(pwd)/build/
+docker cp $WEBAPP_BUILDER_CONTAINER_ID:/frontend/build/ $(pwd)/build/
 
 # copy the zip output folder to the host
-docker cp $webAppBuilderContainerId:/tmp/output/$releaseCommitId.zip $(pwd)/
+docker cp $WEBAPP_BUILDER_CONTAINER_ID:/tmp/output/$releaseCommitId.zip $(pwd)/
 
 # remove container
-docker rm $webAppBuilderContainerId
+docker rm $WEBAPP_BUILDER_CONTAINER_ID

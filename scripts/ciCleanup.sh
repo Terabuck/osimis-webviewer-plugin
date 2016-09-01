@@ -34,4 +34,12 @@ if [[ "${AWS_DOCKER_CONTAINER_ID}" != "" ]]; then
 	fi
 fi
 
+# remove web app builder if exists
+if [[ "${WEB_APP_BUILDER_CONTAINER_ID}" != "" ]]; then
+	dockerContainer=$(docker ps -a -q --no-trunc | grep ${WEB_APP_BUILDER_CONTAINER_ID} 2> /dev/null)
+	if [[ $dockerContainer != "" ]]; then
+		docker rm $dockerContainer
+	fi
+fi
+
 echo "...cleaned up"
