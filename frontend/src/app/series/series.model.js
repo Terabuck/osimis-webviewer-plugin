@@ -227,7 +227,7 @@
             // Benchmark play loop
             if (console.time && console.timeEnd) {
                 _timeLog = 'play (expect ? ms)';
-                console.time(_timeLog);
+                // console.time(_timeLog);
             }
 
             // Create recursive closure to display each images
@@ -244,9 +244,9 @@
 
                             // Benchmark play loop
                             if (console.time && console.timeEnd) {
-                                console.timeEnd(_timeLog);
+                                // console.timeEnd(_timeLog);
                                 _timeLog = 'play (expect ' + Math.round(desiredFrameRateInMs) + 'ms)';
-                                console.time(_timeLog);
+                                // console.time(_timeLog);
                             }
                             
                             // Track current time to calculate Frame Rate
@@ -271,7 +271,7 @@
 
                 // Stop benchmarking play loop
                 if (console.time && console.timeEnd) {
-                    console.timeEnd(_timeLog);
+                    // console.timeEnd(_timeLog);
                     _timeLog = 'play (expect ? ms)';
                 }
             }
