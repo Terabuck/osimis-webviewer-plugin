@@ -219,7 +219,7 @@ header.close()
 PYTHON_MAJOR_VERSION = sys.version_info[0]
 
 def WriteResource(cpp, item):
-    cpp.write('    static const uint8_t resource%dBuffer[] = {' % item['Index'])
+    cpp.write('    static const uint8_t resource%dBuffer[] = { // %s' % (item['Index'], item['Filename']))
 
     f = open(item['Filename'], "rb")
     content = f.read()
