@@ -250,7 +250,7 @@ add_library(OsimisWebViewer
 
 
 if (STATIC_BUILD OR NOT USE_SYSTEM_GDCM)
-  add_dependencies(OsimisWebViewer GDCM)
+  add_dependencies(OsimisWebViewer GDCM EmbeddedResourcesGenerator)
 endif()
 
 target_link_libraries(OsimisWebViewer ${GDCM_LIBRARIES})
@@ -277,7 +277,7 @@ add_executable(UnitTests
   )
 
 if (STATIC_BUILD OR NOT USE_SYSTEM_GDCM)
-  add_dependencies(UnitTests GDCM)
+  add_dependencies(UnitTests GDCM EmbeddedResourcesGenerator)
 endif()
 
 target_link_libraries(UnitTests ${GDCM_LIBRARIES})
