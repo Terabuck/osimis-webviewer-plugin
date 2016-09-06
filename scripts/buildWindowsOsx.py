@@ -36,7 +36,7 @@ for build in builds:
 	ret = BuildHelpers.buildCMake(cmakeListsFolderPath = os.path.join(rootFolder, 'backend'),
 	                              buildFolderPath = buildFolder,
 	                              cmakeTargetName = 'OsimisWebViewer',
-	                              cmakeArguments = ["-DJS_FRONTEND_VERSION={}".format(args.branchName)],
+	                              cmakeArguments = [],
 	                              builder = build['builder'],
 	                              config = BuildHelpers.CONFIG_RELEASE
 	                              )

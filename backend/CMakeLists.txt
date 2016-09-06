@@ -34,15 +34,18 @@ if(EXISTS ${JS_CLIENT_PATH})
   # Set frontend version based on local build if available
   # when building inside the docker container, the frontend/build folder is already there and we don't want to override it.
   set(JS_FRONTEND_VERSION "LOCAL" CACHE STRING "the version of the frontend package to download")
-elseif (${PRODUCT_VERSION_BRANCH} STREQUAL "master")
-  # Set frontend version based on tag for master
-  # @todo we'll have to adapt this if we use maintenance branch
-  set(JS_FRONTEND_VERSION ${PRODUCT_VERSION_SHORT_STRING} CACHE STRING "the version of the frontend package to download")
+#elseif (${PRODUCT_VERSION_BRANCH} STREQUAL "master")
+#  # Set frontend version based on tag for master
+#  # @todo we'll have to adapt this if we use maintenance branch
+#  set(JS_FRONTEND_VERSION ${PRODUCT_VERSION_SHORT_STRING} CACHE STRING "the version of the frontend package to download")
 else()
   # Set frontend version based on the branch for non-release version
-  set(JS_FRONTEND_VERSION ${PRODUCT_VERSION_BRANCH} CACHE STRING "the version of the frontend package to download")
-  # Make variable file-name compatible, to make it relate to the aws built front-end zip file
-  string(REPLACE "/" "-" JS_FRONTEND_VERSION ${JS_FRONTEND_VERSION})
+  set(JS_FRONTEND_VERSION ${PRODUCT_VERSION_COMMIT_SHA1_STRING} CACHE STRING "the version of the frontend package to download")
+
+#  if(JS_FRONTED_VERSION=="HEAD") # this happens on detached head builds like on Jenkins slaves
+#      set(JS_)
+#  # Make variable file-name compatible, to make it relate to the aws built front-end zip file
+#  string(REPLACE "/" "-" JS_FRONTEND_VERSION ${JS_FRONTEND_VERSION})
 endif()
 
 MESSAGE( STATUS "PRODUCT_VERSION_BRANCH:         " ${PRODUCT_VERSION_BRANCH} )

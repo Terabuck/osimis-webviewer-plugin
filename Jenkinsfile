@@ -1,11 +1,3 @@
-node('windows') {
-    stage 'Retrieve sources'
-    checkout scm
-
-    stage 'Build C++ Windows plugin'
-    bat 'cd scripts & ciBuildWindows.bat %BRANCH_NAME%'
-}
-
 node('docker') {
     stage 'Retrieve sources'
     checkout scm
@@ -27,6 +19,9 @@ node('docker') {
 node('windows') {
     stage 'Retrieve sources'
     checkout scm
+
+    stage 'Build C++ Windows plugin'
+    bat 'cd scripts & ciBuildWindows.bat %BRANCH_NAME%'
 }
 
 node('docker') {
