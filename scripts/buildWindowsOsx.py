@@ -7,7 +7,7 @@ from subprocess import call
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("branchName", type = string, required = True)
+parser.add_argument("branchName", required = True)
 args = parser.parse_args()
 
 rootFolder = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..')
