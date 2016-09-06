@@ -4,7 +4,11 @@ services:
         image: osimis/orthanc-webviewer-plugin:${releaseCommitId}
         expose:
             - "8042"
-    tests:
+    test_cpp:
+        image: osimis/orthanc-webviewer-plugin:${releaseCommitId}
+        entrypoint: /root/OsimisViewerUnitTests
+        command: [ ]
+    test_js:
         build:
             context: ..
             dockerfile: DockerfileTestRunner

@@ -21,7 +21,7 @@ cmake -DALLOW_DOWNLOADS:BOOL=ON \
 
 git status
 make -j$COUNT_CORES
-./UnitTests
+cp -L UnitTests /root/OsimisViewerUnitTests
 cp -L libOsimisWebViewer.so /usr/share/orthanc/plugins/
 
 # Remove the build directory to recover space
