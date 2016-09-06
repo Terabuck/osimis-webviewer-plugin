@@ -3,7 +3,7 @@ node('windows') {
     checkout scm
 
     stage 'Build C++ Windows plugin'
-    bat 'scripts/ciBuildWindows.bat'
+    bat 'cd scripts & ciBuildWindows.bat'
 }
 
 node('docker') {
