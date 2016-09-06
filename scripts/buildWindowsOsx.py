@@ -4,6 +4,11 @@ import platform
 import os
 import shutil
 from subprocess import call
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("branchName", type = string, required = True)
+args = parser.parse_args()
 
 rootFolder = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..')
 
@@ -31,7 +36,7 @@ for build in builds:
 	ret = BuildHelpers.buildCMake(cmakeListsFolderPath = os.path.join(rootFolder, 'backend'),
 	                              buildFolderPath = buildFolder,
 	                              cmakeTargetName = 'OsimisWebViewer',
-	                              cmakeArguments = [],
+	                              cmakeArguments = ["-DJS_FRONTEND_VERSION={}".format(branchName)],
 	                              builder = build['builder'],
 	                              config = BuildHelpers.CONFIG_RELEASE
 	                              )
