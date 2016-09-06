@@ -9,11 +9,6 @@ node('docker') {
 		stage 'Push Frontend lib to AWS (commitId tag)'
 		sh 'scripts/ciPushFrontend.sh ${BRANCH_NAME} tagWithCommitId'
 	}
-
-	stage 'Build Docker Image'
-	sh 'scripts/ciBuildDockerImage.sh ${BRANCH_NAME}'
-
-	stage 'Run tests (TODO)'
 }
 
 node('windows') {
@@ -25,6 +20,11 @@ node('windows') {
 }
 
 node('docker') {
+	stage 'Build Docker Image'
+	sh 'scripts/ciBuildDockerImage.sh ${BRANCH_NAME}'
+
+	stage 'Run tests (TODO)'
+
 	withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
 		stage 'Push Frontend lib to AWS (releaseTag)'
 		sh 'scripts/ciPushFrontend.sh ${BRANCH_NAME} tagWithReleaseTag'

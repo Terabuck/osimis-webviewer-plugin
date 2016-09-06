@@ -37,7 +37,7 @@ string(REGEX REPLACE "^([0-9]+)\\..*" "\\1" PRODUCT_VERSION_MAJOR "${gitRepoVers
 string(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1" PRODUCT_VERSION_MINOR "${gitRepoVersion}")
 string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" PRODUCT_VERSION_PATCH "${gitRepoVersion}")
 string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.[0-9]+-([0-9]+)-.*" "\\1" PRODUCT_VERSION_COMMIT_NUMBER "${gitRepoVersion}")
-string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.[0-9]+-[0-9]+-(.*)" "\\1" PRODUCT_VERSION_COMMIT_SHA1_STRING "${gitRepoVersion}")
+string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.[0-9]+-[0-9]+-g(.*)" "\\1" PRODUCT_VERSION_COMMIT_SHA1_STRING "${gitRepoVersion}")
 string(TIMESTAMP PRODUCT_VERSION_BUILD_YEAR %Y)
 string(TIMESTAMP PRODUCT_VERSION_BUILD_MONTH %m)
 string(TIMESTAMP PRODUCT_VERSION_BUILD_DAY %d)
