@@ -6,7 +6,7 @@
 # 	$ source errorHandler.sh
 
 # activate debug mode
-set -x
+# set -x
 
 branchName=${1:-$(git rev-parse --abbrev-ref HEAD)} #if no argument defined, get the branch name from git
 

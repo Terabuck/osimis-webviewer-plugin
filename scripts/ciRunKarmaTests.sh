@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 #start from the right place
 cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"/
 

@@ -1,6 +1,5 @@
 #!/bin/bash
 
-set -x # debug mode
 set -e # exit on error (and avoid recursive call to errorHandler in ciErrorHandler) - this should never happen during cleanup phase
 
 # start from the right place
