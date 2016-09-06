@@ -1,6 +1,14 @@
+node('windows') {
+    stage 'Retrieve sources'
+    checkout scm
+
+    stage 'Build C++ Windows plugin'
+    bat 'scripts/ciBuildWindows.bat'
+}
+
 node('docker') {
-	stage 'Retrieve sources'
-	checkout scm
+    stage 'Retrieve sources'
+    checkout scm
 
 	stage 'Build Frontend'
 	sh 'scripts/ciBuildFrontend.sh ${BRANCH_NAME}'
@@ -14,7 +22,14 @@ node('docker') {
 	sh 'scripts/ciBuildDockerImage.sh ${BRANCH_NAME}'
 
 	stage 'Run tests (TODO)'
+}
 
+node('windows') {
+    stage 'Retrieve sources'
+    checkout scm
+}
+
+node('docker') {
 	withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
 		stage 'Push Frontend lib to AWS (releaseTag)'
 		sh 'scripts/ciPushFrontend.sh ${BRANCH_NAME} tagWithReleaseTag'
