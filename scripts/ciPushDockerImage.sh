@@ -27,3 +27,13 @@ if [[ $branchName == "master" ]]; then
 	docker tag $imageName:$releaseCommitId $imageName:latest
 	docker push $imageName:latest
 fi
+
+echo '------------------------'
+echo 'Docker images uploaded.'
+echo 'Orthanc & Web Viewer Plugin can be installed via:'
+echo '$ docker pull '$imageName':'$releaseCommitId
+echo '$ docker pull '$imageName':'$releaseTag
+if [[ $branchName == "master" ]]; then
+echo '$ docker pull '$imageName':latest'
+fi
+echo '------------------------'

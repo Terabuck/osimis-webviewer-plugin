@@ -32,4 +32,4 @@ else
 fi
 
 # display what has changed in git
-git status
+# git status

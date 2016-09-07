@@ -43,13 +43,14 @@ singleRun = True
 launchOrthanc = True
 orthancHost = 'localhost'
 orthancHttpPort = 8042
+uploadInstances = True
 karmaExec = os.path.realpath('../../frontend/node_modules/karma/bin/karma')
 karmaConf = os.path.realpath('./karma.conf.js')
 karmaCwd = os.path.realpath('../../frontend/')
 try:
 	opts, args = getopt.getopt(argv, "hwp:m:", ["auto-watch", "orthanc-path=", "manual-orthanc="])
 except getopt.GetoptError:
-	print('incorrect command: ')
+	print('Incorrect command: ')
 	print('\t' + sys.argv)
 
 	print('Usage:')
@@ -57,18 +58,19 @@ except getopt.GetoptError:
 	sys.exit(2)
 for opt, arg in opts:
 	if opt == '-h':
-		print('osimis-test-runner.py -w')
+		print('Usage:')
+		print('\tpython osimis-test-runner.py [--auto-watch|-w] [--orthanc-path=|-p=] [--manual-orthanc|-m[=http://125.314.153.132:1653/]]')
 		sys.exit()
 	elif opt in ("-w", "--auto-watch"):
 		singleRun = False
 	elif opt in ("-p", "--orthanc-path"):
 		orthancFolder = os.path.realpath(arg)
 	elif opt in ("-m", "--manual-orthanc"):
-		pattern = re.compile('https?://([\w\.\:\-\[\]]):((\d){0,5})/?'); # <host>:<port>
+		pattern = re.compile(r"^https?\:\/\/([\w\.\:\-\[\]]+):(\d{0,5})\/?$"); # <host>:<port>
 		hostAndPort = pattern.match(arg);
 		if hostAndPort != None:
 			orthancHost = hostAndPort.group(1)
-			orthancHttpPort = +hostAndPort.group(2)
+			orthancHttpPort = int(hostAndPort.group(2))
 
 		launchOrthanc = False
 
@@ -76,8 +78,6 @@ for opt, arg in opts:
 client = OrthancClient('http://' + orthancHost + ':' + str(orthancHttpPort))
 
 if launchOrthanc is True:
-	dicomSamplesFolder = 'dicom-samples/'
-
 	# Download Orthanc server (if not in path)
 	OrthancServer.loadExecutable(orthancFolder, OrthancServerVersion.NIGHTLY)
 
@@ -89,7 +89,10 @@ if launchOrthanc is True:
 	server.addPlugin('OsimisWebViewer')
 	server.launch()
 
+if uploadInstances is True:
 	# Uploading dicom files
+	dicomSamplesFolder = 'dicom-samples/'
+
 	# @todo use instances = client.uploadFolder(dicomSamplesFolder) once fixed
 	instancesIds = []
 	for path in os.listdir(dicomSamplesFolder):
@@ -98,8 +101,8 @@ if launchOrthanc is True:
 	        instancesIds.append(client.uploadDicomFile(imagePath))
 
 	# List instances for testing purpose
-	print(colored('Instances:', 'blue'));
-	print(colored(json.dumps(instancesIds, sort_keys=True, indent=4), 'blue'));
+	# print(colored('Instances:', 'blue'));
+	# print(colored(json.dumps(instancesIds, sort_keys=True, indent=4), 'blue'));
 
 # Launch karma
 karmaEnv = os.environ.copy()
@@ -115,7 +118,7 @@ karmaReturnCode = None
 try:
 	karmaReturnCode = karma.wait(timeout = 60*5 if singleRun else None) # kill after 5 min
 except:
-	print(colored('error: karma timeout expired', 'red'))
+	print(colored('Error: karma run took more than 5 minutes', 'red'))
 	if launchOrthanc is True:
 		server.stop()
 	karma.kill()

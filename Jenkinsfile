@@ -1,35 +1,43 @@
+#!/usr/bin/groovy
 node('docker') {
 	wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
 
-		stage 'Retrieve sources'
+		stage 'Retrieve: sources'
 		checkout scm
 
-		stage 'Build Frontend'
+		stage 'Build: js'
 		sh 'scripts/ciBuildFrontend.sh ${BRANCH_NAME}'
 
+		stage 'Publish: js -> AWS (commitId)'
 		withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
-			stage 'Push Frontend lib to AWS (commitId tag)'
 			sh 'scripts/ciPushFrontend.sh ${BRANCH_NAME} tagWithCommitId'
 		}
 
-		stage 'Build Docker Image'
+		stage 'Build: cpp'
 		sh 'scripts/ciBuildDockerImage.sh ${BRANCH_NAME}'
 
-		stage 'Run tests'
-		sh 'scripts/ciRunTests.sh ${BRANCH_NAME}'
+		stage 'Test: setup'
+		sh 'scripts/ciPrepareTests.sh ${BRANCH_NAME}'
 
+		stage 'Test: cpp'
+		sh 'scripts/ciRunCppTests.sh ${BRANCH_NAME}'
+
+		stage 'Test: integration + js'
+		sh 'scripts/ciRunJsTests.sh ${BRANCH_NAME}'
+
+		stage 'Publish: js -> AWS (release)'
 		withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
-			stage 'Push Frontend lib to AWS (releaseTag)'
 			sh 'scripts/ciPushFrontend.sh ${BRANCH_NAME} tagWithReleaseTag'
 		}
 
+		stage 'Publish: orthanc -> DockerHub'
 		docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkinsosimis') {
-			stage 'push Docker Image to DockerHub'
 			sh 'scripts/ciPushDockerImage.sh ${BRANCH_NAME}'
 		}
 
-		stage 'Cleanup'
+		stage 'Clean up'
 		sh 'scripts/ciCleanup.sh ${BRANCH_NAME}'
+
 	}
 }
 

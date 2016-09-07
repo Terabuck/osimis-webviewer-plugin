@@ -1,11 +1,11 @@
 version: "2"
 services:
     orthanc:
-        image: osimis/orthanc-webviewer-plugin:${releaseCommitId}
+        image: osimis/orthanc-webviewer-plugin/test:${releaseCommitId}
         expose:
             - "8042"
     test_cpp:
-        image: osimis/orthanc-webviewer-plugin:${releaseCommitId}
+        image: osimis/orthanc-webviewer-plugin/test:${releaseCommitId}
         entrypoint: /root/OsimisViewerUnitTests
         command: [ ]
     test_js:

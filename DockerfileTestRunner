@@ -33,6 +33,6 @@ COPY tests/ /tests/
 COPY frontend/ /frontend/
 
 # set command
-ENV ORTHANC_URL=http://localhost:8042/
+ENV ORTHANC_URL=http://orthanc:8042/
 WORKDIR /tests/osimis-test-runner
-ENTRYPOINT bash python3 osimis-test-runner.py --manual-orthanc=$ORTHANC_URL "default" # use sh -c to process ENV
+ENTRYPOINT python3 osimis-test-runner.py --manual-orthanc=$ORTHANC_URL # use sh -c to process ENV

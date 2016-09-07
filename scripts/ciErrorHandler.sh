@@ -20,7 +20,7 @@ function errorHandler {
 	cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"/
 	
 	# cleanup (& provide branch name argument)
-	./scripts/ciCleanup.sh $branchName
+	./scripts/ciCleanup.sh $branchName &> /dev/null
 
 	# exit with error status
     exit $lastError

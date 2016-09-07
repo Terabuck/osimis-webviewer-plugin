@@ -33,7 +33,7 @@ docker cp $releaseCommitId.zip ${AWS_DOCKER_CONTAINER_ID}:/tmp/$zipFileToUpload.
 docker start -a ${AWS_DOCKER_CONTAINER_ID}
 
 # remove container
-docker rm ${AWS_DOCKER_CONTAINER_ID}
+docker rm ${AWS_DOCKER_CONTAINER_ID} > /dev/null
 
 echo '------------------------'
 echo 'File uploaded.'
