@@ -1,5 +1,4 @@
-from buildHelpers import BuildHelpers as BuildHelpers2
-from helpers import BuildHelpers, GitHelpers
+from helpers import BuildHelpers, GitHelpers, FileHelpers
 import logging
 import platform
 import os
@@ -40,6 +39,7 @@ def build(config):
     logging.info("Building {name} version".format(name = config['name']))
 
     buildFolder = os.path.join(rootFolder, config['buildFolder'])
+    FileHelpers.makeSurePathDoesNotExists(buildFolder)  # cleanup old build folder
     os.makedirs(buildFolder, exist_ok = True)
     os.chdir(buildFolder)
     shutil.rmtree(buildFolder, ignore_errors = True)
