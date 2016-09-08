@@ -1,4 +1,5 @@
-from buildHelpers import BuildHelpers
+from buildHelpers import BuildHelpers as BuildHelpers2
+from helpers import BuildHelpers, GitHelpers
 import logging
 import platform
 import os
@@ -6,90 +7,96 @@ import shutil
 from subprocess import call
 import argparse
 
+logging.basicConfig(level = logging.INFO)
+
 parser = argparse.ArgumentParser()
 parser.add_argument("branchName")
+parser.add_argument('action',
+                    choices = ['build',
+                               'publish'],
+                    default = 'build')
+
 args = parser.parse_args()
 
 rootFolder = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..')
 
-logger = logging.getLogger()
+commitId = GitHelpers.getVersion(os.path.dirname(__file__)).commitSha1
 
-builds = [{
-	'name' : "64bits",
-	'builder' : BuildHelpers.BUILDER_VS2015_64BITS,
-	'buildFolder' : "build/build64"
-	},
-	{
-	'name' : "32bits",
-	'builder' : BuildHelpers.BUILDER_VS2015_32BITS,
-	'buildFolder' : "build/build32"
+configs = [
+    {
+    'name' : "64bits",
+    'builder' : BuildHelpers.BUILDER_VS2015_64BITS,
+    'buildFolder' : "build/build64",
+    'webFolder' : 'win64'
+    },
+    {
+    'name' : "32bits",
+    'builder' : BuildHelpers.BUILDER_VS2015_32BITS,
+    'buildFolder' : "build/build32",
+    'webFolder': 'win32'
 }]
 
-for build in builds:
-	logger.info("Building {name} version".format(name = build['name']))
+def build(config):
+    logging.info("Building {name} version".format(name = config['name']))
 
-	buildFolder = os.path.join(rootFolder, build['buildFolder'])
-	os.makedirs(buildFolder, exist_ok = True)
-	os.chdir(buildFolder)
-	shutil.rmtree(buildFolder, ignore_errors = True)
+    buildFolder = os.path.join(rootFolder, config['buildFolder'])
+    os.makedirs(buildFolder, exist_ok = True)
+    os.chdir(buildFolder)
+    shutil.rmtree(buildFolder, ignore_errors = True)
 
-	ret = BuildHelpers.buildCMake(cmakeListsFolderPath = os.path.join(rootFolder, 'backend'),
-	                              buildFolderPath = buildFolder,
-	                              cmakeTargetName = 'OsimisWebViewer',
-	                              cmakeArguments = [],
-	                              builder = build['builder'],
-	                              config = BuildHelpers.CONFIG_RELEASE
-	                              )
-	if ret != 0:
-		exit(ret)
+    ret = BuildHelpers.buildCMake(cmakeListsFolderPath = os.path.join(rootFolder, 'backend'),
+                                  buildFolderPath = buildFolder,
+                                  cmakeTargetName = 'OsimisWebViewer',
+                                  cmakeArguments = [],
+                                  builder = config['builder'],
+                                  config = BuildHelpers.CONFIG_RELEASE
+                                  )
+    if ret != 0:
+        exit(ret)
 
-	logger.info("Running unit tests ({name})".format(name = build['name']))
+    logging.info("Running unit tests ({name})".format(name = config['name']))
 
-	os.chdir(os.path.join(buildFolder, 'Release'))
-	ret = call('UnitTests.exe')
-	if ret != 0:
-		exit(ret)
-
-
-# rem python %startScriptDir%\buildHelpers.py --cmakeFolder=%backendFolder% --buildFolder=%cd% --target=OsimisWebViewer
-# rem if %errorlevel% neq 0 exit /b %errorlevel%
-
-# rem # run the unit tests
-# rem cd Release
-# rem UnitTests.exe
-
-# rem if %errorlevel% neq 0 exit /b %errorlevel%
+    os.chdir(os.path.join(buildFolder, 'Release'))
+    ret = call('UnitTests.exe')
+    if ret != 0:
+        exit(ret)
 
 
-# rem echo "==========================="
-# rem echo "Building the 32bits version"
-# rem echo "==========================="
+def publish(config):
+    logging.info("Publishing {name} version".format(name = config['name']))
 
-# rem cd %startScriptDir%
-# rem cd ..\backend
+    if platform.system() == 'Windows':
+        awsExecutable = 'aws.cmd'
+    elif platform.system() == 'Darwin':
+        awsExecutable = 'aws'
+    libraryName = BuildHelpers.getDynamicLibraryName('OsimisWebViewer')
+    os.chdir(os.path.join(rootFolder, config['buildFolder'], 'Release'))
 
-# rem rm -rf build32/
-# rem mkdir build32
-# rem cd build32
+    # upload in a commitId folder
+    ret = call("{exe} s3 --region eu-west-1 cp {lib} s3://orthanc.osimis.io/{target}/viewer/{version}/ --cache-control max-age=1".format(exe = awsExecutable,
+                                                                                                                                         lib = libraryName,
+                                                                                                                                         target = config['webFolder'],
+                                                                                                                                         version = commitId))
+    # upload in a branchName folder
+    ret = call("{exe} s3 --region eu-west-1 cp {lib} s3://orthanc.osimis.io/{target}/viewer/{version}/ --cache-control max-age=1".format(exe = awsExecutable,
+                                                                                                                                         lib = libraryName,
+                                                                                                                                         target = config['webFolder'],
+                                                                                                                                         version = args.branchName))
 
-# rem python %startScriptDir%\buildHelpers.py --cmakeFolder=%backendFolder% --buildFolder=%cd% --target=OsimisWebViewer
-# rem if %errorlevel% neq 0 exit /b %errorlevel%
-
-# rem # Build the plugin
-# rem cmake .. -G "Visual Studio 14 2015"
-# rem "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" OsimisWebViewer.sln /t:Build /maxcpucount /p:Configuration=Release
+    if ret != 0:
+        print(ret)
+        exit(ret)
 
 
-exit(0)
-ret = BuildHelpers.buildCMake(os.path.join(rootDirectory, repository['localName'], build['buildFromFolder']),
-                              os.path.join(rootDirectory, repository['localName'], build['buildOutputFolder']),
-                              build['cmakeTarget'],
-                              build['cmakeOptions'],
-                              builder,
-                              config,
-                              cmakeTargetsOSX = build['cmakeTargetsOSX'] if 'cmakeTargetsOSX' in build else None
-                              )
+if __name__ == '__main__':
+    for config in configs:
+        if args.action == 'build':
+            build(config)
+        elif args.action == 'publish':
+            publish(config)
+        else:
+            logging.info('invalid')
 
-if ret != 0:
-	logging.error('Error while Building {0}'.format(repositoryName))
-	exit(ret)
+    logging.info('done')
+
+    exit(0)

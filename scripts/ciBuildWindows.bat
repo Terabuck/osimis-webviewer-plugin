@@ -1,14 +1,15 @@
 set startScriptDir=%cd%
 
-set branchName=%1
+set action=%1
+set branchName=%2
 
 python -m venv env
 CALL env\Scripts\activate.bat
 
-pip install -e git+https://bitbucket.org/osimis/build-helpers.git@0.3.0#egg=buildHelpers
+pip install -r requirements.txt
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-python buildWindowsOsx.py %branchName%
+python buildWindowsOsx.py %action% %branchName%
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 CALL deactivate
