@@ -20,4 +20,4 @@ echo 'Prepare karma unit test environment..'
 cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"/tests/
 export releaseCommitId # make releaseCommitId available to docker-compose
 docker network create wvtest_default || true # see https://github.com/docker/compose/issues/3068
-docker-compose -f docker-compose.yml -p wv_test create --build --force-recreate
+docker-compose -f docker-compose.yml -p wv_test create --build # do not use --force-recreate (invalidate images cache - not stated in doc)
