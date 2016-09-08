@@ -24,14 +24,14 @@
   "devDependencies": {
     "sinon": "http://sinonjs.org/releases/sinon-1.12.1.js",
     "bardjs": "^0.1.8",
-    "angular-mocks": "^1.5.0"
+    "angular-mocks": "^1.5.8"
   },
   "dependencies": {
     "jquery": "^2.2.0",
-    "angular": "^1.5.0",
-    "angular-animate": "^1.5.0",
-    "angular-resource": "^1.5.0",
-    "angular-sanitize": "^1.5.0",
+    "angular": "^1.5.8",
+    "angular-animate": "^1.5.8",
+    "angular-resource": "^1.5.8",
+    "angular-sanitize": "^1.5.8",
     "bootstrap": "^3.3.6",
     "lodash": "^4.5.1",
     "ng-range-filter": "~0.1.0",
@@ -50,7 +50,7 @@
     "jpeg-lossless-decoder-js": "^1.2.11"
   },
   "resolutions": {
-    "angular": "^1.5.0",
+    "angular": "^1.5.8",
     "jquery": "^2.2.0"
   },
   "overrides": {
