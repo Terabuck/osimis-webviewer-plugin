@@ -1,9 +1,9 @@
 /**
  * @ngdoc
- * @name wvSeriesId
+ * @name vpSeriesId
  *
  * @description
- * The `wvSeriesId` directive is an extension of the `wvViewport` directive.
+ * The `vpSeriesId` directive is an extension of the `wvViewport` directive.
  * It sets and updates the images displayed on the viewport, based on the one available in the series.
  * The relative series model can be retrieved via attribute and therefore be controlled externaly.
  * 
@@ -14,7 +14,7 @@
  *
  * @require wvViewport
  *
- * @param {series_id} wvSeriesId (optional) The id of the displayed series.
+ * @param {series_id} vpSeriesId (optional) The id of the displayed series.
  *   It can also be set using inter-directive communication, therefore this attribute is optional and may
  *   be changed by the directive itself.
  *   series_id = <orthanc-series-id>:<instance-index> where instance-index = n ⊂ [0; Infinity]
@@ -37,7 +37,7 @@
  * <p>{{imageId}}: {{$image.tags.PatientName}}</p>
  * <button ng-click="$series.play()">Play the series!</button>
  * ```
- * The imageId is defined by the wvSeriesId directive. However,
+ * The imageId is defined by the vpSeriesId directive. However,
  * you can still use wv-image-id to retrieve the imageId, and you can
  * still access the image model via the wv-image attribute.
  **/
