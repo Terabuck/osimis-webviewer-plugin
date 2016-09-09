@@ -212,7 +212,7 @@ module.exports = function() {
             },
             preprocessors: {}
         };
-        options.preprocessors[clientApp + '**/!(*.spec)+(.js)'] = ['coverage'];
+        // options.preprocessors[clientApp + '**/!(*.spec)+(.js)'] = ['coverage'];
         return options;
     }
 };

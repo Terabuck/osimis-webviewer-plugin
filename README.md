@@ -203,27 +203,16 @@ Manual procedure requires a few dependencies.
 
 2. Install ruby
 
-3. Install compass
+3. Install other dependencies
+
+See the following scripts:
 
 ```shell
-    gem update --system
-    gem install compass
-```
-
-4. Install these NPM packages globally
-
-```shell
-    npm install -g bower gulp
+    cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"
+    ./scripts/userInstallAdditionalDevTools.sh
 ```
 
     >Refer to these [instructions on how to not require sudo](https://github.com/sindresorhus/guides/blob/master/npm-global-without-sudo.md)
-
-5. Install tests dependencies
-
-```shell
-    npm install -g nodemon marked jsonlint jshint eslint jscs phantomjs protractor karma-cli
-    webdriver-manager update
-```
 
 #### Build instructions
 

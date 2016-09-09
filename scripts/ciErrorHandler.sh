@@ -6,7 +6,7 @@
 # 	$ source errorHandler.sh
 
 # activate debug mode
-set -x
+# set -x
 
 branchName=${1:-$(git rev-parse --abbrev-ref HEAD)} #if no argument defined, get the branch name from git
 
@@ -20,7 +20,7 @@ function errorHandler {
 	cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"/
 	
 	# cleanup (& provide branch name argument)
-	./scripts/ciCleanup.sh $branchName
+	./scripts/ciCleanup.sh $branchName &> /dev/null
 
 	# exit with error status
     exit $lastError
