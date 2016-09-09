@@ -47,8 +47,9 @@
     }
 
     // see https://docs.angularjs.org/api/ng/function/angular.element for available methods
-    function directive(html) {
+    function directive(html, ctrlName) { // ctrlName is optional, used to select the ctrlName of an attribute instead of the element
         var domElement = $(html);
+        ctrlName = ctrlName || domElement.prop('tagName').toLowerCase();
 
         // @note element must appended to body to retrieve its size
         $('body').append(domElement);
@@ -64,7 +65,7 @@
             // Therefore, we have to manually call the timeout.
             setTimeout(function() {
                 // Add helpers
-                element.$controller = controller(element, domElement.prop('tagName').toLowerCase());
+                element.$controller = controller(element, ctrlName);
                 element.$scope = element.isolateScope() || element.scope();
 
                 resolve(element);
