@@ -34,7 +34,7 @@ from orthancRestApi import OrthancClient
 from helpers import LogHelpers
 from termcolor import colored
 import logging
-import os, re, sys, getopt, shlex, subprocess, json
+import time, os, re, sys, getopt, shlex, subprocess, json
 
 # Parse command line attributes
 argv = sys.argv[1:]
@@ -75,7 +75,8 @@ for opt, arg in opts:
 		launchOrthanc = False
 
 # Init Orthanc client
-client = OrthancClient('http://' + orthancHost + ':' + str(orthancHttpPort))
+orthancUrl = 'http://' + orthancHost + ':' + str(orthancHttpPort)
+client = OrthancClient(orthancUrl)
 
 if launchOrthanc is True:
 	# Download Orthanc server (if not in path)
@@ -95,14 +96,37 @@ if uploadInstances is True:
 
 	# @todo use instances = client.uploadFolder(dicomSamplesFolder) once fixed
 	instancesIds = []
-	for path in os.listdir(dicomSamplesFolder):
-	    imagePath = os.path.join(dicomSamplesFolder, path)
-	    if os.path.isfile(imagePath) and '/.' not in imagePath:
-	        instancesIds.append(client.uploadDicomFile(imagePath))
 
-	# List instances for testing purpose
-	# print(colored('Instances:', 'blue'));
-	# print(colored(json.dumps(instancesIds, sort_keys=True, indent=4), 'blue'));
+	# Make atmost 5 attempts to upload files (until Orthanc is connected)
+	for i in range(0, 5):
+		# Upload all available instances to Orthanc
+		try:
+			for path in os.listdir(dicomSamplesFolder):
+				imagePath = os.path.join(dicomSamplesFolder, path)
+				if os.path.isfile(imagePath) and '/.' not in imagePath:
+					instancesIds.append(client.uploadDicomFile(imagePath))
+
+			# List instances for testing purpose
+			# print(colored('Instances:', 'blue'));
+			# print(colored(json.dumps(instancesIds, sort_keys=True, indent=4), 'blue'));
+
+		# Wait 5 seconds before retry on error
+		except NoResponseReceivedException:
+			time.sleep(5)
+			continue
+
+		# Continue processing, upload has worked
+		else:
+			break
+
+	# Upload didn't work after 5 attempts, exit
+	else:
+		# Print an error to stderr
+		try:
+			raise Exception('Unable to connect to Orthanc', orthancUrl)
+		except Exception as e:
+			print(e)
+			sys.exit(-1)
 
 # Launch karma
 karmaEnv = os.environ.copy()
