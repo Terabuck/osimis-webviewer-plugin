@@ -34,7 +34,7 @@ if [[ "${AWS_DOCKER_CONTAINER_ID}" != "" ]]; then
 	dockerContainer=$(docker ps -a -q --no-trunc | grep ${AWS_DOCKER_CONTAINER_ID} 2> /dev/null)
 	if [[ $dockerContainer != "" ]]; then
 		echo "Cleaning $dockerContainer (AWS_DOCKER_CONTAINER_ID)"
-		docker rm $dockerContainer > /dev/null
+		docker rm -v $dockerContainer > /dev/null
 	fi
 fi
 
@@ -43,7 +43,7 @@ if [[ "${WEBAPP_BUILDER_CONTAINER_ID}" != "" ]]; then
 	dockerContainer=$(docker ps -a -q --no-trunc | grep ${WEBAPP_BUILDER_CONTAINER_ID} 2> /dev/null)
 	if [[ $dockerContainer != "" ]]; then
 		echo "Cleaning $dockerContainer (WEBAPP_BUILDER_CONTAINER_ID)"
-		docker rm $dockerContainer > /dev/null
+		docker rm -v $dockerContainer > /dev/null
 	fi
 fi
 

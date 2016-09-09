@@ -36,4 +36,4 @@ docker cp $WEBAPP_BUILDER_CONTAINER_ID:/frontend/build/ $(pwd)/build/
 docker cp $WEBAPP_BUILDER_CONTAINER_ID:/tmp/output/$releaseCommitId.zip $(pwd)/
 
 # remove container
-docker rm $WEBAPP_BUILDER_CONTAINER_ID > /dev/null
+docker rm -v $WEBAPP_BUILDER_CONTAINER_ID > /dev/null

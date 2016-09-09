@@ -13,7 +13,7 @@ cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"/
 testedContainer=$(docker create --name tested-webviewer-plugin-$releaseCommitId osimis/orthanc-webviewer-plugin:$releaseCommitId)
 docker cp $testedOrthancConfig $testedContainer:/etc/orthanc/orthanc.json > /dev/null
 docker commit $testedContainer $testedImage > /dev/null
-docker rm $testedContainer > /dev/null
+docker rm -v $testedContainer > /dev/null
 
 # Prepare unit tests
 echo 'Prepare karma unit test environment..'
