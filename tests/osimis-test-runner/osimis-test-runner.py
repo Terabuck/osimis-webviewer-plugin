@@ -46,7 +46,7 @@ orthancHttpPort = 8042
 uploadInstances = True
 karmaExec = os.path.realpath('../../frontend/node_modules/karma/bin/karma')
 karmaConf = os.path.realpath('./karma.conf.js')
-karmaCwd = os.path.realpath('../../frontend/')
+frontendCwd = os.path.realpath('../../frontend/')
 try:
 	opts, args = getopt.getopt(argv, "hwp:m:", ["auto-watch", "orthanc-path=", "manual-orthanc="])
 except getopt.GetoptError:
@@ -128,12 +128,28 @@ if uploadInstances is True:
 			print(e)
 			sys.exit(-1)
 
+# Pre process: dependency injection, angular template cache & SASS (because testing requires development-mode preprocessors to be applied)
+# Wait for result before launching tests
+# @warning this call destroys the frontend/build/ directory content!
+gulp = subprocess.Popen(
+	shlex.split('gulp inject'),
+	cwd = frontendCwd
+)
+try:
+	gulp.wait(timeout = 60*5 if singleRun else None) # kill after 5 min
+except:
+	print(colored('Error: gulp pre-processing took more than 5 minutes', 'red'))
+	if launchOrthanc is True:
+		server.stop()
+	gulp.kill()
+	sys.exit(50)
+
 # Launch karma
 karmaEnv = os.environ.copy()
 karmaEnv["ORTHANC_URL"] = "http://" + orthancHost + ":" + str(orthancHttpPort) + "/"
 karma = subprocess.Popen(
 	shlex.split(karmaExec + ' start ' + karmaConf + (' --single-run' if singleRun else '')),
-	cwd = karmaCwd, # set cwd path so bower.json can be found by karma.conf.js,
+	cwd = frontendCwd, # set cwd path so bower.json can be found by karma.conf.js,
 	env = karmaEnv
 )
 
