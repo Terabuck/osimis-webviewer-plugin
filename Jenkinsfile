@@ -6,6 +6,7 @@ node('docker') {
 		checkout scm
 
 		stage 'Build: js'
+		sh 'scripts/ciLogDockerState.sh prebuild'
 		sh 'scripts/ciBuildFrontend.sh ${BRANCH_NAME}'
 
 		stage 'Publish: js -> AWS (commitId)'
@@ -36,6 +37,7 @@ node('docker') {
 		}
 
 		stage 'Clean up'
+		sh 'scripts/ciLogDockerState.sh postbuild'
 		sh 'scripts/ciCleanup.sh ${BRANCH_NAME}'
 
 	}

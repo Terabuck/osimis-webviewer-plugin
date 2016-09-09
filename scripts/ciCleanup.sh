@@ -7,6 +7,7 @@ cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"/
 
 source scripts/setBuildVariables.sh
 
+echo "------------------------"
 echo "Cleaning up..."
 
 # cleanup osimis/orthanc-webviewer-plugin related images
@@ -62,3 +63,16 @@ if [[ $dockerImage != "" ]]; then
 fi
 
 echo "...cleaned up"
+
+echo "------------------------"
+echo "Cleanup After Status:"
+
+./scripts/ciLogDockerState.sh postclean
+echo "+ images"
+diff --ignore-all-space /tmp/wv-docker-images-prebuild.txt /tmp/wv-docker-images-postclean.txt || true
+echo "+ containers"
+diff --ignore-all-space /tmp/wv-docker-ps-prebuild.txt /tmp/wv-docker-ps-postclean.txt || true
+echo "+ volumes"
+diff --ignore-all-space /tmp/wv-docker-volumes-prebuild.txt /tmp/wv-docker-volumes-postclean.txt || true
+echo "+ networks"
+diff --ignore-all-space /tmp/wv-docker-networks-prebuild.txt /tmp/wv-docker-networks-postclean.txt || true
