@@ -12,6 +12,7 @@ services:
         build:
             context: ..
             dockerfile: DockerfileTestRunner
+        image: osimis/orthanc-webviewer-plugin/test-js:${releaseCommitId} # set a name for debugging purpose
         environment:
             - ORTHANC_URL=http://orthanc:8042/
         expose:
