@@ -59,6 +59,7 @@ def build(config):
     os.chdir(os.path.join(buildFolder, 'Release'))
     ret = call('UnitTests.exe')
     if ret != 0:
+        print("build: exiting with error code = {}".format(ret))
         exit(ret)
 
 
@@ -84,7 +85,7 @@ def publish(config):
                                                                                                                                          version = args.branchName))
 
     if ret != 0:
-        print(ret)
+        print("publish: exiting with error code = {}".format(ret))
         exit(ret)
 
 
