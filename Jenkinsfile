@@ -4,41 +4,42 @@ node('docker') {
 
 		stage 'Retrieve: sources'
 		checkout scm
+		sh 'scripts/ciLogDockerState.sh prebuild'
+		sh 'scripts/setEnv.sh ${BRANCH_NAME}'
 
 		stage 'Build: js'
-		sh 'scripts/ciLogDockerState.sh prebuild'
-		sh 'scripts/ciBuildFrontend.sh ${BRANCH_NAME}'
+		sh 'scripts/ciBuildFrontend.sh'
 
 		stage 'Publish: js -> AWS (commitId)'
 		withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
-			sh 'scripts/ciPushFrontend.sh ${BRANCH_NAME} tagWithCommitId'
+			sh 'scripts/ciPushFrontend.sh tagWithCommitId'
 		}
 
 		stage 'Build: cpp'
-		sh 'scripts/ciBuildDockerImage.sh ${BRANCH_NAME}'
+		sh 'scripts/ciBuildDockerImage.sh'
 
 		stage 'Test: setup'
-		sh 'scripts/ciPrepareTests.sh ${BRANCH_NAME}'
+		sh 'scripts/ciPrepareTests.sh'
 
 		stage 'Test: cpp'
-		sh 'scripts/ciRunCppTests.sh ${BRANCH_NAME}'
+		sh 'scripts/ciRunCppTests.sh'
 
 		stage 'Test: integration + js'
-		sh 'scripts/ciRunJsTests.sh ${BRANCH_NAME}'
+		sh 'scripts/ciRunJsTests.sh'
 
 		stage 'Publish: js -> AWS (release)'
 		withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
-			sh 'scripts/ciPushFrontend.sh ${BRANCH_NAME} tagWithReleaseTag'
+			sh 'scripts/ciPushFrontend.sh tagWithReleaseTag'
 		}
 
 		stage 'Publish: orthanc -> DockerHub'
 		docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkinsosimis') {
-			sh 'scripts/ciPushDockerImage.sh ${BRANCH_NAME}'
+			sh 'scripts/ciPushDockerImage.sh'
 		}
 
 		stage 'Clean up'
 		sh 'scripts/ciLogDockerState.sh postbuild'
-		sh 'scripts/ciCleanup.sh ${BRANCH_NAME}'
+		sh 'scripts/ciCleanup.sh'
 
 	}
 }

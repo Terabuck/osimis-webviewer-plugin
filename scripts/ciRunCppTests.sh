@@ -1,20 +1,19 @@
 #!/bin/bash
-
-# Requires ciPrepareTests.sh to be called
+# Run C++ unit tests.
+#
+# pre-condition: setEnv.sh must be called
+#                ciPrepareTests.sh must be called
 
 # Handle errors
-source scripts/ciErrorHandler.sh
-
-source scripts/setBuildVariables.sh
+source .env
+source $SRC_ROOT/scripts/ciErrorHandler.sh
 
 # Run cpp tests
-cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"/tests/
-export releaseCommitId # make releaseCommitId available to docker-compose
-docker-compose -f docker-compose.yml -p wv_test up --abort-on-container-exit --no-recreate test_cpp # --no-recreate because of ciPrepareTests.sh
+docker-compose -f $TEST_COMPOSE_FILE -p $TEST_COMPOSE_PROJECT up --abort-on-container-exit --no-recreate test_cpp # --no-recreate because of ciPrepareTests.sh
 
 # Exit on docker-compose failure
 # see http://blog.ministryofprogramming.com/docker-compose-and-exit-codes/
-docker-compose -f docker-compose.yml -p wv_test ps -q | xargs docker inspect -f '{{ .State.ExitCode }}' | while read code; do  
+docker-compose -f $TEST_COMPOSE_FILE -p $TEST_COMPOSE_PROJECT ps -q | xargs docker inspect -f '{{ .State.ExitCode }}' | while read code; do  
     if [ "$code" != "0" ]; then    
        exit $code
     fi
