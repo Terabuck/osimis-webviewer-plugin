@@ -9,4 +9,4 @@ source .env
 source $SRC_ROOT/scripts/ciErrorHandler.sh
 
 # build the image
-docker build -t $MAIN_IMAGE:$COMMIT_ID $SRC_ROOT
+docker build -t $MAIN_IMAGE:$TAG $SRC_ROOT

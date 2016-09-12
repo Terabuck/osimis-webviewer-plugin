@@ -111,7 +111,8 @@ if uploadInstances is True:
 			# print(colored(json.dumps(instancesIds, sort_keys=True, indent=4), 'blue'));
 
 		# Wait 5 seconds before retry on error
-		except NoResponseReceivedException:
+		except orthancRestApi.restApiClient.NoResponseReceivedException as e:
+			print(e, 'Attempt Orthanc connexion #'+i)
 			time.sleep(5)
 			continue
 

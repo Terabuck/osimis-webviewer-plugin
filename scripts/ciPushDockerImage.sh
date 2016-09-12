@@ -9,15 +9,16 @@ source .env
 source $SRC_ROOT/scripts/ciErrorHandler.sh
 
 # push to docker hub (with the commit Id)
+docker tag $MAIN_IMAGE:$TAG $MAIN_IMAGE:$COMMIT_ID
 docker push $MAIN_IMAGE:$COMMIT_ID
 
 # push to docker hub (with the branch name)
-docker tag $MAIN_IMAGE:$COMMIT_ID $MAIN_IMAGE:$RELEASE_TAG
+docker tag $MAIN_IMAGE:$TAG $MAIN_IMAGE:$RELEASE_TAG
 docker push $MAIN_IMAGE:$RELEASE_TAG
 
-#if in master branch, the current tag should also be marked as the latest
+# if in master branch, the current tag should also be marked as the latest
 if [[ $branchName == "master" ]]; then
-	docker tag $MAIN_IMAGE:$COMMIT_ID $MAIN_IMAGE:latest
+	docker tag $MAIN_IMAGE:$TAG $MAIN_IMAGE:latest
 	docker push $MAIN_IMAGE:latest
 fi
 

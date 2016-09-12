@@ -10,6 +10,12 @@ echo "------------------------"
 echo "Cleaning up..."
 
 # cleanup osimis/orthanc-webviewer-plugin related images
+dockerImage=$(docker images -q $MAIN_IMAGE:$TAG 2> /dev/null)
+if [[ $dockerImage != "" ]]; then
+	echo "Cleaning $MAIN_IMAGE:$TAG"
+	docker rmi $MAIN_IMAGE:$TAG > /dev/null
+fi
+
 dockerImage=$(docker images -q $MAIN_IMAGE:$COMMIT_ID 2> /dev/null)
 if [[ $dockerImage != "" ]]; then
 	echo "Cleaning $MAIN_IMAGE:$COMMIT_ID"
@@ -48,15 +54,11 @@ fi
 
 # remove test runner docker container if exists
 echo "Cleaning $TEST_COMPOSE_PROJECT docker compose project"
-tmpPwd=$(pwd)
-cd ${SRC_ROOT}/tests/
-export COMMIT_ID # make COMMIT_ID available to docker-compose
 # docker network rm wvtest_default > /dev/null
-docker-compose -p $TEST_COMPOSE_PROJECT down --rmi all --volumes > /dev/null
+docker-compose -f $TEST_COMPOSE_FILE -p $TEST_COMPOSE_PROJECT down --rmi all --volumes > /dev/null
 # move back to the previous folder
-cd $tmpPwd
 
-testedImage=${TEST_IMAGE}:${COMMIT_ID}
+testedImage=${TEST_IMAGE}:${TAG}
 dockerImage=$(docker images -q $testedImage 2> /dev/null)
 if [[ $dockerImage != "" ]]; then
 	echo "Cleaning $testedImage"

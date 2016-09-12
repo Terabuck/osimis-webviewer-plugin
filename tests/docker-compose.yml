@@ -1,18 +1,18 @@
 version: "2"
 services:
     orthanc:
-        image: ${TEST_IMAGE}:${COMMIT_ID}
+        image: ${TEST_IMAGE}:${TAG}
         expose:
             - "8042"
     test_cpp:
-        image: ${TEST_IMAGE}:${COMMIT_ID}
+        image: ${TEST_IMAGE}:${TAG}
         entrypoint: /root/OsimisViewerUnitTests
         command: [ ]
     test_js:
         build:
             context: ..
             dockerfile: DockerfileTestRunner
-        image: ${TEST_RUNNER_IMAGE}:${COMMIT_ID} # set a name for debugging purpose
+        image: ${TEST_RUNNER_IMAGE}:${TAG} # set a name for debugging purpose
         environment:
             - ORTHANC_URL=http://orthanc:8042/
         expose:
