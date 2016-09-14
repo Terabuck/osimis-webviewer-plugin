@@ -34,7 +34,7 @@ from orthancRestApi import OrthancClient
 from helpers import LogHelpers
 from termcolor import colored
 import logging
-import os, re, sys, getopt, shlex, subprocess, json
+import time, os, re, sys, getopt, shlex, subprocess, json
 
 # Parse command line attributes
 argv = sys.argv[1:]
@@ -46,7 +46,7 @@ orthancHttpPort = 8042
 uploadInstances = True
 karmaExec = os.path.realpath('../../frontend/node_modules/karma/bin/karma')
 karmaConf = os.path.realpath('./karma.conf.js')
-karmaCwd = os.path.realpath('../../frontend/')
+frontendCwd = os.path.realpath('../../frontend/')
 try:
 	opts, args = getopt.getopt(argv, "hwp:m:", ["auto-watch", "orthanc-path=", "manual-orthanc="])
 except getopt.GetoptError:
@@ -75,7 +75,8 @@ for opt, arg in opts:
 		launchOrthanc = False
 
 # Init Orthanc client
-client = OrthancClient('http://' + orthancHost + ':' + str(orthancHttpPort))
+orthancUrl = 'http://' + orthancHost + ':' + str(orthancHttpPort)
+client = OrthancClient(orthancUrl)
 
 if launchOrthanc is True:
 	# Download Orthanc server (if not in path)
@@ -95,21 +96,61 @@ if uploadInstances is True:
 
 	# @todo use instances = client.uploadFolder(dicomSamplesFolder) once fixed
 	instancesIds = []
-	for path in os.listdir(dicomSamplesFolder):
-	    imagePath = os.path.join(dicomSamplesFolder, path)
-	    if os.path.isfile(imagePath) and '/.' not in imagePath:
-	        instancesIds.append(client.uploadDicomFile(imagePath))
 
-	# List instances for testing purpose
-	# print(colored('Instances:', 'blue'));
-	# print(colored(json.dumps(instancesIds, sort_keys=True, indent=4), 'blue'));
+	# Make atmost 5 attempts to upload files (until Orthanc is connected)
+	for i in range(0, 5):
+		# Upload all available instances to Orthanc
+		try:
+			for path in os.listdir(dicomSamplesFolder):
+				imagePath = os.path.join(dicomSamplesFolder, path)
+				if os.path.isfile(imagePath) and '/.' not in imagePath:
+					instancesIds.append(client.uploadDicomFile(imagePath))
+
+			# List instances for testing purpose
+			# print(colored('Instances:', 'blue'));
+			# print(colored(json.dumps(instancesIds, sort_keys=True, indent=4), 'blue'));
+
+		# Wait 5 seconds before retry on error
+		except orthancRestApi.restApiClient.NoResponseReceivedException as e:
+			print(e, 'Attempt Orthanc connexion #'+i)
+			time.sleep(5)
+			continue
+
+		# Continue processing, upload has worked
+		else:
+			break
+
+	# Upload didn't work after 5 attempts, exit
+	else:
+		# Print an error to stderr
+		try:
+			raise Exception('Unable to connect to Orthanc', orthancUrl)
+		except Exception as e:
+			print(e)
+			sys.exit(-1)
+
+# Pre process: dependency injection, angular template cache & SASS (because testing requires development-mode preprocessors to be applied)
+# Wait for result before launching tests
+# @warning this call destroys the frontend/build/ directory content!
+gulp = subprocess.Popen(
+	shlex.split('gulp inject'),
+	cwd = frontendCwd
+)
+try:
+	gulp.wait(timeout = 60*5 if singleRun else None) # kill after 5 min
+except:
+	print(colored('Error: gulp pre-processing took more than 5 minutes', 'red'))
+	if launchOrthanc is True:
+		server.stop()
+	gulp.kill()
+	sys.exit(50)
 
 # Launch karma
 karmaEnv = os.environ.copy()
 karmaEnv["ORTHANC_URL"] = "http://" + orthancHost + ":" + str(orthancHttpPort) + "/"
 karma = subprocess.Popen(
 	shlex.split(karmaExec + ' start ' + karmaConf + (' --single-run' if singleRun else '')),
-	cwd = karmaCwd, # set cwd path so bower.json can be found by karma.conf.js,
+	cwd = frontendCwd, # set cwd path so bower.json can be found by karma.conf.js,
 	env = karmaEnv
 )
 

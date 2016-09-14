@@ -1,18 +1,18 @@
 version: "2"
 services:
     orthanc:
-        image: osimis/orthanc-webviewer-plugin/test:${releaseCommitId}
+        image: ${TEST_IMAGE}:${TAG}
         expose:
             - "8042"
     test_cpp:
-        image: osimis/orthanc-webviewer-plugin/test:${releaseCommitId}
+        image: ${TEST_IMAGE}:${TAG}
         entrypoint: /root/OsimisViewerUnitTests
         command: [ ]
     test_js:
         build:
             context: ..
             dockerfile: DockerfileTestRunner
-        image: osimis/orthanc-webviewer-plugin/test-js:${releaseCommitId} # set a name for debugging purpose
+        image: ${TEST_RUNNER_IMAGE}:${TAG} # set a name for debugging purpose
         environment:
             - ORTHANC_URL=http://orthanc:8042/
         expose:

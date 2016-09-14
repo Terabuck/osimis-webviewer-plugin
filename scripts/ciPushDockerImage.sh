@@ -1,39 +1,33 @@
 #!/bin/bash
-# this script pushed the osimis/orthanc-webviewer-plugin docker image to DockerHub.
+# This script pushed the osimis/orthanc-webviewer-plugin docker image to DockerHub.
 # You must be logged in DockerHub before it runs.
 #
-# arguments: $1 = branchName (optional; if not provided, it will get it 
-#                             from a git command.  In a jenkins build context,
-#                             the branch name is not available through git so it must be
-#                             passed as an argument)
-
-# start from the right place
-cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"/
+# pre-condition: setEnv.sh must be called
 
 # handle errors
-source scripts/ciErrorHandler.sh
-
-source scripts/setBuildVariables.sh
+source .env
+source $SRC_ROOT/scripts/ciErrorHandler.sh
 
 # push to docker hub (with the commit Id)
-docker push $imageName:$releaseCommitId
+docker tag $MAIN_IMAGE:$TAG $MAIN_IMAGE:$COMMIT_ID
+docker push $MAIN_IMAGE:$COMMIT_ID
 
 # push to docker hub (with the branch name)
-docker tag $imageName:$releaseCommitId $imageName:$releaseTag
-docker push $imageName:$releaseTag
+docker tag $MAIN_IMAGE:$TAG $MAIN_IMAGE:$RELEASE_TAG
+docker push $MAIN_IMAGE:$RELEASE_TAG
 
-#if in master branch, the current tag should also be marked as the latest
+# if in master branch, the current tag should also be marked as the latest
 if [[ $branchName == "master" ]]; then
-	docker tag $imageName:$releaseCommitId $imageName:latest
-	docker push $imageName:latest
+	docker tag $MAIN_IMAGE:$TAG $MAIN_IMAGE:latest
+	docker push $MAIN_IMAGE:latest
 fi
 
 echo '------------------------'
 echo 'Docker images uploaded.'
 echo 'Orthanc & Web Viewer Plugin can be installed via:'
-echo '$ docker pull '$imageName':'$releaseCommitId
-echo '$ docker pull '$imageName':'$releaseTag
+echo '$ docker pull '$MAIN_IMAGE':'$COMMIT_ID
+echo '$ docker pull '$MAIN_IMAGE':'$RELEASE_TAG
 if [[ $branchName == "master" ]]; then
-echo '$ docker pull '$imageName':latest'
+echo '$ docker pull '$MAIN_IMAGE':latest'
 fi
 echo '------------------------'
