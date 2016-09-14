@@ -8,7 +8,7 @@
 source .env
 source $SRC_ROOT/scripts/ciErrorHandler.sh
 
-# Create a webviewer docker image with the right configuration (~ authentification disabled)
+# Create a webviewer docker image with the right configuration (~ authentication disabled)
 echo "Prepare testable orthanc image.."
 testedContainerId=$(docker create --name $TEST_TMP_CONTAINER $MAIN_IMAGE:$TAG)
 docker cp $TEST_CONFIG $testedContainerId:/etc/orthanc/orthanc.json > /dev/null

@@ -3,7 +3,7 @@
    * General configuration of Orthanc
    * used by CI to run the integration tests.
    * This is the same config as the one inside the webviewer
-   * docker image, but with authentification and gzip compression
+   * docker image, but with authentication and gzip compression
    * deactivated.
    **/
 
