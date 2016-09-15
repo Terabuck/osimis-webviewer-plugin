@@ -22,4 +22,8 @@ report/
 .DS_Store
 npm-debug.log
 build-*/
+
+# CI build side files
 build/
+scripts/__pycache__/
+scripts/env/
