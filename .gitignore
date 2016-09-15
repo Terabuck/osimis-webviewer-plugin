@@ -24,6 +24,9 @@ report/
 npm-debug.log
 build-*/
 
+debugBuild/
+releaseBuild/
+
 # CI build side files
 build/
 scripts/__pycache__/
