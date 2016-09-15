@@ -44,7 +44,7 @@ if (BOOST_STATIC)
   set(BOOST_MD5 "f1acff449a00c3f73cd21e213ac94ba7")
   set(BOOST_URL "http://orthanc.osimis.io/ThirdPartyDownloads/boost_1_60_0_no_doc.zip")
   set(BOOST_FILESYSTEM_SOURCES_DIR "${BOOST_NAME}/libs/filesystem/src") 
-  set(BOOST_SOURCES_DIR ${CMAKE_BINARY_DIR}/${BOOST_NAME})
+  set(BOOST_SOURCES_DIR ${CMAKE_BINARY_DIR}/${BOOST_NAME} FALSE)
 
   DownloadPackage(${BOOST_MD5} ${BOOST_URL} "${BOOST_SOURCES_DIR}")
 
