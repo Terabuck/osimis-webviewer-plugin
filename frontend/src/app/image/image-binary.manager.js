@@ -221,7 +221,7 @@
                     }
                 }
 
-                console.log('flush cache q:', quality, 'pre:', totalCacheSizeByQuality[quality] / 1024 / 1024, 'post:', totalFlushedCacheSizeByQuality[quality] / 1024 / 1024);
+                // console.log('flush cache q:', quality, 'pre:', totalCacheSizeByQuality[quality] / 1024 / 1024, 'post:', totalFlushedCacheSizeByQuality[quality] / 1024 / 1024);
             }
         }, 5000);
 

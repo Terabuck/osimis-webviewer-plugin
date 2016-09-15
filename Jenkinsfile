@@ -1,19 +1,19 @@
+#!/usr/bin/groovy
 node('docker') {
-    stage 'Retrieve sources'
-    checkout scm
+	wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
 
-	stage 'Build Frontend'
-	sh 'scripts/ciBuildFrontend.sh ${BRANCH_NAME}'
+		stage 'Retrieve: sources'
+		checkout scm
+		sh 'scripts/ciLogDockerState.sh prebuild'
+		sh 'scripts/setEnv.sh ${BRANCH_NAME}'
 
-	withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
-		stage 'Push Frontend lib to AWS (commitId tag)'
-		sh 'scripts/ciPushFrontend.sh ${BRANCH_NAME} tagWithCommitId'
+		stage 'Build: js'
+		sh 'scripts/ciBuildFrontend.sh'
+
+		stage 'Publish: js -> AWS (commitId)'
+		withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
+			sh 'scripts/ciPushFrontend.sh tagWithCommitId'
 	}
-
-	stage 'Build Docker Image'
-	sh 'scripts/ciBuildDockerImage.sh ${BRANCH_NAME}'
-
-	stage 'Run tests (TODO)'
 }
 
 node('windows') {
@@ -30,18 +30,33 @@ node('windows') {
 }
 
 node('docker') {
+	wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+		stage 'Build: cpp'
+		sh 'scripts/ciBuildDockerImage.sh'
 
-	withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
-		stage 'Push Frontend lib to AWS (releaseTag)'
-		sh 'scripts/ciPushFrontend.sh ${BRANCH_NAME} tagWithReleaseTag'
+		stage 'Test: setup'
+		sh 'scripts/ciPrepareTests.sh'
+
+		stage 'Test: cpp'
+		sh 'scripts/ciRunCppTests.sh'
+
+		stage 'Test: integration + js'
+		sh 'scripts/ciRunJsTests.sh'
+
+		stage 'Publish: js -> AWS (release)'
+		withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
+			sh 'scripts/ciPushFrontend.sh tagWithReleaseTag'
+		}
+
+		stage 'Publish: orthanc -> DockerHub'
+		docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkinsosimis') {
+			sh 'scripts/ciPushDockerImage.sh'
+		}
+
+		stage 'Clean up'
+		sh 'scripts/ciLogDockerState.sh postbuild'
+		sh 'scripts/ciCleanup.sh'
+
 	}
-
-	docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkinsosimis') {
-		stage 'push Docker Image to DockerHub'
-		sh 'scripts/ciPushDockerImage.sh ${BRANCH_NAME}'
-	}
-
-	stage 'Cleanup'
-	sh 'scripts/ciCleanup.sh ${BRANCH_NAME}'
 }
 

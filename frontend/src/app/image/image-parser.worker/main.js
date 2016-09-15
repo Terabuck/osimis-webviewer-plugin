@@ -300,7 +300,7 @@ function parseKLV(arraybuffer) {
     };
 
     var compression = klvReader.getString(keys.Compression);
-    console.log('compression:' + compression);
+    // console.log('compression:' + compression);
     if (compression.toLowerCase() !== 'jpeg' && compression.toLowerCase() !== 'jpeg-lossless' && compression.toLowerCase() !== 'png') {
         _processingRequest = null; // cleaning request
         throw new Error('unknown compression: ' + compression);
