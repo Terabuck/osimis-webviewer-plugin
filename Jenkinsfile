@@ -13,6 +13,7 @@ node('docker') {
 		stage 'Publish: js -> AWS (commitId)'
 		withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
 			sh 'scripts/ciPushFrontend.sh tagWithCommitId'
+		}
 	}
 }
 
