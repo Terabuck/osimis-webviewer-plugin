@@ -97,6 +97,11 @@
      * @param {object} headers HTTP headers hashmap
      */
     HttpRequest.prototype.setHeaders = function(headers) {
+        // Clone the header object (make sure we never change the passed object, especially since it's very likely it's
+        // a direct reference to the main configuration object).
+        // Use JSON instead of lodash to lower dependency in workers.
+        headers = JSON.parse(JSON.stringify(headers));
+
         // Store the headers for conveniance until they are added to xhr object (which must
         // be 'opened' first)
         this._httpHeaders = headers;

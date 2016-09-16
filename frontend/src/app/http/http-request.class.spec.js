@@ -116,6 +116,43 @@ describe('http', function() {
             return Promise.all([r1]);
         });
 
+        it('should clone the provided header object', function() {
+            // Mock xhr requests
+            _server.respondWith(
+                'GET',
+                '/my-request',
+                [
+                    200,
+                    {
+                        "Content-Type": "application/json"
+                    },
+                    '{ "id": 12, "comment": "Hey there" }'
+                ]
+            );
+            
+            // Create a request
+            var request = new osimis.HttpRequest();
+
+            // Set custom headers
+            var myHeaders = {
+                'my-header': 'do exists'
+            };
+            request.setHeaders(myHeaders);
+
+            var r1 = request
+                .get('/my-request')
+                .then(function(response) {
+                    // Make sure we use a clone
+                    assert.notEqual(request._httpHeaders, myHeaders);
+                }, function(response) {
+                    // Should not fail
+                    assert(false);
+                })
+                ;
+
+            // End test once everything has been tested
+            return Promise.all([r1]);
+        });
         
     });
 
