@@ -14,18 +14,53 @@ node('docker') {
 		withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
 			sh 'scripts/ciPushFrontend.sh tagWithCommitId'
 		}
+	}
+}
 
-		stage 'Build: cpp'
-		sh 'scripts/ciBuildDockerImage.sh'
+stage 'build & test on windows & docker'
+parallel windows: {
+		node('windows && vs2015') {
+		    //stage 'Retrieve sources'
+		    checkout scm
 
-		stage 'Test: setup'
-		sh 'scripts/ciPrepareTests.sh'
+		    //stage 'Build C++ Windows plugin'
+		    bat 'cd scripts & ciBuildWindows.bat %BRANCH_NAME% build'
 
-		stage 'Test: cpp'
-		sh 'scripts/ciRunCppTests.sh'
+			withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
+			    //stage 'Publish C++ Windows plugin'
+			    bat 'cd scripts & ciBuildWindows.bat %BRANCH_NAME% publish'
+			}
+		}
+		
+	},
+	docker: {
+		node('docker') {
+			wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+				//stage 'Build: cpp'
+				sh 'scripts/ciBuildDockerImage.sh'
 
-		stage 'Test: integration + js'
-		sh 'scripts/ciRunJsTests.sh'
+				//stage 'Test: setup'
+				sh 'scripts/ciPrepareTests.sh'
+
+				//stage 'Test: cpp'
+				sh 'scripts/ciRunCppTests.sh'
+
+				//stage 'Test: integration + js'
+				sh 'scripts/ciRunJsTests.sh'
+			}
+		}
+	}
+
+node('windows && vs2015') {
+
+	withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
+	    stage 'Publish C++ Windows plugin'
+	    bat 'cd scripts & ciBuildWindows.bat %BRANCH_NAME% publish'
+	}
+}
+
+node('docker') {
+	wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
 
 		stage 'Publish: js -> AWS (release)'
 		withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
@@ -40,7 +75,6 @@ node('docker') {
 		stage 'Clean up'
 		sh 'scripts/ciLogDockerState.sh postbuild'
 		sh 'scripts/ciCleanup.sh'
-
 	}
 }
 

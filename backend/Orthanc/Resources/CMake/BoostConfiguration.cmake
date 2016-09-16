@@ -41,8 +41,8 @@ endif()
 if (BOOST_STATIC)
   # Parameters for Boost 1.60.0
   set(BOOST_NAME boost_1_60_0)
-  set(BOOST_MD5 "2d8dff07d7df14cffb03766ece60fe82")
-  set(BOOST_URL "http://orthanc.osimis.io/ThirdPartyDownloads/boost_1_60_0.zip")
+  set(BOOST_MD5 "f1acff449a00c3f73cd21e213ac94ba7")
+  set(BOOST_URL "http://orthanc.osimis.io/ThirdPartyDownloads/boost_1_60_0_no_doc.zip")
   set(BOOST_FILESYSTEM_SOURCES_DIR "${BOOST_NAME}/libs/filesystem/src") 
   set(BOOST_SOURCES_DIR ${CMAKE_BINARY_DIR}/${BOOST_NAME})
 
