@@ -44,9 +44,9 @@ OrthancPluginErrorCode SeriesController::_ParseURLPostFix(const std::string& url
 OrthancPluginErrorCode SeriesController::_ProcessRequest()
 {
   BENCH(FULL_PROCESS);
+  OrthancPluginContext* context = OrthancContextManager::Get();
   try {
     // Write Log
-    OrthancPluginContext* context = OrthancContextManager::Get();
     std::string message = "Ordering instances of series: " + this->seriesId_;
     OrthancPluginLogInfo(context, message.c_str());
     
@@ -57,13 +57,18 @@ OrthancPluginErrorCode SeriesController::_ProcessRequest()
     return this->_AnswerBuffer(series->ToJson(), "application/json");
   }
   catch (const Orthanc::OrthancException& exc) {
+    OrthancPluginLogInfo(context, exc.What());
     return this->_AnswerError(exc.GetHttpStatus());
   }
-  catch(...) {
-      // @note if the exception has been thrown from some constructor,
-      // memory leaks may happen. we should fix the bug instead of focusing on those memory leaks.
-      // however, in case of memory leak due to bad alloc, we should clean memory.
-      // @todo avoid memory allocation within constructor
+  catch (const std::exception& exc) {
+    OrthancPluginLogInfo(context, exc.what());
+    return this->_AnswerError(500);
+  }
+  catch (...) {
+    // @note if the exception has been thrown from some constructor,
+    // memory leaks may happen. we should fix the bug instead of focusing on those memory leaks.
+    // however, in case of memory leak due to bad alloc, we should clean memory.
+    // @todo avoid memory allocation within constructor
 
     return this->_AnswerError(500);
   }
