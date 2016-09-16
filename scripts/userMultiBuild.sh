@@ -33,8 +33,8 @@ cmake .. -DCMAKE_BUILD_TYPE=Debug -DALLOW_DOWNLOADS=ON -DSTANDALONE_BUILD=ON -DS
 make -j2
 
 # Copy files
-mkdir ${srcRoot}/debugBuild
-rsync -av . ${srcRoot}/debugBuild/
+mkdir ${srcRoot}/build-debug
+rsync -av . ${srcRoot}/build-debug/
 
 
 ## Build DEBUG ##
@@ -57,6 +57,6 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DALLOW_DOWNLOADS=ON -DSTANDALONE_BUILD=ON -
 make -j2
 
 # Copy files
-mkdir ${srcRoot}/releaseBuild
-rsync -av . ${srcRoot}/releaseBuild/
+mkdir ${srcRoot}/build-release
+rsync -av . ${srcRoot}/build-release/
 
