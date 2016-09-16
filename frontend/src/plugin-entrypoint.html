@@ -59,7 +59,7 @@
                 requireBase: false
             });
         })
-        .controller('OsimisWebViewer', function($scope, $location, $rootScope, $http, wvConfig, wvSeriesManager) {
+        .controller('OsimisWebViewer', function($scope, $location, $rootScope, WvHttpRequest, wvConfig, wvSeriesManager) {
             var vm = this;
 
             var orthancStudyId = $location.search().study;
@@ -86,8 +86,11 @@
                         // When multiframe, consider series as a study
                         else if (!vm.studyId) {
                             // @todo @warning multiple series may be shown instead of a single one... study id should also be split...
-                            $http
-                                .get(wvConfig.orthancApiURL + '/series/'+orthancSeriesId+'/study', {cache: false})
+                            var request = new WvHttpRequest();
+                            request.setHeaders(wvConfig.httpRequestHeaders);
+                            
+                            request
+                                .get(wvConfig.orthancApiURL + '/series/'+orthancSeriesId+'/study')
                                 .then(function(study) {
                                     vm.mode = 'study';
                                     vm.studyId = study.data.ID;

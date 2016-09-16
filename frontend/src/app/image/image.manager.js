@@ -6,7 +6,7 @@
         .factory('wvImageManager', wvImageManager);
 
     /* @ngInject */
-    function wvImageManager($rootScope, $http, $q, $compile, $timeout, wvConfig, WvImage) {
+    function wvImageManager($rootScope, WvHttpRequest, $q, $compile, $timeout, wvConfig, WvImage) {
         var service = {
             get: get,
             createAnnotedImage: createAnnotedImage,
@@ -82,8 +82,10 @@
                 }
                 
                 // Create & return image model based on request results
-                _modelCache[id] = $http
-                    .get(wvConfig.orthancApiURL + '/instances/'+instanceId+'/simplified-tags', {cache: false}) // already cached at upper level (only useful for multiframe instance)
+                var request = new WvHttpRequest();
+                request.setHeaders(wvConfig.httpRequestHeaders);
+                _modelCache[id] = request
+                    .get(wvConfig.orthancApiURL + '/instances/'+instanceId+'/simplified-tags') // already cached at upper level (only useful for multiframe instance)
                     .then(function(response) {
                         var tags = response.data;
 

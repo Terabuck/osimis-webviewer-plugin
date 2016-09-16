@@ -6,7 +6,7 @@
         .factory('wvSeriesManager', wvSeriesManager);
 
     /* @ngInject */
-    function wvSeriesManager($rootScope, $q, $http, wvConfig, wvOrthancSeriesAdapter) {
+    function wvSeriesManager($rootScope, $q, WvHttpRequest, wvConfig, wvOrthancSeriesAdapter) {
         var service = {
             get: get,
             listFromOrthancSeriesId: listFromOrthancSeriesId,
@@ -28,7 +28,10 @@
 
         function listFromOrthancSeriesId(id) {
             // @todo bench this method
-            var seriesPromise = $http.get(wvConfig.orthancApiURL + '/osimis-viewer/series/'+id, {cache: true});
+            var request = new WvHttpRequest();
+            request.setHeaders(wvConfig.httpRequestHeaders);
+            request.setCache(true);
+            var seriesPromise = request.get(wvConfig.orthancApiURL + '/osimis-viewer/series/'+id);
 
             return seriesPromise
                 .then(function(result) {
@@ -47,7 +50,10 @@
         }
 
         function listFromOrthancStudyId(id) {
-            return $http.get(wvConfig.orthancApiURL + '/studies/'+id, {cache: true})
+            var request = new WvHttpRequest();
+            request.setHeaders(wvConfig.httpRequestHeaders);
+            request.setCache(true);
+            return request.get(wvConfig.orthancApiURL + '/studies/'+id)
                 .then(function(response) {
                     var orthancStudy = response.data;
                     var orthancSeriesIds = orthancStudy.Series;

@@ -7,7 +7,7 @@
  * # wvStudylist
  */
 angular.module('webviewer')
-  .directive('wvStudylist', function ($rootScope, $http, wvConfig) {
+  .directive('wvStudylist', function ($rootScope, WvHttpRequest, wvConfig) {
     return {
       scope: {
         wvSelectedStudyId: '='
@@ -23,8 +23,12 @@ angular.module('webviewer')
       link: function postLink(scope, element, attrs) {
         scope.studies = [];
         
-        $http
-        .get(wvConfig.orthancApiURL + '/studies/', {cache: true})
+        var request = new WvHttpRequest();
+        request.setHeaders(wvConfig.httpRequestHeaders);
+        request.setCache(true);
+
+        request
+        .get(wvConfig.orthancApiURL + '/studies/')
         .then(function(response) {
             var studyIds = response.data;
             scope.studies = studyIds.map(function(studyId) {
@@ -36,8 +40,13 @@ angular.module('webviewer')
           
         scope.studies.forEach(function(v) {
             var studyId = v.value;
-            $http
-                .get(wvConfig.orthancApiURL + '/studies/' + studyId, {cache: true})
+
+            var request = new WvHttpRequest();
+            request.setHeaders(wvConfig.httpRequestHeaders);
+            request.setCache(true);
+
+            request
+                .get(wvConfig.orthancApiURL + '/studies/' + studyId)
                 .then(function(response) {
                     var study = response.data;
                     v.label = study.MainDicomTags.StudyDescription;

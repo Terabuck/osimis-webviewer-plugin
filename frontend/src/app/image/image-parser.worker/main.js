@@ -19,6 +19,10 @@
 
 // @todo move jpgjs & pngjs out of bower_components
 
+// Import osimis.HttpRequest
+/* @inline: */ importScripts('/app/http/http-request.class.js');
+
+// Import KLVReader
 /* @inline: */ importScripts('/app/image/image-parser.worker/klvreader.class.js');
 
 // Import jpeg lib
@@ -75,8 +79,9 @@ self.addEventListener('message', function(evt) {
         // Get an image binary
         var id = evt.data.id;
         var quality = evt.data.quality;
+        var headers = evt.data.headers;
 
-        getCommand(id, quality);
+        getCommand(id, quality, headers);
         break;
     case 'abort':
         // Abort a getCommand.
@@ -103,17 +108,17 @@ function abortCommand() {
 }
 
 /** Get & Decompress Image from Orthanc **/
-function getCommand(id, quality) {
+function getCommand(id, quality, headers) {
     if (_processingRequest) {
         throw new Error('Another request is already in process within worker thread.');
     }
 
     // Execute request
-    _processingRequest = new BinaryRequest(id, quality);
+    _processingRequest = new BinaryRequest(id, quality, headers);
     _processingRequest.execute();
 }
 
-function BinaryRequest(id, quality) {
+function BinaryRequest(id, quality, headers) {
     this.id = id;
     this.quality = quality;
 
@@ -143,25 +148,23 @@ function BinaryRequest(id, quality) {
     }
 
     // Create request
-    this.xhr = new XMLHttpRequest();
-    this.xhr.open('GET', encodeURI(url), true); // async xhr request because we wan't to be able to abort the request
-    this.xhr.responseType = 'arraybuffer';
+    this.request = new osimis.HttpRequest();
+    this.request.setResponseType('arraybuffer');
+    this.request.setHeaders(headers);
+    this.url = url;
 }
 BinaryRequest.prototype.execute = function() {
-    var xhr = this.xhr;
+    var request = this.request;
+    var url = this.url;
     var quality = this.quality;
 
-    // Process request on load (decompress the image)
-    xhr.onreadystatechange = function() {
-        // Only check finished requests
-        if (xhr.readyState !== XMLHttpRequest.DONE) {
-            return;
-        }
-
-        if (xhr.status === 200) {
+    // Trigger request
+    request
+        .get(url)
+        .then(function(response) {
             try {
-                // process binary out of the klv
-                var arraybuffer = xhr.response;
+                // Process binary out of the klv
+                var arraybuffer = response.data;
                 var data = parseKLV(arraybuffer);
 
                 if (data.decompression.compression.toLowerCase() === 'jpeg') {
@@ -179,7 +182,8 @@ BinaryRequest.prototype.execute = function() {
                 }
             }
             catch (e) {
-                _processingRequest = null; // cleaning request
+                // Clean the processing request
+                _processingRequest = null;
                 
                 // Log the stacktrace before rethrowing
                 if (e.stack) {
@@ -188,7 +192,7 @@ BinaryRequest.prototype.execute = function() {
                 throw e;
             }
 
-            // stock the format of the array, and return the array's buffer
+            // Stock the format of the array, and return the array's buffer
             // with its format instead of the array itself (array can't be worker transferable object but buffer can)
             var pixelBufferFormat = null;
             if (pixelArray instanceof Uint8Array) {
@@ -208,34 +212,34 @@ BinaryRequest.prototype.execute = function() {
                 throw new Error("Unexpected array binary format");
             }
 
-            // answer request to the main thread
+            // Answer request to the main thread
             self.postMessage({
                 type: 'success',
                 cornerstoneMetaData: data.cornerstone,
                 pixelBuffer: pixelArray.buffer,
                 pixelBufferFormat: pixelBufferFormat
             }, [pixelArray.buffer]); // pixelArray is transferable
-        }
-        else {
-            // May be called by abort (@todo not sure this behavior is crossbrowser compatible)
 
+            // Clean the processing request
+            _processingRequest = null;
+        })
+        .then(null, function(response) {
+            // May be called by abort (@todo not sure this behavior is crossbrowser compatible)
             self.postMessage({
                 type: 'failure',
-                status: xhr.status
+                status: response.status
             });
-        }
 
-        // Clean the processing request when it's done
-        _processingRequest = null;
-    };
+            // Clean the processing request
+            _processingRequest = null;
+        })
+        ;
 
-    // Trigger request
-    xhr.send(); // async call
 };
 
 BinaryRequest.prototype.abort = function() {
     // Abort the http request
-    this.xhr.abort();
+    this.request.abort();
 
     // The jpeg decompression can't be aborted (requires setTimeout loop during decompression to allow a function to stop it asynchronously during the event loop)
     // Png decompression is done it two times so it could potentially be stopped at half.

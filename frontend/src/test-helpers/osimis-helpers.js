@@ -58,7 +58,7 @@
 
         window.$rootScope.$digest();
 
-        return $q(function(resolve, reject) {
+        return new Promise(function(resolve, reject) {
             // Force a setTimeout after the $digest (somehow due to AngularJS testing intricaties when bardjs
             // is used in async mode, even if $digest should be synchronous anyway)
             // Note $q don't trigger setTimeout like most promise systems do because it relies on $digest cycle instead.

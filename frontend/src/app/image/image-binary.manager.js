@@ -87,12 +87,16 @@
                 _cache[id] = {};
             }
             if (!_cache[id][quality]) {
-                // download klv, extract metadata & decompress data to raw image
+                // Set http headers
+                var headers = wvConfig.httpRequestHeaders; // used to set user auth tokens for instance
+
+                // Download klv, extract metadata & decompress data to raw image
                 var requestPromise = pool
                     .queueTask({
                         type: 'getBinary',
                         id: id,
-                        quality: quality
+                        quality: quality,
+                        headers: headers
                     })
                     .then(function(result) {
                         // Loading done
@@ -142,7 +146,7 @@
                         // Propagate promise error
                         return $q.reject(err);
                     });
-
+                
                 _cache[id][quality] = new osimis.ImageBinaryRequest(id, quality, requestPromise);
             }
 
