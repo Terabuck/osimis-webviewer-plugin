@@ -74,6 +74,8 @@
      * 
      * The result's promise is cached, not the result itself (to avoid dual requests for instance).
      * Failed requests invalidate the cache.
+     *
+     * @warning `setCache` should only be used for GET requests.
      * 
      * Note: the cache is based on exact URL matching, therefore, a trailing slash request may not
      * use the same cache as a non-trailing slash request, even if the same resource is sent.

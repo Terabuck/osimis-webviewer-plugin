@@ -7,7 +7,7 @@
  * The `wvConfig` provider is used:
  *   * To retrieve/configure the Orthanc's path.
  *   * To retrieve the web-viewer version.
- *   * To configure user authentification (see the httpRequestHeaders method documentation below).
+ *   * To configure user authentication (see the httpRequestHeaders method documentation below).
  *
  * Warning: Web Viewer is uncompatible with <base> HTML element (due to SVG/XLink issue)! Don't use it!
  *
@@ -65,7 +65,7 @@
      * @name wvConfig.setHttpRequestHeaders
      * @methodOf webviewer.wvConfig
      * @description
-     * WebViewer is not responsible for authentification. However, it is quite often embedded behind a proxy.
+     * WebViewer is not responsible for authentication. However, it is quite often embedded behind a proxy.
      * It's therefore convenient to provide the additional user informations to the proxy. The `wvConfig.setHttpRequestHeaders`
      * method can be used to set an user token.
      *

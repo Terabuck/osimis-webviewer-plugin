@@ -88,6 +88,8 @@
             }
             if (!_cache[id][quality]) {
                 // Set http headers
+                // @note Since the request is queued, headers configuration might changes in the meanwhile (before the request execution).
+                //       However, since they are linked by reference (and not copied), changes will be bound.
                 var headers = wvConfig.httpRequestHeaders; // used to set user auth tokens for instance
 
                 // Download klv, extract metadata & decompress data to raw image
