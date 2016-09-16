@@ -102,6 +102,10 @@ if uploadInstances is True:
 		# Upload all available instances to Orthanc
 		try:
 			for path in os.listdir(dicomSamplesFolder):
+				# Ignore index.txt
+				if path == 'index.txt':
+					continue
+
 				imagePath = os.path.join(dicomSamplesFolder, path)
 				if os.path.isfile(imagePath) and '/.' not in imagePath:
 					instancesIds.append(client.uploadDicomFile(imagePath))

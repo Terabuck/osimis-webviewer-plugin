@@ -1,0 +1,38 @@
+This files list caracteristics of present dicoms.
+
+DICOM SR TESTS
+==============
+MR000000.dcm
+SR000000.dcm
+--------------
+study-id: 3ff62993-28b67f81-6dfb132b-9d53983a-3a61f711
+
+UNKNOWN REASON
+==============
+006fb144-6289-4b8e-b828-b3fd8d42c03d.dcm
+1a2f5e03-b88d-4e86-9aa1-be25f2beea85.dcm
+3639d971-4eb2-4d0f-b3db-c89e87094333.dcm
+386352c2-5d43-4049-901a-f943e26c03a7.dcm
+4f7f0152-5f84-41fe-8c8d-f2bb2b719fd8.dcm
+569567af-09e9-445f-9a97-6f1052bf9b2d.dcm
+584f007b-9f00-4675-9498-ab45e1c294d6.dcm
+86545e4a-f54d-4eeb-b737-76383a910220.dcm
+8769a4cb-1320-4cc5-92f7-77b4d19b605e.dcm
+8b60bd81-0b89-48e6-a3ba-96f98e69ab31.dcm
+8c4baa1e-7da6-4a0d-b11b-d480d93e4822.dcm
+9d6b194e-f779-4624-a055-64fbd5c8c72c.dcm
+cebcf7dd-1c03-4475-96d2-fc25395fd3fb.dcm
+d4977763-40e7-4e1e-9221-8984b7c5430e.dcm
+d700ae6e-0d9c-4834-9c5e-d749502b074b.dcm
+e1f0fa34-37b9-4ee7-9eeb-a1d76b793cf0.dcm
+e66be190-a9f1-4152-a7cb-3aa49c4925cd.dcm
+e8ce6ff4-8f2e-4b16-a2d8-f1249c7e75d5.dcm
+eae29e77-0603-4008-93a0-fce672d2bbee.dcm
+ee37157e-0ecd-4b09-adb2-6e317f846e9e.dcm
+ef744a1e-9217-4627-bfa3-a50093644204.dcm
+f2d9d62f-5105-4107-a386-958a40968f61.dcm
+f619ceb8-a6e1-4af7-a221-0e4b1ebf87bb.dcm
+fc037329-4cd2-4e2f-a1b1-ffbdee4492ed.dcm
+fc9778bb-fb75-47a2-9c72-aaf9c434bf2c.dcm
+
+
