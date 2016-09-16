@@ -12,6 +12,10 @@
 #include "../Image/AvailableQuality/OnTheFlyDownloadAvailableQualityPolicy.h"
 #include "ViewerToolbox.h"
 
+namespace {
+  bool _isDicomSr(Json::Value &tags);
+}
+
 SeriesRepository::SeriesRepository(DicomRepository* dicomRepository)
   : _dicomRepository(dicomRepository), _seriesFactory(std::auto_ptr<IAvailableQualityPolicy>(new OnTheFlyDownloadAvailableQualityPolicy))
 {
@@ -55,6 +59,23 @@ std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId) {
     throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
   }
 
+  // Ignore DICOM SR files (they can't be processed by our SeriesFactory)
+  if (::_isDicomSr(tags2)) {
+    throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_IncompatibleImageFormat));
+  }
+  
   // Create a series based on tags and ordered instances
   return std::auto_ptr<Series>(_seriesFactory.CreateSeries(seriesId, slicesShort, tags1, tags2));
+}
+
+namespace {
+  bool _isDicomSr(Json::Value &tags) {
+    if (tags["Modality"].empty()) {
+      return false;
+    }
+
+    std::string modality = tags["Modality"].asString();
+
+    return (modality == "SR");
+  }
 }
