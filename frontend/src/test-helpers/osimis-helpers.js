@@ -47,8 +47,9 @@
     }
 
     // see https://docs.angularjs.org/api/ng/function/angular.element for available methods
-    function directive(html) {
+    function directive(html, ctrlName) { // ctrlName is optional, used to select the ctrlName of an attribute instead of the element
         var domElement = $(html);
+        ctrlName = ctrlName || domElement.prop('tagName').toLowerCase();
 
         // @note element must appended to body to retrieve its size
         $('body').append(domElement);
@@ -57,14 +58,14 @@
 
         window.$rootScope.$digest();
 
-        return $q(function(resolve, reject) {
+        return new Promise(function(resolve, reject) {
             // Force a setTimeout after the $digest (somehow due to AngularJS testing intricaties when bardjs
             // is used in async mode, even if $digest should be synchronous anyway)
             // Note $q don't trigger setTimeout like most promise systems do because it relies on $digest cycle instead.
             // Therefore, we have to manually call the timeout.
             setTimeout(function() {
                 // Add helpers
-                element.$controller = controller(element, domElement.prop('tagName').toLowerCase());
+                element.$controller = controller(element, ctrlName);
                 element.$scope = element.isolateScope() || element.scope();
 
                 resolve(element);

@@ -1,4 +1,6 @@
-var args = require('yargs').argv;
+var yargs = require('yargs');
+var args = yargs.argv;
+var taskName = args._[0];
 var browserSync = require('browser-sync');
 var config = require('./gulp.config')();
 var del = require('del');
@@ -10,6 +12,13 @@ var $ = require('gulp-load-plugins')({lazy: true});
 var osisync = require('osisync');
 $.injectInlineWorker = require('gulp-injectInlineWorker/index.js');
 var mergeStream = require('merge-stream')
+
+// Set optional dev dependencies
+if (taskName === 'serve-dev' || taskName === 'serve-build' || taskName === 'osisync') {
+    $.nodemon = require('gulp-nodemon') || null;
+    $.jscs = require('gulp-jscs') || null;
+    $.jshint = require('gulp-jshint') || null;
+}
 
 var colors = $.util.colors;
 var envenv = $.util.env;

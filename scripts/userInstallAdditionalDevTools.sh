@@ -1,6 +1,9 @@
 #!/bin/bash
 
 # This file installs development dependencies not used in our continous integration
+# Recommended sublimetext plugins: 
+# - docblockr
+# - ngdoc-snippets
 
 # Start from the right place
 previousDir=$(pwd)
