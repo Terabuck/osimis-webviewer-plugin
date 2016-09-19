@@ -89,7 +89,7 @@
      *     // This is called at module initialization time; therefore, userToken has to exist prior to application initialization.
      *     // The above statement is invalided if the following configuration routes are available without the user token:
      *     // - '${ORTHANC_URL}/plugins/osimis-web-viewer'
-     *     // - '${ORTHANC_URL}/plugins/system'
+     *     // - '${ORTHANC_URL}/system'
      *     var userToken = 'some-user-token';
      *
      *     // Configure the header
