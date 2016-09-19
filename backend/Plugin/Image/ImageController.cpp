@@ -50,7 +50,7 @@ ImageController::ImageController(OrthancPluginRestOutput* response, const std::s
 #endif // PLUGIN_ENABLE_DEBUG_ROUTE
 }
 
-OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlPostfix) {
+int ImageController::_ParseURLPostFix(const std::string& urlPostfix) {
   BENCH(URL_PARSING);
   // /osimis-viewer/images/<instance_uid:str>/<frame_index:int>/{low|medium|high|pixeldata}-quality
   boost::regex regexp("^(nocache/|cleancache/)?([^/]+)/(\\d+)(?:/(.+))$");
@@ -103,10 +103,10 @@ OrthancPluginErrorCode ImageController::_ParseURLPostFix(const std::string& urlP
 
   }
 
-  return OrthancPluginErrorCode_Success;
+  return 200;
 }
 
-OrthancPluginErrorCode ImageController::_ProcessRequest()
+int ImageController::_ProcessRequest()
 {
   BENCH(FULL_PROCESS);
 

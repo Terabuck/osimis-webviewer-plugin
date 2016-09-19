@@ -9,22 +9,26 @@
 class BaseController {
 public:
   BaseController(OrthancPluginRestOutput* response, const std::string& url, const OrthancPluginHttpRequest* request);
+  virtual ~BaseController() {}
   OrthancPluginErrorCode ProcessRequest();
 
 protected:
 
   // Called when the route URL isn't postfixed
-  virtual OrthancPluginErrorCode _OnEmptyURLPostFix() { return OrthancPluginErrorCode_Success; }
+  // Returns the HTTP status (200 for success)
+  virtual int _OnEmptyURLPostFix() { return 404; }
 
   // Parse the rest of the URL (the relative URL without the path prefix set in RegisterRoute)
-  virtual OrthancPluginErrorCode _ParseURLPostFix(const std::string& urlPostfix) { return OrthancPluginErrorCode_Success; }
+  // Returns the HTTP status (200 for success)
+  virtual int _ParseURLPostFix(const std::string& urlPostfix) { return 404; }
 
   // Process the url content
-  virtual OrthancPluginErrorCode _ProcessRequest() = 0;
+  // Returns the HTTP status (200 for success)
+  virtual int _ProcessRequest() = 0;
 
-  OrthancPluginErrorCode _AnswerError(int error_code);
-  OrthancPluginErrorCode _AnswerBuffer(const char* output, size_t outputSize, const std::string& mimeType);
-  OrthancPluginErrorCode _AnswerBuffer(const std::string& output, const std::string& mimeType);
+  int _AnswerError(int errorCode);
+  int _AnswerBuffer(const char* output, size_t outputSize, const std::string& mimeType);
+  int _AnswerBuffer(const std::string& output, const std::string& mimeType);
 
 protected:
   OrthancPluginRestOutput* response_;

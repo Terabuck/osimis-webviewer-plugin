@@ -7,37 +7,42 @@ BaseController::BaseController(OrthancPluginRestOutput* response, const std::str
 }
 
 OrthancPluginErrorCode BaseController::ProcessRequest() {
-  // parse the URL
+  // Parse the URL
   if (this->request_->groupsCount == 0) {
-    OrthancPluginErrorCode error = this->_OnEmptyURLPostFix();
-    if (error != OrthancPluginErrorCode_Success) {
-      return error;
+    // Process url (when url has no content)
+    int httpStatus = this->_OnEmptyURLPostFix();
+    // Stop on failure
+    if (httpStatus != 200) {
+      return OrthancPluginErrorCode_Success;
     }
   }
   else if (this->request_->groupsCount == 1) {
-    OrthancPluginErrorCode error = this->_ParseURLPostFix(this->request_->groups[0]);
-    if (error != OrthancPluginErrorCode_Success) {
-      return error;
+    // Process url (when url has additional content)
+    int httpStatus = this->_ParseURLPostFix(this->request_->groups[0]);
+    // Stop on failure
+    if (httpStatus != 200) {
+      return OrthancPluginErrorCode_Success;
     }
   }
   else {
-    // should not happen
+    // Should not happen
     return OrthancPluginErrorCode_ParameterOutOfRange;
   }
 
-  // process the data
-  return this->_ProcessRequest();
+  // Process the data
+  int httpStatus = this->_ProcessRequest();
+  return OrthancPluginErrorCode_Success;
 }
 
-OrthancPluginErrorCode BaseController::_AnswerError(int error_code) {
-  OrthancPluginSendHttpStatusCode(OrthancContextManager::Get(), response_, error_code);
-  return OrthancPluginErrorCode_Success;
+int BaseController::_AnswerError(int errorCode) {
+  OrthancPluginSendHttpStatusCode(OrthancContextManager::Get(), response_, errorCode);
+  return errorCode;
 }
-OrthancPluginErrorCode BaseController::_AnswerBuffer(const std::string& output, const std::string& mimeType) {
+int BaseController::_AnswerBuffer(const std::string& output, const std::string& mimeType) {
   OrthancPluginAnswerBuffer(OrthancContextManager::Get(), response_, output.c_str(), output.size(), mimeType.c_str());
-  return OrthancPluginErrorCode_Success;
+  return 200;
 }
-OrthancPluginErrorCode BaseController::_AnswerBuffer(const char* output, size_t outputSize, const std::string& mimeType) {
+int BaseController::_AnswerBuffer(const char* output, size_t outputSize, const std::string& mimeType) {
   OrthancPluginAnswerBuffer(OrthancContextManager::Get(), response_, output, outputSize, mimeType.c_str());
-  return OrthancPluginErrorCode_Success;
+  return 200;
 }

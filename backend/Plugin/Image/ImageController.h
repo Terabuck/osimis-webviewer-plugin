@@ -19,8 +19,8 @@ public:
   static void Inject(T* obj);
 
 protected:
-  virtual OrthancPluginErrorCode _ParseURLPostFix(const std::string& urlPostfix);
-  virtual OrthancPluginErrorCode _ProcessRequest();
+  virtual int _ParseURLPostFix(const std::string& urlPostfix);
+  virtual int _ProcessRequest();
 
 private:
   static ImageRepository* imageRepository_;

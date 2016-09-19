@@ -21,7 +21,7 @@ SeriesController::SeriesController(OrthancPluginRestOutput* response, const std:
 
 }
 
-OrthancPluginErrorCode SeriesController::_ParseURLPostFix(const std::string& urlPostfix) {
+int SeriesController::_ParseURLPostFix(const std::string& urlPostfix) {
   // /osimis-viewer/series/<series_uid>
   boost::regex regexp("^([^/]+)$");
 
@@ -37,11 +37,11 @@ OrthancPluginErrorCode SeriesController::_ParseURLPostFix(const std::string& url
 
     BENCH_LOG(SERIES_ID, seriesId_);
 
-    return OrthancPluginErrorCode_Success;
+    return 200;
   }
 }
 
-OrthancPluginErrorCode SeriesController::_ProcessRequest()
+int SeriesController::_ProcessRequest()
 {
   BENCH(FULL_PROCESS);
   OrthancPluginContext* context = OrthancContextManager::Get();
