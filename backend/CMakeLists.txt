@@ -43,6 +43,10 @@ MESSAGE( STATUS "PRODUCT_VERSION_BRANCH:         " ${PRODUCT_VERSION_BRANCH} )
 MESSAGE( STATUS "PRODUCT_VERSION_SHORT_STRING:   " ${PRODUCT_VERSION_SHORT_STRING} )
 MESSAGE( STATUS "JS_FRONTEND_VERSION:            " ${JS_FRONTEND_VERSION} )
 
+# Directory CMAKE_USE_RELATIVE_PATHS
+set(VIEWER_PLUGIN_SOURCE_DIR ${CMAKE_SOURCE_DIR}/WebViewerPlugin)
+set(VIEWER_LIBRARY_SOURCE_DIR ${CMAKE_SOURCE_DIR}/WebViewerLibrary)
+
 # Advanced parameters to fine-tune linking against system libraries
 set(USE_SYSTEM_BOOST ON CACHE BOOL "Use the system version of Boost")
 set(USE_SYSTEM_GDCM ON CACHE BOOL "Use the system version of Grassroot DICOM (GDCM)")
@@ -147,7 +151,7 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR
     ${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
   link_libraries(rt)
 elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-   list(APPEND PLUGIN_SOURCES  ${CMAKE_SOURCE_DIR}/Plugin/resources.rc)
+   list(APPEND PLUGIN_SOURCES  ${PLUGIN_SOURCES}/resources.rc)
 endif()
 
 if (APPLE)
@@ -161,11 +165,11 @@ add_definitions(
   -DORTHANC_ENABLE_LOGGING=0
   )
 
-include_directories(${CMAKE_SOURCE_DIR}/Plugin/)
-include_directories(${CMAKE_SOURCE_DIR}/Plugin/Image)
-include_directories(${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer)
-include_directories(${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy)
-include_directories(${CMAKE_SOURCE_DIR}/Plugin/Image/Utilities)
+include_directories(${VIEWER_LIBRARY_SOURCE_DIR}/)
+include_directories(${VIEWER_LIBRARY_SOURCE_DIR}/Image)
+include_directories(${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageContainer)
+include_directories(${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy)
+include_directories(${VIEWER_LIBRARY_SOURCE_DIR}/Image/Utilities)
 
 # create an intermediary OsimisWebViewerObject to avoid source recompilation
 # for both unit tests and web viewer library
@@ -199,40 +203,40 @@ add_library(OsimisWebViewerObject
   ${ORTHANC_SDK_ROOT}/Resources/ThirdParty/base64/base64.cpp
 
   # The following files depend on GDCM
-  ${CMAKE_SOURCE_DIR}/Plugin/DecodedImageAdapter.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/DecodedImageAdapter.cpp
   ${ORTHANC_SDK_ROOT}/Plugins/Samples/GdcmDecoder/GdcmImageDecoder.cpp
   ${ORTHANC_SDK_ROOT}/Plugins/Samples/GdcmDecoder/GdcmDecoderCache.cpp
   ${ORTHANC_SDK_ROOT}/Plugins/Samples/GdcmDecoder/OrthancImageWrapper.cpp
   
-  ${CMAKE_SOURCE_DIR}/Plugin/OrthancContextManager.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/BaseController.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Instance/DicomRepository.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Series/SeriesFactory.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Series/SeriesRepository.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Series/Series.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Series/SeriesController.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/Utilities/KLVWriter.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/AvailableQuality/OnTheFlyDownloadAvailableQualityPolicy.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/RawImageContainer.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/CompressedImageContainer.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/CornerstoneKLVContainer.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/CompositePolicy.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/PixelDataQualityPolicy.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/HighQualityPolicy.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/MediumQualityPolicy.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/LowQualityPolicy.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/ResizePolicy.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/Uint8ConversionPolicy.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/JpegConversionPolicy.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/PngConversionPolicy.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageProcessingPolicy/KLVEmbeddingPolicy.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/Image.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageMetaData.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageRepository.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageController.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/OrthancContextManager.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/BaseController.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Instance/DicomRepository.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Series/SeriesFactory.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Series/SeriesRepository.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Series/Series.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Series/SeriesController.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/Utilities/KLVWriter.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/AvailableQuality/OnTheFlyDownloadAvailableQualityPolicy.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageContainer/RawImageContainer.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageContainer/CompressedImageContainer.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageContainer/CornerstoneKLVContainer.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy/CompositePolicy.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy/PixelDataQualityPolicy.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy/HighQualityPolicy.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy/MediumQualityPolicy.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy/LowQualityPolicy.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy/ResizePolicy.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy/Uint8ConversionPolicy.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy/JpegConversionPolicy.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy/PngConversionPolicy.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy/KLVEmbeddingPolicy.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/Image.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageMetaData.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageRepository.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageController.cpp
   
-  ${CMAKE_SOURCE_DIR}/Plugin/BenchmarkHelper.cpp
-  ${CMAKE_SOURCE_DIR}/Plugin/ViewerToolbox.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/BenchmarkHelper.cpp
+  ${VIEWER_LIBRARY_SOURCE_DIR}/ViewerToolbox.cpp
   )
 # bind OsimisWebViewerObject to GDCM & EmbeddedResources so any executable/library embedding 
 # OsimisWebViewerObject.a also embed both.
@@ -262,7 +266,7 @@ add_library(OsimisWebViewer
   SHARED
   ${AUTOGENERATED_SOURCES}
   ${PLUGIN_SOURCES}
-  ${CMAKE_SOURCE_DIR}/Plugin/Plugin.cpp
+  ${VIEWER_PLUGIN_SOURCE_DIR}/Plugin.cpp
   )
 
 add_dependencies(OsimisWebViewer OsimisWebViewerObject)
