@@ -28,15 +28,15 @@ set(BENCHMARK OFF CACHE BOOL "Send benchmark informations to stdout")
 set(STATIC_BUILD ON CACHE BOOL "Static build of the third-party libraries (necessary for Windows)")
 SET(STANDALONE_BUILD ON CACHE BOOL "Standalone build (all the resources are embedded, necessary for releases)")
 set(ALLOW_DOWNLOADS ON CACHE BOOL "Allow CMake to download packages")
-set(JS_CLIENT_PATH ${CMAKE_SOURCE_DIR}/../frontend/build)
+set(JS_CLIENT_PATH "${CMAKE_SOURCE_DIR}/../frontend/build" CACHE STRING "Path of the front-end build folder")
 
-if(EXISTS ${JS_CLIENT_PATH})
+if(EXISTS ${JS_CLIENT_PATH}) # If file exists (not var)
   # Set frontend version based on local build if available
   # when building inside the docker container, the frontend/build folder is already there and we don't want to override it.
-  set(JS_FRONTEND_VERSION "LOCAL" CACHE STRING "the version of the frontend package to download")
+  set(JS_FRONTEND_VERSION "LOCAL")
 else()
   # Set frontend version based on the commit id for all other builds including the release version
-  set(JS_FRONTEND_VERSION ${PRODUCT_VERSION_COMMIT_SHA1_STRING} CACHE STRING "the version of the frontend package to download")
+  set(JS_FRONTEND_VERSION ${PRODUCT_VERSION_COMMIT_SHA1_STRING})
 endif()
 
 MESSAGE( STATUS "PRODUCT_VERSION_BRANCH:         " ${PRODUCT_VERSION_BRANCH} )

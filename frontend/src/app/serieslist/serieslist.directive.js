@@ -11,7 +11,8 @@ angular.module('webviewer')
 return {
   scope: {
     wvStudyId: '=',
-    wvClassTmp: '=?wvClass'
+    wvClassTmp: '=?wvClass',
+    wvOnStudyLoaded: '&?wvOnStudyLoaded' // For testing convenience
   },
   templateUrl: 'app/serieslist/serieslist.directive.html',
   restrict: 'E',
@@ -36,6 +37,11 @@ return {
           scope.seriesIds = seriesList.map(function(series) {
             return series.id;
           });
+
+          // Trigger on-study-loaded (mainly for testing convenience)
+          if (scope.wvOnStudyLoaded) {
+            scope.wvOnStudyLoaded();
+          }
         });
       
     }

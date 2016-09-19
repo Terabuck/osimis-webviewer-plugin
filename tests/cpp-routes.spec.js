@@ -1,6 +1,6 @@
 describe('backend', function() {
 
-    this.timeout(10000); // Set a long timeout because image compression can takes longer than the default 2s timeout
+    this.timeout(10000); // Set a long timeout because image compression can take longer than the default 2s timeout
 
     beforeEach(function() {
         bard.asyncModule('webviewer', function(wvConfigProvider) {

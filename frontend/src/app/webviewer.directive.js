@@ -126,6 +126,9 @@
                 }
             });
             scope.$watch('vm.studyId', function(newStudyId, oldStudyId) {
+                // Log study id
+                console.log('Study: ', newStudyId);
+
                 // Cancel previous preloading
                 if (oldStudyId && newStudyId !== oldStudyId) {
                     $rootScope.$emit('UserUnSelectedStudyId', oldStudyId);
