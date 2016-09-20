@@ -26,7 +26,7 @@ set(ORTHANC_DIR ${CMAKE_SOURCE_DIR}/Orthanc)
 set(LOCAL_DEPENDENCIES_DIR ${CMAKE_SOURCE_DIR}/Dependencies)
 set(VIEWER_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/WebViewerLibrary)
 set(VIEWER_PLUGIN_DIR ${CMAKE_SOURCE_DIR}/WebViewerPlugin)
-set(VIEWER_TESTS_DIR ${CMAKE_SOURCE_DIR}/UnitTestsSources)
+set(VIEWER_TESTS_DIR ${CMAKE_SOURCE_DIR}/WebViewerTests)
 set(VIEWER_FRONTEND_DIR ${CMAKE_SOURCE_DIR}/../frontend)
 
 # Build intermediate Web Viewer Library
