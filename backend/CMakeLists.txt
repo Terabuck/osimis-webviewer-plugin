@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-cmake_minimum_required(VERSION 3.1) # for generator expressions
+cmake_minimum_required(VERSION 2.8) # 2.8 is our current windows' CI version of cmake
 
 project(OsimisWebViewer)
 
