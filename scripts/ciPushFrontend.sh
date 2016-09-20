@@ -7,7 +7,7 @@
 source .env
 source $SRC_ROOT/scripts/ciErrorHandler.sh
 
-tagType=${2:-tagWithCommitId}  # before the code is validate, we don't wan't to push code with a branch name that could overwrite a valid one that is already on AWS server.  So, only push the commit id
+tagType=${1:-tagWithCommitId}  # before the code is validate, we don't wan't to push code with a branch name that could overwrite a valid one that is already on AWS server.  So, only push the commit id
 if [[ $tagType == "tagWithReleaseTag" ]]; then
     zipFileToUpload=$RELEASE_TAG
 else
