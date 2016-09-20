@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <boost/regex.hpp>
-#include "../../Orthanc/Core/OrthancException.h"
+#include <Core/OrthancException.h>
 
 #include "../BenchmarkHelper.h" // for BENCH(*)
 #include "../OrthancContextManager.h"

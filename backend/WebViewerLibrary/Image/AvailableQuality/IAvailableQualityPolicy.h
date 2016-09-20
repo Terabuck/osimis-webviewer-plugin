@@ -2,7 +2,7 @@
 
 #include <set>
 #include <json/value.h>
-#include "../../Orthanc/Core/DicomFormat/DicomMap.h"
+#include <Core/DicomFormat/DicomMap.h>
 #include "ImageQuality.h"
 
 /** IAvailableQualityPolicy

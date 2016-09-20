@@ -4,8 +4,8 @@
 #include <boost/foreach.hpp>
 // #include <json/value.h>
 #include <json/json.h>
-#include "../../Orthanc/Core/OrthancException.h"
-#include "../../Orthanc/Core/Toolbox.h"
+#include <Core/OrthancException.h>
+#include <Core/Toolbox.h>
 
 using namespace Orthanc;
 

@@ -5,8 +5,8 @@
 #include <json/value.h>
 #include <boost/scope_exit.hpp>
 #include <boost/pointer_cast.hpp>
-#include "../../Orthanc/Core/OrthancException.h"
-#include "../../Orthanc/Core/DicomFormat/DicomMap.h"
+#include <Core/OrthancException.h>
+#include <Core/DicomFormat/DicomMap.h>
 
 #include "../OrthancContextManager.h"
 #include "../Image/AvailableQuality/OnTheFlyDownloadAvailableQualityPolicy.h"

@@ -3,7 +3,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp> // for boost::algorithm::split
 
-#include "../../Orthanc/Core/OrthancException.h" // for OrthancException(UnknownResource) catch
+#include <Core/OrthancException.h> // for OrthancException(UnknownResource) catch
 
 #include "../BenchmarkHelper.h" // for BENCH(*)
 #include "ImageProcessingPolicy/LowQualityPolicy.h"

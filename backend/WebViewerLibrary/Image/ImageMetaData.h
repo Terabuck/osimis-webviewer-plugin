@@ -5,7 +5,7 @@
 #include <boost/cstdint.hpp> // for uint32_t
 #include <json/writer.h> // for Json::Value
 
-#include "../../Orthanc/Core/DicomFormat/DicomMap.h"
+#include <Core/DicomFormat/DicomMap.h>
 #include "ImageContainer/RawImageContainer.h"
 #include "ImageContainer/IImageContainer.h"
 

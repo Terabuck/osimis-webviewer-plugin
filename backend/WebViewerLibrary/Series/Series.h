@@ -23,7 +23,7 @@
 #include <string>
 #include <set>
 #include <json/value.h>
-#include "../../Orthanc/Core/DicomFormat/DicomMap.h"
+#include <Core/DicomFormat/DicomMap.h>
 #include "../AvailableQuality/ImageQuality.h"
 
 class Series : public boost::noncopyable {

@@ -1,8 +1,8 @@
 #include "Uint8ConversionPolicy.h"
 
-#include "../../Orthanc/Core/Images/ImageBuffer.h" // for ImageBuffer
-#include "../../Orthanc/Core/Images/ImageProcessing.h" // for ImageProcessing::GetMinMaxValue
-#include "../../Orthanc/Core/OrthancException.h"
+#include <Core/Images/ImageBuffer.h> // for ImageBuffer
+#include <Core/Images/ImageProcessing.h> // for ImageProcessing::GetMinMaxValue
+#include <Core/OrthancException.h>
 #include "../../Logging.h"
 #include "../../BenchmarkHelper.h"
 

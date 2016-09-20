@@ -5,8 +5,8 @@
 #include <boost/thread/lock_guard.hpp> 
 #include <boost/scope_exit.hpp>
 
-#include "../../Orthanc/Core/OrthancException.h" // for throws
-#include "../../Orthanc/Core/DicomFormat/DicomMap.h"
+#include <Core/OrthancException.h> // for throws
+#include <Core/DicomFormat/DicomMap.h>
 #include "../ViewerToolbox.h" // for OrthancPlugins::get*FromOrthanc && OrthancPluginImage
 #include "../BenchmarkHelper.h" // for BENCH(*)
 #include "../OrthancContextManager.h" // for context_ global

@@ -25,22 +25,22 @@
 #include <EmbeddedResources.h>
 #include <boost/filesystem.hpp>
 
-#include "../Orthanc/Core/OrthancException.h"
-#include "../Orthanc/Core/Toolbox.h"
-#include "../Orthanc/Core/DicomFormat/DicomMap.h"
-#include "ViewerToolbox.h"
+#include <Core/OrthancException.h>
+#include <Core/Toolbox.h>
+#include <Core/DicomFormat/DicomMap.h>
+#include <ViewerToolbox.h>
 
-#include "OrthancContextManager.h"
-#include "BaseController.h"
-#include "Instance/DicomRepository.h"
-#include "Series/SeriesRepository.h"
-#include "Series/SeriesController.h"
-#include "Image/ImageRepository.h"
-#include "Image/ImageController.h"
-#include "DecodedImageAdapter.h"
-#include "../Orthanc/Plugins/Samples/GdcmDecoder/GdcmDecoderCache.h"
-#include "../Orthanc/Core/Toolbox.h"
-#include "Version.h"
+#include <OrthancContextManager.h>
+#include <BaseController.h>
+#include <Instance/DicomRepository.h>
+#include <Series/SeriesRepository.h>
+#include <Series/SeriesController.h>
+#include <Image/ImageRepository.h>
+#include <Image/ImageController.h>
+#include <DecodedImageAdapter.h>
+#include <Plugins/Samples/GdcmDecoder/GdcmDecoderCache.h>
+#include <Core/Toolbox.h>
+#include <Version.h>
 
 static OrthancPluginContext* context_ = NULL;
 static bool restrictTransferSyntaxes_ = false;

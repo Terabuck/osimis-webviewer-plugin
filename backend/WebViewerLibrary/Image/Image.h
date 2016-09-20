@@ -3,7 +3,7 @@
 #include <string>
 #include <json/writer.h> // for Json::Value
 
-#include "../../Orthanc/Core/DicomFormat/DicomMap.h"
+#include <Core/DicomFormat/DicomMap.h>
 #include "../OrthancContextManager.h"
 #include "ImageContainer/IImageContainer.h"
 #include "ImageContainer/RawImageContainer.h"

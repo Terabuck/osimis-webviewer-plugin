@@ -21,7 +21,7 @@
 
 #include "ViewerToolbox.h"
 
-#include "../Orthanc/Core/OrthancException.h"
+#include <Core/OrthancException.h>
 #include <boost/regex.hpp>
 #include <boost/foreach.hpp>
 

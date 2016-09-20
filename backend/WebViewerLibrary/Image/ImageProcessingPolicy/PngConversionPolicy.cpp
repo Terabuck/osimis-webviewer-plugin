@@ -1,8 +1,8 @@
 #include "PngConversionPolicy.h"
 
 #include <orthanc/OrthancCPlugin.h> // for OrthancPluginMemoryBuffer & OrthancPluginCompressPngImage
-#include "../../Orthanc/Core/Images/ImageBuffer.h"
-#include "../../Orthanc/Core/OrthancException.h"
+#include <Core/Images/ImageBuffer.h>
+#include <Core/OrthancException.h>
 #include "../../Logging.h"
 #include "../../BenchmarkHelper.h"
 

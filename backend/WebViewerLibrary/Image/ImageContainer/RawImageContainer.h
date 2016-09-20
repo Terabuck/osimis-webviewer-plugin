@@ -7,9 +7,9 @@
 
 #include "../../OrthancContextManager.h"
 #include "../../ViewerToolbox.h" // for OrthancPluginImage
-#include "../../Orthanc/Plugins/Samples/GdcmDecoder/OrthancImageWrapper.h" // for OrthancImageWrapper
-#include "../../Orthanc/Core/Images/ImageAccessor.h" // for ImageAccessor
-#include "../../Orthanc/Core/Images/ImageBuffer.h" // for ImageBuffer
+#include <Plugins/Samples/GdcmDecoder/OrthancImageWrapper.h> // for OrthancImageWrapper
+#include <Core/Images/ImageAccessor.h> // for ImageAccessor
+#include <Core/Images/ImageBuffer.h> // for ImageBuffer
 #include "IImageContainer.h"
 
 class RawImageContainer : public IImageContainer {
