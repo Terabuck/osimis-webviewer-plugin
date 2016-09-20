@@ -31,8 +31,8 @@ add_library(OsimisWebViewer
   ${VIEWER_PLUGIN_SOURCE_DIR}/Plugin.cpp
   )
 
-add_dependencies(OsimisWebViewer OsimisWebViewerObject)
-target_link_libraries(OsimisWebViewer OsimisWebViewerObject)
+add_dependencies(OsimisWebViewer WebViewerLibrary)
+target_link_libraries(OsimisWebViewer WebViewerLibrary)
 
 message("Setting the version of the library to ${PRODUCT_VERSION_SHORT_STRING}")
 
@@ -52,5 +52,5 @@ add_executable(UnitTests
   ${JSONCPP_SOURCES}
   ${CMAKE_SOURCE_DIR}/UnitTestsSources/UnitTestsMain.cpp
   )
-add_dependencies(UnitTests OsimisWebViewerObject)
-target_link_libraries(UnitTests OsimisWebViewerObject)
+add_dependencies(UnitTests WebViewerLibrary)
+target_link_libraries(UnitTests WebViewerLibrary)

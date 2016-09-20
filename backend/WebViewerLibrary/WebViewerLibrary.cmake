@@ -17,18 +17,14 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-# Create a OsimisWebViewerObject.a including all viewer dependencies
+# Create a WebViewerLibrary.a including all viewer dependencies
 # and the core source code (without the plugin.cpp)
 #
 # Usage:
 #   (within CMakeLists.txt)
 #	set(...) # set all required variables
 #   include(WebViewerLibrary.cmake)
-#   # target OsimisWebViewerObject is available
-
-cmake_minimum_required(VERSION 2.8)
-
-project(OsimisWebViewer)
+#   # target WebViewerLibrary is available
 
 ## Set variables
 
@@ -185,9 +181,9 @@ include_directories(${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageContainer)
 include_directories(${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy)
 include_directories(${VIEWER_LIBRARY_SOURCE_DIR}/Image/Utilities)
 
-# create an intermediary OsimisWebViewerObject to avoid source recompilation
+# create an intermediary WebViewerLibrary to avoid source recompilation
 # for both unit tests and web viewer library
-add_library(OsimisWebViewerObject
+add_library(WebViewerLibrary
   STATIC
 
   ${BOOST_SOURCES}
@@ -251,25 +247,25 @@ add_library(OsimisWebViewerObject
   ${VIEWER_LIBRARY_SOURCE_DIR}/BenchmarkHelper.cpp
   ${VIEWER_LIBRARY_SOURCE_DIR}/ViewerToolbox.cpp
   )
-# bind OsimisWebViewerObject to GDCM & EmbeddedResources so any executable/library embedding 
-# OsimisWebViewerObject.a also embed both.
+# bind WebViewerLibrary to GDCM & EmbeddedResources so any executable/library embedding 
+# WebViewerLibrary.a also embed both.
 if (STATIC_BUILD OR NOT USE_SYSTEM_GDCM)
-  add_dependencies(OsimisWebViewerObject GDCM EmbeddedResourcesGenerator)
+  add_dependencies(WebViewerLibrary GDCM EmbeddedResourcesGenerator)
 endif()
-target_link_libraries(OsimisWebViewerObject ${GDCM_LIBRARIES})
+target_link_libraries(WebViewerLibrary ${GDCM_LIBRARIES})
 
-# If using gcc, build OsimisWebViewerObject with the "-fPIC" argument to allow its
+# If using gcc, build WebViewerLibrary with the "-fPIC" argument to allow its
 # embedding into the shared library containing the Orthanc plugin
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR
     ${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD" OR
     ${CMAKE_SYSTEM_NAME} STREQUAL "kFreeBSD")
-  get_target_property(Flags OsimisWebViewerObject COMPILE_FLAGS)
+  get_target_property(Flags WebViewerLibrary COMPILE_FLAGS)
   if(Flags STREQUAL "Flags-NOTFOUND")
     SET(Flags "-fPIC -ldl")
   else()
     SET(Flags "${Flags} -fPIC")
   endif()
-  set_target_properties(OsimisWebViewerObject PROPERTIES
+  set_target_properties(WebViewerLibrary PROPERTIES
       COMPILE_FLAGS ${Flags})
-  target_link_libraries(OsimisWebViewerObject -ldl)
+  target_link_libraries(WebViewerLibrary -ldl)
 endif()
