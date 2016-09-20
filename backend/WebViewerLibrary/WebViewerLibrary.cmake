@@ -22,13 +22,18 @@
 #
 # Usage:
 #   (within CMakeLists.txt)
-#	set(...) # set all required variables
+#	  # Set all required variables
+#   set(RESOURCES_DIR ${CMAKE_SOURCE_DIR}/Resources)
+#   set(ORTHANC_DIR ${CMAKE_SOURCE_DIR}/Orthanc)
+#   set(LOCAL_DEPENDENCIES_DIR ${CMAKE_SOURCE_DIR}/Dependencies)
+#   set(VIEWER_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/WebViewerLibrary)
+#   # Build intermediate WebViewerLibrary
 #   include(WebViewerLibrary.cmake)
 #   # target WebViewerLibrary is available
 
 ## Set variables
 
-include(${CMAKE_SOURCE_DIR}/Resources/CMake/GetProductVersionFromGitTag.cmake)
+include(${RESOURCES_DIR}/CMake/GetProductVersionFromGitTag.cmake)
 
 # Parameters of the build
 set(BENCHMARK OFF CACHE BOOL "Send benchmark informations to stdout")
@@ -55,33 +60,31 @@ set(USE_GTEST_DEBIAN_SOURCE_PACKAGE OFF CACHE BOOL "Use the sources of Google Te
 mark_as_advanced(USE_GTEST_DEBIAN_SOURCE_PACKAGE)
 
 # Build dependencies
-set(ORTHANC_ROOT ${CMAKE_SOURCE_DIR}/Orthanc)
+set(ORTHANC_ROOT ${ORTHANC_DIR}) # required by orthanc's cmake
 include(CheckIncludeFiles)
 include(CheckIncludeFileCXX)
 include(CheckLibraryExists)
 include(FindPythonInterp)
-include(${ORTHANC_ROOT}/Resources/CMake/Compiler.cmake)
-include(${ORTHANC_ROOT}/Resources/CMake/DownloadPackage.cmake)
 
 #download the frontend lib
 if(NOT ${JS_FRONTEND_VERSION} STREQUAL "LOCAL") 
   DownloadPackage(FALSE "http://orthanc.osimis.io/public/osimisWebViewer/${JS_FRONTEND_VERSION}.zip" ${JS_CLIENT_PATH} TRUE)
 endif()
 
-include(${ORTHANC_ROOT}/Resources/CMake/BoostConfiguration.cmake)
-include(${ORTHANC_ROOT}/Resources/CMake/GoogleTestConfiguration.cmake)
-include(${ORTHANC_ROOT}/Resources/CMake/JsonCppConfiguration.cmake)
-include(${ORTHANC_ROOT}/Resources/CMake/SQLiteConfiguration.cmake)
-
-include(${CMAKE_SOURCE_DIR}/Resources/CMake/GdcmConfiguration.cmake)
+include(${ORTHANC_DIR}/Resources/CMake/Compiler.cmake)
+include(${ORTHANC_DIR}/Resources/CMake/DownloadPackage.cmake) # Required by boost
+include(${ORTHANC_DIR}/Resources/CMake/BoostConfiguration.cmake)
+include(${ORTHANC_DIR}/Resources/CMake/JsonCppConfiguration.cmake)
+include(${ORTHANC_DIR}/Resources/CMake/SQLiteConfiguration.cmake)
+include(${RESOURCES_DIR}/CMake/GdcmConfiguration.cmake)
 
 # Include GIL boost library - adobe version with numeric extensions
 # Help debug boost GIL templates
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_definitions(-DBOOST_GIL_USE_CONCEPT_CHECK=1)
 endif()
-include_directories(${CMAKE_SOURCE_DIR}/Dependencies/boost-1_60_0/)
-include_directories(${CMAKE_SOURCE_DIR}/Dependencies/gil-2_1_1/)
+include_directories(${LOCAL_DEPENDENCIES_DIR}/boost-1_60_0/)
+include_directories(${LOCAL_DEPENDENCIES_DIR}/gil-2_1_1/)
 
 # Enable image processing *generic* http routes on debug mode
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -106,10 +109,10 @@ if (BENCHMARK)
 endif()
 
 
-include_directories(${ORTHANC_ROOT})
+include_directories(${ORTHANC_DIR})
 # Check that the Orthanc SDK headers are available or download them
 if (STATIC_BUILD OR NOT USE_SYSTEM_ORTHANC_SDK)
-  include_directories(${ORTHANC_ROOT}/Sdk-1.1.0)
+  include_directories(${ORTHANC_DIR}/Sdk-1.1.0)
 else ()
   CHECK_INCLUDE_FILE_CXX(orthanc/OrthancCPlugin.h HAVE_ORTHANC_H)
   if (NOT HAVE_ORTHANC_H)
@@ -139,12 +142,12 @@ add_definitions(
   -DORTHANC_ENABLE_LOGGING=0
   )
 
-include_directories(${VIEWER_LIBRARY_SOURCE_DIR}/)
+include_directories(${VIEWER_LIBRARY_DIR}/)
 # @todo remove
-include_directories(${VIEWER_LIBRARY_SOURCE_DIR}/Image)
-include_directories(${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageContainer)
-include_directories(${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy)
-include_directories(${VIEWER_LIBRARY_SOURCE_DIR}/Image/Utilities)
+include_directories(${VIEWER_LIBRARY_DIR}/Image)
+include_directories(${VIEWER_LIBRARY_DIR}/Image/ImageContainer)
+include_directories(${VIEWER_LIBRARY_DIR}/Image/ImageProcessingPolicy)
+include_directories(${VIEWER_LIBRARY_DIR}/Image/Utilities)
 
 # create an intermediary WebViewerLibrary to avoid source recompilation
 # for both unit tests and web viewer library
@@ -156,61 +159,61 @@ add_library(WebViewerLibrary
   ${JSONCPP_SOURCES}
 
   # Sources inherited from Orthanc core
-  ${ORTHANC_ROOT}/Core/ChunkedBuffer.cpp
-  ${ORTHANC_ROOT}/Core/Enumerations.cpp
-  ${ORTHANC_ROOT}/Core/FileStorage/FilesystemStorage.cpp
-  ${ORTHANC_ROOT}/Core/Images/ImageAccessor.cpp
-  ${ORTHANC_ROOT}/Core/Images/ImageBuffer.cpp
-  ${ORTHANC_ROOT}/Core/Images/ImageProcessing.cpp
-  ${ORTHANC_ROOT}/Core/MultiThreading/SharedMessageQueue.cpp
-  ${ORTHANC_ROOT}/Core/SQLite/Connection.cpp
-  ${ORTHANC_ROOT}/Core/SQLite/FunctionContext.cpp
-  ${ORTHANC_ROOT}/Core/SQLite/Statement.cpp
-  ${ORTHANC_ROOT}/Core/SQLite/StatementId.cpp
-  ${ORTHANC_ROOT}/Core/SQLite/StatementReference.cpp
-  ${ORTHANC_ROOT}/Core/SQLite/Transaction.cpp
-  ${ORTHANC_ROOT}/Core/Toolbox.cpp
-  ${ORTHANC_ROOT}/Core/Uuid.cpp
-  ${ORTHANC_ROOT}/Core/DicomFormat/DicomMap.cpp
-  ${ORTHANC_ROOT}/Core/DicomFormat/DicomTag.cpp
-  ${ORTHANC_ROOT}/Core/DicomFormat/DicomValue.cpp
-  ${ORTHANC_ROOT}/Core/DicomFormat/DicomArray.cpp
-  ${ORTHANC_ROOT}/Resources/ThirdParty/base64/base64.cpp
+  ${ORTHANC_DIR}/Core/ChunkedBuffer.cpp
+  ${ORTHANC_DIR}/Core/Enumerations.cpp
+  ${ORTHANC_DIR}/Core/FileStorage/FilesystemStorage.cpp
+  ${ORTHANC_DIR}/Core/Images/ImageAccessor.cpp
+  ${ORTHANC_DIR}/Core/Images/ImageBuffer.cpp
+  ${ORTHANC_DIR}/Core/Images/ImageProcessing.cpp
+  ${ORTHANC_DIR}/Core/MultiThreading/SharedMessageQueue.cpp
+  ${ORTHANC_DIR}/Core/SQLite/Connection.cpp
+  ${ORTHANC_DIR}/Core/SQLite/FunctionContext.cpp
+  ${ORTHANC_DIR}/Core/SQLite/Statement.cpp
+  ${ORTHANC_DIR}/Core/SQLite/StatementId.cpp
+  ${ORTHANC_DIR}/Core/SQLite/StatementReference.cpp
+  ${ORTHANC_DIR}/Core/SQLite/Transaction.cpp
+  ${ORTHANC_DIR}/Core/Toolbox.cpp
+  ${ORTHANC_DIR}/Core/Uuid.cpp
+  ${ORTHANC_DIR}/Core/DicomFormat/DicomMap.cpp
+  ${ORTHANC_DIR}/Core/DicomFormat/DicomTag.cpp
+  ${ORTHANC_DIR}/Core/DicomFormat/DicomValue.cpp
+  ${ORTHANC_DIR}/Core/DicomFormat/DicomArray.cpp
+  ${ORTHANC_DIR}/Resources/ThirdParty/base64/base64.cpp
 
   # The following files depend on GDCM
-  ${VIEWER_LIBRARY_SOURCE_DIR}/DecodedImageAdapter.cpp
-  ${ORTHANC_ROOT}/Plugins/Samples/GdcmDecoder/GdcmImageDecoder.cpp
-  ${ORTHANC_ROOT}/Plugins/Samples/GdcmDecoder/GdcmDecoderCache.cpp
-  ${ORTHANC_ROOT}/Plugins/Samples/GdcmDecoder/OrthancImageWrapper.cpp
+  ${VIEWER_LIBRARY_DIR}/DecodedImageAdapter.cpp
+  ${ORTHANC_DIR}/Plugins/Samples/GdcmDecoder/GdcmImageDecoder.cpp
+  ${ORTHANC_DIR}/Plugins/Samples/GdcmDecoder/GdcmDecoderCache.cpp
+  ${ORTHANC_DIR}/Plugins/Samples/GdcmDecoder/OrthancImageWrapper.cpp
   
-  ${VIEWER_LIBRARY_SOURCE_DIR}/OrthancContextManager.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/BaseController.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Instance/DicomRepository.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Series/SeriesFactory.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Series/SeriesRepository.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Series/Series.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Series/SeriesController.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/Utilities/KLVWriter.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageContainer/RawImageContainer.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageContainer/CompressedImageContainer.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageContainer/CornerstoneKLVContainer.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy/CompositePolicy.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy/PixelDataQualityPolicy.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy/HighQualityPolicy.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy/MediumQualityPolicy.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy/LowQualityPolicy.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy/ResizePolicy.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy/Uint8ConversionPolicy.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy/JpegConversionPolicy.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy/PngConversionPolicy.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageProcessingPolicy/KLVEmbeddingPolicy.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/Image.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageMetaData.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageRepository.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/Image/ImageController.cpp
+  ${VIEWER_LIBRARY_DIR}/OrthancContextManager.cpp
+  ${VIEWER_LIBRARY_DIR}/BaseController.cpp
+  ${VIEWER_LIBRARY_DIR}/Instance/DicomRepository.cpp
+  ${VIEWER_LIBRARY_DIR}/Series/SeriesFactory.cpp
+  ${VIEWER_LIBRARY_DIR}/Series/SeriesRepository.cpp
+  ${VIEWER_LIBRARY_DIR}/Series/Series.cpp
+  ${VIEWER_LIBRARY_DIR}/Series/SeriesController.cpp
+  ${VIEWER_LIBRARY_DIR}/Image/Utilities/KLVWriter.cpp
+  ${VIEWER_LIBRARY_DIR}/Image/ImageContainer/RawImageContainer.cpp
+  ${VIEWER_LIBRARY_DIR}/Image/ImageContainer/CompressedImageContainer.cpp
+  ${VIEWER_LIBRARY_DIR}/Image/ImageContainer/CornerstoneKLVContainer.cpp
+  ${VIEWER_LIBRARY_DIR}/Image/ImageProcessingPolicy/CompositePolicy.cpp
+  ${VIEWER_LIBRARY_DIR}/Image/ImageProcessingPolicy/PixelDataQualityPolicy.cpp
+  ${VIEWER_LIBRARY_DIR}/Image/ImageProcessingPolicy/HighQualityPolicy.cpp
+  ${VIEWER_LIBRARY_DIR}/Image/ImageProcessingPolicy/MediumQualityPolicy.cpp
+  ${VIEWER_LIBRARY_DIR}/Image/ImageProcessingPolicy/LowQualityPolicy.cpp
+  ${VIEWER_LIBRARY_DIR}/Image/ImageProcessingPolicy/ResizePolicy.cpp
+  ${VIEWER_LIBRARY_DIR}/Image/ImageProcessingPolicy/Uint8ConversionPolicy.cpp
+  ${VIEWER_LIBRARY_DIR}/Image/ImageProcessingPolicy/JpegConversionPolicy.cpp
+  ${VIEWER_LIBRARY_DIR}/Image/ImageProcessingPolicy/PngConversionPolicy.cpp
+  ${VIEWER_LIBRARY_DIR}/Image/ImageProcessingPolicy/KLVEmbeddingPolicy.cpp
+  ${VIEWER_LIBRARY_DIR}/Image/Image.cpp
+  ${VIEWER_LIBRARY_DIR}/Image/ImageMetaData.cpp
+  ${VIEWER_LIBRARY_DIR}/Image/ImageRepository.cpp
+  ${VIEWER_LIBRARY_DIR}/Image/ImageController.cpp
   
-  ${VIEWER_LIBRARY_SOURCE_DIR}/BenchmarkHelper.cpp
-  ${VIEWER_LIBRARY_SOURCE_DIR}/ViewerToolbox.cpp
+  ${VIEWER_LIBRARY_DIR}/BenchmarkHelper.cpp
+  ${VIEWER_LIBRARY_DIR}/ViewerToolbox.cpp
   )
 # bind WebViewerLibrary to GDCM so any executable/library embedding 
 # WebViewerLibrary.a also embed GDCM.
