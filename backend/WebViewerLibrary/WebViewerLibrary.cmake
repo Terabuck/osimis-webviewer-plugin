@@ -28,7 +28,7 @@
 #   set(LOCAL_DEPENDENCIES_DIR ${CMAKE_SOURCE_DIR}/Dependencies)
 #   set(VIEWER_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/WebViewerLibrary)
 #   # Build intermediate WebViewerLibrary
-#   include(WebViewerLibrary.cmake)
+#   include(${VIEWER_LIBRARY_DIR}/WebViewerLibrary.cmake)
 #   # target WebViewerLibrary is available
 
 ## Set variables

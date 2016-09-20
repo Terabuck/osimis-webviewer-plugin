@@ -99,16 +99,4 @@ install(
   )
 
 # Create OsimisWebViewer unit tests
-
-# Distribution-specific settings
-set(USE_SYSTEM_GOOGLE_TEST ON CACHE BOOL "Use the system version of Google Test")
-set(USE_GTEST_DEBIAN_SOURCE_PACKAGE OFF CACHE BOOL "Use the sources of Google Test shipped with libgtest-dev (Debian only)")
-mark_as_advanced(USE_GTEST_DEBIAN_SOURCE_PACKAGE)
-include(${ORTHANC_DIR}/Resources/CMake/GoogleTestConfiguration.cmake)
-
-add_executable(UnitTests
-  ${GTEST_SOURCES}
-  ${VIEWER_TESTS_DIR}/UnitTestsMain.cpp
-  )
-add_dependencies(UnitTests WebViewerLibrary)
-target_link_libraries(UnitTests WebViewerLibrary)
+include(${VIEWER_TESTS_DIR}/WebViewerTests.cmake)
