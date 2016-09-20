@@ -44,20 +44,12 @@ MESSAGE( STATUS "PRODUCT_VERSION_BRANCH:         " ${PRODUCT_VERSION_BRANCH} )
 MESSAGE( STATUS "PRODUCT_VERSION_SHORT_STRING:   " ${PRODUCT_VERSION_SHORT_STRING} )
 MESSAGE( STATUS "JS_FRONTEND_VERSION:            " ${JS_FRONTEND_VERSION} )
 
-# Directory CMAKE_USE_RELATIVE_PATHS
-set(VIEWER_LIBRARY_SOURCE_DIR ${CMAKE_SOURCE_DIR}/WebViewerLibrary)
-
 # Advanced parameters to fine-tune linking against system libraries
 set(USE_SYSTEM_BOOST ON CACHE BOOL "Use the system version of Boost")
 set(USE_SYSTEM_GDCM ON CACHE BOOL "Use the system version of Grassroot DICOM (GDCM)")
-set(USE_SYSTEM_GOOGLE_TEST ON CACHE BOOL "Use the system version of Google Test")
 set(USE_SYSTEM_JSONCPP ON CACHE BOOL "Use the system version of JsonCpp")
 set(USE_SYSTEM_SQLITE ON CACHE BOOL "Use the system version of SQLite")
 set(USE_SYSTEM_ORTHANC_SDK ON CACHE BOOL "Use the system version of the Orthanc plugin SDK")
-
-# Distribution-specific settings
-set(USE_GTEST_DEBIAN_SOURCE_PACKAGE OFF CACHE BOOL "Use the sources of Google Test shipped with libgtest-dev (Debian only)")
-mark_as_advanced(USE_GTEST_DEBIAN_SOURCE_PACKAGE)
 
 # Build dependencies
 set(ORTHANC_ROOT ${ORTHANC_DIR}) # required by orthanc's cmake
@@ -65,12 +57,6 @@ include(CheckIncludeFiles)
 include(CheckIncludeFileCXX)
 include(CheckLibraryExists)
 include(FindPythonInterp)
-
-#download the frontend lib
-if(NOT ${JS_FRONTEND_VERSION} STREQUAL "LOCAL") 
-  DownloadPackage(FALSE "http://orthanc.osimis.io/public/osimisWebViewer/${JS_FRONTEND_VERSION}.zip" ${JS_CLIENT_PATH} TRUE)
-endif()
-
 include(${ORTHANC_DIR}/Resources/CMake/Compiler.cmake)
 include(${ORTHANC_DIR}/Resources/CMake/DownloadPackage.cmake) # Required by boost
 include(${ORTHANC_DIR}/Resources/CMake/BoostConfiguration.cmake)
