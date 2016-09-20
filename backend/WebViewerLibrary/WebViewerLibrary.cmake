@@ -16,7 +16,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
 # Create a WebViewerLibrary.a including all viewer dependencies
 # and the core source code (without the plugin.cpp)
 #
@@ -30,8 +29,6 @@
 #   # Build intermediate WebViewerLibrary
 #   include(${VIEWER_LIBRARY_DIR}/WebViewerLibrary.cmake)
 #   # target WebViewerLibrary is available
-
-## Set variables
 
 include(${RESOURCES_DIR}/CMake/GetProductVersionFromGitTag.cmake)
 

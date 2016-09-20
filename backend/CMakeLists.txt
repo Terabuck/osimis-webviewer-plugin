@@ -20,7 +20,7 @@ cmake_minimum_required(VERSION 3.1) # for generator expressions
 
 project(OsimisWebViewer)
 
-# Set basic paths
+# Set paths
 set(RESOURCES_DIR ${CMAKE_SOURCE_DIR}/Resources)
 set(ORTHANC_DIR ${CMAKE_SOURCE_DIR}/Orthanc)
 set(LOCAL_DEPENDENCIES_DIR ${CMAKE_SOURCE_DIR}/Dependencies)
