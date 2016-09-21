@@ -9,5 +9,4 @@ ADD . /root/osimis-webviewer
 
 RUN bash /root/osimis-webviewer/scripts/buildCppLibraryFromDocker.sh "default"
 
-ENTRYPOINT [ "Orthanc" ]
 CMD [ "/etc/orthanc/orthanc.json" ]
