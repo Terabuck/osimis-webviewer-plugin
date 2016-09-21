@@ -8,5 +8,3 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update; apt-get -y install libgdcm2-d
 ADD . /root/osimis-webviewer
 
 RUN bash /root/osimis-webviewer/scripts/buildCppLibraryFromDocker.sh "default"
-
-CMD [ "/etc/orthanc/orthanc.json" ]
