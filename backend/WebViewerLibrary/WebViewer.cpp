@@ -224,11 +224,6 @@ WebViewer::~WebViewer()
   delete _dicomRepository;
 }
 
-WebViewerConfiguration WebViewer::getConfiguration() const
-{
-  return *_config.get(); // return copy of config
-}
-
 std::string WebViewer::getName() const
 {
   return "osimis-web-viewer";

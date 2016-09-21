@@ -57,5 +57,4 @@ public:
 
   virtual std::string getName() const;
   virtual std::string getVersion() const;
-  WebViewerConfiguration getConfiguration() const;
 };

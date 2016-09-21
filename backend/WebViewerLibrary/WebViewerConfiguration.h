@@ -13,28 +13,19 @@ private:
 protected:
 
 public:
-  // int decodingThreads;
-  bool gdcmEnabled;
-  // int cacheSize; // ???
   bool cachedImageStorageEnabled;
 
+  bool gdcmEnabled;
   bool restrictTransferSyntaxes;
-
   std::set<std::string> enabledTransferSyntaxes;
 
   WebViewerConfiguration(OrthancPluginContext* context) : _context(context) {
-    // By default, use half of the available processing cores for the decoding of DICOM images 
-    // decodingThreads = (boost::thread::hardware_concurrency()) / 2 || 1;
-
-    // By default, use GDCM
-    gdcmEnabled = true;
-
-    // By default, a cache of 100 MB is used 
-    // cacheSize = 100; 
-
     // By default, disable storage attachment cache 
     cachedImageStorageEnabled = false;
 
+    // By default, use GDCM
+    gdcmEnabled = true;
+    // By default, use GDCM for everything
     restrictTransferSyntaxes = false;
   }
 

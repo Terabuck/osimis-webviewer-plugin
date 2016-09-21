@@ -19,8 +19,6 @@ void WebViewerConfiguration::parseFile()
   if (configuration.isMember(CONFIG_WEB_VIEWER))
   {
 
-    // decodingThreads = OrthancPlugins::GetIntegerValue(configuration[CONFIG_WEB_VIEWER], "Threads", decodingThreads);
-
     static const char* CONFIG_GDCM_ENABLED = "GdcmEnabled";
     if (configuration[CONFIG_WEB_VIEWER].isMember(CONFIG_GDCM_ENABLED))
     {
@@ -69,11 +67,4 @@ void WebViewerConfiguration::parseFile()
       }
     }
   }
-
-  // if (decodingThreads <= 0 ||
-  //     cacheSize <= 0)
-  // {
-  //   throw Orthanc::OrthancException(Orthanc::ErrorCode_ParameterOutOfRange);
-  // }
-
 }
