@@ -210,6 +210,8 @@ add_library(WebViewerLibrary
   
   ${VIEWER_LIBRARY_DIR}/BenchmarkHelper.cpp
   ${VIEWER_LIBRARY_DIR}/ViewerToolbox.cpp
+  ${VIEWER_LIBRARY_DIR}/WebViewerConfiguration.cpp
+  ${VIEWER_LIBRARY_DIR}/WebViewer.cpp
   )
 # bind WebViewerLibrary to GDCM so any executable/library embedding 
 # WebViewerLibrary.a also embed GDCM.
