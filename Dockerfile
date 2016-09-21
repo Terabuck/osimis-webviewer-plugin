@@ -7,4 +7,4 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update; apt-get -y install libgdcm2-d
 
 COPY . /root/osimis-webviewer
 
-RUN bash /root/osimis-webviewer/scripts/buildCppLibraryFromDocker.sh "default"
+RUN /root/osimis-webviewer/scripts/buildCppLibraryFromDocker.sh "default"
