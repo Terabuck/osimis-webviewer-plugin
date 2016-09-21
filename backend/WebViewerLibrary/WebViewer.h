@@ -3,7 +3,7 @@
 #include <string>
 #include <boost/noncopyable.hpp>
 #include <orthanc/OrthancCPlugin.h>
-#include <memory.h> // for std::auto_ptr
+#include <memory> // for std::auto_ptr
 
 class DicomRepository;
 class ImageRepository;

@@ -20,53 +20,6 @@
 #include <orthanc/OrthancCPlugin.h>
 #include <WebViewer.h>
 
-// static OrthancPluginErrorCode IsStableSeries(OrthancPluginRestOutput* output,
-//                                              const char* url,
-//                                              const OrthancPluginHttpRequest* request)
-// {
-//   try
-//   {
-//     if (request->method != OrthancPluginHttpMethod_Get)
-//     {
-//       OrthancPluginSendMethodNotAllowed(context_, output, "GET");
-//       return OrthancPluginErrorCode_Success;
-//     }
-
-//     const std::string id = request->groups[0];
-//     Json::Value series;
-
-//     if (OrthancPlugins::GetJsonFromOrthanc(series, context_, "/series/" + id) &&
-//         series.type() == Json::objectValue)
-//     {
-//       bool value = (series["IsStable"].asBool() ||
-//                     series["Status"].asString() == "Complete");
-//       std::string answer = value ? "true" : "false";
-//       OrthancPluginAnswerBuffer(context_, output, answer.c_str(), answer.size(), "application/json");
-//     }
-//     else
-//     {
-//       OrthancPluginSendHttpStatusCode(context_, output, 404);
-//     }
-
-//     return OrthancPluginErrorCode_Success;
-//   }
-//   catch (Orthanc::OrthancException& e)
-//   {
-//     OrthancPluginLogError(context_, e.What());
-//     return OrthancPluginErrorCode_Plugin;
-//   }
-//   catch (std::runtime_error& e)
-//   {
-//     OrthancPluginLogError(context_, e.what());
-//     return OrthancPluginErrorCode_Plugin;
-//   }
-//   catch (boost::bad_lexical_cast&)
-//   {
-//     OrthancPluginLogError(context_, "Bad lexical cast");
-//     return OrthancPluginErrorCode_Plugin;
-//   }
-// }
-
 WebViewer* _webViewer;
 
 extern "C"
