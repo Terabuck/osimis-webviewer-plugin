@@ -16,7 +16,7 @@
 #include "ImageContainer/CornerstoneKLVContainer.h" // For cached image retrieval
 #include "ImageContainer/CompressedImageContainer.h" // For orthanc pixeldata retrieval
 #include "ImageProcessingPolicy/PixelDataQualityPolicy.h" // For orthanc pixeldata retrieval
-#include "ScopedBuffers.h"
+#include "Utilities/ScopedBuffers.h"
 
 namespace
 {

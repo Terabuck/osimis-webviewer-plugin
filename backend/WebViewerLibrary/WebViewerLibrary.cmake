@@ -151,11 +151,6 @@ add_definitions(
   )
 
 include_directories(${VIEWER_LIBRARY_DIR}/)
-# @todo remove
-include_directories(${VIEWER_LIBRARY_DIR}/Image)
-include_directories(${VIEWER_LIBRARY_DIR}/Image/ImageContainer)
-include_directories(${VIEWER_LIBRARY_DIR}/Image/ImageProcessingPolicy)
-include_directories(${VIEWER_LIBRARY_DIR}/Image/Utilities)
 
 # create an intermediary WebViewerLibrary to avoid source recompilation
 # for both unit tests and web viewer library

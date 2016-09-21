@@ -198,7 +198,7 @@ int32_t WebViewer::start()
   ::s_config = _config.get();
 
   // Inject configuration within components
-  _imageRepository->enableCachedImageStorage(s_config->cachedImageStorageEnabled);
+  _imageRepository->enableCachedImageStorage(_config->cachedImageStorageEnabled);
 
   // Configure DICOM decoder policy (GDCM/internal)
   s_configureDicomDecoderPolicy();

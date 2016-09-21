@@ -3,7 +3,7 @@
 #include <memory>
 #include <json/value.h>
 #include <Core/DicomFormat/DicomMap.h>
-#include "../AvailableQuality/IAvailableQualityPolicy.h"
+#include "../Image/AvailableQuality/IAvailableQualityPolicy.h"
 #include "Series.h"
 
 class SeriesFactory : public boost::noncopyable {

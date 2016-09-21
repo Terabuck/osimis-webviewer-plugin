@@ -24,7 +24,7 @@
 #include <set>
 #include <json/value.h>
 #include <Core/DicomFormat/DicomMap.h>
-#include "../AvailableQuality/ImageQuality.h"
+#include "../Image/AvailableQuality/ImageQuality.h"
 
 class Series : public boost::noncopyable {
 friend class SeriesFactory;
