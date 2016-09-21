@@ -54,12 +54,12 @@ describe('serieslist', function() {
             return osi
                 .directive('<wv-serieslist wv-study-id="studyId" wv-on-study-loaded="checkShownSeries()"></wv-serieslist>')
                 .then(function(directive) {
-                    // Set the study id containing both a DICOM SR series and a normal one
-                    $scope.studyId = '3ff62993-28b67f81-6dfb132b-9d53983a-3a61f711';
-
                     // Use a callback to wait till calls are made
                     // Then check the desired series are found
-                    return $q(function(resolve, reject) {
+                    return new Promise(function(resolve, reject) {
+                        // Set the study id containing both a DICOM SR series and a normal one
+                        $scope.studyId = '3ff62993-28b67f81-6dfb132b-9d53983a-3a61f711';
+
                         // Surround with try catch to convert assertion exception into promise rejection (and therefore let
                         // mocha process the error instead of just logging it and timing out)
                         $scope.checkShownSeries = function() {
@@ -73,6 +73,7 @@ describe('serieslist', function() {
                                 reject(e);
                             }
                         };
+                        
                         $scope.$apply();
                     });
                 })
