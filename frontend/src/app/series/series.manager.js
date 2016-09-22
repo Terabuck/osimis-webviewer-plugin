@@ -64,25 +64,25 @@
                     // Retrieve every wv-series' ids from orthanc-series ids.
                     // @note This does the same as $q.all, except it doesn't stop if one single promise fails.
                     return $q(function(resolve, reject) {
-                        var wvSeriesList = [];
+                        var wvSeriesLists = [];
                         var count = wvSeriesPromises.length;
                         var i = 0;
                         wvSeriesPromises.forEach(function(wvSeriesPromise) {
                             wvSeriesPromise.then(function(wvSeries) {
-                                wvSeriesList.push(wvSeries);
+                                wvSeriesLists.push(wvSeries);
                                 ++i;
                                 // Resolve overall promise once every sub promises have been processed
-                                if(i === count-1) {
-                                    resolve(wvSeriesList);
+                                if(i === count) {
+                                    resolve(wvSeriesLists);
                                 }
                             }, function(error) {
                                 // @todo @warning forward failed promise somewhere!
                                 console.error('Unable to retrieve a series.', error);
                                 ++i;
                                 // Resolve overall promise once every sub promises have been processed
-                                if(i === count-1) {
+                                if(i === count) {
                                     // Resolve the overall promise even if one of the sub-promise fails.
-                                    resolve(wvSeriesList);
+                                    resolve(wvSeriesLists);
                                 }
                             })
                         })
