@@ -55,6 +55,6 @@ public:
    */
   int32_t start();
 
-  virtual std::string getName() const;
-  virtual std::string getVersion() const;
+  static std::string getName();
+  static std::string getVersion();
 };

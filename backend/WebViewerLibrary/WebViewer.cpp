@@ -224,12 +224,12 @@ WebViewer::~WebViewer()
   delete _dicomRepository;
 }
 
-std::string WebViewer::getName() const
+std::string WebViewer::getName()
 {
   return "osimis-web-viewer";
 }
 
-std::string WebViewer::getVersion() const
+std::string WebViewer::getVersion()
 {
   return PRODUCT_VERSION_FULL_STRING;
 }

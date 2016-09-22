@@ -42,12 +42,14 @@ extern "C"
 
   ORTHANC_PLUGINS_API const char* OrthancPluginGetName()
   {
-    return _webViewer->getName().c_str();
+    // Call static methods to retrieve version since _webViewer is not initialized yet
+    return WebViewer::getName().c_str();
   }
 
 
   ORTHANC_PLUGINS_API const char* OrthancPluginGetVersion()
   {
-    return _webViewer->getVersion().c_str();
+    // Call static methods to retrieve version since _webViewer is not initialized yet
+    return WebViewer::getVersion().c_str();
   }
 }
