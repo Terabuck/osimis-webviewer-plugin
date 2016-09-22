@@ -16,6 +16,9 @@
             this.imageCount = imageIds.length;
             this.currentIndex = 0; // real index of the image, waiting loading to be shown
             this.currentShownIndex = 0; // index shown at the moment
+            // @warning Those are all the tags of the middle instance of the orthanc series!
+            // Multiframe instance may cause mismatch since one orthanc multiframe instance is one frontend series.
+            // For instance we can't rely on this for framerate but only on tags common to an orthanc series.
             this.tags = tags;
             this.availableQualities = availableQualities;
             this.onCurrentImageIdChanged = new osimis.Listener();

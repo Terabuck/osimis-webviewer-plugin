@@ -38,7 +38,7 @@ private:
       const std::set<ImageQuality>& imageQualities);
 
   std::string _seriesId;
-  Json::Value _seriesTags;
+  Json::Value _seriesTags; // @warning Those are all the tags of the middle instance of the orthanc series!
   Json::Value _orderedInstances;
   std::set<ImageQuality> _imageQualities;
 };
