@@ -28,7 +28,7 @@
                         seriesList.forEach(function(series) {
                             // Select the lowest quality available
                             var quality = Math.min.apply(Math, _.toArray(series.availableQualities));
-                            _preload(series, quality, 2);
+                            _unpreload(series, quality, 2);
                         });
                     });
             });
@@ -69,17 +69,17 @@
                     .then(function(series) {
                         // Abort every series' thumbnails preloading
                         var quality = Math.min.apply(Math, _.toArray(series.availableQualities));
-                        _preload(series, quality, 1);
+                        _unpreload(series, quality, 1);
 
                         // Abort 1000x1000 studies images preloading
                         quality = WvImageQualities.MEDIUM;
                         if (series.hasQuality(quality)) {
-                            _preload(series, quality, 1);
+                            _unpreload(series, quality, 1);
                         }
 
                         // Abort lossless studies images preloading
                         quality = Math.max.apply(Math, _.toArray(series.availableQualities));
-                        _preload(series, quality, 1);
+                        _unpreload(series, quality, 1);
                     });
             });
 
@@ -87,6 +87,13 @@
                 for (var i=0; i<series.imageIds.length; ++i) {
                     var imageId = series.imageIds[i];
                     wvImageBinaryManager.requestLoading(imageId, quality, priority);
+                }
+            }
+
+            function _unpreload(series, quality, priority) {
+                for (var i=0; i<series.imageIds.length; ++i) {
+                    var imageId = series.imageIds[i];
+                    wvImageBinaryManager.abortLoading(imageId, quality, priority);
                 }
             }
 

@@ -163,28 +163,51 @@
             worker.postMessage(message);
         });
     };
+    
+    /**
+     * Check an object match a filter.
+     * Properties from object not contained in the filter are ignored (the comparison continues).
+     *
+     * @param {object} object The input object.
+     * @param {object} filter The filtering object.
+     * 
+     * @return {bool} True if object contains match filter.
+     */
+    function _objectMatchFilter(object, filter) {
+        var isCompatible = true;
 
-    /** WorkerPool#abortTask(taskOptions)
+        // Compare each properties (ignore properties not set in object)
+        for (var prop in filter) {
+            if (filter.hasOwnProperty(prop)) {
+                isCompatible &= _.isEqual(object[prop], filter[prop]);
+            }
+        }
+
+        return !!isCompatible; // "!!" to make sure it returns boolean
+    }
+
+    /** WorkerPool#abortTask(taskOptionsFilter)
      *
      * Abort a task, note this method do nothing when task is inexistant.
      *
      * Compare the tasks in _tasksToProcess and remove them from the queue.
      * Compare the tasks in _tasksInProcess and abort them.
      *
-     * @param taskOptions {type: <string>, ...}
+     * @param taskOptionsFilter {type: <string>, ...} Filter used to select the tasks. Properties not set in taskOptionsFilter
+     *   are matched by default. For instance, if taskOptionsFilter == {}, every task will be matched.
      *
      */
-    WorkerPool.prototype.abortTask = function(taskOptions) {
+    WorkerPool.prototype.abortTask = function(taskOptionsFilter) {
         // Remove task from the toProcess queue (if here)
         // @todo optimize (actually 50ms process) -> sorted by quality + tree research on id ?
-        _.pullAllWith(this._tasksToProcess, [taskOptions], function(a, b) {
-            return _.isEqual(a.options, b);
+        _.pullAllWith(this._tasksToProcess, [taskOptionsFilter], function(task, taskOptionsFilter) {
+            return _objectMatchFilter(task.options, taskOptionsFilter);
         });
 
         // Abort task from the inProcess queue
         for (var i=this._tasksInProcess.length-1; i>=0; --i) { // loop in reverse so we can remove items without breaking the loop iterations
             var task = this._tasksInProcess[i];
-            if (_.isEqual(task.options, taskOptions)) {
+            if (_objectMatchFilter(task.options, taskOptionsFilter)) {
                 task.abort();
                 _.pull(this._tasksInProcess, task);
             }
