@@ -1,6 +1,8 @@
 describe('serieslist', function() {
 
-    this.timeout(10000); // Set a long timeout because image compression can take longer than the default 2s timeout
+    this.timeout(25000); // Set a long timeout because image compression
+                         // can take longer than the default 2s timeout.
+                         // Use 25 secs because CI server can sometimes be quite slow.
 
     osi.beforeEach();
     osi.afterEach();
