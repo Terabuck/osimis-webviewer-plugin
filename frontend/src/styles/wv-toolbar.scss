@@ -6,6 +6,7 @@
 	padding: 0px;
 }
 
+.wv-toolbar { // add a level of specificity to ensure there is no conflict with bootstrap related classes in lify
 .wv-toolbar-icon-rotate-right {
 	transform: rotate(90deg);
 }
@@ -69,4 +70,5 @@
 .wv-toolbar-end {
 	flex-grow: 10;
 	border-bottom: 1px solid white;
+}
 }
