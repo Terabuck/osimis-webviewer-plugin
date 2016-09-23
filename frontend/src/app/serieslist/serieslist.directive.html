@@ -5,12 +5,12 @@
   		ng-transclude
   		wv-size-tag
 	>
-	    <wv-viewport vp-series-id="id" wv-image="$image" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}"
+	    <wv-viewport vp-series-id="id" wv-image="$image" wv-series="$series" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}"
 	    	wv-draggable-series-ext wv-scroll-on-over-series-ext
     	>
 		    <wv-overlay wv-tags="$image.tags">
 		    	<div class="wv-serieslist-overlay">
-	        		{{$image.tags.SeriesDescription}}
+	        		{{$series.tags.SeriesDescription}}
 	        	</div>
 		    </wv-overlay>
 	    </wv-viewport>

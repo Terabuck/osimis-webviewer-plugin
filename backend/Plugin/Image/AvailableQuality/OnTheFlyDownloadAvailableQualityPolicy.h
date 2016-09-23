@@ -22,13 +22,14 @@ public:
 
     std::set<ImageQuality> result;
 
-    // Add low qualities based on image size
+    // Always provide thumbnail quality image (even if image is <150x150 since optimization includes
+    // dynamic reduction and lq jpeg compression instead of lossless)
+    result.insert(ImageQuality(ImageQuality::LOW)); // 150x150 jpeg80
+    BENCH_LOG("QUALITY", "low");
+
+    // Add medium qualities based on image size
     int columns = boost::lexical_cast<int>(otherTags["Columns"].asString());
     int rows = boost::lexical_cast<int>(otherTags["Rows"].asString());
-    if (rows > 512 && columns > 512) {
-      result.insert(ImageQuality(ImageQuality::LOW)); // 150x150 jpeg80
-      BENCH_LOG("QUALITY", "low");
-    }
     if (rows > 1000 && columns > 1000) {
       result.insert(ImageQuality(ImageQuality::MEDIUM)); // 1000x1000 jpeg80
       BENCH_LOG("QUALITY", "medium");

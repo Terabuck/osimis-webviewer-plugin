@@ -8,13 +8,13 @@
     <wv-droppable-series-overlay-item></wv-droppable-series-overlay-item>
 
     <div class="wv-overlay-topleft" ng-if="vm.showTopLeftArea()">
-        {{vm.wvTags.PatientName}}<br/>
-        {{vm.wvTags.PatientID}}
+        {{vm.wvSeries.tags.PatientName}}<br/>
+        {{vm.wvSeries.tags.PatientID}}
     </div>
     <div class="wv-overlay-topright" ng-if="vm.showTopRightArea()">
-        {{vm.wvTags.StudyDescription}}<br/>
-        {{vm.wvTags.StudyDate}}<br/>
-        #{{vm.wvTags.SeriesNumber}} - {{vm.wvTags.SeriesDescription}}<br/>
+        {{vm.wvSeries.tags.StudyDescription}}<br/>
+        {{vm.wvSeries.tags.StudyDate}}<br/>
+        #{{vm.wvSeries.tags.SeriesNumber}} - {{vm.wvSeries.tags.SeriesDescription}}<br/>
     </div>
     
     <div class="wv-overlay-bottomright" ng-if="vm.showBottomRightArea()">

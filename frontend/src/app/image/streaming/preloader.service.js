@@ -12,13 +12,6 @@
                     .then(function(seriesList) {
                         // Preload every series' thumbnails
                         seriesList.forEach(function(series) {
-                            // Preload every series' tags (for thumbnails' scroll-on-over / required for RecommendedFrameRate tag)
-                            for (var i=0; i<series.imageIds.length; ++i) {
-                                var imageId = series.imageIds[i];
-
-                                wvImageManager.get(imageId);
-                            }
-
                             // Select the lowest quality available
                             var quality = Math.min.apply(Math, _.toArray(series.availableQualities));
                             _preload(series, quality, 2);
@@ -35,7 +28,7 @@
                         seriesList.forEach(function(series) {
                             // Select the lowest quality available
                             var quality = Math.min.apply(Math, _.toArray(series.availableQualities));
-                            _preload(series, quality, 2);
+                            _abortPreload(series, quality, 2);
                         });
                     });
             });
@@ -45,7 +38,7 @@
                 wvSeriesManager
                     .get(seriesId)
                     .then(function(series) {
-                        // Preload every series' tags
+                        // Preload every series' tags (for thumbnails' scroll-on-over / required for RecommendedFrameRate tag)
                         for (var i=0; i<series.imageIds.length; ++i) {
                             var imageId = series.imageIds[i];
 
@@ -76,17 +69,17 @@
                     .then(function(series) {
                         // Abort every series' thumbnails preloading
                         var quality = Math.min.apply(Math, _.toArray(series.availableQualities));
-                        _preload(series, quality, 1);
+                        _abortPreload(series, quality, 1);
 
                         // Abort 1000x1000 studies images preloading
                         quality = WvImageQualities.MEDIUM;
                         if (series.hasQuality(quality)) {
-                            _preload(series, quality, 1);
+                            _abortPreload(series, quality, 1);
                         }
 
                         // Abort lossless studies images preloading
                         quality = Math.max.apply(Math, _.toArray(series.availableQualities));
-                        _preload(series, quality, 1);
+                        _abortPreload(series, quality, 1);
                     });
             });
 
@@ -94,6 +87,13 @@
                 for (var i=0; i<series.imageIds.length; ++i) {
                     var imageId = series.imageIds[i];
                     wvImageBinaryManager.requestLoading(imageId, quality, priority);
+                }
+            }
+
+            function _abortPreload(series, quality, priority) {
+                for (var i=0; i<series.imageIds.length; ++i) {
+                    var imageId = series.imageIds[i];
+                    wvImageBinaryManager.abortLoading(imageId, quality, priority);
                 }
             }
 

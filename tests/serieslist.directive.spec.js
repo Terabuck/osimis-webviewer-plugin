@@ -11,6 +11,42 @@ describe('serieslist', function() {
 
     describe('directive', function() {
 
+        it('should display a list of DICOM multiframe instances as a list of series', function() {
+
+            $scope.studyId = undefined;
+
+            return osi
+                .directive('<wv-serieslist wv-study-id="studyId" wv-on-study-loaded="checkShownSeries()"></wv-serieslist>')
+                .then(function(directive) {
+                    // Set the study id containing two DICOM multi frame instances
+                    $scope.studyId = '595df1a1-74fe920a-4b9e3509-826f17a3-762a2dc3';
+
+                    // Use a callback to wait till calls are made
+                    // Then check the desired series are found
+                    return $q(function(resolve, reject) {
+                        // Surround with try catch to convert assertion exception into promise rejection (and therefore let
+                        // mocha process the error instead of just logging it and timing out)
+                        $scope.checkShownSeries = function() {
+                            try {
+                                // Two frontend series are displayed for two DICOM instance
+                                // from one single DICOM series
+                                assert.deepEqual(directive.$scope.seriesIds, [
+                                    '5d0d012e-4e2766cb-dd38b9ab-605538eb-ea8ac2cf:0',
+                                    '5d0d012e-4e2766cb-dd38b9ab-605538eb-ea8ac2cf:1'
+                                ]);
+                                resolve();
+                            }
+                            catch (e) {
+                                reject(e);
+                            }
+                        };
+                        $scope.$apply();
+                    });
+                })
+                ;
+
+        });
+
         it('should display the list of series when unsupported series are present (eg. DICOM SR)', function() {
 
             $scope.studyId = undefined;
