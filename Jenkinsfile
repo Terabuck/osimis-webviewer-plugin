@@ -129,11 +129,20 @@ lock(resource: 'webviewer', inversePrecedence: false) {
         }}}
     }
 
-    // Publish js code
+    // Publish js code for in-lify integration (until we use iframe) & wvp usage as a library
     stage('Publish: js -> AWS (release)') {
         node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
                 sh 'scripts/ciPushFrontend.sh tagWithReleaseTag'
+            }
+        }}}
+    }
+
+    // Publish cpp code for static build within web viewer pro
+    stage('Publish: cpp -> AWS (release)') {
+        node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
+                sh 'scripts/ciPushBackend.sh tagWithReleaseTag'
             }
         }}}
     }
