@@ -24,14 +24,9 @@ parallel windows: {
 		    checkout scm
 
 		    //stage 'Build C++ Windows plugin'
-		    bat 'cd scripts & ciBuildWindows.bat %BRANCH_NAME% build'
-
-			withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
-			    //stage 'Publish C++ Windows plugin'
-			    bat 'cd scripts & ciBuildWindows.bat %BRANCH_NAME% publish'
-			}
+		    bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% build'
 		}
-		
+
 	},
 	docker: {
 		node('docker') {
@@ -55,7 +50,7 @@ node('windows && vs2015') {
 
 	withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
 	    stage 'Publish C++ Windows plugin'
-	    bat 'cd scripts & ciBuildWindows.bat %BRANCH_NAME% publish'
+	    bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% publish'
 	}
 }
 
