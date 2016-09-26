@@ -74,6 +74,6 @@ module.exports = function(config) {
         browserDisconnectTimeout: 10000,
         browserDisconnectTolerance: 5, // by default 0
         // 30 sec to allow slow png compression processing
-        browserNoActivityTimeout: 30000 // by default 10000
+        browserNoActivityTimeout: 60000 // by default 10000
     });
 };
