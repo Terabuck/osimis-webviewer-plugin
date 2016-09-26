@@ -4,7 +4,7 @@ set action=%1
 set branchName=%2
 
 python -m venv env
-env\Scripts\activate.bat
+call "env\Scripts\activate.bat"
 
 pip install -r requirements.txt
 if %errorlevel% neq 0 exit /b %errorlevel%
