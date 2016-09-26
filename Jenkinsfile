@@ -20,7 +20,7 @@ else {
         timeout(time: 30, unit: 'SECONDS') {
             userInput = input(
                 id: 'userInput', message: 'Configure build', parameters: [
-                    [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildDocker'], description: 'Build Docker', name: 'buildDocker'],
+                    [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildDocker'], description: 'Build Docker (/!\\ false -> disable tests)', name: 'buildDocker'],
                     [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildWindows'], description: 'Build Windows', name: 'buildWindows'],
                     [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildOSX'], description: 'Build OSX', name: 'buildOSX']
                 ]
@@ -33,7 +33,7 @@ else {
 }
 
 // Print the build parameters
-echo 'Build Docker  : ' + (userInput['buildDocker'] ? 'OK' : 'KO')
+echo 'Build Docker  : ' + (userInput['buildDocker'] ? 'OK' : 'KO (/!\\ tests disabled)')
 echo 'Build Windows : ' + (userInput['buildWindows'] ? 'OK' : 'KO')
 echo 'Build OSX     : ' + (userInput['buildOSX'] ? 'OK' : 'KO')
 
