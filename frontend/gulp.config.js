@@ -193,6 +193,12 @@ module.exports = function() {
                 // clientApp + '**/*.worker/main.js',
             ],
             client: {
+                // Mocha config
+                mocha: {
+                    // asyncOnly: true,
+                    // ignoreLeaks: false,
+                    timeout: 60000 // Set a long timeout for orthanc to process requests on slow servers
+                },
                 // Load workers-related files in web workers
                 mochaWebWorker: {
                     pattern : [
