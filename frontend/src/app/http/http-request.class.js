@@ -42,6 +42,7 @@
         
         // Use JSON by default - can be overriden via headers
         this._httpHeaders['Content-type'] = 'application/json';
+        this._httpHeaders['Accept'] = 'application/json, text/plain, */*';
         this._xhr.responseType = 'json';
 
         // Disable cache by default
@@ -108,8 +109,9 @@
         // be 'opened' first)
         this._httpHeaders = headers;
 
-        // Set back default 'Content-type' if not present
+        // Set back default 'Content-type' & 'Accept' if not present
         this._httpHeaders['Content-type'] = headers.hasOwnProperty('Content-type') ? headers['Content-type'] : 'application/json';
+        this._httpHeaders['Accept'] = headers.hasOwnProperty('Accept') ? headers['Accept'] : 'application/json, text/plain, */*';
     };
 
     /**
@@ -127,6 +129,15 @@
      */
     HttpRequest.prototype.setResponseType = function(responseType) {
         this._xhr.responseType = responseType;
+
+        // Remove default json Accept header when not using json anymore
+        if (responseType !== 'json' && this._httpHeaders['Accept'] === 'application/json, text/plain, */*') {
+            delete this._httpHeaders['Accept'];
+        }
+        // Set it back if we use json again and haven't overriden it
+        else if (responseType === 'json' && this._httpHeaders['Accept'] === 'application/json, text/plain, */*') {
+            this._httpHeaders['Accept'] === 'application/json, text/plain, */*';
+        }
     };
 
     /**
