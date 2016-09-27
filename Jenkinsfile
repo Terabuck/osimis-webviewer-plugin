@@ -73,12 +73,7 @@ parallel(
                 checkout scm
 
                 //stage 'Build C++ Windows plugin'
-                bat 'cd scripts & ciBuildWindows.bat %BRANCH_NAME% build'
-
-                //stage 'Publish C++ Windows plugin'
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
-                    bat 'cd scripts & ciBuildWindows.bat %BRANCH_NAME% publish'
-                }
+                bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% build'
             }
         }
     },
@@ -108,7 +103,7 @@ if (userInput['buildWindows']) {
     node('windows && vs2015') {
         withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
             stage 'Publish C++ Windows plugin'
-            bat 'cd scripts & ciBuildWindows.bat %BRANCH_NAME% publish'
+            bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% publish'
         }
     }
 }
