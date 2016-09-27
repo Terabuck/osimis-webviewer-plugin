@@ -90,7 +90,7 @@ if (userInput['buildDocker']) {
     stage name: 'Test: unit + integration', concurrency: 1 // Low concurrency to reduce test timeout
     node('docker') {
         wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
-            // @not Requires the built docker image to work
+            // @note Requires the built docker image to work
             sh 'scripts/ciPrepareTests.sh'
             sh 'scripts/ciRunCppTests.sh'
             sh 'scripts/ciRunJsTests.sh'
