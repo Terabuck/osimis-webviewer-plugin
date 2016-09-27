@@ -37,7 +37,7 @@ echo 'Build Docker  : ' + (userInput['buildDocker'] ? 'OK' : 'KO (/!\\ tests dis
 echo 'Build Windows : ' + (userInput['buildWindows'] ? 'OK' : 'KO')
 echo 'Build OSX     : ' + (userInput['buildOSX'] ? 'OK' : 'KO')
 
-// Always build frontend w/ docker (because it's fast enough)
+// Init environment
 stage 'Retrieve: sources'
 node('docker') {
     wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
@@ -47,6 +47,7 @@ node('docker') {
     }
 }
 
+// Build frontend
 stage 'Build: js'
 node('docker') {
     wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
@@ -54,6 +55,7 @@ node('docker') {
     }
 }
 
+// Publish temporary frontend so we can embed it within orthanc plugin
 stage 'Publish: js -> AWS (commitId)'
 node('docker') {
     wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
@@ -63,67 +65,75 @@ node('docker') {
     }
 }
 
-// Build on selected platforms in parallel
-stage name: 'Build + Test', concurrency: 1
-parallel(
-    windows: {
-        if (userInput['buildWindows']) {
-            node('windows && vs2015') {
-                //stage 'Retrieve sources'
-                checkout scm
+// Build windows
+// @todo parallelize windows & linux builds once this feature is available 
+if (userInput['buildWindows']) {
+    stage name: 'Build: windows', concurrency: 1
+    node('windows && vs2015') {
+        //stage 'Retrieve sources'
+        checkout scm
 
-                //stage 'Build C++ Windows plugin'
-                bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% build'
-            }
-        }
-    },
-    docker: {
-        if (userInput['buildDocker']) {
-            node('docker') {
-                wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
-                    // stage 'Build: cpp', concurrency: 2
-                    sh 'scripts/ciBuildDockerImage.sh'
+        //stage 'Build C++ Windows plugin'
+        bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% build'
+    }
+}
 
-                    // stage 'Test: setup'
-                    sh 'scripts/ciPrepareTests.sh'
-
-                    // stage 'Test: cpp'
-                    sh 'scripts/ciRunCppTests.sh'
-
-                    // stage 'Test: integration + js'
-                    sh 'scripts/ciRunJsTests.sh'
-                }
-            }
+// Build docker & launch tests
+if (userInput['buildDocker']) {
+    stage name: 'Build: docker', concurrency: 1 // Low concurrency to reduce test timeout
+    node('docker') {
+        wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+            sh 'scripts/ciBuildDockerImage.sh'
         }
     }
-)
 
-// Publish release
+    stage name: 'Test: unit + integration', concurrency: 1 // Low concurrency to reduce test timeout
+    node('docker') {
+        wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+            // @note Requires the built docker image to work
+            sh 'scripts/ciPrepareTests.sh'
+            sh 'scripts/ciRunCppTests.sh'
+            sh 'scripts/ciRunJsTests.sh'
+        }
+    }
+}
+
+// Publish windows release
 if (userInput['buildWindows']) {
     node('windows && vs2015') {
         withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
-            stage 'Publish C++ Windows plugin'
+            stage 'Publish: C++ Windows plugin'
             bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% publish'
         }
     }
 }
 
+// Publish docker release
+stage 'Publish: orthanc -> DockerHub'
 node('docker') {
     wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
-
-        stage 'Publish: js -> AWS (release)'
-        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
-            sh 'scripts/ciPushFrontend.sh tagWithReleaseTag'
-        }
-
         if (userInput['buildDocker']) {
-            stage 'Publish: orthanc -> DockerHub'
             docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkinsosimis') {
                 sh 'scripts/ciPushDockerImage.sh'
             }
         }
+    }
+}
 
-        stage 'Clean up'
+// Publish js code
+stage 'Publish: js -> AWS (release)'
+node('docker') {
+    wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
+            sh 'scripts/ciPushFrontend.sh tagWithReleaseTag'
+        }
+    }
+}
+
+// Clean up
+stage 'Clean up'
+node('docker') {
+    wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
         sh 'scripts/ciLogDockerState.sh postbuild'
         sh 'scripts/ciCleanup.sh'
     }
