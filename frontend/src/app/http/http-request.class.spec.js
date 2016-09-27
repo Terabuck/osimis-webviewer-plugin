@@ -154,6 +154,66 @@ describe('http', function() {
             return Promise.all([r1]);
         });
         
+        it('should send "Accept: application/json, text/plain, */*" by default as long as setRespoinseType is not used', function() {
+            // Mock xhr requests
+            _server.respondWith(
+                'GET',
+                '/my-request',
+                [
+                    200,
+                    {
+                        "Content-Type": "application/json"
+                    },
+                    '{ "id": 12, "comment": "Hey there" }'
+                ]
+            );
+            
+            /* Create a request */
+            var request = new osimis.HttpRequest();
+
+            // Do not set custom headers
+            // Expect application/json to be set anyway
+            assert.equal(request._httpHeaders['Accept'], 'application/json, text/plain, */*', 'Should accept json by default');
+
+
+            /* Create a request */
+            request = new osimis.HttpRequest();
+
+            // Set custom headers
+            var myHeaders = {};
+            request.setHeaders(myHeaders);
+
+            // Expect application/json to be set anyway
+            assert.equal(request._httpHeaders['Accept'], 'application/json, text/plain, */*', 'Should accept json by default even when new headers have been set');
+
+
+            /* Create a request */
+            request = new osimis.HttpRequest();
+
+            // Set non-json Content-type
+            myHeaders = {
+                'Content-type': 'something/weird'
+            };
+            request.setHeaders(myHeaders);
+
+            // Expect application/json to be set anyway (because content-type is for the call, accept is for the response)
+            assert.equal(request._httpHeaders['Accept'], 'application/json, text/plain, */*', 'Should still accept json on custom content-type');
+
+
+            /* Create a request */
+            request = new osimis.HttpRequest();
+
+            // Set non-json response type
+            request.setHeaders(myHeaders);
+            request.setResponseType('blob');
+
+            // Expect application/json to *not* be set
+            assert.notEqual(request._httpHeaders['Accept'], 'application/json, text/plain, */*', 'Should not accept json on custom responseType');
+
+            // End test once everything has been tested
+            return Promise.all([]);
+        });
+
     });
 
 });
