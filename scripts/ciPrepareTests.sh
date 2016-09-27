@@ -18,6 +18,6 @@ docker rm -v $testedContainerId > /dev/null
 # Prepare unit tests
 echo "Prepare karma unit test environment.."
 echo "Create network ${TEST_NETWORK}"
-subnet=10.0.0.$(($RANDOM % 25 * 8)) # one chance out of 25 to overlap each time (8 for /29 mask)
+subnet=10.0.0.$(($RANDOM % (255 / 8) * 8)) # one chance out of 25 to overlap each time (8 for /29 mask)
 docker network create ${TEST_NETWORK} --subnet=${subnet} || true # manual network create, see https://github.com/docker/compose/issues/3068 (also, limit to 4 ips / class A)
 docker-compose -f $TEST_COMPOSE_FILE -p $TEST_COMPOSE_PROJECT create --build # do not use --force-recreate (invalidate images cache - not stated in doc)
