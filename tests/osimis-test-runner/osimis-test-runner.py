@@ -164,10 +164,23 @@ try:
 	karmaReturnCode = karma.wait(timeout = 60*1 if singleRun else None) # kill after 1 min
 except:
 	print(colored('Error: karma run took more than 1 minute', 'red'))
+	
+	# Print error if orthanc is no longer accessible
+	try:
+		client.getInstancesIdFromStudy('f4951629-35ef9e4b-ade74118-14bc0200-577786a5')
+	except:
+		print(colored('Error: Orthanc is no longer accessible from tests', 'red'))
+	
 	if launchOrthanc is True:
 		server.stop()
 	karma.kill()
 	sys.exit(51)
+
+# Print error if orthanc is no longer accessible
+try:
+	client.getInstancesIdFromStudy('f4951629-35ef9e4b-ade74118-14bc0200-577786a5')
+except:
+	print(colored('Error: Orthanc is no longer accessible from tests', 'red'))
 
 if launchOrthanc is True:
 	server.stop()
