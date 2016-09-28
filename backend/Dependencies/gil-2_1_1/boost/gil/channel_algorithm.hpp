@@ -29,6 +29,7 @@
 #include <boost/mpl/integral_c.hpp>
 #include <boost/mpl/greater.hpp>
 #include <boost/type_traits.hpp>
+#include <boost/integer_traits.hpp>
 
 namespace boost { namespace gil {
 
@@ -51,7 +52,7 @@ template <typename SrcChannelV, typename DstChannelV, bool SrcLessThanDst, bool 
 
 
 template <typename UnsignedIntegralChannel>
-struct unsigned_integral_max_value : public mpl::integral_c<UnsignedIntegralChannel,-1> {};
+struct unsigned_integral_max_value : public mpl::integral_c<UnsignedIntegralChannel, boost::integer_traits<UnsignedIntegralChannel>::const_max> {};
 
 template <>
 struct unsigned_integral_max_value<uint8_t> : public mpl::integral_c<uint32_t,0xFF> {};
