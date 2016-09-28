@@ -23,7 +23,7 @@ std::auto_ptr<Series> SeriesFactory::CreateSeries(const std::string& seriesId, c
       const Orthanc::DicomMap& metaInfoTags, const Json::Value& otherTags)
 {
   // Retrieve available image formats
-  std::set<ImageQuality> imageQualities = _availableQualityPolicy->RetrieveByTags(metaInfoTags, otherTags);
+  std::set<ImageQuality> imageQualities = _availableQualityPolicy->retrieveByTags(metaInfoTags, otherTags);
   
   // Create the series
   return std::auto_ptr<Series>(new Series(seriesId, otherTags, slicesShort, imageQualities));

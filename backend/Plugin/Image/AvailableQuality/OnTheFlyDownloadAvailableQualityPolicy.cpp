@@ -45,7 +45,8 @@ bool OnTheFlyDownloadAvailableQualityPolicy::_isAlreadyCompressedWithinDicom(
   boost::regex regexp("^1\\.2\\.840\\.10008\\.1\\.2\\.4\\.(\\d\\d)$");
   boost::cmatch matches;
   try {
-    // Provide direct raw file if the raw is already compressed
+    // Provide direct raw file if the raw is already compressed.
+    // Only accept formats that are supported by the frontend.
     if (boost::regex_match(transferSyntax.c_str(), matches, regexp) && (
         // see http://www.dicomlibrary.com/dicom/transfer-syntax/
         boost::lexical_cast<uint32_t>(matches[1]) == 50 || // Lossy JPEG 8-bit Image Compression
@@ -71,10 +72,11 @@ bool OnTheFlyDownloadAvailableQualityPolicy::_isAlreadyCompressedWithinDicom(
   }
   catch (const boost::bad_lexical_cast&) {
     assert(false); // should not happen (because of regex)
+    return false;
   }
 }
 
-std::set<ImageQuality> OnTheFlyDownloadAvailableQualityPolicy::RetrieveByTags(
+std::set<ImageQuality> OnTheFlyDownloadAvailableQualityPolicy::retrieveByTags(
                                                               const Orthanc::DicomMap& headerTags,
                                                               const Json::Value& otherTags)
 {

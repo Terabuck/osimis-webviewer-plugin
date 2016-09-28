@@ -21,5 +21,5 @@ private:
 
 public:
   // Returns available qualities depending on the image DICOM tags
-  virtual std::set<ImageQuality> RetrieveByTags(const Orthanc::DicomMap& headerTags, const Json::Value& otherTags);
+  virtual std::set<ImageQuality> retrieveByTags(const Orthanc::DicomMap& headerTags, const Json::Value& otherTags);
 };
