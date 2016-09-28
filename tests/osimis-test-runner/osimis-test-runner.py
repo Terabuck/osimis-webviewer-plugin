@@ -161,9 +161,9 @@ karma = subprocess.Popen(
 # Stop Orthanc once karma has fininshed
 karmaReturnCode = None
 try:
-	karmaReturnCode = karma.wait(timeout = 60*5 if singleRun else None) # kill after 5 min
+	karmaReturnCode = karma.wait(timeout = 60*1 if singleRun else None) # kill after 1 min
 except:
-	print(colored('Error: karma run took more than 5 minutes', 'red'))
+	print(colored('Error: karma run took more than 1 minute', 'red'))
 	if launchOrthanc is True:
 		server.stop()
 	karma.kill()
