@@ -84,10 +84,10 @@ module.exports = function(config) {
 
         // fix phantomjs issue: http://stackoverflow.com/a/33802985/939741
         // we reload phantomjs everytimes it fails up to 100 times...
-        captureTimeout: 60000,
+        captureTimeout: 120000,
         browserDisconnectTimeout: 10000,
         browserDisconnectTolerance: 5, // by default 0
         // 30 sec to allow slow png compression processing
-        browserNoActivityTimeout: 60000 // by default 10000
+        browserNoActivityTimeout: 120000 // by default 10000
     });
 };
