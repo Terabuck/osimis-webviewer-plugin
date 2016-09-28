@@ -43,11 +43,11 @@ echo 'Build OSX     : ' + (userInput['buildOSX'] ? 'OK' : 'KO')
 // is heavy (in terms of disk space). Use jenkins' dir plugin instead of ws plugin to have control over our own locking mechanism.
 // @warning make sure not to use the jenkins' dir plugin if this lock is removed.
 lock(resource: 'webviewer', inversePrecedence: false) {
-    def workspacePath = '../common-ws'
+    def workspacePath = '../_common-ws'
 
     // Init environment
     stage('Retrieve: sources') {
-        node('docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+        node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             checkout scm
             sh 'scripts/ciLogDockerState.sh prebuild'
             sh 'scripts/setEnv.sh ${BRANCH_NAME}'
@@ -56,14 +56,14 @@ lock(resource: 'webviewer', inversePrecedence: false) {
 
     // Build frontend
     stage('Build: js') {
-        node('docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+        node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             sh 'scripts/ciBuildFrontend.sh'
         }}}
     }
 
     // Publish temporary frontend so we can embed it within orthanc plugin
     stage('Publish: js -> AWS (commitId)') {
-        node('docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+        node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
                 sh 'scripts/ciPushFrontend.sh tagWithCommitId'
             }
@@ -87,13 +87,13 @@ lock(resource: 'webviewer', inversePrecedence: false) {
     // Build docker & launch tests
     if (userInput['buildDocker']) {
         stage('Build: docker') {
-            node('docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+            node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
                 sh 'scripts/ciBuildDockerImage.sh'
             }}}
         }
 
         stage('Test: unit + integration') {
-            node('docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+            node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
                 // @note Requires the built docker image to work
                 sh 'scripts/ciPrepareTests.sh'
                 sh 'scripts/ciRunCppTests.sh'
@@ -115,7 +115,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
 
     // Publish docker release
     stage('Publish: orthanc -> DockerHub') {
-        node('docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+        node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             if (userInput['buildDocker']) {
                 docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkinsosimis') {
                     sh 'scripts/ciPushDockerImage.sh'
@@ -126,7 +126,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
 
     // Publish js code
     stage('Publish: js -> AWS (release)') {
-        node('docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+        node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
                 sh 'scripts/ciPushFrontend.sh tagWithReleaseTag'
             }
@@ -135,7 +135,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
 
     // Clean up
     stage('Clean up') {
-        node('docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+        node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             sh 'scripts/ciLogDockerState.sh postbuild'
             sh 'scripts/ciCleanup.sh'
         }}}
