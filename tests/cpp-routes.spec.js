@@ -86,7 +86,7 @@ describe('backend', function() {
       "2b22dad1-5b26015e-68493e3d-83a9854b-91a16d53:0"
     ];
     var seriesAvailableImageQualities = {
-        'PIXELDATA': 101, 'MEDIUM': 2, 'LOW': 1
+        'PIXELDATA': 101
     };
 
     describe('route /series/<instance>', function() {
