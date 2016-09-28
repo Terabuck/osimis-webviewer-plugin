@@ -37,108 +37,108 @@ echo 'Build Docker  : ' + (userInput['buildDocker'] ? 'OK' : 'KO (/!\\ tests dis
 echo 'Build Windows : ' + (userInput['buildWindows'] ? 'OK' : 'KO')
 echo 'Build OSX     : ' + (userInput['buildOSX'] ? 'OK' : 'KO')
 
+// Lock overall build to avoid issues related to slow unit test runs or docker ip/name conflicts for instance
+// This allow to benefits the optimization of using a common workspace for every branches (for instance, test
+// preparation docker image is reused in new branches), but can increase slowness if the branch content differences
+// is heavy (in terms of disk space). Use jenkins' dir plugin instead of ws plugin to have control over our own locking mechanism.
+// @warning make sure not to use the jenkins' dir plugin if this lock is removed.
 lock(resource: 'webviewer', inversePrecedence: false) {
+    def workspacePath = '../common-ws'
 
     // Init environment
-    stage 'Retrieve: sources'
-    node('docker') {
-        wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+    stage('Retrieve: sources') {
+        node('docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             checkout scm
             sh 'scripts/ciLogDockerState.sh prebuild'
             sh 'scripts/setEnv.sh ${BRANCH_NAME}'
-        }
+        }}}
     }
 
     // Build frontend
-    stage 'Build: js'
-    node('docker') {
-        wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+    stage('Build: js') {
+        node('docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             sh 'scripts/ciBuildFrontend.sh'
-        }
+        }}}
     }
 
     // Publish temporary frontend so we can embed it within orthanc plugin
-    stage 'Publish: js -> AWS (commitId)'
-    node('docker') {
-        wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+    stage('Publish: js -> AWS (commitId)') {
+        node('docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
                 sh 'scripts/ciPushFrontend.sh tagWithCommitId'
             }
-        }
+        }}}
     }
 
     // Build windows
     // @todo parallelize windows & linux builds once this feature is available 
     if (userInput['buildWindows']) {
-        stage name: 'Build: windows', concurrency: 1
-        node('windows && vs2015') {
-            //stage 'Retrieve sources'
-            checkout scm
+        stage('Build: windows') {
+            node('windows && vs2015') { dir(path: workspacePath) {
+                //stage('Retrieve sources') {}
+                checkout scm
 
-            //stage 'Build C++ Windows plugin'
-            bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% build'
+                //stage('Build C++ Windows plugin') {}
+                bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% build'
+            }}
         }
     }
 
     // Build docker & launch tests
     if (userInput['buildDocker']) {
-        stage name: 'Build: docker', concurrency: 1 // Low concurrency to reduce test timeout
-        node('docker') {
-            wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+        stage('Build: docker') {
+            node('docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
                 sh 'scripts/ciBuildDockerImage.sh'
-            }
+            }}}
         }
 
-        stage name: 'Test: unit + integration', concurrency: 1 // Low concurrency to reduce test timeout
-        node('docker') {
-            wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+        stage('Test: unit + integration') {
+            node('docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
                 // @note Requires the built docker image to work
                 sh 'scripts/ciPrepareTests.sh'
                 sh 'scripts/ciRunCppTests.sh'
                 sh 'scripts/ciRunJsTests.sh'
-            }
+            }}}
         }
     }
 
     // Publish windows release
     if (userInput['buildWindows']) {
-        node('windows && vs2015') {
-            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
-                stage 'Publish: C++ Windows plugin'
-                bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% publish'
-            }
+        stage('Publish: C++ Windows plugin') {
+            node('windows && vs2015') { dir(path: workspacePath) {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
+                    bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% publish'
+                }
+            }}
         }
     }
 
     // Publish docker release
-    stage 'Publish: orthanc -> DockerHub'
-    node('docker') {
-        wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+    stage('Publish: orthanc -> DockerHub') {
+        node('docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             if (userInput['buildDocker']) {
                 docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkinsosimis') {
                     sh 'scripts/ciPushDockerImage.sh'
                 }
             }
-        }
+        }}}
     }
 
     // Publish js code
-    stage 'Publish: js -> AWS (release)'
-    node('docker') {
-        wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+    stage('Publish: js -> AWS (release)') {
+        node('docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
                 sh 'scripts/ciPushFrontend.sh tagWithReleaseTag'
             }
-        }
+        }}}
     }
 
     // Clean up
-    stage 'Clean up'
-    node('docker') {
-        wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+    stage('Clean up') {
+        node('docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             sh 'scripts/ciLogDockerState.sh postbuild'
             sh 'scripts/ciCleanup.sh'
-        }
+        }}}
     }
 
 }
