@@ -54,9 +54,7 @@ fi
 
 # remove test runner docker container if exists
 echo "Cleaning $TEST_COMPOSE_PROJECT docker compose project"
-# docker network rm wvtest_default > /dev/null
-docker-compose -f $TEST_COMPOSE_FILE -p $TEST_COMPOSE_PROJECT down --rmi all --volumes > /dev/null
-# move back to the previous folder
+docker-compose -f $TEST_COMPOSE_FILE -p $TEST_COMPOSE_PROJECT down --volumes > /dev/null
 
 testedImage=${TEST_IMAGE}:${TAG}
 dockerImage=$(docker images -q $testedImage 2> /dev/null)
@@ -64,6 +62,9 @@ if [[ $dockerImage != "" ]]; then
 	echo "Cleaning $testedImage"
 	docker rmi $testedImage > /dev/null
 fi
+
+# do not remove related test-runner image (for cache purpose)
+# testedImage=${TEST_RUNNER_IMAGE}
 
 echo "...cleaned up"
 
