@@ -193,6 +193,9 @@ module.exports = function() {
                 // clientApp + '**/*.worker/main.js',
             ],
             client: {
+                // Remove application log
+                captureConsole: false,
+
                 // Mocha config
                 mocha: {
                     // asyncOnly: true,
