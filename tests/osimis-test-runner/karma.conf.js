@@ -43,7 +43,10 @@ module.exports = function(config) {
             output: 'full',
             showDiff: 'unified'
         },
-        
+
+        // log tests slower than 20ms
+        reportSlowerThan: 20,
+
         // coverageReporter: {
         //     dir: gulpConfig.karma.coverage.dir,
         //     reporters: gulpConfig.karma.coverage.reporters
