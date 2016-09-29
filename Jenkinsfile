@@ -3,6 +3,11 @@
 // Set build parameters
 def isUserDevBranch = env.BRANCH_NAME != "dev" && env.BRANCH_NAME != "master"
 
+// @warning We force dev branches to disable automatic windows build since it's not completely
+// implemented yet.
+// @todo Remove this line once the windows build is fully implemented.
+isUserDevBranch = true
+
 def userInput = [
     buildDocker: true,
     buildWindows: isUserDevBranch ? false : true,
@@ -17,7 +22,7 @@ else {
 
     // Let user override default settings (max 30 seconds to do so)
     try {
-        timeout(time: 30, unit: 'SECONDS') {
+        timeout(time: 10, unit: 'SECONDS') {
             userInput = input(
                 id: 'userInput', message: 'Configure build', parameters: [
                     [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildDocker'], description: 'Build Docker (/!\\ false -> disable tests)', name: 'buildDocker'],

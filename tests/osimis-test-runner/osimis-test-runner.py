@@ -141,9 +141,9 @@ gulp = subprocess.Popen(
 	cwd = frontendCwd
 )
 try:
-	gulp.wait(timeout = 60*5 if singleRun else None) # kill after 5 min
+	gulp.wait(timeout = 60*2 if singleRun else None) # kill after 2 min
 except:
-	print(colored('Error: gulp pre-processing took more than 5 minutes', 'red'))
+	print(colored('Error: gulp pre-processing took more than 2 minutes', 'red'))
 	if launchOrthanc is True:
 		server.stop()
 	gulp.kill()
@@ -161,9 +161,9 @@ karma = subprocess.Popen(
 # Stop Orthanc once karma has fininshed
 karmaReturnCode = None
 try:
-	karmaReturnCode = karma.wait(timeout = 60*1 if singleRun else None) # kill after 1 min
+	karmaReturnCode = karma.wait(timeout = 60*3 if singleRun else None) # kill after 1 min
 except:
-	print(colored('Error: karma run took more than 1 minute', 'red'))
+	print(colored('Error: karma run took more than 3 minute', 'red'))
 	
 	# Print error if orthanc is no longer accessible
 	try:
