@@ -65,22 +65,24 @@
                     // @note This does the same as $q.all, except it doesn't stop if one single promise fails.
                     return $q(function(resolve, reject) {
                         var wvSeriesLists = [];
-                        var count = wvSeriesPromises.length;
+                        var _failedResults = []; // @todo @warning forward failed promise somewhere! (the issue here is we must bypass failed request (for SR/bad DICOM tolerance)),
+                                                 // so we must "resolve" failing promises, while we most reject them at the same times). Promise can't handle these use cases, either
+                                                 // they fails or succeed but not both, they can't succeed partly.
                         var i = 0;
                         wvSeriesPromises.forEach(function(wvSeriesPromise) {
                             wvSeriesPromise.then(function(wvSeries) {
                                 wvSeriesLists.push(wvSeries);
                                 ++i;
                                 // Resolve overall promise once every sub promises have been processed
-                                if(i === count) {
+                                if(i === wvSeriesPromises.length) {
                                     resolve(wvSeriesLists);
                                 }
                             }, function(error) {
-                                // @todo @warning forward failed promise somewhere!
+                                _failedResults.push(error);
                                 console.error('Unable to retrieve a series.', error);
                                 ++i;
                                 // Resolve overall promise once every sub promises have been processed
-                                if(i === count) {
+                                if(i === wvSeriesPromises.length) {
                                     // Resolve the overall promise even if one of the sub-promise fails.
                                     resolve(wvSeriesLists);
                                 }
@@ -93,8 +95,9 @@
                     // we need to flatten it to only keep wvSeriesList
                     wvSeriesList = _.flatten(wvSeriesList);
                     return wvSeriesList;
-                }, function(errors) {
-                    console.error(errors);
+                }, function(err) {
+                    console.error(err);
+                    return $q.reject(err); 
                 });
         }
 

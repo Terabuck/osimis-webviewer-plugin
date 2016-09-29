@@ -70,6 +70,13 @@
         return new Promise(resolver);
     }) || undefined;
 
+    /**
+     * Timeout in millisecond, useful for tests.
+     * See xhr.timeout property.
+     * 
+     * @type {Number} 0 is infinity
+     */
+    HttpRequest.timeout = 0;
 
     /**
      * @description
@@ -237,6 +244,9 @@
             inputData = JSON.stringify(inputData);
         }
 
+        // Set timeout (mostly used for tests)
+        xhr.timeout = HttpRequest.timeout;
+
         // Set request method, url and async mode
         xhr.open(method, encodeURI(url), true); // true: async xhr request because we wan't to be able to abort the request
 
@@ -269,7 +279,13 @@
                     }
 
                     // Retrieve response data
-                    var data = typeof xhr.response !== 'undefined' ? xhr.response : xhr.responseType === 'json' && JSON.parse(xhr.responseText);
+                    try {
+                        var data = typeof xhr.response !== 'undefined' ? xhr.response : xhr.responseType === 'json' && JSON.parse(xhr.responseText);
+                    }
+                    catch(e) {
+                        // Result is probably not json, log the true result
+                        throw new Error('Failed to parse to JSON: ' + xhr.responseText);
+                    }
 
                     if (xhr.status === 200) {
                         // Resolve the xhr result with the same scheme as AngularJS#$http
