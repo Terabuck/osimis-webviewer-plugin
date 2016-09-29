@@ -4,11 +4,13 @@ describe('backend', function() {
         bard.asyncModule('webviewer', function(wvConfigProvider) {
             wvConfigProvider.setApiURL(window.orthancUrl || '/');
         });
-        bard.inject('wvSeriesManager', 'wvImageBinaryManager', 'WvImageQualities');
+        bard.inject('wvSeriesManager', 'WvHttpRequest', 'wvImageBinaryManager', 'WvImageQualities');
 
         seriesId = '7982dce8-d6a3ce66-d6fac396-d2427a98-61d94367:0';
         seriesId2 = '5910c9dd-4c2f8394-a9d63c4a-983e3837-7acded9b:0';
         imageId = '04389b99-731fd35c-a8ba10a0-a1d9cb32-d7dbd903:0';
+
+        WvHttpRequest.timeout = 20000; // limit requests to 20s (for better error feedback)
     });
 
     var seriesId, seriesId2;

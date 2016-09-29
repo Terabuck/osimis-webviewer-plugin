@@ -22,6 +22,8 @@
         //       statement doesn't apply in the case of workers which have an external context.
         osimis.HttpRequest.Promise = $q;
 
+        osimis.HttpRequest.timeout = 0; // No timeout
+
         // Return the HttpRequest class
         return osimis.HttpRequest;
     }
