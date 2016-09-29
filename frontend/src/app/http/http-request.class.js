@@ -266,7 +266,13 @@
                     }
 
                     // Retrieve response data
-                    var data = typeof xhr.response !== 'undefined' ? xhr.response : xhr.responseType === 'json' && JSON.parse(xhr.responseText);
+                    try {
+                        var data = typeof xhr.response !== 'undefined' ? xhr.response : xhr.responseType === 'json' && JSON.parse(xhr.responseText);
+                    }
+                    catch(e) {
+                        // Probably not json
+                        throw new Error('Failed to parse to JSON: ' + xhr.responseText);
+                    }
 
                     if (xhr.status === 200) {
                         // Resolve the xhr result with the same scheme as AngularJS#$http

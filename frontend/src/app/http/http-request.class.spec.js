@@ -63,7 +63,7 @@ describe('http', function() {
                     });
                 }, function(response) {
                     // Should not fail
-                    assert(false);
+                    assert(false, JSON.stringify(response));
                 })
                 ;
 
@@ -146,7 +146,7 @@ describe('http', function() {
                     assert.notEqual(request._httpHeaders, myHeaders);
                 }, function(response) {
                     // Should not fail
-                    assert(false);
+                    assert(false, JSON.stringify(response));
                 })
                 ;
 
