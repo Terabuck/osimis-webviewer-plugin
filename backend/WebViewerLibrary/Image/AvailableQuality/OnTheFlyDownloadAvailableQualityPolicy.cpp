@@ -3,8 +3,8 @@
 #include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp>
 #include <orthanc/OrthancCPlugin.h>
-#include "../../Orthanc/Core/OrthancException.h"
-#include "../../Orthanc/Core/Toolbox.h"
+#include <Core/OrthancException.h>
+#include <Core/Toolbox.h>
 #include "../../BenchmarkHelper.h"
 
 bool OnTheFlyDownloadAvailableQualityPolicy::_isLargerThan1000x1000(

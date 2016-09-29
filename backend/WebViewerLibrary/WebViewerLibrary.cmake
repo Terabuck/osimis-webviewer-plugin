@@ -188,6 +188,7 @@ add_library(WebViewerLibrary
   ${VIEWER_LIBRARY_DIR}/Series/SeriesRepository.cpp
   ${VIEWER_LIBRARY_DIR}/Series/Series.cpp
   ${VIEWER_LIBRARY_DIR}/Series/SeriesController.cpp
+  ${VIEWER_LIBRARY_DIR}/Image/AvailableQuality/OnTheFlyDownloadAvailableQualityPolicy.cpp
   ${VIEWER_LIBRARY_DIR}/Image/Utilities/KLVWriter.cpp
   ${VIEWER_LIBRARY_DIR}/Image/ImageContainer/RawImageContainer.cpp
   ${VIEWER_LIBRARY_DIR}/Image/ImageContainer/CompressedImageContainer.cpp
