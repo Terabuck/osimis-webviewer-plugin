@@ -212,6 +212,7 @@ add_library(OsimisWebViewerObject
   ${CMAKE_SOURCE_DIR}/Plugin/Series/Series.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Series/SeriesController.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/Utilities/KLVWriter.cpp
+  ${CMAKE_SOURCE_DIR}/Plugin/Image/AvailableQuality/OnTheFlyDownloadAvailableQualityPolicy.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/RawImageContainer.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/CompressedImageContainer.cpp
   ${CMAKE_SOURCE_DIR}/Plugin/Image/ImageContainer/CornerstoneKLVContainer.cpp

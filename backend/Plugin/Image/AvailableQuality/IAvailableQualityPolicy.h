@@ -13,5 +13,5 @@
  */
 class IAvailableQualityPolicy {
 public:
-  virtual std::set<ImageQuality> RetrieveByTags(const Orthanc::DicomMap& headerTags, const Json::Value& otherTags) = 0;
+  virtual std::set<ImageQuality> retrieveByTags(const Orthanc::DicomMap& headerTags, const Json::Value& otherTags) = 0;
 };
