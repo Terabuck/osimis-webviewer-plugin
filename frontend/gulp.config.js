@@ -200,7 +200,7 @@ module.exports = function() {
                 mocha: {
                     // asyncOnly: true,
                     // ignoreLeaks: false,
-                    timeout: 20000 // Set a long by-test timeout for orthanc to process requests on slow servers
+                    timeout: 60000 // Set a long by-test timeout for orthanc to process requests on slow servers
                 },
                 // Load workers-related files in web workers
                 mochaWebWorker: {
