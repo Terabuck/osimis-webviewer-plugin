@@ -1,5 +1,5 @@
 #!/bin/bash
-# Publish the front-end on AWS.
+# Publish the backend on AWS.
 #
 # pre-condition: setEnv.sh must be called
 
