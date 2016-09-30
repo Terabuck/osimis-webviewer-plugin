@@ -24,7 +24,7 @@
             restrict: 'E',
             transclude: true,
             require: {
-                series: '?^^wvSeriesId',
+                series: '?^^vpSeriesId',
                 droppableSeriesExt: '?^^wvDroppableSeriesExt'
             },
             templateUrl: 'app/overlay/droppable-series-overlay-item.directive.html',
