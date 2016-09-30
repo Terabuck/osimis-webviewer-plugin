@@ -4,7 +4,7 @@
 
 #include "IImageContainer.h"
 #include "../ImageMetaData.h"
-#include "ScopedBuffers.h"
+#include "../Utilities/ScopedBuffers.h"
 
 class CornerstoneKLVContainer : public IImageContainer {
 public:

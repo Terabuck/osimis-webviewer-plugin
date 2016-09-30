@@ -32,10 +32,10 @@
 #include <Core/Toolbox.h>
 #include <Plugins/Samples/GdcmDecoder/OrthancImageWrapper.h>
 #include <Resources/ThirdParty/base64/base64.h>
-#include "../ViewerToolbox.h"
-#include "../BenchmarkHelper.h"
-#include "Utilities/KLVWriter.h"
-#include "Utilities/ScopedBuffers.h"
+#include "ViewerToolbox.h"
+#include "BenchmarkHelper.h"
+#include "Image/Utilities/KLVWriter.h"
+#include "Image/Utilities/ScopedBuffers.h"
 
 namespace OrthancPlugins
 {

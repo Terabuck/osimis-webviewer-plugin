@@ -73,13 +73,26 @@ include(${ORTHANC_DIR}/Resources/CMake/JsonCppConfiguration.cmake)
 include(${ORTHANC_DIR}/Resources/CMake/SQLiteConfiguration.cmake)
 include(${RESOURCES_DIR}/CMake/GdcmConfiguration.cmake)
 
+# Remove policy CMP0042 warning on mac (set to default value)
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
+  set(CMAKE_MACOSX_RPATH 1)
+endif()
+
+# Add additional warning/error flags to Clang (for mac)
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-long-long -Wno-implicit-function-declaration")  
+  # --std=c99 makes libcurl not to compile
+  # -pedantic gives a lot of warnings on OpenSSL 
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-long-long -Wno-variadic-macros")
+endif()
+
 # Include GIL boost library - adobe version with numeric extensions
 # Help debug boost GIL templates
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_definitions(-DBOOST_GIL_USE_CONCEPT_CHECK=1)
 endif()
-include_directories(${LOCAL_DEPENDENCIES_DIR}/boost-1_60_0/)
-include_directories(${LOCAL_DEPENDENCIES_DIR}/gil-2_1_1/)
+include_directories(SYSTEM ${LOCAL_DEPENDENCIES_DIR}/boost-1_60_0/)
+include_directories(SYSTEM ${LOCAL_DEPENDENCIES_DIR}/gil-2_1_1/)
 
 # Enable image processing *generic* http routes on debug mode
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -138,11 +151,6 @@ add_definitions(
   )
 
 include_directories(${VIEWER_LIBRARY_DIR}/)
-# @todo remove
-include_directories(${VIEWER_LIBRARY_DIR}/Image)
-include_directories(${VIEWER_LIBRARY_DIR}/Image/ImageContainer)
-include_directories(${VIEWER_LIBRARY_DIR}/Image/ImageProcessingPolicy)
-include_directories(${VIEWER_LIBRARY_DIR}/Image/Utilities)
 
 # create an intermediary WebViewerLibrary to avoid source recompilation
 # for both unit tests and web viewer library
@@ -210,6 +218,8 @@ add_library(WebViewerLibrary
   
   ${VIEWER_LIBRARY_DIR}/BenchmarkHelper.cpp
   ${VIEWER_LIBRARY_DIR}/ViewerToolbox.cpp
+  ${VIEWER_LIBRARY_DIR}/WebViewerConfiguration.cpp
+  ${VIEWER_LIBRARY_DIR}/WebViewer.cpp
   )
 # bind WebViewerLibrary to GDCM so any executable/library embedding 
 # WebViewerLibrary.a also embed GDCM.
