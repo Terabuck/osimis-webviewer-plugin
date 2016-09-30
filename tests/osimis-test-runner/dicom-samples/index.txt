@@ -9,6 +9,19 @@ SR-sr_instance.dcm
 study-id: 3ff62993-28b67f81-6dfb132b-9d53983a-3a61f711
 
 
+DICOM RGB US
+==============
+RGB-us-1.dcm
+	series: 0c94972d-96958bca-322136ac-eab228ed-d6a64772
+	instance: 97c349fa-ac660853-e6e56f0e-2f228b90-349a73a2
+RGB-us-2.dcm
+	series: 0c94972d-96958bca-322136ac-eab228ed-d6a64772
+	instance: cc8a37a5-fbe14059-88be8343-a335865e-b148991a
+RGB-us-1.dcm
+--------------
+study-id: 2578aef7-f90dd1b6-574c432a-4de716e7-e272b61b
+
+
 ORTHO
 ==============
 ortho-COLONNE_LOMB_3_4.dcm

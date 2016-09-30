@@ -131,7 +131,7 @@ std::auto_ptr<Image> ImageRepository::_LoadImageFromOrthanc(const std::string& i
     //boost::lock_guard<boost::mutex> guard(mutex_); // check what happens if only one thread asks for frame at a time
 
     // Retrieve dicom file
-    OrthancPluginMemoryBuffer dicom;
+    OrthancPluginMemoryBuffer dicom = { 0 };
     _dicomRepository->getDicomFile(instanceId, dicom);
 
     // @note dicom tags could be gathered from DICOM instance in this case
@@ -142,6 +142,11 @@ std::auto_ptr<Image> ImageRepository::_LoadImageFromOrthanc(const std::string& i
 
     // Clean DICOM file memory once the frame has been retrieved from the dicom file - @todo call on exception
     _dicomRepository->decrefDicomFile(instanceId);
+
+    // Throw exception if frame couldn't be decoded
+    if (frame == NULL) {
+      throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_IncompatibleImageFormat));
+    }
 
     // Store the frame inside a container
     std::auto_ptr<RawImageContainer> data(new RawImageContainer(frame));
