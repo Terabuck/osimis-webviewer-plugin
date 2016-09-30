@@ -7,13 +7,15 @@
 #include "../../Orthanc/Core/Toolbox.h"
 #include "../../BenchmarkHelper.h"
 
-bool OnTheFlyDownloadAvailableQualityPolicy::_isLargerThan1000x1000(
+bool OnTheFlyDownloadAvailableQualityPolicy::_isLargerThan(
+                                                              uint32_t width,
+                                                              uint32_t height,
                                                               const Json::Value& otherTags)
 {
   int columns = boost::lexical_cast<int>(otherTags["Columns"].asString());
   int rows = boost::lexical_cast<int>(otherTags["Rows"].asString());
 
-  return rows > 1000 && columns > 1000;
+  return columns > width && rows > height;
 }
 
 bool OnTheFlyDownloadAvailableQualityPolicy::_isAlreadyCompressedWithinDicom(
@@ -84,9 +86,15 @@ std::set<ImageQuality> OnTheFlyDownloadAvailableQualityPolicy::retrieveByTags(
 
   std::set<ImageQuality> result;
 
-  // Decompressing<->Recompression takes time, so we avoid recompressing dicom images at all cost,
-  // even for high dimension images
+  // Decompressing<->Recompression takes time, so we avoid recompressing dicom images at all cost
   if (_isAlreadyCompressedWithinDicom(headerTags)) {
+    // Set thumbnails only on medium sized images
+    if (_isLargerThan(750, 750, otherTags)) {
+      result.insert(ImageQuality(ImageQuality::LOW)); // 150x150 jpeg80
+      BENCH_LOG("QUALITY", "low");
+    }
+
+    // Always set HQ/RAW (for medical reasons)
     result.insert(ImageQuality(ImageQuality::PIXELDATA)); // raw file (unknown format)
     BENCH_LOG("QUALITY", "pixeldata");
   }
@@ -98,7 +106,7 @@ std::set<ImageQuality> OnTheFlyDownloadAvailableQualityPolicy::retrieveByTags(
     BENCH_LOG("QUALITY", "low");
 
     // Set MQ on large images
-    if (_isLargerThan1000x1000(otherTags)) {
+    if (_isLargerThan(1000, 1000, otherTags)) {
       result.insert(ImageQuality(ImageQuality::MEDIUM)); // 1000x1000 jpeg80
       BENCH_LOG("QUALITY", "medium");
     }
