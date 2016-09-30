@@ -4,11 +4,13 @@ describe('backend', function() {
         bard.asyncModule('webviewer', function(wvConfigProvider) {
             wvConfigProvider.setApiURL(window.orthancUrl || '/');
         });
-        bard.inject('wvSeriesManager', 'wvImageBinaryManager', 'WvImageQualities');
+        bard.inject('wvSeriesManager', 'WvHttpRequest', 'wvImageBinaryManager', 'WvImageQualities');
 
         seriesId = '7982dce8-d6a3ce66-d6fac396-d2427a98-61d94367:0';
         seriesId2 = '5910c9dd-4c2f8394-a9d63c4a-983e3837-7acded9b:0';
         imageId = '04389b99-731fd35c-a8ba10a0-a1d9cb32-d7dbd903:0';
+
+        WvHttpRequest.timeout = 20000; // limit requests to 20s (for better error feedback)
     });
 
     var seriesId, seriesId2;
@@ -100,7 +102,7 @@ describe('backend', function() {
                     assert.deepEqual(series.tags, seriesTags);
                 }, function(error) {
                     // Fail the test - series not found
-                    assert.fail();
+                    assert(false, JSON.stringify(error));
                 });
         });
 
@@ -113,7 +115,7 @@ describe('backend', function() {
                     assert.deepEqual(series.imageIds, seriesOrderedImageIds);
                 }, function(error) {
                     // Fail the test - series not found
-                    assert.fail();
+                    assert(false, JSON.stringify(error));
                 });
         });
         
@@ -126,7 +128,7 @@ describe('backend', function() {
                     assert.deepEqual(series.availableQualities, seriesAvailableImageQualities);
                 }, function(error) {
                     // Fail the test - series not found
-                    assert.fail();
+                    assert(false, JSON.stringify(error));
                 });
         });
 
@@ -136,7 +138,7 @@ describe('backend', function() {
                 .get('my-inexistant-series:35')
                 .then(function(series) {
                     // Fail the test - series shouldn't have been found
-                    assert.fail();
+                    assert(false, 'should not load inexistant thing');
                 }, function(error) {
                     // Succeed on error - if image has not been retrieved
                     assert.equal(error.status, 404);
@@ -168,7 +170,7 @@ describe('backend', function() {
                     assert.equal(pixelObject.height, imageResolution.highQuality[1]);
                 }, function(error) {
                     // Fail on error - if image should have been retrieved
-                    assert.fail();
+                    assert(false, JSON.stringify(error));
                 });
         });
 
@@ -178,7 +180,7 @@ describe('backend', function() {
                 .get('robocop:34', WvImageQualities.LOSSLESS)
                 .then(function() {
                     // Fail if inexistant image request returns successful result
-                    assert.fail();
+                    assert(false, 'should not load inexistant thing');
                 }, function(error) {
                     // Succeed on error - if image has not been retrieved
                     assert.equal(error.status, 404);
@@ -203,7 +205,7 @@ describe('backend', function() {
 
                 }, function(error) {
                     // Fail on error - if image should have been retrieved
-                    assert.fail();
+                    assert(false, JSON.stringify(error));
                 });
         });
 
@@ -213,7 +215,7 @@ describe('backend', function() {
                 .get('robocop:34', WvImageQualities.MEDIUM)
                 .then(function() {
                     // Fail if inexistant image request returns successful result
-                    assert.fail();
+                    assert(false, 'should not load inexistant thing');
                 }, function(error) {
                     // Succeed on error - if image has not been retrieved
                     assert.equal(error.status, 404);
@@ -237,7 +239,7 @@ describe('backend', function() {
                     assert.equal(pixelObject.height, imageResolution.lowQuality[1]);
                 }, function(error) {
                     // Fail on error - if image should have been retrieved
-                    assert.fail();
+                    assert(false, JSON.stringify(error));
                 });
         });
 
@@ -247,7 +249,7 @@ describe('backend', function() {
                 .get('robocop:34', WvImageQualities.LOW)
                 .then(function() {
                     // Fail if inexistant image request returns successful result
-                    assert.fail();
+                    assert(false, 'should not load inexistant thing');
                 }, function(error) {
                     // Succeed on error - if image has not been retrieved
                     assert.equal(error.status, 404);
