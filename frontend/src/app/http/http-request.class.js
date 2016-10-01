@@ -45,7 +45,7 @@
         this._httpHeaders['Content-type'] = this._defaultContentType;
         this._defaultAcceptHeader = 'application/json, text/plain, */*';
         this._httpHeaders['Accept'] = this._defaultAcceptHeader;
-        this._xhr.responseType = 'json';
+        this._responseType = 'json';
 
         // Disable cache by default
         this._cacheEnabled = false;
@@ -130,7 +130,7 @@
      *    * ...
      */
     HttpRequest.prototype.setResponseType = function(responseType) {
-        this._xhr.responseType = responseType;
+        this._responseType = responseType;
 
         // Remove default json Accept header when not using json anymore
         if (responseType !== 'json' && this._httpHeaders['Accept'] === this._defaultAcceptHeader) {
@@ -246,6 +246,9 @@
                 xhr.setRequestHeader(prop, headers[prop]);
             }
         }
+
+        // Inject the response type (now that the xhr object has been opened)
+        xhr.responseType = this._responseType;
 
         if (cacheEnabled && _cache[url]) {
             // Return the cached version if available & cache is enabled
