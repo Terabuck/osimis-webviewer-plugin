@@ -78,8 +78,8 @@ lock(resource: 'webviewer', inversePrecedence: false) {
                 //stage('Retrieve sources') {}
                 checkout scm
 
-                //stage('Build C++ Windows plugin') {}
-                bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% build'
+                //stage('Build C++ OSX plugin') {}
+                sh 'cd scripts & ./ciBuildOSX.sh $BRANCH_NAME build'
             }}
         }
     }
