@@ -17,7 +17,7 @@ else {
 
     // Let user override default settings (max 30 seconds to do so)
     try {
-        timeout(time: 10, unit: 'SECONDS') {
+        timeout(time: 30, unit: 'SECONDS') {
             userInput = input(
                 id: 'userInput', message: 'Configure build', parameters: [
                     [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildDocker'], description: 'Build Docker (/!\\ false -> disable tests)', name: 'buildDocker'],
