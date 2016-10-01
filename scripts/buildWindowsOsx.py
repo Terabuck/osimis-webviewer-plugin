@@ -57,7 +57,7 @@ def build(config):
     logging.info("Running unit tests ({name})".format(name = config['name']))
 
     os.chdir(os.path.join(buildFolder, 'Release'))
-    ret = call('UnitTests.exe')
+    ret = call(BuildHelpers.getExeCommandName('UnitTests'))
     if ret != 0:
         print("build: exiting with error code = {}".format(ret))
         exit(ret)

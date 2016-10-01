@@ -1,2 +1,2 @@
-http://orthanc.osimis.io/pythonToolbox/OsimisToolbox-1.12.0.tar.gz
+http://orthanc.osimis.io/pythonToolbox/OsimisToolbox-1.12.3.tar.gz
 awscli

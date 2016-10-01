@@ -3,11 +3,6 @@
 // Set build parameters
 def isUserDevBranch = env.BRANCH_NAME != "dev" && env.BRANCH_NAME != "master"
 
-// @warning We force dev branches to disable automatic windows build since it's not completely
-// implemented yet.
-// @todo Remove this line once the windows build is fully implemented.
-isUserDevBranch = true
-
 def userInput = [
     buildDocker: true,
     buildWindows: isUserDevBranch ? false : true,
@@ -75,8 +70,22 @@ lock(resource: 'webviewer', inversePrecedence: false) {
         }}}
     }
 
+    // Build osx
+    // @todo parallelize windows & linux builds once this feature is available
+    if (userInput['buildOSX']) {
+        stage('Build: osx') {
+            node('osx') { dir(path: workspacePath) {
+                //stage('Retrieve sources') {}
+                checkout scm
+
+                //stage('Build C++ Windows plugin') {}
+                bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% build'
+            }}
+        }
+    }
+
     // Build windows
-    // @todo parallelize windows & linux builds once this feature is available 
+    // @todo parallelize windows & linux builds once this feature is available
     if (userInput['buildWindows']) {
         stage('Build: windows') {
             node('windows && vs2015') { dir(path: workspacePath) {
