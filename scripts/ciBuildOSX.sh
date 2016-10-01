@@ -12,13 +12,14 @@ cd ..
 #create a python virtual environment
 source scripts/createPythonVenv.sh
 source env/bin/activate
+
+cd $startScriptDir/
 pip install -r requirements.txt
 pip install awscli
 
 #display all SDKs supports by this version of xcode
 xcodebuild -showsdks
 
-cd $startScriptDir/
 python3 buildWindowsOSX.py $branchName $action
 
 cd $startScriptDir
