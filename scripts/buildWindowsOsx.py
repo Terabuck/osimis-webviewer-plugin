@@ -55,6 +55,7 @@ def build(config):
     ret = BuildHelpers.buildCMake(cmakeListsFolderPath = os.path.join(rootFolder, 'backend'),
                                   buildFolderPath = buildFolder,
                                   cmakeTargetName = 'OsimisWebViewer',
+                                  cmakeTargetOSX = ['OsimisWebViewer', 'UnitTests'],
                                   cmakeArguments = [],
                                   builder = config['builder'],
                                   config = BuildHelpers.CONFIG_RELEASE
