@@ -79,7 +79,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
                 checkout scm
 
                 //stage('Build C++ OSX plugin') {}
-                sh 'cd scripts & ./ciBuildOSX.sh $BRANCH_NAME build'
+                sh 'cd scripts && ./ciBuildOSX.sh $BRANCH_NAME build'
             }}
         }
     }
