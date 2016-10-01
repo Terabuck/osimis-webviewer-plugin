@@ -116,6 +116,19 @@ lock(resource: 'webviewer', inversePrecedence: false) {
         }
     }
 
+    // Publish osx release
+    if (userInput['buildOSX']) {
+        stage('Publish: osx') {
+            node('osx') { dir(path: workspacePath) {
+                //stage('Retrieve sources') {}
+                checkout scm
+
+                //stage('Publish C++ OSX plugin') {}
+                sh 'cd scripts && ./ciBuildOSX.sh $BRANCH_NAME publish'
+            }}
+        }
+    }
+
     // Publish windows release
     if (userInput['buildWindows']) {
         stage('Publish: C++ Windows plugin') {
