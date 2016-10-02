@@ -3,18 +3,13 @@
 // Set build parameters
 def isUserDevBranch = env.BRANCH_NAME != "dev" && env.BRANCH_NAME != "master"
 
-// @warning We force dev branches to disable automatic windows build since it's not completely
-// implemented yet.
-// @todo Remove this line once the windows build is fully implemented.
-isUserDevBranch = true
-
 def userInput = [
     buildDocker: true,
     buildWindows: isUserDevBranch ? false : true,
     buildOSX: isUserDevBranch ? false : true
 ];
 
-if (!isUserDevBranch) {
+if (/*!isUserDevBranch*/ false) { // @warning @todo uncomment to force windows build on dev
     echo 'Master/Dev branch: serious test & build business enforced...'
 }
 else {
