@@ -46,7 +46,9 @@ if (STATIC_BUILD OR NOT USE_SYSTEM_GDCM)
   externalproject_add(GDCM
     URL "http://orthanc.osimis.io/ThirdPartyDownloads/gdcm-2.6.0.tar.gz"
     URL_MD5 "978afe57af448b1c97c9f116790aca9c"
-    CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} ${Flags}
+    # Always build GDCM in release mode since debug mode breaks on OSX
+    # see https://phabricator.mitk.org/T19995 https://sourceforge.net/p/gdcm/mailman/message/35369639/
+    CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=Release -DGDCM_DOCUMENTATION_SKIP_MANPAGES:BOOL=ON ${Flags}
     #-DLIBRARY_OUTPUT_PATH=${CMAKE_CURRENT_BINARY_DIR}
     INSTALL_COMMAND ""  # Skip the install step
     )
