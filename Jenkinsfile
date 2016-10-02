@@ -1,7 +1,7 @@
 #!/usr/bin/groovy
 
 // Set build parameters
-def isUserDevBranch = env.BRANCH_NAME != "dev" && env.BRANCH_NAME != "master"
+def isUserDevBranch = env.BRANCH_NAME != "dev" && env.BRANCH_NAME != "master" && !env.BRANCH_NAME.startsWith("release")
 
 def userInput = [
     buildDocker: true,
