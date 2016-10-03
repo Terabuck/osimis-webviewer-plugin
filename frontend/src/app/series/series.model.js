@@ -6,10 +6,16 @@
         .factory('WvSeries', factory);
 
     /* @ngInject */
-    function factory($rootScope, $timeout, wvImageManager, wvAnnotationManager, WvAnnotationGroup, wvImageBinaryManager) {
+    function factory($rootScope, $timeout, wvImageManager, wvAnnotationManager, WvAnnotationGroup, wvImageBinaryManager, WvImageQualities, uaParser) {
 
         function WvSeries(id, imageIds, tags, availableQualities) {
             var _this = this;
+
+            // Replace PixelData by lossless in safari (for decompression library incompatibility reasons)
+            if (uaParser.getBrowser().name.indexOf('Safari') !== -1 && availableQualities.hasOwnProperty('PIXELDATA')) {
+                delete availableQualities.PIXELDATA;
+                availableQualities.LOSSLESS = WvImageQualities.LOSSLESS;
+            }
 
             this.id = id; // id == orthancId + ':' + subSeriesIndex
             this.imageIds = imageIds;
