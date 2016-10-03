@@ -51,6 +51,8 @@
         this._workerThread.addEventListener('error', function(evt) {
             var task = _this._currentTask;
 
+            console.log('task error', evt.message, evt.filename, evt.lineno, evt.colno, evt.error, evt.stack);
+
             // Trigger task has failed
             task.onFailure.trigger(evt.data);
 
