@@ -88,13 +88,13 @@ lock(resource: 'webviewer', inversePrecedence: false) {
     // @todo parallelize windows & linux builds once this feature is available
     if (userInput['buildWindows']) {
         stage('Build: windows') {
-            node('windows && vs2015') { dir(path: workspacePath) {
+            node('windows && vs2015') {
                 //stage('Retrieve sources') {}
                 checkout scm
 
                 //stage('Build C++ Windows plugin') {}
                 bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% build'
-            }}
+            }
         }
     }
 
@@ -132,11 +132,11 @@ lock(resource: 'webviewer', inversePrecedence: false) {
     // Publish windows release
     if (userInput['buildWindows']) {
         stage('Publish: C++ Windows plugin') {
-            node('windows && vs2015') { dir(path: workspacePath) {
+            node('windows && vs2015') {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
                     bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% publish'
                 }
-            }}
+            }
         }
     }
 
