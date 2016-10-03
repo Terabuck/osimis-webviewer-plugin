@@ -280,7 +280,7 @@
 
                     // Retrieve response data
                     try {
-                        var data = typeof xhr.response !== 'undefined' ? xhr.response : xhr.responseType === 'json' && JSON.parse(xhr.responseText);
+                        var data = typeof xhr.response !== 'undefined' ? xhr.response : (xhr.responseType === 'json' && xhr.responseText && JSON.parse(xhr.responseText) || null);
                     }
                     catch(e) {
                         // Result is probably not json, log the true result
