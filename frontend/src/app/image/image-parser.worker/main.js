@@ -19,6 +19,9 @@
 
 // @todo move jpgjs & pngjs out of bower_components
 
+// Import promise polyfill
+/* @inline: */ importScripts('/bower_components/promise-polyfill/promise.min.js');
+
 // Import osimis.HttpRequest
 /* @inline: */ importScripts('/app/http/http-request.class.js');
 

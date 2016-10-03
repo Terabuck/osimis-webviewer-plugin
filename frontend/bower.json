@@ -48,7 +48,8 @@
     "hammer-time": "^1.1.0",
     "png.js": "devongovett/png.js",
     "jpeg-lossless-decoder-js": "^1.2.11",
-    "ua-parser-js": "^0.7.10"
+    "ua-parser-js": "^0.7.10",
+    "promise-polyfill": "^6.0.2"
   },
   "resolutions": {
     "angular": "^1.5.8",
