@@ -19,6 +19,17 @@
 
 // @todo move jpgjs & pngjs out of bower_components
 
+// Import bluebird promise polyfill (wrap in try catch for enhanced logging)
+try {
+/* @inline: */ importScripts('/bower_components/bluebird/js/browser/bluebird.js');
+}
+catch(e) {
+    console.error('WORKER ERROR');
+    console.error(e.message);
+    console.error(e.stack);
+    console.error(e.stacktrace);
+    throw new Error(JSON.stringify(e.stack));
+}
 // Import osimis.HttpRequest
 /* @inline: */ importScripts('/app/http/http-request.class.js');
 
