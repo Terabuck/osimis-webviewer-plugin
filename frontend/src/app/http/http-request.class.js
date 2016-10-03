@@ -244,12 +244,12 @@
             inputData = JSON.stringify(inputData);
         }
 
-        // Set timeout (mostly used for tests)
-        xhr.timeout = HttpRequest.timeout;
-
         // Set request method, url and async mode
         xhr.open(method, encodeURI(url), true); // true: async xhr request because we wan't to be able to abort the request
 
+        // Set timeout (mostly used for tests)
+        xhr.timeout = HttpRequest.timeout;
+        
         // Inject the headers in the xhr object (now that the xhr object has been opened)
         for (var prop in headers) {
             if (headers.hasOwnProperty(prop)) {
