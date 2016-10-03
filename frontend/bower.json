@@ -1,7 +1,7 @@
 {
   "name": "webViewer",
   "description": "Orthanc & component based viewer",
-  "version": "0.5.1",
+  "version": "0.5.3",
   "main": [
     "js/app.js",
     "styles/app.css"

@@ -33,7 +33,7 @@
 (function() {
     'use strict';
 
-    var version = '0.5.1';
+    var version = '0.5.3';
 
     /**
      * @class
