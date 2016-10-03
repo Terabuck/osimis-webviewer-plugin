@@ -17,7 +17,7 @@ else {
 
     // Let user override default settings (max 30 seconds to do so)
     try {
-        timeout(time: 10, unit: 'SECONDS') {
+        timeout(time: 30, unit: 'SECONDS') {
             userInput = input(
                 id: 'userInput', message: 'Configure build', parameters: [
                     [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildDocker'], description: 'Build Docker (/!\\ false -> disable tests)', name: 'buildDocker'],
@@ -70,8 +70,22 @@ lock(resource: 'webviewer', inversePrecedence: false) {
         }}}
     }
 
+    // Build osx
+    // @todo parallelize windows & linux builds once this feature is available
+    if (userInput['buildOSX']) {
+        stage('Build: osx') {
+            node('osx') { dir(path: workspacePath) {
+                //stage('Retrieve sources') {}
+                checkout scm
+
+                //stage('Build C++ OSX plugin') {}
+                sh 'cd scripts && ./ciBuildOSX.sh $BRANCH_NAME build'
+            }}
+        }
+    }
+
     // Build windows
-    // @todo parallelize windows & linux builds once this feature is available 
+    // @todo parallelize windows & linux builds once this feature is available
     if (userInput['buildWindows']) {
         stage('Build: windows') {
             node('windows && vs2015') { dir(path: workspacePath) {
@@ -99,6 +113,19 @@ lock(resource: 'webviewer', inversePrecedence: false) {
                 sh 'scripts/ciRunCppTests.sh'
                 sh 'scripts/ciRunJsTests.sh'
             }}}
+        }
+    }
+
+    // Publish osx release
+    if (userInput['buildOSX']) {
+        stage('Publish: osx') {
+            node('osx') { dir(path: workspacePath) {
+                //stage('Retrieve sources') {}
+                checkout scm
+
+                //stage('Publish C++ OSX plugin') {}
+                sh 'cd scripts && ./ciBuildOSX.sh $BRANCH_NAME publish'
+            }}
         }
     }
 

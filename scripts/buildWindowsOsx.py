@@ -23,17 +23,25 @@ commitId = GitHelpers.getVersion(os.path.dirname(__file__)).commitSha1
 
 configs = [
     {
-    'name' : "64bits",
-    'builder' : BuildHelpers.BUILDER_VS2015_64BITS,
-    'buildFolder' : "build/build64",
-    'webFolder' : 'win64'
+        'name': "64bits",
+        'builder': BuildHelpers.BUILDER_VS2015_64BITS,
+        'buildFolder': "build/build64",
+        'webFolder': 'win64'
     },
     {
-    'name' : "32bits",
-    'builder' : BuildHelpers.BUILDER_VS2015_32BITS,
-    'buildFolder' : "build/build32",
-    'webFolder': 'win32'
-}]
+        'name': "32bits",
+        'builder': BuildHelpers.BUILDER_VS2015_32BITS,
+        'buildFolder': "build/build32",
+        'webFolder': 'win32'
+    },
+    {
+        'name': "osx",
+        'builder': BuildHelpers.BUILDER_XCODE,
+        'buildFolder': "build/osx",
+        'webFolder': 'osx'
+    }
+]
+
 
 def build(config):
     logging.info("Building {name} version".format(name = config['name']))
@@ -47,6 +55,7 @@ def build(config):
     ret = BuildHelpers.buildCMake(cmakeListsFolderPath = os.path.join(rootFolder, 'backend'),
                                   buildFolderPath = buildFolder,
                                   cmakeTargetName = 'OsimisWebViewer',
+                                  cmakeTargetsOSX = ['OsimisWebViewer', 'UnitTests'],
                                   cmakeArguments = [],
                                   builder = config['builder'],
                                   config = BuildHelpers.CONFIG_RELEASE
@@ -57,7 +66,7 @@ def build(config):
     logging.info("Running unit tests ({name})".format(name = config['name']))
 
     os.chdir(os.path.join(buildFolder, 'Release'))
-    ret = call('UnitTests.exe')
+    ret = call(BuildHelpers.getExeCommandName('UnitTests'))
     if ret != 0:
         print("build: exiting with error code = {}".format(ret))
         exit(ret)
@@ -74,15 +83,19 @@ def publish(config):
     os.chdir(os.path.join(rootFolder, config['buildFolder'], 'Release'))
 
     # upload in a commitId folder
-    ret = call("{exe} s3 --region eu-west-1 cp {lib} s3://orthanc.osimis.io/{target}/viewer/{version}/ --cache-control max-age=1".format(exe = awsExecutable,
-                                                                                                                                         lib = libraryName,
-                                                                                                                                         target = config['webFolder'],
-                                                                                                                                         version = commitId))
+    ret = call(
+        "{exe} s3 --region eu-west-1 cp {lib} s3://orthanc.osimis.io/{target}/viewer/{version}/ --cache-control max-age=1".format(
+            exe = awsExecutable,
+            lib = libraryName,
+            target = config['webFolder'],
+            version = commitId))
     # upload in a branchName folder
-    ret = call("{exe} s3 --region eu-west-1 cp {lib} s3://orthanc.osimis.io/{target}/viewer/{version}/ --cache-control max-age=1".format(exe = awsExecutable,
-                                                                                                                                         lib = libraryName,
-                                                                                                                                         target = config['webFolder'],
-                                                                                                                                         version = args.branchName))
+    ret = call(
+        "{exe} s3 --region eu-west-1 cp {lib} s3://orthanc.osimis.io/{target}/viewer/{version}/ --cache-control max-age=1".format(
+            exe = awsExecutable,
+            lib = libraryName,
+            target = config['webFolder'],
+            version = args.branchName))
 
     if ret != 0:
         print("publish: exiting with error code = {}".format(ret))
@@ -90,7 +103,13 @@ def publish(config):
 
 
 if __name__ == '__main__':
+
     for config in configs:
+        if platform.system() == 'Windows' and not 'win' in config['webFolder']:
+            continue
+        if platform.system() == 'Darwin' and not 'osx' in config['webFolder']:
+            continue
+
         if args.action == 'build':
             build(config)
         elif args.action == 'publish':
