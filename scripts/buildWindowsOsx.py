@@ -56,7 +56,7 @@ def build(config):
                                   buildFolderPath = buildFolder,
                                   cmakeTargetName = 'OsimisWebViewer',
                                   cmakeTargetsOSX = ['OsimisWebViewer', 'UnitTests'],
-                                  cmakeArguments = [],
+                                  cmakeArguments = ['-DGDCM_DOCUMENTATION_SKIP_MANPAGES:BOOL=ON'],
                                   builder = config['builder'],
                                   config = BuildHelpers.CONFIG_RELEASE
                                   )
