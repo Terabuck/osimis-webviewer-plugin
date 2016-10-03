@@ -43,7 +43,7 @@ echo 'Build OSX     : ' + (userInput['buildOSX'] ? 'OK' : 'KO')
 // is heavy (in terms of disk space). Use jenkins' dir plugin instead of ws plugin to have control over our own locking mechanism.
 // @warning make sure not to use the jenkins' dir plugin if this lock is removed.
 lock(resource: 'webviewer', inversePrecedence: false) {
-    def workspacePath = '../_common-ws'
+    def workspacePath = '../_common-wvb-ws'
 
     // Init environment
     stage('Retrieve: sources') {
@@ -91,13 +91,13 @@ lock(resource: 'webviewer', inversePrecedence: false) {
     if (userInput['buildOSX']) {
         buildMap.put('osx', {
             stage('Build: osx') {
-                node('osx') { dir(path: workspacePath) {
+                node('osx') {
                     //stage('Retrieve sources') {}
                     checkout scm
 
                     //stage('Build C++ OSX plugin') {}
                     sh 'cd scripts && ./ciBuildOSX.sh $BRANCH_NAME build'
-                }}
+                }
             }
         })
     }
@@ -132,13 +132,13 @@ lock(resource: 'webviewer', inversePrecedence: false) {
     if (userInput['buildOSX']) {
         publishMap.put('osx', {
             stage('Publish: osx') {
-                node('osx') { dir(path: workspacePath) {
+                node('osx') {
                     //stage('Retrieve sources') {}
                     checkout scm
 
                     //stage('Publish C++ OSX plugin') {}
                     sh 'cd scripts && ./ciBuildOSX.sh $BRANCH_NAME publish'
-                }}
+                }
             }
         })
     }
