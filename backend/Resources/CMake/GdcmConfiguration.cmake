@@ -48,7 +48,7 @@ if (STATIC_BUILD OR NOT USE_SYSTEM_GDCM)
     URL_MD5 "594e0a23cb5dce554874b330b3584a03"
     # Always build GDCM in release mode since debug mode breaks on OSX
     # see https://phabricator.mitk.org/T19995 https://sourceforge.net/p/gdcm/mailman/message/35369639/
-    CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=Release -DGDCM_DOCUMENTATION_SKIP_MANPAGES:BOOL=ON ${Flags}
+    CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=Release -DGDCM_BUILD_DOCBOOK_MANPAGES=OFF -DGDCM_DOCUMENTATION_SKIP_MANPAGES:BOOL=ON ${Flags}
     #-DLIBRARY_OUTPUT_PATH=${CMAKE_CURRENT_BINARY_DIR}
     INSTALL_COMMAND ""  # Skip the install step
     )
