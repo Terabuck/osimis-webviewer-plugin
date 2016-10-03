@@ -69,87 +69,107 @@ lock(resource: 'webviewer', inversePrecedence: false) {
             }
         }}}
     }
-
-    // Build osx
-    // @todo parallelize windows & linux builds once this feature is available
-    if (userInput['buildOSX']) {
-        stage('Build: osx') {
-            node('osx') { dir(path: workspacePath) {
-                //stage('Retrieve sources') {}
-                checkout scm
-
-                //stage('Build C++ OSX plugin') {}
-                sh 'cd scripts && ./ciBuildOSX.sh $BRANCH_NAME build'
-            }}
-        }
-    }
+    
+    def buildMap = [:]
 
     // Build windows
-    // @todo parallelize windows & linux builds once this feature is available
     if (userInput['buildWindows']) {
-        stage('Build: windows') {
-            node('windows && vs2015') {
-                //stage('Retrieve sources') {}
-                checkout scm
+        buildMap.put('windows', {
+            stage('Build: windows') {
+                node('windows && vs2015') {
+                    //stage('Retrieve sources') {}
+                    checkout scm
 
-                //stage('Build C++ Windows plugin') {}
-                bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% build'
+                    //stage('Build C++ Windows plugin') {}
+                    bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% build'
+                }
             }
-        }
+        })
+    }
+
+    // Build osx
+    if (userInput['buildOSX']) {
+        buildMap.put('osx', {
+            stage('Build: osx') {
+                node('osx') { dir(path: workspacePath) {
+                    //stage('Retrieve sources') {}
+                    checkout scm
+
+                    //stage('Build C++ OSX plugin') {}
+                    sh 'cd scripts && ./ciBuildOSX.sh $BRANCH_NAME build'
+                }}
+            }
+        })
     }
 
     // Build docker & launch tests
     if (userInput['buildDocker']) {
-        stage('Build: docker') {
-            node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
-                sh 'scripts/ciBuildDockerImage.sh'
-            }}}
-        }
+        buildMap.put('docker', {
+            stage('Build: docker') {
+                node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+                    sh 'scripts/ciBuildDockerImage.sh'
+                }}}
+            }
 
-        stage('Test: unit + integration') {
-            node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
-                // @note Requires the built docker image to work
-                sh 'scripts/ciPrepareTests.sh'
-                sh 'scripts/ciRunCppTests.sh'
-                sh 'scripts/ciRunJsTests.sh'
-            }}}
-        }
+            stage('Test: unit + integration') {
+                node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+                    // @note Requires the built docker image to work
+                    sh 'scripts/ciPrepareTests.sh'
+                    sh 'scripts/ciRunCppTests.sh'
+                    sh 'scripts/ciRunJsTests.sh'
+                }}}
+            }
+        })
     }
+
+    parallel(buildMap)
+
+    // Wait for docker build (& integration tests) before running publishing scripts
+
+    def publishMap = [:]
 
     // Publish osx release
     if (userInput['buildOSX']) {
-        stage('Publish: osx') {
-            node('osx') { dir(path: workspacePath) {
-                //stage('Retrieve sources') {}
-                checkout scm
+        publishMap.put('osx', {
+            stage('Publish: osx') {
+                node('osx') { dir(path: workspacePath) {
+                    //stage('Retrieve sources') {}
+                    checkout scm
 
-                //stage('Publish C++ OSX plugin') {}
-                sh 'cd scripts && ./ciBuildOSX.sh $BRANCH_NAME publish'
-            }}
-        }
+                    //stage('Publish C++ OSX plugin') {}
+                    sh 'cd scripts && ./ciBuildOSX.sh $BRANCH_NAME publish'
+                }}
+            }
+        })
     }
 
     // Publish windows release
     if (userInput['buildWindows']) {
-        stage('Publish: C++ Windows plugin') {
-            node('windows && vs2015') {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
-                    bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% publish'
+        publishMap.put('windows', {
+            stage('Publish: C++ Windows plugin') {
+                node('windows && vs2015') {
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
+                        bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% publish'
+                    }
                 }
             }
-        }
+        })
     }
 
     // Publish docker release
-    stage('Publish: orthanc -> DockerHub') {
-        node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
-            if (userInput['buildDocker']) {
-                docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkinsosimis') {
-                    sh 'scripts/ciPushDockerImage.sh'
-                }
+    if (userInput['buildDocker']) {
+        publishMap.put('docker', {
+            stage('Publish: orthanc -> DockerHub') {
+                node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkinsosimis') {
+                        sh 'scripts/ciPushDockerImage.sh'
+                    }
+                }}}
             }
-        }}}
+        })
     }
+
+    parallel(publishMap)
 
     // Publish js code
     stage('Publish: js -> AWS (release)') {
