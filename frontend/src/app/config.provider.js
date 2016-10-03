@@ -55,6 +55,7 @@
             orthanc: null,
             db: null
         };
+        this.browser = {};
         this.orthancApiURL = null;
         this.httpRequestHeaders = {};
     };
@@ -148,8 +149,11 @@
             _config.orthancApiURL = urlConvertor.toAbsoluteURL(orthancApiUrl);
         };
 
-        this.$get = function(WvHttpRequest, $q) {
+        this.$get = function(WvHttpRequest, $q, uaParser) {
             // This is executed at runtime (after initialization)
+            
+            // Add browser to config (for log mainly)
+            _config.browser = uaParser.getResult();
             
             // Check version compatibility between the frontend and the plugin
             var request1 = new WvHttpRequest();

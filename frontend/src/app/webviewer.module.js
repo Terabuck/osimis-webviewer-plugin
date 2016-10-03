@@ -18,6 +18,7 @@
     .constant('hamster', window.Hamster)
     .constant('cornerstone', window.cornerstone)
     .constant('cornerstoneTools', window.cornerstoneTools)
+    .constant('uaParser', new UAParser())
     ;
 
 })();
