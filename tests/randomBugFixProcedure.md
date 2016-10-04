@@ -3,6 +3,10 @@ Random bug debugging procedure
 STEP 1
 
 1.1.
+Only retry the tests
+(env) nuKs:osimis-test-runner (TP-WVP-10)$ python osimis-test-runner.py -p ../../backend/build/ -r 20;
+
+Or full process reloading
 (env) nuKs:osimis-test-runner (TP-WVP-10)$ for i in {1..20}; do python osimis-test-runner.py -p ../../backend/build/; done;
 
 1.2.
@@ -87,7 +91,7 @@ Get more log.
 [sample b]
 	Add assert(false, JSON.stringify(e)); to the returned failed promise
 
-Redo first step.
+Redo first step (& select tests by adding mocha ".only" to specs sources).
 Scheduling 50 jenkins jobs also work.
 
 STEP 3
