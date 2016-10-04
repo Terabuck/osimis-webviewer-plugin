@@ -190,7 +190,7 @@ module.exports = function() {
                 {pattern: clientApp + '**/*.worker/*.js', included: false, served: true},
 
                 clientApp + '**/*.module.js',
-                clientApp + '*.js',
+                clientApp + '*!(.spec).js', // see https://medium.com/@SchizoDuckie/so-your-karma-tests-run-twice-this-is-what-you-need-to-do-be74ce9f257e#.r3kp55lix
                 clientApp + '**/!(*.worker)/*.js',
                 temp + config.templateCache.file
             ),
