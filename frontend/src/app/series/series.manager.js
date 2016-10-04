@@ -8,8 +8,33 @@
     /* @ngInject */
     function wvSeriesManager($rootScope, $q, WvHttpRequest, wvConfig, wvOrthancSeriesAdapter) {
         var service = {
+            /**
+             * Retrieve a series from a frontend series id
+             * 
+             * @param {string} id Id of the series in wv format, where multiframe instances are considered as series
+             *    format: <orthancSeriesId>:<instanceNumber>
+             *    instanceNumber can be > 0 if the series contain multiframe instances
+             * 
+             * @return {promise<WvSeries>} The series model (wrapped in promise)
+             */
             get: get,
+            /**
+             * Retrieve a list of frontend series from a backend series id
+             * 
+             * @param {string} id Id of the series in the orthanc format
+             * 
+             * @return {promise<array<WvSeries>>} A list of series model (wrapped in promise)
+             */
             listFromOrthancSeriesId: listFromOrthancSeriesId,
+            /**
+             * Retrieve a list of frontend series from a backend study id
+             *
+             * @note There is no frontend study id
+             * 
+             * @param {string} id Id of the study (in the orthanc format)
+             * 
+             * @return {promise<array<WvSeries>>} A list of series model (wrapped in promise)
+             */
             listFromOrthancStudyId: listFromOrthancStudyId
         };
 
