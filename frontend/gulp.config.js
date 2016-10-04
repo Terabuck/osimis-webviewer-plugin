@@ -177,6 +177,12 @@ module.exports = function() {
         var options = {
             files: [].concat(
                 bowerFiles,
+
+                // Minified dependencies not available in default bower mains
+                bower.directory + '/ua-parser-js/dist/ua-parser.min.js',
+                bower.directory + '/bluebird/js/browser/bluebird.min.js',
+                bower.directory + '/jpeg-lossless-decoder-js/release/current/lossless-min.js',
+
                 config.specHelpers,
                 client + 'config.js', // config file used to run tests
 
