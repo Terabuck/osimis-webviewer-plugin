@@ -101,13 +101,9 @@
                 }
                 
                 // Create & return image model based on request results
-                var request = new WvHttpRequest();
-                request.setHeaders(wvConfig.httpRequestHeaders);
-                _modelCache[id] = request
-                    .get(wvConfig.orthancApiURL + '/instances/'+instanceId+'/simplified-tags') // already cached at upper level (only useful for multiframe instance)
-                    .then(function(response) {
-                        var tags = response.data;
-
+                _modelCache[id] = wvInstanceManager
+                    .getTags(instanceId)
+                    .then(function(tags) {
                         return new WvImage(_this, id, tags, availableQualities, postProcesses);
                     });
             };
