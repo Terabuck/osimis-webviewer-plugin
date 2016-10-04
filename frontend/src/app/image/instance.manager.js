@@ -62,7 +62,7 @@
                 var request = new WvHttpRequest();
                 request.setHeaders(wvConfig.httpRequestHeaders);
                 _tagsByInstances[id] = request
-                    .get(wvConfig.orthancApiURL + '/instances/'+id+'/simplified-tags') // already cached at upper level (only useful for multiframe instance)
+                    .get(wvConfig.orthancApiURL + '/instances/'+id+'/simplified-tags')
                     .then(function(response) {
                         var tags = response.data;
 
