@@ -8,7 +8,7 @@
     /* @ngInject */
     function factory($rootScope, $timeout, wvImageManager, wvAnnotationManager, WvAnnotationGroup, wvImageBinaryManager, WvImageQualities, uaParser) {
 
-        function WvSeries(id, imageIds, tags, availableQualities) {
+        function WvSeries(id, imageIds, tags, availableQualities, instanceTags) {
             var _this = this;
 
             // Replace PixelData by lossless in safari (for decompression library incompatibility reasons)
@@ -76,7 +76,7 @@
          *
          * List instances (and not images)
          *
-         * @return [instanceId: String, ...]
+         * @return {array} [instanceId: String, ...]
          *
          */
         WvSeries.prototype.listInstanceIds = function() {

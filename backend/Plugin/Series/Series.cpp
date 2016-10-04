@@ -25,9 +25,9 @@
 #include <boost/regex.hpp>
 #include <boost/foreach.hpp>
 
-Series::Series(const std::string& seriesId, const Json::Value& seriesTags, const Json::Value& orderedInstances,
+Series::Series(const std::string& seriesId, const Json::Value& seriesTags, const Json::Value& instancesTags, const Json::Value& orderedInstances,
     const std::set<ImageQuality>& imageQualities)
-    : _seriesId(seriesId), _seriesTags(seriesTags), _orderedInstances(orderedInstances), _imageQualities(imageQualities)
+    : _seriesId(seriesId), _seriesTags(seriesTags), _instancesTags(instancesTags), _orderedInstances(orderedInstances), _imageQualities(imageQualities)
 {
 
 }
@@ -36,6 +36,7 @@ std::string Series::ToJson() const {
   Json::Value result;
   result["id"] = _seriesId;
   result["tags"] = _seriesTags;
+  result["instancesTags"] = _instancesTags;
   result["instances"] = _orderedInstances;
   // result["tags"] = OrthancPlugins::ConvertDicomMapToJson(*_seriesTags.get());
 

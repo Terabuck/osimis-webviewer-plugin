@@ -6,12 +6,37 @@
         .factory('wvImageManager', wvImageManager);
 
     /* @ngInject */
-    function wvImageManager($rootScope, WvHttpRequest, $q, $compile, $timeout, wvConfig, WvImage) {
+    function wvImageManager($rootScope, $q, $compile, $timeout, wvInstanceManager, WvImage) {
         var service = {
+            /**
+             * Retrieve an image model by id.
+             * 
+             * @pre The image's series has been loaded via wvSeriesManager
+             * 
+             * @param {string} id Id of the image
+             *   format: <slice-id>[|<processor>...]
+             *      * <slice-id>:  *:\d+ (_instance_:_slice_)
+             *      * <processor>: <string>[~<string>...] (_name_~_param1_~_param2_...)
+             * 
+             * @return {promise<WvImageModel>}
+             */
             get: get,
+            /**
+             * Retrieve an image picture from an image id.
+             * 
+             * @todo should be in @RootAggregate (ie. image-model)
+             * 
+             * @param {string} id Id of the image
+             * @param {int} width Width of the output
+             * @param {int} height Height of the output
+             * 
+             * @return {promise<string>} Resulting image in PNG as a DATA URI string
+             */
             createAnnotedImage: createAnnotedImage,
             /**
-             * @public register a post processor
+             * Register a post processor
+             *
+             * @depracated
              */
             registerPostProcessor: registerPostProcessor
         };
@@ -23,7 +48,7 @@
 
         /** _availableQualities
          *
-         * Cache available qualities by instanceId when a series are loaded,
+         * Cache available qualities by instanceId when a series is loaded,
          * because all images' available qualities are only retrieved in one single series http request
          * to avoid unnecessary http requests.
          *
@@ -42,12 +67,6 @@
 
         ////////////////
         
-        // @input id: string <slice-id>[|<processor>...]
-        //    <slice-id>: *:\d+ (_instance_:_slice_)
-        //    <processor>: <string>[~<string>...] (_name_~_param1_~_param2_...)
-        // 
-        // @pre the image's series has been loaded via wvSeriesManager
-        // 
         function get(id) {
             var _this = this;
 
@@ -82,13 +101,9 @@
                 }
                 
                 // Create & return image model based on request results
-                var request = new WvHttpRequest();
-                request.setHeaders(wvConfig.httpRequestHeaders);
-                _modelCache[id] = request
-                    .get(wvConfig.orthancApiURL + '/instances/'+instanceId+'/simplified-tags') // already cached at upper level (only useful for multiframe instance)
-                    .then(function(response) {
-                        var tags = response.data;
-
+                _modelCache[id] = wvInstanceManager
+                    .getTags(instanceId)
+                    .then(function(tags) {
                         return new WvImage(_this, id, tags, availableQualities, postProcesses);
                     });
             };
@@ -100,7 +115,6 @@
             postProcessorClasses[name] = PostProcessor;
         }
 
-        // @todo should be in @RootAggregate (ie. image-model)
         function createAnnotedImage(id, width, height) {
             // create a fake viewport containing the image to save it with the annotations
 

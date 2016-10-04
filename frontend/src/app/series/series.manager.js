@@ -6,11 +6,46 @@
         .factory('wvSeriesManager', wvSeriesManager);
 
     /* @ngInject */
-    function wvSeriesManager($rootScope, $q, WvHttpRequest, wvConfig, wvOrthancSeriesAdapter) {
+    function wvSeriesManager($rootScope, $q, WvHttpRequest, wvConfig, wvOrthancSeriesAdapter, wvInstanceManager) {
         var service = {
+            /**
+             * Retrieve a series from a frontend series id
+             * 
+             * @param {string} id Id of the series in wv format, where multiframe instances are considered as series
+             *    format: <orthancSeriesId>:<instanceNumber>
+             *    instanceNumber can be > 0 if the series contain multiframe instances
+             * 
+             * @return {promise<WvSeries>} The series model (wrapped in promise)
+             */
             get: get,
+            /**
+             * Retrieve a list of frontend series from a backend series id
+             * 
+             * @param {string} id Id of the series in the orthanc format
+             * 
+             * @return {promise<array<WvSeries>>} A list of series model (wrapped in promise)
+             */
             listFromOrthancSeriesId: listFromOrthancSeriesId,
-            listFromOrthancStudyId: listFromOrthancStudyId
+            /**
+             * Retrieve a list of frontend series from a backend study id
+             *
+             * @note There is no frontend study id
+             * 
+             * @param {string} id Id of the study (in the orthanc format)
+             * 
+             * @return {promise<array<WvSeries>>} A list of series model (wrapped in promise)
+             */
+            listFromOrthancStudyId: listFromOrthancStudyId,
+            /**
+             * Cache each instances' tags in `wvInstanceManager` from the series request result
+             *
+             * Purely for optimization.
+             * 
+             * @param {object} instancesTags Hash of tags for each instances
+             *
+             * @private
+             */
+            _cacheInstancesTags: _cacheInstancesTags
         };
 
         ////////////////
@@ -38,6 +73,10 @@
                     // @note One server-side multiframe series is converted into multiple front-end
                     // series, so the result is an array of series instead of a single one.
                     var seriesList = wvOrthancSeriesAdapter.process(response.data);
+
+                    // Cache instance tags in wvInstanceManager
+                    var instancesTags = response.data.instancesTags;
+                    _cacheInstancesTags(instancesTags);
 
                     // Emit event when series have been loaded.
                     // This is notably used by image manager to cache available image qualities.
@@ -99,6 +138,14 @@
                     console.error(err);
                     return $q.reject(err); 
                 });
+        }
+
+        function _cacheInstancesTags(instancesTags) {
+            for (var instanceId in instancesTags) {
+                if (instancesTags.hasOwnProperty(instanceId)) {
+                    wvInstanceManager.setTags(instanceId, instancesTags[instanceId]);
+                }
+            }
         }
 
         return service;

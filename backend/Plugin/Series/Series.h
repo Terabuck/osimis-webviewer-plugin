@@ -34,11 +34,12 @@ public:
 
 private:
   // takes seriesTags memory ownership
-  Series(const std::string& seriesId, const Json::Value& seriesTags, const Json::Value& orderedInstances,
+  Series(const std::string& seriesId, const Json::Value& seriesTags, const Json::Value& instancesTags, const Json::Value& orderedInstances,
       const std::set<ImageQuality>& imageQualities);
 
   std::string _seriesId;
   Json::Value _seriesTags; // @warning Those are all the tags of the middle instance of the orthanc series!
+  Json::Value _instancesTags; // Tags from all instances
   Json::Value _orderedInstances;
   std::set<ImageQuality> _imageQualities;
 };
