@@ -5,7 +5,7 @@
  *
  * @description
  * The `wvInstanceManager` provide information relative to image at the instance level. These are mainly the DICOM tags.
- * It is used by the image model, to retrieve tags. Most of the time, a image == a DICOM instance, but in case of multiframe instance,
+ * It is used by the image model, to retrieve tags. Most of the time, an image == a DICOM instance, but in case of multiframe instance,
  * one image == one DICOM frame. Therefore, `wvInstanceManager` is useful to cache things at the instance level.
  */
 (function() {
@@ -39,8 +39,8 @@
         };
 
         /**
-         * Cache tags by instanceId when a series are loaded,
-         * because all images' available qualities are only retrieved in one single series http request
+         * Cache tags by instanceId when a series is loaded,
+         * because all images' tags are only retrieved in one single series http request
          * to avoid unnecessary http requests.
          * 
          * @type {object}
