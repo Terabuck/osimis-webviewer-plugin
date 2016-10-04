@@ -10,19 +10,69 @@ RUN apt-get update ; apt-get install -y python3 python3-pip curl zip unzip \
     apt-get install -y build-essential nodejs ; npm install -g npm@latest ; \
     npm install -g bower gulp ; rm -rf /var/lib/apt/lists/*
 
-# install ruby (from https://github.com/docker-library/ruby/blob/e89be7d60685ec51a193a358a8f3364b287aee3b/2.3/slim/Dockerfile)
-RUN apt-get update \
-	&& apt-get install -y --no-install-recommends \
-		bzip2 \
+# install ruby
+
+# from https://github.com/docker-library/buildpack-deps/blob/a0a59c61102e8b079d568db69368fb89421f75f2/jessie/curl/Dockerfile
+RUN apt-get update && apt-get install -y --no-install-recommends \
 		ca-certificates \
-		libffi-dev \
-		libgdbm3 \
-		libssl-dev \
-		libyaml-dev \
+		curl \
+		wget \
+	&& rm -rf /var/lib/apt/lists/*
+
+# from https://github.com/docker-library/buildpack-deps/blob/1845b3f918f69b4c97912b0d4d68a5658458e84f/jessie/scm/Dockerfile
+# procps is very common in build systems, and is a reasonably small package
+RUN apt-get update && apt-get install -y --no-install-recommends \
+		bzr \
+		git \
+		mercurial \
+		openssh-client \
+		subversion \
+		\
 		procps \
+	&& rm -rf /var/lib/apt/lists/*
+
+# from https://github.com/docker-library/buildpack-deps/blob/f1d33d5c92e1bd2aee9f2333ceb316251e6388d4/jessie/Dockerfile
+RUN apt-get update && apt-get install -y --no-install-recommends \
+		autoconf \
+		automake \
+		bzip2 \
+		file \
+		g++ \
+		gcc \
+		imagemagick \
+		libbz2-dev \
+		libc6-dev \
+		libcurl4-openssl-dev \
+		libdb-dev \
+		libevent-dev \
+		libffi-dev \
+		libgeoip-dev \
+		libglib2.0-dev \
+		libjpeg-dev \
+		libkrb5-dev \
+		liblzma-dev \
+		libmagickcore-dev \
+		libmagickwand-dev \
+		libmysqlclient-dev \
+		libncurses-dev \
+		libpng-dev \
+		libpq-dev \
+		libreadline-dev \
+		libsqlite3-dev \
+		libssl-dev \
+		libtool \
+		libwebp-dev \
+		libxml2-dev \
+		libxslt-dev \
+		libyaml-dev \
+		make \
+		patch \
+		xz-utils \
 		zlib1g-dev \
 	&& rm -rf /var/lib/apt/lists/*
 
+
+# from from https://github.com/docker-library/ruby/blob/e89be7d60685ec51a193a358a8f3364b287aee3b/2.3/Dockerfile
 # skip installing gem documentation
 RUN mkdir -p /usr/local/etc \
 	&& { \
@@ -40,19 +90,9 @@ ENV RUBYGEMS_VERSION 2.6.7
 RUN set -ex \
 	\
 	&& buildDeps=' \
-		autoconf \
 		bison \
-		gcc \
-		libbz2-dev \
 		libgdbm-dev \
-		libglib2.0-dev \
-		libncurses-dev \
-		libreadline-dev \
-		libxml2-dev \
-		libxslt-dev \
-		make \
 		ruby \
-		wget \
 	' \
 	&& apt-get update \
 	&& apt-get install -y --no-install-recommends $buildDeps \
