@@ -1,4 +1,4 @@
-from helpers import BuildHelpers, GitHelpers, FileHelpers
+from helpers import BuildHelpers, GitHelpers, FileHelpers, CmdHelpers
 import logging
 import platform
 import os
@@ -83,19 +83,23 @@ def publish(config):
     os.chdir(os.path.join(rootFolder, config['buildFolder'], 'Release'))
 
     # upload in a commitId folder
-    ret = call(
+    ret = CmdHelpers.runExitIfFails(
+        "Uploading DLL to commitId folder",
         "{exe} s3 --region eu-west-1 cp {lib} s3://orthanc.osimis.io/{target}/viewer/{version}/ --cache-control max-age=1".format(
             exe = awsExecutable,
             lib = libraryName,
             target = config['webFolder'],
-            version = commitId))
+            version = commitId),
+        stdoutCallback = logging.info)
     # upload in a branchName folder
-    ret = call(
+    ret = CmdHelpers.runExitIfFails(
+        "Uploading DLL to branch folder",
         "{exe} s3 --region eu-west-1 cp {lib} s3://orthanc.osimis.io/{target}/viewer/{version}/ --cache-control max-age=1".format(
             exe = awsExecutable,
             lib = libraryName,
             target = config['webFolder'],
-            version = args.branchName))
+            version = args.branchName),
+        stdoutCallback = logging.info)
 
     if ret != 0:
         print("publish: exiting with error code = {}".format(ret))
