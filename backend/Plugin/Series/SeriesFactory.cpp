@@ -19,14 +19,17 @@ SeriesFactory::SeriesFactory(std::auto_ptr<IAvailableQualityPolicy> availableQua
 
 }
 
-std::auto_ptr<Series> SeriesFactory::CreateSeries(const std::string& seriesId, const Json::Value& slicesShort,
-      const Orthanc::DicomMap& metaInfoTags, const Json::Value& otherTags)
+std::auto_ptr<Series> SeriesFactory::CreateSeries(const std::string& seriesId,
+                                                  const Json::Value& slicesShort,
+                                                  const Orthanc::DicomMap& metaInfoTags,
+                                                  const Json::Value& otherTags,
+                                                  const Json::Value& instancesTags)
 {
   // Retrieve available image formats
   std::set<ImageQuality> imageQualities = _availableQualityPolicy->retrieveByTags(metaInfoTags, otherTags);
   
   // Create the series
-  return std::auto_ptr<Series>(new Series(seriesId, otherTags, slicesShort, imageQualities));
+  return std::auto_ptr<Series>(new Series(seriesId, otherTags, instancesTags, slicesShort, imageQualities));
 }
 
 namespace {
