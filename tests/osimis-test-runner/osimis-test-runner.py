@@ -55,12 +55,12 @@ except getopt.GetoptError:
 	print('\t' + sys.argv)
 
 	print('Usage:')
-	print('\tpython osimis-test-runner.py [--auto-watch|-w] [--orthanc-path=|-p=] [--manual-orthanc|-m=http://125.314.153.132:1653/] [--retry|-m=10]')
+	print('\tpython osimis-test-runner.py [--auto-watch|-w] [--orthanc-path=|-p=] [--manual-orthanc|-m=http://125.314.153.132:1653/] [--retry|-r=10]')
 	sys.exit(2)
 for opt, arg in opts:
 	if opt == '-h':
 		print('Usage:')
-		print('\tpython osimis-test-runner.py [--auto-watch|-w] [--orthanc-path=|-p=] [--manual-orthanc|-m=http://125.314.153.132:1653/] [--retry|-m=10]')
+		print('\tpython osimis-test-runner.py [--auto-watch|-w] [--orthanc-path=|-p=] [--manual-orthanc|-m=http://125.314.153.132:1653/] [--retry|-r=10]')
 		sys.exit()
 	elif opt in ("-w", "--auto-watch"):
 		singleRun = False
@@ -192,4 +192,5 @@ if launchOrthanc is True:
 	server.stop()
 
 # Return karma exit status (for CI purpose)
+# @todo Do a worst case politic (this return the karma status of the last run, it should return a failure code if a single one of those test fails)
 sys.exit(karmaLastReturnCode)
