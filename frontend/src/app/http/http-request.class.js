@@ -311,12 +311,12 @@
                         }
 
                         // Reject the xhr result with the same scheme as AngularJS#$http
-                        reject({
+                        reject(new HttpRequestError({
                             data: data,
                             status: xhr.status,
                             statusText: xhr.statusText,
                             headers: xhr.getResponseHeader.bind(xhr)
-                        });
+                        }));
                     }
                 };
 
@@ -354,6 +354,20 @@
         // Abort the http request
         this._xhr.abort();
     }
+
+    // Http Exception Type
+    function HttpRequestError(opts) {
+        this.name = 'HttpRequestError';
+        this.message = 'Failed HTTP request';
+        this.stack = (new Error()).stack;
+
+        this.data = opts.data;
+        this.status = opts.status;
+        this.statusText = opts.statusText;
+        this.headers = opts.headersFn
+    }
+    HttpRequestError.prototype = new Error;
+    HttpRequest.HttpRequestError = HttpRequestError;
 
     module.HttpRequest = HttpRequest;
 
