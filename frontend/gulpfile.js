@@ -88,7 +88,6 @@ gulp.task('styles', ['clean-styles'], function() {
 
     return gulp
         .src(config.scss)
-        .pipe($.plumber()) // exit gracefully if something fails after this
         .pipe($.compass({
             project: __dirname + '/',
             css: config.cssDir,
@@ -291,7 +290,6 @@ gulp.task('optimize', ['inject'], function() {
     // Build/Optimise js, css & html
     var buildStream = gulp
         .src(config.tempIndexes.concat(['./bower.json']))
-        .pipe($.plumber())
         .pipe(inject(templateCache, 'templates'))
         // Replace the font .css locations
         .pipe(inject(fontsCss, 'fonts'))
