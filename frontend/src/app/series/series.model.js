@@ -11,8 +11,13 @@
         function WvSeries(id, imageIds, tags, availableQualities, instanceTags) {
             var _this = this;
 
-            // Replace PixelData by lossless in safari (for decompression library incompatibility reasons)
-            if (uaParser.getBrowser().name.indexOf('Safari') !== -1 && availableQualities.hasOwnProperty('PIXELDATA')) {
+            // Replace PixelData by lossless in safari & internet (for decompression library incompatibility reasons)
+            if (uaParser.getBrowser().name.indexOf('Safari') !== -1
+                || uaParser.getBrowser().name.indexOf('IE') !== -1
+                && availableQualities.hasOwnProperty('PIXELDATA'))
+            {
+                // @todo Check with edge if this may be disabled (& in latest Safari versions)
+                console.warn && console.warn('Transtypage of PIXELDATA to PNG for of Safari & IE -> Much slower decompression');
                 delete availableQualities.PIXELDATA;
                 availableQualities.LOSSLESS = WvImageQualities.LOSSLESS;
             }

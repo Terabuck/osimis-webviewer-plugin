@@ -77,7 +77,7 @@
 			var length = this._dataview.getUint32(offset, false);
 			offset += 4;
 
-			var value = new Uint8ClampedArray(this._binary.slice(offset, offset + length));
+			var value = new Uint8Array(this._binary.slice(offset, offset + length));
 			offset += length;
 
 			this._keys[key] = value;
