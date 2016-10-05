@@ -76,13 +76,13 @@ lock(resource: 'webviewer', inversePrecedence: false) {
     if (userInput['buildWindows']) {
         buildMap.put('windows', {
             stage('Build: windows') {
-                node('windows && vs2015') {
+                node('windows && vs2015') { dir(path: workspacePath) {
                     //stage('Retrieve sources') {}
                     checkout scm
 
                     //stage('Build C++ Windows plugin') {}
                     bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% build'
-                }
+                }}
             }
         })
     }
@@ -147,11 +147,11 @@ lock(resource: 'webviewer', inversePrecedence: false) {
     if (userInput['buildWindows']) {
         publishMap.put('windows', {
             stage('Publish: C++ Windows plugin') {
-                node('windows && vs2015') {
+                node('windows && vs2015') { dir(path: workspacePath) {
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
                         bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% publish'
                     }
-                }
+                }}
             }
         })
     }
