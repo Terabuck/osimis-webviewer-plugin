@@ -85,7 +85,7 @@ def publish(config):
     os.chdir(os.path.join(rootFolder, config['buildFolder'], 'Release'))
 
     # upload in a commitId folder
-    ret = CmdHelpers.runExitIfFails(
+    CmdHelpers.runExitIfFails(
         "Uploading DLL to commitId folder",
         "{exe} s3 --region eu-west-1 cp {lib} s3://orthanc.osimis.io/{target}/viewer/{version}/ --cache-control max-age=1".format(
             exe = awsExecutable,
@@ -94,7 +94,7 @@ def publish(config):
             version = commitId),
         stdoutCallback = logging.info)
     # upload in a branchName folder
-    ret = CmdHelpers.runExitIfFails(
+    CmdHelpers.runExitIfFails(
         "Uploading DLL to branch folder",
         "{exe} s3 --region eu-west-1 cp {lib} s3://orthanc.osimis.io/{target}/viewer/{version}/ --cache-control max-age=1".format(
             exe = awsExecutable,
@@ -105,7 +105,7 @@ def publish(config):
 
     # upload in a version folder if current branch is master
     if (args.branchName == "master"):
-        ret = CmdHelpers.runExitIfFails(
+        CmdHelpers.runExitIfFails(
             "Uploading DLL to branch folder",
             "{exe} s3 --region eu-west-1 cp {lib} s3://orthanc.osimis.io/{target}/viewer/{version}/ --cache-control max-age=1".format(
                 exe = awsExecutable,
@@ -113,11 +113,6 @@ def publish(config):
                 target = config['webFolder'],
                 version = taggedVersion),
             stdoutCallback = logging.info)
-
-    if ret != 0:
-        print("publish: exiting with error code = {}".format(ret))
-        exit(ret)
-
 
 if __name__ == '__main__':
 
