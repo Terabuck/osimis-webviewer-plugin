@@ -19,7 +19,9 @@ args = parser.parse_args()
 
 rootFolder = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..')
 
-commitId = GitHelpers.getVersion(os.path.dirname(__file__)).commitSha1
+gitBranchInfo = GitHelpers.getVersion(os.path.dirname(__file__))
+commitId = gitBranchInfo.commitSha1
+taggedVersion = str(gitBranchInfo.major) + '.' + str(gitBranchInfo.minor) + '.' + str(gitBranchInfo.revision) + (('-' + gitBranchInfo.preReleaseName) if gitBranchInfo.preReleaseName is not None else '')
 
 configs = [
     {
@@ -100,6 +102,17 @@ def publish(config):
             target = config['webFolder'],
             version = args.branchName),
         stdoutCallback = logging.info)
+
+    # upload in a version folder if current branch is master
+    if (args.branchName == "master"):
+        ret = CmdHelpers.runExitIfFails(
+            "Uploading DLL to branch folder",
+            "{exe} s3 --region eu-west-1 cp {lib} s3://orthanc.osimis.io/{target}/viewer/{version}/ --cache-control max-age=1".format(
+                exe = awsExecutable,
+                lib = libraryName,
+                target = config['webFolder'],
+                version = taggedVersion),
+            stdoutCallback = logging.info)
 
     if ret != 0:
         print("publish: exiting with error code = {}".format(ret))
