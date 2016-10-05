@@ -174,7 +174,7 @@ describe('backend', function() {
                     assert.deepEqual(series.tags, seriesTags);
                 }, function(error) {
                     // Fail the test - series not found
-                    assert.fail();
+                    assert(false, JSON.stringify(error));
                 });
         });
 
@@ -187,7 +187,7 @@ describe('backend', function() {
                     assert.deepEqual(series.imageIds, seriesOrderedImageIds);
                 }, function(error) {
                     // Fail the test - series not found
-                    assert.fail();
+                    assert(false, JSON.stringify(error));
                 });
         });
         
@@ -200,7 +200,7 @@ describe('backend', function() {
                     assert.deepEqual(series.availableQualities, seriesAvailableImageQualities);
                 }, function(error) {
                     // Fail the test - series not found
-                    assert.fail();
+                    assert(false, JSON.stringify(error));
                 });
         });
 
@@ -238,7 +238,7 @@ describe('backend', function() {
                 .get('my-inexistant-series:35')
                 .then(function(series) {
                     // Fail the test - series shouldn't have been found
-                    assert.fail();
+                    assert(false, 'should not load inexistant thing');
                 }, function(error) {
                     // Succeed on error - if image has not been retrieved
                     assert.equal(error.status, 404);
@@ -270,7 +270,7 @@ describe('backend', function() {
                     assert.equal(pixelObject.height, imageResolution.highQuality[1]);
                 }, function(error) {
                     // Fail on error - if image should have been retrieved
-                    assert.fail();
+                    assert(false, JSON.stringify(error));
                 });
         });
 
@@ -280,7 +280,7 @@ describe('backend', function() {
                 .get('robocop:34', WvImageQualities.LOSSLESS)
                 .then(function() {
                     // Fail if inexistant image request returns successful result
-                    assert.fail();
+                    assert(false, 'should not load inexistant thing');
                 }, function(error) {
                     // Succeed on error - if image has not been retrieved
                     assert.equal(error.status, 404);
@@ -305,7 +305,7 @@ describe('backend', function() {
 
                 }, function(error) {
                     // Fail on error - if image should have been retrieved
-                    assert.fail();
+                    assert(false, JSON.stringify(error));
                 });
         });
 
@@ -315,7 +315,7 @@ describe('backend', function() {
                 .get('robocop:34', WvImageQualities.MEDIUM)
                 .then(function() {
                     // Fail if inexistant image request returns successful result
-                    assert.fail();
+                    assert(false, 'should not load inexistant thing');
                 }, function(error) {
                     // Succeed on error - if image has not been retrieved
                     assert.equal(error.status, 404);
@@ -339,7 +339,7 @@ describe('backend', function() {
                     assert.equal(pixelObject.height, imageResolution.lowQuality[1]);
                 }, function(error) {
                     // Fail on error - if image should have been retrieved
-                    assert.fail();
+                    assert(false, JSON.stringify(error));
                 });
         });
 
@@ -349,7 +349,7 @@ describe('backend', function() {
                 .get('robocop:34', WvImageQualities.LOW)
                 .then(function() {
                     // Fail if inexistant image request returns successful result
-                    assert.fail();
+                    assert(false, 'should not load inexistant thing');
                 }, function(error) {
                     // Succeed on error - if image has not been retrieved
                     assert.equal(error.status, 404);
