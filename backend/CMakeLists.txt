@@ -41,11 +41,11 @@ if (${JS_CLIENT_CLEAN_FIRST})
   GetUrlFilename(JS_CLIENT_ZIP_FILENAME "http://orthanc.osimis.io/public/osimisWebViewer/${PRODUCT_VERSION_COMMIT_SHA1_STRING}.zip")
   set(JS_CLIENT_ZIP_PATH "${CMAKE_SOURCE_DIR}/ThirdPartyDownloads/${JS_CLIENT_ZIP_FILENAME}")
   file(REMOVE "${JS_CLIENT_ZIP_PATH}")
-  message("Removing js build zip (if exists)        : ${JS_CLIENT_ZIP_PATH}")
+  message("Removing js build zip (if exists)          : ${JS_CLIENT_ZIP_PATH}")
 
   # Remove JS local dependency
   file(REMOVE_RECURSE "${JS_CLIENT_PATH}")
-  message("Removing js local bild folder (if exists): ${JS_CLIENT_PATH}")
+  message("Removing js local build folder (if exists) : ${JS_CLIENT_PATH}")
 endif()
 
 if(EXISTS "${JS_CLIENT_PATH}") # If file exists (not var)
