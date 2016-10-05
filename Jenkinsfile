@@ -91,13 +91,13 @@ lock(resource: 'webviewer', inversePrecedence: false) {
     if (userInput['buildOSX']) {
         buildMap.put('osx', {
             stage('Build: osx') {
-                node('osx') {
+                node('osx') { dir(path: workspacePath) {
                     //stage('Retrieve sources') {}
                     checkout scm
 
                     //stage('Build C++ OSX plugin') {}
                     sh 'cd scripts && ./ciBuildOSX.sh $BRANCH_NAME build'
-                }
+                }}
             }
         })
     }
@@ -132,13 +132,13 @@ lock(resource: 'webviewer', inversePrecedence: false) {
     if (userInput['buildOSX']) {
         publishMap.put('osx', {
             stage('Publish: osx') {
-                node('osx') {
+                node('osx') { dir(path: workspacePath) {
                     //stage('Retrieve sources') {}
                     checkout scm
 
                     //stage('Publish C++ OSX plugin') {}
                     sh 'cd scripts && ./ciBuildOSX.sh $BRANCH_NAME publish'
-                }
+                }}
             }
         })
     }
