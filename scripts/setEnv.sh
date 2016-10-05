@@ -69,6 +69,7 @@ function _setEnvMain {
 tee <<EOT > .env
 export TAG=$tag
 export SRC_ROOT="$srcRoot"
+export BRANCH_NAME=$branchName
 
 export MAIN_IMAGE=osimis/orthanc-webviewer-plugin
 export COMMIT_ID=$releaseCommitId

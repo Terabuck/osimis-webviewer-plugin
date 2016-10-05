@@ -17,7 +17,7 @@ docker tag $MAIN_IMAGE:$TAG $MAIN_IMAGE:$RELEASE_TAG
 docker push $MAIN_IMAGE:$RELEASE_TAG
 
 # if in master branch, the current tag should also be marked as the latest
-if [[ $branchName == "master" ]]; then
+if [[ $BRANCH_NAME == "master" ]]; then
 	docker tag $MAIN_IMAGE:$TAG $MAIN_IMAGE:latest
 	docker push $MAIN_IMAGE:latest
 fi
@@ -27,7 +27,7 @@ echo 'Docker images uploaded.'
 echo 'Orthanc & Web Viewer Plugin can be installed via:'
 echo '$ docker pull '$MAIN_IMAGE':'$COMMIT_ID
 echo '$ docker pull '$MAIN_IMAGE':'$RELEASE_TAG
-if [[ $branchName == "master" ]]; then
+if [[ $BRANCH_NAME == "master" ]]; then
 echo '$ docker pull '$MAIN_IMAGE':latest'
 fi
 echo '------------------------'

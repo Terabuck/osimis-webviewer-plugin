@@ -47,32 +47,35 @@ uploadInstances = True
 karmaExec = os.path.realpath('../../frontend/node_modules/karma/bin/karma')
 karmaConf = os.path.realpath('./karma.conf.js')
 frontendCwd = os.path.realpath('../../frontend/')
+runCount = 1
 try:
-	opts, args = getopt.getopt(argv, "hwp:m:", ["auto-watch", "orthanc-path=", "manual-orthanc="])
+	opts, args = getopt.getopt(argv, "hwp:m:r:", ["auto-watch", "orthanc-path=", "manual-orthanc=", "--retry="])
 except getopt.GetoptError:
 	print('Incorrect command: ')
 	print('\t' + sys.argv)
 
 	print('Usage:')
-	print('\tpython osimis-test-runner.py [--auto-watch|-w] [--orthanc-path=|-p=] [--manual-orthanc|-m[=http://125.314.153.132:1653/]]')
+	print('\tpython osimis-test-runner.py [--auto-watch|-w] [--orthanc-path=|-p=] [--manual-orthanc|-m=http://125.314.153.132:1653/] [--retry|-m=10]')
 	sys.exit(2)
 for opt, arg in opts:
 	if opt == '-h':
 		print('Usage:')
-		print('\tpython osimis-test-runner.py [--auto-watch|-w] [--orthanc-path=|-p=] [--manual-orthanc|-m[=http://125.314.153.132:1653/]]')
+		print('\tpython osimis-test-runner.py [--auto-watch|-w] [--orthanc-path=|-p=] [--manual-orthanc|-m=http://125.314.153.132:1653/] [--retry|-m=10]')
 		sys.exit()
 	elif opt in ("-w", "--auto-watch"):
 		singleRun = False
 	elif opt in ("-p", "--orthanc-path"):
 		orthancFolder = os.path.realpath(arg)
 	elif opt in ("-m", "--manual-orthanc"):
-		pattern = re.compile(r"^https?\:\/\/([\w\.\:\-\[\]]+):(\d{0,5})\/?$"); # <host>:<port>
-		hostAndPort = pattern.match(arg);
+		pattern = re.compile(r"^https?\:\/\/([\w\.\:\-\[\]]+):(\d{0,5})\/?$") # <host>:<port>
+		hostAndPort = pattern.match(arg)
 		if hostAndPort != None:
 			orthancHost = hostAndPort.group(1)
 			orthancHttpPort = int(hostAndPort.group(2))
 
 		launchOrthanc = False
+	elif opt in ("-r", "--retry"):
+		runCount = int(arg)
 
 # Init Orthanc client
 orthancUrl = 'http://' + orthancHost + ':' + str(orthancHttpPort)
@@ -143,7 +146,7 @@ gulp = subprocess.Popen(
 try:
 	gulp.wait(timeout = 60*2 if singleRun else None) # kill after 2 min
 except:
-	print(colored('Error: gulp pre-processing took more than 2 minutes', 'red'))
+	print(colored('Error: gulp pre-processing took more than 2 minutes (or was killed with ctrl+C)', 'red'))
 	if launchOrthanc is True:
 		server.stop()
 	gulp.kill()
@@ -152,29 +155,32 @@ except:
 # Launch karma
 karmaEnv = os.environ.copy()
 karmaEnv["ORTHANC_URL"] = "http://" + orthancHost + ":" + str(orthancHttpPort) + "/"
-karma = subprocess.Popen(
-	shlex.split(karmaExec + ' start ' + karmaConf + (' --single-run' if singleRun else '')),
-	cwd = frontendCwd, # set cwd path so bower.json can be found by karma.conf.js,
-	env = karmaEnv
-)
+for i in range(0, runCount):
+	karma = subprocess.Popen(
+		shlex.split(karmaExec + ' start ' + karmaConf + (' --single-run' if singleRun else '')),
+		cwd = frontendCwd, # set cwd path so bower.json can be found by karma.conf.js,
+		env = karmaEnv
+	)
 
-# Stop Orthanc once karma has fininshed
-karmaReturnCode = None
-try:
-	karmaReturnCode = karma.wait(timeout = 60*3 if singleRun else None) # kill after 1 min
-except:
-	print(colored('Error: karma run took more than 3 minute', 'red'))
-	
-	# Print error if orthanc is no longer accessible
+	# Stop Orthanc once karma has fininshed
+	karmaLastReturnCode = None
 	try:
-		client.getInstancesIdFromStudy('f4951629-35ef9e4b-ade74118-14bc0200-577786a5')
+		karmaLastReturnCode = karma.wait(timeout = 60*3 if singleRun else None) # kill after 1 min
 	except:
-		print(colored('Error: Orthanc is no longer accessible from tests', 'red'))
-	
-	if launchOrthanc is True:
-		server.stop()
-	karma.kill()
-	sys.exit(51)
+		print(colored('Error: karma run took more than 3 minute (or was killed with ctrl+C)', 'red'))
+		
+		# Print error if orthanc is no longer accessible
+		try:
+			client.getInstancesIdFromStudy('f4951629-35ef9e4b-ade74118-14bc0200-577786a5')
+		except:
+			print(colored('Error: Orthanc is no longer accessible from tests', 'red'))
+		
+		# Exit with error if this is the last test run
+		if i == runCount-1:
+			if launchOrthanc is True:
+				server.stop()
+			karma.kill()
+			sys.exit(51)
 
 # Print error if orthanc is no longer accessible
 try:
@@ -186,4 +192,4 @@ if launchOrthanc is True:
 	server.stop()
 
 # Return karma exit status (for CI purpose)
-sys.exit(karmaReturnCode)
+sys.exit(karmaLastReturnCode)

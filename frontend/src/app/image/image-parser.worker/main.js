@@ -19,17 +19,18 @@
 
 // @todo move jpgjs & pngjs out of bower_components
 
-// Import bluebird promise polyfill (wrap in try catch for enhanced logging)
-try {
-/* @inline: */ importScripts('/bower_components/bluebird/js/browser/bluebird.js');
-}
-catch(e) {
-    console.error('WORKER ERROR');
-    console.error(e.message);
-    console.error(e.stack);
-    console.error(e.stacktrace);
-    throw new Error(JSON.stringify(e.stack));
-}
+// Load libraries
+
+// Import ArrayBuffer polyfill
+/* @inline: */ importScripts('/app/image/image-parser.worker/array-buffer.polyfill.js');
+
+// Import user agent parser
+/* @inline: */ importScripts('/bower_components/ua-parser-js/dist/ua-parser.min.js');
+var uaParser = (new UAParser()).getResult();
+
+// Import bluebird promise polyfill
+/* @inline: */ importScripts('/bower_components/bluebird/js/browser/bluebird.min.js');
+
 // Import osimis.HttpRequest
 /* @inline: */ importScripts('/app/http/http-request.class.js');
 
@@ -40,7 +41,7 @@ catch(e) {
 /* @inline: */ importScripts('/bower_components/jpgjs/jpg.js');
 
 // Import jpeg FFC3 lib
-/* @inline: */ importScripts('/bower_components/jpeg-lossless-decoder-js/release/current/lossless.js');
+/* @inline: */ importScripts('/bower_components/jpeg-lossless-decoder-js/release/current/lossless-min.js');
 
 // Make png.js & config.js worker compatible
 var document = {
@@ -54,6 +55,7 @@ var window = {};
 
 var PNG = window.PNG;
 var KLVReader = WorkerGlobalScope.KLVReader;
+
 
 /** setImageApiUrl(locationUrl, orthancApiUrl)
  *
@@ -180,15 +182,21 @@ BinaryRequest.prototype.execute = function() {
 
                 if (data.decompression.compression.toLowerCase() === 'jpeg') {
                     // Decompress lossy jpeg into 16bit
+                    // @note IE10 & safari tested/compatible
                     var pixelArray = parseJpeg(data.decompression);
                     pixelArray = convertBackTo16bit(pixelArray, data.decompression);
                 }
                 else if (data.decompression.compression.toLowerCase() === 'png') {
                     // Decompress lossless png
+                    // @note IE10 & safari tested/compatible
                     var pixelArray = parsePng(data.decompression)
                 }
                 else if (data.decompression.compression.toLowerCase() === 'jpeg-lossless') { // jpeg FFC3       
                     // Decompress lossless jpeg
+                    // @warning IE11 & safari uncompatible - actual fix is to always ask PNG
+                    //          conversion of PIXELDATA requested quality in LOSSLESS. This may provide issues
+                    //          if we for instance require availableQualities for other things than chosing
+                    //          the desired image formats (ie. add an indicator), but is not likely.
                     var pixelArray = parseJpegLossless(data.decompression);
                 }
             }
@@ -224,12 +232,25 @@ BinaryRequest.prototype.execute = function() {
             }
 
             // Answer request to the main thread
-            self.postMessage({
-                type: 'success',
-                cornerstoneMetaData: data.cornerstone,
-                pixelBuffer: pixelArray.buffer,
-                pixelBufferFormat: pixelBufferFormat
-            }, [pixelArray.buffer]); // pixelArray is transferable
+            if(uaParser.browser.name.indexOf('IE') !== -1 && uaParser.browser.major <= 10) {
+                // IE10 fallback for transferable objects
+                // see https://connect.microsoft.com/IE/feedback/details/783468/ie10-window-postmessage-throws-datacloneerror-for-transferrable-arraybuffers
+                self.postMessage({
+                    type: 'success',
+                    cornerstoneMetaData: data.cornerstone,
+                    pixelBuffer: pixelArray.buffer,
+                    pixelBufferFormat: pixelBufferFormat
+                });
+            }
+            else {
+                self.postMessage({
+                    type: 'success',
+                    cornerstoneMetaData: data.cornerstone,
+                    pixelBuffer: pixelArray.buffer,
+                    pixelBufferFormat: pixelBufferFormat
+                }, [pixelArray.buffer]); // pixelArray is transferable
+            }
+            
 
             // Clean the processing request
             _processingRequest = null;
@@ -238,7 +259,8 @@ BinaryRequest.prototype.execute = function() {
             // May be called by abort (@todo not sure this behavior is crossbrowser compatible)
             self.postMessage({
                 type: 'failure',
-                status: response.status
+                status: response.status,
+                response: response // send whole response in case the error has been done by a throw
             });
 
             // Clean the processing request

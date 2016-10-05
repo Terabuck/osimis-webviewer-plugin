@@ -51,10 +51,8 @@
         this._workerThread.addEventListener('error', function(evt) {
             var task = _this._currentTask;
 
-            console.log('task error', evt.message, evt.filename, evt.lineno, evt.colno, evt.error, evt.stack);
-
-            // Trigger task has failed
-            task.onFailure.trigger(evt.data);
+            // Trigger task has failed (evt may be an uncaught worker exception as well as a postmessage result)
+            task.onFailure.trigger(evt.data || evt);
 
             // Set worker available
             _this._currentTask.onAbort.close(_this); // Close listener

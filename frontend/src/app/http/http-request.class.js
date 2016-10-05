@@ -232,6 +232,7 @@
         var xhr = this._xhr;
         var cacheEnabled = this._cacheEnabled;
         var headers = this._httpHeaders;
+        var responseType = this._responseType;
 
         // Check against dual send of a request (_send should only be called once with this implementation
         // due to the actual usage of xhr callback).
@@ -258,7 +259,7 @@
         }
 
         // Inject the response type (now that the xhr object has been opened)
-        xhr.responseType = this._responseType;
+        xhr.responseType = responseType;
 
         if (cacheEnabled && _cache[url]) {
             // Return the cached version if available & cache is enabled
@@ -280,7 +281,12 @@
 
                     // Retrieve response data
                     try {
-                        var data = typeof xhr.response !== 'undefined' ? xhr.response : (xhr.responseType === 'json' && xhr.responseText && JSON.parse(xhr.responseText) || null);
+                        // @note use responseType instead of xhr.responseType and (typeof xhr.response !== 'string') for IE11 compatibility
+                        // see https://connect.microsoft.com/IE/feedback/details/794808
+                        var data =
+                            typeof xhr.response !== 'undefined' && typeof xhr.response !== 'string'
+                            ? xhr.response
+                            : (responseType === 'json' && xhr.responseText && JSON.parse(xhr.responseText) || null);
                     }
                     catch(e) {
                         // Result is probably not json, log the true result
@@ -305,12 +311,12 @@
                         }
 
                         // Reject the xhr result with the same scheme as AngularJS#$http
-                        reject({
+                        reject(new HttpRequestError({
                             data: data,
                             status: xhr.status,
                             statusText: xhr.statusText,
                             headers: xhr.getResponseHeader.bind(xhr)
-                        });
+                        }));
                     }
                 };
 
@@ -348,6 +354,20 @@
         // Abort the http request
         this._xhr.abort();
     }
+
+    // Http Exception Type
+    function HttpRequestError(opts) {
+        this.name = 'HttpRequestError';
+        this.message = 'Failed HTTP request';
+        this.stack = (new Error()).stack;
+
+        this.data = opts.data;
+        this.status = opts.status;
+        this.statusText = opts.statusText;
+        this.headers = opts.headersFn
+    }
+    HttpRequestError.prototype = new Error;
+    HttpRequest.HttpRequestError = HttpRequestError;
 
     module.HttpRequest = HttpRequest;
 

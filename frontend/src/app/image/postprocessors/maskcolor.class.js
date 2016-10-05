@@ -45,7 +45,7 @@
             var originalPixels = pixelObject.getPixelData();
             pixelObject.getPixelData = function() {
                 var buf = new ArrayBuffer((originalPixels.length) * 4); // /2 for int16->uint8 -- *4 for Greyscale->RGB32
-                var resultPixels = new Uint8ClampedArray(buf);
+                var resultPixels = new Uint8Array(buf);
                 var index = 0;
                 for (var i = 0; i < originalPixels.length; ++i) {
                     resultPixels[index++] = originalPixels[i]; // @todo normalize (but clampedarray should do it)
