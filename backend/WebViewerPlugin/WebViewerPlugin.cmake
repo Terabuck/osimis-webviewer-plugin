@@ -29,7 +29,6 @@
 #   include(${WebViewerPlugin}/WebViewerPlugin.cmake)
 
 # Set build parameters
-set(STANDALONE_BUILD ON CACHE BOOL "Standalone build (all the resources are embedded, necessary for releases)")
 set(JS_CLIENT_PATH "${VIEWER_FRONTEND_DIR}/build" CACHE STRING "Path of the front-end build folder")
 if(EXISTS ${JS_CLIENT_PATH}) # If file exists (not var)
   # Set frontend version based on local build if available

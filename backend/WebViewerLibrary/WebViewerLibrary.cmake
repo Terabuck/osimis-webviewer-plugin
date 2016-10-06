@@ -33,6 +33,7 @@
 include(${RESOURCES_DIR}/CMake/GetProductVersionFromGitTag.cmake)
 
 # Parameters of the build
+set(STANDALONE_BUILD ON CACHE BOOL "Standalone build (all the resources are embedded, necessary for releases)")
 set(BENCHMARK OFF CACHE BOOL "Send benchmark informations to stdout")
 set(STATIC_BUILD ON CACHE BOOL "Static build of the third-party libraries (necessary for Windows)")
 set(ALLOW_DOWNLOADS ON CACHE BOOL "Allow CMake to download packages")
