@@ -144,7 +144,9 @@
             vm.viewports = [];
             vm.configureViewport = function(index) {
                 vm.viewports[index] = {
-                    seriesId: vm.seriesId
+                    seriesId: vm.seriesId,
+                    csViewport: {},
+                    imageIndex: 0
                 };
             };
             vm.cleanupViewport = function(index) {

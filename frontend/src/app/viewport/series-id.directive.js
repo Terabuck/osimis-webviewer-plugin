@@ -29,6 +29,8 @@
  *   Available Callback Arguments:
  *   * `$series` - series_model
  *
+ * @param {integer} wvImageIndex Index of the image in the series
+ *
  * @example Display a specific series with some informations and a play button
  * ```html
  * <wv-viewport wv-series-id="'your-series-id'" wv-series="$series" wv-size="{width: '100px', height: '100px'}"
@@ -72,6 +74,8 @@
         function link(scope, element, attrs, ctrls) {
             var viewmodel = ctrls.vpSeriesId;
             var viewportController = ctrls.wvViewport;
+            var wvImageIndexParser = $parse(attrs.wvImageIndex);
+            var _cancelCyclicCall = false;
 
             // Provide access to the viewport controller through the seriesId
             ctrls.vpSeriesId.getViewport = function() {
@@ -89,9 +93,23 @@
                                 setShownImageCallback(imageId);
                             }
                         });
+
+                    // wv-image-index
+                    if (wvImageIndexParser && wvImageIndexParser.assign) {
+                        var series = viewmodel.getSeries();
+                        if (series) { // assert(!!series)
+                            _cancelCyclicCall = wvImageIndexParser(scope) !== series.currentIndex;
+                            wvImageIndexParser.assign(scope, series.currentIndex);
+                        }
+                    }
                 }
                 else {
                     viewportController.clearImage();
+                    // wv-image-index
+                    if (wvImageIndexParser && wvImageIndexParser.assign) {
+                        _cancelCyclicCall = wvImageIndexParser(scope) !== 0;
+                        wvImageIndexParser.assign(scope, 0);
+                    }
                 }
             });
 
@@ -106,18 +124,32 @@
                 }
             });
 
+            // wv-image-index
+            scope.$watch(wvImageIndexParser, function(index) {
+                if (_cancelCyclicCall) {
+                    _cancelCyclicCall = false;
+                    return;
+                }
+
+                var series = viewmodel.getSeries();
+                if (series) {
+                    series.goToImage(+index);
+                }
+            });
+
             // bind view model -> attributes
             var vpOnSeriesChangeParser = $parse(attrs.vpOnSeriesChange);
             var wvSeriesParser = $parse(attrs.wvSeries);
             viewmodel.onSeriesChanged(function(series) {
-                if (!wvSeriesParser || !wvSeriesParser.assign) {
-                    return;
+                if (wvSeriesParser && wvSeriesParser.assign) {
+                    wvSeriesParser.assign(scope, series);
                 }
-
-                wvSeriesParser.assign(scope, series);
-
                 if (vpOnSeriesChangeParser) {
                     vpOnSeriesChangeParser(scope, {$series: series});
+                }
+                // @warning endless recursivity
+                if (vpSeriesIdParser && vpSeriesIdParser.assign) {
+                    vpSeriesIdParser.assign(scope, series && series.id);
                 }
             });
 
