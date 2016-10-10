@@ -53,6 +53,14 @@ if(NOT ${JS_FRONTEND_VERSION} STREQUAL "LOCAL")
   DownloadPackage(FALSE "http://orthanc.osimis.io/public/osimisWebViewer/${JS_FRONTEND_VERSION}.zip" ${JS_CLIENT_PATH} TRUE)
 endif()
 
+# Check JS_FRONTEND content exists
+if(NOT EXISTS ${JS_CLIENT_PATH}/js/lib.js OR
+  NOT EXISTS ${JS_CLIENT_PATH}/js/app.js OR
+  NOT EXISTS ${JS_CLIENT_PATH}/styles/lib.css OR
+  NOT EXISTS ${JS_CLIENT_PATH}/styles/app.css)
+  message(FATAL_ERROR "Bad frontend folder content in ${JS_CLIENT_PATH}")
+endif()
+
 # Generate embedded resources
 # Always embed at least ORTHANC_EXPLORER, even if STANDALONE_BUILD is off?
 if (STANDALONE_BUILD)
