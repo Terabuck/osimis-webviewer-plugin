@@ -19,7 +19,7 @@ rm -rf build/
 docker build --tag=$JS_BUILDER_IMAGE --file=DockerfileFrontEndBuilder $SRC_ROOT/frontend/
 
 # we first need to create the container before we can copy files to it
-JS_BUILDER_CONTAINER_ID=$(docker create --name $JS_BUILDER_CONTAINER $JS_BUILDER_IMAGE $COMMIT_ID) # Last $COMMIT_ID is the COMMAND of DockerfileFrontEndBuilder
+JS_BUILDER_CONTAINER_ID=$(docker create --name $JS_BUILDER_CONTAINER $JS_BUILDER_IMAGE)
 export JS_BUILDER_CONTAINER_ID # export the variable so we can remove the container later
 
 # copy the frontend files in the container
@@ -32,7 +32,10 @@ docker start -a $JS_BUILDER_CONTAINER_ID
 docker cp $JS_BUILDER_CONTAINER_ID:/frontend/build/ $SRC_ROOT/frontend/build/
 
 # copy the zip output folder to the host
-docker cp $JS_BUILDER_CONTAINER_ID:/tmp/output/$COMMIT_ID.zip $SRC_ROOT/frontend/
+docker cp $JS_BUILDER_CONTAINER_ID:/tmp/output/frontend-build.zip $SRC_ROOT/frontend/
+
+# rename frontend build by commit id
+mv $SRC_ROOT/frontend/frontend-build.zip $SRC_ROOT/frontend/${COMMIT_ID}.zip
 
 # remove container
 docker rm -v $JS_BUILDER_CONTAINER_ID > /dev/null
