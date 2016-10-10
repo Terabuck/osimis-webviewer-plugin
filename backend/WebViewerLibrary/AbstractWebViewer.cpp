@@ -1,11 +1,11 @@
-#include "WebViewer.h"
+#include "AbstractWebViewer.h"
 
 #include <typeinfo> // Fix gil 'bad_cast' not member of 'std' https://svn.boost.org/trac/boost/ticket/2483
 
+#include <string>
 #include <memory>
 #include <boost/thread.hpp>
 #include <boost/lexical_cast.hpp>
-#include <EmbeddedResources.h>
 #include <boost/filesystem.hpp>
 
 #include <orthanc/OrthancCPlugin.h>
@@ -23,73 +23,33 @@
 #include "Image/ImageRepository.h"
 #include "Image/ImageController.h"
 #include "DecodedImageAdapter.h"
-#include "Version.h"
 #include "WebViewerConfiguration.h"
 
 namespace
 {
   // Needed locally for use by orthanc's callbacks
-  OrthancPluginContext* s_context;
-  const WebViewerConfiguration* s_config;
+  OrthancPluginContext* _context;
+  const WebViewerConfiguration* _config;
 
   // Call WebViewerConfiguration#parseFile and add logs accordingly
-  void s_parseConfigFile(WebViewerConfiguration* config);
+  void _parseConfigFile(WebViewerConfiguration* config);
 
-  void s_configureDicomDecoderPolicy();
+  void _configureDicomDecoderPolicy();
   
-  OrthancPluginErrorCode s_decodeImageCallback(OrthancPluginImage** target,
+  OrthancPluginErrorCode _decodeImageCallback(OrthancPluginImage** target,
                                                const void* dicom,
                                                const uint32_t size,
                                                uint32_t frameIndex);
   
-  bool s_isTransferSyntaxEnabled(const void* dicom,
+  bool _isTransferSyntaxEnabled(const void* dicom,
                                  const uint32_t size);
 
-  bool s_extractTransferSyntax(std::string& transferSyntax,
+  bool _extractTransferSyntax(std::string& transferSyntax,
                                const void* dicom,
                                const uint32_t size);
 }
 
-#if ORTHANC_STANDALONE == 0
-  static OrthancPluginErrorCode s_serveWebViewer(OrthancPluginRestOutput* output,
-                                          const char* url,
-                                          const OrthancPluginHttpRequest* request);
-#else
-  template <enum Orthanc::EmbeddedResources::DirectoryResourceId folder>
-  static OrthancPluginErrorCode s_serveEmbeddedFolder(OrthancPluginRestOutput* output,
-                                               const char* url,
-                                               const OrthancPluginHttpRequest* request)
-  {
-    if (request->method != OrthancPluginHttpMethod_Get)
-    {
-      OrthancPluginSendMethodNotAllowed(s_context, output, "GET");
-      return OrthancPluginErrorCode_Success;
-    }
-
-    std::string path = "/" + std::string(request->groups[0]);
-    const char* mime = OrthancPlugins::GetMimeType(path);
-
-    try
-    {
-      std::string s;
-      Orthanc::EmbeddedResources::GetDirectoryResource(s, folder, path.c_str());
-
-      const char* resource = s.size() ? s.c_str() : NULL;
-      OrthancPluginAnswerBuffer(s_context, output, resource, s.size(), mime);
-
-      return OrthancPluginErrorCode_Success;
-    }
-    catch (std::runtime_error& e)
-    {
-      std::string s = "Unknown static resource in plugin: " + std::string(request->groups[0]);
-      OrthancPluginLogError(s_context, s.c_str());
-      OrthancPluginSendHttpStatusCode(s_context, output, 404);
-      return OrthancPluginErrorCode_Success;
-    }
-  }
-#endif
-
-bool WebViewer::_isOrthancCompatible()
+bool AbstractWebViewer::_isOrthancCompatible()
 {
   using namespace OrthancPlugins;
   std::string message;
@@ -111,19 +71,19 @@ bool WebViewer::_isOrthancCompatible()
   }
 }
 
-std::auto_ptr<WebViewerConfiguration> WebViewer::_createConfig()
+std::auto_ptr<WebViewerConfiguration> AbstractWebViewer::_createConfig()
 {
   // Init config (w/ default values)
   WebViewerConfiguration* config = new WebViewerConfiguration(_context);
 
   // Parse config
-  s_parseConfigFile(config); // may throw
+  _parseConfigFile(config); // may throw
 
   return std::auto_ptr<WebViewerConfiguration>(config);
 }
 
 
-void WebViewer::_serveBackEnd()
+void AbstractWebViewer::_serveBackEnd()
 {
   // Register routes & controllers
   RegisterRoute<ImageController>("/osimis-viewer/images/");
@@ -132,47 +92,28 @@ void WebViewer::_serveBackEnd()
   // OrthancPluginRegisterRestCallbackNoLock(_context, "/osimis-viewer/is-stable-series/(.*)", IsStableSeries);
 }
 
-// @todo !!! resource as argument
-void WebViewer::_serveFrontEnd()
-{
-  // @todo use common interface with RegisterRoute
-#if ORTHANC_STANDALONE == 0
-    OrthancPluginRegisterRestCallbackNoLock(_context, "/osimis-viewer/app/(.*)", s_serveWebViewer);
-#else
-    OrthancPluginRegisterRestCallbackNoLock(_context, "/osimis-viewer/app/(.*)", s_serveEmbeddedFolder<Orthanc::EmbeddedResources::WEB_VIEWER>);
-#endif
-}
-
-void WebViewer::_plugToOrthancFrontEnd()
-{
-   // Extend the default Orthanc Explorer with custom JavaScript 
-  std::string explorer;
-  Orthanc::EmbeddedResources::GetFileResource(explorer, Orthanc::EmbeddedResources::ORTHANC_EXPLORER);
-  OrthancPluginExtendOrthancExplorer(_context, explorer.c_str());
-}
-
-WebViewer::WebViewer(OrthancPluginContext* context)
+AbstractWebViewer::AbstractWebViewer(OrthancPluginContext* context)
 {
   _context = context;
 
+  // Share the context statically with the _decodeImageCallback and other orthanc C callbacks
+  ::_context = _context;
+
   OrthancContextManager::Set(_context); // weird // @todo inject
 
-  // Instantiate repositories
-  _dicomRepository = new DicomRepository;
-  _imageRepository = new ImageRepository(_dicomRepository);
-  _seriesRepository = new SeriesRepository(_dicomRepository);
+  // Instantiate repositories @warning member declaration order is important
+  _dicomRepository.reset(new DicomRepository);
+  _imageRepository.reset(new ImageRepository(_dicomRepository.get()));
+  _seriesRepository.reset(new SeriesRepository(_dicomRepository.get()));
 
   // Inject repositories within controllers (we can't do it without static method
   // since Orthanc API doesn't allow us to pass attributes when processing REST request)
-  ImageController::Inject(_imageRepository);
-  SeriesController::Inject(_seriesRepository);
+  ImageController::Inject(_imageRepository.get());
+  SeriesController::Inject(_seriesRepository.get());
 }
 
-int32_t WebViewer::start()
+int32_t AbstractWebViewer::start()
 {
-  // Share the context with the s_decodeImageCallback and other orthanc callbacks
-  ::s_context = _context;
-
   // @note we don't do the work within the constructor to ensure we can benefit from polymorphism
   OrthancPluginLogWarning(_context, "Initializing the Web viewer");
 
@@ -186,7 +127,7 @@ int32_t WebViewer::start()
 
   // Set default configuration
   try {
-    _config = _createConfig();
+    this->_config = _createConfig();
   }
   catch(...) {
     // @todo handle error logging at that level (or even upper -> better)
@@ -194,49 +135,31 @@ int32_t WebViewer::start()
     return -1;
   }
 
-  // Share the config with the s_decodeImageCallback and other orthanc callbacks
-  ::s_config = _config.get();
+  // Share the config with the _decodeImageCallback and other orthanc callbacks
+  ::_config = _config.get();
 
   // Inject configuration within components
-  _imageRepository->enableCachedImageStorage(_config->cachedImageStorageEnabled);
+  _imageRepository->enableCachedImageStorage(this->_config->cachedImageStorageEnabled);
 
   // Configure DICOM decoder policy (GDCM/internal)
-  s_configureDicomDecoderPolicy();
+  _configureDicomDecoderPolicy();
 
   // Register routes
   _serveBackEnd();
   _serveFrontEnd();
 
-  // Integrate web viewer within Orthanc front end
-  _plugToOrthancFrontEnd();
-
   // Return success
   return 0;
 }
 
-WebViewer::~WebViewer()
+AbstractWebViewer::~AbstractWebViewer()
 {
   OrthancPluginLogWarning(_context, "Finalizing the Web viewer");
-
-  // Free repositories
-  delete _seriesRepository;
-  delete _imageRepository;
-  delete _dicomRepository;
-}
-
-std::string WebViewer::getName()
-{
-  return "osimis-web-viewer";
-}
-
-std::string WebViewer::getVersion()
-{
-  return PRODUCT_VERSION_FULL_STRING;
 }
 
 namespace
 {
-  void s_parseConfigFile(WebViewerConfiguration* config)
+  void _parseConfigFile(WebViewerConfiguration* config)
   {
       try
       {
@@ -244,46 +167,46 @@ namespace
       }
       catch (std::runtime_error& e)
       {
-        OrthancPluginLogError(s_context, e.what());
+        OrthancPluginLogError(::_context, e.what());
         throw;
       }
       catch (Orthanc::OrthancException& e)
       {
         if (e.GetErrorCode() == Orthanc::ErrorCode_BadFileFormat)
         {
-          OrthancPluginLogError(s_context, "Unable to read the configuration of the Web viewer plugin");
+          OrthancPluginLogError(::_context, "Unable to read the configuration of the Web viewer plugin");
         }
         else
         {
-          OrthancPluginLogError(s_context, e.What());
+          OrthancPluginLogError(::_context, e.What());
         }
         throw;
       }
   }
 
-  void s_configureDicomDecoderPolicy()
+  void _configureDicomDecoderPolicy()
   {
     // Configure the DICOM decoder
-    if (s_config->gdcmEnabled)
+    if (_config->gdcmEnabled)
     {
       // Replace the default decoder of DICOM images that is built in Orthanc
-      OrthancPluginLogWarning(s_context, "Using GDCM instead of the DICOM decoder that is built in Orthanc");
-      OrthancPluginRegisterDecodeImageCallback(s_context, s_decodeImageCallback);
+      OrthancPluginLogWarning(::_context, "Using GDCM instead of the DICOM decoder that is built in Orthanc");
+      OrthancPluginRegisterDecodeImageCallback(::_context, _decodeImageCallback);
     }
     else
     {
-      OrthancPluginLogWarning(s_context, "Using the DICOM decoder that is built in Orthanc (not using GDCM)");
+      OrthancPluginLogWarning(::_context, "Using the DICOM decoder that is built in Orthanc (not using GDCM)");
     }
   }
 
-  OrthancPluginErrorCode s_decodeImageCallback(OrthancPluginImage** target,
+  OrthancPluginErrorCode _decodeImageCallback(OrthancPluginImage** target,
                                                const void* dicom,
                                                const uint32_t size,
                                                uint32_t frameIndex)
   {
     try
     {
-      if (!s_isTransferSyntaxEnabled(dicom, size))
+      if (!_isTransferSyntaxEnabled(dicom, size))
       {
         *target = NULL;
         return OrthancPluginErrorCode_Success;
@@ -292,7 +215,7 @@ namespace
       std::auto_ptr<OrthancPlugins::OrthancImageWrapper> image;
 
       OrthancPlugins::GdcmImageDecoder decoder(dicom, size);
-      image.reset(new OrthancPlugins::OrthancImageWrapper(s_context, decoder.Decode(s_context, frameIndex)));
+      image.reset(new OrthancPlugins::OrthancImageWrapper(::_context, decoder.Decode(::_context, frameIndex)));
 
       *target = image->Release();
 
@@ -303,7 +226,7 @@ namespace
       *target = NULL;
 
       std::string s = "Cannot decode image using GDCM: " + std::string(e.What());
-      OrthancPluginLogError(s_context, s.c_str());
+      OrthancPluginLogError(::_context, s.c_str());
       return OrthancPluginErrorCode_Plugin;
     }
     catch (std::runtime_error& e)
@@ -311,12 +234,12 @@ namespace
       *target = NULL;
 
       std::string s = "Cannot decode image using GDCM: " + std::string(e.what());
-      OrthancPluginLogError(s_context, s.c_str());
+      OrthancPluginLogError(::_context, s.c_str());
       return OrthancPluginErrorCode_Plugin;
     }
   }
 
-  bool s_isTransferSyntaxEnabled(const void* dicom,
+  bool _isTransferSyntaxEnabled(const void* dicom,
                                  const uint32_t size)
   {
     std::string formattedSize;
@@ -327,40 +250,40 @@ namespace
       formattedSize.assign(tmp);
     }
 
-    if (!s_config->restrictTransferSyntaxes)
+    if (!_config->restrictTransferSyntaxes)
     {
       std::string s = "Decoding one DICOM instance of " + formattedSize + " using GDCM";
-      OrthancPluginLogInfo(s_context, s.c_str());
+      OrthancPluginLogInfo(::_context, s.c_str());
       return true;
     }
 
     std::string transferSyntax;
-    if (!s_extractTransferSyntax(transferSyntax, dicom, size))
+    if (!_extractTransferSyntax(transferSyntax, dicom, size))
     {
       std::string s = ("Cannot extract the transfer syntax of this instance of " + 
                        formattedSize + ", will use GDCM to decode it");
-      OrthancPluginLogInfo(s_context, s.c_str());
+      OrthancPluginLogInfo(::_context, s.c_str());
       return true;
     }
 
-    if (s_config->enabledTransferSyntaxes.find(transferSyntax) != s_config->enabledTransferSyntaxes.end())
+    if (_config->enabledTransferSyntaxes.find(transferSyntax) != _config->enabledTransferSyntaxes.end())
     {
       // Decoding for this transfer syntax is enabled
       std::string s = ("Using GDCM to decode this instance of " + 
                        formattedSize + " with transfer syntax " + transferSyntax);
-      OrthancPluginLogInfo(s_context, s.c_str());
+      OrthancPluginLogInfo(::_context, s.c_str());
       return true;
     }
     else
     {
       std::string s = ("Won't use GDCM to decode this instance of " + 
                        formattedSize + ", as its transfer syntax " + transferSyntax + " is disabled");
-      OrthancPluginLogInfo(s_context, s.c_str());
+      OrthancPluginLogInfo(::_context, s.c_str());
       return false;
     }
   }
 
-  bool s_extractTransferSyntax(std::string& transferSyntax,
+  bool _extractTransferSyntax(std::string& transferSyntax,
                                const void* dicom,
                                const uint32_t size)
   {
@@ -387,36 +310,6 @@ namespace
     }
   }
 
-#if ORTHANC_STANDALONE == 0
-  OrthancPluginErrorCode s_serveWebViewer(OrthancPluginRestOutput* output,
-                                          const char* url,
-                                          const OrthancPluginHttpRequest* request)
-  {
-    if (request->method != OrthancPluginHttpMethod_Get)
-    {
-      OrthancPluginSendMethodNotAllowed(s_context, output, "GET");
-      return OrthancPluginErrorCode_Success;
-    }
 
-    const std::string path = std::string(WEB_VIEWER_PATH) + std::string(request->groups[0]);
-    const char* mime = OrthancPlugins::GetMimeType(path);
-    
-    std::string s;
-    try
-    {
-      Orthanc::Toolbox::ReadFile(s, path);
-      const char* resource = s.size() ? s.c_str() : NULL;
-      OrthancPluginAnswerBuffer(s_context, output, resource, s.size(), mime);
-    }
-    catch (Orthanc::OrthancException&)
-    {
-      std::string s = "Inexistent file in served folder: " + path;
-      OrthancPluginLogError(s_context, s.c_str());
-      OrthancPluginSendHttpStatusCode(s_context, output, 404);
-    }
-
-    return OrthancPluginErrorCode_Success;
-  }
-#endif
 
 }

@@ -18,7 +18,7 @@
  **/
 
 #include <orthanc/OrthancCPlugin.h>
-#include <WebViewer.h>
+#include "WebViewer.h"
 
 WebViewer* _webViewer;
 
@@ -42,14 +42,12 @@ extern "C"
 
   ORTHANC_PLUGINS_API const char* OrthancPluginGetName()
   {
-    // Call static methods to retrieve version since _webViewer is not initialized yet
-    return WebViewer::getName().c_str();
+    return WebViewer::getName().c_str(); // static methods to retrieve name since _webViewer is not initialized yet
   }
 
 
   ORTHANC_PLUGINS_API const char* OrthancPluginGetVersion()
   {
-    // Call static methods to retrieve version since _webViewer is not initialized yet
-    return WebViewer::getVersion().c_str();
+    return WebViewer::getVersion().c_str(); // static methods to retrieve version since _webViewer is not initialized yet
   }
 }
