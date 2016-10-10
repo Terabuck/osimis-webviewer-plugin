@@ -99,7 +99,7 @@
              * so the behavior doesn't persist.
              *
              * An alternative solution would be to do the code logic within $watches instead of within the directive controller's
-             * methods which is currently considered as a viewmodel) and only use the directive's controller to change the scope
+             * methods (which is currently considered as a viewmodel) and only use the directive's controller to change the scope
              * attributes. No _cancelCyclicCall variable would be required that way but it requires to create an additional (meaningless)
              * abstraction layer.
              * 

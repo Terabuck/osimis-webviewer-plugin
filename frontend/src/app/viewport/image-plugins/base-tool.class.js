@@ -130,7 +130,7 @@
                 // The handles visibility is compared as well (highlight & active properties) - for livesharing purpose
                 if (oldAnnotations && _.isEqual(newAnnotationsData, oldAnnotations.data)) return;
                 
-                // do the $apply after the check to avoid an useless $digest cycle in case there is no change
+                // do the $evalAsync after the check to avoid a potential useless $digest cycle in case there is no change
                 $rootScope.$evalAsync(function() {
                     // avoid having to use angular deep $watch
                     // using a fast shallow object clone
