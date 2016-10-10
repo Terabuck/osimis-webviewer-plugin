@@ -58,10 +58,6 @@ add_library(OsimisWebViewer
   ${VIEWER_PLUGIN_DIR}/Plugin.cpp
   )
 
-if (STATIC_BUILD)
-  add_dependencies(OsimisWebViewer EmbeddedResourcesGenerator)
-endif()
-
 add_dependencies(OsimisWebViewer WebViewerLibrary)
 target_link_libraries(OsimisWebViewer WebViewerLibrary)
 

@@ -172,11 +172,11 @@ else()
     )
 endif()
 
+# Always embed at least ORTHANC_EXPLORER, even if STANDALONE_BUILD is off?
 EmbedResources(
   ORTHANC_EXPLORER  ${RESOURCES_DIR}/OrthancExplorer.js
   ${EMBEDDED_RESOURCES}
   )
-
 
 # create an intermediary WebViewerLibrary to avoid source recompilation
 # for both unit tests and web viewer library
@@ -256,6 +256,11 @@ if (STATIC_BUILD OR NOT USE_SYSTEM_GDCM)
   add_dependencies(WebViewerLibrary GDCM)
 endif()
 target_link_libraries(WebViewerLibrary ${GDCM_LIBRARIES})
+
+# Check & rebuild if embedded resources has changed?
+if (STATIC_BUILD)
+  add_dependencies(WebViewerLibrary EmbeddedResourcesGenerator)
+endif()
 
 # If using gcc, build WebViewerLibrary with the "-fPIC" argument to allow its
 # embedding into the shared library containing the Orthanc plugin
