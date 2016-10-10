@@ -86,10 +86,10 @@ STEP 2
 Get more log.
 
 [sample a]
-	Exception is triggered from SinonJS mock. See manual fix https://github.com/sinonjs/sinon/pull/678 - Also, sinon.log is a noop function
+  Exception is triggered from SinonJS mock. See manual fix https://github.com/sinonjs/sinon/pull/678 - Also, sinon.log is a noop function
 
 [sample b]
-	Add assert(false, JSON.stringify(e)); to the returned failed promise
+  Add assert(false, JSON.stringify(e)); to the returned failed promise
 
 Redo first step (& select tests by adding mocha ".only" to specs sources).
 Scheduling 50 jenkins jobs also work.

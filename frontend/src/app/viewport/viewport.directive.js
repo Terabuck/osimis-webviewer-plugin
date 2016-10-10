@@ -19,7 +19,7 @@
  * wvOverlay directive by default. It may be overloaded using standard transclusion. It is therefore
  * important to not put any whitespace between the DOM element's start and end tags, otherwise the default
  * overlay will be overloaded with white space.
- * By setting the overlay's css _position_ attribute to _absolute_, the overlay can position information to the top, right, bottom and left sides
+ * By setting the overlay's css _position_ attribute to _absolute_, the ovgetViewporterlay can position information to the top, right, bottom and left sides
  * of the viewport.
  *
  * @scope
@@ -115,8 +115,8 @@
             link: link,
             restrict: 'E',
             require: {
-                'wvViewport': 'wvViewport',
-                'wvSize': 'wvSize' // @todo make optional (by setting a canvas size equals to the shown image size)
+                'wvViewportCtrl': 'wvViewport', // Ctrl postfix to avoid conflict w/ scope attribute
+                'wvSizeCtrl': 'wvSize' // @todo make optional (by setting a canvas size equals to the shown image size)
             },
             scope: {
                 wvImageId: '=?',
@@ -150,14 +150,14 @@
 
             // bind directive's sizing (via wv-size controller) to cornerstone
             {
-                var wvSizeCtrl = ctrls.wvSize;
+                var wvSizeCtrl = ctrls.wvSizeCtrl;
                 var unbindWvSize = _bindWvSizeController(wvSizeCtrl, model);
             }
 
             // bind directive's controller to cornerstone (via directive's attributes)
             var _cancelCyclicCall = false; // cancel databinding induced by controller calls
             {
-                var ctrl = ctrls.wvViewport;
+                var ctrl = ctrls.wvViewportCtrl;
                 ctrl.getImage = function() {
                     return model.getImageId();
                 };
@@ -191,6 +191,18 @@
                         model.setImage(wvImageId);
                     }
                 });
+
+                // @todo @warning recursive loops?! performance hungry!
+                scope.$watch('vm.wvViewport', function(wvViewport, old) {
+                    // var wvViewport = scope.vm.wvViewport
+                    if (_cancelCyclicCall) {
+                        _cancelCyclicCall = false;
+                        return;
+                    }
+                    if (wvViewport && wvViewport !== old) {
+                        model.setViewport(wvViewport);
+                    }
+                }, true);
             }
 
             // bind model to directive's attributes
@@ -203,7 +215,11 @@
             });
             element.on('CornerstoneImageRendered', function(evt, args) { // element.off not needed
                 scope.$evalAsync(function() { // trigger a new digest if needed
-                    scope.vm.wvViewport = args.viewport;
+                    _cancelCyclicCall = true;
+
+                    // Copy the viewport, while making sure we don't change its
+                    // reference though
+                    _.merge(scope.vm.wvViewport, args.viewport);
                 });
             });
 
@@ -326,6 +342,7 @@
             // Merge the data into cornernerstone
             // We can't simply change the object references because cornerstone would lose link to the handles it's working on.
             // Strange behavior: merge seems to handle property deletion as well
+            this.toolState[imageId][toolName] = this.toolState[imageId][toolName] || {};
             _.merge(this.toolState[imageId][toolName], state);
             
             if (redraw) {

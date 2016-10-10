@@ -16,6 +16,7 @@
         <!-- Toolbar -->
         <wv-toolbar ng-if="vm.toolbarEnabled"
             wv-items="vm.tools"
+            wv-active-tool="vm.activeTool"
         ></wv-toolbar>
 
         <!-- Splitpane & Viewports -->
@@ -31,6 +32,8 @@
                         wv-droppable-series-ext="vm.serieslistEnabled"
                         wv-scroll-on-wheel-series-ext="true"
                         wv-enable-overlay="vm.tools.overlay"
+                        wv-viewport="vm.viewports[$index].csViewport"
+                        wv-image-index="vm.viewports[$index].imageIndex"
 
                         wv-default-viewport-tool="vm.tools.windowing"
                         wv-angle-measure-viewport-tool="vm.tools.anglemeasure"

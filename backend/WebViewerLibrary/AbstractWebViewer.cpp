@@ -1,0 +1,315 @@
+#include "AbstractWebViewer.h"
+
+#include <typeinfo> // Fix gil 'bad_cast' not member of 'std' https://svn.boost.org/trac/boost/ticket/2483
+
+#include <string>
+#include <memory>
+#include <boost/thread.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/filesystem.hpp>
+
+#include <orthanc/OrthancCPlugin.h>
+#include <Core/OrthancException.h>
+#include <Core/Toolbox.h>
+#include <Core/DicomFormat/DicomMap.h>
+#include <Plugins/Samples/GdcmDecoder/GdcmDecoderCache.h>
+
+#include "ViewerToolbox.h"
+#include "OrthancContextManager.h"
+#include "BaseController.h"
+#include "Instance/DicomRepository.h"
+#include "Series/SeriesRepository.h"
+#include "Series/SeriesController.h"
+#include "Image/ImageRepository.h"
+#include "Image/ImageController.h"
+#include "DecodedImageAdapter.h"
+#include "WebViewerConfiguration.h"
+
+namespace
+{
+  // Needed locally for use by orthanc's callbacks
+  OrthancPluginContext* _context;
+  const WebViewerConfiguration* _config;
+
+  // Call WebViewerConfiguration#parseFile and add logs accordingly
+  void _parseConfigFile(WebViewerConfiguration* config);
+
+  void _configureDicomDecoderPolicy();
+  
+  OrthancPluginErrorCode _decodeImageCallback(OrthancPluginImage** target,
+                                               const void* dicom,
+                                               const uint32_t size,
+                                               uint32_t frameIndex);
+  
+  bool _isTransferSyntaxEnabled(const void* dicom,
+                                 const uint32_t size);
+
+  bool _extractTransferSyntax(std::string& transferSyntax,
+                               const void* dicom,
+                               const uint32_t size);
+}
+
+bool AbstractWebViewer::_isOrthancCompatible()
+{
+  using namespace OrthancPlugins;
+  std::string message;
+
+  /* Check the version of the Orthanc core */
+  if (OrthancPluginCheckVersion(_context) == 0)
+  {
+    char info[1024];
+    sprintf(info, "Your version of Orthanc (%s) must be above %d.%d.%d to run this plugin",
+            _context->orthancVersion,
+            ORTHANC_PLUGINS_MINIMAL_MAJOR_NUMBER,
+            ORTHANC_PLUGINS_MINIMAL_MINOR_NUMBER,
+            ORTHANC_PLUGINS_MINIMAL_REVISION_NUMBER);
+    OrthancPluginLogError(_context, info);
+    return false;
+  }
+  else {
+    return true;
+  }
+}
+
+std::auto_ptr<WebViewerConfiguration> AbstractWebViewer::_createConfig()
+{
+  // Init config (w/ default values)
+  WebViewerConfiguration* config = new WebViewerConfiguration(_context);
+
+  // Parse config
+  _parseConfigFile(config); // may throw
+
+  return std::auto_ptr<WebViewerConfiguration>(config);
+}
+
+
+void AbstractWebViewer::_serveBackEnd()
+{
+  // Register routes & controllers
+  RegisterRoute<ImageController>("/osimis-viewer/images/");
+  RegisterRoute<SeriesController>("/osimis-viewer/series/");
+
+  // OrthancPluginRegisterRestCallbackNoLock(_context, "/osimis-viewer/is-stable-series/(.*)", IsStableSeries);
+}
+
+AbstractWebViewer::AbstractWebViewer(OrthancPluginContext* context)
+{
+  _context = context;
+
+  // Share the context statically with the _decodeImageCallback and other orthanc C callbacks
+  ::_context = _context;
+
+  OrthancContextManager::Set(_context); // weird // @todo inject
+
+  // Instantiate repositories @warning member declaration order is important
+  _dicomRepository.reset(new DicomRepository);
+  _imageRepository.reset(new ImageRepository(_dicomRepository.get()));
+  _seriesRepository.reset(new SeriesRepository(_dicomRepository.get()));
+
+  // Inject repositories within controllers (we can't do it without static method
+  // since Orthanc API doesn't allow us to pass attributes when processing REST request)
+  ImageController::Inject(_imageRepository.get());
+  SeriesController::Inject(_seriesRepository.get());
+}
+
+int32_t AbstractWebViewer::start()
+{
+  // @note we don't do the work within the constructor to ensure we can benefit from polymorphism
+  OrthancPluginLogWarning(_context, "Initializing the Web viewer");
+
+  if (!_isOrthancCompatible()) {
+    // @todo use exception instead of return code
+    return -1;
+  }
+
+  // Set description
+  OrthancPluginSetDescription(_context, "Provides a Web viewer of DICOM series within Orthanc.");
+
+  // Set default configuration
+  try {
+    this->_config = _createConfig();
+  }
+  catch(...) {
+    // @todo handle error logging at that level (or even upper -> better)
+    // @todo use exception instead of return code
+    return -1;
+  }
+
+  // Share the config with the _decodeImageCallback and other orthanc callbacks
+  ::_config = _config.get();
+
+  // Inject configuration within components
+  _imageRepository->enableCachedImageStorage(this->_config->cachedImageStorageEnabled);
+
+  // Configure DICOM decoder policy (GDCM/internal)
+  _configureDicomDecoderPolicy();
+
+  // Register routes
+  _serveBackEnd();
+  _serveFrontEnd();
+
+  // Return success
+  return 0;
+}
+
+AbstractWebViewer::~AbstractWebViewer()
+{
+  OrthancPluginLogWarning(_context, "Finalizing the Web viewer");
+}
+
+namespace
+{
+  void _parseConfigFile(WebViewerConfiguration* config)
+  {
+      try
+      {
+        config->parseFile();
+      }
+      catch (std::runtime_error& e)
+      {
+        OrthancPluginLogError(::_context, e.what());
+        throw;
+      }
+      catch (Orthanc::OrthancException& e)
+      {
+        if (e.GetErrorCode() == Orthanc::ErrorCode_BadFileFormat)
+        {
+          OrthancPluginLogError(::_context, "Unable to read the configuration of the Web viewer plugin");
+        }
+        else
+        {
+          OrthancPluginLogError(::_context, e.What());
+        }
+        throw;
+      }
+  }
+
+  void _configureDicomDecoderPolicy()
+  {
+    // Configure the DICOM decoder
+    if (_config->gdcmEnabled)
+    {
+      // Replace the default decoder of DICOM images that is built in Orthanc
+      OrthancPluginLogWarning(::_context, "Using GDCM instead of the DICOM decoder that is built in Orthanc");
+      OrthancPluginRegisterDecodeImageCallback(::_context, _decodeImageCallback);
+    }
+    else
+    {
+      OrthancPluginLogWarning(::_context, "Using the DICOM decoder that is built in Orthanc (not using GDCM)");
+    }
+  }
+
+  OrthancPluginErrorCode _decodeImageCallback(OrthancPluginImage** target,
+                                               const void* dicom,
+                                               const uint32_t size,
+                                               uint32_t frameIndex)
+  {
+    try
+    {
+      if (!_isTransferSyntaxEnabled(dicom, size))
+      {
+        *target = NULL;
+        return OrthancPluginErrorCode_Success;
+      }
+
+      std::auto_ptr<OrthancPlugins::OrthancImageWrapper> image;
+
+      OrthancPlugins::GdcmImageDecoder decoder(dicom, size);
+      image.reset(new OrthancPlugins::OrthancImageWrapper(::_context, decoder.Decode(::_context, frameIndex)));
+
+      *target = image->Release();
+
+      return OrthancPluginErrorCode_Success;
+    }
+    catch (Orthanc::OrthancException& e)
+    {
+      *target = NULL;
+
+      std::string s = "Cannot decode image using GDCM: " + std::string(e.What());
+      OrthancPluginLogError(::_context, s.c_str());
+      return OrthancPluginErrorCode_Plugin;
+    }
+    catch (std::runtime_error& e)
+    {
+      *target = NULL;
+
+      std::string s = "Cannot decode image using GDCM: " + std::string(e.what());
+      OrthancPluginLogError(::_context, s.c_str());
+      return OrthancPluginErrorCode_Plugin;
+    }
+  }
+
+  bool _isTransferSyntaxEnabled(const void* dicom,
+                                 const uint32_t size)
+  {
+    std::string formattedSize;
+
+    {
+      char tmp[16];
+      sprintf(tmp, "%0.1fMB", static_cast<float>(size) / (1024.0f * 1024.0f));
+      formattedSize.assign(tmp);
+    }
+
+    if (!_config->restrictTransferSyntaxes)
+    {
+      std::string s = "Decoding one DICOM instance of " + formattedSize + " using GDCM";
+      OrthancPluginLogInfo(::_context, s.c_str());
+      return true;
+    }
+
+    std::string transferSyntax;
+    if (!_extractTransferSyntax(transferSyntax, dicom, size))
+    {
+      std::string s = ("Cannot extract the transfer syntax of this instance of " + 
+                       formattedSize + ", will use GDCM to decode it");
+      OrthancPluginLogInfo(::_context, s.c_str());
+      return true;
+    }
+
+    if (_config->enabledTransferSyntaxes.find(transferSyntax) != _config->enabledTransferSyntaxes.end())
+    {
+      // Decoding for this transfer syntax is enabled
+      std::string s = ("Using GDCM to decode this instance of " + 
+                       formattedSize + " with transfer syntax " + transferSyntax);
+      OrthancPluginLogInfo(::_context, s.c_str());
+      return true;
+    }
+    else
+    {
+      std::string s = ("Won't use GDCM to decode this instance of " + 
+                       formattedSize + ", as its transfer syntax " + transferSyntax + " is disabled");
+      OrthancPluginLogInfo(::_context, s.c_str());
+      return false;
+    }
+  }
+
+  bool _extractTransferSyntax(std::string& transferSyntax,
+                               const void* dicom,
+                               const uint32_t size)
+  {
+    Orthanc::DicomMap header;
+    if (!Orthanc::DicomMap::ParseDicomMetaInformation(header, reinterpret_cast<const char*>(dicom), size))
+    {
+      return false;
+    }
+
+    const Orthanc::DicomValue* tag = header.TestAndGetValue(0x0002, 0x0010);
+    if (tag == NULL ||
+        tag->IsNull() ||
+        tag->IsBinary())
+    {
+      return false;
+    }
+    else
+    {
+      // Stripping spaces should not be required, as this is a UI value
+      // representation whose stripping is supported by the Orthanc
+      // core, but let's be careful...
+      transferSyntax = Orthanc::Toolbox::StripSpaces(tag->GetContent());
+      return true;
+    }
+  }
+
+
+
+}

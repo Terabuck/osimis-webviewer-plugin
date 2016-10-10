@@ -140,16 +140,21 @@
                 }
             });
 
-            // Configure viewports by index
+            // Store each viewports' states at this level
+            // so they can be either later changed by external means (ie. Lify want to retrieve
+            // which series is being seen for analysis) or saved for liveshare for instance. 
             vm.viewports = [];
             vm.configureViewport = function(index) {
                 vm.viewports[index] = {
-                    seriesId: vm.seriesId
+                    seriesId: vm.seriesId,
+                    csViewport: {},
+                    imageIndex: 0
                 };
             };
             vm.cleanupViewport = function(index) {
                 vm.viewports[index] = undefined; // don't use splice since it changes the indexes from the array
             };
+
             // Adapt the viewports to new seriesId if the viewports had no prior configurations.
             scope.$watch('vm.seriesId', function(newSeriesId, oldSeriesId) {
                 vm.viewports.forEach(function(viewport) {

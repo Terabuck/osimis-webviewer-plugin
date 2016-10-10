@@ -42,6 +42,11 @@ return {
           if (scope.wvOnStudyLoaded) {
             scope.wvOnStudyLoaded();
           }
+        }, function(err) {
+          // Trigger on-study-loaded with the error
+          if (scope.wvOnStudyLoaded) {
+            scope.wvOnStudyLoaded({$error: err})
+          }
         });
       
     }

@@ -33,7 +33,7 @@ else()
   #  set(BOOST_STATIC 1)
   #endif()
 
-  include_directories(${Boost_INCLUDE_DIRS})
+  include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
   link_libraries(${Boost_LIBRARIES})
 endif()
 
@@ -127,7 +127,7 @@ if (BOOST_STATIC)
   endif()
 
   include_directories(
-    ${BOOST_SOURCES_DIR}
+    SYSTEM ${BOOST_SOURCES_DIR}
     )
 
   source_group(ThirdParty\\Boost REGULAR_EXPRESSION ${BOOST_SOURCES_DIR}/.*)

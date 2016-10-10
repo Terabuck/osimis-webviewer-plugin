@@ -34,11 +34,18 @@ if [[ $dockerImage != "" ]]; then
 	docker rmi $MAIN_IMAGE:latest > /dev/null
 fi
 
-# remove aws docker container if exists
+# remove aws docker containers if they exist
 if [[ "${AWS_DOCKER_CONTAINER_ID}" != "" ]]; then
 	dockerContainer=$(docker ps -a -q --no-trunc | grep ${AWS_DOCKER_CONTAINER_ID} 2> /dev/null)
 	if [[ $dockerContainer != "" ]]; then
 		echo "Cleaning $dockerContainer (AWS_DOCKER_CONTAINER_ID)"
+		docker rm -v $dockerContainer > /dev/null
+	fi
+fi
+if [[ "${AWS_DOCKER_CONTAINER2_ID}" != "" ]]; then
+	dockerContainer=$(docker ps -a -q --no-trunc | grep ${AWS_DOCKER_CONTAINER2_ID} 2> /dev/null)
+	if [[ $dockerContainer != "" ]]; then
+		echo "Cleaning $dockerContainer (AWS_DOCKER_CONTAINER2_ID)"
 		docker rm -v $dockerContainer > /dev/null
 	fi
 fi

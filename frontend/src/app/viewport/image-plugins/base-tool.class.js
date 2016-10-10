@@ -117,6 +117,8 @@
             var toolStateManager = cornerstoneTools.getElementToolStateManager(enabledElement);
 
             // for each viewport, listen..
+            // @todo debounce should be throttle when liveshare is "on"
+            // 
             $(enabledElement).on('CornerstoneImageRendered.'+this.toolName, _.debounce(function() {
                 var image = viewport.getImage();
                 var newAnnotationsData = toolStateManager.getStateByToolAndImageId(_this.toolName, image.id);
@@ -128,8 +130,8 @@
                 // The handles visibility is compared as well (highlight & active properties) - for livesharing purpose
                 if (oldAnnotations && _.isEqual(newAnnotationsData, oldAnnotations.data)) return;
                 
-                // do the $apply after the check to avoid an useless $digest cycle in case there is no change
-                $rootScope.$apply(function() {
+                // do the $evalAsync after the check to avoid a potential useless $digest cycle in case there is no change
+                $rootScope.$evalAsync(function() {
                     // avoid having to use angular deep $watch
                     // using a fast shallow object clone
                     var data = _.clone(newAnnotationsData);
