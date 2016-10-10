@@ -29,7 +29,9 @@
  *   Available Callback Arguments:
  *   * `$series` - series_model
  *
- * @param {integer} wvImageIndex Index of the image in the series
+ * @param {integer} wvImageIndex Index of the actual image in the series.
+ *    Notably used by the liveshare feature to save the current state of the series.
+ *    Note the value may be different from the displayed image's index when an image is waiting loading to finish before display.
  *
  * @example Display a specific series with some informations and a play button
  * ```html
@@ -52,22 +54,15 @@
 
     /* @ngInject */
     function vpSeriesId($parse) {
-        // Usage:
-        //
-        // Creates:
-        //
         var directive = {
-            // bindToController: true,
             require: {
                 'vpSeriesId': 'vpSeriesId',
                 'wvViewport': 'wvViewport'
             },
             controller: SeriesViewModel,
-            // controllerAs: 'vm',
             link: link,
             restrict: 'A',
-            // @note use $parse to try to not dirty the scope
-            scope: false
+            scope: false // we use $parse instead to try to not dirty the scope
         };
         return directive;
 
@@ -75,6 +70,41 @@
             var viewmodel = ctrls.vpSeriesId;
             var viewportController = ctrls.wvViewport;
             var wvImageIndexParser = $parse(attrs.wvImageIndex);
+
+            /**
+             * AngularJS' directives provide three ways to communicate with the external world:
+             * - Attribute data binding (via either $parse($attrs...) or the directive's scope attribute)
+             * - Scope (via either direct access or transclusion + scope inheritance for instance)
+             * - Controller injectection (via directive's require attribute)
+             *
+             * In this directive, we make use of multiple ones at once.
+             *
+             * 
+             * These ways however do not work well together, and produce infine recursive loops:
+             * 
+             * [call to controller] ctrl->setSmtg('data');
+             *                   |     •
+             *                   •     |
+             * [scope update] scope->smtg = 'data'
+             *                   |     |
+             *                   •     |
+             * [html attribute update] <... smtg="'data'">
+             *                   |     |
+             *                   •     |
+             * [html attribute watch] scope.$watch($parse($attrs.smtg), function(data) { ctrl->setSmtg(data) });
+             * 
+             *
+             * _cancelCyclicCall is used to fix revoke the infinite loop before it happens.
+             * When true, the HTML attribute watch is ignored. The variable is then automaticaly set back to false
+             * so the behavior doesn't persist.
+             *
+             * An alternative solution would be to do the code logic within $watches instead of within the directive controller's
+             * methods which is currently considered as a viewmodel) and only use the directive's controller to change the scope
+             * attributes. No _cancelCyclicCall variable would be required that way but it requires to create an additional (meaningless)
+             * abstraction layer.
+             * 
+             * @type {Boolean}
+             */
             var _cancelCyclicCall = false;
 
             // Provide access to the viewport controller through the seriesId
@@ -84,6 +114,7 @@
 
             // bind view model -> viewport controller
             viewmodel.onCurrentImageIdChanged(function(imageId, isNewSeries, setShownImageCallback) {
+                // Change displayed image when series' current image changes
                 if (imageId) {
                     var resetViewport = isNewSeries;
                     viewportController
@@ -114,6 +145,7 @@
             });
 
             // bind attributes -> view model
+            // vp-series-id
             var vpSeriesIdParser = $parse(attrs.vpSeriesId);
             scope.$watch(vpSeriesIdParser, function(id) {
                 if (!id) {
@@ -141,19 +173,22 @@
             var vpOnSeriesChangeParser = $parse(attrs.vpOnSeriesChange);
             var wvSeriesParser = $parse(attrs.wvSeries);
             viewmodel.onSeriesChanged(function(series) {
+                // wv-series
                 if (wvSeriesParser && wvSeriesParser.assign) {
                     wvSeriesParser.assign(scope, series);
                 }
+                // vp-on-series-change
                 if (vpOnSeriesChangeParser) {
                     vpOnSeriesChangeParser(scope, {$series: series});
                 }
-                // @warning endless recursivity
+                // vp-series-id
                 if (vpSeriesIdParser && vpSeriesIdParser.assign) {
                     vpSeriesIdParser.assign(scope, series && series.id);
                 }
             });
 
             // bind view model -> extensions -> model
+            // Series-related tools
             _.filter(ctrls, function(ctrl, ctrlName) {
                 var ctrlIsExtension = _.endsWith(ctrlName, 'SeriesExt');
                 if (!ctrl) {
