@@ -13,25 +13,25 @@ echo "Cleaning up..."
 dockerImage=$(docker images -q $MAIN_IMAGE:$TAG 2> /dev/null)
 if [[ $dockerImage != "" ]]; then
 	echo "Cleaning $MAIN_IMAGE:$TAG"
-	docker rmi $MAIN_IMAGE:$TAG > /dev/null
+	docker rmi --no-prune $MAIN_IMAGE:$TAG > /dev/null
 fi
 
 dockerImage=$(docker images -q $MAIN_IMAGE:$COMMIT_ID 2> /dev/null)
 if [[ $dockerImage != "" ]]; then
 	echo "Cleaning $MAIN_IMAGE:$COMMIT_ID"
-	docker rmi $MAIN_IMAGE:$COMMIT_ID > /dev/null
+	docker rmi --no-prune $MAIN_IMAGE:$COMMIT_ID > /dev/null
 fi
 
 dockerImage=$(docker images -q $MAIN_IMAGE:$RELEASE_TAG 2> /dev/null)
 if [[ $dockerImage != "" ]]; then
 	echo "Cleaning $MAIN_IMAGE:$RELEASE_TAG"
-	docker rmi $MAIN_IMAGE:$RELEASE_TAG > /dev/null
+	docker rmi --no-prune $MAIN_IMAGE:$RELEASE_TAG > /dev/null
 fi
 
 dockerImage=$(docker images -q $MAIN_IMAGE:latest 2> /dev/null)
 if [[ $dockerImage != "" ]]; then
 	echo "Cleaning $MAIN_IMAGE:latest"
-	docker rmi $MAIN_IMAGE:latest > /dev/null
+	docker rmi --no-prune $MAIN_IMAGE:latest > /dev/null
 fi
 
 # remove aws docker containers if they exist
@@ -67,7 +67,7 @@ testedImage=${TEST_IMAGE}:${TAG}
 dockerImage=$(docker images -q $testedImage 2> /dev/null)
 if [[ $dockerImage != "" ]]; then
 	echo "Cleaning $testedImage"
-	docker rmi $testedImage > /dev/null
+	docker rmi --no-prune $testedImage > /dev/null
 fi
 
 # do not remove related test-runner image (for cache purpose)
