@@ -1,19 +1,18 @@
 FROM osimis/webapp-builder:1.1.1
 
-RUN mkdir /frontend
-
-COPY package.json /frontend
-COPY bower.json /frontend
-
+# Install frontend dependencies
 WORKDIR /frontend
-
-# npm cache clean # make sure install is fine
+COPY package.json .
+COPY bower.json .
 RUN npm install --unsafe-perm --python=python2.7
-
-# install 2 times (for random phantom_js download issues)
-RUN npm install --unsafe-perm --python=python2.7
-
 RUN bower install --allow-root
+# Make sure the home-made developed injectInlineWorker plugin has not been erased by npm install
+COPY node_modules/gulp-injectInlineWorker/ node_modules/gulp-injectInlineWorker/
 
-ENTRYPOINT [ "bash",  "/frontend/scripts/buildFrontendFromDocker.sh" ]
-CMD [ "0000000" ]
+# Build frontend
+WORKDIR /frontend
+COPY . .
+RUN ./scripts/buildFrontendFromDocker.sh
+
+# Use true as an entrypoint to cache the build script output
+ENTRYPOINT [ "true" ]

@@ -27,12 +27,6 @@
 #   # Build unit tests
 #   include(${WebViewerTests}/WebViewerTests.cmake)
 
-# Distribution-specific settings
-set(USE_SYSTEM_GOOGLE_TEST ON CACHE BOOL "Use the system version of Google Test")
-set(USE_GTEST_DEBIAN_SOURCE_PACKAGE OFF CACHE BOOL "Use the sources of Google Test shipped with libgtest-dev (Debian only)")
-mark_as_advanced(USE_GTEST_DEBIAN_SOURCE_PACKAGE)
-include(${ORTHANC_DIR}/Resources/CMake/GoogleTestConfiguration.cmake)
-
 # Create unit test executable
 add_executable(UnitTests
   ${GTEST_SOURCES}

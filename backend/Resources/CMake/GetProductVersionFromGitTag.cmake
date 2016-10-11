@@ -11,11 +11,11 @@ execute_process(COMMAND
     RESULT_VARIABLE
     res
     OUTPUT_VARIABLE
-    gitRepoVersion
+    GIT_REPO_VERSION
     ERROR_QUIET
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 if(NOT res EQUAL 0)
-    message(FATAL_ERROR "could not describe git tag.  Make sure you have already tagged your repo with a command like 'git tag -a \"0.1.0\".  ' ${gitRepoVersion}-${res}")
+    message(FATAL_ERROR "could not describe git tag.  Make sure you have already tagged your repo with a command like 'git tag -a \"0.1.0\".  ' ${GIT_REPO_VERSION}-${res}")
 endif()
 
 # get git branch
@@ -30,14 +30,14 @@ execute_process(COMMAND
 )
 
 message("CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
-message("Git version = ${gitRepoVersion}")
+message("Git version = ${GIT_REPO_VERSION}")
 
 #parse the version information into pieces.
-string(REGEX REPLACE "^([0-9]+)\\..*" "\\1" PRODUCT_VERSION_MAJOR "${gitRepoVersion}")
-string(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1" PRODUCT_VERSION_MINOR "${gitRepoVersion}")
-string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" PRODUCT_VERSION_PATCH "${gitRepoVersion}")
-string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.[0-9]+-([0-9]+)-.*" "\\1" PRODUCT_VERSION_COMMIT_NUMBER "${gitRepoVersion}")
-string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.[0-9]+-[0-9]+-g(.*)" "\\1" PRODUCT_VERSION_COMMIT_SHA1_STRING "${gitRepoVersion}")
+string(REGEX REPLACE "^([0-9]+)\\..*" "\\1" PRODUCT_VERSION_MAJOR "${GIT_REPO_VERSION}")
+string(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1" PRODUCT_VERSION_MINOR "${GIT_REPO_VERSION}")
+string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" PRODUCT_VERSION_PATCH "${GIT_REPO_VERSION}")
+string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.[0-9]+-([0-9]+)-.*" "\\1" PRODUCT_VERSION_COMMIT_NUMBER "${GIT_REPO_VERSION}")
+string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.[0-9]+-[0-9]+-g(.*)" "\\1" PRODUCT_VERSION_COMMIT_SHA1_STRING "${GIT_REPO_VERSION}")
 string(TIMESTAMP PRODUCT_VERSION_BUILD_YEAR %Y)
 string(TIMESTAMP PRODUCT_VERSION_BUILD_MONTH %m)
 string(TIMESTAMP PRODUCT_VERSION_BUILD_DAY %d)
@@ -50,12 +50,13 @@ message(${PRODUCT_VERSION_COMMIT_SHA1_STRING})
 message(${PRODUCT_VERSION_SHORT_STRING})
 
 #define macros that can be reused inside the C++ code (i.e, in the resources.rc file when building a windows DLL)
-add_definitions(-DPRODUCT_VERSION_BRANCH=${PRODUCT_VERSION_BRANCH})
-add_definitions(-DPRODUCT_VERSION_MAJOR=${PRODUCT_VERSION_MAJOR})
-add_definitions(-DPRODUCT_VERSION_MINOR=${PRODUCT_VERSION_MINOR})
-add_definitions(-DPRODUCT_VERSION_PATCH=${PRODUCT_VERSION_PATCH})
-add_definitions(-DPRODUCT_VERSION_COMMIT_NUMBER=${PRODUCT_VERSION_COMMIT_NUMBER})
-add_definitions(-DPRODUCT_VERSION_COMMIT_SHA1_STRING=\"${PRODUCT_VERSION_COMMIT_SHA1_STRING}\")
-add_definitions(-DPRODUCT_VERSION_BUILD_YEAR_STRING=\"${PRODUCT_VERSION_BUILD_YEAR}\")
-add_definitions(-DPRODUCT_VERSION_BUILD_MONTH_STRING=\"${PRODUCT_VERSION_BUILD_MONTH}\")
-add_definitions(-DPRODUCT_VERSION_BUILD_DAY_STRING=\"${PRODUCT_VERSION_BUILD_DAY}\")
+# @note Commented because add_definitions breaks incremental build (use target_compile_definitions instead!)
+# add_definitions(-DPRODUCT_VERSION_BRANCH=${PRODUCT_VERSION_BRANCH})
+# add_definitions(-DPRODUCT_VERSION_MAJOR=${PRODUCT_VERSION_MAJOR})
+# add_definitions(-DPRODUCT_VERSION_MINOR=${PRODUCT_VERSION_MINOR})
+# add_definitions(-DPRODUCT_VERSION_PATCH=${PRODUCT_VERSION_PATCH})
+# add_definitions(-DPRODUCT_VERSION_COMMIT_NUMBER=${PRODUCT_VERSION_COMMIT_NUMBER})
+# add_definitions(-DPRODUCT_VERSION_COMMIT_SHA1_STRING=\"${PRODUCT_VERSION_COMMIT_SHA1_STRING}\")
+# add_definitions(-DPRODUCT_VERSION_BUILD_YEAR_STRING=\"${PRODUCT_VERSION_BUILD_YEAR}\")
+# add_definitions(-DPRODUCT_VERSION_BUILD_MONTH_STRING=\"${PRODUCT_VERSION_BUILD_MONTH}\")
+# add_definitions(-DPRODUCT_VERSION_BUILD_DAY_STRING=\"${PRODUCT_VERSION_BUILD_DAY}\")
