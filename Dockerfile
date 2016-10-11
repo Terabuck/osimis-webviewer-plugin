@@ -21,8 +21,8 @@ RUN cd /root/osimis-webviewer/backend && \
     -DBUILD_INTERMEDIATE_TARGETS:BOOL=OFF \
     -DBUILD_FINAL_TARGETS:BOOL=OFF \
     .. && \
-    make GDCM && \
-    make WebViewerDependencies
+    make GDCM -j$(nproc) && \
+    make -j$(nproc) WebViewerDependencies
 
 # Copy everything required to build the intermediate library
 COPY ./backend/WebViewerLibrary/ /root/osimis-webviewer/backend/WebViewerLibrary/
@@ -36,7 +36,7 @@ RUN cd /root/osimis-webviewer/backend/Build && \
     -DBUILD_INTERMEDIATE_TARGETS:BOOL=ON \
     -DBUILD_FINAL_TARGETS:BOOL=OFF \
     .. && \
-    make WebViewerLibrary
+    make -j$(nproc) WebViewerLibrary
 
 # Copy everything required to build unit tests & the final library (including the .git folder to retrieve tags)
 # COPY ./.git/ /root/osimis-webviewer/.git/
@@ -57,9 +57,9 @@ RUN cd /root/osimis-webviewer/backend/Build && \
     -DBUILD_INTERMEDIATE_TARGETS:BOOL=ON \
     -DBUILD_FINAL_TARGETS:BOOL=ON \
     .. && \
-    make EmbeddedResourcesGenerator && \
-    make UnitTests && \
-    make OsimisWebViewer && \
+    make -j$(nproc) EmbeddedResourcesGenerator && \
+    make -j$(nproc) UnitTests && \
+    make -j$(nproc) OsimisWebViewer && \
     cp -L UnitTests /root/OsimisViewerUnitTests && \
     cp -L libOsimisWebViewer.so /usr/share/orthanc/plugins/ && \
     cd /root/ && \
