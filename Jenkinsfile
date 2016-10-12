@@ -6,7 +6,8 @@ def isUserDevBranch = env.BRANCH_NAME != "dev" && env.BRANCH_NAME != "master" &&
 def userInput = [
     buildDocker: true,
     buildWindows: isUserDevBranch ? false : true,
-    buildOSX: isUserDevBranch ? false : true
+    buildOSX: isUserDevBranch ? false : true,
+    syncS3DicomSamples: false
 ];
 
 if (/*!isUserDevBranch*/ false) { // @warning @todo uncomment to force windows build on dev
@@ -20,9 +21,10 @@ else {
         timeout(time: 30, unit: 'SECONDS') {
             userInput = input(
                 id: 'userInput', message: 'Configure build', parameters: [
-                    [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildDocker'], description: 'Build Docker (/!\\ false -> disable tests)', name: 'buildDocker'],
+                    [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildDocker'], description: 'Build Docker (/!\\ false -> disable tests & deployment)', name: 'buildDocker'],
                     [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildWindows'], description: 'Build Windows', name: 'buildWindows'],
-                    [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildOSX'], description: 'Build OSX', name: 'buildOSX']
+                    [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildOSX'], description: 'Build OSX', name: 'buildOSX'],
+                    [$class: 'BooleanParameterDefinition', defaultValue: userInput['syncS3DicomSamples'], description: 'Sync S3 DICOM samples', name: 'syncS3DicomSamples']
                 ]
             )
         }
@@ -33,9 +35,10 @@ else {
 }
 
 // Print the build parameters
-echo 'Build Docker  : ' + (userInput['buildDocker'] ? 'OK' : 'KO (/!\\ tests disabled)')
-echo 'Build Windows : ' + (userInput['buildWindows'] ? 'OK' : 'KO')
-echo 'Build OSX     : ' + (userInput['buildOSX'] ? 'OK' : 'KO')
+echo 'Build Docker          : ' + (userInput['buildDocker'] ? 'OK' : 'KO (/!\\ tests disabled)')
+echo 'Build Windows         : ' + (userInput['buildWindows'] ? 'OK' : 'KO')
+echo 'Build OSX             : ' + (userInput['buildOSX'] ? 'OK' : 'KO')
+echo 'Sync S3 DICOM samples : ' + (userInput['syncS3DicomSamples'] ? 'OK' : 'KO')
 
 // Lock overall build to avoid issues related to slow unit test runs or docker ip/name conflicts for instance
 // This allow to benefits the optimization of using a common workspace for every branches (for instance, test
@@ -123,6 +126,45 @@ lock(resource: 'webviewer', inversePrecedence: false) {
     }
 
     parallel(buildMap)
+
+    // Deploy docker image
+    if (userInput['buildDocker']) {
+        stage('Deploy: docker demo') {
+            node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
+                    if (userInput['syncS3DicomSamples']) {
+                        sh '. ${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}/.env && demo/build.sh ${BRANCH_NAME} true'
+                    }
+                    else {
+                        sh '. ${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}/.env && demo/build.sh ${BRANCH_NAME} false'
+                    }
+                    sh '. ${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}/.env && demo/deploy.sh -p ${DEMO_PORT} -t ${BRANCH_NAME} -b ${BRANCH_NAME} -u "http://lify.io.osidev.net:%s/"'
+
+                    // Retrieve port
+                    sh '. ${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}/.env && echo ${DEMO_PORT} > .port'
+                    def DEMO_PORT = readFile('.port').trim()
+                    sh 'rm .port'
+
+                    // Retrieve ticket number
+                    def ticketNumber = "?"
+                    if (isUserDevBranch) {
+                        try {
+                            ticketNumber = ((env.BRANCH_NAME =~ /.+(?:\-|\/)(\w+\-\d+).*/)[0][1])
+                        } catch(err) {
+                            // ignore incompatible branch name
+                        }
+                    }
+
+                    // Send message on slack with address
+                    slackSend color: '#800080', message: "wvb: ${BRANCH_NAME} deployed.\n- http://lify.io.osidev.net:${DEMO_PORT}/osimis-viewer/app/index.html\n- https://osimis.myjetbrains.com/youtrack/issue/${ticketNumber}"
+                }
+            }}}
+        }
+    }
+
+    // @todo Ask confirmation for publication when on master/release branch?
+    if (!isUserDevBranch) {
+    }
 
     // Wait for docker build (& integration tests) before running publishing scripts
 

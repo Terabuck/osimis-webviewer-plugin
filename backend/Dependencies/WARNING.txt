@@ -1,0 +1,6 @@
+The boost GIL library available in this folder has been patched by Osimis.
+
+The provided modifications are:
+- Adobe extensions' inclusion
+- Compatibility with recent compilers (C++03)
+- Compatibility with C++11
