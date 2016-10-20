@@ -9,6 +9,20 @@ set -e # exit on error (and avoid recursive call to errorHandler in ciErrorHandl
 echo "------------------------"
 echo "Cleaning up..."
 
+# remove test runner docker container if exists
+echo "Cleaning $TEST_COMPOSE_PROJECT docker compose project"
+docker-compose -f $TEST_COMPOSE_FILE -p $TEST_COMPOSE_PROJECT down --volumes > /dev/null
+
+testedImage=${TEST_IMAGE}:${TAG}
+dockerImage=$(docker images -q $testedImage 2> /dev/null)
+if [[ $dockerImage != "" ]]; then
+	echo "Cleaning $testedImage"
+	docker rmi --no-prune $testedImage > /dev/null
+fi
+
+# do not remove related test-runner image (for cache purpose)
+# testedImage=${TEST_RUNNER_IMAGE}
+
 # cleanup osimis/orthanc-webviewer-plugin related images
 dockerImage=$(docker images -q $MAIN_IMAGE:$TAG 2> /dev/null)
 if [[ $dockerImage != "" ]]; then
@@ -58,20 +72,6 @@ if [[ "${JS_BUILDER_CONTAINER_ID}" != "" ]]; then
 		docker rm -v $dockerContainer > /dev/null
 	fi
 fi
-
-# remove test runner docker container if exists
-echo "Cleaning $TEST_COMPOSE_PROJECT docker compose project"
-docker-compose -f $TEST_COMPOSE_FILE -p $TEST_COMPOSE_PROJECT down --volumes > /dev/null
-
-testedImage=${TEST_IMAGE}:${TAG}
-dockerImage=$(docker images -q $testedImage 2> /dev/null)
-if [[ $dockerImage != "" ]]; then
-	echo "Cleaning $testedImage"
-	docker rmi --no-prune $testedImage > /dev/null
-fi
-
-# do not remove related test-runner image (for cache purpose)
-# testedImage=${TEST_RUNNER_IMAGE}
 
 echo "...cleaned up"
 
