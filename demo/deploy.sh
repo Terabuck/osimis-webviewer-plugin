@@ -51,14 +51,13 @@ while getopts "hu:p:t:b:" opt; do
 	esac
 done
 
+set -x
+
 # Stop all previous demo using the same tag
 docker rm $(docker stop $(docker ps -a -q --filter ancestor=${demoImage}:${tag} --format="{{.ID}}")) || true
 
 # Launch demo
 docker run -p ${port}:8042 -v ${dataVolumeName}:${orthancInternalDataPath} -d ${demoImage}:${tag}
-
-# Check every hour to kill the demo once remote git branch no longer exist (hope this work)
-${srcRoot}/demo/undeployOnBranchDeleted.sh
 
 # Print URL
 if [[ $uriTemplate ]]; then
