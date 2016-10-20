@@ -53,11 +53,15 @@ done
 
 set -x
 
-# Stop all previous demo using the same tag
-docker rm $(docker stop $(docker ps -a -q --filter ancestor=${demoImage}:${tag} --format="{{.ID}}")) || true
+# Stop previous demo using the same tag (if exists)
+demoContainer="$(echo "wv_demo_${tag}" | LC_CTYPE=POSIX \
+	tr -c -d '[:alnum:]' \
+	| dd conv=lcase 2> /dev/null
+)"
+docker rm $(docker stop $(docker ps -a -q --filter name=${demoContainer} --format="{{.ID}}")) || true
 
 # Launch demo
-docker run -p ${port}:8042 -v ${dataVolumeName}:${orthancInternalDataPath} -d ${demoImage}:${tag}
+docker run -p ${port}:8042 -v ${dataVolumeName}:${orthancInternalDataPath} --name ${demoContainer} -d ${demoImage}:${tag}
 
 # Print URL
 if [[ $uriTemplate ]]; then
