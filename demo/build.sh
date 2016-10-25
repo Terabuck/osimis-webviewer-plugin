@@ -42,9 +42,6 @@ demoImage=${DEMO_IMAGE:-osimis/orthanc-webviewer-plugin/demo}
 
 # source: lify/scripts/createOrthancImageWithSample.sh
 
-# clean previous demo with the same name
-docker rm -f ${tmpOrthancContainer} || true
-
 # creates the network used to bind the populator with the orthanc demo
 docker network create ${network} || true
 
