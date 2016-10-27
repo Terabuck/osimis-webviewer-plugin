@@ -1,10 +1,8 @@
 describe('backend', function() {
 
     beforeEach(function() {
-        bard.asyncModule('webviewer', function(wvConfigProvider) {
-            wvConfigProvider.setApiURL(window.orthancUrl || '/');
-        });
-        bard.inject('wvSeriesManager', 'WvHttpRequest', 'wvImageBinaryManager', 'WvImageQualities', 'wvInstanceManager');
+        bard.asyncModule('webviewer');
+        bard.inject('wvSeriesManager', 'WvHttpRequest', 'wvImageBinaryManager', 'WvImageQualities', 'wvInstanceManager', 'wvConfig');
 
         seriesId = '7982dce8-d6a3ce66-d6fac396-d2427a98-61d94367:0';
         seriesId2 = '5910c9dd-4c2f8394-a9d63c4a-983e3837-7acded9b:0';
@@ -354,6 +352,19 @@ describe('backend', function() {
                     // Succeed on error - if image has not been retrieved
                     assert.equal(error.status, 404);
                 });
+        });
+
+    });
+
+    describe('route /config', function() {
+
+        it('should return webviewer version to the frontend', function() {
+            // The retrieval is already done at init time, no need to do it again
+            
+            // Expect frontend config to contain versions
+            assert.match(wvConfig.version.orthanc, /^(mainline|(\d+\.?)+)$/, "bad version format");
+            assert.match(wvConfig.version.db, /^\d+$/, "bad version format");
+            assert.match(wvConfig.version.webviewer, /^(\d+\.?){3,4}(-\w+)?(-dirty)?$/, "bad version format");
         });
 
     });

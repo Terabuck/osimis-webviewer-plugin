@@ -57,13 +57,22 @@ public:
 
   /**
    * Retrieve a specific set of options for the frontend.
-   * This returns an empty json hash at the moment, but is inherited in wvp.
+   * This only return the version at the moment, but is inherited in wvp.
    *
    * @rationale
    * The goal is to avoid having secure-sensitive options available from the frontend while letting
    * the webviewerpro easily inherit this class to add additional options.
    *
-   * @return Json::Value
+   * @return Json::Value The webviewer configuration (includes current versions)
+   *     ```json
+   *     {
+   *       "version": {
+   *         "orthanc": x.x.x,
+   *         "webviewer": x.x.x,
+   *         "db": x.x.x
+   *       }
+   *     }
+   *     ```
    */
   virtual Json::Value getFrontendConfig() const;
 

@@ -26,9 +26,6 @@
     function beforeEach() {
         window.beforeEach(function() {
             bard.asyncModule('webviewer', 
-                function(wvConfigProvider) {
-                    wvConfigProvider.setApiURL(window.orthancUrl || '/');
-                },
                 function($exceptionHandlerProvider) {
                     $exceptionHandlerProvider.mode('rethrow');
                 },

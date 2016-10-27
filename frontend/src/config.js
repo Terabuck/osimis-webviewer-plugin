@@ -1,2 +1,1 @@
-// URL of the localhost orthanc server for development purpose
-window.orthancUrl = '/orthanc/';
+alert('things have change, config.js should not be loaded anymore!')

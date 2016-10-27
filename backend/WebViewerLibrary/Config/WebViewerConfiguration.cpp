@@ -97,5 +97,29 @@ void WebViewerConfiguration::parseFile()
 }
 
 Json::Value WebViewerConfiguration::getFrontendConfig() const {
-  return Json::Value();
+  Json::Value config;
+
+  // Register "version" 
+  // @todo move external requests out of model object (cleaner)
+  {
+    Json::Value system;
+    if (!OrthancPlugins::GetJsonFromOrthanc(system, _context, "/system"))
+    {
+      throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
+    }
+    config["version"]["orthanc"] = system["Version"].asString();
+    config["version"]["db"] = system["DatabaseVersion"].asString();
+  }
+
+  {
+    Json::Value plugin;
+    // @warning @todo don't use /plugins/*osimis-web-viewer* route !! May change in wv-pro
+    if (!OrthancPlugins::GetJsonFromOrthanc(plugin, _context, "/plugins/osimis-web-viewer"))
+    {
+      throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
+    }
+    config["version"]["webviewer"] = plugin["Version"].asString();
+  }
+
+  return config;
 }

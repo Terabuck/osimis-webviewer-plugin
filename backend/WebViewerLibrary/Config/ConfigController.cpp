@@ -1,7 +1,6 @@
 #include "ConfigController.h"
 
 #include <assert.h>
-#include <json/Value.h>
 #include <Core/OrthancException.h>
 
 #include "../OrthancContextManager.h"
@@ -37,10 +36,10 @@ int ConfigController::_ProcessRequest()
     OrthancPluginLogInfo(context, message.c_str());
 
     // Retrieve the frontend related config
-    Json::Value frontendConfig = _config->getFrontendConfig();
+    std::string frontendConfig = "var __webViewerConfig = " + _config->getFrontendConfig().toStyledString() + ";";
 
     // Answer Request with frontend config as JSON
-    return this->_AnswerBuffer(frontendConfig.toStyledString(), "application/json");
+    return this->_AnswerBuffer(frontendConfig, "application/javascript");
   }
   catch (const Orthanc::OrthancException& exc) {
     OrthancPluginLogInfo(context, exc.What());

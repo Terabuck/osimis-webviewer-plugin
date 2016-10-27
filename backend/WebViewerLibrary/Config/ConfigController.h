@@ -2,6 +2,9 @@
 
 /**
  * The `ConfigController` controller share the frontend configuration publicly.
+ *
+ * The config is shared via the route `/osimis-viewer/config.js`. It's served as a JS
+ * file because it's easier to handle synchronous JS configuration than JSON one.
  */
 
 #include "../BaseController.h"

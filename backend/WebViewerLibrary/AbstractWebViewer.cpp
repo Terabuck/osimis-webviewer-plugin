@@ -92,7 +92,7 @@ void AbstractWebViewer::_serveBackEnd()
   // Register routes & controllers
   RegisterRoute<ImageController>("/osimis-viewer/images/");
   RegisterRoute<SeriesController>("/osimis-viewer/series/");
-  RegisterRoute<ConfigController>("/osimis-viewer/config/");
+  RegisterRoute<ConfigController>("/osimis-viewer/config.js");
 
   // OrthancPluginRegisterRestCallbackNoLock(_context, "/osimis-viewer/is-stable-series/(.*)", IsStableSeries);
 }
