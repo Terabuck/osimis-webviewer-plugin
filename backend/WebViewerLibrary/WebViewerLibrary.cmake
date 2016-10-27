@@ -64,10 +64,11 @@ add_library(WebViewerLibrary
   ${VIEWER_LIBRARY_DIR}/Image/ImageMetaData.cpp
   ${VIEWER_LIBRARY_DIR}/Image/ImageRepository.cpp
   ${VIEWER_LIBRARY_DIR}/Image/ImageController.cpp
-  
+  ${VIEWER_LIBRARY_DIR}/Config/WebViewerConfiguration.cpp
+  ${VIEWER_LIBRARY_DIR}/Config/ConfigController.cpp
+
   ${VIEWER_LIBRARY_DIR}/BenchmarkHelper.cpp
   ${VIEWER_LIBRARY_DIR}/ViewerToolbox.cpp
-  ${VIEWER_LIBRARY_DIR}/WebViewerConfiguration.cpp
   ${VIEWER_LIBRARY_DIR}/AbstractWebViewer.cpp
   )
 

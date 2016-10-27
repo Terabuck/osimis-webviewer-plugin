@@ -295,6 +295,11 @@ These routes are considered unstable and may change often between MAJOR versions
 /osimis-viewer/series/<series_uid:str>
 ```
 
+- Provide configuration for frontend
+```
+/osimis-viewer/config
+```
+
 The following Orthanc routes are also used:
 
 ```

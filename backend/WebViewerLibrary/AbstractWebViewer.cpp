@@ -22,17 +22,15 @@
 #include "Series/SeriesController.h"
 #include "Image/ImageRepository.h"
 #include "Image/ImageController.h"
+#include "Config/ConfigController.h"
+#include "Config/WebViewerConfiguration.h"
 #include "DecodedImageAdapter.h"
-#include "WebViewerConfiguration.h"
 
 namespace
 {
   // Needed locally for use by orthanc's callbacks
   OrthancPluginContext* _context;
   const WebViewerConfiguration* _config;
-
-  // Call WebViewerConfiguration#parseFile and add logs accordingly
-  void _parseConfigFile(WebViewerConfiguration* config);
 
   void _configureDicomDecoderPolicy();
   
@@ -77,7 +75,7 @@ std::auto_ptr<WebViewerConfiguration> AbstractWebViewer::_createConfig()
   WebViewerConfiguration* config = new WebViewerConfiguration(_context);
 
   // Parse config
-  _parseConfigFile(config); // may throw
+  config->parseFile(); // may throw
 
   return std::auto_ptr<WebViewerConfiguration>(config);
 }
@@ -85,9 +83,16 @@ std::auto_ptr<WebViewerConfiguration> AbstractWebViewer::_createConfig()
 
 void AbstractWebViewer::_serveBackEnd()
 {
+  assert(_config.get() != NULL);
+
+  // Inject config within ConfigController (we can't do it without static method
+  // since Orthanc API doesn't allow us to pass attributes when processing REST request)
+  ConfigController::setConfig(_config.get());
+  
   // Register routes & controllers
   RegisterRoute<ImageController>("/osimis-viewer/images/");
   RegisterRoute<SeriesController>("/osimis-viewer/series/");
+  RegisterRoute<ConfigController>("/osimis-viewer/config/");
 
   // OrthancPluginRegisterRestCallbackNoLock(_context, "/osimis-viewer/is-stable-series/(.*)", IsStableSeries);
 }
@@ -95,6 +100,7 @@ void AbstractWebViewer::_serveBackEnd()
 AbstractWebViewer::AbstractWebViewer(OrthancPluginContext* context)
 {
   _context = context;
+  _config = std::auto_ptr<WebViewerConfiguration>(NULL); // set in #start()
 
   // Share the context statically with the _decodeImageCallback and other orthanc C callbacks
   ::_context = _context;
@@ -127,7 +133,7 @@ int32_t AbstractWebViewer::start()
 
   // Set default configuration
   try {
-    this->_config = _createConfig();
+    _config = _createConfig();
   }
   catch(...) {
     // @todo handle error logging at that level (or even upper -> better)
@@ -139,7 +145,7 @@ int32_t AbstractWebViewer::start()
   ::_config = _config.get();
 
   // Inject configuration within components
-  _imageRepository->enableCachedImageStorage(this->_config->cachedImageStorageEnabled);
+  _imageRepository->enableCachedImageStorage(_config->cachedImageStorageEnabled);
 
   // Configure DICOM decoder policy (GDCM/internal)
   _configureDicomDecoderPolicy();
@@ -159,31 +165,6 @@ AbstractWebViewer::~AbstractWebViewer()
 
 namespace
 {
-  void _parseConfigFile(WebViewerConfiguration* config)
-  {
-      try
-      {
-        config->parseFile();
-      }
-      catch (std::runtime_error& e)
-      {
-        OrthancPluginLogError(::_context, e.what());
-        throw;
-      }
-      catch (Orthanc::OrthancException& e)
-      {
-        if (e.GetErrorCode() == Orthanc::ErrorCode_BadFileFormat)
-        {
-          OrthancPluginLogError(::_context, "Unable to read the configuration of the Web viewer plugin");
-        }
-        else
-        {
-          OrthancPluginLogError(::_context, e.What());
-        }
-        throw;
-      }
-  }
-
   void _configureDicomDecoderPolicy()
   {
     // Configure the DICOM decoder

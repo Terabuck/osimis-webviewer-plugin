@@ -7,6 +7,7 @@
  * The `wvConfig` provider is used:
  *   * To retrieve/configure the Orthanc's path.
  *   * To retrieve the web-viewer version.
+ *   * To retrieve frontend configuration (defined from backend config files).
  *   * To configure user authentication (see the httpRequestHeaders method documentation below).
  *
  * Warning: Web Viewer is uncompatible with <base> HTML element (due to SVG/XLink issue)! Don't use it!
@@ -55,6 +56,12 @@
             orthanc: null,
             db: null
         };
+
+        // Frontend config retrieved from server.
+        // Intended to enabled/disable/configure frontend features from
+        // serverside orthanc configuration file.
+        this.frontend = {};
+
         this.browser = {};
         this.orthancApiURL = null;
         this.httpRequestHeaders = {};
@@ -138,6 +145,7 @@
         // We don't have to set this if the following routes are on public access
         // - /plugins/osimis-web-viewer
         // - /system
+        // - /osimis-viewer/config
         this.setHttpRequestHeaders = _config.setHttpRequestHeaders.bind(_config);
 
         var urlConvertor = new osi.OrthancUrlConvertor(
@@ -145,6 +153,7 @@
             window.location.hostname,
             window.location.port,
             window.location.pathname);
+
         this.setApiURL = function(orthancApiUrl) {
             _config.orthancApiURL = urlConvertor.toAbsoluteURL(orthancApiUrl);
         };
@@ -162,6 +171,9 @@
             var request2 = new WvHttpRequest();
             request2.setHeaders(_config.httpRequestHeaders);
             var orthancInfo = request2.get(_config.orthancApiURL + '/system');
+
+            // Retrieve frontend config from server
+            var serverConfig = request1.get(_config.orthancApiURL + '/osimis-viewer/config');
 
             $q.all({
                 plugin: pluginInfo,
@@ -189,7 +201,6 @@
                     return $q.reject('frontend version ' + _config.version.frontend +
                         ' is incompatible with the plugin version ' + _config.version.plugin);
                 }
-
             }, function(err) {
                 // Request failed
                 // should never thrown because inside of a promise - !but! angular uses $q.reject instead
