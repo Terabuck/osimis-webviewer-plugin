@@ -31,10 +31,6 @@
 # Include version (taken from git tag)
 include(${RESOURCES_DIR}/CMake/GetProductVersionFromGitTag.cmake) # see target_compile_definitions below target for more info
 
-MESSAGE( STATUS "PRODUCT_VERSION_BRANCH:         " ${PRODUCT_VERSION_BRANCH} )
-MESSAGE( STATUS "PRODUCT_VERSION_SHORT_STRING:   " ${PRODUCT_VERSION_SHORT_STRING} )
-MESSAGE( STATUS "JS_FRONTEND_VERSION:            " ${JS_FRONTEND_VERSION} )
-
 # Set build parameters
 set(STANDALONE_BUILD ON CACHE BOOL "Standalone build (all the resources are embedded, necessary for releases)")
 set(JS_CLIENT_PATH "${VIEWER_FRONTEND_DIR}/build" CACHE STRING "Path of the front-end build folder")
@@ -46,6 +42,10 @@ else()
   # Set frontend version based on the commit id for all other builds including the release version
   set(JS_FRONTEND_VERSION ${PRODUCT_VERSION_COMMIT_SHA1_STRING})
 endif()
+
+MESSAGE( STATUS "PRODUCT_VERSION_BRANCH:         " ${PRODUCT_VERSION_BRANCH} )
+MESSAGE( STATUS "PRODUCT_VERSION_SHORT_STRING:   " ${PRODUCT_VERSION_SHORT_STRING} )
+MESSAGE( STATUS "JS_FRONTEND_VERSION:            " ${JS_FRONTEND_VERSION} )
 
 # Download the frontend lib
 if(NOT ${JS_FRONTEND_VERSION} STREQUAL "LOCAL") 
