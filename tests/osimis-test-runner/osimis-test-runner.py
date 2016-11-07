@@ -154,7 +154,7 @@ except:
 
 # Launch karma
 karmaEnv = os.environ.copy()
-karmaEnv["ORTHANC_URL"] = "http://" + orthancHost + ":" + str(orthancHttpPort) + "/"
+karmaEnv["ORTHANC_URL"] = "http://" + orthancHost + ":" + str(orthancHttpPort)
 for i in range(0, runCount):
 	karma = subprocess.Popen(
 		shlex.split(karmaExec + ' start ' + karmaConf + (' --single-run' if singleRun else '')),

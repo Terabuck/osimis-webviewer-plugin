@@ -184,7 +184,6 @@ module.exports = function() {
                 bower.directory + '/jpeg-lossless-decoder-js/release/current/lossless-min.js',
 
                 config.specHelpers,
-                client + 'config.js', // config file used to run tests
 
                 // Make sure worker files aren't included
                 {pattern: clientApp + '**/*.worker/*.js', included: false, served: true},

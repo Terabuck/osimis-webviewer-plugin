@@ -11,6 +11,13 @@
      */
     angular
     .module('webviewer', ['ngResource', 'ngSanitize', 'mgcrea.ngStrap', 'ngRangeFilter', 'debounce'])
+    .config(function($locationProvider) {
+        // Warning: Web Viewer is uncompatible with <base> HTML element (due to SVG/XLink issue)! Don't use it!
+        $locationProvider.html5Mode({
+            enabled: true,
+            requireBase: false
+        });
+    })
     .constant('$', window.$)
     .constant('_', window._)
     .constant('pako', window.pako)

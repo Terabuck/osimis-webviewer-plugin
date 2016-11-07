@@ -23,37 +23,53 @@ console.log('NODE_ENV=' + environment);
 
 // setting proxies
 var orthancProxy = httpProxy.createProxyServer();
+var orthancUrl = 'http://localhost:8042';
 
 // avoid crash on request cancel
 orthancProxy.on('error', function (err, req, res) {
 });
 
-app.all("/orthanc/*", function(req, res) {
-    var orthancUrl = 'http://localhost:8042';
+app.all('/config.js', function(req, res, next) {
+    // Prefix config.js with osimis-viewer/. The proxy has lost the "osimis-viewer" because it's the
+    // relative path `../config.js` -> `/../config.js` -> `/config.js`
+    req.url = '/osimis-viewer/' + req.url;
+    next();
+})
+app.all("/:service/*", function(req, res, next) {
+    var toRedirectToOrthanc = [
+        'osimis-viewer',
+        'studies',
+        'instances',
+        'series'
+    ];
 
-    console.log('redirecting to Orthanc server');
-    req.url = req.url.replace('/orthanc', '');
-    console.log(req.url);
-    console.log("final Url:", orthancUrl + req.url);
+    // Keep serving
+    if (toRedirectToOrthanc.indexOf(req.params.service) === -1) {
+        next();
+    }
+    // Redirect to orthanc
+    else {
+        console.log('redirecting ' + req.url + ' to Orthanc server ' + orthancUrl);
 
-    // There's a problem when handling post requests, replace the bodyParser middleware as in https://github.com/nodejitsu/node-http-proxy/issues/180
-    // and handle manually the body parsing
-    req.removeAllListeners('data');
-    req.removeAllListeners('end');
+        // There's a problem when handling post requests, replace the bodyParser middleware as in https://github.com/nodejitsu/node-http-proxy/issues/180
+        // and handle manually the body parsing
+        req.removeAllListeners('data');
+        req.removeAllListeners('end');
 
-    process.nextTick(function () {
-        if(req.body) {
-            if(req.header("Content-Type") == "application/x-www-form-urlencoded"){
-                req.emit('data', serializedIntoFormData(req.body));
-            }else{
-                req.emit('data', JSON.stringify(req.body));
+        process.nextTick(function () {
+            if(req.body) {
+                if(req.header("Content-Type") == "application/x-www-form-urlencoded"){
+                    req.emit('data', serializedIntoFormData(req.body));
+                }else{
+                    req.emit('data', JSON.stringify(req.body));
+                }
+
             }
-
-        }
-        req.emit('end');
-    });
-    
-    orthancProxy.web(req, res, {target: orthancUrl});
+            req.emit('end');
+        });
+        
+        orthancProxy.web(req, res, {target: orthancUrl});
+    }
 });
 
 switch (environment){

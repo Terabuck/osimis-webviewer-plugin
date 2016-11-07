@@ -1,11 +1,1 @@
-// URL of the orthanc server when the javascript is embedded inside orthanc
-window.orthancUrl = '/';
-
-// Remove debug info and improve performances
-// Can be reactivated on the fly using "angular.reloadWithDebugInfo();" in the console
-// see https://docs.angularjs.org/guide/production#disabling-debug-data
-angular
-.module('webviewer')
-.config(['$compileProvider', function ($compileProvider) {
-    $compileProvider.debugInfoEnabled(false);
-}]);
+alert('things have change, config.js should not be loaded anymore!')

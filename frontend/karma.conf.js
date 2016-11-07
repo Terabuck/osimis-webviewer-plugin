@@ -1,6 +1,13 @@
 module.exports = function(config) {
     var gulpConfig = require('./gulp.config')();
 
+    var orthancUrl = process.env.ORTHANC_URL || 'http://localhost:8042';
+
+    // Add orthanc served config file
+    gulpConfig.karma.files.push(orthancUrl + '/osimis-viewer/config.js')
+
+    console.log(gulpConfig.karma.files);
+
     config.set({
         // base path that will be used to resolve all patterns (eg. files, exclude)
         basePath: './',
@@ -19,11 +26,13 @@ module.exports = function(config) {
 
         proxies: {
             // Add orthanc route
-            '/orthanc/': 'http://localhost:8042/',
+            '/instances/': orthancUrl + '/instances/',
+            '/series/': orthancUrl + '/series/',
+            '/studies/': orthancUrl + '/studies/',
+            '/osimis-viewer/': orthancUrl + '/osimis-viewer/',
             // Proxy for web worker to work with mocha
             '/app/': '/base/src/app/',
-            '/bower_components/': '/base/bower_components/',
-            '/config.js': '/base/src/config.js'
+            '/bower_components/': '/base/bower_components/'
         },
 
         // preprocess matching files before serving them to the browser
