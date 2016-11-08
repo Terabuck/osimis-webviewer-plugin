@@ -1,6 +1,6 @@
 param(
      [Parameter(Position=0)][string]$branchName = "unknown",
-     [Parameter(Position=1)][string]$viewerVersion = "0.0.0-0-gxxxxxxxx-dirty" # git describe --tags --long --dirty=-dirty
+     [Parameter(Position=1)][string]$viewerVersion = "0.0.0-0-gxxxxxxxx-dirty", # git describe --tags --long --dirty=-dirty
      [Parameter(Position=2)][string]$action = "build"  # build/publish
 )
 
