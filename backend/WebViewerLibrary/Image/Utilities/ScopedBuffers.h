@@ -64,8 +64,8 @@ public:
 
 class ScopedOrthancPluginImage
 {
-  OrthancPluginImage* _image;
   OrthancPluginContext* _context;
+  OrthancPluginImage* _image;
 
 public:
     ScopedOrthancPluginImage(OrthancPluginContext* context, OrthancPluginImage* image)

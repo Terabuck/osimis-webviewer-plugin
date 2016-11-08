@@ -46,11 +46,12 @@ std::auto_ptr<IImageContainer> Uint8ConversionPolicy::Apply(std::auto_ptr<IImage
   BENCH(CONVERT_TO_UINT8);
 
   // Convert 8bit image to 16bit
-  Orthanc::ImageBuffer* outBuffer = new Orthanc::ImageBuffer;
-  outBuffer->SetMinimalPitchForced(true);
-  outBuffer->SetFormat(Orthanc::PixelFormat_Grayscale8);
-  outBuffer->SetWidth(inAccessor->GetWidth());
-  outBuffer->SetHeight(inAccessor->GetHeight());
+  std::auto_ptr<Orthanc::ImageBuffer> outBuffer(new Orthanc::ImageBuffer(
+      Orthanc::PixelFormat_Grayscale8,
+      inAccessor->GetWidth(),
+      inAccessor->GetHeight(),
+      true
+  ));
   Orthanc::ImageAccessor outAccessor = outBuffer->GetAccessor();
 
   if (pixelFormat == Orthanc::PixelFormat_Grayscale16)
@@ -68,7 +69,7 @@ std::auto_ptr<IImageContainer> Uint8ConversionPolicy::Apply(std::auto_ptr<IImage
   
   BENCH_LOG(SIZE_IN_BYTES, metaData->sizeInBytes);
 
-  RawImageContainer* rawOutputImage = new RawImageContainer(outBuffer);
+  RawImageContainer* rawOutputImage = new RawImageContainer(outBuffer.release()); // @todo take auto ptr as input
   return std::auto_ptr<IImageContainer>(rawOutputImage);
 }
 

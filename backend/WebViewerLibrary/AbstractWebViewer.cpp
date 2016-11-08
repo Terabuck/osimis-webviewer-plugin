@@ -45,6 +45,8 @@ namespace
   bool _extractTransferSyntax(std::string& transferSyntax,
                                const void* dicom,
                                const uint32_t size);
+
+  bool _displayPerformanceWarning();
 }
 
 bool AbstractWebViewer::_isOrthancCompatible()
@@ -120,6 +122,9 @@ AbstractWebViewer::AbstractWebViewer(OrthancPluginContext* context)
 
 int32_t AbstractWebViewer::start()
 {
+  // Display warning if assert are activated
+  assert(_displayPerformanceWarning());
+
   // @note we don't do the work within the constructor to ensure we can benefit from polymorphism
   OrthancPluginLogWarning(_context, "Initializing the Web viewer");
 
@@ -291,6 +296,12 @@ namespace
     }
   }
 
-
+  bool _displayPerformanceWarning()
+  {
+    (void) _displayPerformanceWarning;   // Disable warning about unused function
+    OrthancPluginLogWarning(_context, "Performance warning in Web viewer: "
+                            "Non-release build, runtime debug assertions are turned on");
+    return true;
+  }
 
 }

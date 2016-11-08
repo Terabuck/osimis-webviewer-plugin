@@ -195,7 +195,10 @@ namespace Orthanc
      * {summary}{Graylevel, floating-point image.}
      * {description}{The image is graylevel. Each pixel is floating-point and stored in 4 bytes.}
      **/
-    PixelFormat_Float32 = 6
+    PixelFormat_Float32 = 6,
+
+    // This is the memory layout for Cairo
+    PixelFormat_BGRA32 = 7
   };
 
 
@@ -385,6 +388,17 @@ namespace Orthanc
     RequestOrigin_Lua
   };
 
+  enum ServerBarrierEvent
+  {
+    ServerBarrierEvent_Stop,
+    ServerBarrierEvent_Reload  // SIGHUP signal: reload configuration file
+  };
+
+  enum FileMode
+  {
+    FileMode_ReadBinary,
+    FileMode_WriteBinary
+  };
 
   /**
    * The value representations Orthanc knows about. They correspond to

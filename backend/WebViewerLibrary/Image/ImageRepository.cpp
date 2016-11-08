@@ -25,7 +25,7 @@ std::string _getAttachmentNumber(int frameIndex, const IImageProcessingPolicy* p
 }
 
 ImageRepository::ImageRepository(DicomRepository* dicomRepository)
-  : _cachedImageStorageEnabled(true), _dicomRepository(dicomRepository)
+  : _dicomRepository(dicomRepository), _cachedImageStorageEnabled(true)
 {
 }
 
