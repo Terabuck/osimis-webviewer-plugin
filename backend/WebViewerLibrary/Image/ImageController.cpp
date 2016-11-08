@@ -31,7 +31,7 @@ void ImageController::Inject<ImageRepository>(ImageRepository* obj) {
 }
 
 ImageController::ImageController(OrthancPluginRestOutput* response, const std::string& url, const OrthancPluginHttpRequest* request)
-  : BaseController(response, url, request), frameIndex_(0), imageProcessingRouteParser_()
+  : BaseController(response, url, request), imageProcessingRouteParser_(), frameIndex_(0)
 {
   // Register sub routes
 
