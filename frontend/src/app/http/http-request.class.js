@@ -176,10 +176,10 @@
      *
      * @return {Promise} The result of the request
      */
-    // @note Commented untill we really need it. Need additional unit test once uncomment.
-    // HttpRequest.prototype.post = function(url, data) {
-    //     return this._send('POST', url, data);
-    // };
+    // @todo add additional unit test
+    HttpRequest.prototype.post = function(url, data) {
+        return this._send('POST', url, data);
+    };
 
     /**
      * @description

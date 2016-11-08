@@ -168,5 +168,5 @@ COPY frontend/ /frontend/
 WORKDIR /tests/osimis-test-runner
 # @note avoiding the '[ ]' docker syntax equals using 'sh -c' to process ENV.
 # @warning $ORTHANC_URL env doesn't seem to be overriden by docker-compose.yml
-ENV ORTHANC_URL=http://orthanc:8042
+ENV ORTHANC_URL=http://orthanc:8042/
 ENTRYPOINT python3 osimis-test-runner.py --manual-orthanc=$ORTHANC_URL 

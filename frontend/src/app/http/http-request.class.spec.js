@@ -116,6 +116,8 @@ describe('http', function() {
             return Promise.all([r1]);
         });
 
+        // @todo test POST requests
+
         it('should clone the provided header object', function() {
             // Mock xhr requests
             _server.respondWith(

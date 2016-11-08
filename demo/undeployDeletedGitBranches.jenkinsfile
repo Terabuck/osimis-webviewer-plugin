@@ -1,8 +1,0 @@
-stage ('Undeploy: Deleted git branches') {
-	node ('docker && master') {
-		checkout scm
-		withCredentials([[$class: 'StringBinding', credentialsId: 'git-as-text', variable: 'GIT_SSH_KEY']]) {
-			sh 'demo/undeployDeletedGitBranches.sh'
-		}
-	}
-}
