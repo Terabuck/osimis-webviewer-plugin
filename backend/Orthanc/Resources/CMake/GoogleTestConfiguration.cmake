@@ -12,7 +12,7 @@ elseif (STATIC_BUILD OR NOT USE_SYSTEM_GOOGLE_TEST)
   set(GTEST_URL "http://www.montefiore.ulg.ac.be/~jodogne/Orthanc/ThirdPartyDownloads/gtest-1.7.0.zip")
   set(GTEST_MD5 "2d6ec8ccdf5c46b05ba54a9fd1d130d7")
 
-  DownloadPackage(${GTEST_MD5} ${GTEST_URL} "${GTEST_SOURCES_DIR}" FALSE)
+  DownloadPackage(${GTEST_MD5} ${GTEST_URL} "${GTEST_SOURCES_DIR}")
 
   include_directories(
     ${GTEST_SOURCES_DIR}/include
@@ -22,6 +22,13 @@ elseif (STATIC_BUILD OR NOT USE_SYSTEM_GOOGLE_TEST)
   set(GTEST_SOURCES
     ${GTEST_SOURCES_DIR}/src/gtest-all.cc
     )
+
+  # https://code.google.com/p/googletest/issues/detail?id=412
+  if (MSVC) # VS2012 does not support tuples correctly yet
+    add_definitions(/D _VARIADIC_MAX=10)
+  endif()
+
+  source_group(ThirdParty\\GoogleTest REGULAR_EXPRESSION ${GTEST_SOURCES_DIR}/.*)
 
 else()
   include(FindGTest)

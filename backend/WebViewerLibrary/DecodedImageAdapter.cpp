@@ -115,6 +115,8 @@ namespace OrthancPlugins
         {
             BENCH(LOAD_DICOM);
 
+            // S. Jodogne now uses GetStringFromOrthanc(dicom, context_, "/instances/" + instanceId + "/file"
+            // @todo Use dicom repository instead !!
             if (!GetDicomFromOrthanc(dicom.getPtr(), context_, instanceId) ||
                 !GetJsonFromOrthanc(tags, context_, "/instances/" + instanceId + "/tags"))
             {
@@ -326,8 +328,6 @@ namespace OrthancPlugins
     accessor.AssignReadOnly(OrthancPlugins::Convert(image.GetFormat()), image.GetWidth(),
                             image.GetHeight(), image.GetPitch(), image.GetBuffer());
 
-    Orthanc::ImageBuffer buffer;
-    buffer.SetMinimalPitchForced(true);
 
     Orthanc::ImageAccessor converted;
 
@@ -339,10 +339,11 @@ namespace OrthancPlugins
 
       case Orthanc::PixelFormat_Grayscale8:
       case Orthanc::PixelFormat_Grayscale16:
-        buffer.SetFormat(Orthanc::PixelFormat_Grayscale16);
-        buffer.SetWidth(accessor.GetWidth());
-        buffer.SetHeight(accessor.GetHeight());
-        converted = buffer.GetAccessor();
+        buffer.reset(new Orthanc::ImageBuffer(Orthanc::PixelFormat_Grayscale16,
+                                              accessor.GetWidth(),
+                                              accessor.GetHeight(),
+                                              true /* force minimal pitch */));
+        converted = buffer->GetAccessor();
         Orthanc::ImageProcessing::Convert(converted, accessor);
         break;
 
@@ -363,7 +364,6 @@ namespace OrthancPlugins
     jsonResult["Orthanc"]["Compression"] = "Deflate";
     jsonResult["sizeInBytes"] = converted.GetSize();
 
-    CompressUsingDeflate(imageResult, image.GetContext(), converted.GetConstBuffer(), converted.GetSize());
 
     return true;
   }
@@ -427,8 +427,6 @@ namespace OrthancPlugins
     accessor.AssignReadOnly(OrthancPlugins::Convert(image.GetFormat()), image.GetWidth(),
                             image.GetHeight(), image.GetPitch(), image.GetBuffer());
 
-    Orthanc::ImageBuffer buffer;
-    buffer.SetMinimalPitchForced(true);
 
     Orthanc::ImageAccessor converted;
 
@@ -442,10 +440,13 @@ namespace OrthancPlugins
              accessor.GetFormat() == Orthanc::PixelFormat_SignedGrayscale16)
     {
       jsonResult["Orthanc"]["Stretched"] = true;
-      buffer.SetFormat(Orthanc::PixelFormat_Grayscale8);
-      buffer.SetWidth(accessor.GetWidth());
-      buffer.SetHeight(accessor.GetHeight());
-      converted = buffer.GetAccessor();
+
+      buffer.reset(new Orthanc::ImageBuffer(Orthanc::PixelFormat_Grayscale8,
+                                            accessor.GetWidth(),
+                                            accessor.GetHeight(),
+                                            true /* force minimal pitch */));
+      converted = buffer->GetAccessor();
+
 
       int64_t a, b;
       Orthanc::ImageProcessing::GetMinMaxValue(a, b, accessor);

@@ -3,6 +3,7 @@
 
 # Build dependencies
 set(ORTHANC_ROOT ${ORTHANC_DIR}) # required by orthanc's cmake
+set(ORTHANC_DISABLE_PATCH ON)  # No need for the "patch" command-line tool
 set(USE_SYSTEM_GOOGLE_TEST ON CACHE BOOL "Use the system version of Google Test")
 set(USE_GTEST_DEBIAN_SOURCE_PACKAGE OFF CACHE BOOL "Use the sources of Google Test shipped with libgtest-dev (Debian only)")
 mark_as_advanced(USE_GTEST_DEBIAN_SOURCE_PACKAGE)
