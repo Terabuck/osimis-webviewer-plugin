@@ -24,6 +24,7 @@ function _setEnvMain {
 	branchName=${1:-$(git rev-parse --abbrev-ref HEAD)} #if no argument defined, get the branch name from git
 	releaseCommitId=$(git rev-parse --short HEAD)
 
+	viewerVersion=$(git describe --tags --long --dirty=-dirty) # version as used in cmake for backend build
 
 	if [[ ! $branchName ]]; then
 		# Exit if detached head
@@ -84,6 +85,7 @@ tee <<EOT > .env
 export TAG=$tag
 export SRC_ROOT="$srcRoot"
 export BRANCH_NAME=$branchName
+export VIEWER_VERSION="$viewerVersion" # version as used in cmake for backend build
 
 # Delivery
 export MAIN_IMAGE=osimis/orthanc-webviewer-plugin

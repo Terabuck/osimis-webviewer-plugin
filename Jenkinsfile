@@ -10,6 +10,9 @@ def userInput = [
     syncS3DicomSamples: false
 ];
 
+// The built version, defined via `git describe` in scripts/setEnv.sh call
+def VIEWER_VERSION;
+
 if (/*!isUserDevBranch*/ false) { // @warning @todo uncomment to force windows build on dev
     echo 'Master/Dev branch: serious test & build business enforced...'
 }
@@ -45,6 +48,7 @@ echo 'Sync S3 DICOM samples : ' + (userInput['syncS3DicomSamples'] ? 'OK' : 'KO'
 // preparation docker image is reused in new branches), but can increase slowness if the branch content differences
 // is heavy (in terms of disk space). Use jenkins' dir plugin instead of ws plugin to have control over our own locking mechanism.
 // @warning make sure not to use the jenkins' dir plugin if this lock is removed.
+// @warning make sure we do not rely on `:latest-local` docker tags anymore if this lock is removed.
 lock(resource: 'webviewer', inversePrecedence: false) {
     def workspacePath = '../_common-wvb-ws'
 
@@ -54,6 +58,11 @@ lock(resource: 'webviewer', inversePrecedence: false) {
             checkout scm
             sh 'scripts/ciLogDockerState.sh prebuild'
             sh 'scripts/setEnv.sh ${BRANCH_NAME}'
+
+            // Retrieve GIT version `git describe --tags --long --dirty=-dirty` (used to inject version in backend via Version.h)
+            sh '. ${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}/.env && echo ${VIEWER_VERSION} > .viewer_version'
+            VIEWER_VERSION = readFile('.viewer_version').trim()
+            sh 'rm .viewer_version'
         }}}
     }
 
@@ -117,6 +126,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
             stage('Test: unit + integration') {
                 node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
                     // @note Requires the built docker image to work
+                    // @todo use root docker-compose.yml instead
                     sh 'scripts/ciPrepareTests.sh'
                     sh 'scripts/ciRunCppTests.sh'
                     sh 'scripts/ciRunJsTests.sh'
@@ -132,18 +142,42 @@ lock(resource: 'webviewer', inversePrecedence: false) {
         stage('Deploy: docker demo') {
             node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
+                    Random random = new Random();
+
+                    // Set subnet (divide by 16 for /28 mask - `bash -c` because dash doesn't support $RANDOM)
+                    def demoSubnet = sh(
+                        script: 'bash -c \'echo "10.$(($RANDOM % 256)).$(($RANDOM % 256)).$(($RANDOM % (256 / 16) * 16))/28"\'',
+                        returnStdout: true
+                    ).trim()
+
+                    // Chose random port
+                    // @todo remove DEMO_PORT from setEnv
+                    int minPort = 20000
+                    int maxPort = 40000
+                    int demoPort = random.nextInt(maxPort - minPort + 1) + minPort;
+
+                    // Build demo
                     if (userInput['syncS3DicomSamples']) {
-                        sh '. ${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}/.env && demo/build.sh ${BRANCH_NAME} true'
+                        sh "demo/scripts/buildDocker.sh \"\" true"
                     }
                     else {
-                        sh '. ${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}/.env && demo/build.sh ${BRANCH_NAME} false'
+                        sh "demo/scripts/buildDocker.sh \"\" false"
                     }
-                    sh '. ${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}/.env && demo/deploy.sh -p ${DEMO_PORT} -t ${BRANCH_NAME} -b ${BRANCH_NAME} -u "http://lify.io.osidev.net:%s/"'
 
-                    // Retrieve port
-                    sh '. ${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}/.env && echo ${DEMO_PORT} > .port'
-                    def DEMO_PORT = readFile('.port').trim()
-                    sh 'rm .port'
+                    // Load docker registry (required by docker-compose)
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkinsosimis') {
+                        // Build proxy (in case config has changed)
+                        sh "SUBNET=${demoSubnet} PORT=${demoPort} docker-compose build proxy"
+
+                        // Set docker-compose project name
+                        def dockerProject = "wvb_demo_${BRANCH_NAME}"
+
+                        // Stop previous demo (if already exists)
+                        sh "SUBNET=${demoSubnet} PORT=${demoPort} docker-compose -p ${dockerProject} down || true"
+                        
+                        // Start demo (with proxy)
+                        sh "SUBNET=${demoSubnet} PORT=${demoPort} docker-compose -p ${dockerProject} up -d proxy"
+                    }
 
                     // Retrieve ticket number
                     def ticketNumber = '?'
@@ -156,17 +190,14 @@ lock(resource: 'webviewer', inversePrecedence: false) {
                     }
 
                     // Send message on slack with address
-                    slackSend color: '#800080', message: "wvb: ${BRANCH_NAME} deployed.\n- http://qa.lify.io.osidev.net:${DEMO_PORT}/osimis-viewer/app/index.html\n- https://osimis.myjetbrains.com/youtrack/issue/${ticketNumber}\n- https://bitbucket.org/osimis/osimis-webviewer-plugin/pull-requests/\n- https://toggl.com/app/reports/detailed/68539/period/thisYear/projects/15802638,11576700,11576708,13082543,13396013,14100173/description/${ticketNumber}%20/billable/both"
+                    slackSend color: '#800080', message: "wvb: ${BRANCH_NAME} deployed.\n- http://qa.lify.io.osidev.net:${demoPort}/osimis-viewer/app/index.html\n- https://osimis.myjetbrains.com/youtrack/issue/${ticketNumber}\n- https://bitbucket.org/osimis/osimis-webviewer-plugin/pull-requests/\n- https://toggl.com/app/reports/detailed/68539/period/thisYear/projects/15802638,11576700,11576708,13082543,13396013,14100173/description/${ticketNumber}%20/billable/both"
                 }
             }}}
         }
     }
 
-    // @todo Ask confirmation for publication when on master/release branch?
-    if (!isUserDevBranch) {
-    }
-
     // Wait for docker build (& integration tests) before running publishing scripts
+    // ...
 
     def publishMap = [:]
 
@@ -179,7 +210,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
                     checkout scm
 
                     //stage('Publish C++ OSX plugin') {}
-                    sh 'cd scripts && ./ciBuildOSX.sh $BRANCH_NAME publish'
+                    sh "cd scripts && ./ciBuildOSX.sh $BRANCH_NAME ${VIEWER_VERSION} publish"
                 }}
             }
         })
@@ -191,7 +222,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
             stage('Publish: C++ Windows plugin') {
                 node('windows && vs2015') { dir(path: workspacePath) {
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
-                        bat 'cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% publish'
+                        bat "cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% ${VIEWER_VERSION} publish"
                     }
                 }}
             }

@@ -73,6 +73,9 @@ if [[ "${JS_BUILDER_CONTAINER_ID}" != "" ]]; then
 	fi
 fi
 
+# remove network created for tests
+docker network rm ${TEST_NETWORK} || true
+
 echo "...cleaned up"
 
 echo "------------------------"

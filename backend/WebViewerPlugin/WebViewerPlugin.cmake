@@ -24,12 +24,27 @@
 #   set(ORTHANC_DIR ${CMAKE_SOURCE_DIR}/Orthanc)
 #   set(VIEWER_PLUGIN_DIR ${CMAKE_SOURCE_DIR}/WebViewerPlugin)
 #   set(VIEWER_FRONTEND_DIR ${CMAKE_SOURCE_DIR}/../frontend)
+#   set(VIEWER_VERSION_FULL "0.0.0-0-gxxxxxxxx-dirty" CACHE STRING "Product version - should be generated via git describe") # generated via `git describe --tags --long --dirty=-dirty`
 #   # Make sure WebViewerLibrary target is available (see `WebViewerLibrary/WebViewerLibrary.cmake`)
 #   # Build unit tests
 #   include(${WebViewerPlugin}/WebViewerPlugin.cmake)
 
-# Include version (taken from git tag)
-include(${RESOURCES_DIR}/CMake/GetProductVersionFromGitTag.cmake) # see target_compile_definitions below target for more info
+# Parse version string
+string(REGEX REPLACE "^([0-9]+)\\..*" "\\1" PRODUCT_VERSION_MAJOR "${VIEWER_VERSION_FULL}")
+string(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1" PRODUCT_VERSION_MINOR "${VIEWER_VERSION_FULL}")
+string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" PRODUCT_VERSION_PATCH "${VIEWER_VERSION_FULL}")
+string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.[0-9]+-([0-9]+)-.*" "\\1" PRODUCT_VERSION_COMMIT_NUMBER "${VIEWER_VERSION_FULL}")
+string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.[0-9]+-[0-9]+-g(.*)" "\\1" PRODUCT_VERSION_COMMIT_SHA1_STRING "${VIEWER_VERSION_FULL}")
+string(TIMESTAMP PRODUCT_VERSION_BUILD_YEAR %Y)
+string(TIMESTAMP PRODUCT_VERSION_BUILD_MONTH %m)
+string(TIMESTAMP PRODUCT_VERSION_BUILD_DAY %d)
+set(PRODUCT_VERSION_SHORT_STRING "${PRODUCT_VERSION_MAJOR}.${PRODUCT_VERSION_MINOR}.${PRODUCT_VERSION_PATCH}")  #used by cmake directly to set .so/.dylib version numbers
+message(${PRODUCT_VERSION_MAJOR})
+message(${PRODUCT_VERSION_MINOR})
+message(${PRODUCT_VERSION_PATCH})
+message(${PRODUCT_VERSION_COMMIT_NUMBER})
+message(${PRODUCT_VERSION_COMMIT_SHA1_STRING})
+message(${PRODUCT_VERSION_SHORT_STRING})
 
 # Set build parameters
 set(STANDALONE_BUILD ON CACHE BOOL "Standalone build (all the resources are embedded, necessary for releases)")
@@ -102,8 +117,7 @@ else()
     )
 endif()
 
-# Include version (taken from git tag)
-# @todo create a macro instead
+# include version inside Version.h
 target_compile_definitions(OsimisWebViewer PRIVATE -DPRODUCT_VERSION_BRANCH=${PRODUCT_VERSION_BRANCH})
 target_compile_definitions(OsimisWebViewer PRIVATE -DPRODUCT_VERSION_MAJOR=${PRODUCT_VERSION_MAJOR})
 target_compile_definitions(OsimisWebViewer PRIVATE -DPRODUCT_VERSION_MINOR=${PRODUCT_VERSION_MINOR})

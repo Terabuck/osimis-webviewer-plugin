@@ -1,0 +1,62 @@
+version: "2"
+services:
+    # Orthanc w/ default configuration
+    orthanc_neutral:
+        # Must be built via backend/scripts/buildDocker.sh
+        image: osimis/orthanc-webviewer-plugin:latest-local
+        expose:
+            - "8042"
+
+    # Orthanc w/ public access configuration (for unit tests)
+    orthanc_clean:
+        build:
+            context: tests/orthanc/
+            dockerfile: Dockerfile
+        image: osimis/orthanc-webviewer-plugin/testable:latest-local
+        expose:
+            - "8042"
+
+    test_cpp:
+        image: osimis/orthanc-webviewer-plugin:latest-local
+        entrypoint: /root/OsimisViewerUnitTests
+        command: [ ]
+
+    test_js:
+        build:
+            context: .
+            dockerfile: DockerfileTestRunner
+        image: osimis/orthanc-webviewer-plugin/test-runner:latest-local
+        environment:
+            - ORTHANC_URL=http://orthanc_clean:8042
+        links:
+            - orthanc_clean # for depends_on https://github.com/docker/compose/blob/129092b7/docs/yml.md#links
+
+    # Demo (populated orthanc)
+    orthanc_populated:
+        # Must be built via demo/scripts/buildDocker.sh
+        image: osimis/orthanc-webviewer-plugin/demo:latest-local
+        volumes:
+            - "orthancSamplesDb2:/orthancStorage"
+        expose:
+            - "8042"
+    
+    # Proxy for demo
+    proxy:
+        build:
+            context: reverse-proxy/
+            dockerfile: Dockerfile
+        image: osimis/orthanc-webviewer-plugin/reverse-proxy:latest-local
+        ports:
+            - "${PORT}:80"
+        links:
+            - orthanc_populated # for depends_on https://github.com/docker/compose/blob/129092b7/docs/yml.md#links
+
+volumes:
+    orthancSamplesDb2:
+        external: true
+
+networks:
+    default:
+        ipam:
+            config:
+                - subnet: ${SUBNET}
