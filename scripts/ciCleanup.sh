@@ -73,8 +73,8 @@ if [[ "${JS_BUILDER_CONTAINER_ID}" != "" ]]; then
 	fi
 fi
 
-# remove network created for tests
-docker network rm ${TEST_NETWORK} || true
+# remove any networks created for tests
+docker network ls | grep -P '\w+\s+wv.?test' | awk '{print $2}' | xargs docker network rm || true
 
 echo "...cleaned up"
 
