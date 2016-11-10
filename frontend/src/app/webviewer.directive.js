@@ -48,7 +48,7 @@
         .directive('wvWebviewer', wvWebviewer);
 
     /* @ngInject */
-    function wvWebviewer($rootScope) {
+    function wvWebviewer($rootScope, wvMobileCompatibility) {
         var directive = {
             bindToController: true,
             controller: Controller,
@@ -71,7 +71,7 @@
             var vm = scope.vm;
 
             // Configure attributes default values
-            vm.toolbarEnabled =  typeof vm.toolbarEnabled !== 'undefined' ? vm.toolbarEnabled : true;
+            vm.toolbarEnabled = typeof vm.toolbarEnabled !== 'undefined' ? vm.toolbarEnabled : wvMobileCompatibility.toolbarEnabled;
             vm.studylistEnabled = typeof vm.studylistEnabled !== 'undefined' ? vm.studylistEnabled : true;
             vm.serieslistEnabled = typeof vm.serieslistEnabled !== 'undefined' ? vm.serieslistEnabled : true;
             vm.tools = typeof vm.tools !== 'undefined' ? vm.tools : {
