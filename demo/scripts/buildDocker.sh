@@ -61,7 +61,8 @@ fi
 
 # Creates the network used to bind the populator with the orthanc demo
 network=wvdemopopulator
-docker network create ${network} || true
+docker network rm ${network} || true
+docker network create ${network}
 
 # Create temporary webviewer container (to push dicom data into and then commit as an image)
 tmpOrthancContainer=wv-demo-tmpcontainer
