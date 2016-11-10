@@ -75,9 +75,9 @@
             vm.studylistEnabled = typeof vm.studylistEnabled !== 'undefined' ? vm.studylistEnabled : true;
             vm.serieslistEnabled = typeof vm.serieslistEnabled !== 'undefined' ? vm.serieslistEnabled : true;
             vm.tools = typeof vm.tools !== 'undefined' ? vm.tools : {
-                windowing: true,
+                pan: true,
                 zoom: false,
-                pan: false,
+                windowing: false,
                 invert: false,
                 lengthmeasure: false,
                 anglemeasure: false,
