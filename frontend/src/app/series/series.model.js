@@ -11,9 +11,10 @@
         function WvSeries(id, imageIds, tags, availableQualities, instanceTags) {
             var _this = this;
 
-            // Replace PixelData by lossless in safari & internet (for decompression library incompatibility reasons)
+            // Replace PixelData by lossless in safari & internet explorer (for decompression library incompatibility reasons)
             if (uaParser.getBrowser().name.indexOf('Safari') !== -1
                 || uaParser.getBrowser().name.indexOf('IE') !== -1
+                || uaParser.getBrowser().name.indexOf('Edge') !== -1
                 && availableQualities.hasOwnProperty('PIXELDATA'))
             {
                 // @todo Check with edge if this may be disabled (& in latest Safari versions)
