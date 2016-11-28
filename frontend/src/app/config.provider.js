@@ -39,7 +39,7 @@
      * }
      */
     function Configuration() {
-        this.version = __webViewerConfig.version;
+        this.version = window.__webViewerConfig && __webViewerConfig.version;
 
         this.browser = {};
 
