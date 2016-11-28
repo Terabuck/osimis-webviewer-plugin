@@ -173,12 +173,12 @@
                     });
 
                 // Request will be cleaned in the promise rejection
-                _cache.remove(id, quality);
+                // _cache.remove(id, quality);
 
                 // Clean cache index
-                if (typeof _loadedCacheIndex[id][quality] !== 'undefined') {
-                    delete _loadedCacheIndex[id][quality];
-                }
+                // if (typeof _loadedCacheIndex[id][quality] !== 'undefined') {
+                //     delete _loadedCacheIndex[id][quality];
+                // }
                 
                 // Trigger binary has been unloaded (used by torrent-like loading bar)
                 service.onBinaryUnLoaded.trigger(id, quality);
