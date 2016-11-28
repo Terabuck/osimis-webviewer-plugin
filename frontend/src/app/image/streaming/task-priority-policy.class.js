@@ -1,9 +1,9 @@
 (function(module) {
     'use strict';
 
-    function TaskPriorityPolicy(imageBinaryRequests) {
-        // imageBinaryRequests[id][quality] = <ImageBinaryRequest> - used to calculate priorities
-        this._imageBinaryRequests = imageBinaryRequests;
+    function TaskPriorityPolicy(imageBinariesCache) {
+        // imageBinariesCache[id][quality] = <ImageBinaryRequest> - used to calculate priorities
+        this._imageBinariesCache = imageBinariesCache;
     }
 
     /** TaskPriorityPolicy#selectTask(availableWorkers, busyWorkers, tasksToProcess, tasksInProcess)
@@ -17,7 +17,7 @@
      *
      */
     TaskPriorityPolicy.prototype.selectTask = function(availableWorkers, busyWorkers, tasksToProcess, tasksInProcess) {
-        var requestQueue = this._imageBinaryRequests;
+        var imageBinariesCache = this._imageBinariesCache;
         var taskQueue = tasksToProcess;
 
         // Sort by priority
@@ -29,7 +29,7 @@
             var task = taskQueue[i];
             var id = task.options.id;
             var quality = task.options.quality;
-            var request = requestQueue[id][quality];
+            var request = imageBinariesCache.get(id,quality);
             var priority = request.getPriority();
 
             switch(priority) {

@@ -36,15 +36,7 @@
 
         ////////////////
 
-        /** _cache: Promise<cornerstoneImageObject>[<imageId>][<quality>]
-         *
-         * A cache of request (and their results) to avoid multiple request.
-         *
-         * @invariant _cache[imageId][quality] = Promise<cornerstoneImageObject>
-         * @invariant _cache[*] should always contains at least one item for hasCache method to work
-         *
-         */
-        var _cache = {};
+        var _cache = new osimis.ImageBinariesCache();
 
         /** _loadedCachedRequests: boolean[imageId][quality]
          *
@@ -53,18 +45,11 @@
          */
         var _loadedCacheIndex = {};
 
-        /** _cacheReferenceCount: int[<imageId>][<quality>]
-         *
-         * Represent the number of time the cache has been get
-         *
-         */
-        var _cacheReferenceCount = {};
-
         var pool = new window.osimis.WorkerPool({
             path: /* @inline-worker: */ '/app/image/image-parser.worker/main.js',
             workerCount: 6,
             createPromiseFn: $q,
-            taskPriorityPolicy: new osimis.TaskPriorityPolicy(_cache)
+            taskPriorityPolicy: new osimis.TaskPriorityPolicy(_cache) // @todo break dependency
         });
 
         // Send the orthanc API URL to each threads
@@ -83,10 +68,8 @@
             }
 
             // Generate request cache (if inexistant)
-            if (!_cache[id]) {
-                _cache[id] = {};
-            }
-            if (!_cache[id][quality]) {
+            var request = _cache.get(id, quality);
+            if (!request) {
                 // Set http headers
                 // @note Since the request is queued, headers configuration might changes in the meanwhile (before the request execution).
                 //       However, since they are linked by reference (and not copied), changes will be bound.
@@ -104,10 +87,9 @@
                         // Loading done
 
                         // Abort the finished loading when an abortion has been asked but not made in time
-                        if (!_cacheReferenceCount[id][quality]) {
+                        if (!_cache.getRefCount(id, quality)) {
                             // Remove promise from cache
-                            delete _cacheReferenceCount[id][quality];
-                            delete _cache[id][quality]; // @todo inefficient, use null & adapt getBestQualityInCache instead
+                            _cache.remove(id, quality);
                             if (typeof _loadedCacheIndex[id][quality] !== 'undefined') {
                                 delete _loadedCacheIndex[id][quality];
                             }
@@ -119,10 +101,12 @@
 
                         // consider the promise to be resolved
                         _loadedCacheIndex[id][quality] = true;
-                        _cache[id][quality].isLoaded = true;
+                        var request = _cache.get(id, quality);
+                        request.isLoaded = true;
 
                         // Set the cache size so total memory size can be limited
-                        _cache[id][quality].size = result.pixelBuffer.byteLength;
+                        _cache.setBinarySize(id, quality, result.pixelBuffer.byteLength);
+                        // request.size = result.pixelBuffer.byteLength
 
                         // trigger binaryLoaded event
                         service.onBinaryLoaded.trigger(id, quality, cornerstoneImageObject);
@@ -136,8 +120,7 @@
                         // to be sure the promise is uncached anytime the promise is rejected
 
                         // Remove promise from cache
-                        delete _cacheReferenceCount[id][quality];
-                        delete _cache[id][quality]; // @todo inefficient, use null & adapt getBestQualityInCache instead
+                        _cache.remove(id, quality);
                         if (typeof _loadedCacheIndex[id][quality] !== 'undefined') {
                             delete _loadedCacheIndex[id][quality];
                         }
@@ -149,102 +132,38 @@
                         return $q.reject(err);
                     });
                 
-                _cache[id][quality] = new osimis.ImageBinaryRequest(id, quality, requestPromise);
+                request = new osimis.ImageBinaryRequest(id, quality, requestPromise);
+                _cache.add(id, quality, request);
             }
 
             // Increment cache reference count
-            _cache[id][quality].pushPriority(priority);
-            if (!_cacheReferenceCount[id]) {
-                _cacheReferenceCount[id] = {};
-            }
-            if (!_cacheReferenceCount[id][quality]) {
-                _cacheReferenceCount[id][quality] = 0;
-            }
-            ++_cacheReferenceCount[id][quality];
+            _cache.push(id, quality);
+            request.pushPriority(priority);
 
             // Return Promise<cornerstoneImageObject>
-            return _cache[id][quality].promise;
+            return request.promise;
         }
 
-        // Clean cache every 5 seconds if cache size > 2000
+        // Flush cache every 5 seconds
+        // @todo move inside cache module
         window.setInterval(function() {
             // @todo check once binary has been loaded + add debounce
-            
-            var id, quality, totalCacheSizeByQuality = {}, totalFlushedCacheSizeByQuality = {};
-
-            // Calculate cache amount by looping through each requests
-            for (id in _cache) {
-                for (quality in _cache[id]) {
-                    var cachedRequest = _cache[id][+quality];
-
-                    // Init totalCacheSizeByQuality[quality] if required
-                    totalCacheSizeByQuality[+quality] = totalCacheSizeByQuality[+quality] || 0;
-                    
-                    // Increment totalCache amount
-                    if (cachedRequest.isLoaded) {
-                        totalCacheSizeByQuality[+quality] += cachedRequest.size;
-                    }
-                }
-            }
-
-            // Flush lossless files
-            _flushCache(WvImageQualities.LOSSLESS, 1024 * 1024 * 700); // Max 700mo
-            _flushCache(WvImageQualities.MEDIUM, 1024 * 1024 * 700); // Max 700mo
-            _flushCache(WvImageQualities.LOW, 1024 * 1024 * 300); // Max 300mo
-
-            function _flushCache(quality, cacheSizeLimit) {
-                totalFlushedCacheSizeByQuality[quality] = totalFlushedCacheSizeByQuality[quality] || 0;
-                totalCacheSizeByQuality[quality] = totalCacheSizeByQuality[quality] || 0;
-
-                if (totalCacheSizeByQuality[quality] < cacheSizeLimit) { 
-                    return;
-                }
-                for (var id in _cacheReferenceCount) {
-                    // Stop flush too much as soon as there is enough space left
-                    if (totalCacheSizeByQuality[quality] < cacheSizeLimit) {
-                        return;
-                    }
-
-                    // Flush cache
-                    var refCount = _cacheReferenceCount[id][quality];
-                    if (refCount === 0) {
-                        // Decrement cache size
-                        var flushedSize = _cache[id][quality].size || 0;
-                        totalCacheSizeByQuality[quality] -= flushedSize;
-
-                        // Save flushed quantity for logging purpose
-                        totalFlushedCacheSizeByQuality[quality] += flushedSize;
-
-                        // Clean request cache
-                        _cache[id][quality] = null;
-                        delete _cache[id][quality]; // @todo inefficient, use null & adapt getBestQualityInCache instead
-
-                        // Clean cache index
-                        if (typeof _loadedCacheIndex[id][quality] !== 'undefined') {
-                            delete _loadedCacheIndex[id][quality];
-                        }
-                        delete _cacheReferenceCount[id][quality];
-                    }
-                }
-
-                // console.log('flush cache q:', quality, 'pre:', totalCacheSizeByQuality[quality] / 1024 / 1024, 'post:', totalFlushedCacheSizeByQuality[quality] / 1024 / 1024);
-            }
+            _cache.flush();
         }, 5000);
 
         function abortLoading(id, quality, priority) {
             // Check the item is cached
-            if (!_cacheReferenceCount.hasOwnProperty(id) || !_cacheReferenceCount[id].hasOwnProperty(quality) || _cacheReferenceCount[id][quality] < 1) {
+            if (_cache.getRefCount(id, quality) < 1) {
                 throw new Error('Free uncached image binary.');
             }
 
             // Decount reference
-            --_cacheReferenceCount[id][quality];
-            if (_cache[id][quality]) {
-                _cache[id][quality].popPriority(priority);
-            }
+            _cache.pop(id, quality)
+            var request = _cache.get(id, quality);
+            request.popPriority(priority);
 
             // Cancel request if pending
-            if (_cacheReferenceCount[id][quality] === 0 && !_loadedCacheIndex[id][quality]) {
+            if (_cache.getRefCount(id, quality) === 0 && !_loadedCacheIndex[id][quality]) {
                 // Cancel request if pending
                 pool
                     .abortTask({
@@ -253,15 +172,13 @@
                         quality: quality
                     });
 
-                // Clean request cache
-                _cache[id][quality] = null;
-                delete _cache[id][quality]; // @todo inefficient, use null & adapt getBestQualityInCache instead
+                // Request will be cleaned in the promise rejection
+                _cache.remove(id, quality);
 
                 // Clean cache index
                 if (typeof _loadedCacheIndex[id][quality] !== 'undefined') {
                     delete _loadedCacheIndex[id][quality];
                 }
-                delete _cacheReferenceCount[id][quality];
                 
                 // Trigger binary has been unloaded (used by torrent-like loading bar)
                 service.onBinaryUnLoaded.trigger(id, quality);
