@@ -101,11 +101,7 @@
      * Doc available at the head of the file
      * @ngInject
      */
-    function wvViewport($, _, cornerstone, cornerstoneTools, $rootScope, $q, $parse, wvImageManager, WvImageQualities) {
-        // Usage:
-        //
-        // Creates:
-        //
+    function wvViewport($, _, cornerstone, cornerstoneTools, $rootScope, $q, $parse, wvImageManager) {
         var directive = {
             transclude: true,
             bindToController: true,
@@ -143,7 +139,7 @@
          */
         function link(scope, element, attrs, ctrls) {
             var enabledElement = element.children('div').children('.wv-cornerstone-enabled-image')[0];
-            var model = new osimis.Viewport(wvImageManager, enabledElement, !!scope.vm.wvLossless);
+            var model = new osimis.Viewport($q, cornerstone, enabledElement, !!scope.vm.wvLossless);
 
             scope.vm.wvEnableOverlay = !!scope.vm.wvEnableOverlay;
             var wvImageIdParser = $parse(attrs.wvImageId);
@@ -169,7 +165,11 @@
 
                     scope.vm.wvImageId = id;
 
-                    return model.setImage(id, resetParameters);
+                    return wvImageManager
+                        .get(id)
+                        .then(function(image) {
+                            return model.setImage(image, resetParameters);
+                        });
                 };
                 ctrl.clearImage = function() {
                     scope.vm.wvImageId = null;

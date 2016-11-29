@@ -57,7 +57,8 @@
  * Failed requests shall not be cached
  */
 (function(module) {
-
+    'use strict';
+    
     function ImageBinariesCache() {
         // Listener.
         // Used to abort flushed requests
@@ -91,13 +92,21 @@
         // Used to select which request to flush (flush only the
         // ones that have no reference left).
         // 
+        // @warning The current design rule is: reference count is never reset,
+        // even when request fails. That way, cache users like preloader don't
+        // have to keep state of the request success/failures to know if they
+        // should trigger a request abortion or not.
+        // @todo Separate abort/get from incr/decr in the ImageBinaryManager!
+        // 
+        // 
         // _referenceCount[imageId][quality] = int
         this._referenceCount = {};
 
         this._scopes = {
             'LOW': module.quality.LOW,
             'MEDIUM': module.quality.MEDIUM,
-            'HIGH': 14312 // either quality.LOSSLESS or quality.PIXELDATA - use positive integer as its faster on current browsers
+            'HIGH': 14312 // either quality.LOSSLESS or quality.PIXELDATA - use
+                          // positive integer as its faster on current browsers
         }
     };
 
@@ -138,7 +147,9 @@
         this._binarySizes[imageId][scope] = undefined;
 
         // Set the binary ref count to 0 (user needs to call the #push method)
-        this._referenceCount[imageId][scope] = 0;
+        // If _referenceCount already defined, keep the current one (this can happen if a request
+        // as failed: it is removed from cache but there still are references to it).
+        this._referenceCount[imageId][scope] = this._referenceCount[imageId][scope] || 0;
 
         // Cache the request
         this._cache[imageId][scope] = binaryRequest;
@@ -157,14 +168,21 @@
         var scope = this._getCacheScopeFromQuality(quality);
 
         // Prevent removing of uncached image
+        var removingUncachedImage = false;
         if (!this._cache[imageId][scope]) {
-            throw new Error('Removing an uncached instance from cache');
+            removingUncachedImage = true;
         }
 
         // Uncache the request
         this._cache[imageId][scope] = undefined;
-        this._referenceCount[imageId][scope] = 0;
+        // Do not reset _referenceCount
+        // this._referenceCount[imageId][scope] = 0;
         this._binarySizes[imageId][scope] = undefined;
+
+        // Throw the exception only after the cache is in clean state
+        if (removingUncachedImage) {
+            throw new Error('Removing an uncached instance from cache');
+        }
     };
 
     /**
@@ -210,6 +228,10 @@
         var scope = this._getCacheScopeFromQuality(quality);
 
         --this._referenceCount[imageId][scope];
+
+        if (this._referenceCount[imageId][scope] < 0) {
+            throw new Error('Reference count should not go below 0');
+        }
     };
 
     ImageBinariesCache.prototype.getRefCount = function(imageId, quality) {
@@ -258,9 +280,14 @@
             case module.quality.MEDIUM:
                 return this._scopes.MEDIUM;
             // use a common scope for both LOSSLESS & PIXELDATA
+            case this._scopes.HIGH:
+                return this._scopes.HIGH;
             case module.quality.LOSSLESS:
+                return this._scopes.HIGH;
             case module.quality.PIXELDATA:
                 return this._scopes.HIGH;
+            default:
+                throw new Error('Unexpected quality');
         }
     };
 
@@ -272,12 +299,13 @@
 
         // Calculate scope cache amount by looping through each requests
         // @todo make more efficient (no need to recalculate at each flush, just keep a global one)
-        for (imageId in cache) {
+        for (var imageId in cache) {
             var cachedRequest = cache[imageId][scope];
 
             // Increment totalCache amount
             if (cache[imageId].hasOwnProperty(scope)) {
-                totalScopeCache += binarySizes[imageId][scope];
+                totalScopeCache += binarySizes[imageId][scope] || 0; // `|| 0` because binarySizes can be undefined (because binary as not yet been loaded and
+                                                                     // the response size is not available).
             }
         }
 
@@ -342,12 +370,12 @@
                     continue;
                 }
 
-                // Flush request
-                cache[imageId][scope] = null; // do not delete key as its slow
-
                 // Decrement cache size
-                var flushedSize = binarySizes[imageId][scope];
+                var flushedSize = binarySizes[imageId][scope]; // store flushedSize before it's removed by the #remove method call
                 totalCacheSizeByScope[scope] -= flushedSize;
+                
+                // Flush request
+                _this.remove(imageId, scope);
 
                 // Save flushed quantity for logging purpose
                 totalFlushedCacheSizeByScope[scope] += flushedSize;

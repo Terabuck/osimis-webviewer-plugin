@@ -5,7 +5,9 @@ module.exports = function(config) {
     var orthancUrl = process.env.ORTHANC_URL || 'http://localhost:8042';
 
     // Add orthanc served config file
-    gulpConfig.karma.files.push(orthancUrl + '/osimis-viewer/config.js')
+    // Must not put orthancUrl content, would trigger CORS error. Mocha proxies 
+    // `/osimis-viewer/` route instead.
+    gulpConfig.karma.files.push('http://localhost:9876/osimis-viewer/config.js')
 
     // Add integration tests
     gulpConfig.karma.files.push('../tests/**/*.spec.js')

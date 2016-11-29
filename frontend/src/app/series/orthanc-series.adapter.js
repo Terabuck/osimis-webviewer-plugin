@@ -6,7 +6,7 @@
         .factory('wvOrthancSeriesAdapter', wvOrthancSeriesAdapter);
 
     /* @ngInject */
-    function wvOrthancSeriesAdapter(_, WvSeries, WvImageQualities) {
+    function wvOrthancSeriesAdapter(_, WvSeries) {
         var service = {
             process: process
         };
@@ -49,8 +49,8 @@
             // Get tags
             var tags = orthancSeries.tags;
             
-            // Convert available qualities into WvImageQualities format
-            var availableQualities = _.pickBy(WvImageQualities, function(value, key) {
+            // Convert available qualities into osimis.quality format
+            var availableQualities = _.pickBy(osimis.quality, function(value, key) {
                 // availableQualities (uppercase) has key
                 for (var i=0; i<orthancSeries.availableQualities.length; ++i) {
                     var availableQuality = orthancSeries.availableQualities[i];

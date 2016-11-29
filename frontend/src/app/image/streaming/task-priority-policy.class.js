@@ -8,6 +8,10 @@
 
     /** TaskPriorityPolicy#selectTask(availableWorkers, busyWorkers, tasksToProcess, tasksInProcess)
      *
+     * This methods returns the next task to be processed.
+     *
+     * @todo Optimize heavily! It's called at each binary loading! Maybe use an external priority queue implementation?
+     *
      * @param availableWorkers
      * @param busyWorkers
      * @param tasksToProcess
@@ -30,6 +34,13 @@
             var id = task.options.id;
             var quality = task.options.quality;
             var request = imageBinariesCache.get(id,quality);
+            if (!request) {
+                // It's possible for a task to be removed from cache while still being in process (in abortion),
+                // @todo separete abortion logic from the rest.
+                console.error('Cache & Task Queue should strictly contains the same requests!');
+                //throw new Error('Cache & Task Queue should strictly contains the same requests!');
+                continue;
+            }
             var priority = request.getPriority();
 
             switch(priority) {
@@ -54,7 +65,7 @@
             }
         }
 
-        // see WvImageQualities
+        // see osimis.quality
         // - 1 lowest
         // - 2 medium
         // - 100 lossless

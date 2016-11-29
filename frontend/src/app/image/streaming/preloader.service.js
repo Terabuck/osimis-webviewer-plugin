@@ -3,7 +3,7 @@
 
     angular
         .module('webviewer')
-        .run(function($rootScope, wvSeriesManager, wvImageManager, wvImageBinaryManager, WvImageQualities) {
+        .run(function($rootScope, wvSeriesManager, wvImageManager, wvImageBinaryManager) {
 
             // Preload thumbnail when user has selected a study (on left menu)
             $rootScope.$on('UserSelectedStudyId', function(evt, studyId) {
@@ -51,7 +51,7 @@
                         _preload(series, quality, 1);
 
                         // Preload whole 1000x1000 studies images
-                        quality = WvImageQualities.MEDIUM;
+                        quality = osimis.quality.MEDIUM;
                         if (series.hasQuality(quality)) {
                             _preload(series, quality, 1);
                         }
@@ -72,7 +72,7 @@
                         _abortPreload(series, quality, 1);
 
                         // Abort 1000x1000 studies images preloading
-                        quality = WvImageQualities.MEDIUM;
+                        quality = osimis.quality.MEDIUM;
                         if (series.hasQuality(quality)) {
                             _abortPreload(series, quality, 1);
                         }
@@ -86,7 +86,15 @@
             function _preload(series, quality, priority) {
                 for (var i=0; i<series.imageIds.length; ++i) {
                     var imageId = series.imageIds[i];
-                    wvImageBinaryManager.requestLoading(imageId, quality, priority);
+                    wvImageBinaryManager
+                        .requestLoading(imageId, quality, priority)
+                        .then(null, function() {
+                            /* Ignore loading error.
+                             * 
+                             * Prevent Bluebird to throw an error due to
+                             * unhandled exception.
+                             */
+                        });
                 }
             }
 

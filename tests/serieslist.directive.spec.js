@@ -4,10 +4,13 @@ describe('serieslist', function() {
     osi.afterEach();
 
     beforeEach(function() {
-        bard.inject('wvSeriesManager', 'WvHttpRequest');
+        bard.inject('wvSeriesManager');
 
-        WvHttpRequest.timeout = 20000; // limit requests to 20s (for better error feedback)
-    })
+        osimis.HttpRequest.timeout = 20000; // limit requests to 20s (for better error feedback)
+    });
+    afterEach(function() {
+        osimis.HttpRequest.timeout = 0; // reset HttpRequest timeouts
+    });
 
     describe('directive', function() {
 

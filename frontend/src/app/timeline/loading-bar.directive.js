@@ -57,7 +57,7 @@
     }
 
     /* @ngInject */
-    function Controller($scope, wvImageBinaryManager, WvImageQualities) {
+    function Controller($scope, wvImageBinaryManager) {
         var _this = this;
 
         // [<image index>: [<image quality: int>, ...], ...] - image-index != image-id
@@ -65,7 +65,7 @@
         // [<image index>: <image quality: int> , ...] - image-index != image-id
         this.bestQualityByImage = [];
 
-        this.QualityKeys = _.invert(WvImageQualities);
+        this.QualityKeys = _.invert(osimis.quality);
 
         // $scope.$watch('vm.series.id', function(seriesId) {
 

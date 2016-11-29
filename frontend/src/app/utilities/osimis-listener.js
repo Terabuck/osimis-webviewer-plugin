@@ -83,7 +83,7 @@
             // We use asap instead of setTimeout (for instance) to make
             // sure we don't trigger reflows inbetween the callbacks
             // calls (which may be really slow).
-            asap(function() {
+            try {
                 _listeners
                     .filter(function(listener) {
                         return !listener.ignore;
@@ -91,7 +91,18 @@
                     .forEach(function(listener) {
                         listener.apply(null, args);
                     });
-            });
+            }
+            catch (e) {
+                // We only use asap when an exception is thrown:
+                // even with asap instead of setTimeout, we have
+                // a perf drop from 60FPS to 20FPS on play speed
+                // after tests. We can keep these 60FPS this way,
+                // and especially avoid leaving requestAnimationFrame
+                // method due to the use of osimis.Listener.
+                asap(function() {
+                    throw e;
+                });
+            }
     	};
 
         // return listen method (= functor)

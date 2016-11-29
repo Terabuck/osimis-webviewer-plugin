@@ -188,7 +188,7 @@
 
     /** WorkerPool#abortTask(taskOptionsFilter)
      *
-     * Abort a task, note this method do nothing when task is inexistant.
+     * Abort a task, this method throws when task is inexistant or when multiple tasks are aborted at once.
      *
      * Compare the tasks in _tasksToProcess and remove them from the queue.
      * Compare the tasks in _tasksInProcess and abort them.
@@ -200,17 +200,26 @@
     WorkerPool.prototype.abortTask = function(taskOptionsFilter) {
         // Remove task from the toProcess queue (if here)
         // @todo optimize (actually 50ms process) -> sorted by quality + tree research on id ?
+        var sizeBefore = this._tasksToProcess.length;
         _.pullAllWith(this._tasksToProcess, [taskOptionsFilter], function(task, taskOptionsFilter) {
             return _objectMatchFilter(task.options, taskOptionsFilter);
         });
+        var sizeAfter = this._tasksToProcess.length;
 
         // Abort task from the inProcess queue
+        var cancelledTaskCount = sizeBefore - sizeAfter;
         for (var i=this._tasksInProcess.length-1; i>=0; --i) { // loop in reverse so we can remove items without breaking the loop iterations
             var task = this._tasksInProcess[i];
             if (_objectMatchFilter(task.options, taskOptionsFilter)) {
                 task.abort();
+                ++cancelledTaskCount;
                 _.pull(this._tasksInProcess, task);
             }
+        }
+    
+        // Throw an exception no task was removed 
+        if (cancelledTaskCount !== 1) {
+            throw new Error('One task must be aborted instead of ' + cancelledTaskCount + '!');
         }
     };
 
