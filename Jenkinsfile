@@ -103,7 +103,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
     if (userInput['buildOSX']) {
         buildMap.put('osx', {
             stage('Build: osx') {
-                node('osx') { dir(path: workspacePath) {
+                node('osx && xcode') { dir(path: workspacePath) {
                     //stage('Retrieve sources') {}
                     checkout scm
 
