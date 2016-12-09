@@ -47,8 +47,7 @@ namespace {
     Json::Value dicomTags_;
   };
 
-
-  TEST_F(ImageMetaDataTest, HandleWindowing) {
+  TEST_F(ImageMetaDataTest, USR0507_T0511_MultipleWindowingDICOMTag) {
     // When WW/WC tags are multi-value integers
     dicomTags_["WindowCenter"] = "40\\450";
     dicomTags_["WindowWidth"] = "350\\1500";
@@ -59,7 +58,9 @@ namespace {
     EXPECT_EQ(a->windowCenter, 40.f);
     EXPECT_EQ(a->windowWidth, 350.f);
     delete a;
+  }
 
+  TEST_F(ImageMetaDataTest, USR0507_T0512_SingleWindowingDICOMTag) {
     // When WW/WC tags are single-value integer
     dicomTags_["WindowCenter"] = "436";
     dicomTags_["WindowWidth"] = "143";
