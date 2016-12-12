@@ -39,7 +39,7 @@
      * }
      */
     function Configuration() {
-        this.version = window.__webViewerConfig && __webViewerConfig.version;
+        this.version = typeof window.__webViewerConfig !== 'undefined' && __webViewerConfig.version;
 
         this.browser = {};
 
