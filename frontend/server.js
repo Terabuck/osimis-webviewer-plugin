@@ -1,4 +1,8 @@
 /*jshint node:true*/
+
+// This server purpose is for development only, in production, the frontend is served by the C++ Plugin:
+// see `backend/` folder.
+
 'use strict';
 
 var express = require('express');
