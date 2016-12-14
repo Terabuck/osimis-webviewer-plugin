@@ -52,12 +52,5 @@ The prerequisites are the same as for the Frontend Development.
 
 ## Manual Tests
 
-The Web Viewer Pro follows ISO13485 quality management standard. The Web Viewer
-Basic is not required to follows this standard. However, as it is used as a
-library for the Web Viewer Pro, it is conveniant to test extensively the Web
-Viewer Basic before each release. These tests are up to the Osimis' team 
-discretion. They may follow the Web Viewer Pro ones as most features are 
-identical.
-
-The tests may be run directly from the URL provided by the Osimis' private 
-Slack channel `jenkins` when the viewer has been built.
+These tests are up to the Osimis' team  discretion. They may follow the Web
+Viewer Pro's Test Plan as most features are identical.
