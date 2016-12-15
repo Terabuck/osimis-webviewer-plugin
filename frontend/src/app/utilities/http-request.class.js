@@ -353,7 +353,7 @@
 
         // Abort the http request
         this._xhr.abort();
-    }
+    };
 
     // Http Exception Type
     function HttpRequestError(opts) {
