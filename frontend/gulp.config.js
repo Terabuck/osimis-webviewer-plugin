@@ -22,7 +22,6 @@ module.exports = function() {
          */
         // all javascript that we want to vet
         alljs: [
-            '!./src/**/*.worker/**/*.js',
             './src/**/*.js',
             './*.js'
         ],

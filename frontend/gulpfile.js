@@ -50,6 +50,28 @@ gulp.task('help', $.taskListing);
 gulp.task('default', ['help']);
 
 /**
+ * Generate the soure code documentation.
+ *
+ * Use `cd docs/ && python -m SimpleHTTPServer 6442` to serve the docs.
+ *
+ * @return {Stream}
+ */
+gulp.task('docs', [], function() {
+    return gulp
+        .src(config.alljs)
+        .pipe($.ngdocs.process({
+            html5Mode: false,
+            scripts: [
+              'bower_components/angular/angular.min.js',
+              'bower_components/angular/angular.min.js.map',
+              'bower_components/angular-animate/angular-animate.min.js',
+              'bower_components/angular-animate/angular-animate.min.js.map'
+            ]
+        }))
+        .pipe(gulp.dest('./docs'));
+});
+
+/**
  * vet the code and create coverage report
  * @return {Stream}
  */
@@ -248,7 +270,7 @@ gulp.task('build-specs', ['templatecache'], function(done) {
  * This is separate so we can run tests on
  * optimize before handling image or fonts
  */
-gulp.task('build', ['optimize', 'images', 'fonts'], function() {
+gulp.task('build', ['docs', 'optimize', 'images', 'fonts'], function() {
     log('Building everything');
 
     var msg = {
