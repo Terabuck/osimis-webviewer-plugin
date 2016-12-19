@@ -71,14 +71,27 @@
         // trigger method
     	OsimisListener.trigger = function() {
     	    var args = Array.prototype.splice.call(arguments, 0);
-    	    
-    		_listeners
-    		    .filter(function(listener) {
-    		        return !listener.ignore;
-    		    })
-                .forEach(function(listener) {
-                    listener.apply(null, args);
-                });
+	       
+            // The listeners may throws exceptions. if the event is
+            // triggered within a promise, these exceptions are swallowed
+            // by the external promise. We wan't to separate the promises
+            // from the Listener (which are in the end two different patterns
+            // for the same kind of use cases).
+            // Therefore, we launch the callbacks within asap,
+            // as JS microtask using so the listener's exceptions are not
+            // swallowed by potential promises containing the trigger.
+            // We use asap instead of setTimeout (for instance) to make
+            // sure we don't trigger reflows inbetween the callbacks
+            // calls (which may be really slow).
+            asap(function() {
+                _listeners
+                    .filter(function(listener) {
+                        return !listener.ignore;
+                    })
+                    .forEach(function(listener) {
+                        listener.apply(null, args);
+                    });
+            });
     	};
 
         // return listen method (= functor)
