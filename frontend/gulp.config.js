@@ -45,7 +45,8 @@ module.exports = function() {
             clientApp + '**/*.module.js',
             clientApp + '**/*.js',
             '!' + clientApp + '**/*.worker/**/*.js',
-            '!' + clientApp + '**/*.spec.js'
+            '!' + clientApp + '**/*.spec.js',
+            '!' + clientApp + '**/*.mock.js'
         ],
         jsOrder: [
             '**/webviewer.module.js',
@@ -126,8 +127,12 @@ module.exports = function() {
             nodeModules + '/chai/chai.js',
             nodeModules + '/sinon-chai/lib/sinon-chai.js'
         ],
-        specHelpers: [client + 'test-helpers/**/*.js'],
-        specs: [clientApp + '**/*.spec.js'],
+        specHelpers: [
+            client + 'test-helpers/**/*.js'
+        ],
+        specs: [
+            clientApp + '**/*.spec.js'
+        ],
 
         /**
          * Node settings
@@ -188,8 +193,9 @@ module.exports = function() {
                 {pattern: clientApp + '**/*.worker/*.js', included: false, served: true},
 
                 clientApp + '**/*.module.js',
-                clientApp + '*!(.spec).js', // see https://medium.com/@SchizoDuckie/so-your-karma-tests-run-twice-this-is-what-you-need-to-do-be74ce9f257e#.r3kp55lix
                 clientApp + '**/!(*.worker)/*.js',
+                clientApp + '**/*.mock.js',
+                clientApp + '*!(.spec).js', // see https://medium.com/@SchizoDuckie/so-your-karma-tests-run-twice-this-is-what-you-need-to-do-be74ce9f257e#.r3kp55lix
                 temp + config.templateCache.file
             ),
             exclude: [
