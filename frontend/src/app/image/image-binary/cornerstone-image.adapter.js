@@ -36,6 +36,11 @@
         
         // wrap back buffer into an array
         // create pixelArray out of getPixelData for caching
+        // pixelBufferFormat mimics the binary RAW format of the image. For
+        // instance, if image is 16bit grey scale, it'll be (U)Int16. For
+        // (a)RGB it's mostly Uint8. Cornerstone interpret them differently to
+        // draw the image in the canvas. In the end, canvas always uses 8bits
+        // views though.
         var pixelArray = null
         switch (pixelBufferFormat) {
         case 'Uint8':
