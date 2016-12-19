@@ -1,3 +1,9 @@
+/**
+ * @ngdoc object
+ * @memberOf osimis
+ * 
+ * @name osimis.KLVReader
+ */
 (function(module) {
 
 	function KLVReader(binary) {

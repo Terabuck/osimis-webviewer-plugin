@@ -1,13 +1,19 @@
 /**
- * The `CornerstoneAnnotationSynchronizer` class. Exclusively instantiated within the webviewer tools classes (see `viewport/image-plugins/` directory).
+ * @ngdoc object
+ * @memberOf osimis
  * 
- * @lifecycle
+ * @name osimis.CornerstoneAnnotationSynchronizer
+ * 
+ * @description
+ * The `CornerstoneAnnotationSynchronizer` class. Exclusively instantiated within the webviewer tools classes (see `viewport/image-plugins/` directory).
+ *
+ * # @lifecycle
  * Lifecycle is bound to *Viewports Grouped by imageId* (only for the viewports having the tool corresponding to the annotation enabled).
  * Although cornerstonejs can also bind annotation at the series level for instance, we don't use these kind in our
  * webviewer. On top of that, it's very unlickely such annotations rely on pixel-based coordinate (since pixel are defined at image
  * scope). We can therefore only bind the annotations bound by imageId.
  *
- * @rationale
+ * # @rationale
  * CornerstoneJS store annotations' coordinates in pixel and doesn't handle image's prgressive-resolution loading.
  * The `AnnotationSynchronizer` build a bridge between webviewer's annotations and cornerstone's annotations.
  * The former having the following advantages:
@@ -63,28 +69,38 @@
     };
 
     /**
-     * @warning This method expect resolution scale to be the same for both side (width and height),
-     *          this constraint is not verified for performance reasons.
-     *          
-     * @param  {[type]} baseBinaryResolution [description]
-     * @param  {[type]} newBinaryResolution  [description]
+     * @ngdoc method
+     * @methodOf osimis.CornerstoneAnnotationSynchronizer
+     * 
+     * @name osimis.CornerstoneAnnotationSynchronizer#_retrieveResolutionScaleRatio
+     * @param {object} baseBinaryResolution The base binary resolution
+     * @param {object} newBinaryResolution The new binary resolutio
+     *
+     * @description
+     * # @warning This method expect resolution scale to be the same for both side (width and height),
+     *            this constraint is not verified for performance reasons.
      */
     function _retrieveResolutionScaleRatio(baseBinaryResolution, newBinaryResolution) {
         return baseBinaryResolution.width / newBinaryResolution.width;
     }
 
     /**
-     * Update (mutate) annotations to the new resolution.
-     *
-     * Mutation is done to keep the variable references with cornerstoneTools.
+     * @ngdoc method
+     * @methodOf osimis.CornerstoneAnnotationSynchronizer
      * 
-     * @param  {object} annotations          The cornerstone annotations of an imageId (for one tool)
-     * @param  {object} baseBinaryResolution Old resolution, with values {height, width}, it's the binary resolution,
+     * @name osimis.CornerstoneAnnotationSynchronizer#syncByAnnotationType
+     * @param {object} annotations The cornerstone annotations of an imageId (for one tool)
+     * @param {object} baseBinaryResolution Old resolution, with values {height, width}, it's the binary resolution,
      *                                       not necessarily the annotation one! This is why data.imageResolution takes
      *                                       precedences over baseBinaryResolution when there is a conflict (for instance when
      *                                       the annotations are downloaded over internet instead of written directly from the
      *                                       viewport). This is important for features such as the liveshare.
-     * @param  {object} newBinaryResolution  New resolution, with values {height, width}
+     * @param {object} newBinaryResolution New resolution, with values {height, width}
+     * 
+     * @description
+     * Update (mutate) annotations to the new resolution.
+     *
+     * Mutation is done to keep the variable references with cornerstoneTools.
      */
     CornerstoneAnnotationSynchronizer.prototype.syncByAnnotationType = function(type, annotations, baseBinaryResolution, newBinaryResolution) {
         // Bypass useless processings
@@ -126,17 +142,22 @@
         });
     };
 
-    /**
-     * Update (mutate) all the provided annotations to the new resolution.
-     *
-     * Mutation is done to keep the variable references with cornerstoneTools.
-     * 
-     * @param  {object} annotations   The cornerstone annotations of an imageId (for each tools)
-     * @param  {object} newBinaryResolution New resolution, with values {height, width}
-     */
-    CornerstoneAnnotationSynchronizer.prototype.sync = function(annotations, newBinaryResolution) {
+    // *
+    //  * @ngdoc method
+    //  * @methodOf osimis.CornerstoneAnnotationSynchronizer
+    //  * 
+    //  * @name osimis.CornerstoneAnnotationSynchronizer#sync
+    //  * @param {object} annotations The cornerstone annotations of an imageId (for each tools)
+    //  * @param {object} newBinaryResolution New resolution, with values {height, width}
+    //  *
+    //  * @description
+    //  * Update (mutate) all the provided annotations to the new resolution.
+    //  *
+    //  * Mutation is done to keep the variable references with cornerstoneTools.
+     
+    // CornerstoneAnnotationSynchronizer.prototype.sync = function(annotations, newBinaryResolution) {
         
-    };
+    // };
 
     module.CornerstoneAnnotationSynchronizer = CornerstoneAnnotationSynchronizer;
 

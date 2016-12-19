@@ -1,14 +1,17 @@
 /**
- * @ngdoc class
+ * @ngdoc method
+ * @methodOf osimis
  *
- * @name QualityForDiagnosis
+ * @name osimis.QualityForDiagnosis
+ * @param {osimis.Image} image Image model instance
+ * @return {Array<osimis.quality>} List of image qualities
  * 
  * @description
  * Don't display lowest qualities when better ones are already cached: for
  * instance if lossless is already available in cache, don't download thumbnail
  * again.
  * 
- * See `quality-policy.interface.js`.
+ * See the `QualityPolicy` interface.
  */
 (function(module) {
     'use strict';

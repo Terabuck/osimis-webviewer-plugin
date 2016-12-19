@@ -1,17 +1,26 @@
+/**
+ * @ngdoc object
+ * @memberOf osimis
+ * 
+ * @name osimis.Listener
+ *
+ * @example
+ * object constructor:
+ * ```js
+ *  this.onSomethingHappened = new osimis.Listener();
+ *  this.onSomethingHappened.trigger(arg1, arg2);
+ * ```
+ *
+ * user:
+ * ```js
+ *  object.onSomethingHappened(function(arg1, arg2) { 
+ *      // react..
+ *  });
+ * ```
+ */
 (function(root) {
     'use strict';
 
-    /** usage:
-     *
-     * object constructor:
-     * 	this.onSomethingHappened = new osimis.Listener();
-     * 	this.onSomethingHappened.trigger(arg1, arg2);
-     *
-     * user:
- 	 *  object.onSomethingHappened(function(arg1, arg2) { 
- 	 *      // react..
- 	 *  });
-     */
     function OsimisListener() {
     	var _listeners = [];
 

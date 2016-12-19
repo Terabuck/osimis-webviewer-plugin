@@ -1,4 +1,12 @@
 /**
+ * @ngdoc object
+ * @memberOf osimis
+ * 
+ * @name osimis.ProgressiveImageLoader
+ * @param {osimis.Image} image The image model to download quality from
+ * @param {Array<osimis.quality>} qualities The array of quality to be downloaded
+ * 
+ * @description
  * The `ProgressiveImageLoader` class manage image resolution
  * loading (and loading abortion) for a viewport.
  *
@@ -15,8 +23,7 @@
     'use strict';
 
     /**
-     * @param {Image} image              The image model to download quality from
-     * @param {Array<quality>} qualities The array of quality to be downloaded
+     * @constructor osimis.ProgressiveImageLoader
      */
     function ProgressiveImageLoader(Promise, image, qualities) {
         this._Promise = Promise;
@@ -36,6 +43,17 @@
         this._lastLoadedImageQuality = null;
     }
 
+    /**
+     * @ngdoc method
+     * @methodOf osimis.ProgressiveImageLoader
+     * 
+     * @name osimis.ProgressiveImageLoader#loadBinaries
+     *
+     * @description
+     * Pregressivily load all the image binaries defined fromù the qualities
+     * set in the constructor.
+     * Trigger `onBinaryLoaded` and `onLoadingFailed` events.
+     */
     ProgressiveImageLoader.prototype.loadBinaries = function() {
         var _this = this;
         var Promise = this._Promise;
@@ -98,9 +116,49 @@
         });
     };
 
+    /**
+     * @ngdoc method
+     * @methodOf osimis.ProgressiveImageLoader
+     *
+     * @name osimis.ProgressiveImageLoader#onBinaryLoaded
+     * 
+     * @param {callback} callback
+     *    Called when a binary has been loaded.
+     * 
+     *    Parameters:
+     *    * {osimis.quality} `quality` The quality of the binary.
+     *    * {object} `cornerstoneImageObject` The cornerstone image object of 
+     *                                        the loaded binary.
+     */
     ProgressiveImageLoader.prototype.onBinaryLoaded = null;
+
+    /**
+     * @ngdoc method
+     * @methodOf osimis.ProgressiveImageLoader
+     *
+     * @name osimis.ProgressiveImageLoader#onLoadingFailed
+     * 
+     * @param {callback} callback
+     *    Called when a loading as failed. Ignored loaded images are not 
+     *    considered as failed loadings (a LQ binary is ignored when loaded 
+     *    after a HQ binary for instance).
+     * 
+     *    Parameters:
+     *    * {osimis.quality} `quality` The quality of the binary.
+     *    * {Error} `err` The thrown javascript error.
+     */
     ProgressiveImageLoader.prototype.onLoadingFailed = null;
 
+    /**
+     * @ngdoc method
+     * @methodOf osimis.ProgressiveImageLoader
+     * 
+     * @name osimis.ProgressiveImageLoader#abortBinariesLoading
+     *
+     * @description
+     * Abort current binaries' loading. Mostly called by the `#destroy`
+     * method.
+     */
     ProgressiveImageLoader.prototype.abortBinariesLoading = function() {
         var image = this._image;
         
@@ -130,6 +188,16 @@
         }
     };
 
+    /**
+     * @ngdoc method
+     * @methodOf osimis.ProgressiveImageLoader
+     * 
+     * @name osimis.ProgressiveImageLoader#destroy
+     *
+     * @description
+     * Abort current binaries' loading and close `onBinaryLoaded` and 
+     * `onLoadingFailed` listeners.
+     */
     ProgressiveImageLoader.prototype.destroy = function() {
         this.abortBinariesLoading();
 

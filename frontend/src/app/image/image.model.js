@@ -1,14 +1,19 @@
-/** class Image
+/**
+ * @ngdoc object
+ * @memberOf osimis
+ * 
+ * @name osimis.Image
  *
- * @RootAggregate
- *
+ * @description
  * This contains image id, tags, annotations & binaries.
  * an image either account for a DICOM instance (if the instance is monoframe), or a frame.
- *
  */
 (function(module) {
     'use strict';
 
+    /**
+     * @constructor osimis.Image
+     */
     function Image(imageBinaryManager, annotationManager, // injected values
                    id, tags, availableQualities, postProcesses
     ) {
@@ -55,92 +60,125 @@
         // @todo need to be destroyed on no listener anymore
     };
 
-    /** Image#getAvailableQualities()
-     *
-     * @return available qualities as {<string>: <int>} array
-     *
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Image
+     * 
+     * @name osimis.Image#getAvailableQualities
+     * @return {Array<object>} Available qualities as a {<string>: <int>} array
      */
     Image.prototype.getAvailableQualities = function() {
         return this._availableQualities;
     };
 
-    /** Image#getAnnotations(type)
-     *
-     * @param type Annotation tool's name
-     * @return cornerstoneTools' annotation array for one instance
-     *
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Image
+     * 
+     * @name osimis.Image#getAnnotations
+     * @param {string} type Annotation tool's name.
+     * @return {Array<object>} cornerstoneTools' annotation array for one
+     *                         instance.
      */
     Image.prototype.getAnnotations = function(type) {
         return this._annotationManager.getByImageId(this.id, type);
     };
 
-    /** Image#setAnnotations(type, data)
-     *
-     * @param type Annotation tool's name
-     * @param data cornerstoneTools' annotation array for one instance
-     *
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Image
+     * 
+     * @name osimis.Image#setAnnotations
+     * @param {string} type Annotation tool's name
+     * @param {object} data cornerstoneTools' annotation array for one instance
      */
     Image.prototype.setAnnotations = function(type, data) {
         var annotation = new osimis.AnnotationValueObject(type, this.id, data);
         this._annotationManager.set(annotation);
     };
 
-    /** Image#onAnnotationChanged(callback)
-     *
-     * @event called when one image's annotation has changed
-     * @param callback function(annotation: WvAnnotationValueObject)
-     *
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Image
+     * 
+     * @name osimis.Image#onAnnotationChanged
+     * @param {callback} callback
+     *    Called when one image's annotation has changed
+     * 
+     *    Parameters:
+     *    * {object} `annotation` The modified annotation (WvAnnotationValueObject)
      */
     Image.prototype.onAnnotationChanged = angular.noop;
 
-    /** Image#loadBinary(desiredQualityLevel)
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Image
      * 
-     * @param quality see ImageQualities
-     * @return Promise<cornerstoneImageObject> // see https://github.com/chafey/cornerstone/wiki/image
-     *
+     * @name osimis.Image#loadBinary
+     * @param {osimis.quality} desiredQualityLevel Binary quality as an integer.
+     * @return {Promise<object>} cornerstoneImageObject,
+     *         See https://github.com/chafey/cornerstone/wiki/image
      */
     Image.prototype.loadBinary = function(quality) {
         return this._imageBinaryManager.get(this.id, quality);
     };
 
-    /** Image#freeBinary(quality)
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Image
+     * 
+     * @name osimis.Image#freeBinary
+     * @param {osimis.quality} quality The quality level of the binary to be
+     *                                 freed as an integer.
      *
+     * @description
      * Free binary memory - note it doesn't mean the cache will be freed
      * as the cache logic is implemented by the image-binary-manager (and
      * probably work with reference counting and other specific mechanisms).
-     *
-     * @param quality: int the quality level of the binary to be freed
-     *
      */
     Image.prototype.freeBinary = function(quality) {
         this._imageBinaryManager.free(this.id, quality);
     };
 
-    /** Image#abortBinaryLoading(quality)
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Image
+     * 
+     * @name osimis.Image#abortBinaryLoading
+     * @param {osimis.quality} quality The quality level of the binary to be
+     *                                 freed as an integer
      *
-     * Alias of freeBinary (if a request is pending, it's automaticaly canceled before its freed).
-     *
-     * @param quality: int the quality level of the binary to be freed
-     *
+     * @description
+     * Alias of freeBinary (if a request is pending, it's automaticaly canceled
+     * before its freed).
      */
     Image.prototype.abortBinaryLoading = function(quality) {
         this._imageBinaryManager.free(this.id, quality);
     };
 
-    /** Image#getBinaryOfHighestQualityAvailable()
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Image
      * 
-     * @return Promise<cornerstoneImageObject> // see https://github.com/chafey/cornerstone/wiki/image
-     *
+     * @name osimis.Image#getBinaryOfHighestQualityAvailable
+     * @return {Promise<object>} cornerstoneImageObject,
+     *         See https://github.com/chafey/cornerstone/wiki/image
      */
     Image.prototype.getBestQualityInCache = function() {
         return this._imageBinaryManager.getBestQualityInCache(this.id);
     };
 
-    /** Image#onBinaryLoaded(callback)
-     *
-     * @event called when a new binary has been loaded
-     * @param callback function(qualityLevel: ImageQualities, binary: cornerstoneImageObject)
-     *
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Image
+     * 
+     * @name osimis.Image#onBinaryLoaded
+     * @param {callback} callback
+     *    Called when a new binary has been loaded
+     * 
+     *    Parameters:
+     *    * {osimis.quality} `qualityLevel` The quality of the loaded binary
+     *    * {object} `annotation` The modified annotation (WvAnnotationValueObject)
      */
     Image.prototype.onBinaryLoaded = function() { /* noop */ };
 

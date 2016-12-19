@@ -1,3 +1,11 @@
+/**
+ * @ngdoc service
+ *
+ * @name webviewer.service:wvAnnotationManager
+ *
+ * @description
+ * Manager images' annotations.
+ */
 (function(osimis) {
     'use strict';
 
@@ -7,8 +15,28 @@
         this.onAnnotationChanged = new osimis.Listener();
     }
 
+    /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvAnnotationManager
+     *
+     * @name osimis.AnnotationManager#onAnnotationChanged
+     * 
+     * @param {callback} callback
+     *    Called when an annotation has changed
+     * 
+     *    Parameters:
+     *    * {object} `annotation` The modified annotation
+     */
     AnnotationManager.prototype.onAnnotationChanged = function() { /* noop */ }; // see constructor
 
+    /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvAnnotationManager
+     *
+     * @name osimis.AnnotationManager#set
+     * 
+     * @param {object} annotation The annotation
+     */
     AnnotationManager.prototype.set = function(annotation) {
         var annotations = this._annotations;
 
@@ -25,6 +53,20 @@
         this.onAnnotationChanged.trigger(annotation);
     };
 
+    /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvAnnotationManager
+     *
+     * @name osimis.AnnotationManager#getByImageId
+     * 
+     * @param {string} imageId The image id 
+     * @param {string} [type] 
+     *    If set, either one of those value:
+     *    * The annotation type
+     *    * The related cornestone tool's name
+     *    If undefined, all the available annotations will be returned.
+     * @return {Array<object>} The list of annotation returned
+     */
     AnnotationManager.prototype.getByImageId = function(imageId, type) {
         var annotations = this._annotations;
 
@@ -50,12 +92,12 @@
 
     osimis.AnnotationManager = AnnotationManager;
 
+    // Inject in angular
+    
     angular
         .module('webviewer')
         .factory('wvAnnotationManager', wvAnnotationManager);
 
-    // Inject in angular
-    
     /* @ngInject */
     function wvAnnotationManager() {
         return new AnnotationManager();

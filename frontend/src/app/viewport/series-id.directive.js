@@ -1,31 +1,20 @@
 /**
- * @ngdoc
- * @name vpSeriesId
- *
- * @description
- * The `vpSeriesId` directive is an extension of the `wvViewport` directive.
- * It sets and updates the images displayed on the viewport, based on the one available in the series.
- * The relative series model can be retrieved via attribute and therefore be controlled externaly.
+ * @ngdoc directive
  * 
- * This directive is also meant to be extended the same way `wvViewport` is.
- * Have a look at the _series-plugins/_ folder for an exhaustive list of series-related features.
+ * @name webviewer.directive:vpSeriesId
  *
- * @restrict A
- *
- * @require wvViewport
- *
- * @param {series_id} vpSeriesId (optional) The id of the displayed series.
+ * @param {string} [vpSeriesId] The id of the displayed series.
  *   It can also be set using inter-directive communication, therefore this attribute is optional and may
  *   be changed by the directive itself.
  *   series_id = <orthanc-series-id>:<instance-index> where instance-index = n ⊂ [0; Infinity]
  *   In case of multiframe instances, multiple orthanc series can relates to multiple viewport
  *   series_id (one multiframe instance is converted into one web viewer series).
  *
- * @param {series_model} wvSeries (optional, readonly) Share the series model instance.
+ * @param {osimis.Series} [wvSeries] (readonly) Share the series model instance.
  *   The series-id directive handles the series model loading. Therefore, it also provide access to it.
  *   This is done through this attribute, which should only be used to retrieve the model, not to set it.
  *
- * @param {callback} wvOnSeriesChange (optional, callback) Triggered when the series has changed
+ * @param {callback} [wvOnSeriesChange] Triggered when the series has changed
  *   Available Callback Arguments:
  *   * `$series` - series_model
  *
@@ -33,7 +22,20 @@
  *    Notably used by the liveshare feature to save the current state of the series.
  *    Note the value may be different from the displayed image's index when an image is waiting loading to finish before display.
  *
- * @example Display a specific series with some informations and a play button
+ * @restrict Attribute
+ * @requires webviewer.directive:wvViewport
+ * 
+ * @description
+ * The `vpSeriesId` directive is an extension of the `wvViewport` directive.
+ * It sets and updates the images displayed on the viewport, based on the one available in the series.
+ * The relative series model can be retrieved via attribute and therefore be controlled externaly.
+ * 
+ * This directive is also meant to be extended the same way `wvViewport` is.
+ * Have a look at the _series-plugins/_ folder for an exhaustive list of series-related features.
+ * 
+ * @example
+ * Display a specific series with some informations and a play button:
+ * 
  * ```html
  * <wv-viewport wv-series-id="'your-series-id'" wv-series="$series" wv-size="{width: '100px', height: '100px'}"
  *              wv-image-id="imageId" wv-image="$image" wv-lossless="true"

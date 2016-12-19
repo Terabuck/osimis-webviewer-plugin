@@ -1,3 +1,9 @@
+/**
+ * @ngdoc object
+ * @memberOf osimis
+ * 
+ * @name osimis.Series
+ */
 (function() {
     'use strict';
 

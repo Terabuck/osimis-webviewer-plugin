@@ -1,13 +1,14 @@
 /**
- * @ngdoc overview
+ * @ngdoc object
+ * @memberOf osimis
  * 
- * @name HttpRequest
+ * @name osimis.HttpRequest
  * 
  * @description
  * Wrapper over the xhr object. 
  * Its user need to set `HttpRequest.Promise` variable before usage.
  *
- * @rationale
+ * # Rational
  * We need a concrete way to handle http requests and set additional headers both from AngularJS and the web workers.
  * This class has been developed because most xhr wrappers don't provide control over xhr.responseType, or aren't fit
  * for usage within web workers (due to call to the window object).
@@ -18,22 +19,22 @@
  * @example
  * See unit tests for examples.
  */
-(function(module) {
-
+(function(osimis) {
     /**
+     * @type {object}
+     *
+     * @description
      * Super cache object at global scope.
      *
      * Keys are the URL of the request.
      * Values are Promises of the request result. 
      * 
      * Cache is disabled by default.
-     * 
-     * @type {Object}
      */
     var _cache = {};
 
     /**
-     * @class
+     * @constructor osimis.HttpRequest
      */
     function HttpRequest() {
         this._httpHeaders = {};
@@ -56,14 +57,18 @@
     }
 
     /**
+     * @ngdoc property
+     * @propertyOf osimis.HttpRequest
+     *
+     * @name osimis.HttpRequest.Promise
+     * @type {Function}
+     * 
+     * @description
      * Can be overriden by user. We recommand to use $q for AngularJS and to keep native promises for workers.
      * Be careful the implementation is Promise/A+ compliant, see my comment here
      * https://github.com/chrisdavies/plite/issues/4#issuecomment-247022165.
      *
      * @todo change native promise by some lib if we need IE compatibility http://caniuse.com/#search=promise
-     * 
-     * @type {function}
-     * @static
      */
     HttpRequest.Promise = (Promise && function(resolver) {
         // Wrap native promises
@@ -71,42 +76,49 @@
     }) || undefined;
 
     /**
+     * @ngdoc property
+     * @propertyOf osimis.HttpRequest
+     *
+     * @name osimis.HttpRequest.timeout
+     * @type {number} 0 is infinity
+     *
+     * @description
      * Timeout in millisecond, useful for tests.
      * See xhr.timeout property.
-     * 
-     * @type {Number} 0 is infinity
      */
     HttpRequest.timeout = 0;
 
     /**
+     * @ngdoc method
+     * @methodOf osimis.HttpRequest
+     * 
+     * @name osimis.HttpRequest#setCache
+     * @param {boolean} enableCache Activate/Deactivate the global cache for this request
+     * 
      * @description
      * Activate/Deactivate global cache for the actual request.
      * 
      * The result's promise is cached, not the result itself (to avoid dual requests for instance).
      * Failed requests invalidate the cache.
      *
-     * @warning `setCache` should only be used for GET requests.
+     * # @warning `setCache` should only be used for GET requests.
      * 
-     * Note: the cache is based on exact URL matching, therefore, a trailing slash request may not
-     * use the same cache as a non-trailing slash request, even if the same resource is sent.
-     *
-     * @method HttpRequest.setCache
-     * @access public
-     * 
-     * @param {boolean} enableCache Activate/Deactivate the global cache for this request
+     * # @note The cache is based on exact URL matching, therefore, a trailing slash request may not
+     *   use the same cache as a non-trailing slash request, even if the same resource is sent.
      */
     HttpRequest.prototype.setCache = function(enableCache) {
         this._cacheEnabled = !!enableCache;
     };
 
     /**
+     * @ngdoc method
+     * @methodOf osimis.HttpRequest
+     * 
+     * @name osimis.HttpRequest#setHeaders
+     * @param {object} headers HTTP headers hashmap
+     * 
      * @description
      * Used mainly to add user credentials.
-     *
-     * @method HttpRequest.setHeaders
-     * @access public
-     * 
-     * @param {object} headers HTTP headers hashmap
      */
     HttpRequest.prototype.setHeaders = function(headers) {
         // Clone the header object (make sure we never change the passed object, especially since it's very likely it's
@@ -124,17 +136,18 @@
     };
 
     /**
-     * @description
-     * Used to retrieve binary data. See XMLHTTPRequest.responseType.
-     * This method doesn't have to be used when retrieving JSON data (this is the default).
-     *
-     * @method HttpRequest.setResponseType
-     * @access public
+     * @ngdoc method
+     * @methodOf osimis.HttpRequest
      * 
+     * @name osimis.HttpRequest#setResponseType
      * @param {string} responseType Equivalent to XMLHTTPRequest.responseType.
      *    * 'arraybuffer'
      *    * 'json'
      *    * ...
+     * 
+     * @description
+     * Used to retrieve binary data. See XMLHTTPRequest.responseType.
+     * This method doesn't have to be used when retrieving JSON data (this is the default).
      */
     HttpRequest.prototype.setResponseType = function(responseType) {
         this._responseType = responseType;
@@ -150,66 +163,71 @@
     };
 
     /**
+     * @ngdoc method
+     * @methodOf osimis.HttpRequest
+     * 
+     * @name osimis.HttpRequest#get
+     * @param {string} url The destination of the HTTP request
+     * @return {Promise<object>} The result of the request
+     * 
      * @description
      * Send an HTTP GET request to _url_.
-     * 
-     * @method HttpRequest.get
-     * @access public
-     * 
-     * @param {url} url The destination of the HTTP request
-     *
-     * @return {Promise} The result of the request
      */
     HttpRequest.prototype.get = function(url) {
         return this._send('GET', url);
     };
 
     /**
+     * @ngdoc method
+     * @methodOf osimis.HttpRequest
+     * 
+     * @name osimis.HttpRequest#post
+     * @param {string} url The destination of the HTTP request
+     * @param {object} data Input data sent via the POST method
+     * @return {Promise<object>} The result of the request
+     *
      * @description
      * Send an HTTP POST request to _url_.
-     * 
-     * @method HttpRequest.post
-     * @access public
-     * 
-     * @param {url} url The destination of the HTTP request
-     * @param {object} data Input data sent via the POST method
      *
-     * @return {Promise} The result of the request
+     * @todo add additional unit test
      */
-    // @todo add additional unit test
     HttpRequest.prototype.post = function(url, data) {
         return this._send('POST', url, data);
     };
 
     /**
+     * @ngdoc method
+     * @methodOf osimis.HttpRequest
+     * @deprecated Not implemented at the moment.
+     * 
+     * @name osimis.HttpRequest#put
+     * @param {string} url The destination of the HTTP request
+     * @param {object} data Input data sent via the POST method
+     * @return {Promise<object>} The result of the request
+     * 
      * @description
      * Send an HTTP PUT request to _url_.
-     * 
-     * @method HttpRequest.put
-     * @access public
-     * 
-     * @param {url} url The destination of the HTTP request
-     * @param {object} data Input data sent via the POST method
      *
-     * @return {Promise} The result of the request
+     * @note Commented until we really need it. Need additional unit test once uncomment.
      */
-    // @note Commented untill we really need it. Need additional unit test once uncomment.
     // HttpRequest.prototype.put = function(url, data) {
     //     return this._send('PUT', url, data);
     // };
 
     /**
+     * @ngdoc method
+     * @methodOf osimis.HttpRequest
+     * @deprecated Not implemented at the moment.
+     * 
+     * @name osimis.HttpRequest#delete
+     * @param {string} url The destination of the HTTP request
+     * @return {Promise<object>} The result of the request
+     * 
      * @description
      * Send an HTTP DELETE request to _url_.
-     * 
-     * @method HttpRequest.delete
-     * @access public
-     * 
-     * @param {url} url The destination of the HTTP request
      *
-     * @return {Promise} The result of the request
+     * @note Commented until we really need it. Need additional unit test once uncomment.
      */
-    // @note Commented untill we really need it. Need additional unit test once uncomment.
     // HttpRequest.prototype.delete = function(url) {
     //     return this._send('DELETE', url);
     // };
@@ -218,14 +236,14 @@
      * @description
      * Send an HTTP request to _url_.
      * 
-     * @method HttpRequest._send
-     * @access private
-     *
+     * @ngdoc method
+     * @methodOf osimis.HttpRequest
+     * 
+     * @name osimis.HttpRequest#_send
      * @param {string} method The HTTP method type of the call (eg. GET, ...)
-     * @param {url} url The destination of the HTTP request
-     * @param {object} data (optional) Additional input data sent via the request (ie. for POST method)
-     *
-     * @return {Promise} The result of the request
+     * @param {string} url The destination of the HTTP request
+     * @param {object} [data] Additional input data sent via the request (ie. for POST method)
+     * @return {Promise<object>} The result of the request
      */
     HttpRequest.prototype._send = function(method, url, inputData) {
         var Promise = HttpRequest.Promise;
@@ -338,12 +356,14 @@
     };
 
     /**
+     * @ngdoc method
+     * @methodOf osimis.HttpRequest
+     * 
+     * @name osimis.HttpRequest#abort
+     * 
      * @description
      * Cancel the sent XHR request.
      * Must be used after #get/#post/#put/#delete/...
-     * 
-     * @method HttpRequest.abort
-     * @access public
      */
     HttpRequest.prototype.abort = function() {
         // Check the request has been sent
@@ -369,9 +389,8 @@
     HttpRequestError.prototype = new Error;
     HttpRequest.HttpRequestError = HttpRequestError;
 
-    module.HttpRequest = HttpRequest;
-
+    osimis.HttpRequest = HttpRequest;
 })(typeof WorkerGlobalScope !== 'undefined' ?
-    (self.osimis || (self.osimis = {})) // use osimis module on workers
-    : (window.osimis || (window.osimis = {})) // use osimis module on main thread
+    (self.osimis || (self.osimis = {})) // use osimis osimis on workers
+    : (window.osimis || (window.osimis = {})) // use osimis osimis on main thread
 );

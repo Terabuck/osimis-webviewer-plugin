@@ -1,33 +1,31 @@
 /**
  * @ngdoc directive
+ * @name webviewer.directive:wvWebviewer
  *
- * @name wvWebviewer
- *
- * @description
- * The `wvWebviewer` directive display a whole web viewer at full scale (100% width, 100% height).
- *
- * @scope
- * 
- * @restrict E
- *
- * @param {boolean} wvToolbarEnabled (optional) Display the toolbar
+ * @param {boolean} [wvToolbarEnabled] Display the toolbar
  *   Note all tools are disabled when the toolbar is disabled, including the preselected ones (windowing & zooming).
  *
- * @param {boolean} wvStudylistEnabled (optional) Show a list of study to let the user choose the `wv-study-id`.
+ * @param {boolean} [wvStudylistEnabled] Show a list of study to let the user choose the `wv-study-id`.
  *   `wvSerieslistEnabled` must be true.
  *
- * @param {string} wvStudyId (optional) Configure the study shown in the serieslist
+ * @param {string} [wvStudyId] Configure the study shown in the serieslist
  *   `wvSerieslistEnabled` must be true.
  *
- * @param {boolean} wvSerieslistEnabled (optional) Display the list of series
+ * @param {boolean} [wvSerieslistEnabled] Display the list of series
  *   Used to show the list of series of `wv-study-id`.
  *   Either `wvStudyId` has to be defined or wv-studylist-enabled` has to be true.
  *
- * @param {string} wvSeriesId (optional) Configure the series shown in the main viewport
+ * @param {string} [wvSeriesId] Configure the series shown in the main viewport
  *
- * @param {object} wvTools (optioanl) Configure the displayed tools with their default vaule
+ * @param {object} [wvTools] Configure the displayed tools with their default vaule
  *   See source code for available configuration options.
+ * 
+ * @scope
+ * @restrict Element
  *
+ * @description
+ * The `wvWebviewer` directive display a whole web viewer at full scale (100% width, 100% height).
+ * 
  * @example
  * The following example show the toolbar, hide the full list of studies,
  * and display a list of draggable series with a splitable pane of droppable

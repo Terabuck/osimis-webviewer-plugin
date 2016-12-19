@@ -1,3 +1,9 @@
+/**
+ * @ngdoc object
+ * @memberOf osimis
+ * 
+ * @name osimis.PreLoader
+ */
 (function() {
     'use strict';
 

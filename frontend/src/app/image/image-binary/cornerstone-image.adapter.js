@@ -1,4 +1,10 @@
 /**
+ * @ngdoc object
+ * @memberOf osimis
+ * 
+ * @name osimis.CornerstoneImageAdapter
+ *
+ * @description
  * The `CornerstonImageAdapter` class creates an image binary (cornerstone pixel
  * object) from a backend response.
  */

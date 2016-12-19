@@ -1,3 +1,9 @@
+/**
+ * @ngdoc object
+ * @memberOf osimis
+ * 
+ * @name osimis.TaskPriorityPolicy
+ */
 (function(module) {
     'use strict';
 
@@ -6,19 +12,24 @@
         this._imageBinariesCache = imageBinariesCache;
     }
 
-    /** TaskPriorityPolicy#selectTask(availableWorkers, busyWorkers, tasksToProcess, tasksInProcess)
+    /**
+     * @ngdoc method
+     * @methodOf osimis.TaskPriorityPolicy
+     * 
+     * @name osimis.TaskPriorityPolicy#selectTask
+     * @param {Array<osimis.TaskWorker>} availableWorkers The available workers
+     * @param {Array<osimis.TaskWorker>} busyWorkers The workers currently 
+     *                                               working
+     * @param {Array<osimis.Task>} tasksToProcess The tasks in the process list
+     * @param {Array<osimis.Task>} tasksInProcess The tasks being treated by
+     *                                            a web worker
+     * @return {osimis.Task|null} The chosen task to process
      *
+     * @description
      * This methods returns the next task to be processed.
      *
-     * @todo Optimize heavily! It's called at each binary loading! Maybe use an external priority queue implementation?
-     *
-     * @param availableWorkers
-     * @param busyWorkers
-     * @param tasksToProcess
-     * @param tasksInProcess
-     *
-     * @return null or the chosen task to process
-     *
+     * # @todo Optimize heavily! It's called at each binary loading! Maybe use
+     *         an external priority queue implementation?
      */
     TaskPriorityPolicy.prototype.selectTask = function(availableWorkers, busyWorkers, tasksToProcess, tasksInProcess) {
         var imageBinariesCache = this._imageBinariesCache;

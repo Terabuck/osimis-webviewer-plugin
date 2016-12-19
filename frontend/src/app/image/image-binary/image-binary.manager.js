@@ -1,5 +1,9 @@
-/** wvImageBinaryManager
+/** 
+ * @ngdoc service
  *
+ * @name webviewer.service:wvImageBinaryManager
+ *
+ * @description
  * Manage the binary loading side of images.
  *
  * As it is quite complex and requires specific caching & prefetching algorithm,
@@ -39,15 +43,56 @@
         }, 5000);
     }
     
-    // (id, quality, cornerstoneImageObject)
+    /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvImageBinaryManager
+     *
+     * @name osimis.ImageBinaryManager#onBinaryLoaded
+     * 
+     * @param {callback} callback
+     *    Called when a binary has been loaded
+     * 
+     *    Parameters:
+     *    * {string} `id`
+     *    * {int} `quality`
+     *    * {object} `cornerstoneImageObject`
+     */
     ImageBinaryManager.prototype.onBinaryLoaded = function() { /* noop */ };
 
-    // (id, quality)
+    /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvImageBinaryManager
+     *
+     * @name osimis.ImageBinaryManager#onBinaryUnLoaded
+     * @param {callback} [cb]
+     *    Called when a binary loading has failed/aborted
+     * 
+     *    Parameters:
+     *    * {string} `id`
+     *    * {int} `quality`
+     */
     ImageBinaryManager.prototype.onBinaryUnLoaded = function() { /* noop */ };
 
     /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvImageBinaryManager
+     *
+     * @name osimis.ImageBinaryManager#requestLoading
+     * @param {string} id Id of the image (<instanceId>:<frameIndex>)
+     * @param {osimis.quality} quality Quality of the binary
+     * @param {priority} priority
+     *    Priority of the download (lower is better)
+     *    * `0` for displayed images
+     *    * `1`, `2`, ... for preloading images
+     * @return {Promise<object>}
+     *    Returns a promise of cornerstone image object,
+     *    see https://github.com/chafey/cornerstone/wiki/image
+     *
+     * @description
      * Request the loading of an image with a specified priority.
      * Used notably by the preloader instead of the standard .get method.
+     *
+     * Increase the request reference count.
      */
     ImageBinaryManager.prototype.requestLoading = function(id, quality, priority) {
         var Promise = this._Promise;
@@ -140,6 +185,30 @@
         return request.promise;
     };
 
+    /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvImageBinaryManager
+     *
+     * @name osimis.ImageBinaryManager#abortLoading
+     * @param {string} id Id of the image (<instanceId>:<frameIndex>)
+     * @param {osimis.quality} quality Quality of the binary
+     * @param {priority} priority
+     *    Priority of the download (lower is better)
+     *    * `0` for displayed images
+     *    * `1`, `2`, ... for preloading images
+     *
+     * @description
+     * Decrease binary request reference counting.
+     * 
+     * When reference counting arrives at 0,
+     * - if the request is being downloaded, it is aborted
+     * - if the request has already been downloaded, it can be flushed from
+     *   cache (only when cache max size is exceeded)
+     *
+     * # @warning This should be called even if the request has failed, because
+     *            the reference count isn't decreased when a request failed.
+     * # @todo Rename the method to something like decrBinaryRefCount instead.
+     */
     ImageBinaryManager.prototype.abortLoading = function(id, quality, priority) {
         var pool = this._workerPool;
         var cache = this._cache;
@@ -196,18 +265,21 @@
         }
     };
 
-    /** wvImageBinaryManager#get(id, quality)
+    /**
+     * wvImageBinaryManager#get(id, quality)
      *
-     * @param id <instanceId>:<frameIndex>
+     * @param id 
      * @param quality see osimis.quality
-     * @return Promise<cornerstoneImageObject> // see https://github.com/chafey/cornerstone/wiki/image
+     * @return Promise<object> cornerstoneImageObject, see https://github.com/chafey/cornerstone/wiki/image
      *
+     * @deprecated in favour of requestLoading
      */
     ImageBinaryManager.prototype.get = function(id, quality) {
         return this.requestLoading(id, quality, 0);
     };
 
-    /** wvImageBinaryManager#free(id, quality)
+    /**
+     * wvImageBinaryManager#free(id, quality)
      *
      * Free the defined image binary.
      * Reference counting implementation (if the image was called 4 times, #free has to be called 4 time as well to effectively free the memory).
@@ -218,19 +290,23 @@
      * @param id <instanceId>:<frameIndex>
      * @param quality see osimis.quality
      *
+     * @deprecated in favour of abortLoading
      */
     ImageBinaryManager.prototype.free = function(id, quality) {
         return this.abortLoading(id, quality, 0);
     };
 
-    /** wvImageBinaryManager#listCachedBinaries(id)
+    /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvImageBinaryManager
      *
-     * Return all the cached binaries of an image, listed
-     * by their quality number.
+     * @name osimis.ImageBinaryManager#listCachedBinaries
+     * @param {string} id Id of the image (<instanceId>:<frameIndex>)
+     * @return {Array<osimis.quality>} List of qualities in cache *and* already loaded
      *
-     * @param id <instanceId>:<frameIndex>
-     * @return [] or [<quality-value: int>, ...]
+     * @description
      *
+     * Return the qualities of the loaded binaries of an image.
      */
     ImageBinaryManager.prototype.listCachedBinaries = function(id) {
         var loadedCacheIndex = this._loadedCacheIndex;
@@ -250,11 +326,16 @@
         return result;
     };
 
-    /** wvImageBinaryManager#getCachedHighestQuality(id)
+    /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvImageBinaryManager
      *
-     * @param id <instanceId>:<frameIndex>
-     * @return quality: int
+     * @name osimis.ImageBinaryManager#getCachedHighestQuality
+     * @param {string} id Id of the image (<instanceId>:<frameIndex>)
+     * @return {osimis.quality} Highest qualities in cache *and* already loaded
      *
+     * @description
+     * Return the highest quality of the loaded binaries of an image.
      */
     ImageBinaryManager.prototype.getBestQualityInCache = function(id) {
         var loadedCacheIndex = this._loadedCacheIndex;

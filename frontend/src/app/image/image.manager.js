@@ -1,6 +1,15 @@
 /**
+ * @ngdoc service
+ *
+ * @name webviewer.service:wvImageManager
+ *
+ * @description
+ * Manage high-level image models.
+ * An image correspond to a monoframe instance or to the frame of a multiframe
+ * instance. One image may have multiple binaries (one by quality).
  * 
- * Available qualities may change from one instance to another within the same series
+ * Available qualities may change from one instance to another within the same
+ * series.
  */
 (function(osimis) {
     'use strict';
@@ -27,16 +36,18 @@
     }
 
     /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvImageManager
+     *
+     * @name osimis.ImageManager#get
+     * 
+     * @param {string} id Id of the image (<instance-id>:<frame-index>)
+     * @return {Promise<osimis.Image>} The image model's promise
+     *
+     * @description
      * Retrieve an image model by id.
      * 
-     * @pre The image's series has been loaded via wvSeriesManager
-     * 
-     * @param {string} id Id of the image
-     *   format: <slice-id>[|<processor>...]
-     *      * <slice-id>:  *:\d+ (_instance_:_slice_)
-     *      * <processor>: <string>[~<string>...] (_name_~_param1_~_param2_...)
-     * 
-     * @return {promise<osimis.Image>}
+     * # @pre The image's series has been loaded via wvSeriesManager
      */
     ImageManager.prototype.get = function(id) {
         var instanceManager = this._instanceManager;
@@ -87,7 +98,17 @@
         return modelCache[id];
     };
 
-    /** _availableQualities
+    /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvImageManager
+     *
+     * @name osimis.ImageManager#cacheAvailableQualitiesForInstance
+     * 
+     * @param {string} instanceId Id of the instance
+     * @param {Array<osimis.quality>} availableQualities 
+     *    List of the current instance's qualities available for download.
+     *
+     * @description
      * Cache available qualities by instanceId when a series is loaded,
      * because all images' available qualities are only retrieved in one single series http request
      * to avoid unnecessary http requests.
@@ -126,15 +147,19 @@
         });
 
         /**
+         * @ngdoc method
+         * @methodOf webviewer.service:wvImageManager
+         *
+         * @name osimis.ImageManager#createAnnotedImage
+         * 
+         * @param {string} id Id of the image (<instance-id>:<frame-index>)
+         * @param {int} width Width of the output
+         * @param {int} height Height of the output
+         *
+         * @description
          * Retrieve an image picture from an image id.
          * 
          * @todo move in @RootAggregate (ie. image-model)
-         * 
-         * @param {string} id Id of the image
-         * @param {int} width Width of the output
-         * @param {int} height Height of the output
-         * 
-         * @return {promise<string>} Resulting image in PNG as a DATA URI string
          */
         imageManager.createAnnotedImage = function(id, width, height) {
             // create a fake viewport containing the image to save it with the annotations

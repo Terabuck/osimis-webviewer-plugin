@@ -1,7 +1,55 @@
 /**
  * @ngdoc directive
- * @name wvViewport
+ * @name webviewer.directive:wvViewport
  *
+ * @param {object} wvSize Please have a look at the `wvSize` directive source code for more information
+ *
+ * @param {string} [wvImageId]
+ *   The id of the displayed image can be set using this attribute.
+ *   It can also be set without attributes, using inter-directive communication. Therefore this attribute may be changed
+ *   by the viewport itself (eg. when a series is dropped on the viewport).
+ *   image_id = <orthanc-instance-id>:<frame-index> where frame-index = n ⊂ [0; 1000]
+ *
+ * @param {osimis.Image} [wvImage] (readonly)
+ *   Share the image model instance.
+ *   The viewport handles the image model loading. Therefore, it also provide access to it.
+ *   This is done through this attribute, which should only be used to retrieve the model, not to set it.
+ *
+ * @param {string} [wvSeriesId]
+ *   Please have a look at the `wvSeriesId` directive source code for more information
+ *   concerning _wvSeriesId_ attribute, and other related attributes (for instance _wvSeries_ and _wvOnSeriesChange_).
+ *
+ * @param {callback} [wvOnImageChange]
+ *   triggered when image has effectively changed
+ *   
+ *   Available Callback Arguments:
+ *   * `$image` - image_model
+ *
+ * @param {object} wvViewport (readonly)
+ *   Share the cornerstone viewport data. It is different from the viewport
+ *   model which is only accessible via viewport plugins.
+ *   
+ *   The cornerstone viewport object contains the following attributes (source: https://github.com/chafey/cornerstone/wiki/viewport):
+ *   * `scale` - The scale applied to the image. A scale of 1.0 will display no zoom (one image pixel takes up one screen pixel). A scale of 2.0 will be double zoom and a scale of .5 will be zoomed out by 2x
+ *   * `translation` - an object with properties x and y which describe the translation to apply in the pixel coordinate system. Note that the image is initially displayed centered in the enabled element with a x and y translation of 0 and 0 respectively.
+ *   * `voi` - an object with properties windowWidth and windowCenter.
+ *   * `invert` - true if the image should be inverted, false if not.
+ *   * `pixelReplication` - true if the image smooth / interpolation should be used when zoomed in on the image or false if pixel replication should be used.
+ *   * `hflip` - true if the image is flipped horizontally. Default is false
+ *   * `vflip` - true if the image is flipped vertically. Default is false
+ *   * `rotation` - the rotation of the image (90 degree increments). Default is 0
+ *
+ * @param {boolean} [wvEnableOverlay=false] Display the overlay
+ *
+ * @param {boolean} [wvLossless=false] Force lossless quality fetching.
+ *   * `false` - fetch image with quality based on viewport size.
+ *   * `true` - fetch image with the maximum available quality.
+ *   Note it doesn't disable progressive loading.
+ *
+ * @scope
+ * @restrict Element
+ * @requires webviewer.directive:wvSize
+ * 
  * @description
  * The `wvViewport` directive display medical images inside a canvas.
  *
@@ -21,54 +69,10 @@
  * overlay will be overloaded with white space.
  * By setting the overlay's css _position_ attribute to _absolute_, the ovgetViewporterlay can position information to the top, right, bottom and left sides
  * of the viewport.
- *
- * @scope
- *
- * @restrict E
- *
- * @require wvSize
- *
- * @param {size_object} wvSize (required) Please have a look at the `wvSize` directive source code for more information
- *
- * @param {image_id} wvImageId (optional) The id of the displayed image.
- *   The id of the displayed image can be set using this attribute.
- *   It can also be set without attributes, using inter-directive communication. Therefore this attribute may be changed
- *   by the viewport itself (eg. when a series is dropped on the viewport).
- *   image_id = <orthanc-instance-id>:<frame-index> where frame-index = n ⊂ [0; 1000]
- *
- * @param {image_model} wvImage (optional, readonly) Share the image model instance.
- *   The viewport handles the image model loading. Therefore, it also provide access to it.
- *   This is done through this attribute, which should only be used to retrieve the model, not to set it.
- *
- * @param {series_id} wvSeriesId (optional) Please have a look at the `wvSeriesId` directive source code for more information
- *   concerning _wvSeriesId_ attribute, and other related attributes (for instance _wvSeries_ and _wvOnSeriesChange_).
- *
- * @param {callback} wvOnImageChange (optional, callback) triggered when image has effectively changed
- *   Available Callback Arguments:
- *   * `$image` - image_model
- *
- * @param {cornerstone_viewport} wvViewport (optional, readonly) Share the cornerstone viewport data. It is different from
- *   the web viewer viewport model which is only accessible via viewport plugins.
- *   The cornerstone viewport object contains the following attributes (source: https://github.com/chafey/cornerstone/wiki/viewport):
- *   * `scale` - The scale applied to the image. A scale of 1.0 will display no zoom (one image pixel takes up one screen pixel). A scale of 2.0 will be double zoom and a scale of .5 will be zoomed out by 2x
- *   * `translation` - an object with properties x and y which describe the translation to apply in the pixel coordinate system. Note that the image is initially displayed centered in the enabled element with a x and y translation of 0 and 0 respectively.
- *   * `voi` - an object with properties windowWidth and windowCenter.
- *   * `invert` - true if the image should be inverted, false if not.
- *   * `pixelReplication` - true if the image smooth / interpolation should be used when zoomed in on the image or false if pixel replication should be used.
- *   * `hflip` - true if the image is flipped horizontally. Default is false
- *   * `vflip` - true if the image is flipped vertically. Default is false
- *   * `rotation` - the rotation of the image (90 degree increments). Default is 0
- *
- * @param {boolean} wvEnableOverlay (optional) Display the overlay
- *   default: false
- *
- * @param {boolean} wvLossless (optional) Force lossless quality fetching.
- *   * `false` - fetch image with quality based on viewport size.
- *   * `true` - fetch image with the maximum available quality.
- *   Note it doesn't disable progressive loading.
- *   default: false
- *
- * @example Display a specific image with some informations
+ * 
+ * @example
+ * Display a specific image with some informations
+ * 
  * ```html
  * <wv-viewport wv-image-id="'your-image-id" wv-image="$image" wv-size="{width: '100px', height: '100px'}"
  $              wv-viewport="$viewport" wv-lossless="true"
@@ -77,7 +81,9 @@
  * <p>image position: {{$viewport.translate}}</p>
  * ```
  *
- * @example Display a specific image with custom overlay
+ * @example
+ * Display a specific image with custom overlay
+ * 
  * ```html
  * <wv-viewport wv-image-id="'your-image-id'" wv-image="$image" wv-size="{width: '100px', height: '100px'}"
  *              wv-viewport="$viewport" wv-lossless="true">

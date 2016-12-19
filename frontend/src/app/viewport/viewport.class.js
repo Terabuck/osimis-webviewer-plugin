@@ -1,11 +1,27 @@
 /**
+ * @ngdoc object
+ * @memberOf osimis
+ * 
+ * @name osimis.Viewport
+ *
+ * @description
  * Wrapper on top of cornerstone:
  * - work with progressive image loading
  *
- * @rationale
+ * # @rationale
  * Should be the easiest possible class to manage a viewport.
  */
 (function(osimis) {
+
+    /**
+     * @ngdoc method
+     * @methodOf osimis
+     *
+     * @constructor osimis.Viewport
+     * @name osimis.Viewport
+     * @param {DOMElement} domElement The div that will contains the canvas
+     * @param {boolean} [isDiagnosisViewport=true] The 
+     */
     function Viewport(
         Promise, cornerstone, 
         domElement, isDiagnosisViewport
@@ -66,6 +82,17 @@
         this.onParametersResetting = new osimis.Listener();
     }
 
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Viewport
+     *
+     * @name osimis.Viewport#destroy
+     * 
+     * @description
+     * Disable cornerstone enabled element.
+     * Close listeners.
+     * Abort current images' loadings.
+     */
     Viewport.prototype.destroy = function() {
         var cornerstone = this._cornerstone;
 
@@ -82,16 +109,44 @@
         cornerstone.disable(this._enabledElement);
     }
 
-    // used by extensions
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Viewport
+     *
+     * @name osimis.Viewport#getEnabledElement
+     * @return {DOMElement} cornerstone enabled element
+     *
+     * @description
+     * Used by extensions.
+     */
     Viewport.prototype.getEnabledElement = function() {
         return this._enabledElement;
     };
 
-    // Used by tools to retrieve an image (and its annotations)
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Viewport
+     *
+     * @name osimis.Viewport#getImage
+     * @return {osimis.Image} Displayed image.
+     * 
+     * @description
+     * Used by tools to retrieve an image (and its annotations).
+     */
     Viewport.prototype.getImage = function() {
         return this._displayedImage;
     };
 
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Viewport
+     *
+     * @name osimis.Viewport#draw
+     * 
+     * @description
+     * Draw the image. Mostly used internally. Can sometimes be used by tool
+     * also.
+     */
     Viewport.prototype.draw = function() {
         var cornerstone = this._cornerstone;
         var enabledElement = this._enabledElement;
@@ -111,12 +166,17 @@
     };
 
     /**
-     * Change the displayed image.
-     * Binaries will automaticaly be downloaded and displayed.
-     * 
-     * @param {Image} image             Image model
+     * @ngdoc method
+     * @methodOf osimis.Viewport
+     *
+     * @name osimis.Viewport#setImage
+     * @param {osimis.Image} image      Image model
      * @param {boolean} resetParameters Reset the viewport parameters (ie. zoom, ...),
      *                                  mostly call when the end-user changes the series. 
+     *
+     * @description
+     * Change the displayed image.
+     * Binaries will automaticaly be downloaded and displayed.
      */
     Viewport.prototype.setImage = function(image, resetViewport) {
         var cornerstone = this._cornerstone;
@@ -241,6 +301,17 @@
             throw err;
         });
     };
+
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Viewport
+     *
+     * @name osimis.Viewport#destroy
+     * 
+     * @description
+     * Abort the current image's loadings.
+     * Hide the current image.
+     */
     Viewport.prototype.clearImage = function() {
         var progressiveImageLoader = this._progressiveImageLoader
         var canvas = this._canvas;
@@ -263,8 +334,20 @@
         this._displayedImage = null;
     };
 
-    // allow tools to reacts to click on the viewport
-    // @todo move out ?
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Viewport
+     *
+     * @name osimis.Viewport#enableSelection
+     * @param {callback} onSelectedCallback
+     *
+     *   Callback's parameters:
+     *   * {osimis.Viewport} `viewport` Current viewport (this object).
+     * 
+     * @description
+     * allow tools to reacts to click on the viewport
+     * # @todo move out ?
+     */
     Viewport.prototype.enableSelection = function(onSelectedCallback) {
         var _this = this;
         
@@ -278,21 +361,58 @@
         
         $(this._enabledElement).on('click', this._onViewportSelectedCallback);
     };
+
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Viewport
+     *
+     * @name osimis.Viewport#disableSelection
+     * 
+     * @description
+     * see enableSelection
+     */
     Viewport.prototype.disableSelection = function() {
         $(this._enabledElement).off('click', this._onViewportSelectedCallback);
         this._onViewportSelectedCallback = null;
     };
 
-    // @todo refactor getParameters
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Viewport
+     *
+     * @name osimis.Viewport#getViewport
+     * @return {object} Return cornerstone viewport data (see cornerstone doc).
+     * 
+     * @description
+     * # @todo abstract from cornerstone
+     */
     Viewport.prototype.getViewport = function() {
         return cornerstone.getViewport(this._enabledElement);
     };
+
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Viewport
+     *
+     * @name osimis.Viewport#setViewport
+     * @param {object} viewportData Set cornerstone viewport data (see
+     *                              cornerstone doc).
+     * 
+     * @description
+     * # @todo abstract from cornerstone
+     */
     // @todo refactor updateParameters & use displayer
     Viewport.prototype.setViewport = function(viewportData) {
         return cornerstone.setViewport(this._enabledElement, viewportData);
     };
 
     /**
+     * @ngdoc method
+     * @methodOf osimis.Viewport
+     *
+     * @name osimis.Viewport#reset
+     * 
+     * @description
      * Reset viewports options (zoom, windowing, pan, ...)
      * Keep the same image and annotation.
      * 
@@ -388,6 +508,19 @@
     //     // Method's user has to call .draw to avoid dual image redrawing.
     // };
 
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Viewport
+     *
+     * @name osimis.Viewport#resizeCanvas
+     * @param {int} width New canvas width (in pixel).
+     * @param {int} height New canvas height (in pixel).
+     * 
+     * @description
+     * Resize cornerstone canvas.
+     * Must be called when the windows is resized for instance, or when the
+     * layout change.
+     */
     Viewport.prototype.resizeCanvas = function(width, height) {
         var jqEnabledElement = $(this._enabledElement);
         var enabledElement = this._enabledElement;
@@ -412,34 +545,6 @@
             this.draw();
         }
     };
-
-    // Viewport.prototype._switchImageResolution = function(quality) {
-    //     // Update resolution
-    // };
-
-    // Viewport.prototype._resizeZone = function(width, height) {
-    // 
-    // };
-
-    // Viewport.prototype._resizeContent = function(width, height) {
-    // 
-    // };
-
-    // Viewport.prototype.setZoom = function(ratio) {
-    // 
-    // };
-
-    // Viewport.prototype.setPan = function(x, y) {
-    // 
-    // };
-
-    // Viewport.prototype.invertColor = function() {
-    // 
-    // };
-
-    // Viewport.prototype.tickPolling = function() {
-    // 
-    // };
 
     osimis.Viewport = Viewport;
 
