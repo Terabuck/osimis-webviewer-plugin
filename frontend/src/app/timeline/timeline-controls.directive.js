@@ -1,7 +1,12 @@
 /**
  * @ngdoc directive
- * @name wvTimelineControls
+ * @name webviewer.directive:wvTimelineControls
+ * 
+ * @param {osimis.Series} wvSeries The model of the series, as provided by the `wvSeriesId` directive.
  *
+ * @scope
+ * @restrict Element
+ * 
  * @description
  * The `wvTimelineControls` directive displays the following four controls:
  *   * The previous and next buttons allow the user to switch image by image.
@@ -12,12 +17,6 @@
  * is still shown.
  *
  * This directive is used by the `wvTimeline` directive.
- *
- * @scope
- *
- * @restrict E
- *
- * @param {series_model} wvSeries (required) The model of the series, as provided by the `wvSeriesId` directive.
  **/
  (function() {
     'use strict';

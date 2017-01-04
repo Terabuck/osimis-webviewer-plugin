@@ -1,8 +1,19 @@
 /**
+ * @ngdoc object
+ * @memberOf osimis
+ *
+ * @name osimis.quality
+ *
+ * @description
  * These are the image compression qualities available, as
- * processed by the web viewer plugin's backend.
+ * processed by the web viewer plugin's backend:
  * 
- * @warning the DICOM pixeldata may have already been compressed,
+ *   * `LOW`
+ *   * `MEDIUM`
+ *   * `LOSSLESS`
+ *   * `PIXELDATA`
+ * 
+ * - @warning the DICOM pixeldata may have already been compressed,
  * therefore lossless quality may provide lossy data!
  */
 (function(module) {

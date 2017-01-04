@@ -1,17 +1,26 @@
+/**
+ * @ngdoc object
+ * @memberOf osimis
+ * 
+ * @name osimis.Listener
+ *
+ * @example
+ * object constructor:
+ * ```js
+ *  this.onSomethingHappened = new osimis.Listener();
+ *  this.onSomethingHappened.trigger(arg1, arg2);
+ * ```
+ *
+ * user:
+ * ```js
+ *  object.onSomethingHappened(function(arg1, arg2) { 
+ *      // react..
+ *  });
+ * ```
+ */
 (function(root) {
     'use strict';
 
-    /** usage:
-     *
-     * object constructor:
-     * 	this.onSomethingHappened = new osimis.Listener();
-     * 	this.onSomethingHappened.trigger(arg1, arg2);
-     *
-     * user:
- 	 *  object.onSomethingHappened(function(arg1, arg2) { 
- 	 *      // react..
- 	 *  });
-     */
     function OsimisListener() {
     	var _listeners = [];
 
@@ -71,14 +80,38 @@
         // trigger method
     	OsimisListener.trigger = function() {
     	    var args = Array.prototype.splice.call(arguments, 0);
-    	    
-    		_listeners
-    		    .filter(function(listener) {
-    		        return !listener.ignore;
-    		    })
-                .forEach(function(listener) {
-                    listener.apply(null, args);
+	       
+            // The listeners may throws exceptions. if the event is
+            // triggered within a promise, these exceptions are swallowed
+            // by the external promise. We wan't to separate the promises
+            // from the Listener (which are in the end two different patterns
+            // for the same kind of use cases).
+            // Therefore, we launch the callbacks within asap,
+            // as JS microtask using so the listener's exceptions are not
+            // swallowed by potential promises containing the trigger.
+            // We use asap instead of setTimeout (for instance) to make
+            // sure we don't trigger reflows inbetween the callbacks
+            // calls (which may be really slow).
+            try {
+                _listeners
+                    .filter(function(listener) {
+                        return !listener.ignore;
+                    })
+                    .forEach(function(listener) {
+                        listener.apply(null, args);
+                    });
+            }
+            catch (e) {
+                // We only use asap when an exception is thrown:
+                // even with asap instead of setTimeout, we have
+                // a perf drop from 60FPS to 20FPS on play speed
+                // after tests. We can keep these 60FPS this way,
+                // and especially avoid leaving requestAnimationFrame
+                // method due to the use of osimis.Listener.
+                asap(function() {
+                    throw e;
                 });
+            }
     	};
 
         // return listen method (= functor)

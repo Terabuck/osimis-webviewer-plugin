@@ -1,3 +1,10 @@
+/**
+ * @ngdoc directive
+ * @name webviewer.directive:wvOverlay
+ * 
+ * @restrict Element
+ * @requires webviewer.directive:wvViewport
+ */
 (function() {
     'use strict';
 
@@ -7,10 +14,6 @@
 
     /* @ngInject */
     function wvOverlay() {
-        // Usage:
-        //
-        // Creates:
-        //
         var directive = {
             bindToController: true,
             controller: Controller,

@@ -1,7 +1,7 @@
 /**
  * @ngdoc service
  *
- * @name wvConfig
+ * @name webviewer.service:wvConfig
  *
  * @description
  * The `wvConfig` provider is used:
@@ -9,37 +9,36 @@
  *   * To retrieve frontend configuration (defined from backend config files).
  *   * To configure user authentication (see the httpRequestHeaders method documentation below).
  *
- * Warning: Web Viewer is uncompatible with <base> HTML element (due to SVG/XLink issue)! Don't use it!
+ * # @warning Web Viewer is uncompatible with <base> HTML element (due to SVG/XLink issue)! Don't use it!
+ *
+ * The `Configuration` class handle the general webviewer config,
+ * and versioning informations. This is much like a private local POJO-like
+ * class.
+ * 
+ * It is meant only to be used by the `wvConfig` service. However, that service
+ * gives a public access to an unique _instance_ of this class.
+ *
+ * ```json
+ * {
+ *     "version": {
+ *         "webviewer": "x.x.x-...",
+ *         "orthanc": "x.x.x",
+ *         "db": "x.x.x"
+ *     },
+ *     "browser": {}, // returns { ua: '', browser: {}, cpu: {}, device: {}, engine: {}, os: {} } - see https://github.com/faisalman/ua-parser-js #getResult()
+ *     "orthancApiURL": "http://stg:8421/xxx",  // absolute path used by workers to use correct orthanc url
+ *     "httpRequestheaders": {} // Additionnal headers that can be set by user (only used for Lify atm)
+ * }
+ * ```
  **/
 (function() {
     'use strict';
 
     /**
-     * @class
-     * 
-     * @name Configuration
-     *
-     * @description
-     * The `Configuration` class handle the general webviewer config,
-     * and versioning informations. This is much like a private local POJO-like
-     * class.
-     * 
-     * It is meant only to be used by the `wvConfig` service. However, that service
-     * gives a public access to an unique _instance_ of this class.
-     *
-     * {
-     *     "version": {
-     *         "webviewer": "x.x.x-...",
-     *         "orthanc": "x.x.x",
-     *         "db": "x.x.x"
-     *     },
-     *     "browser": {}, // returns { ua: '', browser: {}, cpu: {}, device: {}, engine: {}, os: {} } - see https://github.com/faisalman/ua-parser-js #getResult()
-     *     "orthancApiURL": "http://stg:8421/xxx",  // absolute path used by workers to use correct orthanc url
-     *     "httpRequestheaders": {} // Additionnal headers that can be set by user (only used for Lify atm)
-     * }
+     * @constructor Configuration
      */
     function Configuration() {
-        this.version = window.__webViewerConfig && __webViewerConfig.version;
+        this.version = typeof window.__webViewerConfig !== 'undefined' && __webViewerConfig.version;
 
         this.browser = {};
 
@@ -57,9 +56,11 @@
 
     /**
      * @ngdoc method
+     * @methodOf webviewer.service:wvConfig
      * 
-     * @name wvConfig.setHttpRequestHeaders
-     * @methodOf webviewer.wvConfig
+     * @name webviewer.service:wvConfig#setHttpRequestHeaders
+     * @param {object} headers A hash containing the HTTP headers we wan't to insert in each request
+     * 
      * @description
      * WebViewer is not responsible for authentication. However, it is quite often embedded behind a proxy.
      * It's therefore convenient to provide the additional user informations to the proxy. The `wvConfig.setHttpRequestHeaders`
@@ -71,10 +72,8 @@
      * `setHttpRequestHeaders` has to be called by the host at module initialization (unless configuration routes are on public
      * access) and each time the token expires (see example in the setHttpRequestHeaders method's documentation).
      *
-     * @note Would be better to propose a policy. However, we can't pass policies to web workers, so this solution is not
+     * # @note Would be better to propose a policy. However, we can't pass policies to web workers, so this solution is not
      * technically achievable.
-     * 
-     * @param {object} headers A hash containing the HTTP headers we wan't to insert in each request
      * 
      * @example
      * The following example show how to use the `wvConfig` provider to set an user token.
@@ -126,7 +125,7 @@
         // - /system
         this.setHttpRequestHeaders = _config.setHttpRequestHeaders.bind(_config);
 
-        this.$get = function(WvHttpRequest, $q, uaParser) {
+        this.$get = function($q, uaParser) {
             // This is executed at runtime (after initialization)
             
             // Add browser to config (for log mainly)

@@ -1,3 +1,9 @@
+/**
+ * @ngdoc object
+ * @memberOf osimis
+ * 
+ * @name osimis.Series
+ */
 (function() {
     'use strict';
 
@@ -6,7 +12,7 @@
         .factory('WvSeries', factory);
 
     /* @ngInject */
-    function factory($rootScope, $timeout, wvImageManager, wvAnnotationManager, WvAnnotationGroup, wvImageBinaryManager, WvImageQualities, uaParser) {
+    function factory($rootScope, $timeout, wvImageManager, wvAnnotationManager, WvAnnotationGroup, wvImageBinaryManager, uaParser) {
 
         function WvSeries(id, imageIds, tags, availableQualities, instanceTags) {
             var _this = this;
@@ -20,7 +26,7 @@
                 // @todo Check with edge if this may be disabled (& in latest Safari versions)
                 console.warn && console.warn('Transtypage of PIXELDATA to PNG for of Safari & IE -> Much slower decompression');
                 delete availableQualities.PIXELDATA;
-                availableQualities.LOSSLESS = WvImageQualities.LOSSLESS;
+                availableQualities.LOSSLESS = osimis.quality.LOSSLESS;
             }
 
             this.id = id; // id == orthancId + ':' + subSeriesIndex

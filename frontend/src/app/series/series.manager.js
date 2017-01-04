@@ -1,3 +1,11 @@
+/**
+ * @ngdoc service
+ *
+ * @name webviewer.service:wvSeriesManager
+ *
+ * @description
+ * Manage series models.
+ */
 (function() {
     'use strict';
 
@@ -6,44 +14,63 @@
         .factory('wvSeriesManager', wvSeriesManager);
 
     /* @ngInject */
-    function wvSeriesManager($rootScope, $q, WvHttpRequest, wvConfig, wvOrthancSeriesAdapter, wvInstanceManager) {
+    function wvSeriesManager($rootScope, $q, wvConfig, wvOrthancSeriesAdapter, wvInstanceManager) {
         var service = {
             /**
+             * @ngdoc method
+             * @methodOf webviewer.service:wvSeriesManager
+             * 
+             * @name osimis.SeriesManager#getTags
+             * @param {string} id
+             *    Id of the series in wv format, where multiframe instances are considered as series
+             *    * format: <orthancSeriesId>:<instanceNumber>
+             *    * instanceNumber can be > 0 if the series contain multiframe instances
+             * @return {Promise<osimis.Series>} The series model's promise
+             * 
+             * @description
              * Retrieve a series from a frontend series id
-             * 
-             * @param {string} id Id of the series in wv format, where multiframe instances are considered as series
-             *    format: <orthancSeriesId>:<instanceNumber>
-             *    instanceNumber can be > 0 if the series contain multiframe instances
-             * 
-             * @return {promise<WvSeries>} The series model (wrapped in promise)
              */
             get: get,
             /**
-             * Retrieve a list of frontend series from a backend series id
+             * @ngdoc method
+             * @methodOf webviewer.service:wvSeriesManager
              * 
-             * @param {string} id Id of the series in the orthanc format
-             * 
+             * @name osimis.SeriesManager#listFromOrthancSeriesId
+             * @param {string} id
+             *    Id of the series in wv format, where multiframe instances are considered as series
+             *    * format: <orthancSeriesId>:<instanceNumber>
+             *    * instanceNumber can be > 0 if the series contain multiframe instances
              * @return {promise<array<WvSeries>>} A list of series model (wrapped in promise)
+             * 
+             * @description
+             * Retrieve a list of frontend series from a backend series id
              */
             listFromOrthancSeriesId: listFromOrthancSeriesId,
             /**
+             * @ngdoc method
+             * @methodOf webviewer.service:wvSeriesManager
+             * 
+             * @name osimis.SeriesManager#listFromOrthancStudyId
+             * @param {string} id Id of the study (in the orthanc format)
+             * @return {promise<array<WvSeries>>} A list of series model (wrapped in promise)
+             * 
+             * @description
              * Retrieve a list of frontend series from a backend study id
              *
-             * @note There is no frontend study id
-             * 
-             * @param {string} id Id of the study (in the orthanc format)
-             * 
-             * @return {promise<array<WvSeries>>} A list of series model (wrapped in promise)
+             * # @note There is no frontend study id
              */
             listFromOrthancStudyId: listFromOrthancStudyId,
             /**
+             * @ngdoc method
+             * @methodOf webviewer.service:wvSeriesManager
+             * 
+             * @name osimis.SeriesManager#_cacheInstancesTags
+             * @param {object} instancesTags Hash of tags for each instances
+             *
+             * @description
              * Cache each instances' tags in `wvInstanceManager` from the series request result
              *
              * Purely for optimization.
-             * 
-             * @param {object} instancesTags Hash of tags for each instances
-             *
-             * @private
              */
             _cacheInstancesTags: _cacheInstancesTags
         };
@@ -63,7 +90,7 @@
 
         function listFromOrthancSeriesId(id) {
             // @todo bench this method
-            var request = new WvHttpRequest();
+            var request = new osimis.HttpRequest();
             request.setHeaders(wvConfig.httpRequestHeaders);
             request.setCache(true);
             var seriesPromise = request.get(wvConfig.orthancApiURL + '/osimis-viewer/series/'+id);
@@ -89,7 +116,7 @@
         }
 
         function listFromOrthancStudyId(id) {
-            var request = new WvHttpRequest();
+            var request = new osimis.HttpRequest();
             request.setHeaders(wvConfig.httpRequestHeaders);
             request.setCache(true);
             return request.get(wvConfig.orthancApiURL + '/studies/'+id)

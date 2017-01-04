@@ -1,7 +1,12 @@
 /**
  * @ngdoc directive
- * @name wvTimeline
+ * @name webviewer.directive:wvTimeline
+ * 
+ * @param {osimis.Series} wvSeries The model of the series, as provided by the `wvSeriesId` directive.
  *
+ * @scope
+ * @restrict Element
+ * 
  * @description
  * The `wvTimeline` high-level directive displays a timeline relative to a shown series.
  *
@@ -22,17 +27,13 @@
  *   * A play button let the user play the series and _configure a specific framerate_.
  *
  * This directive shall be used with the `wvViewport` directive extended by `wvSeriesId`.
- *
- * @compatibility Do not use html <base> tag! cf. http://www.chriskrycho.com/2015/html5-location-base-and-svg.html#fn1
- *                Check the `wvLoadingBar` directive source code for more information.
- *
- * @scope
- *
- * @restrict E
- *
- * @param {series_model} wvSeries (required) The model of the series, as provided by the `wvSeriesId` directive.
- *
- * @example Display a series viewport with the timeline
+ * 
+ * # @compatibility Do not use html <base> tag! cf. http://www.chriskrycho.com/2015/html5-location-base-and-svg.html#fn1
+ *                  Check the `wvLoadingBar` directive source code for more information.
+ * 
+ * @example
+ * Display a series viewport with the timeline.
+ * 
  * ```html
  * <wv-viewport wv-series-id="'your-series-id'" wv-series="$series" wv-size="{width: '100px', height: '100px'}">
  * </wv-viewport>

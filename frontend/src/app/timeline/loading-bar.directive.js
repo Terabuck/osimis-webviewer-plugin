@@ -1,7 +1,12 @@
 /**
  * @ngdoc directive
- * @name wvLoadingBar
- *
+ * @name webviewer.directive:wvLoadingBar
+ * 
+ * @param {osimis.Series} wvSeries The model of the series, as provided by the `wvSeriesId` directive.
+ * 
+ * @scope
+ * @restrict Element
+ * 
  * @description
  * The `wvLoadingBar` directive displays a timeline relative to a shown series.
  *
@@ -17,15 +22,8 @@
  *
  * This directive is used by the `wvTimeline` directive.
  *
- * @compatibility Do not use html <base> tag! cf. http://www.chriskrycho.com/2015/html5-location-base-and-svg.html#fn1
- *                Check the `wvLoadingBar` directive source code for more information.
- *
- * @scope
- *
- * @restrict E
- *
- * @param {series_model} wvSeries (required) The model of the series, as provided by the `wvSeriesId` directive.
- *
+ * # @compatibility Do not use html <base> tag! cf. http://www.chriskrycho.com/2015/html5-location-base-and-svg.html#fn1
+ *                  Check the `wvLoadingBar` directive source code for more information.
  */ 
 (function() {
     'use strict';
@@ -57,7 +55,7 @@
     }
 
     /* @ngInject */
-    function Controller($scope, wvImageBinaryManager, WvImageQualities) {
+    function Controller($scope, wvImageBinaryManager) {
         var _this = this;
 
         // [<image index>: [<image quality: int>, ...], ...] - image-index != image-id
@@ -65,7 +63,7 @@
         // [<image index>: <image quality: int> , ...] - image-index != image-id
         this.bestQualityByImage = [];
 
-        this.QualityKeys = _.invert(WvImageQualities);
+        this.QualityKeys = _.invert(osimis.quality);
 
         // $scope.$watch('vm.series.id', function(seriesId) {
 
