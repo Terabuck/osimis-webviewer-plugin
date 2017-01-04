@@ -1,23 +1,38 @@
+/**
+ * @ngdoc object
+ * @memberOf osimis
+ * 
+ * @name osimis.TaskPriorityPolicy
+ */
 (function(module) {
     'use strict';
 
-    function TaskPriorityPolicy(imageBinaryRequests) {
-        // imageBinaryRequests[id][quality] = <ImageBinaryRequest> - used to calculate priorities
-        this._imageBinaryRequests = imageBinaryRequests;
+    function TaskPriorityPolicy(imageBinariesCache) {
+        // imageBinariesCache[id][quality] = <ImageBinaryRequest> - used to calculate priorities
+        this._imageBinariesCache = imageBinariesCache;
     }
 
-    /** TaskPriorityPolicy#selectTask(availableWorkers, busyWorkers, tasksToProcess, tasksInProcess)
+    /**
+     * @ngdoc method
+     * @methodOf osimis.TaskPriorityPolicy
+     * 
+     * @name osimis.TaskPriorityPolicy#selectTask
+     * @param {Array<osimis.TaskWorker>} availableWorkers The available workers
+     * @param {Array<osimis.TaskWorker>} busyWorkers The workers currently 
+     *                                               working
+     * @param {Array<osimis.Task>} tasksToProcess The tasks in the process list
+     * @param {Array<osimis.Task>} tasksInProcess The tasks being treated by
+     *                                            a web worker
+     * @return {osimis.Task|null} The chosen task to process
      *
-     * @param availableWorkers
-     * @param busyWorkers
-     * @param tasksToProcess
-     * @param tasksInProcess
+     * @description
+     * This methods returns the next task to be processed.
      *
-     * @return null or the chosen task to process
-     *
+     * # @todo Optimize heavily! It's called at each binary loading! Maybe use
+     *         an external priority queue implementation?
      */
     TaskPriorityPolicy.prototype.selectTask = function(availableWorkers, busyWorkers, tasksToProcess, tasksInProcess) {
-        var requestQueue = this._imageBinaryRequests;
+        var imageBinariesCache = this._imageBinariesCache;
         var taskQueue = tasksToProcess;
 
         // Sort by priority
@@ -29,7 +44,14 @@
             var task = taskQueue[i];
             var id = task.options.id;
             var quality = task.options.quality;
-            var request = requestQueue[id][quality];
+            var request = imageBinariesCache.get(id,quality);
+            if (!request) {
+                // It's possible for a task to be removed from cache while still being in process (in abortion),
+                // @todo separete abortion logic from the rest.
+                console.error('Cache & Task Queue should strictly contains the same requests!');
+                //throw new Error('Cache & Task Queue should strictly contains the same requests!');
+                continue;
+            }
             var priority = request.getPriority();
 
             switch(priority) {
@@ -54,7 +76,7 @@
             }
         }
 
-        // see WvImageQualities
+        // see osimis.quality
         // - 1 lowest
         // - 2 medium
         // - 100 lossless

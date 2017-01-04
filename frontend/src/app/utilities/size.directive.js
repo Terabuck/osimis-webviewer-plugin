@@ -1,3 +1,9 @@
+/**
+ * @ngdoc directive
+ *
+ * @name webviewer.directive:wvSize
+ * @restrict Attribute
+ */
 (function() {
     'use strict';
 

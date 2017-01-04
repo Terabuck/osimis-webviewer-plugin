@@ -1,10 +1,33 @@
-/** WorkerPool
- * Usage:
+/**
+ * @ngdoc object
+ * @memberOf osimis
+ * 
+ * @name osimis.WorkerPool
+ * @param {object} options
+ *   
+ *   Options:
+ *   * {string} `path` The path to the script of the worker.
+ *      script may be inlined here using either Osimis' gulp-inline-worker
+ *      script or URL Blob Workers.
+ *   * {number} `workerCount` Minimum 2 (one is always kept for high priority
+ *     displays).
+ *   * {function} `createPromiseFn` see:
+ *     `function(wrappedFunction: (resolve, reject)=>Any): Promise`.
+ *   * {function} `taskPriorityPolicy` A configurable to set the priority of
+ *     the task. see task-priority-policy.class.js for an example.
+ *
+ * @description
+ * The `WorkerPool` instantiate multiple TaskWorkers (~= threads),
+ * the WorkerPool's user can either assign task to the pool or broadcast message to every TaskWorkers.
+ * When a task is assigned to the pool, the WorkerPool waits for an available TaskWorker and assign the
+ * task as soon as possible.
+ * 
+ * # @usage:
  *  // in workerScript: just listen to message & post message back (only once) or throw..
  *  Worker listens to message evt.data.type (with specific type: 'abort')
  *  They respond {type: 'success', ...} or {type: 'failure', ...}
  *  
- * To Test:
+ * # To Test:
  *  - does throw in workerScript result in failed promise
  *  - can a new taskOptions be performed after an uncatched throw in a workerScript
  *  - is the post message be sure to not be called after a throw in a workerScript
@@ -13,22 +36,7 @@
     'use strict';
 
     /**
-     *
-     * @class WorkerPool
-     * 
-     * @param options {object}
-     *   `path` {string} - the path to the script of the worker.
-     *      script may be inlined here using either Osimis' gulp-inline-worker script or URL Blob Workers.
-     *   `workerCount` {number} - minimum 2 (one is always kept for high priority displays)
-     *   `createPromiseFn` {function} - function(wrappedFunction: (resolve, reject)=>Any): Promise
-     *   `taskPriorityPolicy` {function} - a configurable to set the priority of the task. see task-priority-policy.class.js for an example.
-     * 
-     * @description
-     * The `WorkerPool` instantiate multiple TaskWorkers (~= threads),
-     * the WorkerPool's user can either assign task to the pool or broadcast message to every TaskWorkers.
-     * When a task is assigned to the pool, the WorkerPool waits for an available TaskWorker and assign the
-     * task as soon as possible.
-     *
+     * @constructor osimis.WorkerPool
      */
     function WorkerPool(options) {
         var _this = this;
@@ -112,11 +120,14 @@
         }
     }
 
-    /** WorkerPool#queueTask(taskOptions)
-     *
-     * @param taskOptions {type: <string>, ...}
-     * @return Promise<TaskResult> once the taskOptions has finished (succeded, failed or aborted)
-     *
+    /**
+     * @ngdoc method
+     * @methodOf osimis.WorkerPool
+     * 
+     * @name osimis.WorkerPool#queueTask
+     * @param {object} taskOptions {type: <string>, ...}
+     * @return {Promise<TaskResult>} Once the taskOptions has finished (
+     *                               succeded, failed or aborted).
      */
     WorkerPool.prototype.queueTask = function(taskOptions) {
         var _this = this;
@@ -146,15 +157,17 @@
         });
     };
 
-    /** WorkerPool#broadcast(message)
+    /**
+     * @ngdoc method
+     * @methodOf osimis.WorkerPool
      * 
-     * @method broadcast
-     *
-     * @param {object} message - any object sent as a message to every of the threads
-     *
+     * @name osimis.WorkerPool#broadcastMessage
+     * @param {object} message Any object sent as a message to every of the
+     *                         threads.
+     * 
      * @description
-     * Send a message to every existing threads, used mainly for configuration purpose
-     *
+     * Send a message to every existing threads, used mainly for configuration
+     * purpose.
      */
     WorkerPool.prototype.broadcastMessage = function(message) {
         var taskWorkers = _.concat(this._availableTaskWorkers, this._busyTaskWorkers);
@@ -165,13 +178,17 @@
     };
     
     /**
-     * Check an object match a filter.
-     * Properties from object not contained in the filter are ignored (the comparison continues).
-     *
+     * @ngdoc method
+     * @methodOf osimis.WorkerPool
+     * 
+     * @name osimis.WorkerPool#_objectMatchFilter
      * @param {object} object The input object.
      * @param {object} filter The filtering object.
-     * 
      * @return {bool} True if object contains match filter.
+     *
+     * @description
+     * Check an object match a filter.
+     * Properties from object not contained in the filter are ignored (the comparison continues).
      */
     function _objectMatchFilter(object, filter) {
         var isCompatible = true;
@@ -186,38 +203,59 @@
         return !!isCompatible; // "!!" to make sure it returns boolean
     }
 
-    /** WorkerPool#abortTask(taskOptionsFilter)
+    /**
+     * @ngdoc method
+     * @methodOf osimis.WorkerPool
+     * 
+     * @name osimis.WorkerPool#abortTask
+     * @param {object} taskOptionsFilter synthax: {type: <string>, ...}
+     *                                   Filter used to select the tasks.
+     *                                   Properties not set in taskOptionsFilter
+     *                                   are matched by default. For instance,
+     *                                   if taskOptionsFilter == {}, every task
+     *                                   will be matched.
      *
-     * Abort a task, note this method do nothing when task is inexistant.
+     * @description
+     * Abort a task, this method throws when task is inexistant or when
+     * multiple tasks are aborted at once.
      *
      * Compare the tasks in _tasksToProcess and remove them from the queue.
      * Compare the tasks in _tasksInProcess and abort them.
-     *
-     * @param taskOptionsFilter {type: <string>, ...} Filter used to select the tasks. Properties not set in taskOptionsFilter
-     *   are matched by default. For instance, if taskOptionsFilter == {}, every task will be matched.
-     *
      */
     WorkerPool.prototype.abortTask = function(taskOptionsFilter) {
         // Remove task from the toProcess queue (if here)
         // @todo optimize (actually 50ms process) -> sorted by quality + tree research on id ?
+        var sizeBefore = this._tasksToProcess.length;
         _.pullAllWith(this._tasksToProcess, [taskOptionsFilter], function(task, taskOptionsFilter) {
             return _objectMatchFilter(task.options, taskOptionsFilter);
         });
+        var sizeAfter = this._tasksToProcess.length;
 
         // Abort task from the inProcess queue
+        var cancelledTaskCount = sizeBefore - sizeAfter;
         for (var i=this._tasksInProcess.length-1; i>=0; --i) { // loop in reverse so we can remove items without breaking the loop iterations
             var task = this._tasksInProcess[i];
             if (_objectMatchFilter(task.options, taskOptionsFilter)) {
                 task.abort();
+                ++cancelledTaskCount;
                 _.pull(this._tasksInProcess, task);
             }
         }
+    
+        // Throw an exception no task was removed 
+        if (cancelledTaskCount !== 1) {
+            throw new Error('One task must be aborted instead of ' + cancelledTaskCount + '!');
+        }
     };
 
-    /** WorkerPool#_processQueuedTaskInAvailableWorker()
-     *
+    /**
+     * @ngdoc method
+     * @methodOf osimis.WorkerPool
+     * 
+     * @name osimis.WorkerPool#_processQueuedTaskInAvailableWorker
+     * 
+     * @description
      * Called everytime a worker is available or a new task is added
-     *
      */
     WorkerPool.prototype._processQueuedTaskInAvailableWorker = function() {
         var _this = this;

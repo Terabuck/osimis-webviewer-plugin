@@ -13,6 +13,9 @@ backend/ThirdPartyDownloads/
 backend/CMakeLists.txt.user
 backend/env/
 
+# Generated doc/report
+frontend/docs/
+
 # other
 .env
 report/

@@ -1,3 +1,9 @@
+/**
+ * @ngdoc object
+ * @memberOf osimis
+ * 
+ * @name osimis.AnnotationGroup
+ */
 (function() {
     'use strict';
 
