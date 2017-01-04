@@ -9,6 +9,8 @@
  *   series_id = <orthanc-series-id>:<instance-index> where instance-index = n ⊂ [0; Infinity]
  *   In case of multiframe instances, multiple orthanc series can relates to multiple viewport
  *   series_id (one multiframe instance is converted into one web viewer series).
+ *   Cornerstone viewport data has to be manually reset when the series change (ie.
+ *   on drag&drop).
  *
  * @param {osimis.Series} [wvSeries] (readonly) Share the series model instance.
  *   The series-id directive handles the series model loading. Therefore, it also provide access to it.
@@ -120,9 +122,8 @@
             viewmodel.onCurrentImageIdChanged(function(imageId, isNewSeries, setShownImageCallback) {
                 // Change displayed image when series' current image changes
                 if (imageId) {
-                    var resetViewport = isNewSeries;
                     viewportController
-                        .setImage(imageId, resetViewport)
+                        .setImage(imageId)
                         .then(function() {
                             if (setShownImageCallback) {
                                 setShownImageCallback(imageId);

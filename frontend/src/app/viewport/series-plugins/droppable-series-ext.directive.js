@@ -52,8 +52,17 @@
                             // Set new series
                             .setSeries(seriesId)
 
-                            // Reset image index once series loaded
+                            // Reset properties once series loaded.
                             .then(function(series) {
+                                // Reset cornerstone viewport data.
+                                // No need to call `#draw` as goToImage will do the redraw.
+                                var viewport = viewmodel.getViewport();
+
+                                viewport.onImageChanging.once(function() {
+                                    viewport.reset();
+                                });
+                                
+                                // Reset image index (go to the first image )
                                 series.goToImage(0);
                             });
                     });

@@ -345,12 +345,17 @@
 
             this.toolState[imageId] = this.toolState[imageId] || {};
             
-            // Merge the data into cornernerstone
+            // Merge the data into cornernerstone (if annotation is not removed)
             // We can't simply change the object references because cornerstone would lose link to the handles it's working on.
-            // Strange behavior: merge seems to handle property deletion as well
             this.toolState[imageId][toolName] = this.toolState[imageId][toolName] || {};
-            _.merge(this.toolState[imageId][toolName], state);
-            
+            if (state) {
+                _.merge(this.toolState[imageId][toolName], state);
+            }
+            // Remove the data from cornerstone ((i annotation is removed)
+            else if (!state) {
+                delete this.toolState[imageId][toolName];
+            }
+
             if (redraw) {
                 // refresh viewports
                 var enabledElementObjects = cornerstone.getEnabledElementsByImageId(imageId);
