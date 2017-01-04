@@ -3,7 +3,8 @@
   "prefix": "wv",
   "ignore": [
     "**/*.worker/**/*.js",
-    "**/*.spec.js"
+    "**/*.spec.js",
+    "**/*.mock.js"
   ],
   "dev": {
     "inject:js": [
