@@ -41,6 +41,28 @@
         // (for instance if the last loaded image has lower quality than the last
         // shown image)
         this._lastLoadedImageQuality = null;
+
+        // Memory allocation is hard to grasp in this class.
+        // There is 4 ways a binary reference may be decreased by the
+        // `ProgressiveImageLoader`:
+        // 1. We decr. loaded LQ binary because we don't need it. It happens 
+        //    when HQ is loaded before LQ.
+        // 2. We decr. loaded LQ binary because we don't need it. It also 
+        //    happens when HQ is loaded after LQ.
+        // 3. We decr. currently loaded image's binary when the 
+        //    `ProgressiveImageLoader` is destroyed (when the image changes for 
+        //    instance, see `#abortBinariesLoading`).
+        // 4. We decr. in-loading image's binaries when the
+        //    `ProgressiveImageLoader` is destroyed (when the image changes for 
+        //    instance, see `#abortBinariesLoading`).
+        // 5. We decr. binaries which have failed to load.
+        // 
+        // The fifth point may also be triggered by the four previous ones 
+        // (except when the preloader still hold instances of the binary).
+        // Therefore, ref. may be decreased twice!
+        // 
+        // To prevent this from happening, we also keep track of decr. binaries.
+        this._destroyedQualities = [];
     }
 
     /**
@@ -60,6 +82,7 @@
         var image = this._image;
         var qualities = this._qualities;
         var binariesInLoading = this._binariesInLoading;
+        var destroyedQualities = this._destroyedQualities;
 
         // Request load of the binaries of each processed image
         qualities.forEach(function(quality) {
@@ -76,14 +99,16 @@
                 // Ignore lower resolution than if an higher one has already been loaded
                 // to ensure the maximum quality to stay displayed and free the memory
                 // of the inferior quality image
-                if (_this._lastLoadedImageQuality > quality) {
-                    image.freeBinary(quality);
+                if (_this._lastLoadedImageQuality > quality) { // Keep ref using `_this. due to asynchronicity
                     return Promise.reject(new Error('LQ Loaded after HQ'));
                     // @note Things will be cleaned in `.then(null, function(err) { .. })`
                 }
-                // Free memory of previous downloaded image (when its quality is the lowest one)
+                // Decr. ref of previous downloaded binary (when its quality is the lowest one)
                 else if (_this._lastLoadedImageQuality) {
-                    image.freeBinary(_this._lastLoadedImageQuality);
+                    if (destroyedQualities.indexOf(_this._lastLoadedImageQuality) === -1) {
+                        image.freeBinary(_this._lastLoadedImageQuality);
+                        destroyedQualities.push(_this._lastLoadedImageQuality);
+                    }
                 }
 
                 // Update last downloaded image reference so it can be freed later
@@ -99,6 +124,12 @@
                 _this.onBinaryLoaded.trigger(quality, cornerstoneImageObject);
             })
             .then(null, function(err) {
+                // Decrease failed binary's ref. count
+                if (destroyedQualities.indexOf(quality) === -1) {
+                    image.freeBinary(quality);
+                    destroyedQualities.push(quality);
+                }
+
                 // Remove the binary from the binariesInLoading queue (used to be able to cancel the loading request)
                 _.pull(binariesInLoading, quality);
                 
@@ -161,28 +192,35 @@
      */
     ProgressiveImageLoader.prototype.abortBinariesLoading = function() {
         var image = this._image;
+        var destroyedQualities = this._destroyedQualities;
         
         // Cancel binary loading requests
         this._binariesInLoading.forEach(function(quality) {
-            try {
-                image.abortBinaryLoading(quality);
-            }
-            catch(exc) {
+            // try {
+                // Decrease in-loading binaries' ref count.
+                if (destroyedQualities.indexOf(quality) === -1) {
+                    image.freeBinary(quality);
+                    destroyedQualities.push(quality);
+                }
+            // }
+            // catch(exc) {
                 // Ignore exceptions: they may be caused because
                 // we try to free a binary whose download has been
                 // successfuly cancelled by the binary manager but not
                 // yet been removed from _binariesInLoading.
                 // @todo check this theory w/ chrome timeline
                 // @todo unit test
-            }
+            // }
         });
         this._binariesInLoading = [];
 
-        // Free image binary
+        // Decrease currently displayed image binary ref count
         var image = this._image;
         if (this._lastLoadedImageQuality) {
-            // Free listeners
-            image.freeBinary(this._lastLoadedImageQuality);
+            if (destroyedQualities.indexOf(this._lastLoadedImageQuality) === -1) {
+                image.freeBinary(this._lastLoadedImageQuality);
+                destroyedQualities.push(this._lastLoadedImageQuality);
+            }
             image = null;
             this._lastLoadedImageQuality = null;
         }
