@@ -48,14 +48,6 @@
                 var seriesId = droppedElement.data('series-id');
                 $scope.$apply(function() {
                     _wvSeriesIdViewModels.forEach(function(viewmodel) {
-                        // Log
-                        console.log('series: ', seriesId);
-
-                        // Trigger old series removed UX global event
-                        var oldSeries = viewmodel.getSeries();
-                        if (oldSeries) {
-                            $rootScope.$emit('UserUnSelectedSeriesId', oldSeries.id);
-                        }
                         viewmodel
                             // Set new series
                             .setSeries(seriesId)
