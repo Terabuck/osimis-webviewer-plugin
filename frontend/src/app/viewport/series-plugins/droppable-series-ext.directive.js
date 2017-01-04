@@ -56,15 +56,13 @@
                         if (oldSeries) {
                             $rootScope.$emit('UserUnSelectedSeriesId', oldSeries.id);
                         }
-
-                        // Set new series
                         viewmodel
+                            // Set new series
                             .setSeries(seriesId)
-                            .then(function(newSeries) {
-                                // Trigger new series UX global event
-                                if (newSeries) {
-                                    $rootScope.$emit('UserSelectedSeriesId', seriesId);
-                                }
+
+                            // Reset image index once series loaded
+                            .then(function(series) {
+                                series.goToImage(0);
                             });
                     });
                 });
