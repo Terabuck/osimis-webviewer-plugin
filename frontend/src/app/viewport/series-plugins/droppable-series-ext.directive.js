@@ -48,23 +48,22 @@
                 var seriesId = droppedElement.data('series-id');
                 $scope.$apply(function() {
                     _wvSeriesIdViewModels.forEach(function(viewmodel) {
-                        // Log
-                        console.log('series: ', seriesId);
-
-                        // Trigger old series removed UX global event
-                        var oldSeries = viewmodel.getSeries();
-                        if (oldSeries) {
-                            $rootScope.$emit('UserUnSelectedSeriesId', oldSeries.id);
-                        }
-
-                        // Set new series
                         viewmodel
+                            // Set new series
                             .setSeries(seriesId)
-                            .then(function(newSeries) {
-                                // Trigger new series UX global event
-                                if (newSeries) {
-                                    $rootScope.$emit('UserSelectedSeriesId', seriesId);
-                                }
+
+                            // Reset properties once series loaded.
+                            .then(function(series) {
+                                // Reset cornerstone viewport data.
+                                // No need to call `#draw` as goToImage will do the redraw.
+                                var viewport = viewmodel.getViewport();
+
+                                viewport.onImageChanging.once(function() {
+                                    viewport.reset();
+                                });
+                                
+                                // Reset image index (go to the first image )
+                                series.goToImage(0);
                             });
                     });
                 });

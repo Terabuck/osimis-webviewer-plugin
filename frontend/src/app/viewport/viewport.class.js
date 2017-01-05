@@ -69,6 +69,10 @@
         // the true height/width
         this._displayedCornerstoneImageObject = null;
         
+        // Store viewport data (since the image may not be yet loaded at the
+        // moment and cornerstone#setViewport requires the image to be set).
+        this._viewportData = undefined;
+        
         // Trigger onImageChanging prior to image drawing
         // but after the viewport data is updated
         // Used for instance by tools to set the canvas image annotations prior to the drawing
@@ -232,7 +236,13 @@
             // Do stuffs required only when the first resolution is being loaded (cf. reset, etc.)
             if (_firstLoadingResolution) {
                 // Force canvas reset if the viewportData are not defined already
-                resetViewport = resetViewport || !_this._enabledElementObject.viewport;
+                resetViewport = resetViewport || !_this._viewportData;
+
+                // Sync the cs viewport object to the one stored if it is not 
+                // yet defined.
+                if (!resetViewport && !_this._enabledElementObject.viewport) {
+                    _this._enabledElementObject.viewport = _this._viewportData;
+                }
 
                 // Either keep old parameters from the previous image or clear them
                 if (resetViewport) {
@@ -265,6 +275,9 @@
             if (!resetViewport || !_firstLoadingResolution) {
                 var csViewportData = _this._enabledElementObject.viewport;
                 CornerstoneViewportSynchronizer.sync(csViewportData, oldResolution, newResolution);
+
+                // Update _viewportData so it can be kept in sync.
+                this._viewportData = csViewportData;
             }
 
             // Do stuffs required only when the first resolution is being loaded (cf. reset, etc.)
@@ -403,7 +416,18 @@
      */
     // @todo refactor updateParameters & use displayer
     Viewport.prototype.setViewport = function(viewportData) {
-        return cornerstone.setViewport(this._enabledElement, viewportData);
+        // Store viewport data (since the image may not be yet loaded at the
+        // moment and cornerstone#setViewport requires the image to be set).
+        this._viewportData = viewportData;
+
+        // Change the canvas' viewport if the image is already displayed
+        var enabledElementObject = cornerstone.getEnabledElement(this._enabledElement);
+        if (enabledElementObject.viewport) {
+            return cornerstone.setViewport(this._enabledElement, viewportData);
+        }
+
+        // @note If the image is not yet displayed, this._viewportData will
+        // be used once it is. See `#setImage` method.
     };
 
     /**
@@ -460,6 +484,9 @@
         // Replace the viewport data in cornerstone (without redrawing, yet)
         var enabledElementObject = this._enabledElementObject; // enabledElementObject != enabledElementDom
         enabledElementObject.viewport = viewportData;
+
+        // Update the cached viewportData
+        this._viewportData = viewportData;
 
         // allow extensions to extend this behavior
         // Used by invert tool to redefine inversion on viewport reset

@@ -110,34 +110,6 @@
                 });
             });
 
-            // Configure preloading
-            // @todo add on-series-dropped callback and move out the rest of the events from wv-droppable-series.
-            scope.$watch('vm.seriesId', function(newSeriesId, oldSeriesId) {
-                // Cancel previous preloading
-                if (oldSeriesId && newSeriesId !== oldSeriesId) {
-                    $rootScope.$emit('UserUnSelectedSeriesId', oldSeriesId);
-                }
-
-                // Preload series
-                if (newSeriesId) {
-                    $rootScope.$emit('UserSelectedSeriesId', newSeriesId);
-                }
-            });
-            scope.$watch('vm.studyId', function(newStudyId, oldStudyId) {
-                // Log study id
-                console.log('Study: ', newStudyId);
-
-                // Cancel previous preloading
-                if (oldStudyId && newStudyId !== oldStudyId) {
-                    $rootScope.$emit('UserUnSelectedStudyId', oldStudyId);
-                }
-
-                // Preload study
-                if (newStudyId) {
-                    $rootScope.$emit('UserSelectedStudyId', newStudyId);
-                }
-            });
-
             // Store each viewports' states at this level
             // so they can be either later changed by external means (ie. Lify want to retrieve
             // which series is being seen for analysis) or saved for liveshare for instance. 
@@ -153,6 +125,61 @@
                 vm.viewports[index] = undefined; // don't use splice since it changes the indexes from the array
             };
 
+            // Preload studies
+            scope.$watch('vm.studyId', function(newStudyId, oldStudyId) {
+                // Log study id
+                console.log('Study: ', newStudyId);
+
+                // Cancel previous preloading
+                if (oldStudyId && newStudyId !== oldStudyId) {
+                    $rootScope.$emit('UserUnSelectedStudyId', oldStudyId);
+                }
+
+                // Preload study
+                if (newStudyId) {
+                    $rootScope.$emit('UserSelectedStudyId', newStudyId);
+                }
+            });
+
+            // Propagate series preloading events
+            // @todo Add on-series-dropped callback and move out the rest of the events from wv-droppable-series.
+            // @todo Only watch seriesIds & remove deep watch (opti).
+            scope.$watch('vm.viewports', function(newViewports, oldViewports) {
+                for (var i=0; i<newViewports.length || i<oldViewports.length; ++i) {
+                    if (oldViewports[i] && newViewports[i] && oldViewports[i].seriesId === newViewports[i].seriesId
+                    || !oldViewports[i] && !newViewports[i]
+                    ) {
+                        // Ignore changes unrelated to seriesId
+                        continue;
+                    }
+
+                    // Log new series id
+                    console.log('series['+i+']: ', newViewports[i] && newViewports[i].seriesId);
+
+                    // Set viewport's series
+                    if (!oldViewports[i] && newViewports[i]) {
+                        console.log('Viewport: ', newViewports[i]);
+                        if (newViewports[i].seriesId) {
+                            $rootScope.$emit('UserSelectedSeriesId', newViewports[i].seriesId);
+                        }
+                    }
+                    // Remove viewport's series
+                    else if (oldViewports[i] && !newViewports[i]) {
+                        if (oldViewports[i].seriesId) {
+                            $rootScope.$emit('UserUnSelectedSeriesId', oldViewports[i].seriesId);
+                        }
+                    }
+                    // Replace viewport's series
+                    else if (oldViewports[i] && newViewports[i] && oldViewports[i].seriesId !== newViewports[i].seriesId) {
+                        if (oldViewports[i].seriesId) {
+                            $rootScope.$emit('UserUnSelectedSeriesId', oldViewports[i].seriesId);
+                        }
+                        if (newViewports[i].seriesId) {
+                            $rootScope.$emit('UserSelectedSeriesId', newViewports[i].seriesId);
+                        }
+                    }
+                }
+            }, true);
             // Adapt the viewports to new seriesId if the viewports had no prior configurations.
             scope.$watch('vm.seriesId', function(newSeriesId, oldSeriesId) {
                 vm.viewports.forEach(function(viewport) {

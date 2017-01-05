@@ -9,6 +9,8 @@
  *   series_id = <orthanc-series-id>:<instance-index> where instance-index = n ⊂ [0; Infinity]
  *   In case of multiframe instances, multiple orthanc series can relates to multiple viewport
  *   series_id (one multiframe instance is converted into one web viewer series).
+ *   Cornerstone viewport data has to be manually reset when the series change (ie.
+ *   on drag&drop).
  *
  * @param {osimis.Series} [wvSeries] (readonly) Share the series model instance.
  *   The series-id directive handles the series model loading. Therefore, it also provide access to it.
@@ -20,7 +22,9 @@
  *
  * @param {integer} wvImageIndex Index of the actual image in the series.
  *    Notably used by the liveshare feature to save the current state of the series.
- *    Note the value may be different from the displayed image's index when an image is waiting loading to finish before display.
+ *    Note the value may be different from the displayed image's index when an
+ *    image is waiting loading to finish before display. The image index has to
+ *    be manually reset to 0 when the series change (ie. on drag&drop).
  *
  * @restrict Attribute
  * @requires webviewer.directive:wvViewport
@@ -118,9 +122,8 @@
             viewmodel.onCurrentImageIdChanged(function(imageId, isNewSeries, setShownImageCallback) {
                 // Change displayed image when series' current image changes
                 if (imageId) {
-                    var resetViewport = isNewSeries;
                     viewportController
-                        .setImage(imageId, resetViewport)
+                        .setImage(imageId)
                         .then(function() {
                             if (setShownImageCallback) {
                                 setShownImageCallback(imageId);
@@ -154,7 +157,14 @@
                     viewmodel.clearSeries();
                 }
                 else {
-                    viewmodel.setSeries(id);
+                    // Keep the defined series' image index. This is required
+                    // for services such as liveshare. It is not the `wvSeriesId`
+                    // responsibility to set the new image id, but the 
+                    // `wvSeriesId`'s user.
+                    var imageIndex = wvImageIndexParser(scope) || 0;
+
+                    // Set the new series
+                    viewmodel.setSeries(id, imageIndex);
                 }
             });
 
@@ -165,6 +175,7 @@
                     return;
                 }
 
+                // Set the image of the current series
                 var series = viewmodel.getSeries();
                 if (series) {
                     series.goToImage(+index);
@@ -218,6 +229,14 @@
         this._series = null;
 
         this.onCurrentImageIdChanged = new osimis.Listener();
+
+        /**
+         * @type {osimis.Listener}
+         * 
+         * @description
+         * Callback used to update Angular databound HTML attributes (&
+         * events).
+         */
         this.onSeriesChanged = new osimis.Listener();
 
         this.onSeriesChanged(function(newSeries, oldSeries) {
@@ -232,8 +251,9 @@
                     _this.onCurrentImageIdChanged.trigger(imageId, false, setShownImageCallback);
                 });
 
-                var firstImageIdInSeries = newSeries.getCurrentImageId();
-                _this.onCurrentImageIdChanged.trigger(firstImageIdInSeries, true);
+                // Trigger `currentImageIdChanged` event.
+                var imageIdInSeries = newSeries.getCurrentImageId();
+                _this.onCurrentImageIdChanged.trigger(imageIdInSeries, true);
             }
             else {
                 _this.onCurrentImageIdChanged.trigger(null);
@@ -256,19 +276,29 @@
         this.onSeriesChanged.trigger(null, oldSeries);
     };
 
-    SeriesViewModel.prototype.setSeries = function(id) {
+    SeriesViewModel.prototype.setSeries = function(id, imageIndex) {
         var _this = this;
 
         this._seriesId = id;
 
+        // Set the default `imageIndex` to the first image of the series.
+        imageIndex = imageIndex || 0;
+
         var oldSeries = _this._series;
         this._series = null; // Make sure getSeries returns null during the loading of the new one.
 
+        // Load series model
         return this._seriesManager
             .get(id)
             .then(function(series) {
                 _this._series = series;
+
+                // Go to the defined imageIndex
+                series.goToImage(imageIndex);
+
+                // Trigger `onSeriesChanged` event
                 _this.onSeriesChanged.trigger(series, oldSeries);
+
                 return series;
             });
     };

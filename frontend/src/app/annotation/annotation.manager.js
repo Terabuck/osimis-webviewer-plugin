@@ -10,6 +10,7 @@
     'use strict';
 
     function AnnotationManager() {
+        // Hash: invariant is _annotations[type][imageId] === AnnotationValueObject
         this._annotations = {};
 
         this.onAnnotationChanged = new osimis.Listener();
@@ -51,6 +52,109 @@
         }
         
         this.onAnnotationChanged.trigger(annotation);
+    };
+
+    /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvAnnotationManager
+     *
+     * @name osimis.AnnotationManager#getAll
+     * 
+     * @return {object} All the annotations (as cornerstone annotations).
+     *
+     * @description
+     * The `getAll` only intent is to provide backup of annotations for
+     * storage. For instance LiveShare.
+     */
+    AnnotationManager.prototype.getAll = function() {
+        var annotations = this._annotations;
+
+        return _.cloneDeep(annotations);
+    };
+
+    /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvAnnotationManager
+     *
+     * @name osimis.AnnotationManager#setAll
+     * 
+     * @param {object} annotations All the annotations (as cornerstone
+     *                             annotations).
+     *
+     * @description
+     * Primary intent is to retrieve backup of annotations from storage. For
+     * instance LiveShare.
+     */
+    AnnotationManager.prototype.setAll = function(annotations) {
+        // Update the annotations
+        this._annotations = annotations; // No need for deep clone, we trust
+                                         // method's users to not change the
+                                         // object.
+
+        // Trigger events
+        for (var type in this._annotations) {
+            if (this._annotations.hasOwnProperty(type)) {
+                for (var imageId in this._annotations[type]) {
+                    if (this._annotations[type].hasOwnProperty(imageId)) {
+                        // Trigger `onAnnotationChanged event
+                        var annotation = this._annotations[type][imageId];
+                        this.onAnnotationChanged.trigger(annotation);
+
+                        // @todo Recreate the model based on the class (no need
+                        //       yet since the model has no method).
+                    }
+                }
+            }
+        }
+
+
+        // // Regenerate annotations based on AnnotationValueObject model, only
+        // // to trigger `onAnnotationChanged` events.
+
+        // // Sync removed annotations.
+        // for (var type in this._annotations) {
+        //     if (this._annotations.hasOwnProperty(type)) {
+        //         var annotationsByType = imageId;
+        //         for (var imageId in annotationsByType) {
+        //             if (annotationByType.hasOwnProperty(imageId)) {
+        //                 if (!annotations || !annotations[type] || !annotations[type][imageId]) {
+        //                     // Create an empty AnnotationValueObject
+        //                     var annotationValueObject = new AnnotationValueObject(
+        //                         type,
+        //                         imageId,
+        //                         null
+        //                     );
+
+        //                     // Remove annotation & trigger update event
+        //                     this.set(annotationValueObject)
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+
+        // // Sync new/existing annotations.
+        // for (var type in annotations) {
+        //     if (annotations.hasOwnProperty(type)) {
+        //         var annotationsByType = imageId;
+        //         for (var imageId in annotationsByType) {
+        //             if (annotationByType.hasOwnProperty(imageId)) {
+        //                 if (this._annotations && this._annotations[type] && this._annotations[type][imageId]) {
+        //                     // Create an empty AnnotationValueObject
+        //                     var data = annotations[type][imageId];
+        //                     var annotationValueObject = new AnnotationValueObject(
+        //                         type,
+        //                         imageId,
+        //                         data
+        //                     );
+
+        //                     // Sync annotation & trigger update event
+        //                     this.set(annotationValueObject)
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
     };
 
     /**
