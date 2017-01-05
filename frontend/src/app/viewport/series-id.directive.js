@@ -124,11 +124,22 @@
                 if (imageId) {
                     viewportController
                         .setImage(imageId)
-                        .then(function() {
-                            if (setShownImageCallback) {
-                                setShownImageCallback(imageId);
-                            }
-                        });
+
+                    // Update series' displayed image
+                    var viewportModel = viewportController.getModel();
+                    viewportModel.onImageChanged.once(function(image) {
+                        // Ignore if this image is not the one loaded from the 
+                        // series. This may happen for instance if the image 
+                        // loading has failed.
+                        if (image.id !== imageId) {
+                            return;
+                        }
+
+                        // Trigger callback
+                        if (setShownImageCallback) {
+                            setShownImageCallback(imageId);
+                        }
+                    });
 
                     // wv-image-index
                     if (wvImageIndexParser && wvImageIndexParser.assign) {
@@ -240,21 +251,22 @@
         this.onSeriesChanged = new osimis.Listener();
 
         this.onSeriesChanged(function(newSeries, oldSeries) {
-            // unbind to old series
+            // Unbind the old series
             if (oldSeries) {
                 oldSeries.onCurrentImageIdChanged.close(_this);
             }
 
-            // bind to new series
+            // Bind the new series
             if (newSeries) {
                 newSeries.onCurrentImageIdChanged(_this, function(imageId, setShownImageCallback) {
-                    _this.onCurrentImageIdChanged.trigger(imageId, false, setShownImageCallback);
+                    _this.onCurrentImageIdChanged.trigger(imageId, false, setShownImageCallback /* @todo check why undefined ? */);
                 });
 
                 // Trigger `currentImageIdChanged` event.
                 var imageIdInSeries = newSeries.getCurrentImageId();
-                _this.onCurrentImageIdChanged.trigger(imageIdInSeries, true);
+                _this.onCurrentImageIdChanged.trigger(imageIdInSeries, true, newSeries.setShownImage.bind(newSeries));
             }
+            // Trigger no image anymore
             else {
                 _this.onCurrentImageIdChanged.trigger(null);
             }

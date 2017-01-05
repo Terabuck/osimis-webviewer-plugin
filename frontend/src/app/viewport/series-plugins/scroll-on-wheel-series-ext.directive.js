@@ -1,4 +1,19 @@
-(function() {
+/**
+ * @ngdoc directive
+ * @name webviewer.directive:wvScrollOnWheelSeriesExt
+ * 
+ * @param {boolean} [wvScrollOnWheelSeriesExt=true] Makes the viewport
+ *                                                  scrollable.
+ * 
+ * @restrict A
+ * @requires webviewer.directive:wvViewport
+ * @requires webviewer.directive:vpSeriesId
+ * 
+ * @description
+ * The `wvScrollOnWheelSeriesExt` directive let the end-user scroll through a
+ * viewport's series via the mouse wheel (or via fingers on mobile).
+ **/
+ (function() {
     'use strict';
 
     angular
@@ -14,12 +29,9 @@
         });
 
     /* @ngInject */
-    function wvScrollOnWheelSeriesExt() {
-        // Usage:
-        //
-        // Creates:
-        //
+    function wvScrollOnWheelSeriesExt($parse) {
         var directive = {
+            require: 'wvScrollOnWheelSeriesExt',
             controller: Controller,
             link: link,
             restrict: 'A',
@@ -27,7 +39,17 @@
         };
         return directive;
 
-        function link(scope, element, attrs) {
+        function link(scope, element, attrs, tool) {
+            // Switch activate/deactivate based on databound HTML attribute
+            var wvScrollOnWheelSeriesExt = $parse(attrs.wvScrollOnWheelSeriesExt);
+            scope.$watch(wvScrollOnWheelSeriesExt, function(isActivated) {
+                if (isActivated) {
+                    tool.activate();
+                }
+                else {
+                    tool.deactivate();
+                }
+            });
         }
     }
 
@@ -36,23 +58,41 @@
         var _wvSeriesIdViewModels = [];
     	this.register = function(viewmodel) {
             _wvSeriesIdViewModels.push(viewmodel);
-            registerMobileEvents(viewmodel);
     	};
     	this.unregister = function(viewmodel) {
             _.pull(_wvSeriesIdViewModels, viewmodel);
-            unregisterMobileEvents(viewmodel);
     	};
         
+        this.activate = function() {
+            _wvSeriesIdViewModels
+                .forEach(registerDesktopEvents);
+            _wvSeriesIdViewModels
+                .forEach(registerMobileEvents);
+        };
+        this.deactivate = function() {
+            _wvSeriesIdViewModels
+                .forEach(unregisterDesktopEvents);
+            _wvSeriesIdViewModels
+                .forEach(unregisterMobileEvents);
+        };
+
+        // Free events on destroy
+        $scope.$on('$destroy', function() {
+            unregisterDesktopEvents();
+            unregisterMobileEvents();
+        });
 
         /* desktop scrolling */
-
-        hamster = hamster($element[0]);
-
-        hamster.wheel(function(event, delta, deltaX, deltaY) {
-            $scope.$apply(function() {
-                _wvSeriesIdViewModels.forEach(function(viewmodel) {
+        
+        var hamster;
+        function registerDesktopEvents(viewmodel) {
+            // @warning This will only work for one viewport by scrollOnWheel extension
+            // we don't need more however.
+            hamster = hamster($element[0]);
+            hamster.wheel(function(event, delta, deltaX, deltaY) {
+                $scope.$apply(function() {
                     var series = viewmodel.getSeries();
-                    
+
                     if (!series) {
                         return;
                     }
@@ -64,15 +104,23 @@
                         series.goToNextImage(false);
                     }
                 });
+
+                // prevent horizontal & vertical page scrolling
+                event.preventDefault();
             });
+        }
 
-            // prevent horizontal & vertical page scrolling
-            event.preventDefault();
-        });
-
-        $scope.$on('$destroy', function() {
-            hamster.unwheel();
-        });
+        function unregisterDesktopEvents(viewmodel) {
+            if (hamster) {
+                // This won't disable events from other viewports due to the way
+                // hamster is instanciated.
+                if (hamster.unwheel) {
+                    hamster.unwheel();
+                }
+                
+                hamster = null;
+            }
+        }
 
         /* mobile scrolling */
         
@@ -135,9 +183,11 @@
             }
         };
         function unregisterMobileEvents(viewmodel) {
-            var hammertime = _hammertimeObjectsByViewport[viewmodel];
-            hammertime.off('pan', _mobileEvtBySeriesVM[viewmodel])
-            delete _hammertimeObjectsByViewport[viewmodel];
+            if (_hammertimeObjectsByViewport[viewmodel]) {
+                var hammertime = _hammertimeObjectsByViewport[viewmodel];
+                hammertime.off('pan', _mobileEvtBySeriesVM[viewmodel])
+                delete _hammertimeObjectsByViewport[viewmodel];
+            }
         }
 
 

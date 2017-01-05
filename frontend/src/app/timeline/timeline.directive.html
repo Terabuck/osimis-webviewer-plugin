@@ -1,8 +1,11 @@
-<div class="wv-timeline" ng-if="!!vm.series">
+<div 
+    ng-if="!!vm.series"
+    class="wv-timeline"
+>
     <div class="wv-timeline-controls-wrapper">
-        <wv-timeline-controls wv-series="vm.series"></wv-timeline-controls>
+        <wv-timeline-controls wv-readonly="vm.readonly" wv-series="vm.series"></wv-timeline-controls>
     </div>
     <div class="wv-timeline-loading-bar-wrapper">
-        <wv-loading-bar wv-series="vm.series"></wv-loading-bar>
+        <wv-loading-bar wv-readonly="vm.readonly" wv-series="vm.series"></wv-loading-bar>
     </div>
 </div>

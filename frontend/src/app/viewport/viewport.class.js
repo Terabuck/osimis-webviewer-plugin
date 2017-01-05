@@ -422,7 +422,13 @@
 
         // Change the canvas' viewport if the image is already displayed
         var enabledElementObject = cornerstone.getEnabledElement(this._enabledElement);
-        if (enabledElementObject.viewport) {
+        var eeoViewport = enabledElementObject.viewport;
+        if (eeoViewport) {
+            // Make sure nested objects exist to avoid exception due to copy on empty refactor
+            // (see `cornerstone#setViewport` inner function).
+            eeoViewport.translation = eeoViewport.translation || {};
+            eeoViewport.voi = eeoViewport.voi || {};
+
             return cornerstone.setViewport(this._enabledElement, viewportData);
         }
 

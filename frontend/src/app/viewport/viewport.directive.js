@@ -39,8 +39,6 @@
  *   * `vflip` - true if the image is flipped vertically. Default is false
  *   * `rotation` - the rotation of the image (90 degree increments). Default is 0
  *
- * @param {boolean} [wvEnableOverlay=false] Display the overlay
- *
  * @param {boolean} [wvLossless=false] Force lossless quality fetching.
  *   * `false` - fetch image with quality based on viewport size.
  *   * `true` - fetch image with the maximum available quality.
