@@ -25,9 +25,10 @@
  *   Available Callback Arguments:
  *   * `$image` - image_model
  *
- * @param {object} wvViewport (readonly)
+ * @param {object} [wvViewport]
  *   Share the cornerstone viewport data. It is different from the viewport
- *   model which is only accessible via viewport plugins.
+ *   model which is only accessible via viewport plugins. When set to null,
+ *   the viewport data is reset to the default value.
  *   
  *   The cornerstone viewport object contains the following attributes (source: https://github.com/chafey/cornerstone/wiki/viewport):
  *   * `scale` - The scale applied to the image. A scale of 1.0 will display no zoom (one image pixel takes up one screen pixel). A scale of 2.0 will be double zoom and a scale of .5 will be zoomed out by 2x
@@ -203,8 +204,14 @@
                         _cancelCyclicCall = false;
                         return;
                     }
+                    // Set new viewport
                     if (wvViewport && wvViewport !== old) {
                         model.setViewport(wvViewport);
+                    }
+                    // Reset viewport when it's equal to null
+                    else if (!wvViewport && wvViewport !== old) {
+                        model.reset();
+                        model.draw();
                     }
                 }, true);
             }
