@@ -363,6 +363,21 @@
                     }
                 }
 
+                // If src is an array, set the right length first (seems like
+                // the length property is somehow not being taken in account
+                // by the for loops). This is required because cornerstone will
+                // ignore (don't draw) random tools' annotations if an array 
+                // has not a proper length (cf. equals to its item count).
+                if (_.isArray(src)) {
+                    // Assert
+                    if (!_.isArray(target)) {
+                        throw new Error('src and target should be the same type');
+                    }
+
+                    // Set the target array length
+                    target.length = src.length;
+                }
+
                 // Copy src content in target
                 for (var prop in src) {
                     // Copy null value first (just to make sure null is not
