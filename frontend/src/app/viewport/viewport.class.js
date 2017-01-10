@@ -174,9 +174,9 @@
      * @methodOf osimis.Viewport
      *
      * @name osimis.Viewport#setImage
-     * @param {osimis.Image} image      Image model
-     * @param {boolean} resetParameters Reset the viewport parameters (ie. zoom, ...),
-     *                                  mostly call when the end-user changes the series. 
+     * @param {osimis.Image} image Image model
+     * @param {boolean} [resetParameters] Reset the viewport parameters
+     *   (ie. zoom, ...), mostly call when the end-user changes the series. 
      *
      * @description
      * Change the displayed image.
