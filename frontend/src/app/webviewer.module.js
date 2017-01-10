@@ -23,12 +23,17 @@
      */
     angular
     .module('webviewer', ['ngResource', 'ngSanitize', 'mgcrea.ngStrap', 'ngRangeFilter', 'debounce'])
-    .config(function($locationProvider) {
+    .config(function($locationProvider, $compileProvider) {
         // Warning: Web Viewer is uncompatible with <base> HTML element (due to SVG/XLink issue)! Don't use it!
         $locationProvider.html5Mode({
             enabled: true,
             requireBase: false
         });
+
+        // Fix AngularJS 1.6 breaking change https://github.com/angular/angular.js/blob/master/CHANGELOG.md
+        if ($compileProvider.preAssignBindingsEnabled) {
+            $compileProvider.preAssignBindingsEnabled(true);
+        }
     })
     // Configure with HttpRequest at init
     .run(function($q) {
