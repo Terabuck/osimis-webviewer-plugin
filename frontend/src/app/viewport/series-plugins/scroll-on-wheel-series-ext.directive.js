@@ -84,12 +84,16 @@
 
         /* desktop scrolling */
         
-        var hamster;
+        var hamsterInstance;
         function registerDesktopEvents(viewmodel) {
             // @warning This will only work for one viewport by scrollOnWheel extension
-            // we don't need more however.
-            hamster = hamster($element[0]);
-            hamster.wheel(function(event, delta, deltaX, deltaY) {
+            // we don't need more however. Assert this.
+            if (_wvSeriesIdViewModels.length > 1) {
+                throw new Error("More than one viewport when using `wvpScrollOnOverSeriesExt` directive.");
+            }
+
+            hamsterInstance = hamster($element[0]);
+            hamsterInstance.wheel(function(event, delta, deltaX, deltaY) {
                 $scope.$apply(function() {
                     var series = viewmodel.getSeries();
 
@@ -111,14 +115,14 @@
         }
 
         function unregisterDesktopEvents(viewmodel) {
-            if (hamster) {
+            if (hamsterInstance) {
                 // This won't disable events from other viewports due to the way
                 // hamster is instanciated.
-                if (hamster.unwheel) {
-                    hamster.unwheel();
+                if (hamsterInstance.unwheel) {
+                    hamsterInstance.unwheel();
                 }
                 
-                hamster = null;
+                hamsterInstance = null;
             }
         }
 
