@@ -150,7 +150,6 @@
             var wvImageIdParser = $parse(attrs.wvImageId);
 
             var _cancelCyclicCallImageId = false; // cancel cyclic databinding induced by controller calls
-            var _cancelCyclicCallViewport = false; // cancel cyclic databinding induced by CornerstoneImageRenderer event
 
             // bind directive's sizing (via wv-size controller) to cornerstone
             {
@@ -167,7 +166,7 @@
                 ctrl.getModel = function() {
                     return model;
                 }
-                ctrl.setImage = function(newImageId) {
+                ctrl.setImage = function(newImageId, resetParameters) {
                     _cancelCyclicCallImageId = true;
 
                     scope.vm.wvImageId = newImageId;
@@ -175,7 +174,7 @@
                     return wvImageManager
                         .get(newImageId)
                         .then(function(image) {
-                            var resetParameters = !scope.vm.csViewport; // reset parameters when no csViewport set
+                            resetParameters = resetParameters || !scope.vm.csViewport; // reset parameters when no csViewport set
                             return model.setImage(image, resetParameters);
                         });
                 };
@@ -208,38 +207,32 @@
                     //   SET IMAGE
                     //   UPDATE VIEWPORT
                     //   DRAW IMAGE
-                    if (!!newImageId && (_.isEqual(oldValues, newValues) // Is this directive setup?
+                    // If image has already been set by the model, do not 
+                    // redo the whole stuff again.
+                    if (_cancelCyclicCallImageId) {
+                        _cancelCyclicCallImageId = false;
+                    }
+                    else if (!!newImageId && (_.isEqual(oldValues, newValues) // Is this directive setup?
                         || newImageId !== oldImageId)
                     ) {
-                        // If image has already been set by the model, do not 
-                        // redo the whole stuff again.
-                        if (_cancelCyclicCallImageId) {
-                            _cancelCyclicCallImageId = false;
-
-                            // But reset the viewport if needed (I guess, should already have been done by the model)...
-                            model.reset();
-                            model.draw();
-                        }
                         // Load image model & set it.
-                        else {
-                            return wvImageManager
-                                .get(newImageId)
-                                // Wait
-                                .then(function(newImage) {
-                                    // Set/Reset the viewport
-                                    var resetViewport = undefined;
-                                    if (newCsViewport) {
-                                        model.setViewport(newCsViewport);
-                                        resetViewport = false;
-                                    }
-                                    else {
-                                        resetViewport = true;
-                                    }
+                        return wvImageManager
+                            .get(newImageId)
+                            // Wait
+                            .then(function(newImage) {
+                                // Set/Reset the viewport
+                                var resetViewport = undefined;
+                                if (newCsViewport) {
+                                    model.setViewport(newCsViewport);
+                                    resetViewport = false;
+                                }
+                                else {
+                                    resetViewport = true;
+                                }
 
-                                    // Set image & draw
-                                    return model.setImage(newImage, resetViewport);
-                                });
-                        }
+                                // Set image & draw
+                                return model.setImage(newImage, resetViewport);
+                            });
                     }
 
                     // Case 2 : RESET IMAGE
@@ -251,31 +244,17 @@
                     //   UPDATE CS VIEWPORT
                     //   DRAW IMAGE
                     else if (!!newCsViewport && !_.isEqual(newCsViewport, oldCsViewport)) {
-                        // If viewport has already been set by the model, do not 
-                        // redo the whole stuff again.
-                        if (_cancelCyclicCallViewport) {
-                            _cancelCyclicCallViewport = false;
-                        }
                         // Update csViewport
-                        else {
-                            model.setViewport(newCsViewport);
-                            model.draw();
-                        }
+                        model.setViewport(newCsViewport);
+                        model.draw();
                     }
 
                     // Case 4 : KEEP IMAGE
                     //   RESET VIEWPORT
                     //   DRAW IMAGE
                     else if (!newCsViewport && newCsViewport != oldCsViewport) {
-                        // If viewport has already been set by the model, do not 
-                        // redo the whole stuff again.
-                        if (_cancelCyclicCallViewport) {
-                            _cancelCyclicCallViewport = false;
-                        }
-                        else {
-                            model.reset();
-                            model.draw();
-                        }
+                        model.reset();
+                        model.draw();
                     }
                 }, true);
             }
@@ -289,11 +268,21 @@
                 }
             });
             element.on('CornerstoneImageRendered', function(evt, args) { // element.off not needed
-                // Copy the viewport (only if not exactly the same to avoid useless digests).
+                // Copy the viewport (only if not exactly the same to avoid
+                // useless digests) so it can be used to retrieve info for 
+                // overlay or to share data in realtime (for Liveshare).
+                // 
+                // @warning This may override changes introduced by the user (
+                //          eg. if this event occurs after the changes he made).
+                //
+                // To prevent this sync issue, we allow cyclic calls to occur:
+                // if viewport data have been set via model, and then changed 
+                // due to CornerstoneImageRendered for another reason, they
+                // will be reset in the next CornerstoneImageRendered to the
+                // correct value. This come at the performance cost of multiple
+                // useless drawing when viewport is reset.
                 if (!_.isEqual(scope.vm.csViewport, args.viewport)) {
                     scope.$evalAsync(function() { // trigger a new digest if needed
-                        _cancelCyclicCallViewport = true;
-
                         // We can't trust args.viewport to no have changed:
                         // retrieve them again.
                         var newCsViewport = model._enabledElementObject.viewport;
