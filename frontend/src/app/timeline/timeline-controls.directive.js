@@ -59,6 +59,11 @@
         // Process get/set of image index input (the displayed indexes start
         // from 1 instead of 0).
         this.shownIndex = function(value) {
+            // Return null when no series is set yet.
+            if (!vm.series) {
+                return null;
+            }
+
             if (typeof value !== 'undefined') {
                 vm.series.goToImage(value-1);
             }
