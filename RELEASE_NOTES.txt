@@ -1,6 +1,13 @@
 Pending changes in the mainline
 ===============================
 
+Version 0.5.4
+========================
+
+=> Minimum Orthanc version: 1.1.0 <=
+
+* Docker Image: Updated Orthanc to 1.2.0 
+
 Version 0.5.3
 ========================
 
