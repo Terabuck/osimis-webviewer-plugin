@@ -398,6 +398,7 @@ function parseJpegLossless(config) {
         throw new Error("unsupported jpeg-lossless component number: "+decoder.numComp)
     }
 
+    var buf, pixels, index, i;
     if (hasColor) {
         // Convert rgb24 to rgb32
 
