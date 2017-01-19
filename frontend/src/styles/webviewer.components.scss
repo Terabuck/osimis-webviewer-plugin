@@ -19,6 +19,8 @@ wv-toolbar {
   width: 150px;
   height: 150px;
   background-color: rgba(255,255,255,0.25);
+
+  // No need to set z-index (already done by jquery ui lib).
 }
 
 wv-webviewer, .wv-webviewer-container {
