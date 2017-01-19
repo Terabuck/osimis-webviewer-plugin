@@ -60,6 +60,7 @@ The following Orthanc routes are also used:
 /studies/
 /studies/<uid>
 /instances/<uid>/simplified-tags
+/instances/<uid>/pdf
 /series/<uid>/study
 /plugins/osimis-web-viewer
 /system
