@@ -225,11 +225,20 @@
         try {
             // Check the item is cached
             if (cache.getRefCount(id, quality) < 1) {
+                // Make sure the cache is cleaned first so 
+                // a new download can occur if any bug happens
+                try {
+                    cache.remove(id, quality);
+                }
+                catch(e) {
+
+                }
+
+                // Assert
                 throw new Error('Free uncached image binary.');
             }
 
             // Decount reference
-            cache.pop(id, quality);
             try { // bypass errors till it's refactored & unit tested, this will have no consequence
                 var request = cache.get(id, quality);
                 request.popPriority(priority);
@@ -237,6 +246,7 @@
             catch(e) {
                 logError(e);
             }
+            cache.pop(id, quality);
 
             // Cancel request if pending
             if (cache.getRefCount(id, quality) === 0 && !loadedCacheIndex[id][quality]) {
