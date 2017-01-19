@@ -38,7 +38,7 @@ dockerImageName="osimis/orthanc-webviewer-plugin/demo:latest-local"
 syncData=${2:-true};
 
 # Configure the data volume
-dataVolumeName=orthancSamplesDb2
+dataVolumeName=orthancSamplesDb2b
 dataVolumeDriver=local # @todo use azure volume https://github.com/Azure/azurefile-dockervolumedriver
 
 # Build demo docker image
@@ -47,7 +47,7 @@ docker build -t osimis/orthanc-webviewer-plugin/tmp-populated-image:latest ${dem
 
 # Update the populator data's volume
 if [ "$syncData" = true ]; then
-    populatorImage=osimis/lify-orthanc:latest # keep lify name for cache (only diff is that lify uses a random tag as well)
+    populatorImage=osimis/orthanc-webviewer-plugin/populator-image:latest
     populatorPath=${srcRoot}/demo/orthancPopulator/
 
     # Create the data volume
@@ -56,7 +56,7 @@ if [ "$syncData" = true ]; then
     # build the populator image
     export AWS_ACCESS_KEY_ID
     export AWS_SECRET_ACCESS_KEY 
-    docker build -t ${populatorImage} --build-arg AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} --build-arg AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} ${populatorPath}
+    docker build -t ${populatorImage} --build-arg AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} --build-arg AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} --no-cache=true ${populatorPath}
 fi
 
 # Creates the network used to bind the populator with the orthanc demo
