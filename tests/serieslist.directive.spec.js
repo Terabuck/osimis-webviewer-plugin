@@ -37,7 +37,7 @@ describe('serieslist', function() {
                                 else {
                                     // Two frontend series are displayed for two DICOM instance
                                     // from one single DICOM series
-                                    assert.deepEqual(directive.$scope.seriesIds, [
+                                    assert.deepEqual(directive.$scope.vm.seriesIds, [
                                         '5d0d012e-4e2766cb-dd38b9ab-605538eb-ea8ac2cf:0',
                                         '5d0d012e-4e2766cb-dd38b9ab-605538eb-ea8ac2cf:1'
                                     ]);
@@ -78,7 +78,7 @@ describe('serieslist', function() {
                                     assert(false, JSON.stringify(err));
                                 }
                                 else {
-                                    assert.deepEqual(directive.$scope.seriesIds, [
+                                    assert.deepEqual(directive.$scope.vm.seriesIds, [
                                         '7410c2c9-784fdb9b-07b22740-612c386e-69ac4c8c:0'
                                     ]);
                                     resolve();
