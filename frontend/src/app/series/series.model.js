@@ -14,7 +14,7 @@
     /* @ngInject */
     function factory($rootScope, $timeout, wvImageManager, wvAnnotationManager, WvAnnotationGroup, wvImageBinaryManager, uaParser) {
 
-        function WvSeries(id, imageIds, tags, availableQualities, instanceTags) {
+        function WvSeries(id, imageIds, pdfIds, tags, availableQualities, instanceTags) {
             var _this = this;
 
             // Replace PixelData by lossless in safari & internet explorer (for decompression library incompatibility reasons)

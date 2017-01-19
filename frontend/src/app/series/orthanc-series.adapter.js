@@ -4,7 +4,7 @@
  * 
  * @name osimis.OrthancSeriesAdapter
  */
-(function() {
+(function(osimis) {
     'use strict';
 
     angular
@@ -21,9 +21,47 @@
         ////////////////
 
         function process(orthancSeries) {
-            // Retrieve each image ids for each instance in one series
-            var imagesByInstance = orthancSeries.instances
-                // .reverse()
+            // Get tags
+            var tags = orthancSeries.tags;
+            
+            // When series has no image (for instance for a DICOM PDF 
+            // instance), ignore the series.
+            if (!orthancSeries.availableQualities) {
+                // Assert it's not an image series.
+                if (tags.MIMETypeOfEncapsulatedDocument !== 'application/pdf') {
+                    throw new Error('Empty available qualities for non `application/pdf` series');
+                }
+
+                // Ignore the series since it's a pdf-instance, return an
+                // empty array.
+                else {
+                    return [];
+                }
+            }
+
+            // Retrieve each pdf ids for each instances in one series
+            var pdfInstanceIds = orthancSeries.instances
+                // Check if instance has PDF mimetype
+                .filter(function(instance) {
+                    var instanceId = instance[0];
+                    var frameCount = instance[2];
+                    return orthancSeries.instancesTags[instanceId].MIMETypeOfEncapsulatedDocument === 'application/pdf';
+                })
+                // Convert instances `ordered-slices` orthanc model into a list of id
+                .map(function(instance) {
+                    var instanceId = instance[0];
+                    return instanceId;
+                });
+            
+            // Retrieve each image ids & pdf ids for each instance in one series
+            var imageIdsByInstance = orthancSeries.instances
+                // Ignore pdf instances
+                .filter(function(instance) {
+                    var instanceId = instance[0];
+
+                    return pdfInstanceIds.indexOf(instanceId) === -1;
+                })
+                // Group imageIds by instance
                 .map(function(instance) {
                     var instanceId = instance[0];
                     var frameCount = instance[2];
@@ -37,25 +75,24 @@
                 });
             
             // Check if image is single frame
-            var isSingleFrame = imagesByInstance
+            var isSingleFrame = imageIdsByInstance
                 .filter(function(images) {
                     return images.length === 1;
                 })
-                .length === imagesByInstance.length; // each instances have only one image
+                .length === imageIdsByInstance.length; // each instances have only one image
             
             if (isSingleFrame) {
                 // if image is mono frame, set one series = many instances / mono frames
-                var imagesBySeries = [_.flatten(imagesByInstance)];
+                // this is also set when series have no instances
+                var imageIdsBySeries = [_.flatten(imageIdsByInstance)];
             }
             else {
                 // if image is multi frame, set one series = one instance / many frames
-                var imagesBySeries = imagesByInstance;
+                var imageIdsBySeries = imageIdsByInstance;
             }
             
-            // Get tags
-            var tags = orthancSeries.tags;
-            
-            // Convert available qualities into osimis.quality format
+            // Convert available qualities into osimis.quality format when 
+            // series contains image.
             var availableQualities = _.pickBy(osimis.quality, function(value, key) {
                 // availableQualities (uppercase) has key
                 for (var i=0; i<orthancSeries.availableQualities.length; ++i) {
@@ -76,14 +113,17 @@
             }
 
             // Instantiate series objects
-            var seriesList = imagesBySeries.map(function(imageIds, seriesIndex) {
+            // @todo add isPdf attribute?
+            // @todo merge imageIdsBySeries & pdfInstances 
+            // @todo map to wvSeries
+            var seriesList = imageIdsBySeries.map(function(imageIds, seriesIndex) {
                 var id = orthancSeries.id + ':' + seriesIndex;
 
-                return new WvSeries(id, imageIds, tags, availableQualities);
+                return new WvSeries(id, imageIds, [], tags, availableQualities);
             });
 
             return seriesList;
         }
     }
 
-})();
+})(this.osimis || (this.osimis = {}));
