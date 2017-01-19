@@ -38,8 +38,6 @@
 
             // @todo make sure there is enough space left for the overlay bar in html
 
-            // @todo fill pdfInstanceIds
-
             // Set initial values.
             vm.seriesIds = [];
             vm.pdfInstanceIds = [];
@@ -89,9 +87,13 @@
                 var cssClasses = {
                     ul: vm.cssClass.ul || 'wv-serieslist',
                     li: vm.cssClass.li || 'wv-serieslist-item',
-                    liForReport: vm.cssClass.liForReport || 'wv-serieslist-reportitem',
-                    liForNoReport: vm.cssClass.liForNoReport || 'wv-serieslist-noreportitem',
-                    overlay: vm.cssClass.ul || 'wv-serieslist-overlay'
+                    overlay: vm.cssClass.ul || 'wv-serieslist-overlay',
+                    report: vm.cssClass.report || 'wv-serieslist-report',
+                    reporticon: vm.cssClass.reporticon || 'wv-serieslist-reporticon',
+                    reportlabel: vm.cssClass.reportlabel || 'wv-serieslist-reportlabel',
+                    noreport: vm.cssClass.noreport || 'wv-serieslist-noreport',
+                    noreporticon: vm.cssClass.noreporticon || 'wv-serieslist-noreporticon',
+                    noreportlabel: vm.cssClass.noreportlabel || 'wv-serieslist-noreportlabel'
                 };
                 
                 vm.cssClass = cssClasses;

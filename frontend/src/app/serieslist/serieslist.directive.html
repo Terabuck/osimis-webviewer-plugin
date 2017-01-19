@@ -10,18 +10,18 @@
     <li
         ng-show="vm.pdfInstanceIds.length > 0"
         ng-repeat="id in vm.pdfInstanceIds"
-        class="{{vm.cssClass.li}} wv-serieslist-report"
+        class="{{vm.cssClass.li}} {{vm.cssClass.report}} wv-serieslist-report"
         ng-click="vm.openPdf(id)"
     >
-        <span class="wv-serieslist-reporticon fa fa-file-text"></span>
-        <span class="wv-serieslist-reportlabel">PDF report</span>
+        <span class="{{vm.cssClass.reporticon}} fa fa-file-text"></span>
+        <span class="{{vm.cssClass.reportlabel}}">PDF report</span>
     </li>
     <li
         ng-show="!vm.pdfInstanceIds.length"
-        class="{{vm.cssClass.li}} wv-serieslist-noreport"
+        class="{{vm.cssClass.li}} {{vm.cssClass.noreport}}wv-serieslist-noreport"
     >
-        <span class="wv-serieslist-noreporticon fa fa-file-text"></span>
-        <span class="wv-serieslist-noreportlabel">No report</span>
+        <span class="{{vm.cssClass.noreporticon}} fa fa-file-text"></span>
+        <span class="{{vm.cssClass.noreportlabel}}">No report</span>
     </li>
   	<li
   		ng-repeat="id in vm.seriesIds"
