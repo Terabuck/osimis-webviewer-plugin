@@ -10,7 +10,7 @@
  * in case of multiframe instance, one image == one DICOM frame. Therefore,
  * `wvPdfInstanceManager` is useful to cache things at the instance level.
  */
-(function() {
+(function(osimis) {
     'use strict';
 
     angular
@@ -34,6 +34,7 @@
              * 
              * @description
              * Retrieve a list of pdf instance model from a backend study id.
+             * Used mainly to display reports in the `wvSerieslist`.
              *
              * * @warning Only call this method once the pdf instances have
              *   already been loaded by the `wvSeriesManager` in the 
@@ -42,8 +43,7 @@
              * 
              * * @note There is no frontend study id.
              */
-            listFromOrthancStudyId: listFromOrthancStudyId, // @todo
-            // get: get, // @todo
+            listFromOrthancStudyId: listFromOrthancStudyId,
             /**
              * @ngdoc method
              * @methodOf webviewer.service:wvPdfInstanceManager
@@ -51,10 +51,10 @@
              * @name osimis.wvPdfInstanceManager#getPdfBinary
              * 
              * @param {string} id
-             * Id of the instance (orthanc format)
+             * Id of the instance (orthanc format).
              * 
-             * @return {Promise<@todo>}
-             * The PDF document.
+             * @return {Promise<arraybuffer>}
+             * The PDF document as a blob binary.
              * 
              * @description
              * Retrieve the PDF document for a specified instance.
@@ -118,70 +118,30 @@
          */
         var _pdfInstancesByInstanceId = {};
 
-        /**
-         * @type {object}
-         * * keys: instance ids
-         * * values: Pdf Document promises
-         * * format: {<orthancInstanceId>: <@todo>, ...}
-         *
-         * @description
-         * Cache pdf binaries by instanceId when they are downloaded for the 
-         * first time.
-         * 
-         * * @todo Flush the content
-         */
-        var _pdfBinaryByInstanceId = {}
-
         return service;
 
         ////////////////
-
-        // function get(id) {
-        //     // Load image tags if not already in loading
-        //     if (!_tagsByInstances.hasOwnProperty(id)) {
-        //         var request = new osimis.HttpRequest();
-        //         request.setHeaders(wvConfig.httpRequestHeaders);
-        //         _tagsByInstances[id] = request
-        //             .get(wvConfig.orthancApiURL + '/instances/'+id+'/simplified-tags')
-        //             .then(function(response) {
-        //                 var tags = response.data;
-
-        //                 return tags;
-        //             }, function(err) {
-        //                 // @todo uncache & do something with the error
-                        
-        //                 return $q.reject(err);
-        //             });
-        //     }
-
-        //     // Return the tags
-        //     return _tagsByInstances[id];
-        // }
 
         function listFromOrthancStudyId(studyId) {
             return _pdfInstancesByStudyId[studyId];
         }
 
         function getPdfBinary(id) {
-            // Load pdf binary if not already in loading
-            if (!_pdfBinaryByInstanceId.hasOwnProperty(id)) {
-                var request = new osimis.HttpRequest();
-                request.setHeaders(wvConfig.httpRequestHeaders);
-                _pdfBinaryByInstanceId[id] = request
-                    .get(wvConfig.orthancApiURL + '/instances/'+id+'/pdf')
-                    .then(function(response) {
-                        var pdfBinary = response.data;
+            var request = new osimis.HttpRequest();
+            request.setCache(false); // do not cache pdf binaries
+            request.setHeaders(wvConfig.httpRequestHeaders);
+            request.setResponseType('arraybuffer');
+            return request
+                .get(wvConfig.orthancApiURL + '/instances/'+id+'/pdf')
+                .then(function(response) {
+                    var pdfBinary = response.data;
 
-                        return pdfBinary;
-                    }, function(err) {
-                        // @todo uncache & do something with the error
-                        
-                        return $q.reject(err);
-                    });
-            }
-
-            // Return the binary
-            return _pdfBinaryByInstanceId[id];
+                    return pdfBinary;
+                }, function(err) {
+                    // @todo uncache & do something with the error
+                    
+                    return $q.reject(err);
+                });
         }
 
         function setPdfInstance(instanceId, instanceTags, seriesId, studyId) {
@@ -207,4 +167,4 @@
             _pdfInstancesByInstanceId[instanceId] = pdfInstancePromise;
         }
     }
-})();
+})(this.osimis || (this.osimis = {}));

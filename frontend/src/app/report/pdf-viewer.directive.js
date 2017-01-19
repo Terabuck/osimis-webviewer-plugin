@@ -3,8 +3,22 @@
  * https://github.com/legalthings/angular-pdfjs
  * Copyright (c) 2015 ; Licensed MIT
  *
- * Stolen from https://github.com/legalthings/angular-pdfjs-viewer/blob/master/src/angular-pdfjs-viewer.js
- * Modified by osimis.
+ * @ngdoc directive
+ * @name webviewer.directive:wvPdfViewer
+ *
+ * @param {string} wvReportId
+ * The id of the PDF report displayed.
+ *
+ * @description
+ * The `wvPdfViewer` directive displays a PDF based on a it's report id. It 
+ * fulfill the space of its parent DOM element.
+ *
+ * Directive taken from `https://github.com/legalthings/angular-pdfjs-viewer/blob/master/src/angular-pdfjs-viewer.js`.
+ * Adapted by Osimis:
+ * - removal of warnings, errors & related unused features
+ * - implementation of user-defined http request headers (integration of
+ *   `wvPdfInstanceManager`)
+ * - memory cleanup/fixes (when using with `ngIf`)
  */
 
 +function(osimis) {
@@ -78,14 +92,14 @@
         }
     }]);
     
-    module.directive('wvPdfViewer', ['$interval', 'wvConfig', function ($interval, wvConfig) {
+    module.directive('wvPdfViewer', ['$interval', 'wvPdfInstanceManager', function ($interval, wvPdfInstanceManager) {
         return {
             templateUrl: 'app/report/pdf-viewer.directive.html',
             restrict: 'E',
             scope: {
-                onInit: '&?',
-                onPageLoad: '&?',
-                scale: '=?',
+                // onInit: '&?', Osimis - not used anymore
+                // onPageLoad: '&?', Osimis - not used anymore
+                // scale: '=?', Osimis - not used anymore
                 reportId: '=wvReportId'
             },
             link: function ($scope, $element, $attrs) {
@@ -94,11 +108,11 @@
                 /** Osimis **/
 
                 // Sync pdf url with reportId
-                $scope.$watch('reportId', function(newReportId, oldReportId) {
-                    if (newReportId) {
-                        $scope.pdfUrl = wvConfig.orthancApiURL + '/instances/' + newReportId + '/pdf';
-                    }
-                });
+                // $scope.$watch('reportId', function(newReportId, oldReportId) {
+                //     if (newReportId) {
+                //         $scope.pdfUrl = wvConfig.orthancApiURL + '/instances/' + newReportId + '/pdf';
+                //     }
+                // });
 
                 // Close when users clicks on the close button
                 $scope.close = function() {
@@ -181,14 +195,14 @@
                 $scope.$watch(function () {
                     /** Osimis **/
                     // return $attrs.src;
-                    return $scope.pdfUrl;
+                    return $scope.reportId;
                     /** / Osimis **/
-                }, function (newPdfUrl, oldPdfUrl) {
+                }, function (newReportId, oldReportId) {
                     /** Osimis **/
                     // if (!$attrs.src) return;
-                    if (!newPdfUrl) {
+                    if (!newReportId) {
                         // Free resources
-                        if (oldPdfUrl) {
+                        if (oldReportId) {
                             PDFViewerApplication.close();
                         }
 
@@ -252,26 +266,18 @@
                     // > cannot load file:-URLs in a Web Worker. file:-URLs are usually loaded
                     // > very quickly, so there is no need to set up progress event listeners.
 
-                    // Load the PDF file with the correct headers
-                    var httpRequest = new osimis.HttpRequest();
-                    httpRequest.setCache(false);
-                    httpRequest.setHeaders(wvConfig.httpRequestHeaders);
-                    httpRequest.setResponseType('arraybuffer');
-                    
-                    PDFViewerApplication.setTitleUsingUrl(newPdfUrl);
-
-                    // Display the pdf once loaded
-                    httpRequest
-                        .get($scope.pdfUrl)
-                        .then(function(response) {
-                            // Cancel viewing if pdfUrl as changed since then,
-                            // so we don't have sync errors.
-                            if ($scope.pdfUrl !== newPdfUrl) {
+                    // Load the PDF file with the correct headers & display the
+                    // pdf once loaded.
+                    wvPdfInstanceManager
+                        .getPdfBinary(newReportId)
+                        .then(function(pdfBlob) {
+                            // Cancel viewing if reportId as changed since then,
+                            // so we don't have sync issues.
+                            if ($scope.reportId !== newReportId) {
                                 return;
                             }
 
                             // Display PDF inside the PDF viewer
-                            var pdfBlob = response.data;
                             var arrayView = new Uint8Array(pdfBlob);
                             PDFViewerApplication.open(arrayView, 0);
                         });

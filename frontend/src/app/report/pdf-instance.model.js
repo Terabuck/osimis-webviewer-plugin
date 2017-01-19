@@ -10,9 +10,6 @@
  * within the `series/orthanc-series.adapter.js` file. We creates pdf instances 
  * at the series level to avoid having to send multiple HTTP requests (for
  * performance reason).
- * 
- * * @todo Refactor code & separate the concept of PDF instances from the 
- *         concept of wv series.
  */
 (function(osimis) {
     'use strict';
@@ -24,12 +21,6 @@
         this.tags = instanceTags;
 
         this._pdfInstanceManager = pdfInstanceManager;
-    };
-
-    PdfInstance.prototype.getPdfBinary = function() {
-        var pdfInstanceManager = this._pdfInstanceManager;
-
-        return pdfInstanceManager.getPdfBinary(this.id);
     };
 
     osimis.PdfInstance = PdfInstance;
