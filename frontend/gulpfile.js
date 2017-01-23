@@ -113,7 +113,8 @@ gulp.task('styles', ['clean-styles'], function() {
         .pipe($.compass({
             project: __dirname + '/',
             css: config.cssDir,
-            sass: config.scssDir
+            sass: config.scssDir,
+            style: 'nested'
         }))
 //        .on('error', errorLogger) // more verbose and dupe output. requires emit.
         .pipe($.autoprefixer({browsers: ['last 2 version', '> 5%']}))
