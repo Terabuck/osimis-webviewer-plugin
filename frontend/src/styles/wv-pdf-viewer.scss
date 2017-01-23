@@ -4,21 +4,21 @@ wv-pdf-viewer {
     height: 100%;
 }
 
-.wv-pdf-viewer-closebutton {
+#toolbarContainer > #toolbarViewer > #toolbarViewerLeft > .wv-pdf-viewer-closebutton { // We need high priority, !important keywords don't work
     background-color: inherit;
     color: hsl(0, 0%, 100%);
     border: none;
 
-    padding: 2px !important;
-    margin-left: 4px !important;
-    margin-right: 2px !important;
+    padding: 2px;
+    margin-left: 4px;
+    margin-right: 2px;
 
     &:hover {
         color: black;
     }
 }
 
-.wv-pdf-viewer-closebuttonicon {
+.fa.fa-window-close.wv-pdf-viewer-closebuttonicon { // We need high priority
     font-size: 2rem;
     line-height: 28px; // pdf.js toolbar size (- closebutton margin)
 }
