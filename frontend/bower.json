@@ -35,7 +35,7 @@
     "bootstrap": "^3.3.6",
     "lodash": "^4.5.1",
     "ng-range-filter": "~0.1.0",
-    "font-awesome": "fontawesome#~4.5.0",
+    "font-awesome": "fontawesome#~4.7.0",
     "cornerstone": "^0.9.0",
     "cornerstoneTools": "^0.7.7",
     "jpgjs": "notmasteryet/jpgjs",
