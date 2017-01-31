@@ -1,9 +1,9 @@
-<div class="wv-timeline-controls">
+<div ng-show="vm.series" class="wv-timeline-controls">
     <!--  @todo add tooltips -->
 
     <!-- Previous Button -->
     <span 
-        ng-if="vm.series.imageCount > 1"
+        ng-show="vm.series.imageCount > 1"
         ng-click="!vm.readonly && vm.series.goToPreviousImage()"
 
         title="Previous" 
@@ -24,7 +24,7 @@
 
     <!-- Next Button -->
     <label 
-        ng-if="vm.series.imageCount > 1"
+        ng-show="vm.series.imageCount > 1"
         ng-click="!vm.readonly && vm.series.goToNextImage()"
 
         osi-tooltip data-placement="top"
@@ -35,7 +35,7 @@
 
     <!-- Play Button -->
     <div
-        ng-if="vm.series.imageCount > 1"
+        ng-show="vm.series.imageCount > 1"
         class="wv-timeline-controls-play-button-wrapper"
     >
         <wv-play-button wv-readonly="vm.readonly" wv-series="vm.series"></wv-play-button>

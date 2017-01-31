@@ -43,10 +43,10 @@
         this.browser = {};
 
         var urlConvertor = new osi.OrthancUrlConvertor(
-            window.location.protocol,
-            window.location.hostname,
-            window.location.port,
-            window.location.pathname);
+            document.location.protocol,
+            document.location.hostname,
+            document.location.port,
+            document.location.pathname);
         this.orthancApiURL = urlConvertor.toAbsoluteURL('/'); // @note '/' is converted by urlConvertor
                                                               // to the correct path if reverse proxy is found, so np.
                                                               // @todo use ../../ instead

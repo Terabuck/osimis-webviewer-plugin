@@ -61,7 +61,7 @@
                         wv-vflip-viewport-tool="vm.tools.vflip"
                         wv-hflip-viewport-tool="vm.tools.hflip"
                     >
-                        <wv-overlay ng-if="vm.tools.overlay" wv-tags="$image.tags" wv-viewport="vm.viewports[$index].csViewport"></wv-overlay>
+                        <wv-overlay ng-show="vm.tools.overlay" wv-tags="$image.tags" wv-viewport="vm.viewports[$index].csViewport"></wv-overlay>
 
                         <!-- Always show the timeline — even if there is only one image — until we (@todo) develop
                              a specific component to display the image quality -->

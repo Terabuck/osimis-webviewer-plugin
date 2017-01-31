@@ -119,11 +119,12 @@
             };
 
             // bind view model -> viewport controller
+            var _resetViewportOnceImageLoads = false;
             viewmodel.onCurrentImageIdChanged(function(imageId, isNewSeries, setShownImageCallback) {
                 // Change displayed image when series' current image changes
                 if (imageId) {
                     viewportController
-                        .setImage(imageId)
+                        .setImage(imageId, _resetViewportOnceImageLoads);
 
                     // Update series' displayed image
                     var viewportModel = viewportController.getModel();
@@ -158,6 +159,12 @@
                         wvImageIndexParser.assign(scope, 0);
                     }
                 }
+
+                // Consider image has been loaded. Reset states related to this
+                // event.
+                if (_resetViewportOnceImageLoads) {
+                    _resetViewportOnceImageLoads = false;
+                }
             });
 
             // bind attributes -> view model
@@ -176,6 +183,41 @@
 
                     // Set the new series
                     viewmodel.setSeries(id, imageIndex);
+
+                    // Once series has been loaded, reset back the cornerstone
+                    // viewport data as it was first defined by the user.
+                    // It is required to do this because the series is loaded
+                    // asynchronously.
+                    // 
+                    // If users want to change the series and reset the
+                    // viewport, he does:
+                    // - `wv-series-id="stg"`
+                    // - `wv-viewport="null"`
+                    //
+                    // What actually happens is:
+                    // 1. `wv-series-id="stg"`
+                    //    User sets series.
+                    //    In the meanwhile, series is being loaded...
+                    // 3. `wv-viewport="null"`
+                    //    User reset viewport.
+                    //    The reset applies to the current image, because
+                    //    series has not been loaded yet.
+                    // 4. Series is loaded.
+                    //    Viewport is taken from the previous image id.
+                    //
+                    // We therfore need to delay the viewport reset until 
+                    // the series has loaded (in this case).
+                    //
+                    // @warning This only works when viewport is reset.
+                    // @todo Do the same when viewport is changed (not just
+                    //       reset).
+                    var wvViewportParser = $parse(attrs.wvViewport);
+                    if (wvViewportParser !== angular.noop) {
+                        var csViewportAtTheTime = wvViewportParser(scope);
+                        if (!csViewportAtTheTime) {
+                            _resetViewportOnceImageLoads = true;
+                        }
+                    }
                 }
             });
 

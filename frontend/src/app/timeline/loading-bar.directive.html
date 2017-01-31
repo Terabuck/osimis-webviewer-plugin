@@ -13,10 +13,10 @@
         xlink:href=""
         ng-attr-xlink:href="{{'#image-loading-bar-'+$parent.$id}}"
         ng-attr-x="{{vm.imageBarWidth*i}}%" 
-        ng-attr-class="
-            wv-loadingbar-image-bar
-            wv-loadingbar-{{vm.QualityKeys[vm.bestQualityByImage[i]] ? vm.QualityKeys[vm.bestQualityByImage[i]]+'-quality' : 'not-loaded'}}
-        "
+        ng-class="[
+            'wv-loadingbar-image-bar',
+            'wv-loadingbar-' + (vm.QualityKeys[vm.bestQualityByImage[i]] ? vm.QualityKeys[vm.bestQualityByImage[i]]+'-quality' : 'not-loaded')
+        ]"
         y="2px"
     />
 
@@ -28,11 +28,11 @@
         xlink:href=""
         ng-attr-xlink:href="{{'#image-loading-bar-'+$parent.$id}}"
         ng-attr-x="{{vm.imageBarWidth*vm.currentImageIndex}}%" 
-        ng-attr-class="
-            wv-loadingbar-image-bar
-            wv-loadingbar-{{vm.QualityKeys[vm.bestQualityByImage[vm.currentImageIndex]] ? vm.QualityKeys[vm.bestQualityByImage[vm.currentImageIndex]]+'-quality' : 'not-loaded'}}
-            wv-loadingbar-active
-        "
+        ng-class="[
+            'wv-loadingbar-image-bar',
+            'wv-loadingbar-' + (vm.QualityKeys[vm.bestQualityByImage[vm.currentImageIndex]] ? vm.QualityKeys[vm.bestQualityByImage[vm.currentImageIndex]]+'-quality' : 'not-loaded'),
+            'wv-loadingbar-active'
+        ]"
         y="0px"
     />
  </svg>
