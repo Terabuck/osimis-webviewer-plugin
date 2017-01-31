@@ -39,8 +39,6 @@
  *   * `vflip` - true if the image is flipped vertically. Default is false
  *   * `rotation` - the rotation of the image (90 degree increments). Default is 0
  *
- * @param {boolean} [wvEnableOverlay=false] Display the overlay
- *
  * @param {boolean} [wvLossless=false] Force lossless quality fetching.
  *   * `false` - fetch image with quality based on viewport size.
  *   * `true` - fetch image with the maximum available quality.
@@ -329,31 +327,83 @@
         toolStateManager.getStateByToolAndImageId = function(toolName, imageId) {
             return this.toolState[imageId] && this.toolState[imageId][toolName];
         };
+
+        /**
+         * @param {boolean} [redraw=true]
+         *
+         * You can choose to not redraw the image after updating the tools data.
+         * This is usefull to avoid useless dual redrawing when the data changes because the image also changes.
+         *
+         * As long as the listener onImageChanging is used instead of onImageChanged,
+         * the drawing will occurs after the tool reloading,
+         *
+         * @description
+         * Set the annotation data of a specific tool & image in cornerstone.
+         */
         toolStateManager.restoreStateByToolAndImageId = function(toolName, imageId, state, redraw) {
-            /**
-             *
-             * @param redraw: boolean (default: true)
-             *
-             * You can choose to not redraw the image after updating the tools data.
-             * This is usefull to avoid useless dual redrawing when the data changes because the image also changes.
-             *
-             * As long as the listener onImageChanging is used instead of onImageChanged,
-             * the drawing will occurs after the tool reloading,
-             *
-             */
             if (typeof redraw === 'undefined') redraw = true;
 
-            this.toolState[imageId] = this.toolState[imageId] || {};
-            
             // Merge the data into cornernerstone (if annotation is not removed)
-            // We can't simply change the object references because cornerstone would lose link to the handles it's working on.
-            this.toolState[imageId][toolName] = this.toolState[imageId][toolName] || {};
-            if (state) {
-                _.merge(this.toolState[imageId][toolName], state);
+            // We can't simply change the object references because cornerstone
+            // would lose link to the handles it's working on.
+
+            /**
+             * @descriptiopn
+             * Deep clone src in target but keep target's references.
+             * Make sure both src & target are references (object/array).
+             */
+            function homemadeClone(src, target) {
+                // If we are dealing with arrays, should work too since
+                // changing length will erase values.
+
+                // Remove src keys absent from target
+                for (var prop in target) {
+                    if (!src.hasOwnProperty(prop)) {
+                        delete target[prop];
+                    }
+                }
+
+                // Copy src content in target
+                for (var prop in src) {
+                    // Copy null value first (just to make sure null is not
+                    // considered as an object).
+                    if (src[prop] === null) {
+                        target[prop] = null;
+                    }
+                    // Go recursively through nested object
+                    else if (_.isObject(src[prop]) && !_.isArray(src[prop])) {
+                        // Create an object in target if none
+                        if (!_.isObject(target[prop])) {
+                            target[prop] = {};
+                        }
+                        // Go deep
+                        homemadeClone(src[prop], target[prop]);
+                    }
+                    // Go recursively through nested array
+                    else if (_.isArray(src[prop])) {
+                        // Create an array in target if none
+                        if (!_.isArray(target[prop])) {
+                            target[prop] = [];
+                        }
+                        // Go deep
+                        homemadeClone(src[prop], target[prop]);
+                    }
+                    // Copy directly every other kind of value
+                    else {
+                        target[prop] = src[prop];
+                    }
+                }
             }
-            // Remove the data from cornerstone ((i annotation is removed)
-            else if (!state) {
+
+            // Remove the data from cornerstone (if all the related annotations 
+            // are removed).
+            if (!state && this.toolState[imageId] && this.toolState[imageId][toolName]) {
                 delete this.toolState[imageId][toolName];
+            }
+            else {
+                this.toolState[imageId] = this.toolState[imageId] || {};
+                this.toolState[imageId][toolName] = this.toolState[imageId][toolName] || {};
+                homemadeClone(state, this.toolState[imageId][toolName]);
             }
 
             if (redraw) {

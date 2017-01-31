@@ -2,7 +2,10 @@
  * @ngdoc directive
  * @name webviewer.directive:wvPlayButton
  * 
- * @param {osimis.Series} wvSeries The model of the series, as provided by the `wvSeriesId` directive.
+ * @param {osimis.Series} wvSeries The model of the series, as provided by the
+ *                                 `wvSeriesId` directive.
+ *                                 
+ * @param {boolean} [wvReadonly=false] Deactivate the directive's inputs.
  * 
  * @scope
  * @restrict Element
@@ -29,7 +32,8 @@
             link: link,
             restrict: 'E',
             scope: {
-                series: '=wvSeries'
+                series: '=wvSeries',
+                readonly: '=?wvReadonly'
             },
             templateUrl: 'app/timeline/play-button.directive.html'
         };
@@ -41,6 +45,7 @@
 
     /* @ngInject */
     function Controller() {
-
+        // Set default values
+        this.readonly = (typeof this.readonly === 'undefined') ? false : this.readonly;
     }
 })();

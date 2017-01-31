@@ -34,9 +34,9 @@
                 >
                     <wv-viewport 
                         vp:series-id="vm.viewports[$index].seriesId" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}" wv-lossless="true"
-                        wv-droppable-series-ext="vm.serieslistEnabled"
-                        wv-scroll-on-wheel-series-ext="true"
-                        wv-enable-overlay="vm.tools.overlay"
+                        wv-series="$series" wv-image="$image"
+                        wv-droppable-series-ext="!vm.readonly && vm.serieslistEnabled"
+                        wv-scroll-on-wheel-series-ext="!vm.readonly"
                         wv-viewport="vm.viewports[$index].csViewport"
                         wv-image-index="vm.viewports[$index].imageIndex"
 
@@ -50,13 +50,22 @@
                         wv-rectangle-roi-viewport-tool="vm.tools.rectangleroi"
 
                         wv-invert-contrast-viewport-tool="vm.tools.invert"
-                        wv-play-series-ext="vm.tools.play"
 
                         wv-rotateleft-viewport-tool="vm.tools.rotateleft"
                         wv-rotateright-viewport-tool="vm.tools.rotateright"
                         wv-vflip-viewport-tool="vm.tools.vflip"
                         wv-hflip-viewport-tool="vm.tools.hflip"
-                    ></wv-viewport>
+                    >
+                        <wv-overlay ng-if="vm.tools.overlay" wv-tags="$image.tags" wv-viewport="vm.viewports[$index].csViewport"></wv-overlay>
+
+                        <!-- Always show the timeline — even if there is only one image — until we (@todo) develop
+                             a specific component to display the image quality -->
+                        <div class="wv-overlay-timeline-wrapper">
+                            <wv-timeline wv-series="$series" wv-readonly="vm.readonly"></wv-timeline>
+                        </div>
+                        
+                        <wv-droppable-series-overlay-item></wv-droppable-series-overlay-item>
+                    </wv-viewport>
                 </wv-pane-policy>
             </wv-splitpane>
         </div>

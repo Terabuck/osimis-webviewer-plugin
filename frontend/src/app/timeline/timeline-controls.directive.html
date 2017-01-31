@@ -4,25 +4,30 @@
     <!-- Previous Button -->
     <span 
         ng-if="vm.series.imageCount > 1"
+        ng-click="!vm.readonly && vm.series.goToPreviousImage()"
+
         title="Previous" 
         osi-tooltip data-placement="top"
-        ng-click="vm.series.goToPreviousImage()"
         class="wv-timeline-controls-button"
     ><span class="fa fa-step-backward" class="wv-timeline-controls-vertical-sizing"></span></span>
 
     <!-- Input Field -->
     <span class="wv-timeline-controls-vertical-sizing">
-        <input class="wv-timeline-controls-input"
-            type="number" min="1" step="1" max="{{ vm.series.imageCount }}"
+        <input
+            ng-disabled="vm.readonly"
             ng-model="vm.shownIndex" ng-model-options="{ debounce: 500, getterSetter: true }"
+
+            class="wv-timeline-controls-input"
+            type="number" min="1" step="1" max="{{ vm.series.imageCount }}"
         > of {{ vm.series.imageCount }}
     </span>
 
     <!-- Next Button -->
     <label 
         ng-if="vm.series.imageCount > 1"
+        ng-click="!vm.readonly && vm.series.goToNextImage()"
+
         osi-tooltip data-placement="top"
-        ng-click="vm.series.goToNextImage()"
         class="wv-timeline-controls-button"
     >
         <span class="fa fa-step-forward" class="wv-timeline-controls-vertical-sizing"></span>
@@ -33,6 +38,6 @@
         ng-if="vm.series.imageCount > 1"
         class="wv-timeline-controls-play-button-wrapper"
     >
-        <wv-play-button wv-series="vm.series"></wv-play-button>
+        <wv-play-button wv-readonly="vm.readonly" wv-series="vm.series"></wv-play-button>
     </div>
 </div>

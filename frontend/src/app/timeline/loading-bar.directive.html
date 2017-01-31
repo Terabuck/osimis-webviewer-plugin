@@ -6,19 +6,33 @@
     </defs>
 
     <!-- Image Bars -->
-    <use xlink:href="" ng-attr-xlink:href="{{'#image-loading-bar-'+$parent.$id}}"
+    <use
         ng-repeat="i in [0, vm.imageCount] | range track by $index"
+        ng-click="!vm.readonly && vm.series.goToImage(i)"
+
+        xlink:href=""
+        ng-attr-xlink:href="{{'#image-loading-bar-'+$parent.$id}}"
         ng-attr-x="{{vm.imageBarWidth*i}}%" 
-        ng-attr-class="wv-loadingbar-image-bar wv-loadingbar-{{vm.QualityKeys[vm.bestQualityByImage[i]] ? vm.QualityKeys[vm.bestQualityByImage[i]]+'-quality' : 'not-loaded'}}" 
-        ng-click="vm.series.goToImage(i)"
+        ng-attr-class="
+            wv-loadingbar-image-bar
+            wv-loadingbar-{{vm.QualityKeys[vm.bestQualityByImage[i]] ? vm.QualityKeys[vm.bestQualityByImage[i]]+'-quality' : 'not-loaded'}}
+        "
         y="2px"
     />
 
     <!-- Current Image Bar -->
-    <use xlink:href="" ng-attr-xlink:href="{{'#image-loading-bar-'+$parent.$id}}"
+    <use
         ng-if="vm.imageBarWidth"
+        ng-click="!vm.readonly && vm.series.goToImage(vm.currentImageIndex)"
+
+        xlink:href=""
+        ng-attr-xlink:href="{{'#image-loading-bar-'+$parent.$id}}"
         ng-attr-x="{{vm.imageBarWidth*vm.currentImageIndex}}%" 
-        ng-attr-class="wv-loadingbar-image-bar wv-loadingbar-{{vm.QualityKeys[vm.bestQualityByImage[vm.currentImageIndex]] ? vm.QualityKeys[vm.bestQualityByImage[vm.currentImageIndex]]+'-quality' : 'not-loaded'}} wv-loadingbar-active" ng-click="vm.series.goToImage(vm.currentImageIndex)"
+        ng-attr-class="
+            wv-loadingbar-image-bar
+            wv-loadingbar-{{vm.QualityKeys[vm.bestQualityByImage[vm.currentImageIndex]] ? vm.QualityKeys[vm.bestQualityByImage[vm.currentImageIndex]]+'-quality' : 'not-loaded'}}
+            wv-loadingbar-active
+        "
         y="0px"
     />
  </svg>

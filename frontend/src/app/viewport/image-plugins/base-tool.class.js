@@ -25,6 +25,14 @@
             var _this = this;
             
             this.viewports.push(viewport)
+        
+            // For tools related to cornerstone (@todo split BaseTool in AnnotationTools & others)
+            if (cornerstoneTools[this.toolName]) {
+                // Set tool in enable mode (it's a 1D state machine with 4
+                // states) - display annotations but ignore inputs.
+                var enabledElement = viewport.getEnabledElement();
+                cornerstoneTools[this.toolName].enable(enabledElement, 1);
+            }
 
             this._listenModelChange(viewport);
 
@@ -35,22 +43,38 @@
 
         // method called by the viewport
         BaseTool.prototype.unregister = function(viewport) {
+            // For tools related to cornerstone (@todo split BaseTool in AnnotationTools & others)
+            if (cornerstoneTools[this.toolName]) {
+                // Set tool in disable mode (it's a 1D state machine with 4
+                // states) - don't display annotations & ignore inputs.
+                var enabledElement = viewport.getEnabledElement();
+                cornerstoneTools[this.toolName].enable(enabledElement, 1);
+            }
+
             this._unlistenModelChange(viewport);
             
             _.pull(this.viewports, viewport);
         };
 
         BaseTool.prototype._activateInputs = function(viewport) {
+            // Listen to events
             var enabledElement = viewport.getEnabledElement();
-
             cornerstoneTools.mouseInput.enable(enabledElement);
-            cornerstoneTools[this.toolName].activate(enabledElement, true);
+            cornerstoneTools.touchInput.enable(enabledElement);
+
+            // Set tool in activate mode (it's a 1D state machine with 4
+            // states) - display annotations and listen to inputs.
+            cornerstoneTools[this.toolName].activate(enabledElement, 1);
         };
         BaseTool.prototype._deactivateInputs = function(viewport) {
+            // Unlisten to events
             var enabledElement = viewport.getEnabledElement();
-
-            cornerstoneTools[this.toolName].deactivate(enabledElement);
             cornerstoneTools.mouseInput.disable(enabledElement);
+            cornerstoneTools.touchInput.disable(enabledElement);
+
+            // Set tool in enable mode (it's a 1D state machine with 4
+            // states) - display annotations but ignore inputs.
+            cornerstoneTools[this.toolName].enable(enabledElement, 1);
         };
 
         var _imageByViewportListenerIds = [];

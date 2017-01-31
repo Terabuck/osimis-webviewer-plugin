@@ -2,7 +2,10 @@
  * @ngdoc directive
  * @name webviewer.directive:wvLoadingBar
  * 
- * @param {osimis.Series} wvSeries The model of the series, as provided by the `wvSeriesId` directive.
+ * @param {osimis.Series} wvSeries The model of the series, as provided by the
+ *                                 `wvSeriesId` directive.
+ *                                 
+ * @param {boolean} [wvReadonly=false] Deactivate the directive's inputs.
  * 
  * @scope
  * @restrict Element
@@ -10,20 +13,22 @@
  * @description
  * The `wvLoadingBar` directive displays a timeline relative to a shown series.
  *
- * Every series' images are represented on the loading bar. The user can clicked upon one of them to 
- * select it. The displayed images also provide the actual status of the download: 
+ * Every series' images are represented on the loading bar. The user can
+ * clicked upon one of them to select it. The displayed images also provide the 
+ * actual status of the download: 
  *   * `grey` - The image has not been downloaded at all
  *   * `red` - The image thumbnail has been downloaded
  *   * `orange` - The low-quality version of the image has been downloaded
  *   * `green` - The lossless-quality version of the image has been downloaded
- *               Note the green quality does not always mean the image is lossless:
- *               an image saved in the PACS as compressed appears green even, since the best quality
- *               available has been provided.
+ *               Note the green quality does not always mean the image is 
+ *               lossless: an image saved in the PACS as compressed appears 
+ *               green even, since the best quality available has been provided.
  *
  * This directive is used by the `wvTimeline` directive.
  *
- * # @compatibility Do not use html <base> tag! cf. http://www.chriskrycho.com/2015/html5-location-base-and-svg.html#fn1
- *                  Check the `wvLoadingBar` directive source code for more information.
+ * # @compatibility Do not use html <base> tag! cf.
+ *     http://www.chriskrycho.com/2015/html5-location-base-and-svg.html#fn1
+ *     Check the `wvLoadingBar` directive source code for more information.
  */ 
 (function() {
     'use strict';
@@ -44,7 +49,8 @@
             link: link,
             restrict: 'E',
             scope: {
-            	series: '=wvSeries'
+            	series: '=wvSeries',
+                readonly: '=?wvReadonly'
             }
         };
         return directive;
@@ -57,6 +63,9 @@
     /* @ngInject */
     function Controller($scope, wvImageBinaryManager) {
         var _this = this;
+
+        // Set default values
+        this.readonly = (typeof this.readonly === 'undefined') ? false : this.readonly;
 
         // [<image index>: [<image quality: int>, ...], ...] - image-index != image-id
         this.imageQualities = [];
