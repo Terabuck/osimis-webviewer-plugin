@@ -19,6 +19,7 @@
  * - implementation of user-defined http request headers (integration of
  *   `wvPdfInstanceManager`)
  * - memory cleanup/fixes (when using with `ngIf`)
+ * - inlining of webworkers (using Osimis' gulp-inlineWorker plugin).
  */
 
 +function(osimis) {
@@ -27,11 +28,10 @@
     var module = angular.module('webviewer');
     
     module.provider('pdfjsViewerConfig', function() {
-        /** Osimis **/ 
-        
         // We inline worker source to avoid CORS issue, and set the path
-        // to our configuration.
-
+        // to our configuration. Not sure these worker are used since we bypass
+        // the library's file loading mechanism to be able to specify HTTP
+        // headers.
         var config = {
             workerSrc: /* @inline-worker: */ '/bower_components/pdf.js-viewer/pdf.worker.js',
             cmapDir: null,
@@ -40,7 +40,6 @@
             disableWorker: false,
             verbosity: null
         };
-        /** / Osimis **/
 
         this.setWorkerSrc = function(src) {
             config.workerSrc = src;
@@ -105,109 +104,111 @@
             link: function ($scope, $element, $attrs) {
                 $element.children().wrap('<div class="pdfjs" style="width: 100%; height: 100%;"></div>');
                 
-                /** Osimis **/
-
-                // Sync pdf url with reportId
-                // $scope.$watch('reportId', function(newReportId, oldReportId) {
-                //     if (newReportId) {
-                //         $scope.pdfUrl = wvConfig.orthancApiURL + '/instances/' + newReportId + '/pdf';
-                //     }
-                // });
-
                 // Close when users clicks on the close button
                 $scope.close = function() {
                     $scope.reportId = undefined;
                 };
 
-                // We comment features we don't use and poll of  useless 
-                // warnings related to the pdf having not been loaded yet.
-                // Especially since some of the features may have impacts on 
-                // global event scope.
-
-                // var initialised = false;
-                // var loaded = {};
-                // var numLoaded = 0;
-
-                // function onPdfInit() {
-                //     initialised = true;
-                    
-                //     if ($attrs.removeMouseListeners === "true") {
-                //         window.removeEventListener('DOMMouseScroll', handleMouseWheel);
-                //         window.removeEventListener('mousewheel', handleMouseWheel);
-                        
-                //         var pages = document.querySelectorAll('.page');
-                //         angular.forEach(pages, function (page) {
-                //             angular.element(page).children().css('pointer-events', 'none');
-                //         });
-                //     }
-                //     if ($scope.onInit) $scope.onInit();
-                // }
-
-                // var poller = $interval(function () {
-                //     var pdfViewer = PDFViewerApplication.pdfViewer;
-                    
-                //     if (pdfViewer) {
-                //         if ($scope.scale !== pdfViewer.currentScale) {
-                //             loaded = {};
-                //             numLoaded = 0;
-                //             $scope.scale = pdfViewer.currentScale;
-                //         }
-                //     } else {
-                //         console.warn("PDFViewerApplication.pdfViewer is not set");
-                //     }
-                    
-                //     var pages = document.querySelectorAll('.page');
-                //     angular.forEach(pages, function (page) {
-                //         var element = angular.element(page);
-                //         var pageNum = element.attr('data-page-number');
-                        
-                //         if (!element.attr('data-loaded')) {
-                //             delete loaded[pageNum];
-                //             return;
-                //         }
-                        
-                //         if (pageNum in loaded) return;
-
-                //         if (!initialised) onPdfInit();
-                        
-                //         if ($scope.onPageLoad) {
-                //             if ($scope.onPageLoad({page: pageNum}) === false) return;
-                //         }
-                        
-                //         loaded[pageNum] = true;
-                //         numLoaded++;
-                //     });
-                // }, 200);
-
-
-                // $element.on('$destroy', function() {
-                //     $interval.cancel(poller);
-                // });
-
-                /** / Osimis **/
+                // Document title be changed by the pdf library. Store it
+                // so we can set it back when the viewer is closed.
+                var _documentTitle = document.title;
 
                 $scope.$on('$destroy', function() {
                     // Disable recurrent PDFJS window resize event listeners 
                     // console errors..
                     PDFViewerApplication.close();
+
+                    // Set document title back.
+                    document.title = _documentTitle;
                 });
 
+                /**************************************************************
+                // We comment features we don't use and poll of useless 
+                // warnings related to the pdf having not been loaded yet.
+                // Especially since some of the features may have impacts on 
+                // global event scope.
+
+                var initialised = false;
+                var loaded = {};
+                var numLoaded = 0;
+
+                function onPdfInit() {
+                    initialised = true;
+                    
+                    if ($attrs.removeMouseListeners === "true") {
+                        window.removeEventListener('DOMMouseScroll', handleMouseWheel);
+                        window.removeEventListener('mousewheel', handleMouseWheel);
+                        
+                        var pages = document.querySelectorAll('.page');
+                        angular.forEach(pages, function (page) {
+                            angular.element(page).children().css('pointer-events', 'none');
+                        });
+                    }
+                    if ($scope.onInit) $scope.onInit();
+                }
+
+                var poller = $interval(function () {
+                    var pdfViewer = PDFViewerApplication.pdfViewer;
+                    
+                    if (pdfViewer) {
+                        if ($scope.scale !== pdfViewer.currentScale) {
+                            loaded = {};
+                            numLoaded = 0;
+                            $scope.scale = pdfViewer.currentScale;
+                        }
+                    } else {
+                        console.warn("PDFViewerApplication.pdfViewer is not set");
+                    }
+                    
+                    var pages = document.querySelectorAll('.page');
+                    angular.forEach(pages, function (page) {
+                        var element = angular.element(page);
+                        var pageNum = element.attr('data-page-number');
+                        
+                        if (!element.attr('data-loaded')) {
+                            delete loaded[pageNum];
+                            return;
+                        }
+                        
+                        if (pageNum in loaded) return;
+
+                        if (!initialised) onPdfInit();
+                        
+                        if ($scope.onPageLoad) {
+                            if ($scope.onPageLoad({page: pageNum}) === false) return;
+                        }
+                        
+                        loaded[pageNum] = true;
+                        numLoaded++;
+                    });
+                }, 200);
+
+
+                $element.on('$destroy', function() {
+                    $interval.cancel(poller);
+                });
+                **************************************************************/
+
                 $scope.$watch(function () {
-                    /** Osimis **/
-                    // return $attrs.src;
                     return $scope.reportId;
-                    /** / Osimis **/
                 }, function (newReportId, oldReportId) {
-                    /** Osimis **/
-                    // if (!$attrs.src) return;
+                    // When reportId has been set to undefined, close the doc.
                     if (!newReportId) {
                         // Free resources
                         if (oldReportId) {
                             PDFViewerApplication.close();
                         }
 
+                        // Set document title back.
+                        document.title = _documentTitle;
+
                         return;
                     };
+
+                    // Update document title cache variable each time a file is 
+                    // opened. This line is strictly for safety since the 
+                    // document title is static at the moment.
+                    _documentTitle = document.title;
 
                     // @warning Untested behavior: pdfUrl changes from
                     // one to another. It will not happen in the current state
@@ -215,18 +216,19 @@
                     // of issue may occurs back for instance if lify is given
                     // the power to switch between displayed dicom instances.
 
-                    /** / Osimis **/
-
-                    if ($attrs.open === 'false' /* Osimis */ || typeof $attrs.open === 'undefined' /* / Osimis */) {
+                    // Make sure the open file button is disabled!
+                    if ($attrs.open === 'false' || typeof $attrs.open === 'undefined') {
                         document.getElementById('openFile').setAttribute('hidden', 'true');
                         document.getElementById('secondaryOpenFile').setAttribute('hidden', 'true');
                     }
 
+                    // Let download the file by default
                     if ($attrs.download === 'false') {
                         document.getElementById('download').setAttribute('hidden', 'true');
                         document.getElementById('secondaryDownload').setAttribute('hidden', 'true');
                     }
 
+                    // Let print the file by default
                     if ($attrs.print === 'false') {
                         document.getElementById('print').setAttribute('hidden', 'true');
                         document.getElementById('secondaryPrint').setAttribute('hidden', 'true');
@@ -235,15 +237,10 @@
                     if ($attrs.width) {
                         document.getElementById('outerContainer').style.width = $attrs.width;
                     }
-
                     if ($attrs.height) {
                         document.getElementById('outerContainer').style.height = $attrs.height;
                     }
                     
-                    /** Osimis **/
-                    
-                    // PDFJS.webViewerLoad(newPdfUrl);
-
                     // Send null adress so it doesn't load the pdf. We want to 
                     // avoid this behavior because we have to send the correct
                     // http headers with the request, so authentification can
@@ -271,7 +268,7 @@
                     wvPdfInstanceManager
                         .getPdfBinary(newReportId)
                         .then(function(pdfBlob) {
-                            // Cancel viewing if reportId as changed since then,
+                            // Cancel viewing if reportId has changed since then,
                             // so we don't have sync issues.
                             if ($scope.reportId !== newReportId) {
                                 return;
@@ -283,43 +280,9 @@
                         });
                     
                     // @todo process request error
-
-                    /** / Osimis **/
                 });
             }
         };
     }]);
-
-    /** Osimis **/
-
-    // Comment out lines that may have a breaking inpact (especially 
-    // getLocation).
-
-    // === get current script file ===
-    // var file = {};
-    // file.scripts = document.querySelectorAll('script[src]');
-    // file.path = file.scripts[file.scripts.length - 1].src;
-    // file.filename = getFileName(file.path);
-    // file.folder = getLocation(file.path).pathname.replace(file.filename, '');
-
-    // function getFileName(url) {
-    //     var anchor = url.indexOf('#');
-    //     var query = url.indexOf('?');
-    //     var end = Math.min(anchor > 0 ? anchor : url.length, query > 0 ? query : url.length);
-
-    //     return url.substring(url.lastIndexOf('/', end) + 1, end);
-    // }
-
-    // function getLocation(href) {
-    //     var location = document.createElement("a");
-    //     location.href = href;
-
-    //     if (!location.host) location.href = location.href; // Weird assigment
-
-    //     return location;
-    // }
-    // ======
-    
-    /** / Osimis **/
 
 }(this.osimis || (this.osimis = {}));
