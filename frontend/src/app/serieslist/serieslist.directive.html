@@ -1,7 +1,31 @@
-<ul class="{{wvClass.ul}}">
+<ul
+    ng-show="vm.studyId"
+    class="{{vm.cssClass.ul}}"
+>
+    <!--
+    @warning Only series are configurable via transclude. The PDF instances are
+             not.
+    @todo Merge WVB serieslist and WVP advanced serieslist.
+    -->
+    <li
+        ng-show="vm.pdfInstanceIds.length > 0"
+        ng-repeat="id in vm.pdfInstanceIds"
+        class="{{vm.cssClass.li}} {{vm.cssClass.report}} wv-serieslist-report"
+        ng-click="vm.openPdf(id)"
+    >
+        <span class="{{vm.cssClass.reporticon}} fa fa-file-text"></span>
+        <span class="{{vm.cssClass.reportlabel}}">PDF report</span>
+    </li>
+    <li
+        ng-show="!vm.pdfInstanceIds.length"
+        class="{{vm.cssClass.li}} {{vm.cssClass.noreport}}wv-serieslist-noreport"
+    >
+        <span class="{{vm.cssClass.noreporticon}} fa fa-file-text"></span>
+        <span class="{{vm.cssClass.noreportlabel}}">No report</span>
+    </li>
   	<li
-  		ng-repeat="id in seriesIds"
-  		class="{{wvClass.li}}"
+  		ng-repeat="id in vm.seriesIds"
+  		class="{{vm.cssClass.li}}"
   		ng-transclude
   		wv-size-tag
 	>

@@ -5,6 +5,31 @@
 }
 
 .wv-serieslist-item {
+  position: relative; // anchor element
+
+  padding: 0;
+  text-align: center;
+  
+  width: 150px;
+  height: 150px;
+  margin: auto;
+  margin-bottom: 0.5rem;
+
+  // Set text content to grey color
+  color: hsl(0, 0%, 70%);
+}
+
+.wv-serieslist-reportitem {
+  padding: 0;
+  text-align: center;
+  
+  width: 150px;
+  height: 150px;
+  margin: auto;
+  margin-bottom: 0.5rem;
+}
+
+.wv-serieslist-noreportitem {
   padding: 0;
   text-align: center;
   
@@ -25,3 +50,69 @@
   padding: 0.5em;
   border: 1px solid rgba(255, 255, 255, 0.13);
 }
+
+// Report icon
+.wv-serieslist-report {
+  // Pointer cursor (for `ng-click`)
+  cursor: pointer;
+
+  // Lighten up the icon on hover
+  &:hover {
+    color: white;
+  }
+}.wv-serieslist-reporticon {
+  // Fill the li element 
+  width: 100%;
+  height: 100%;
+
+  // Fill the li element with the fontawesome icon
+  font-size: 4em;
+  line-height: 125px; // middle center icon (a bit upper so we have space for the label)
+
+}
+.wv-serieslist-reportlabel {
+  // Position the label
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+// No-report icon
+.wv-serieslist-noreport {
+}
+.wv-serieslist-noreporticon {
+  // Fill the li element 
+  width: 100%;
+  height: 100%;
+
+  // Fill the li element with the fontawesome icon
+  font-size: 4em;
+  line-height: 125px; // middle center icon (a bit upper so we have space for the label)
+
+  // Diagonal line crossing report icon (to tell none are available)
+  position: relative;
+
+  &::after { // use after to not conflicts with font-awesome :before
+    position: absolute;
+
+    left: 0;
+    top: 50%;
+    right: 0;
+    
+    transform:rotate(-45deg);
+
+    border-top: 5px solid;
+    border-color: inherit;
+
+    content: "";
+  }
+}
+.wv-serieslist-noreportlabel {
+  // Position the label
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+

@@ -26,7 +26,17 @@ std::auto_ptr<Series> SeriesFactory::CreateSeries(const std::string& seriesId,
                                                   const Json::Value& instancesTags)
 {
   // Retrieve available image formats
-  std::set<ImageQuality> imageQualities = _availableQualityPolicy->retrieveByTags(metaInfoTags, otherTags);
+  std::set<ImageQuality> imageQualities;
+  try {
+    imageQualities = _availableQualityPolicy->retrieveByTags(metaInfoTags, otherTags);
+  }
+  // If the series' middle instance is not an `image` instance, do not propose
+  // available image qualities. This may happen when the instance is a PDF 
+  // embedded within a DICOM instance for example.
+  catch(const std::exception &e) {
+    // @todo Rethrow if not a PDF
+    // Keep imageQualities empty
+  }
   
   // Create the series
   return std::auto_ptr<Series>(new Series(seriesId, otherTags, instancesTags, slicesShort, imageQualities));

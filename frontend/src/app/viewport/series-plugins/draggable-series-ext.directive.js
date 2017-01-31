@@ -43,9 +43,13 @@
 
         var clone = $('<div class="wv-draggable-clone"></div>');
         $element.draggable({
+            // Make sure the dragged element is visible everywhere in the app
             helper: function() {
                 return clone;
             },
+            appendTo: 'body',
+            // Set dragged element data information to be retrieved by the 
+            // `wvDroppableSeriesExt`.
             start: function(evt, ui) {
                 var series = _wvSeriesIdViewModels[0].getSeries();
                 if (!series) {

@@ -1,4 +1,8 @@
 <div class="wv-webviewer-container">
+    <wv-pdf-viewer
+        ng-if="vm.currentPdfReportId"
+        wv-report-id="vm.currentPdfReportId"
+    ></wv-pdf-viewer>
 
     <div class="wv-notice-menu-on-landscape">
         Turn your device in landscape mode<br/>
@@ -14,6 +18,7 @@
         <!-- drag & drop Serieslist -->
         <wv-serieslist ng-if="vm.serieslistEnabled"
             wv-study-id="vm.studyId"
+            wv-selected-report-id="vm.currentPdfReportId"
         ></wv-serieslist>
     </div>
 
