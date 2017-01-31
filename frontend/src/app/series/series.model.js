@@ -60,7 +60,7 @@
                     .get(middleImageId)
                     .then(function(image) {
                         if (image.tags.RecommendedDisplayFrameRate) {
-                            _this.frameRate = image.tags.RecommendedDisplayFrameRate;
+                            _this.frameRate = +image.tags.RecommendedDisplayFrameRate; // make sure it's a number so input numbers referencing this var don't throw errors
                         }
                     });
             });
