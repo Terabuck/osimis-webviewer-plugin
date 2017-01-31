@@ -20,7 +20,7 @@
         link: function postLink(scope, element, attrs) {
         },
         controller: ['$timeout', '$scope', function($timeout, $scope) {
-          $scope.activeTool = $scope.activeTool || 'windowing';
+          $scope.activeTool = $scope.activeTool || 'pan';
           $scope.activeStates = {};
           $scope.splitpaneConfig = {x: 1, y: 1};
 
@@ -45,9 +45,9 @@
           $scope.activeButton = null;
           /* jshint -W116*/
           if ($scope.wvItems == undefined || !_.size($scope.wvItems)) $scope.wvItems = {
-            windowing: true,
+            windowing: false,
             zoom: false,
-            pan: false,
+            pan: true,
             invert: false,
             lengthmeasure: false,
             anglemeasure: false,
