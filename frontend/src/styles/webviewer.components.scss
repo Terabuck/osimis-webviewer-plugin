@@ -1,5 +1,5 @@
 /* wvp-ui stuffs */
-wvp-webviewer {
+wv-webviewer {
     display: block;
     height: 100%;
     overflow: hidden;
@@ -25,9 +25,12 @@ wvp-webviewer {
 wv-viewport { // make sure the element is sized when using with drag & drop
   display: inline-block;
 }
+
+/*
 wv-toolbar {
   display: block;
 }
+*/
 
 .wv-draggable-clone {
   width: 150px;
@@ -37,6 +40,7 @@ wv-toolbar {
   // No need to set z-index (already done by jquery ui lib).
 }
 
+/*
 wv-webviewer, .wv-webviewer-container {
   height: 100%;
   overflow: hidden;
@@ -68,3 +72,4 @@ wv-webviewer, .wv-webviewer-container {
     height: calc(100% - 40px);
   }
 }
+*/

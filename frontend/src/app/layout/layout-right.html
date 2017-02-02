@@ -1,0 +1,121 @@
+<aside ng-if="vm.asideEnabled" class="wvViewer__asideRight"
+        ng-class="{
+            'wvViewer__asideRight--opened': !vm.asideMinified &amp;&amp; !vm.asideHidden,
+            'wvViewer__asideRight--minimised': vm.asideMinified &amp;&amp; !vm.asideHidden,
+            'wvViewer__asideRight--closed': vm.asideHidden
+        }"
+>
+    <!-- Buttons -->
+    <div class="transition--long"
+        ng-class="{
+            'wvAsideRight__actions': !vm.asideMinified &amp;&amp; !vm.asideHidden,
+            'wvAsideRight__actions--outside': vm.asideHidden || vm.asideMinified,
+            'fluid-height': vm.asideHidden
+        }"
+    >
+
+        <!-- There is 3 possible states:
+            1. Opened fully
+            2. Minimized
+            3. Closed (and togglable)
+
+            We use ng-show instead of ng-if to avoid intermediary reflow.
+        -->
+
+        <!-- State 1: opened fully -->
+        <!--
+        <ul
+            ng-show="!vm.asideHidden &amp;&amp; !vm.asideMinified"
+            class="list-unstyled fs16"
+        >
+        -->
+            <!-- Button 1: minimize @deprecated -->
+            <!-- 
+            <button
+                osi-tooltip data-placement="left" title="Minimize"
+                ng-click="vm.asideHidden = false; vm.asideMinified = true;"
+                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
+            >
+                <span class="fa fa-angle-right"></span>
+            </button>
+            -->
+
+            <!-- Button 2: close -->
+            <!--
+            <button
+                osi-tooltip data-placement="left" title="Close"
+                ng-click="vm.asideHidden = true; vm.asideMinified = true;"
+                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
+            >
+                <span class="fa fa-angle-double-right"></span>
+            </button>
+            -->
+        <!--
+        </ul>
+        -->
+
+        <!-- State 2: minimized -->
+        <ul
+            ng-show="!vm.asideHidden &amp;&amp; vm.asideMinified"
+            class="list-unstyled fs16"
+        > 
+
+            <!-- Button 1: open fully -->
+            <!-- 
+            <button
+                osi-tooltip data-placement="left" title="Open fully"
+                ng-click="vm.asideHidden = false; vm.asideMinified = false;"
+                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center wvAsideRight__fixOpenFullyTooltip"
+            >
+                <span class="fa fa-angle-left"></span>
+            </button>
+            -->
+            <!-- Button 2: close -->
+            <button
+                osi-tooltip data-placement="left" title="Close"
+                ng-click="vm.asideHidden = true; vm.asideMinified = true;"
+                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
+            >
+                <span class="fa fa-angle-right"></span>
+            </button>
+        </ul>
+
+        <!-- State 3: closed -->
+        <ul
+            ng-show="vm.asideHidden &amp;&amp; vm.asideMinified"
+            class="list-unstyled fs16"
+        >
+            <!-- Button 1: open fully -->
+            <!--
+            <button
+                osi-tooltip data-placement="left" title="Open fully"
+                ng-click="vm.asideHidden = false; vm.asideMinified = false;"
+                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center wvAsideRight__fixOpenFullyTooltip"
+            >
+                <span class="fa fa-angle-double-left"></span>
+            </button>
+            -->
+            
+            <!-- Button 2: stick/minimize @deprecated -->
+            <button
+                osi-tooltip data-placement="left" title="Stick"
+                ng-click="vm.asideHidden = false; vm.asideMinified = true;"
+                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
+            >
+                <span class="fa fa-angle-left"></span>
+            </button>
+        </ul>
+
+    </div>
+
+    <!-- Content -->
+    <div
+        class="wvAsideRight__content" ng-class="{
+            'scrollable': vm.asideHidden || vm.asideMinified
+        }" 
+    >
+        <!-- main content -->
+        <ng-transclude></ng-transclude>
+    </div>
+
+</aside>

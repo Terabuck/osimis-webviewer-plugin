@@ -22,7 +22,7 @@
      * The AngularJS Web Viewer's module/package.
      */
     angular
-    .module('webviewer', ['ngResource', 'ngSanitize', 'mgcrea.ngStrap', 'ngRangeFilter', 'debounce'])
+    .module('webviewer', ['webviewer.layout', 'ngResource', 'ngSanitize', 'mgcrea.ngStrap', 'ngRangeFilter', 'debounce'])
     .config(function($locationProvider, $compileProvider) {
         // Warning: Web Viewer is uncompatible with <base> HTML element (due to SVG/XLink issue)! Don't use it!
         $locationProvider.html5Mode({

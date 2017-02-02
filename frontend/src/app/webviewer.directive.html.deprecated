@@ -1,0 +1,79 @@
+<div class="wv-webviewer-container">
+    <wv-pdf-viewer
+        ng-if="vm.currentPdfReportId"
+        wv-report-id="vm.currentPdfReportId"
+    ></wv-pdf-viewer>
+
+    <div class="wv-notice-menu-on-landscape">
+        Turn your device in landscape mode<br/>
+        to toggle the list of series.
+    </div>
+    
+    <div class="wv-webviewer-menu" ng-if="vm.studylistEnabled || vm.serieslistEnabled">
+        <!-- Studylist -->
+        <wv-studylist ng-if="vm.studylistEnabled"
+            wv-selected-study-id="vm.studyId"
+        ></wv-studylist>
+
+        <!-- drag & drop Serieslist -->
+        <wv-serieslist ng-if="vm.serieslistEnabled"
+            wv-study-id="vm.studyId"
+            wv-selected-report-id="vm.currentPdfReportId"
+        ></wv-serieslist>
+    </div>
+
+    <div class="wv-webviewer-main">
+        <!-- Toolbar -->
+        <wv-toolbar ng-if="vm.toolbarEnabled"
+            wv-items="vm.tools"
+            wv-active-tool="vm.activeTool"
+        ></wv-toolbar>
+
+        <!-- Splitpane & Viewports -->
+        <div class="wv-webviewer-content">
+            <wv-splitpane wv-layout="vm.tools.layout">
+                <wv-pane-policy
+                    wv-size-tag
+                    wv-pane-index="$index" wv-pane-position="$position"
+                    wv-on-pane-added="vm.configureViewport($index)" wv-on-pane-removed="vm.cleanupViewport($index)"
+                >
+                    <wv-viewport 
+                        vp:series-id="vm.viewports[$index].seriesId" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}" wv-lossless="true"
+                        wv-series="$series" wv-image="$image"
+                        wv-droppable-series-ext="!vm.readonly && vm.serieslistEnabled"
+                        wv-scroll-on-wheel-series-ext="!vm.readonly"
+                        wv-viewport="vm.viewports[$index].csViewport"
+                        wv-image-index="vm.viewports[$index].imageIndex"
+
+                        wv-default-viewport-tool="vm.tools.windowing"
+                        wv-angle-measure-viewport-tool="vm.tools.anglemeasure"
+                        wv-length-measure-viewport-tool="vm.tools.lengthmeasure"
+                        wv-elliptical-roi-viewport-tool="vm.tools.ellipticalroi"
+                        wv-zoom-viewport-tool="vm.tools.zoom"
+                        wv-pan-viewport-tool="vm.tools.pan"
+                        wv-pixel-probe-viewport-tool="vm.tools.pixelprobe"
+                        wv-rectangle-roi-viewport-tool="vm.tools.rectangleroi"
+
+                        wv-invert-contrast-viewport-tool="vm.tools.invert"
+
+                        wv-rotateleft-viewport-tool="vm.tools.rotateleft"
+                        wv-rotateright-viewport-tool="vm.tools.rotateright"
+                        wv-vflip-viewport-tool="vm.tools.vflip"
+                        wv-hflip-viewport-tool="vm.tools.hflip"
+                    >
+                        <wv-overlay ng-show="vm.tools.overlay" wv-tags="$image.tags" wv-viewport="vm.viewports[$index].csViewport"></wv-overlay>
+
+                        <!-- Always show the timeline — even if there is only one image — until we (@todo) develop
+                             a specific component to display the image quality -->
+                        <div class="wv-overlay-timeline-wrapper">
+                            <wv-timeline wv-series="$series" wv-readonly="vm.readonly"></wv-timeline>
+                        </div>
+                        
+                        <wv-droppable-series-overlay-item></wv-droppable-series-overlay-item>
+                    </wv-viewport>
+                </wv-pane-policy>
+            </wv-splitpane>
+        </div>
+    </div>
+
+</div>

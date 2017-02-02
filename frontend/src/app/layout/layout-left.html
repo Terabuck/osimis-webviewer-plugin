@@ -1,0 +1,114 @@
+<aside class="wvViewer__asideLeft"
+        ng-class="{
+            'wvViewer__asideLeft--opened': !vm.asideMinified &amp;&amp; !vm.asideHidden,
+            'wvViewer__asideLeft--minimised': vm.asideMinified &amp;&amp; !vm.asideHidden,
+            'wvViewer__asideLeft--closed': vm.asideHidden
+        }"
+>
+    <!-- Buttons -->
+    <div class="transition--long"
+        ng-class="{
+            'wvAsideLeft__actions': !vm.asideMinified &amp;&amp; !vm.asideHidden,
+            'wvAsideLeft__actions--outside': vm.asideHidden || vm.asideMinified,
+            'fluid-height': vm.asideHidden
+        }"
+    >
+        <!-- There is 3 possible states:
+            1. Opened fully
+            2. Minimized
+            3. Closed (and togglable)
+
+            We use ng-show instead of ng-if to avoid intermediary reflow.
+        -->
+
+        <!-- State 1: opened fully -->
+        <ul
+            ng-show="!vm.asideHidden &amp;&amp; !vm.asideMinified"
+            class="list-unstyled fs16"
+        >
+
+            <!-- Button 1: minimize -->
+            <button
+                osi-tooltip data-placement="right" title="Minimize"
+                ng-click="vm.asideHidden = false; vm.asideMinified = true;"
+                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
+            >
+                <span class="fa fa-angle-left"></span>
+            </button>
+
+            <!-- Button 2: close -->
+            <button
+                osi-tooltip data-placement="right" title="Close"
+                ng-click="vm.asideHidden = true; vm.asideMinified = true;"
+                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
+            >
+                <span class="fa fa-angle-double-left"></span>
+            </button>
+
+        </ul>
+
+        <!-- State 2: minimized -->
+        <ul
+            ng-show="!vm.asideHidden &amp;&amp; vm.asideMinified"
+            class="list-unstyled fs16"
+        >
+
+            <!-- Button 1: open fully -->
+            <button
+                osi-tooltip data-placement="right" title="Open fully"
+                ng-click="vm.asideHidden = false; vm.asideMinified = false;"
+                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
+            >
+                <span class="fa fa-angle-right"></span>
+            </button>
+
+            <!-- Button 2: close -->
+            <button
+                osi-tooltip data-placement="right" title="Close"
+                ng-click="vm.asideHidden = true; vm.asideMinified = true;"
+                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
+            >
+                <span class="fa fa-angle-left"></span>
+            </button>
+
+        </ul>
+        
+        <!-- State 3: closed -->
+        <ul
+            ng-show="vm.asideHidden &amp;&amp; vm.asideMinified"
+            class="list-unstyled fs16"
+        >
+            <!-- Button 1: open fully -->
+            <button
+                osi-tooltip data-placement="right" title="Open fully"
+                ng-click="vm.asideHidden = false; vm.asideMinified = false;"
+                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
+            >
+                <span class="fa fa-angle-double-right"></span>
+            </button>
+            
+            <!-- Button 2: stick/minimize -->
+            <button
+                osi-tooltip data-placement="right" title="Stick"
+                ng-click="vm.asideHidden = false; vm.asideMinified = true;"
+                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
+            >
+                <span class="fa fa-angle-right"></span>
+            </button>
+
+        </ul>
+
+    </div>
+
+    <!-- Content -->
+    <div
+        class="wvAsideLeft__content" ng-class="{
+            'scrollable': vm.asideHidden || vm.asideMinified,
+            'pl15': !vm.asideHidden &amp;&amp; ! vm.asideMinified
+        }"
+    >
+        <!-- main content -->
+        <ng-transclude></ng-transclude>
+    </div>
+
+</aside>
