@@ -1,3 +1,17 @@
+/* wvp-ui stuffs */
+wvp-webviewer {
+    display: block;
+    height: 100%;
+    overflow: hidden;
+}
+
+@import "variable";
+@import "helpers";
+@import "layout";
+@import "serieList";
+@import "modal";
+
+/* wvb-ui stuffs */
 @import "wv-overlay.scss";
 @import "wv-pdf-viewer.scss";
 @import "wv-serieslist.scss";

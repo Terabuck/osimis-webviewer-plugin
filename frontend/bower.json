@@ -35,6 +35,7 @@
     "bootstrap": "^3.3.6",
     "lodash": "^4.5.1",
     "ng-range-filter": "~0.1.0",
+    "open-sans": "./local_dependencies/open-sans/",
     "font-awesome": "fontawesome#~4.7.0",
     "cornerstone": "^0.9.0",
     "cornerstoneTools": "^0.7.7",
@@ -75,13 +76,13 @@
       ],
       "dist": "dist/js/bootstrap.js"
     },
-    "font-awesome": {
-      "main": []
-    },
     "open-sans": {
       "main": [
         "open-sans.css"
       ]
+    },
+    "font-awesome": {
+      "main": []
     },
     "ng-range-filter": {
       "main": "src/ngRangeFilter.js"

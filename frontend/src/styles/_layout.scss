@@ -1,0 +1,391 @@
+$toolboxHeight: 42px;
+
+$asideWidth: 300px;
+$asideMinifyWidth: 64px;
+
+$asideRightMinifyWidth: 85px; // eq. 7.5rem * 12px - ( $asideRightPadding / 2 )
+$asideRightPadding: 10px;
+
+/* global */
+.popover {
+    // Set back black as default popover text color
+    color: black;
+}
+
+.wvpViewer__editor--full{
+    position:absolute;
+    top:0;
+    right:0;
+    z-index:10;
+    opacity:0;
+    transform: translateX(100%);
+    width:100%;
+    height:100%;
+    background-color:white;
+    color:$text-color;
+    &.opened{
+        opacity:1;
+        transform: translateX(0);
+    }
+}
+.wvpViewer__content{
+    position: absolute;
+
+    // Set the main content below the toolbox
+    top: $toolboxHeight;
+    bottom: 0;
+
+    // Make the main content fill the screen by default
+    // Depending on the browser, the left and right attributes are more
+    // optimized than padding's ones. The reason is that they based upon
+    // absolute positioning. The require no contextual positioning calculation
+    // and are less performance intensive, especially concidering transition
+    // animation.
+    left: 0;
+    right: 0;
+    
+    transition: 0.6s left ease, 0.6s right ease;
+}
+.wvpViewer__content--bigLeftPadding{
+    // Leave place to main content when left aside is shown
+    left: $asideWidth;
+}
+.wvpViewer__content--smallLeftPadding{
+    // Leave place to main content when left aside is shown
+    left: $asideMinifyWidth;
+}
+.wvpViewer__content--bigRightPadding{
+    // Leave place to main content when right aside is shown
+    right: $asideWidth;
+}
+.wvpViewer__content--smallRightPadding{
+    // Leave place to main content when right aside is shown
+    right: $asideRightMinifyWidth;
+}
+
+.wvpViewer__button{
+    background-color:inherit;
+    text-decoration: none;
+    text-align:left;
+    cursor: pointer;
+    *{
+        pointer-events: none;
+    }
+    &:hover, &:active, &:focus{
+        outline:0;
+    }
+
+    // transition: 0.3s opacity ease, 0.3s border ease, 0.3s color ease;
+    transition: 0.3s all ease;
+
+    padding: 0 10px;
+    line-height:40px;
+    vertical-align: middle;
+    color:white;
+    opacity: 0.75;
+    border:none;
+    border-bottom: 2px solid rgba(255,255,255,0.1);
+    &:hover, &:focus{
+        border-color: rgba(255,255,255,1);
+        opacity:1;
+    }
+    &.active{
+        opacity: 1;
+        border-color: $primary;
+    }
+}
+.wvpViewer__topBar{
+    width:100%;
+    // margin-top: 0.5rem;
+}
+.wvpViewer__buttonGroup{
+    display:inline-block;
+}
+.wvpViewer__buttonGroup--asideWidth{
+    width: $asideWidth;
+    padding-right: 1rem;
+}
+.wvpViewer__buttonGroup--contentWidth{
+    width: calc(100% - #{$asideWidth});
+    padding-left: 1rem;
+    max-height: 4.2rem; // Make sure mobile keeps the menubar below a certain size
+}
+.wvpViewer__iframe{
+    position:absolute;
+    left:0;
+    top:0;
+}
+
+/* bottom bar */
+.wvpViewer__bottomBar,
+%wvpViewer__bottomBar{
+    position:absolute;
+    left:0;
+    bottom:0;
+    width:100%;
+    background-color:#111111;
+}
+
+.wvpViewer__bottomBar--expanded{
+    @extend .wvpViewer__bottomBar;
+    height: 80px; //total height of the last serieList cell (64 + 10(margin bottom previous item) + item padding bottom +1 border-width (top item)
+    //border-top: 1px solid rgba(255,255,255,0.1);
+    color:white;
+
+    .wvpViewer__timeline{
+        width: calc(100% - 80px);
+    }
+    .wvpTimeline__hotspots{
+        bottom: -40px;
+    }
+}
+
+.wvpViewer__bottomBar--minimized{
+    @extend .wvpViewer__bottomBar;
+    color: white;
+
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-left: 2.5rem;
+
+    .wvpTimeline__hotspot{
+        top: -40px;
+        opacity:0;
+        visibility:hidden;
+        z-index:-1;
+        transition: all 0.3s ease 0.6s; //adding a delay when mouse leave
+        transition-property: opacity, visibility, z-index;
+    }
+    &:hover .wvpTimeline__hotspot{
+        opacity:1;
+        visibility: visible;
+        z-index:5;
+        transition-delay: 0s;
+    }
+}
+
+.wvpViewer__timeline{
+    height:24px;
+    //background-color:rgba(1,1,1,0.2);
+    line-height: 24px;
+    vertical-align: middle;
+    width:100%;
+}
+
+.wvpViewer__trademark{
+    display:inline-block;
+    float:right;
+    width:80px;
+    height:80px;
+    float:right;
+    line-height: 80px;
+    vertical-align: middle;
+    text-align: center;
+}
+.wvpTimeline__action--text{
+
+}
+.wvpTimeline__input{
+    border-radius: 3px;
+    &:focus{
+        outline:none;
+    }
+    margin-top:2px;
+    border: 1px solid $border-color;
+}
+
+.wvpTimeline__actions{
+    display:inline-block;
+    border-right: 1px solid $border-color;
+}
+.wvpTimeline__wrapper{
+}
+
+/* aside Left */
+.wvpViewer__asideLeft,
+%wvpViewer__asideLeft{
+    display:block;
+    position:absolute;
+    z-index:2;
+    background-color:black;
+    transition: 0.6s width ease, 0.6s transform ease;
+
+    // Position the left side below the toolbox
+    top: $toolboxHeight;
+    bottom: 0;
+
+    // Position the left side on the left
+    left: 0;
+
+    .wvp-hide{
+        transition: 0.6s opacity ease;
+        opacity:0;
+        visibility:hidden;
+        position:absolute;
+    }
+    .wvp-show{
+        transition: 0.6s opacity ease;
+        opacity:1;
+    }
+}
+
+.wvpViewer__asideLeft--opened {
+    width: $asideWidth;
+}
+.wvpViewer__asideLeft--minimised {
+    width: $asideWidth;
+    transform: translateX(- $asideWidth + $asideMinifyWidth); // Keep minimized only
+}
+.wvpViewer__asideLeft--closed {
+    width: $asideWidth;
+    transform: translateX(- $asideWidth); // Move all out of the screen
+
+    &:hover{
+        transform: translateX(- $asideWidth + $asideMinifyWidth); // Keep minimized only
+    }
+}
+
+.wvpAsideLeft__content {
+    height: 100%;
+    float: right;
+
+    border-right: 1px solid #AAA;
+
+    .wvpViewer__asideLeft--opened > & {
+        width: $asideWidth;
+    }
+    .wvpViewer__asideLeft--minimised > & {
+        width: $asideMinifyWidth;
+    }
+    .wvpViewer__asideLeft--closed > & {
+        width: $asideMinifyWidth;
+    }
+}
+
+.wvpAsideLeft__information,
+.wvpAsideLeft__reports {
+    overflow-x: visible;
+
+    // Hide clipping due to reframing
+    .wvpViewer__asideLeft--minimised & {
+        display: none;
+    }
+    .wvpViewer__asideLeft--closed & {
+        display: none;
+    }
+}
+.wvpAsideLeft__actions,
+%wvpAsideLeft__actions{
+    display:block;
+    position:absolute;
+    right:1px; // border
+    top:1rem;
+    width:25px;
+}
+.wvpAsideLeft__actions--outside{
+    @extend.wvpAsideLeft__actions;
+    right:-25px; // width + border
+}
+.wvpAsideLeft__action{
+    background-color:$primary;
+    opacity: 0.5;
+    color:white;
+    &:hover, &:focus{
+        opacity: 1;
+    }
+}
+
+/* aside right */
+.wvpViewer__asideRight,
+%wvpViewer__asideRight{
+    display:block;
+    position:absolute;
+
+    // Position the right side below the toolbox
+    top: $toolboxHeight;
+    bottom: 0;
+
+    // Position the right side on the right
+    right: 0;
+
+    z-index:2;
+    height: calc(100% - );
+    
+    background-color:black;
+    transition: 0.6s width ease, 0.6s transform ease;
+
+    .wvp-hide{
+        transition: 0.6s opacity ease;
+        opacity:0;
+        visibility:hidden;
+        position:absolute;
+    }
+    .wvp-show{
+        transition: 0.6s opacity ease;
+        opacity:1;
+    }
+}
+
+.wvpViewer__asideRight--opened{
+    width: $asideWidth;
+}
+.wvpViewer__asideRight--minimised{
+    width: $asideWidth;
+    text-align: left;
+    transform: translateX(+ $asideWidth - $asideRightMinifyWidth); // Keep minimized only
+}
+.wvpViewer__asideRight--closed{
+    width: $asideWidth;
+    text-align: left;
+    transform: translateX(+ $asideWidth); // Move all out of the screen
+
+    &:hover{
+        transform: translateX(+ $asideWidth - $asideRightMinifyWidth); // Keep minimized only
+    }
+}
+
+.wvpAsideRight__content {
+    height: 100%;
+    float: left;
+
+    border-left: 1px solid #AAA;
+
+    padding: 0 $asideRightPadding/2;
+
+    .wvpViewer__asideRight--opened > & {
+        width: $asideWidth;
+    }
+    .wvpViewer__asideRight--minimised > & {
+        //width: $asideRightMinifyWidth; // we don't use minimzed right aside
+        width: $asideWidth;
+    }
+    .wvpViewer__asideRight--closed > & {
+        //width: $asideRightMinifyWidth; // we don't use minimzed right aside
+        width: $asideWidth;
+    }
+}
+
+.wvpAsideRight__actions,
+%wvpAsideRight__actions{
+    display:block;
+    position:absolute;
+    left:1px; // border
+    top:1rem;
+    width:25px;
+}
+.wvpAsideRight__actions--outside{
+    @extend.wvpAsideRight__actions;
+    left:-25px; // width + border
+}
+.wvpAsideRight__action{
+    background-color:$primary;
+    opacity: 0.5;
+    color:white;
+    &:hover, &:focus{
+        opacity: 1;
+    }
+}
+.wvpAsideRight__fixOpenFullyTooltip + .tooltip { // Fix the "open fully" bad tooltip placement of the asideRight
+    left: -6.633em !important;
+    top: 1px !important;
+}
