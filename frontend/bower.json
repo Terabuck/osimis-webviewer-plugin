@@ -52,8 +52,7 @@
     "ua-parser-js": "^0.7.10",
     "bluebird": "^3.4.6",
     "asap": "kriskowal/asap#^2.0.3",
-    "pdf.js-viewer": "^0.3.3",
-    "jquery-ui": "1.12.1"
+    "pdf.js-viewer": "^0.3.3"
   },
   "resolutions": {
     "angular": "^1.5.8",
@@ -82,32 +81,12 @@
       ]
     },
     "font-awesome": {
-      "main": []
+      "main": [
+        "scss/font-awesome.scss"
+      ]
     },
     "ng-range-filter": {
       "main": "src/ngRangeFilter.js"
-    },
-    "jquery-ui": {
-      "main": [
-        "ui/version.js",
-        "ui/widget.js",
-        "ui/plugin.js",
-        "ui/data.js",
-        "ui/disable-selection.js",
-        "ui/focusable.js",
-        "ui/form.js",
-        "ui/ie.js",
-        "ui/keycode.js",
-        "ui/tabbable.js",
-        "ui/unique-id.js",
-        "ui/safe-active-element.js",
-        "ui/scroll-parent.js",
-        "ui/safe-blur.js",
-        "ui/widgets/tooltip.js",
-        "ui/widgets/mouse.js",
-        "ui/widgets/draggable.js",
-        "ui/widgets/droppable.js"
-      ]
     },
     "png.js": {
       "main": [

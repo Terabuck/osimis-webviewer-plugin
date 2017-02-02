@@ -2,6 +2,7 @@ $fa-font-path: fonts; // not working in dev mode / may require to copy fonts to 
 $icon-font-path: fonts; 
 
 // bower:scss
+@import "../../bower_components/font-awesome/scss/font-awesome.scss";
 // endbower
 
 @import "webviewer.main.scss";
