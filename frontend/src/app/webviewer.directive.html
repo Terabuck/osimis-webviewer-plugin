@@ -1,5 +1,16 @@
 <wv-layout>
     <!--
+    Layout: fullscreen
+
+    @description
+    PDF viewer takes the whole screen when a PDF report is opened
+    -->
+    <wv-pdf-viewer
+        ng-if="vm.currentPdfReportId"
+        wv-report-id="vm.currentPdfReportId"
+    ></wv-pdf-viewer>
+
+    <!--
     Layout: top zones (1, 2, 3 and 4)
 
     @note
@@ -35,7 +46,7 @@
         @description
         Splitpane Grid configuration buttons.
         -->
-        <wv-layout-top2 ng-hide="vm.isEditorShown">
+        <wv-layout-top2>
             <button
                 ng-disabled="vm.readonly"
                 style="cursor: pointer; position: relative; top: 1px; /*align with other buttons*/"
@@ -125,23 +136,18 @@
     @description
     Zone containing the study's information and the list of series.
     -->
-    <wv-layout-left wv-aside-minified="$minified" wv-aside-hidden="$hidden" ng-if="vm.serieslistEnabled">
-        <section ng-show="!$minified &amp;&amp; !$hidden" class="wvAsideLeft__information fontColor__white">
+    <wv-layout-left wv-aside-hidden="$hidden">
+        <section class="wvAsideLeft__information fontColor__white">
             <h3 class="h2 pt10">Study information</h3>
-            <div class="wvAsideLeft__informationList clearfix">
-                <wv-study-information wv-study-id="vm.studyId"></wv-study-information>
-            </div>
+            <wv-study-information wv-study-id="vm.studyId" class="clearfix"></wv-study-information>
         </section>
         <section class="wvAsideLeft__serie fontColor__white wv-h pt10">
-            <!-- @todo osi-fix-height=".wvViewer__asideLeft .wvAsideLeft__information, .wvViewer__asideLeft" -->
-            <h3 ng-if="!vm.serieslistMinified" class="h2 mtn">Series list</h3>
-            <div class="wvAsideLeft__serieList scrollable">
-                <!-- @todo osi-fix-height=".wvViewer__asideLeft .wvAsideLeft__serie>h3" -->
-                <wv-advanced-serielist wv-study-id="vm.studyId" wv-minified="vm.serieslistMinified"></wv-advanced-serielist>
-            </div>
+            <h3 class="h2 mtn">Series list</h3>
+            <wv-serieslist
+                wv-study-id="vm.studyId"
+                wv-selected-report-id="vm.currentPdfReportId"
+            ></wv-serieslist>
         </section>
-        <!-- <study-information ng-if="!vm.serieslistMinified"></study-information> -->
-        <!-- <serie-list display-mode="full|minified"></serie-list> -->
     </wv-layout-left>
 
     <!--

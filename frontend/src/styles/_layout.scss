@@ -50,10 +50,6 @@ $asideRightPadding: 10px;
     // Leave place to main content when left aside is shown
     left: $asideWidth;
 }
-.wvViewer__content--smallLeftPadding{
-    // Leave place to main content when left aside is shown
-    left: $asideMinifyWidth;
-}
 .wvViewer__content--bigRightPadding{
     // Leave place to main content when right aside is shown
     right: $asideWidth;
@@ -232,17 +228,13 @@ $asideRightPadding: 10px;
 .wvViewer__asideLeft--opened {
     width: $asideWidth;
 }
-.wvViewer__asideLeft--minimised {
-    width: $asideWidth;
-    transform: translateX(- $asideWidth + $asideMinifyWidth); // Keep minimized only
-}
 .wvViewer__asideLeft--closed {
     width: $asideWidth;
     transform: translateX(- $asideWidth); // Move all out of the screen
 
-    &:hover{
-        transform: translateX(- $asideWidth + $asideMinifyWidth); // Keep minimized only
-    }
+//     &:hover{
+//         transform: translateX(0); // Show full
+//     }
 }
 
 .wvAsideLeft__content {
@@ -251,28 +243,12 @@ $asideRightPadding: 10px;
 
     border-right: 1px solid #AAA;
 
-    .wvViewer__asideLeft--opened > & {
-        width: $asideWidth;
-    }
-    .wvViewer__asideLeft--minimised > & {
-        width: $asideMinifyWidth;
-    }
-    .wvViewer__asideLeft--closed > & {
-        width: $asideMinifyWidth;
-    }
+    width: $asideWidth;
 }
 
 .wvAsideLeft__information,
 .wvAsideLeft__reports {
     overflow-x: visible;
-
-    // Hide clipping due to reframing
-    .wvViewer__asideLeft--minimised & {
-        display: none;
-    }
-    .wvViewer__asideLeft--closed & {
-        display: none;
-    }
 }
 .wvAsideLeft__actions,
 %wvAsideLeft__actions{

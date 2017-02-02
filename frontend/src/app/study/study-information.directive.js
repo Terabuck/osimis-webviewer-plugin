@@ -21,7 +21,6 @@
         return directive;
 
         function link(scope, element, attrs) {
-            // @todo rename to study informations
         }
     }
 

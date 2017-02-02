@@ -33,7 +33,6 @@
         // wvLayoutRight. 
         // Will be called by wvLayoutLeft/Right as soon as they are
         // initialised (prelink). It wont trigger reflow.
-        this.onAsideLeftMinified = new osimis.Listener();
         this.onAsideLeftHidden = new osimis.Listener();
         this.onAsideRightMinified = new osimis.Listener();
         this.onAsideRightHidden = new osimis.Listener();
@@ -42,14 +41,10 @@
         // Store the values in case the `wvLayoutMain` directive is loaded
         // after `wvLayoutLeft/Right` directives (and thus not have its 
         // listeners set yet).
-        this.asideLeftMinified = undefined;
         this.asideLeftHidden = undefined;
         this.asideRightMinified = undefined;
         this.asideRightHidden = undefined;
         this.asideRightEnabled = undefined;
-        this.onAsideLeftMinified(function(value) {
-            _this.asideLeftMinified = value;
-        })
         this.onAsideLeftHidden(function(value) {
             _this.asideLeftHidden = value;
         })

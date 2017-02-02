@@ -16,7 +16,6 @@
             require: '^^wvLayout',
             transclude: true,
             scope: {
-                asideMinified: '=?wvAsideMinified',
                 asideHidden: '=?wvAsideHidden'
             },
             templateUrl:'app/layout/layout-left.html'
@@ -27,26 +26,18 @@
             var vm = scope.vm;
 
             // Set initial values
-            vm.asideMinified = !!vm.asideMinified;
             vm.asideHidden = !!vm.asideHidden;
 
             // Propagate to `main` layout section
-            layoutCtrl.onAsideLeftMinified.trigger(vm.asideMinified);
             layoutCtrl.onAsideLeftHidden.trigger(vm.asideHidden);
             
             // Use $watchGroup to avoid dual triggering on change.
             scope.$watchGroup([
-                'vm.asideMinified',
                 'vm.asideHidden'
             ], function (newValues, oldValues) {
                 // Ignore the first setting (at application startup)
                 if (newValues[0] === oldValues[0] && newValues[1] === oldValues[1]) {
                     return;
-                }
-
-                // Trigger `minified` changed event (so the main section can changes its size via css)
-                if (newValues[0] !== oldValues[0] && layoutCtrl.onAsideLeftMinified) {
-                    layoutCtrl.onAsideLeftMinified.trigger(newValues[0]);
                 }
 
                 // Trigger `hidden` changed event (so the main section can changes its size via css)

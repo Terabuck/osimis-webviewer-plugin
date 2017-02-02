@@ -27,16 +27,12 @@
             var vm = scope.vm
 
             // Set startup values
-            vm.asideLeftMinified = layoutCtrl.asideLeftMinified;
             vm.asideLeftHidden = layoutCtrl.asideLeftHidden;
             vm.asideRightMinified = layoutCtrl.asideRightMinified;
             vm.asideRightHidden = layoutCtrl.asideRightHidden;
             vm.asideRightEnabled = layoutCtrl.asideRightEnabled;
 
             // Listen to value changes
-            layoutCtrl.onAsideLeftMinified(vm, function(value) {
-                vm.asideLeftMinified = value;
-            });
             layoutCtrl.onAsideLeftHidden(vm, function(value) {
                 vm.asideLeftHidden = value;
             });
@@ -52,7 +48,6 @@
 
             // Close listeners
             scope.$on('$destroy', function() {
-                layoutCtrl.onAsideLeftMinified.close(vm);
                 layoutCtrl.onAsideLeftHidden.close(vm);
                 layoutCtrl.onAsideRightMinified.close(vm);
                 layoutCtrl.onAsideRightHidden.close(vm);
