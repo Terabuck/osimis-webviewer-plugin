@@ -1,0 +1,29 @@
+<dl style="margin-top: -2rem;" class="listdefinition">
+    <!--
+    <dt class="listDefinition__term">Study owner</dt>
+    <dd class="listDefinition__data">John Doe</dd>
+    <dt class="listDefinition__term">Study code</dt>
+    <dd class="listDefinition__data">lightning 234</dd>
+    <dt class="listDefinition__term">Accession number</dt>
+    <dd class="listDefinition__data">182736283948</dd>
+    <dt class="listDefinition__term">Patient age</dt>
+    <dd class="listDefinition__data">34</dd>
+    <dt class="listDefinition__term">Patient gender</dt>
+    <dd class="listDefinition__data">Male</dd>
+    -->
+    <dt class="listDefinition__term" ng-if="vm.patientTags.PatientName">Patient Name</dt>
+    <dd class="listDefinition__data" ng-if="vm.patientTags.PatientName">{{vm.patientTags.PatientName}}</dd>
+    <dt class="listDefinition__term" ng-if="vm.patientTags.PatientBirthDate">Patient Birth Date</dt>
+    <dd class="listDefinition__data" ng-if="vm.patientTags.PatientBirthDate">{{vm.patientTags.PatientBirthDate}}</dd>
+    <dt class="listDefinition__term" ng-if="vm.studyTags.StudyDate">Study date</dt>
+    <dd class="listDefinition__data" ng-if="vm.studyTags.StudyDate">{{vm.studyTags.StudyDate}}<!--11/08/2010--></dd>
+    <!--
+    <dt class="listDefinition__term" ng-if="vm.studyTags.StudyTime">Study time</dt>
+    <dd class="listDefinition__data" ng-if="vm.studyTags.StudyTime">{{vm.studyTags.StudyTime}}</dd>
+    10h34
+    -->
+    <dt class="listDefinition__term" ng-if="vm.studyTags.InstitutionName">Hospital</dt>
+    <dd class="listDefinition__data" ng-if="vm.studyTags.InstitutionName">{{vm.studyTags.InstitutionName}}</dd>
+    <dt class="listDefinition__term" ng-if="vm.studyTags.RequestingPhysician">Physician</dt>
+    <dd class="listDefinition__data" ng-if="vm.studyTags.RequestingPhysician">{{vm.studyTags.RequestingPhysician}}</dd>
+</dl>
