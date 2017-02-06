@@ -1,3 +1,9 @@
+/**
+ * @ngdoc directive
+ * @name webviewer.toolbox.directive:wvToolbox
+ * 
+ * @restrict Element
+ */
 (function () {
     'use strict';
 
