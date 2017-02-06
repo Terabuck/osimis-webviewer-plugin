@@ -6,7 +6,7 @@
         .directive('wvLayoutRight', wvLayoutRight);
 
     /* @ngInject */
-    function wvLayoutRight($timeout) {
+    function wvLayoutRight() {
         var directive = {
             bindToController: true,
             controller: layoutRightCtrl,
@@ -63,30 +63,35 @@
                     layoutCtrl.onAsideRightEnabled.trigger(newValues[2]);
                 }
 
-                // trigger window resizes (so javascript canvas can be resized adequately)
-                _triggerResize();
+                // Trigger window resizes (so javascript canvas can be resized
+                // adequately). We do this after the digest cycle but prior to
+                // the reflow, using asap.
+                asap(function() {
+                    $(window).trigger('resize');
+                });
+                // _triggerResize();
             });
 
-            function _triggerResize() {
-                var start = undefined;
-                var animationDuration = 700; // ms
+            // function _triggerResize() {
+            //     var start = undefined;
+            //     var animationDuration = 700; // ms
 
-                requestAnimationFrame(function _triggerResizeAccumulator(timestamp) { // timestamp unit is millisecond (double) 
-                    if (!start) {
-                        start = timestamp;
-                    }
-                    var progress = timestamp - start;
+            //     requestAnimationFrame(function _triggerResizeAccumulator(timestamp) { // timestamp unit is millisecond (double) 
+            //         if (!start) {
+            //             start = timestamp;
+            //         }
+            //         var progress = timestamp - start;
 
-                    // Animate progressively
-                    if (progress < animationDuration) {
-                        // Resize viewports aso.
-                        $(window).trigger('resize');
+            //         // Animate progressively
+            //         if (progress < animationDuration) {
+            //             // Resize viewports aso.
+            //             $(window).trigger('resize');
 
-                        // Loop
-                        requestAnimationFrame(_triggerResizeAccumulator);
-                    }
-                });
-            }
+            //             // Loop
+            //             requestAnimationFrame(_triggerResizeAccumulator);
+            //         }
+            //     });
+            // }
         }
     }
 

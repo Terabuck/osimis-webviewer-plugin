@@ -15,7 +15,13 @@
             link: link,
             restrict: 'E',
             transclude: true,
-            scope: {},
+            scope: {
+                // In the current state, hidden ~= enabled for aside right 
+                // because there is no hidden state, but enabled hides the
+                // element + the controls button. @todo refactor 
+                // @warning readonly property!
+                asideRightClosed: '=?wvAsideRightClosed'
+            },
             templateUrl: 'app/layout/layout.html'
         };
         return directive;
@@ -47,17 +53,18 @@
         this.asideRightEnabled = undefined;
         this.onAsideLeftHidden(function(value) {
             _this.asideLeftHidden = value;
-        })
+        });
         this.onAsideRightMinified(function(value) {
             _this.asideRightMinified = value;
-        })
+        });
         this.onAsideRightHidden(function(value) {
             _this.asideRightHidden = value;
-        })
+            _this.asideRightClosed = _this.asideRightHidden || !_this.asideRightEnabled;
+        });
         this.onAsideRightEnabled(function(value) {
             _this.asideRightEnabled = value;
-        })
+            _this.asideRightClosed = _this.asideRightHidden || !_this.asideRightEnabled;
+        });
     }
 
 })();
-

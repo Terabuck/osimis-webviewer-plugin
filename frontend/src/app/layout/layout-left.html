@@ -1,11 +1,6 @@
-<aside class="wvViewer__asideLeft"
-        ng-class="{
-            'wvViewer__asideLeft--opened': !vm.asideHidden,
-            'wvViewer__asideLeft--closed': vm.asideHidden
-        }"
->
+<aside class="wvViewer__asideLeft">
     <!-- Buttons -->
-    <div class="transition--long"
+    <div
         ng-class="{
             'wvAsideLeft__actions': !vm.asideHidden,
             'wvAsideLeft__actions--outside': vm.asideHidden,
@@ -109,14 +104,8 @@
 
     </div>
 
-    <!-- Content -->
-    <div
-        class="wvAsideLeft__content" ng-class="{
-            'scrollable': vm.asideHidden,
-            'pl15': !vm.asideHidden
-        }"
-    >
-        <!-- main content -->
+    <!-- Main Content -->
+    <div class="wvAsideLeft__content pl15 scrollable">
         <ng-transclude></ng-transclude>
     </div>
 

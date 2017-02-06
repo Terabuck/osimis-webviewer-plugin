@@ -40,40 +40,45 @@
                     return;
                 }
 
-                // Trigger `hidden` changed event (so the main section can changes its size via css)
+                // Trigger `hidden` changed event (so the main section can
+                // changes its size via css).
                 layoutCtrl.onAsideLeftHidden.trigger(newValues[0]);
 
-                // trigger window resizes (so javascript canvas can be resized adequately)
-                _triggerResize();
+                // Trigger window resizes (so javascript canvas can be resized
+                // adequately). We do this after the digest cycle but prior to
+                // the reflow, using asap.
+                asap(function() {
+                    $(window).trigger('resize');
+                });
             });
 
-            function _triggerResize() {
-                var start = undefined;
-                var animationDuration = 700; // ms
+            // function _triggerResize() {
+            //     var start = undefined;
+            //     var animationDuration = 700; // ms
 
-                // Wait for the current digest cycle to end (so the animation 
-                // has effectively starts). Use setTimeout instead of $timeout
-                // to avoid triggering an useless digest cycle (since
-                // requestAnimationFrame is used as well).
-                setTimeout(function() {
-                    // Start the animation
-                    requestAnimationFrame(function _triggerResizeAccumulator(timestamp) { // timestamp unit is millisecond (double) 
-                        if (!start) {
-                            start = timestamp;
-                        }
-                        var progress = timestamp - start;
+            //     // Wait for the current digest cycle to end (so the animation 
+            //     // has effectively starts). Use setTimeout instead of $timeout
+            //     // to avoid triggering an useless digest cycle (since
+            //     // requestAnimationFrame is used as well).
+            //     setTimeout(function() {
+            //         // Start the animation
+            //         requestAnimationFrame(function _triggerResizeAccumulator(timestamp) { // timestamp unit is millisecond (double) 
+            //             if (!start) {
+            //                 start = timestamp;
+            //             }
+            //             var progress = timestamp - start;
 
-                        // Animate progressively
-                        if (progress < animationDuration) {
-                            // Resize viewports aso.
-                            $(window).trigger('resize');
+            //             // Animate progressively
+            //             if (progress < animationDuration) {
+            //                 // Resize viewports aso.
+            //                 $(window).trigger('resize');
 
-                            // Loop
-                            requestAnimationFrame(_triggerResizeAccumulator);
-                        }
-                    });
-                });
-            }
+            //                 // Loop
+            //                 requestAnimationFrame(_triggerResizeAccumulator);
+            //             }
+            //         });
+            //     });
+            // }
         }
     }
 

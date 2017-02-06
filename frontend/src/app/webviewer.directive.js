@@ -248,7 +248,7 @@
     }
 
     /* @ngInject */
-    function Controller($rootScope, $scope, $timeout) {
+    function Controller($rootScope, $scope) {
         var vm = this;
     }
 

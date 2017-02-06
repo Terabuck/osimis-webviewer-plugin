@@ -77,7 +77,7 @@
     }
 
     /* @ngInject */
-    function toolboxCtrl($timeout) {
+    function toolboxCtrl() {
         var vm = this;
     }
 

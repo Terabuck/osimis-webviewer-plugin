@@ -555,7 +555,6 @@
      * layout change.
      */
     Viewport.prototype.resizeCanvas = function(width, height) {
-        var jqEnabledElement = $(this._enabledElement);
         var enabledElement = this._enabledElement;
 
         // Cache canvas size for later
@@ -563,11 +562,7 @@
         this._canvasWidth = width;
         this._canvasHeight = height;
 
-        // Set the canvas size
-        jqEnabledElement.width(width);
-        jqEnabledElement.height(height);
-
-        // Set the canvas pixel quantity (? not sure it does that)
+        // Set the canvas size / pixel quantity (? not sure it does that)
         cornerstone.resize(enabledElement, false);
 
         // fit the image back in the viewport & draw it (only if an image is currently displayed)

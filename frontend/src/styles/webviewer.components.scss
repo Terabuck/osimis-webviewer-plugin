@@ -24,6 +24,24 @@ wv-webviewer {
 
 wv-viewport { // make sure the element is sized when using with drag & drop
   display: inline-block;
+  width: 100%;
+  height: 100%;
+
+  > div {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  // We don't set 100% width/height to the canvas element, as it would stretch
+  // the pixels. Instead, we center it for more fluid transition when pane's 
+  // width changes (at least the content is kept centered even if the js hasn't
+  // yet reacted to layout reflow).
+  > div > .wv-cornerstone-enabled-image {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+  }
 }
 
 /*

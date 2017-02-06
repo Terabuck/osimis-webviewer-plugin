@@ -77,8 +77,11 @@
             vm.rowHeight = 100 / newLayout.y + '%';
             vm.rowWidth = 100 / newLayout.x + '%';
 
-            $scope.$evalAsync(function() {
-                $(window).resize();
+            // Trigger window resizes (so javascript canvas can be resized
+            // adequately). We do this after the digest cycle but prior to
+            // the reflow, using asap.
+            asap(function() {
+                $(window).trigger('resize');
             });
         }
     }

@@ -12,4 +12,10 @@ wv-pane-policy {
     display: block;
     width: 100%;
     height: 100%;
+
+    > div[ng-transclude] {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
 }
