@@ -36,7 +36,7 @@
     "lodash": "^4.5.1",
     "ng-range-filter": "~0.1.0",
     "open-sans": "./local_dependencies/open-sans/",
-    "font-awesome": "fontawesome#~4.7.0",
+    "font-awesome": "fontawesome#^4.7.0",
     "cornerstone": "^0.9.0",
     "cornerstoneTools": "^0.7.7",
     "jpgjs": "notmasteryet/jpgjs",
@@ -82,7 +82,7 @@
     },
     "font-awesome": {
       "main": [
-        "scss/font-awesome.scss"
+        "css/font-awesome.css"
       ]
     },
     "ng-range-filter": {

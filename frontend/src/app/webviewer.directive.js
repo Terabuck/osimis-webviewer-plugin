@@ -93,8 +93,8 @@
             vm.serieslistEnabled = typeof vm.serieslistEnabled !== 'undefined' ? vm.serieslistEnabled : true;
             vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;
             vm.tools = typeof vm.tools !== 'undefined' ? vm.tools : {
-                windowing: true,
-                zoom: false,
+                windowing: false,
+                zoom: true,
                 pan: false,
                 invert: false,
                 lengthmeasure: false,

@@ -7,10 +7,6 @@
 }
 
 .wv-toolbar { // add a level of specificity to ensure there is no conflict with bootstrap related classes in lify
-	.wv-toolbar-icon-rotate-right {
-		transform: rotate(90deg);
-	}
-
 	.wv-toolbar-item {
 		background-color: black; 
 		background-image: none; 

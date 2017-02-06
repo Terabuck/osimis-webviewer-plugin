@@ -59,7 +59,7 @@ $asideRightPadding: 10px;
     right: $asideRightMinifyWidth;
 }
 
-.wvViewer__button{
+.wvViewer__button, .fa.wvViewer__button{ // make sure we have precedence over .fa class
     background-color:inherit;
     text-decoration: none;
     text-align:left;
@@ -71,8 +71,7 @@ $asideRightPadding: 10px;
         outline:0;
     }
 
-    // transition: 0.3s opacity ease, 0.3s border ease, 0.3s color ease;
-    transition: 0.3s all ease;
+    transition: 0.3s text-decoration ease, 0.3s background-color ease, 0.3s color ease, 0.3s border ease, 0.3s opacity ease;
 
     padding: 0 10px;
     line-height:40px;
@@ -86,6 +85,41 @@ $asideRightPadding: 10px;
         opacity:1;
     }
     &.active{
+        opacity: 1;
+        border-color: $primary;
+    }
+
+    // Make sure the 2px border is not hidden by viewports and other parts of
+    // the layout (.glyphicon class sets top to 1px)
+    top: 0px;
+
+    // Adapt font-awesome icon to glyphicon styles
+    &.fa {
+        top: 0px;
+        font-weight: 800;
+    }
+}
+.wvViewer__button.wvViewer__button--rotate, label.wvViewer__button.wvViewer__button--rotate.fa { // make sure we have more precedence than .fa class
+    // Rotate
+    transform: rotate(90deg);
+
+    // Prevent antialiasing issue on chrome when mouse is over the button
+    -webkit-backface-visibility: hidden;
+    outline: 1px solid transparent;
+
+    // Compensate rotation
+    border-bottom: none;
+    border-right: 2px solid hsla(0, 0%, 100%, 0.1);
+    width: 42px;
+    height: 32px;
+    line-height: 32px;
+    padding: 0 0 0 13px;
+    left: -5px;
+    &:hover, &:focus {
+        border-color: rgba(255,255,255,1);
+        opacity: 1;
+    }
+    &.active {
         opacity: 1;
         border-color: $primary;
     }

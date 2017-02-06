@@ -35,7 +35,7 @@
 
             vm.readonly = (typeof vm.readonly === 'undefined') ? false : vm.readonly;
 
-            vm.tool = vm.tool || 'windowing';
+            vm.tool = vm.tool || 'zoom';
             vm.state = {
                 invert: false
             };
