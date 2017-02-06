@@ -6,7 +6,7 @@
         .directive('wvLayoutLeft', wvLayoutLeft);
 
     /* @ngInject */
-    function wvLayoutLeft($timeout) {
+    function wvLayoutLeft() {
         var directive = {
             bindToController: true,
             controller: layoutLeftCtrl,
@@ -36,14 +36,12 @@
                 'vm.asideHidden'
             ], function (newValues, oldValues) {
                 // Ignore the first setting (at application startup)
-                if (newValues[0] === oldValues[0] && newValues[1] === oldValues[1]) {
+                if (newValues[0] === oldValues[0]) {
                     return;
                 }
 
                 // Trigger `hidden` changed event (so the main section can changes its size via css)
-                if (newValues[1] !== oldValues[1] && layoutCtrl.onAsideLeftHidden) {
-                    layoutCtrl.onAsideLeftHidden.trigger(newValues[1]);
-                }
+                layoutCtrl.onAsideLeftHidden.trigger(newValues[0]);
 
                 // trigger window resizes (so javascript canvas can be resized adequately)
                 _triggerResize();
@@ -54,8 +52,10 @@
                 var animationDuration = 700; // ms
 
                 // Wait for the current digest cycle to end (so the animation 
-                // has effectively starts).
-                $timeout(function() {
+                // has effectively starts). Use setTimeout instead of $timeout
+                // to avoid triggering an useless digest cycle (since
+                // requestAnimationFrame is used as well).
+                setTimeout(function() {
                     // Start the animation
                     requestAnimationFrame(function _triggerResizeAccumulator(timestamp) { // timestamp unit is millisecond (double) 
                         if (!start) {
