@@ -1,3 +1,0 @@
-<label class="btn btn-sm btn-default wv-toolbar-item" ng-if="wvItems[wvName] != undefined" ng-click="wvAction()">
-	<span ng-class="wvIcon"></span>
-</label>
