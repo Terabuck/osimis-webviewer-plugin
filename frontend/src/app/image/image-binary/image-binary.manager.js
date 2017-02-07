@@ -373,7 +373,7 @@
         // Init worker pool
         var workerPool = new window.osimis.WorkerPool({
             path: /* @inline-worker: */ '/app/image/image-parser.worker/main.js',
-            workerCount: 6,
+            workerCount: 5,
             createPromiseFn: $q,
             taskPriorityPolicy: new osimis.TaskPriorityPolicy(cache) // @todo break dependency w/ cache
         });
