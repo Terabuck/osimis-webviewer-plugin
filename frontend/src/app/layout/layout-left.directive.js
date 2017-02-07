@@ -43,13 +43,6 @@
                 // Trigger `hidden` changed event (so the main section can
                 // changes its size via css).
                 layoutCtrl.onAsideLeftHidden.trigger(newValues[0]);
-
-                // Trigger window resizes (so javascript canvas can be resized
-                // adequately). We do this after the digest cycle but prior to
-                // the reflow, using asap.
-                asap(function() {
-                    $(window).trigger('resize');
-                });
             });
 
             // function _triggerResize() {

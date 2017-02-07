@@ -62,14 +62,6 @@
                 if (newValues[2] !== oldValues[2] && layoutCtrl.onAsideRightEnabled) {
                     layoutCtrl.onAsideRightEnabled.trigger(newValues[2]);
                 }
-
-                // Trigger window resizes (so javascript canvas can be resized
-                // adequately). We do this after the digest cycle but prior to
-                // the reflow, using asap.
-                asap(function() {
-                    $(window).trigger('resize');
-                });
-                // _triggerResize();
             });
 
             // function _triggerResize() {

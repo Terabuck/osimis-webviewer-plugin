@@ -1,4 +1,8 @@
-<wv-layout wv-aside-right-closed="$asideRightClosed">
+<wv-layout
+    wv-aside-right-closed="$asideRightClosed"
+    wv-aside-left-closed="$asideLeftClosed"
+    
+>
     <!--
     Layout: fullscreen
 
@@ -134,7 +138,7 @@
     @description
     Zone containing the study's information and the list of series.
     -->
-    <wv-layout-left wv-aside-hidden="$asideLeftClosed" ng-class="{'aside-closed': $asideLeftClosed}">
+    <wv-layout-left ng-class="{'aside-closed': $asideLeftClosed}">
         <section class="wvAsideLeft__information fontColor__white">
             <h3 class="h2 pt10">Study information</h3>
             <wv-study-information wv-study-id="vm.studyId" class="clearfix"></wv-study-information>
