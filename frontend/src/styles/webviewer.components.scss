@@ -7,9 +7,10 @@ wv-webviewer {
 
 @import "variable";
 @import "helpers";
+@import "modal";
+@import "notice";
 @import "layout";
 @import "serieList";
-@import "modal";
 
 /* wvb-ui stuffs */
 @import "wv-overlay.scss";

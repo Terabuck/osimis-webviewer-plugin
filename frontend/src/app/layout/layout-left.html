@@ -1,41 +1,29 @@
-<aside class="wvViewer__asideLeft">
+<aside
+    class="wvLayout__left"
+    ng-show="vm.enabled"
+    ng-class="{
+        'wvLayout__left--toppadding': vm.isTopPaddingEnabled,
+        'wvLayout__left--bottompadding': vm.isBottomPaddingEnabled,
+        'wvLayout__left--closed': vm.closed
+    }"
+>
     <!-- Buttons -->
     <div
+        ng-if="vm.handlesEnabled"
         ng-class="{
-            'wvAsideLeft__actions': !vm.asideHidden,
-            'wvAsideLeft__actions--outside': vm.asideHidden,
-            'fluid-height': vm.asideHidden
+            'wvAsideLeft__actions': !vm.closed,
+            'wvAsideLeft__actions--outside': vm.closed
         }"
     >
-        <!-- There is 3 possible states:
-            1. Opened fully
-            2. Minimized
-            3. Closed (and togglable)
-
-            We use ng-show instead of ng-if to avoid intermediary reflow.
-        -->
-
-        <!-- State 1: opened fully -->
+        <!-- State 1: opened -->
         <ul
-            ng-show="!vm.asideHidden"
+            ng-show="!vm.closed"
             class="list-unstyled fs16"
         >
-
-            <!-- Button 1: minimize -->
-            <!--
-            <button
-                bs-tooltip data-placement="right" title="Minimize"
-                ng-click="vm.asideHidden = false; vm.asideMinified = true;"
-                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
-            >
-                <span class="fa fa-angle-left"></span>
-            </button>
-            -->
-
-            <!-- Button 2: close -->
+            <!-- Button: close -->
             <button
                 bs-tooltip data-placement="right" title="Close"
-                ng-click="vm.asideHidden = true;"
+                ng-click="vm.closed = true;"
                 class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
             >
                 <span class="fa fa-angle-double-left"></span>
@@ -43,62 +31,19 @@
 
         </ul>
 
-        <!-- State 2: minimized -->
-        <!--
+        <!-- State 2: closed -->
         <ul
-            ng-show="!vm.asideHidden &amp;&amp; vm.asideMinified"
+            ng-show="vm.closed"
             class="list-unstyled fs16"
         >
-        -->
-
-            <!-- Button 1: open fully -->
-            <!--
+            <!-- Button: open -->
             <button
-                bs-tooltip data-placement="right" title="Open fully"
-                ng-click="vm.asideHidden = false; vm.asideMinified = false;"
-                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
-            >
-                <span class="fa fa-angle-right"></span>
-            </button>
-            -->
-
-            <!-- Button 2: close -->
-            <!--
-            <button
-                bs-tooltip data-placement="right" title="Close"
-                ng-click="vm.asideHidden = true; vm.asideMinified = true;"
-                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
-            >
-                <span class="fa fa-angle-left"></span>
-            </button>
-
-        </ul>
-        -->
-        
-        <!-- State 3: closed -->
-        <ul
-            ng-show="vm.asideHidden"
-            class="list-unstyled fs16"
-        >
-            <!-- Button 1: open fully -->
-            <button
-                bs-tooltip data-placement="right" title="Open fully"
-                ng-click="vm.asideHidden = false;"
+                bs-tooltip data-placement="right" title="Open"
+                ng-click="vm.closed = false;"
                 class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
             >
                 <span class="fa fa-angle-double-right"></span>
             </button>
-            
-            <!-- Button 2: stick/minimize -->
-            <!--
-            <button
-                bs-tooltip data-placement="right" title="Stick"
-                ng-click="vm.asideHidden = false; vm.asideMinified = true;"
-                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
-            >
-                <span class="fa fa-angle-right"></span>
-            </button>
-            -->
 
         </ul>
 

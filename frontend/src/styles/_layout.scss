@@ -1,4 +1,5 @@
-$toolboxHeight: 42px;
+$toolbarHeight: 42px;
+$bottomHeight: 5rem;
 
 $asideWidth: 300px;
 $asideMinifyWidth: 64px;
@@ -12,7 +13,7 @@ $asideRightPadding: 10px;
 /* left section */
 
 // Adapt left aside based on state (opened/closed)
-wv-layout wv-layout-left {
+.wvLayout__left {
     display:block;
     position:absolute;
     z-index:2;
@@ -20,19 +21,31 @@ wv-layout wv-layout-left {
     width: $asideWidth;
     // transition: 0.6s width ease, 0.6s transform ease;
 
-    // Position the left side below the toolbox
-    top: $toolboxHeight;
-    bottom: 0;
+    // Position the left side below the toolbar if it is shown
+    &.wvLayout__left--toppadding {
+        top: $toolbarHeight;
+    }
+    &:not(.wvLayout__left--toppadding) {
+        top: 0;
+    }
+
+    // Position the left section over the bottom one if the latter is shown
+    &.wvLayout__left--bottompadding {
+        bottom: $bottomHeight;
+    }
+    &:not(.wvLayout__left--bottompadding) {
+        bottom: 0;
+    }
 
     // Position the left side on the left
     left: 0;
 
     // When layout left is shown, nothing special happens (default state)
-    &:not(.aside-closed) {
+    &:not(.wvLayout__left--closed) {
     }
 
     // When layout left is closed, move it aside
-    &.aside-closed {
+    &.wvLayout__left--closed {
         transform: translateX(- $asideWidth); // Move all out of the screen
 
         // Display back the aside when buttons are hovered
@@ -50,7 +63,7 @@ wv-layout wv-layout-left {
 /* right section */
 
 // Adapt right aside based on state (opened/closed).
-wv-layout ng-transclude[ng-transclude-slot="wvLayoutRight"] {
+.wvLayout__right {
     display:block;
     position:absolute;
     z-index:2;
@@ -58,19 +71,31 @@ wv-layout ng-transclude[ng-transclude-slot="wvLayoutRight"] {
     width: $asideRightMinifyWidth;
     // transition: 0.6s width ease, 0.6s transform ease;
 
-    // Position the right side below the toolbox
-    top: $toolboxHeight;
-    bottom: 0;
+    // Position the left side below the toolbar if it is shown
+    &.wvLayout__right--toppadding {
+        top: $toolbarHeight;
+    }
+    &:not(.wvLayout__right--toppadding) {
+        top: 0;
+    }
+
+    // Position the right section over the bottom one if the latter is shown
+    &.wvLayout__right--bottompadding {
+        bottom: $bottomHeight;
+    }
+    &:not(.wvLayout__right--bottompadding) {
+        bottom: 0;
+    }
 
     // Position the right side on the right
     right: 0;
 
     // When layout right is shown, nothing special happens (default state)
-    &:not(.aside-closed) {
+    &:not(.wvLayout__right--closed) {
     }
 
     // When layout right is closed, move it aside
-    &.aside-closed {
+    &.wvLayout__right--closed {
         transform: translateX(+ $asideRightMinifyWidth); // Move all out of the screen
 
         // Display back the aside when buttons are hovered
@@ -89,15 +114,40 @@ wv-layout ng-transclude[ng-transclude-slot="wvLayoutRight"] {
     }
 }
 
+/* bottom section */
+
+// Set bottom section size & position 
+.wvLayout__bottom {
+    position: absolute;
+    
+    // Display the bottom bar in the bottom side
+    height: $bottomHeight;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
 /* main section */
 
 // Set main section size & position 
-wv-layout-main > .wvViewer__content {
+.wvLayout__main {
     position: absolute;
 
-    // Set the main content below the toolbox
-    top: $toolboxHeight;
-    bottom: 0;
+    // Position the main section below the toolbar if the latter is shown
+    &.wvLayout__main--toppadding {
+        top: $toolbarHeight;
+    }
+    &:not(.wvLayout__main--toppadding) {
+        top: 0;
+    }
+
+    // Position the main section over the bottom one if the latter is shown
+    &.wvLayout__main--bottompadding {
+        bottom: $bottomHeight;
+    }
+    &:not(.wvLayout__main--bottompadding) {
+        bottom: 0;
+    }
 
     // Make the main content fill the screen by default
     // Depending on the browser, the left and right attributes are more
@@ -105,30 +155,30 @@ wv-layout-main > .wvViewer__content {
     // absolute positioning. The require no contextual positioning calculation
     // and are less performance intensive, especially concidering transition
     // animation.
-    left: 0;
     right: 0;
+    left: 0;
     
     // transition: 0.6s left ease, 0.6s right ease;
     
     // Adapt main section's size based on aside left's state (opened/closed)
     // 1. When aside left is not hidden , move the main section 300 pixel to
     //   the right
-    wv-layout-left:not(.aside-closed) ~ & {
+    &.wvLayout__main--leftpadding {
         left: $asideWidth;
     }
     // 2. When aside left is hidden, let the main take 100% of the place
-    wv-layout-left.aside-closed ~ & {
+    &:not(.wvLayout__main--leftpadding) {
         left: 0px;
     }
 
     // Adapt main section's size based on aside right's state (opened/closed)
     // 1. When aside right is not hidden , move the main section 84 pixel to
     //   the left
-    ng-transclude[ng-transclude-slot="wvLayoutRight"]:not(.aside-closed) ~ & {
+    &.wvLayout__main--rightpadding {
         right: $asideRightMinifyWidth;
     }
     // 2. When aside right is hidden, let the main take 100% of the place
-    ng-transclude[ng-transclude-slot="wvLayoutRight"].aside-closed ~ & {
+    &:not(.wvLayout__main--rightpadding) {
         right: 0px;
     }
 }
@@ -384,6 +434,10 @@ wv-layout-main > .wvViewer__content {
     left:1px; // border
     top:1rem;
     width:25px;
+
+    // Compensate aside z-index to let user click on button when another button
+    // is behind the actions.
+    z-index: 3;
 }
 .wvAsideRight__actions--outside{
     @extend.wvAsideRight__actions;

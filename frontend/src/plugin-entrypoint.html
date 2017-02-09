@@ -33,9 +33,15 @@
 >
     <wv-webviewer
         wv-study-id="vm.studyId"
-        wv-serieslist-enabled="vm.mode === 'study'" 
-
         wv-series-id="vm.seriesId"
+
+        wv-toolbar-enabled="vm.enableToolbar"
+        wv-serieslist-enabled="vm.enableLayoutLeft && vm.mode === 'study'"
+        wv-studyinformation-enabled="vm.enableLayoutLeft && vm.mode === 'study'"
+        wv-lefthandles-enabled="vm.enableLayoutLeftHandles"
+
+        wv-notice-enabled="vm.enableNotice"
+        wv-notice-text="vm.noticeText"
     >
     </wv-webviewer>
 
@@ -64,13 +70,14 @@
     .config(['$compileProvider', function ($compileProvider) {
         $compileProvider.debugInfoEnabled(false);
     }])
-    // Retrieve URL's params and set study/series
+    // Define a basic controller
     .controller('MainController', [
-        '$location', 'wvConfig', 'wvSeriesManager',
-        function($location, wvConfig, wvSeriesManager)
+        '$scope', '$location', 'wvConfig', 'wvSeriesManager',
+        function($scope, $location, wvConfig, wvSeriesManager)
     {
         var vm = this;
 
+        // Retrieve URL's params and set study/series
         var orthancStudyId = $location.search().study;
         var orthancSeriesId = $location.search().series;
         var orthancStudyId = $location.search().study;
@@ -113,6 +120,27 @@
                     console.error('err', err);
                 });
         }
+        
+        // Configure the user interface depending on the user angent/browser.
+        var userInterfacePolicy = new osimis.UserAgentBasedInterfacePolicy();
+        vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
+        vm.enableToolbar = userInterfacePolicy.enableToolbar;
+        vm.enableLayoutLeft = userInterfacePolicy.enableLayoutLeft;
+        vm.enableLayoutLeftHandles = userInterfacePolicy.enableLayoutLeftHandles;
+        vm.enableNotice = userInterfacePolicy.enableNotice;
+        vm.noticeText = userInterfacePolicy.noticeText;
+
+        // Listen to changes triggered by the user interface policy.    
+        userInterfacePolicy.onUpdate(function() {
+            $scope.$apply(function() {
+                vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
+                vm.enableToolbar = userInterfacePolicy.enableToolbar;
+                vm.enableLayoutLeft = userInterfacePolicy.enableLayoutLeft;
+                vm.enableLayoutLeftHandles = userInterfacePolicy.enableLayoutLeftHandles;
+                vm.enableNotice = userInterfacePolicy.enableNotice;
+                vm.noticeText = userInterfacePolicy.noticeText;
+            });
+        });
 
     }]);
     </script>

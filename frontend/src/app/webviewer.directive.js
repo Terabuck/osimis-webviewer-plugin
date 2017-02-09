@@ -2,41 +2,58 @@
  * @ngdoc directive
  * @name webviewer.directive:wvWebviewer
  * 
- * @param {boolean} [wvToolbarEnabled] Display the toolbar.
- *   By default it's disabled on mobile and enabled on desktop.
- *   Note all tools are disabled when the toolbar is disabled, including the
- *   preselected ones (windowing & zooming).
+ * @param {string} [wvStudyId]
+ * Configure the study shown in the serieslist`wvSerieslistEnabled` must be 
+ * true. Changing the `wvStudyId` resets the viewports to a (1, 1) layout with
+ * the first series of the study shown.
  * 
- * @param {string} [wvStudyId] Configure the study shown in the serieslist
- *   `wvSerieslistEnabled` must be true. Changing the `wvStudyId` resets the
- *   viewports to a (1, 1) layout with the first series of the study shown.
+ * @param {boolean} [wvToolbarEnabled=true]
+ * Display the toolbar. Note all tools are disabled when the toolbar is 
+ * disabled, including the preselected ones (zooming).
  * 
- * @param {boolean} [wvSerieslistEnabled] Display the list of series
- *   Used to show the list of series of `wv-study-id`.
+ * @param {boolean} [wvSerieslistEnabled=true]
+ * Display the list of series based on the `wvStudyId`. 
  * 
- * @param {string} [wvSeriesId] Configure the series shown in the main 
- *   viewport. Viewport's data are reset on change.
- * 
- * @param {object} [wvTools] Configure the displayed tools with their default vaule
- *   See source code for available configuration options.
+ * @param {boolean} [wvStudyinformationEnabled=true]
+ * Display the study information based on the `wvStudyId`.
  *
- * @param {boolean} [wvReadonly=false] Prevent the user from controling the 
- *   interface. This is primary useful to prevent liveshare session's attendees 
- *   interfer with the chair (though the parameter is configured from within 
- *   the `wvLiveshare` directive).
- *    
- *   Especially, the following actions are disabled:
- *   
- *   * Drag&dropping series from the `wvSerieslist` into viewports
- *   * Using the timeline controls
- *   * Using the toolbar & tools
- *   * Scrolling through the series via the mousewheel
+ * @param {boolean} [wvLefthandlesEnabled=true]
+ * Display buttons to toggle the left side of the interface. The right handles
+ * are configurable via the transcluded directive.
+ * 
+ * @param {boolean} [wvNoticeEnabled=false]
+ * Display a notice in the bottom side of the application.
+ * 
+ * @param {boolean} [wvNoticeText]
+ * The displayed notice content, for instance instructions over mobile
+ * ergonomy, or related series / studies.
+ * 
+ * @param {string} [wvSeriesId]
+ * Configure the series shown in the main viewport. Viewport's data are reset
+ * on change.
+ * 
+ * @param {object} [wvTools]
+ * Configure the displayed tools with their default value. See source code for
+ * available configuration options.
+ *
+ * @param {boolean} [wvReadonly=false]
+ * Prevent the user from controling the interface. This is primary useful to 
+ * prevent liveshare session's attendees interfer with the chair (though the
+ * parameter is configured from within the `wvLiveshare` directive).
+ *  
+ * Especially, the following actions are disabled:
+ * 
+ * * Drag&dropping series from the `wvSerieslist` into viewports
+ * * Using the timeline controls
+ * * Using the toolbar & tools
+ * * Scrolling through the series via the mousewheel
  * 
  * @scope
  * @restrict E
  * 
  * @description
- * The `wvWebviewer` directive display a whole web viewer at full scale (100% width, 100% height).
+ * The `wvWebviewer` directive display a whole web viewer at full scale (100%
+ * width, 100% height).
  * 
  * @example
  * The following example show the toolbar, hide the full list of studies,
@@ -45,11 +62,9 @@
  * 
  * ```html
  * <wv-webviewer
- *     wv-studylist-enabled="false"
  *     wv-toolbar-enabled="true"
  *     
  *     wv-study-id="'your-study-id'"
- *     wv-serieslist-enabled="true" 
  * ></wv-webviewer>
  * ```
  **/
@@ -74,23 +89,31 @@
                 seriesId: '=?wvSeriesId',
                 tools: '=?wvTools',
                 toolbarEnabled: '=?wvToolbarEnabled',
-                serieslistEnabled: '=?wvSerieslistEnabled'
+                serieslistEnabled: '=?wvSerieslistEnabled',
+                studyinformationEnabled: '=?wvStudyinformationEnabled',
+                leftHandlesEnabled: '=?wvLefthandlesEnabled',
+                noticeEnabled: '=?wvNoticeEnabled',
+                noticeText: '=?wvNoticeText'
             },
             transclude: {
-                wvLayoutTop1: '?wvLayoutTop1',
-                wvLayoutTop4: '?wvLayoutTop4',
+                wvLayoutTopLeft: '?wvLayoutTopLeft',
+                wvLayoutTopRight: '?wvLayoutTopRight',
                 wvLayoutRight: '?wvLayoutRight'
             },
             templateUrl: 'app/webviewer.directive.html'
         };
         return directive;
 
-        function link(scope, element, attrs) {
+        function link(scope, element, attrs, ctrls, transcludeFn) {
             var vm = scope.vm;
 
             // Configure attributes default values
             vm.toolbarEnabled = typeof vm.toolbarEnabled !== 'undefined' ? vm.toolbarEnabled : true;
             vm.serieslistEnabled = typeof vm.serieslistEnabled !== 'undefined' ? vm.serieslistEnabled : true;
+            vm.studyinformationEnabled = typeof vm.studyinformationEnabled !== 'undefined' ? vm.studyinformationEnabled : true;
+            vm.leftHandlesEnabled = typeof vm.leftHandlesEnabled !== 'undefined' ? vm.leftHandlesEnabled : true;
+            vm.noticeEnabled = typeof vm.noticeEnabled !== 'undefined' ? vm.noticeEnabled : false;
+            vm.noticeText = typeof vm.noticeText !== 'undefined' ? vm.noticeText : undefined;
             vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;
             vm.tools = typeof vm.tools !== 'undefined' ? vm.tools : {
                 windowing: false,
@@ -113,22 +136,6 @@
                 rotateleft: false,
                 rotateright: false
             };
-
-            // Change over these scope variables will in most case change the
-            // layout, including the size of the viewport. Therefore, the
-            // viewport must be resized. We trigger $(window).resize() for this
-            // reason.
-            scope.$watchGroup([
-                'vm.toolbarEnabled',
-                'vm.serieslistEnabled'
-            ], function() {
-                // we use $evalAsync instead of timeout since it does not
-                // trigger reflow.
-                scope.$evalAsync(function() {
-                    // Resize windows
-                    $(window).resize();
-                });
-            });
 
             // Store each viewports' states at this level
             // so they can be either later changed by external means (ie. Lify
@@ -214,36 +221,6 @@
                     vm.viewports[0].csViewport = null;
                 }
             });
-
-            /* Mobile compatibility */
-            
-            // Retrieve device type
-            var uaParser = new UAParser();
-            var deviceType = uaParser.getDevice().type;
-            var isMobile = (deviceType === 'mobile' || deviceType === 'tablet');
-
-            // Disable/Activate toolbar on mobile/desktop (resp.) by default
-            if (typeof vm.toolbarEnabled === 'undefined') {
-                vm.toolbarEnabled = !isMobile ? true : false;
-            }
-
-
-            // Set serieslist default display mode
-            if (typeof vm.serieslistMinified === 'undefined') {
-                // Minify serieslist on mobile/tablets by default
-                if (isMobile) {
-                    vm.serieslistMinified = true;
-                }
-                // Display serieslist in full on other devices
-                else {
-                    vm.serieslistMinified = false;
-                }
-            }
-
-            // Show serieslist by default
-            if (typeof vm.serieslistHidden === 'undefined') {
-                vm.serieslistHidden = false;
-            }
         }
     }
 

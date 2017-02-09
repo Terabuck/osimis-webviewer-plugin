@@ -1,102 +1,48 @@
-<aside ng-if="vm.asideEnabled" class="wvViewer__asideRight">
+<aside
+    class="wvLayout__right"
+    ng-show="vm.enabled"
+    ng-class="{
+        'wvLayout__right--toppadding': vm.isTopPaddingEnabled,
+        'wvLayout__right--bottompadding': vm.isBottomPaddingEnabled,
+        'wvLayout__right--closed': vm.closed
+    }"
+>
     <!-- Buttons -->
     <div
+        ng-if="vm.handlesEnabled"
         ng-class="{
-            'wvAsideRight__actions': !vm.asideMinified &amp;&amp; !vm.asideHidden,
-            'wvAsideRight__actions--outside': vm.asideHidden || vm.asideMinified,
-            'fluid-height': vm.asideHidden
+            'wvAsideRight__actions': !vm.closed,
+            'wvAsideRight__actions--outside': vm.closed
         }"
     >
 
-        <!-- There is 3 possible states:
-            1. Opened fully
-            2. Minimized
-            3. Closed (and togglable)
-
-            We use ng-show instead of ng-if to avoid intermediary reflow.
-        -->
-
-        <!-- State 1: opened fully -->
-        <!--
+        <!-- State 1: opened -->
         <ul
-            ng-show="!vm.asideHidden &amp;&amp; !vm.asideMinified"
+            ng-show="!vm.closed"
             class="list-unstyled fs16"
-        >
-        -->
-            <!-- Button 1: minimize @deprecated -->
-            <!-- 
-            <button
-                bs-tooltip data-placement="left" title="Minimize"
-                ng-click="vm.asideHidden = false; vm.asideMinified = true;"
-                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
-            >
-                <span class="fa fa-angle-right"></span>
-            </button>
-            -->
-
-            <!-- Button 2: close -->
-            <!--
+        > 
+            <!-- Button: close -->
             <button
                 bs-tooltip data-placement="left" title="Close"
-                ng-click="vm.asideHidden = true; vm.asideMinified = true;"
+                ng-click="vm.closed = true;"
                 class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
             >
                 <span class="fa fa-angle-double-right"></span>
             </button>
-            -->
-        <!--
-        </ul>
-        -->
-
-        <!-- State 2: minimized -->
-        <ul
-            ng-show="!vm.asideHidden &amp;&amp; vm.asideMinified"
-            class="list-unstyled fs16"
-        > 
-
-            <!-- Button 1: open fully -->
-            <!-- 
-            <button
-                bs-tooltip data-placement="left" title="Open fully"
-                ng-click="vm.asideHidden = false; vm.asideMinified = false;"
-                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center wvAsideRight__fixOpenFullyTooltip"
-            >
-                <span class="fa fa-angle-left"></span>
-            </button>
-            -->
-            <!-- Button 2: close -->
-            <button
-                bs-tooltip data-placement="left" title="Close"
-                ng-click="vm.asideHidden = true; vm.asideMinified = true;"
-                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
-            >
-                <span class="fa fa-angle-right"></span>
-            </button>
         </ul>
 
-        <!-- State 3: closed -->
+        <!-- State 2: closed -->
         <ul
-            ng-show="vm.asideHidden &amp;&amp; vm.asideMinified"
+            ng-show="vm.closed"
             class="list-unstyled fs16"
         >
-            <!-- Button 1: open fully -->
-            <!--
+            <!-- Button: open -->
             <button
-                bs-tooltip data-placement="left" title="Open fully"
-                ng-click="vm.asideHidden = false; vm.asideMinified = false;"
-                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center wvAsideRight__fixOpenFullyTooltip"
-            >
-                <span class="fa fa-angle-double-left"></span>
-            </button>
-            -->
-            
-            <!-- Button 2: stick/minimize @deprecated -->
-            <button
-                bs-tooltip data-placement="left" title="Stick"
-                ng-click="vm.asideHidden = false; vm.asideMinified = true;"
+                bs-tooltip data-placement="left" title="Open"
+                ng-click="vm.closed = false;"
                 class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
             >
-                <span class="fa fa-angle-left"></span>
+                <span class="fa fa-angle-double-left"></span>
             </button>
         </ul>
 
