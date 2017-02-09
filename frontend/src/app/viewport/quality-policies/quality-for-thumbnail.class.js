@@ -30,6 +30,13 @@
                 osimis.quality.PIXELDATA
             ];
         }
+        // Show LOSSLESS quality for thumbnail when compressed dicom pixeldata,
+        // but device uncompatible with pixeldata format.
+        else if (availableQualities.indexOf(osimis.quality.LOSSLESS) !== -1) {
+            return [
+                osimis.quality.LOSSLESS
+            ];
+        }
         // Assert one of the options exists
         else {
             throw new Error('Low quality not available for image.');
