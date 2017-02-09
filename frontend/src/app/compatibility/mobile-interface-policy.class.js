@@ -26,6 +26,11 @@
         // @warning this may have undesired behavior on projects embedding webviewer without iframe.
         window.scrollTo(0, 1);
 
+        // Prevent from scrolling
+        document.body.addEventListener('touchmove', function(event) {
+          event.preventDefault();
+        }, false); 
+
         // Set initial UI values
         // 1. Disable toolbar on mobile
         this.enableToolbar = false;
