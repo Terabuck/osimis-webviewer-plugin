@@ -53,8 +53,7 @@
     "ua-parser-js": "^0.7.10",
     "bluebird": "^3.4.6",
     "asap": "kriskowal/asap#^2.0.3",
-    "pdf.js-viewer": "^0.3.3",
-    "magictouch": "./local_dependencies/MagicTouch"
+    "pdf.js-viewer": "^0.3.3"
   },
   "resolutions": {
     "angular": "^1.5.8",
@@ -94,11 +93,6 @@
       "main": [
         "zlib.js",
         "png.js"
-      ]
-    },
-    "magictouch": {
-      "main": [
-        "MagicTouch.js"
       ]
     }
   }
