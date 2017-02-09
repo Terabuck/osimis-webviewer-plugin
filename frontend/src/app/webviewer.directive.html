@@ -240,11 +240,11 @@
                     wv-viewport="vm.viewports[$index].csViewport"
                     wv-image-index="vm.viewports[$index].imageIndex"
 
-                    wv-default-viewport-tool="!vm.readonly && vm.tools.windowing"
+                    wv-windowing-viewport-tool="!vm.readonly && (vm.mobileInteraction || vm.tools.windowing)"
                     wv-angle-measure-viewport-tool="!vm.readonly && vm.tools.anglemeasure"
                     wv-length-measure-viewport-tool="!vm.readonly && vm.tools.lengthmeasure"
                     wv-elliptical-roi-viewport-tool="!vm.readonly && vm.tools.ellipticalroi"
-                    wv-zoom-viewport-tool="!vm.readonly && vm.tools.zoom"
+                    wv-zoom-viewport-tool="!vm.readonly && (vm.mobileInteraction || vm.tools.zoom)"
                     wv-pan-viewport-tool="!vm.readonly && vm.tools.pan"
                     wv-pixel-probe-viewport-tool="!vm.readonly && vm.tools.pixelprobe"
                     wv-rectangle-roi-viewport-tool="!vm.readonly && vm.tools.rectangleroi"
