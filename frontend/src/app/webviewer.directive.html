@@ -207,7 +207,11 @@
     <wv-layout-bottom
         wv-enabled="vm.noticeEnabled"
     >
-        <wv-notice wv-content="vm.noticeText" wv-on-close="vm.noticeEnabled = false"></wv-notice">
+        <wv-notice
+            ng-if="vm.noticeEnabled"
+            wv-content="vm.noticeText"
+            wv-on-close="vm.noticeEnabled = false"
+        ></wv-notice">
     </wv-layout-bottom>
 
     <!--
