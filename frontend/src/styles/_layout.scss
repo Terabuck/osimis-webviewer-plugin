@@ -1,5 +1,6 @@
 $toolbarHeight: 42px;
-$bottomHeight: 5rem;
+$bottomHeightSmall: 7rem; // On small width, we provide two-lines bottom zone to compensate the smaller width
+$bottomHeightLarge: 5rem; // On large width, we provide one-line bottom zone
 
 $asideWidth: 300px;
 $asideMinifyWidth: 64px;
@@ -31,7 +32,12 @@ $asideRightPadding: 10px;
 
     // Position the left section over the bottom one if the latter is shown
     &.wvLayout__left--bottompadding {
-        bottom: $bottomHeight;
+        @media screen and (max-device-width: 374px) {
+            bottom: $bottomHeightSmall;
+        }
+        @media screen and (min-device-width: 375px) {
+            bottom: $bottomHeightLarge;
+        }
     }
     &:not(.wvLayout__left--bottompadding) {
         bottom: 0;
@@ -60,6 +66,7 @@ $asideRightPadding: 10px;
     }
 }
 
+
 /* right section */
 
 // Adapt right aside based on state (opened/closed).
@@ -81,7 +88,12 @@ $asideRightPadding: 10px;
 
     // Position the right section over the bottom one if the latter is shown
     &.wvLayout__right--bottompadding {
-        bottom: $bottomHeight;
+        @media screen and (max-device-width: 374px) {
+            bottom: $bottomHeightSmall;
+        }
+        @media screen and (min-device-width: 375px) {
+            bottom: $bottomHeightLarge;
+        }
     }
     &:not(.wvLayout__right--bottompadding) {
         bottom: 0;
@@ -114,6 +126,7 @@ $asideRightPadding: 10px;
     }
 }
 
+
 /* bottom section */
 
 // Set bottom section size & position 
@@ -121,11 +134,21 @@ $asideRightPadding: 10px;
     position: absolute;
     
     // Display the bottom bar in the bottom side
-    height: $bottomHeight;
+    @media screen and (max-device-width: 374px) {
+        height: $bottomHeightSmall;
+    }
+    @media screen and (min-device-width: 375px) {
+        height: $bottomHeightLarge;
+    }
+
     left: 0;
     bottom: 0;
     right: 0;
+
+    // Set grey background color (as it is only used to display notices)
+    background-color: hsl(0, 0%, 10%);
 }
+
 
 /* main section */
 
@@ -143,7 +166,13 @@ $asideRightPadding: 10px;
 
     // Position the main section over the bottom one if the latter is shown
     &.wvLayout__main--bottompadding {
-        bottom: $bottomHeight;
+        bottom:440px;
+        @media screen and (max-device-width: 374px) {
+            bottom: $bottomHeightSmall;
+        }
+        @media screen and (min-device-width: 375px) {
+            bottom: $bottomHeightLarge;
+        }
     }
     &:not(.wvLayout__main--bottompadding) {
         bottom: 0;

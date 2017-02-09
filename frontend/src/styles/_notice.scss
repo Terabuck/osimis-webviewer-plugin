@@ -1,22 +1,43 @@
-.wvNotice {
+wv-notice {
+    display: block;
+    height: 100%;
     width: 100%;
-    height: 100%; // see layout bottom zone height
-    line-height: 4rem;
+}
 
+.wvNotice {
+    // Set padding
     padding: 0.5rem 0.25rem;
-    margin: 0;
-    background-color: hsl(0, 0%, 10%);
 
+    // Fill parent element so text can be centered
+    height: 100%;
+}
+
+.wvNotice__text {
+    // Center text 
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
     text-align: center;
+    margin-left: 1rem;
+
+    // Text style
     font-weight: 400;
     color: hsl(0, 0%, 70%);
+
+    // Keep space for button
+    float: left;
+    width: calc(100% - 7rem); // 3.5 rem + 3 rem margin (incl. button margin + text margin)
 }
 
 .wvNotice__closeButton {
-    // Position button
+    // Position button on right
     float: right;
-    margin: 0.5em;
-    display: inline-block;
+    margin-right: 0.5em;
+
+    // Center button vertically
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
 
     // Set button size
     width: 3.5rem;
