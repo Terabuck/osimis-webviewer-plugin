@@ -3,24 +3,20 @@
 
     angular
         .module('webviewer')
-        .directive('wvDefaultViewportTool', wvDefaultViewportTool)
+        .directive('wvWindowingViewportTool', wvWindowingViewportTool)
         .config(function($provide) {
             $provide.decorator('wvViewportDirective', function($delegate) {
                 var directive = $delegate[0];
-                directive.require['wvDefaultViewportTool'] = '?^wvDefaultViewportTool';
+                directive.require['wvWindowingViewportTool'] = '?^wvWindowingViewportTool';
 
                 return $delegate;
             });
         });
 
     /* @ngInject */
-    function wvDefaultViewportTool($, $parse, WvBaseTool) {
-        // Usage:
-        //
-        // Creates:
-        //
+    function wvWindowingViewportTool($, $parse, WvBaseTool) {
         var directive = {
-        	require: 'wvDefaultViewportTool',
+        	require: 'wvWindowingViewportTool',
             controller: Controller,
             link: link,
             restrict: 'A',
@@ -28,7 +24,7 @@
         };
 
         function link(scope, element, attrs, tool) {
-            var wvDefaultViewportToolParser = $parse(attrs.wvDefaultViewportTool);
+            var wvDefaultViewportToolParser = $parse(attrs.wvWindowingViewportTool);
 
             // bind attributes -> tool
             scope.$watch(wvDefaultViewportToolParser, function(isActivated) {

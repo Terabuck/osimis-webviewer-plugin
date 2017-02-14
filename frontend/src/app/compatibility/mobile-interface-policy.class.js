@@ -21,11 +21,6 @@
         // 4. Unlisten to changes on destroy
         // @todo Unlisten to changes on destroy
 
-        // Hide scrollbar on iphone.
-        // See http://stackoverflow.com/questions/6011223/how-to-completely-hide-the-navigation-bar-in-iphone-html5
-        // @warning this may have undesired behavior on projects embedding webviewer without iframe.
-        window.scrollTo(0, 1);
-
         // Set initial UI values
         // 1. Disable toolbar on mobile
         this.enableToolbar = false;
@@ -45,11 +40,6 @@
     MobileInterfacePolicy.prototype.onUpdate = _.noop;
 
     MobileInterfacePolicy.prototype._onOrientationChanged = function(orientation) {
-        // Hide scrollbar on iphone.
-        // See http://stackoverflow.com/questions/6011223/how-to-completely-hide-the-navigation-bar-in-iphone-html5
-        // @warning this may have undesired behavior on projects embedding webviewer without iframe.
-        window.scrollTo(0, 1);
-        
         // On portrait orientation
         if (orientation === 'portrait') {
             // Disable left layout
