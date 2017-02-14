@@ -32,6 +32,7 @@
     "angular-animate": "^1.5.8",
     "angular-resource": "^1.5.8",
     "angular-sanitize": "^1.5.8",
+    "angular-cookies": "^1.5.8",
     "bootstrap": "^3.3.6",
     "lodash": "^4.5.1",
     "ng-range-filter": "~0.1.0",

@@ -207,7 +207,11 @@
     <wv-layout-bottom
         wv-enabled="vm.noticeEnabled"
     >
-        <wv-notice wv-content="vm.noticeText" wv-on-close="vm.noticeEnabled = false"></wv-notice">
+        <wv-notice
+            ng-if="vm.noticeEnabled"
+            wv-content="vm.noticeText"
+            wv-on-close="vm.noticeEnabled = false"
+        ></wv-notice">
     </wv-layout-bottom>
 
     <!--
@@ -236,21 +240,22 @@
                     wv-viewport="vm.viewports[$index].csViewport"
                     wv-image-index="vm.viewports[$index].imageIndex"
 
-                    wv-default-viewport-tool="!vm.readonly && vm.tools.windowing"
-                    wv-angle-measure-viewport-tool="!vm.readonly && vm.tools.anglemeasure"
-                    wv-length-measure-viewport-tool="!vm.readonly && vm.tools.lengthmeasure"
-                    wv-elliptical-roi-viewport-tool="!vm.readonly && vm.tools.ellipticalroi"
-                    wv-zoom-viewport-tool="!vm.readonly && vm.tools.zoom"
-                    wv-pan-viewport-tool="!vm.readonly && vm.tools.pan"
-                    wv-pixel-probe-viewport-tool="!vm.readonly && vm.tools.pixelprobe"
-                    wv-rectangle-roi-viewport-tool="!vm.readonly && vm.tools.rectangleroi"
+                    wv-mobile-viewport-tool="!vm.readonly && vm.mobileInteraction"
+                    wv-windowing-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.windowing"
+                    wv-angle-measure-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.anglemeasure"
+                    wv-length-measure-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.lengthmeasure"
+                    wv-elliptical-roi-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.ellipticalroi"
+                    wv-zoom-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.zoom"
+                    wv-pan-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.pan"
+                    wv-pixel-probe-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.pixelprobe"
+                    wv-rectangle-roi-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.rectangleroi"
 
-                    wv-invert-contrast-viewport-tool="!vm.readonly && vm.tools.invert"
+                    wv-invert-contrast-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.invert"
 
-                    wv-rotateleft-viewport-tool="!vm.readonly && vm.tools.rotateleft"
-                    wv-rotateright-viewport-tool="!vm.readonly && vm.tools.rotateright"
-                    wv-vflip-viewport-tool="!vm.readonly && vm.tools.vflip"
-                    wv-hflip-viewport-tool="!vm.readonly && vm.tools.hflip"
+                    wv-rotateleft-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.rotateleft"
+                    wv-rotateright-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.rotateright"
+                    wv-vflip-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.vflip"
+                    wv-hflip-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.hflip"
                 >
                     <!--
                     Overlay

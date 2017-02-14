@@ -136,6 +136,10 @@
                 rotateleft: false,
                 rotateright: false
             };
+    
+            // Activate mobile interaction tools on mobile (not tablet)
+            var uaParser = new UAParser();
+            vm.mobileInteraction = uaParser.getDevice().type === 'mobile';
 
             // Store each viewports' states at this level
             // so they can be either later changed by external means (ie. Lify
