@@ -33,13 +33,21 @@
 >
     <wv-webviewer
         wv-study-id="vm.studyId"
+        
+        wv-toolbar-enabled="vm.enableToolbar"
+        wv-serieslist-enabled="vm.enableLayoutLeft"
+        wv-studyinformation-enabled="vm.enableLayoutLeft"
+        wv-lefthandles-enabled="vm.enableLayoutLeftHandles"
+
+        wv-notice-enabled="vm.enableNotice"
+        wv-notice-text="vm.noticeText"
     >
         <!-- Study list (for debug mode) -->
-        <wv-layout-top1>
+        <wv-layout-top-left wv-enabled="vm.enableLayoutTopLeft">
             <wv-studylist 
                 wv-selected-study-id="vm.studyId"
             ></wv-studylist>
-        </wv-layout-top1>
+        </wv-layout-top-left>
     </wv-webviewer>
 
     <!-- build:js js/lib.js -->
@@ -62,15 +70,39 @@
     angular
     .module('webviewer')
     // Remove debug info and improve performances
-    // Can be reactivated on the fly using "angular.reloadWithDebugInfo();" in the console
-    // see https://docs.angularjs.org/guide/production#disabling-debug-data
+    // Can be reactivated on the fly using "angular.reloadWithDebugInfo();" in 
+    // the console see
+    // https://docs.angularjs.org/guide/production#disabling-debug-data
     .config(['$compileProvider', function ($compileProvider) {
-        $compileProvider.debugInfoEnabled(false);
+        // $compileProvider.debugInfoEnabled(false);
     }])
     // Define a basic controller
-    .controller('MainController', ['$location', function($location) {
+    .controller('MainController', ['$scope', '$location', function($scope, $location) {
+        var vm = this;
+
         // We could retrieve URL parameters here. This is not required for the 
         // index page though.
+
+        // Configure the user interface depending on the user angent/browser.
+        var userInterfacePolicy = new osimis.UserAgentBasedInterfacePolicy();
+        vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
+        vm.enableToolbar = userInterfacePolicy.enableToolbar;
+        vm.enableLayoutLeft = userInterfacePolicy.enableLayoutLeft;
+        vm.enableLayoutLeftHandles = userInterfacePolicy.enableLayoutLeftHandles;
+        vm.enableNotice = userInterfacePolicy.enableNotice;
+        vm.noticeText = userInterfacePolicy.noticeText;
+
+        // Listen to changes triggered by the user interface policy.    
+        userInterfacePolicy.onUpdate(function() {
+            $scope.$apply(function() {
+                vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
+                vm.enableToolbar = userInterfacePolicy.enableToolbar;
+                vm.enableLayoutLeft = userInterfacePolicy.enableLayoutLeft;
+                vm.enableLayoutLeftHandles = userInterfacePolicy.enableLayoutLeftHandles;
+                vm.enableNotice = userInterfacePolicy.enableNotice;
+                vm.noticeText = userInterfacePolicy.noticeText;
+            });
+        });
     }]);
     </script>
 </body>

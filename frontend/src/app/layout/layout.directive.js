@@ -15,12 +15,19 @@
             restrict: 'E',
             transclude: true,
             scope: {
-                // In the current state, hidden ~= enabled for aside right 
-                // because there is no hidden state, but enabled hides the
-                // element + the controls button. @todo refactor 
-                // @warning readonly property!
-                asideRightClosed: '=?wvAsideRightClosed',
-                asideLeftHidden: '=?wvAsideLeftClosed'
+                // Those parameters are readonly, they must be configured via
+                // their respective directives. We provide them because the
+                // configuration can be done outside the scope of the 
+                // `wvWebviewer` directive. This is the case when the user
+                // redefine a specific section. 
+                isTopEnabled: '=?wvTopEnabled', // readonly
+                isTopLeftEnabled: '=?wvTopleftEnabled', // readonly
+                isTopRightEnabled: '=?wvToprightEnabled', // readonly
+                isRightEnabled: '=?wvRightEnabled', // readonly
+                isRightClosed: '=?wvRightClosed', // readonly
+                isBottomEnabled: '=?wvBottomEnabled', // readonly
+                isLeftEnabled: '=?wvLeftEnabled', // readonly
+                isLeftClosed: '=?wvLeftClosed', // readonly
             },
             templateUrl: 'app/layout/layout.html'
         };
@@ -35,50 +42,29 @@
     function layoutCtrl($scope) {
         var _this = this;
 
-        // Those are defined by wvLayoutMain and called by wvLayoutLeft &
-        // wvLayoutRight. 
-        // Will be called by wvLayoutLeft/Right as soon as they are
-        // initialised (prelink). It wont trigger reflow.
-        this.onAsideLeftHidden = new osimis.Listener();
-        this.onAsideRightMinified = new osimis.Listener();
-        this.onAsideRightHidden = new osimis.Listener();
-        this.onAsideRightEnabled = new osimis.Listener();
-
-        // Store the values in case the `wvLayoutMain` directive is loaded
-        // after `wvLayoutLeft/Right` directives (and thus not have its 
-        // listeners set yet).
-        this.asideLeftHidden = undefined;
-        this.asideRightMinified = undefined;
-        this.asideRightHidden = undefined;
-        this.asideRightEnabled = undefined;
-        this.asideRightClosed = _this.asideRightHidden || !_this.asideRightEnabled;
-        this.onAsideLeftHidden(function(value) {
-            _this.asideLeftHidden = value;
-        });
-        this.onAsideRightMinified(function(value) {
-            _this.asideRightMinified = value;
-        });
-        this.onAsideRightHidden(function(value) {
-            // Set aside right hidden to true by default
-            if (typeof value === 'undefined') {
-                value = true;
-            }
-
-            _this.asideRightHidden = value;
-            _this.asideRightClosed = _this.asideRightHidden || !_this.asideRightEnabled;
-        });
-        this.onAsideRightEnabled(function(value) {
-            _this.asideRightEnabled = value;
-            _this.asideRightClosed = _this.asideRightHidden || !_this.asideRightEnabled;
-        });
+        // This will be updated by children directives
+        this.isTopEnabled = undefined;
+        this.isTopLeftEnabled = undefined;
+        this.isTopRightEnabled = undefined;
+        this.isRightEnabled = undefined;
+        this.isRightClosed = undefined;
+        this.isBottomEnabled = undefined;
+        this.isLeftEnabled = undefined;
+        this.isLeftClosed = undefined;
 
         // Trigger window resizes (so javascript canvas can be resized
         // adequately). We do this after the digest cycle but prior to
         // the reflow, using asap.
         // asap(function() {
         $scope.$watchGroup([
-            'vm.asideRightClosed',
-            'vm.asideLeftHidden'
+            'vm.isTopEnabled',
+            'vm.isTopLeftEnabled',
+            'vm.isTopRightEnabled',
+            'vm.isRightEnabled',
+            'vm.isRightClosed',
+            'vm.isBottomEnabled',
+            'vm.isLeftEnabled',
+            'vm.isLeftClosed',
         ], function() {
             // Go to the end of the digest cycle, when
             // Right aside css class has been set

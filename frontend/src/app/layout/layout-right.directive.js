@@ -6,7 +6,7 @@
         .directive('wvLayoutRight', wvLayoutRight);
 
     /* @ngInject */
-    function wvLayoutRight() {
+    function wvLayoutRight($parse) {
         var directive = {
             bindToController: true,
             controller: layoutRightCtrl,
@@ -16,74 +16,56 @@
             require: '^^wvLayout',
             transclude: true,
             scope: {
-                // asideMinified: '=?wvAsideMinified', - For now, panel will always be minified (as required by Liveshare UI)
-                asideHidden: '=?wvAsideHidden',
-                asideEnabled: '=?wvAsideEnabled'
+                enabled: '=?wvEnabled',
+                closed: '=?wvClosed',
+                handlesEnabled: '=?wvHandlesEnabled'
             },
             templateUrl:'app/layout/layout-right.html'
         };
         return directive;
 
-        function link(scope, element, attrs, layoutCtrl) {
+        function link(scope, element, attrs, wvLayout) {
             var vm = scope.vm;
 
-            // Set initial values
-            vm.asideMinified = true; // for now, panel will always be minified (as required by Liveshare UI)
-            vm.asideHidden = !!vm.asideHidden;
-            vm.asideEnabled = !!vm.asideEnabled;
+            // Enable top right by default (as long as the directive is used)
+            if ($parse(attrs.enabled).assign) {
+                vm.enabled = typeof vm.enabled !== 'undefined' ? !!vm.enabled : true;
+            }
+            // Keep top right open by default
+            if ($parse(attrs.closed).assign) {
+                vm.closed = typeof vm.closed !== 'undefined' ? !!vm.closed : false;
+            }
+            // Enable handles by default
+            if ($parse(attrs.handlesEnabled).assign) {
+                vm.handlesEnabled = typeof vm.handlesEnabled !== 'undefined' ? !!vm.handlesEnabled : true;
+            }
 
-            // Propagate to `main` layout section
-            layoutCtrl.onAsideRightMinified.trigger(vm.asideMinified);
-            layoutCtrl.onAsideRightHidden.trigger(vm.asideHidden);
-            layoutCtrl.onAsideRightEnabled.trigger(vm.asideEnabled);
-
-            // Use $watchGroup to avoid dual/trial triggering on change.
+            // Transfer states to the wvLayout controller. We delegate state
+            // management to wvLayout since this directive may be set up by
+            // the wvWebviewer 
+            wvLayout.isRightEnabled = vm.enabled;
+            wvLayout.isRightClosed = vm.closed;
             scope.$watchGroup([
-                'vm.asideMinified', // @deprecated
-                'vm.asideHidden',
-                'vm.asideEnabled'
-            ], function (newValues, oldValues) {
-                // Ignore the first setting (at application startup)
-                if (newValues[0] === oldValues[0] && newValues[1] === oldValues[1] && newValues[2] === oldValues[2]) {
-                    return;
-                }
-
-                // Trigger `minified` changed event (so the main section can changes its size via css)
-                if (newValues[0] !== oldValues[0] && layoutCtrl.onAsideRightMinified) {
-                    layoutCtrl.onAsideRightMinified.trigger(newValues[0]);
-                }
-
-                // Trigger `hidden` changed event (so the main section can changes its size via css)
-                if (newValues[1] !== oldValues[1] && layoutCtrl.onAsideRightHidden) {
-                    layoutCtrl.onAsideRightHidden.trigger(newValues[1]);
-                }
-
-                // Trigger `enabled` changed event (so the main section can changes its size via css)
-                if (newValues[2] !== oldValues[2] && layoutCtrl.onAsideRightEnabled) {
-                    layoutCtrl.onAsideRightEnabled.trigger(newValues[2]);
-                }
+                'vm.enabled',
+                'vm.closed'
+            ], function(newValues) {
+                wvLayout.isRightEnabled = !!newValues[0];
+                wvLayout.isRightClosed = !!newValues[1];
             });
 
-            // function _triggerResize() {
-            //     var start = undefined;
-            //     var animationDuration = 700; // ms
-
-            //     requestAnimationFrame(function _triggerResizeAccumulator(timestamp) { // timestamp unit is millisecond (double) 
-            //         if (!start) {
-            //             start = timestamp;
-            //         }
-            //         var progress = timestamp - start;
-
-            //         // Animate progressively
-            //         if (progress < animationDuration) {
-            //             // Resize viewports aso.
-            //             $(window).trigger('resize');
-
-            //             // Loop
-            //             requestAnimationFrame(_triggerResizeAccumulator);
-            //         }
-            //     });
-            // }
+            // Sync right section position with other sections
+            vm.isTopPaddingEnabled = wvLayout.isTopEnabled;
+            vm.isBottomPaddingEnabled = wvLayout.isBottomEnabled;
+            
+            scope.$watch(function() {
+                return [
+                    wvLayout.isTopEnabled,
+                    wvLayout.isBottomEnabled
+                ];
+            }, function(newValues) {
+                vm.isTopPaddingEnabled = newValues[0];
+                vm.isBottomPaddingEnabled = newValues[1];
+            }, true);
         }
     }
 

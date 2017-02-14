@@ -16,43 +16,34 @@
             restrict: 'E',
             transclude: true,
             templateUrl: 'app/layout/layout-main.html',
-            scope: {
-
-            },
-            // replace: true
+            scope: {}
         };
         return directive;
 
-        function link(scope, element, attrs, layoutCtrl) {
+        function link(scope, element, attrs, wvLayout) {
             var vm = scope.vm
 
-            // Set startup values
-            vm.asideLeftHidden = layoutCtrl.asideLeftHidden;
-            vm.asideRightMinified = layoutCtrl.asideRightMinified;
-            vm.asideRightHidden = layoutCtrl.asideRightHidden;
-            vm.asideRightEnabled = layoutCtrl.asideRightEnabled;
+            // Sync main section position with other sections
+            vm.isTopPaddingEnabled = wvLayout.isTopEnabled;
+            vm.isRightPaddingEnabled = wvLayout.isRightEnabled && !wvLayout.isRightClosed;
+            vm.isBottomPaddingEnabled = wvLayout.isBottomEnabled;
+            vm.isLeftPaddingEnabled = wvLayout.isLeftEnabled && !wvLayout.isLeftClosed;
 
-            // Listen to value changes
-            layoutCtrl.onAsideLeftHidden(vm, function(value) {
-                vm.asideLeftHidden = value;
-            });
-            layoutCtrl.onAsideRightMinified(vm, function(value) {
-                vm.asideRightMinified = value;
-            });
-            layoutCtrl.onAsideRightHidden(vm, function(value) {
-                vm.asideRightHidden = value;
-            });
-            layoutCtrl.onAsideRightEnabled(vm, function(value) {
-                vm.asideRightEnabled = value;
-            });
-
-            // Close listeners
-            scope.$on('$destroy', function() {
-                layoutCtrl.onAsideLeftHidden.close(vm);
-                layoutCtrl.onAsideRightMinified.close(vm);
-                layoutCtrl.onAsideRightHidden.close(vm);
-                layoutCtrl.onAsideRightEnabled.close(vm);
-            });
+            scope.$watch(function() {
+                return [
+                    wvLayout.isTopEnabled,
+                    wvLayout.isRightEnabled,
+                    wvLayout.isRightClosed,
+                    wvLayout.isBottomEnabled,
+                    wvLayout.isLeftEnabled,
+                    wvLayout.isLeftClosed,
+                ];
+            }, function(newValues) {
+                vm.isTopPaddingEnabled = newValues[0];
+                vm.isRightPaddingEnabled = newValues[1] && !newValues[2];
+                vm.isBottomPaddingEnabled = newValues[3];
+                vm.isLeftPaddingEnabled = newValues[4] && !newValues[5];
+            }, true);
         }
     }
 

@@ -1,36 +1,37 @@
-(function () {
+/**
+ * @description
+ * Directive to be transcluded in the layout. It provides configuration
+ * attribute that are transmitted to the `wvLayout` directive. The `wvLayout`
+ * directive has the responsibility of setting the right css classes.
+ */
+(function() {
     'use strict';
 
     angular
-        .module('webviewer.layout')
-        .directive('wvLayoutTop', wvLayoutTop);
+        .module('webviewer')
+        .directive('wvLayoutTopLeft', wvLayoutTopLeft);
 
     /* @ngInject */
-    function wvLayoutTop($parse) {
+    function wvLayoutTopLeft($parse) {
         var directive = {
             bindToController: true,
-            require: '^^wvLayout',
-            transclude: {
-                '1': '?wvLayoutTop1',
-                '2': '?wvLayoutTop2',
-                '3': '?wvLayoutTop3',
-                '4': '?wvLayoutTop4'
-            },
-            controller: layoutTopCtrl,
+            controller: LayouTopLeftVM,
             controllerAs: 'vm',
             link: link,
             restrict: 'E',
+            require: '^^wvLayout',
             scope: {
                 enabled: '=?wvEnabled'
             },
-            templateUrl: 'app/layout/layout-top.html'
+            transclude: true,
+            template: '<div ng-transclude></div>'
         };
         return directive;
 
         function link(scope, element, attrs, wvLayout) {
             var vm = scope.vm;
 
-            // Enable top by default (as long as the directive is used)
+            // Enable top left by default (as long as the directive is used)
             if ($parse(attrs.enabled).assign) {
                 vm.enabled = typeof vm.enabled !== 'undefined' ? vm.enabled : true;
             }
@@ -38,17 +39,15 @@
             // Transfer states to the wvLayout controller. We delegate state
             // management to wvLayout since this directive may be set up by
             // the wvWebviewer 
-            wvLayout.isTopEnabled = vm.enabled;
+            wvLayout.isTopLeftEnabled = vm.enabled;
             scope.$watch('vm.enabled', function(isEnabled, wasEnabled) {
-                wvLayout.isTopEnabled = isEnabled;
+                wvLayout.isTopLeftEnabled = isEnabled;
             });
         }
     }
 
     /* @ngInject */
-    function layoutTopCtrl() {
-        var vm = this;
+    function LayouTopLeftVM() {
+
     }
-
 })();
-

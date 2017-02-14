@@ -6,7 +6,7 @@
         .directive('wvLayoutLeft', wvLayoutLeft);
 
     /* @ngInject */
-    function wvLayoutLeft() {
+    function wvLayoutLeft($parse) {
         var directive = {
             bindToController: true,
             controller: layoutLeftCtrl,
@@ -16,62 +16,56 @@
             require: '^^wvLayout',
             transclude: true,
             scope: {
-                asideHidden: '=?wvAsideHidden'
+                enabled: '=?wvEnabled',
+                closed: '=?wvClosed',
+                handlesEnabled: '=?wvHandlesEnabled'
             },
             templateUrl:'app/layout/layout-left.html'
         };
         return directive;
 
-        function link(scope, element, attrs, layoutCtrl) {
+        function link(scope, element, attrs, wvLayout) {
             var vm = scope.vm;
 
-            // Set initial values
-            vm.asideHidden = !!vm.asideHidden;
+            // Enable top left by default (as long as the directive is used)
+            if ($parse(attrs.enabled).assign) {
+                vm.enabled = typeof vm.enabled !== 'undefined' ? !!vm.enabled : true;
+            }
+            // Keep top left open by default
+            if ($parse(attrs.closed).assign) {
+                vm.closed = typeof vm.closed !== 'undefined' ? !!vm.closed : false;
+            }
+            // Enable handles by default
+            if ($parse(attrs.handlesEnabled).assign) {
+                vm.handlesEnabled = typeof vm.handlesEnabled !== 'undefined' ? !!vm.handlesEnabled : true;
+            }
 
-            // Propagate to `main` layout section
-            layoutCtrl.onAsideLeftHidden.trigger(vm.asideHidden);
-            
-            // Use $watchGroup to avoid dual triggering on change.
+            // Transfer states to the wvLayout controller. We delegate state
+            // management to wvLayout since this directive may be set up by
+            // the wvWebviewer 
+            wvLayout.isLeftEnabled = vm.enabled;
+            wvLayout.isLeftClosed = vm.closed;
             scope.$watchGroup([
-                'vm.asideHidden'
-            ], function (newValues, oldValues) {
-                // Ignore the first setting (at application startup)
-                if (newValues[0] === oldValues[0]) {
-                    return;
-                }
-
-                // Trigger `hidden` changed event (so the main section can
-                // changes its size via css).
-                layoutCtrl.onAsideLeftHidden.trigger(newValues[0]);
+                'vm.enabled',
+                'vm.closed'
+            ], function(newValues) {
+                wvLayout.isLeftEnabled = !!newValues[0];
+                wvLayout.isLeftClosed = !!newValues[1];
             });
 
-            // function _triggerResize() {
-            //     var start = undefined;
-            //     var animationDuration = 700; // ms
-
-            //     // Wait for the current digest cycle to end (so the animation 
-            //     // has effectively starts). Use setTimeout instead of $timeout
-            //     // to avoid triggering an useless digest cycle (since
-            //     // requestAnimationFrame is used as well).
-            //     setTimeout(function() {
-            //         // Start the animation
-            //         requestAnimationFrame(function _triggerResizeAccumulator(timestamp) { // timestamp unit is millisecond (double) 
-            //             if (!start) {
-            //                 start = timestamp;
-            //             }
-            //             var progress = timestamp - start;
-
-            //             // Animate progressively
-            //             if (progress < animationDuration) {
-            //                 // Resize viewports aso.
-            //                 $(window).trigger('resize');
-
-            //                 // Loop
-            //                 requestAnimationFrame(_triggerResizeAccumulator);
-            //             }
-            //         });
-            //     });
-            // }
+            // Sync left section position with other sections
+            vm.isTopPaddingEnabled = wvLayout.isTopEnabled;
+            vm.isBottomPaddingEnabled = wvLayout.isBottomEnabled;
+            
+            scope.$watch(function() {
+                return [
+                    wvLayout.isTopEnabled,
+                    wvLayout.isBottomEnabled
+                ];
+            }, function(newValues) {
+                vm.isTopPaddingEnabled = newValues[0];
+                vm.isBottomPaddingEnabled = newValues[1];
+            }, true);
         }
     }
 
