@@ -33,10 +33,6 @@
 
     /* @ngInject */
     function wvScrollOnOverSeriesExt() {
-        // Usage:
-        //
-        // Creates:
-        //
         var directive = {
             controller: Controller,
             link: link,

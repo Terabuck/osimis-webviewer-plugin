@@ -213,6 +213,12 @@
         };
 
         WvSeries.prototype.goToImage = function(newIndex) {
+            // Convert index to integer to be able to simply use expressions 
+            // such as `imageCount/2` in AngularJS declarative code and 
+            // elsewhere.
+            newIndex = Math.floor(newIndex);
+
+            // Limit index to available range of image
             if (newIndex < 0) {
               newIndex = 0;
             }
