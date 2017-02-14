@@ -4,6 +4,7 @@ FROM osimis/webapp-builder:1.1.1
 WORKDIR /frontend
 COPY package.json .
 COPY bower.json .
+COPY local_dependencies/ local_dependencies/
 RUN npm install --unsafe-perm --python=python2.7
 RUN bower install --allow-root
 # Make sure the home-made developed injectInlineWorker plugin has not been erased by npm install

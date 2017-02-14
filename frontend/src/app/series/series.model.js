@@ -256,6 +256,14 @@
                 var desiredFrameRateInMs = 1000 / _this.frameRate; // Convert framerate FPS into MS
                 // Wait for the monitor to attempt refresh
                 _cancelAnimationId = requestAnimationFrame(function(currentTimeInMs) {
+                    // In Safari Mobile 10, currentTimeInMs is undefined. This
+                    // bug is undocumented and doesn't seem to be well known.
+                    // We specify the variable value manually to prevent the
+                    // play feature from not working.
+                    if (typeof currentTimeInMs === 'undefined') {
+                        currentTimeInMs = performance.now();
+                    }
+
                     // Draw series at desired framerate (wait for the desired framerate ms time to be passed,
                     // skip displaying till it has not passed)
                     if (currentTimeInMs - _lastTimeInMs >= desiredFrameRateInMs) {

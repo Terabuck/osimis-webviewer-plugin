@@ -19,26 +19,6 @@
   color: hsl(0, 0%, 70%);
 }
 
-.wv-serieslist-reportitem {
-  padding: 0;
-  text-align: center;
-  
-  width: 150px;
-  height: 150px;
-  margin: auto;
-  margin-bottom: 0.5rem;
-}
-
-.wv-serieslist-noreportitem {
-  padding: 0;
-  text-align: center;
-  
-  width: 150px;
-  height: 150px;
-  margin: auto;
-  margin-bottom: 0.5rem;
-}
-
 .wv-serieslist-overlay {
   position: absolute;
   bottom:0;
@@ -60,35 +40,33 @@
   &:hover {
     color: white;
   }
-}.wv-serieslist-reporticon {
+}
+
+.wv-serieslist-reporticon, .wv-serieslist-reporticon.fa { // Make sure it has precedence over .fa class {
   // Fill the li element 
   width: 100%;
   height: 100%;
 
   // Fill the li element with the fontawesome icon
   font-size: 4em;
-  line-height: 125px; // middle center icon (a bit upper so we have space for the label)
-
-}
-.wv-serieslist-reportlabel {
-  // Position the label
-  position: absolute;
-  bottom: 3rem;
-  left: 50%;
-  transform: translateX(-50%);
+  line-height: 1.25em;
+  text-align: center;
 }
 
-// No-report icon
+// No-report icon & label
 .wv-serieslist-noreport {
+  // Grey out (since no report is available)
+  color: #555;
 }
-.wv-serieslist-noreporticon {
+.wv-serieslist-noreporticon, .wv-serieslist-noreporticon.fa { // Make sure it has precedence over .fa class
   // Fill the li element 
   width: 100%;
   height: 100%;
 
   // Fill the li element with the fontawesome icon
   font-size: 4em;
-  line-height: 125px; // middle center icon (a bit upper so we have space for the label)
+  line-height: 1.25em;
+  text-align: center;
 
   // Diagonal line crossing report icon (to tell none are available)
   position: relative;
@@ -108,11 +86,3 @@
     content: "";
   }
 }
-.wv-serieslist-noreportlabel {
-  // Position the label
-  position: absolute;
-  bottom: 3rem;
-  left: 50%;
-  transform: translateX(-50%);
-}
-

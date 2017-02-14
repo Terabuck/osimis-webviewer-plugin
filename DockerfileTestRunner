@@ -156,6 +156,7 @@ WORKDIR /frontend
 COPY frontend/package.json /frontend/package.json
 RUN npm install
 COPY frontend/bower.json /frontend/bower.json
+COPY frontend/local_dependencies/ /frontend/local_dependencies/
 RUN bower install --allow-root
 
 # copy app content

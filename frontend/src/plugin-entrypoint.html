@@ -1,12 +1,12 @@
 <!doctype html>
-<html class="wv-html">
-  <head>
+<html ng-app="webviewer" class="wv-html">
+<head>
     <style>
         /* This helps the ng-show/ng-hide animations start at the right place. */
         /* Since Angular has this but needs to load, this gives us the class early. */
         .ng-hide { display: none!important; }
     </style>
-    <title ng-bind="title">Osimis Web Viewer</title>
+    <title ng-bind="title">Osimis' Web Viewer</title>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
@@ -17,22 +17,33 @@
     <!-- endbower -->
     <!-- endbuild -->
 
+    <!-- build:css fonts/fonts.css -->
+    <!-- inject:fonts:css -->
+    <!-- endinject -->
+    <!-- endbuild -->
+
     <!-- build:css styles/app.css -->
     <!-- inject:css -->
     <!-- endinject -->
     <!-- endbuild -->
-  </head>
-  <body ng-app="orthanc" class="wv-body" style="background-color: black;">
-    <div ng-controller="OsimisWebViewer as vm" class="wv-container">
-        <wv-webviewer
-            wv-studylist-enabled="false"
-            
-            wv-study-id="vm.studyId"
-            wv-serieslist-enabled="vm.mode === 'study'" 
+</head>
+<body
+    ng-controller="MainController as vm" 
+    class="wv-body"
+>
+    <wv-webviewer
+        wv-study-id="vm.studyId"
+        wv-series-id="vm.seriesId"
 
-            wv-series-id="vm.seriesId"
-        ></wv-webviewer>
-    </div>
+        wv-toolbar-enabled="vm.enableToolbar"
+        wv-serieslist-enabled="vm.enableLayoutLeft && vm.mode === 'study'"
+        wv-studyinformation-enabled="vm.enableLayoutLeft && vm.mode === 'study'"
+        wv-lefthandles-enabled="vm.enableLayoutLeftHandles"
+
+        wv-notice-enabled="vm.enableNotice"
+        wv-notice-text="vm.noticeText"
+    >
+    </wv-webviewer>
 
     <!-- build:js js/lib.js -->
     <!-- bower:js -->
@@ -46,70 +57,92 @@
     <!-- inject:templates:js -->
     <!-- endinject -->
     <!-- endbuild -->
-
+    
     <!-- Path served by orthanc backend -->
     <script src="../config.js" type="text/javascript"></script>
-    
+
     <script>
+    angular
+    .module('webviewer')
     // Remove debug info and improve performances
     // Can be reactivated on the fly using "angular.reloadWithDebugInfo();" in the console
     // see https://docs.angularjs.org/guide/production#disabling-debug-data
-    angular
-    .module('webviewer')
     .config(['$compileProvider', function ($compileProvider) {
         $compileProvider.debugInfoEnabled(false);
+    }])
+    // Define a basic controller
+    .controller('MainController', [
+        '$scope', '$location', 'wvConfig', 'wvSeriesManager',
+        function($scope, $location, wvConfig, wvSeriesManager)
+    {
+        var vm = this;
+
+        // Retrieve URL's params and set study/series
+        var orthancStudyId = $location.search().study;
+        var orthancSeriesId = $location.search().series;
+        var orthancStudyId = $location.search().study;
+
+        vm.studyId = undefined;
+        vm.seriesId = undefined;
+
+        // Display orthanc study
+        if (orthancStudyId) {
+            vm.mode = 'study';
+            vm.studyId = orthancStudyId;
+        }
+        // Display & convert orthanc series id (from url parameter) into frontend series id
+        else {
+            wvSeriesManager
+                .listFromOrthancSeriesId(orthancSeriesId)
+                .then(function(seriesList) {
+                    // When singleframe, display the frontend series
+                    if (seriesList.length === 1) {
+                        vm.mode = 'series';
+                        vm.seriesId = seriesList[0].id;
+                    }
+                    // When multiframe, consider series as a study
+                    else if (!vm.studyId) {
+                        // @todo @warning multiple series may be shown instead of a single one... study id should also be split...
+                        var request = new osimis.HttpRequest();
+                        request.setHeaders(wvConfig.httpRequestHeaders);
+                        
+                        request
+                            .get(wvConfig.orthancApiURL + '/series/'+orthancSeriesId+'/study')
+                            .then(function(study) {
+                                vm.mode = 'study';
+                                vm.studyId = study.data.ID;
+                            });
+                    }
+                    else {
+                        throw new Error('Invalid URL parameters');
+                    }
+                }, function(err) {
+                    console.error('err', err);
+                });
+        }
+        
+        // Configure the user interface depending on the user angent/browser.
+        var userInterfacePolicy = new osimis.UserAgentBasedInterfacePolicy();
+        vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
+        vm.enableToolbar = userInterfacePolicy.enableToolbar;
+        vm.enableLayoutLeft = userInterfacePolicy.enableLayoutLeft;
+        vm.enableLayoutLeftHandles = userInterfacePolicy.enableLayoutLeftHandles;
+        vm.enableNotice = userInterfacePolicy.enableNotice;
+        vm.noticeText = userInterfacePolicy.noticeText;
+
+        // Listen to changes triggered by the user interface policy.    
+        userInterfacePolicy.onUpdate(function() {
+            $scope.$apply(function() {
+                vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
+                vm.enableToolbar = userInterfacePolicy.enableToolbar;
+                vm.enableLayoutLeft = userInterfacePolicy.enableLayoutLeft;
+                vm.enableLayoutLeftHandles = userInterfacePolicy.enableLayoutLeftHandles;
+                vm.enableNotice = userInterfacePolicy.enableNotice;
+                vm.noticeText = userInterfacePolicy.noticeText;
+            });
+        });
+
     }]);
-    </script>
-
-    <script>
-        angular.module('orthanc', ['webviewer'])
-        .controller('OsimisWebViewer', function($scope, $location, $rootScope, WvHttpRequest, wvConfig, wvSeriesManager) {
-            var vm = this;
-
-            var orthancStudyId = $location.search().study;
-            var orthancSeriesId = $location.search().series;
-
-            vm.studyId = undefined;
-            vm.seriesId = undefined;
-
-            // Display orthanc study
-            if (orthancStudyId) {
-                vm.mode = 'study';
-                vm.studyId = orthancStudyId;
-            }
-            // Display & convert orthanc series id (from url parameter) into frontend series id
-            else {
-                wvSeriesManager
-                    .listFromOrthancSeriesId(orthancSeriesId)
-                    .then(function(seriesList) {
-                        // When singleframe, display the frontend series
-                        if (seriesList.length === 1) {
-                            vm.mode = 'series';
-                            vm.seriesId = seriesList[0].id;
-                        }
-                        // When multiframe, consider series as a study
-                        else if (!vm.studyId) {
-                            // @todo @warning multiple series may be shown instead of a single one... study id should also be split...
-                            var request = new WvHttpRequest();
-                            request.setHeaders(wvConfig.httpRequestHeaders);
-                            
-                            request
-                                .get(wvConfig.orthancApiURL + '/series/'+orthancSeriesId+'/study')
-                                .then(function(study) {
-                                    vm.mode = 'study';
-                                    vm.studyId = study.data.ID;
-                                });
-                        }
-                        else {
-                            throw new Error('Invalid URL parameters');
-                        }
-                    }, function(err) {
-                        console.error('err', err);
-                    });
-            }
-
-        })
-        ;
     </script>
 </body>
 </html>
