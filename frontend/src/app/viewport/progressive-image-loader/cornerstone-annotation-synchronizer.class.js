@@ -73,15 +73,15 @@
      * @methodOf osimis.CornerstoneAnnotationSynchronizer
      * 
      * @name osimis.CornerstoneAnnotationSynchronizer#_retrieveResolutionScaleRatio
-     * @param {object} baseBinaryResolution The base binary resolution
-     * @param {object} newBinaryResolution The new binary resolutio
+     * @param {object} baseResolution The base binary resolution
+     * @param {object} newResolution The new binary resolutio
      *
      * @description
      * # @warning This method expect resolution scale to be the same for both side (width and height),
      *            this constraint is not verified for performance reasons.
      */
-    function _retrieveResolutionScaleRatio(baseBinaryResolution, newBinaryResolution) {
-        return baseBinaryResolution.width / newBinaryResolution.width;
+    function _retrieveResolutionScaleRatio(baseResolution, newResolution) {
+        return baseResolution.width / newResolution.width;
     }
 
     /**
@@ -89,38 +89,37 @@
      * @methodOf osimis.CornerstoneAnnotationSynchronizer
      * 
      * @name osimis.CornerstoneAnnotationSynchronizer#syncByAnnotationType
-     * @param {object} annotations The cornerstone annotations of an imageId (for one tool)
-     * @param {object} baseBinaryResolution Old resolution, with values {height, width}, it's the binary resolution,
-     *                                       not necessarily the annotation one! This is why data.imageResolution takes
-     *                                       precedences over baseBinaryResolution when there is a conflict (for instance when
-     *                                       the annotations are downloaded over internet instead of written directly from the
-     *                                       viewport). This is important for features such as the liveshare.
-     * @param {object} newBinaryResolution New resolution, with values {height, width}
+     * 
+     * @param {object} annotations
+     * The cornerstone annotations of an imageId (for one tool)
+     * 
+     * @param {object} baseResolution
+     * Old resolution, with values {height, width}, it's the binary resolution,
+     * not necessarily the annotation one! This is why data.imageResolution takes
+     * precedences over baseResolution when there is a conflict (for instance when
+     * the annotations are downloaded over internet instead of written directly from the
+     * viewport). This is important for features such as the liveshare.
+     * 
+     * @param {object} newResolution
+     * New resolution, with values {height, width}
      * 
      * @description
      * Update (mutate) annotations to the new resolution.
      *
      * Mutation is done to keep the variable references with cornerstoneTools.
      */
-    CornerstoneAnnotationSynchronizer.prototype.syncByAnnotationType = function(type, annotations, baseBinaryResolution, newBinaryResolution) {
-        // Bypass useless processings
-        // Also, ignore some wrong cases where data.imageResolution != baseBinaryResolution happening when reading 
-        if (!annotations.data.length || _.isEqual(baseBinaryResolution, newBinaryResolution)) {
-            return;
-        }
-
+    CornerstoneAnnotationSynchronizer.prototype.syncByAnnotationType = function(type, annotations, baseResolution, newResolution) {
+        // For each annotation
         annotations.data.forEach(function(data) {
-            // Use data.imageResolution in case baseBinaryResolution != data.imageResolution
-            if (baseBinaryResolution && data.imageResolution && !_.isEqual(baseBinaryResolution, data.imageResolution)) {
-                // (console.warn||console.error)('Inconsistant annotation resolution state');
-                baseBinaryResolution = data.imageResolution;
+            // Use data.imageResolution in case baseResolution != data.imageResolution
+            if (data.imageResolution) {
+                baseResolution = data.imageResolution;
             }
-            baseBinaryResolution = baseBinaryResolution || data.imageResolution;
 
             // If a resolution is already defined for these annotations,
             // convert data to the new one.
-            if (baseBinaryResolution) {
-                var resolutionScale = _retrieveResolutionScaleRatio(baseBinaryResolution, newBinaryResolution);
+            if (baseResolution) {
+                var resolutionScale = _retrieveResolutionScaleRatio(baseResolution, newResolution);
                 var propertiesToConvert = _propertyConversionTable[type];
 
                 _
@@ -137,27 +136,10 @@
                     });
             }
 
-            // Store newBinaryResolution as the binary resolution used to measure the annotations
-            data.imageResolution = newBinaryResolution;
+            // Store newResolution as the binary resolution used to measure the annotations
+            data.imageResolution = newResolution;
         });
     };
-
-    // *
-    //  * @ngdoc method
-    //  * @methodOf osimis.CornerstoneAnnotationSynchronizer
-    //  * 
-    //  * @name osimis.CornerstoneAnnotationSynchronizer#sync
-    //  * @param {object} annotations The cornerstone annotations of an imageId (for each tools)
-    //  * @param {object} newBinaryResolution New resolution, with values {height, width}
-    //  *
-    //  * @description
-    //  * Update (mutate) all the provided annotations to the new resolution.
-    //  *
-    //  * Mutation is done to keep the variable references with cornerstoneTools.
-     
-    // CornerstoneAnnotationSynchronizer.prototype.sync = function(annotations, newBinaryResolution) {
-        
-    // };
 
     module.CornerstoneAnnotationSynchronizer = CornerstoneAnnotationSynchronizer;
 

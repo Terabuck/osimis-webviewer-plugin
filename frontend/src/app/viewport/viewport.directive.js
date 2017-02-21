@@ -188,18 +188,22 @@
                 scope.$watch(function() {
                     // To make viewport is not reset before the image changes (
                     // instead of after), we need to treat both variable at the
-                    // same times.
-                    // scope.$watchGroup doesn't supports deep watching, this 
-                    // is the way around.
+                    // same times. scope.$watchGroup doesn't supports deep
+                    // watching, this is the way around. We must use deep watch
+                    // as viewport#setViewport() method creates a copy of
+                    // csViewport parameters, which in turn are set back in 
+                    // viewport directive attribute. If we do not deep watch,
+                    // we will therefore go through an infinite $digest loop.
                     return [
                         scope.vm.wvImageId,
-                        scope.vm.csViewport
-                    ]
+                        scope.vm.csViewport && scope.vm.csViewport.serialize()
+                     ]
                 }, function(newValues, oldValues){
                     var oldImageId = oldValues[0];
                     var newImageId = newValues[0];
-                    var oldCsViewport = oldValues[1];
-                    var newCsViewport = newValues[1]; // Reset viewport if null/undefined
+                    var oldSerializedCsViewport = oldValues[1];
+                    var newSerializedCsViewport = newValues[1]; // Reset viewport if null/undefined
+                    var newUnserializedCsViewport = newSerializedCsViewport && osimis.CornerstoneViewportWrapper.deserialize(newSerializedCsViewport); // scope.vm.csViewport;
 
                     // Case 1 : NEW IMAGE (or first one, at directive setup)
                     //   DOWNLOAD IMAGE
@@ -222,8 +226,8 @@
                             .then(function(newImage) {
                                 // Set/Reset the viewport
                                 var resetViewport = undefined;
-                                if (newCsViewport) {
-                                    model.setViewport(newCsViewport);
+                                if (newSerializedCsViewport) {
+                                    model.setViewport(newUnserializedCsViewport);
                                     resetViewport = false;
                                 }
                                 else {
@@ -243,16 +247,16 @@
                     // Case 3 : KEEP IMAGE
                     //   UPDATE CS VIEWPORT
                     //   DRAW IMAGE
-                    else if (!!newCsViewport && !_.isEqual(newCsViewport, oldCsViewport)) {
+                    else if (!!newSerializedCsViewport && !_.isEqual(newSerializedCsViewport, oldSerializedCsViewport)) {
                         // Update csViewport
-                        model.setViewport(newCsViewport);
+                        model.setViewport(newUnserializedCsViewport);
                         model.draw();
                     }
 
                     // Case 4 : KEEP IMAGE
                     //   RESET VIEWPORT
                     //   DRAW IMAGE
-                    else if (!newCsViewport && newCsViewport != oldCsViewport) {
+                    else if (!newSerializedCsViewport && newSerializedCsViewport != oldSerializedCsViewport) {
                         model.reset();
                         model.draw();
                     }
