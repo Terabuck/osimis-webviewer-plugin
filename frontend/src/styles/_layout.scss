@@ -303,6 +303,13 @@ $asideRightPadding: 10px;
 .wvViewer__topBar{
     width:100%;
     // margin-top: 0.5rem;
+
+    // Make sure the main layout appears behind the toolbar. Button will 
+    // therefore always be clickable even when the windows is small and the
+    // toolbar is split in two vertical bars, one of which appearing on top
+    // of the layout main zone.
+    position: absolute;
+    z-index: 3;
 }
 .wvViewer__buttonGroup{
     display:inline-block;
