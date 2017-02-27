@@ -48,6 +48,11 @@
                 wv-selected-study-id="vm.studyId"
             ></wv-studylist>
         </wv-layout-top-left>
+
+        <!-- Download Study Button -->
+        <wv-layout-top-right wv-enabled="!vm.isMobile && vm.enableLayoutTopRight">
+            <wv-study-download-button ng-if="!vm.isMobile" wv-study-id="vm.studyId"></wv-study-download-button>
+        </wv-layout-top-right>
     </wv-webviewer>
 
     <!-- build:js js/lib.js -->
@@ -83,9 +88,14 @@
         // We could retrieve URL parameters here. This is not required for the 
         // index page though.
 
+        // Deactivate study download on mobile
+        var uaParser = new UAParser();
+        vm.isMobile = (uaParser.getDevice().type === 'mobile');
+
         // Configure the user interface depending on the user angent/browser.
         var userInterfacePolicy = new osimis.UserAgentBasedInterfacePolicy();
         vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
+        vm.enableLayoutTopRight = userInterfacePolicy.enableLayoutTopRight;
         vm.enableToolbar = userInterfacePolicy.enableToolbar;
         vm.enableLayoutLeft = userInterfacePolicy.enableLayoutLeft;
         vm.enableLayoutLeftHandles = userInterfacePolicy.enableLayoutLeftHandles;
@@ -96,6 +106,7 @@
         userInterfacePolicy.onUpdate(function() {
             $scope.$apply(function() {
                 vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
+                vm.enableLayoutTopRight = userInterfacePolicy.enableLayoutTopRight;
                 vm.enableToolbar = userInterfacePolicy.enableToolbar;
                 vm.enableLayoutLeft = userInterfacePolicy.enableLayoutLeft;
                 vm.enableLayoutLeftHandles = userInterfacePolicy.enableLayoutLeftHandles;
