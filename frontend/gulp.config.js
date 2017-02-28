@@ -38,8 +38,7 @@ module.exports = function() {
         htmltemplates: clientApp + '**/*.html',
         images: client + 'images/**/*.*',
         indexes: [
-            client + 'index.html',
-            client + 'plugin-entrypoint.html'
+            client + 'index.html'
         ],
         config: client + 'config.js.embedded', // config file to copy in build
         // app js, with no specs
@@ -66,8 +65,7 @@ module.exports = function() {
         ],
         temp: temp,
         tempIndexes: [
-            temp + 'index.html',
-            temp + 'plugin-entrypoint.html'
+            temp + 'index.html'
         ],
         /**
          * optimized files

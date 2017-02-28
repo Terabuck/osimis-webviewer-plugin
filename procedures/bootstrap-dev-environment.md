@@ -121,5 +121,4 @@ your Orthanc config.json file.
 
 Known issues:
 - the serve-dev command erases the _build/_ folder content.
-- the server must be restarted to update index.html or plugin-entrypoint.html
-  files.
+- the server must be restarted to update index.html file.

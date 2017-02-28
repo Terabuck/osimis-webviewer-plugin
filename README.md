@@ -24,7 +24,7 @@ Have a look at [our blog](http://www.osimis.io/en/blog.html).
 
 A demo of the viewer is available at those links:
 
-- [IRM study](http://osimisviewer.osimis.io/osimis-viewer/app/plugin-entrypoint.html?study=1b4c72ad-5aba2557-9fc396b3-323e190c-07d36585).
+- [IRM study](http://osimisviewer.osimis.io/osimis-viewer/app/index.html?study=1b4c72ad-5aba2557-9fc396b3-323e190c-07d36585).
 - [Full demo](http://osimisviewer.osimis.io/), embedded within the Orthanc
   Explorer. Other studies are available from there.
 

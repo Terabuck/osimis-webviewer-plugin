@@ -7,6 +7,9 @@ Bug Fixes:
 * Display series in order
 * Fit images to the viewports
 
+Breaking changes:
+* `plugin-entrypoint.html` as been renamed to `index.html`
+
 Version 0.5.3
 ========================
 
