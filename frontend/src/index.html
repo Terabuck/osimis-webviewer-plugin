@@ -36,8 +36,8 @@
         wv-series-id="vm.seriesId"
 
         wv-toolbar-enabled="vm.enableToolbar"
-        wv-serieslist-enabled="vm.enableLayoutLeft && vm.mode === 'study'"
-        wv-studyinformation-enabled="vm.enableLayoutLeft && vm.mode === 'study'"
+        wv-serieslist-enabled="vm.enableLayoutLeft && vm.mode !== 'series'"
+        wv-studyinformation-enabled="vm.enableLayoutLeft && vm.mode !== 'series'"
         wv-lefthandles-enabled="vm.enableLayoutLeftHandles"
 
         wv-notice-enabled="vm.enableNotice"
@@ -45,11 +45,11 @@
     >
         <!-- Study list (for debug mode) -->
         <wv-layout-top-left
-            wv-enabled="vm.devMode &&
+            wv-enabled="vm.mode === 'dev' &&
                         vm.enableLayoutTopLeft"
         >
             <wv-studylist 
-                ng-if="vm.devMode"
+                ng-if="vm.mode === 'dev'"
                 wv-selected-study-id="vm.studyId"
             ></wv-studylist>
         </wv-layout-top-left>
@@ -110,9 +110,6 @@
         vm.studyId = undefined;
         vm.seriesId = undefined;
 
-        // Show study list if study & series haven't been set via URL
-        vm.devMode = !orthancStudyId && !orthancSeriesId;
-
         // Display orthanc study
         if (orthancStudyId) {
             vm.mode = 'study';
@@ -148,7 +145,11 @@
                     console.error('err', err);
                 });
         }
-        
+        // Show study list if study & series haven't been set via URL
+        else {
+            vm.mode = 'dev';
+        }
+
         // Configure the user interface depending on the user angent/browser.
         var userInterfacePolicy = new osimis.UserAgentBasedInterfacePolicy();
         vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
