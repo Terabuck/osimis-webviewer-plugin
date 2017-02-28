@@ -1,7 +1,7 @@
 /**
  * @description 
  * This object wraps cornerstone viewport data object to handle progressive
- * image loading via multiple resolution. For conveniance, it keeps the înitial
+ * image loading via multiple resolution. For conveniance, it keeps the initial
  * cornestone interface. Using Object#defineProperties is also the only way to
  * provide real time resolution conversion when cornerstone tools zoom/pan are 
  * being used but and the image resolution changes.
