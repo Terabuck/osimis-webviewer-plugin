@@ -11,7 +11,7 @@
  * # @rationale
  * Should be the easiest possible class to manage a viewport.
  */
-(function(osimis) {
+(function(osimis, Promise) {
 
     /**
      * @ngdoc method
@@ -46,6 +46,19 @@
         }
         else {
             this._qualityPolicy = osimis.QualityForThumbnail;
+        }
+
+        // Sync annotation resolution only for diagnosis viewport. We must do
+        // this as Cornerstone only handle annotation by image id instead of 
+        // via viewport and don't handle multi image resolution. Thus, if we
+        // let for instance thumbnails sync annotation resolution, as they may
+        // use a different resolution than diagnosis viewports, they will make
+        // the annotation go out of sync with diagnosis viewport! Hopefully, 
+        // only diagnosis viewport should display annotation.
+        if (isDiagnosisViewport) {
+            this._syncAnnotationResolution = true;
+        } else {
+            this._syncAnnotationResolution = false;
         }
 
         // Stored to be able to abort loading when image change.
@@ -156,9 +169,18 @@
         var enabledElement = this._enabledElement;
         var enabledElementObject = this._enabledElementObject;
 
-        // Redraw the image - don't use cornerstone#displayImage because bugs occurs (only when debugger is off)
-        // those issues may come from changing the cornerstoneImageObject (cornerstone probably cache it).
-        // Draw image & invalidate cornerstone cache (multiple viewport with different resolution can be displayed at the same time)
+        // Ignore drawing if the image is not loaded yet. This can happen for
+        // instance when the viewport data are modified externally while the 
+        // image hasn't been loaded yet.
+        if (!enabledElementObject.image) {
+            return;
+        }
+
+        // Redraw the image - don't use cornerstone#displayImage because bugs
+        // occurs (only when debugger is off) those issues may come from 
+        // changing the cornerstoneImageObject (cornerstone probably cache it).
+        // Draw image & invalidate cornerstone cache (multiple viewport with
+        // different resolution can be displayed at the same time)
         cornerstone.updateImage(enabledElement, true);
         $(enabledElement).trigger("CornerstoneImageRendered", {
             viewport: enabledElementObject.viewport,
@@ -209,20 +231,18 @@
 
         // Display the binaries when they loads (eg. triggered 3 times if 3 qualities for one image) 
         var _firstLoadingResolution = true;
+        var _oldResolution = undefined;
         this._progressiveImageLoader.onBinaryLoaded(this, function(quality, csImageObject) {
             var oldImage = _this._displayedImage;
             var newImage = image;
-            var oldResolution = _this._currentImageResolution;
-            var newResolution = {
+            var oldResolution = _oldResolution || null;
+            _oldResolution = _.cloneDeep({
                 width: csImageObject.width,
                 height: csImageObject.height
-            };
+            });
 
             // Change binary/pixels
             enabledElementObject.image = csImageObject;
-
-            // Register new resolution
-            _this._currentImageResolution = newResolution;
 
             // Register new binary model (cornerstone image object)
             // Used by #reset method to fit image in the viewport as it need
@@ -230,40 +250,38 @@
             _this._displayedCornerstoneImageObject = csImageObject;
 
             // Register new image
-            // Used for instance by tools to retrieve image annotations - or by pixel to mm conversion (used by tools as well)
+            // Used for instance by tools to retrieve image annotations - or by
+            // pixel to mm conversion (used by tools as well)
             _this._displayedImage = newImage;
 
-            // Do stuffs required only when the first resolution is being loaded (cf. reset, etc.)
+            // Do stuffs required only when the first resolution is being
+            // loaded (cf. reset, etc.)
             if (_firstLoadingResolution) {
-                // Force canvas reset if the viewportData are not defined already
+                // Force canvas reset if the viewportData are not defined
+                // already (if an image was previously shown in this viewport, 
+                // the viewport data from the old image are kept, not reset!)
                 resetViewport = resetViewport || !_this._viewportData;
 
+                // Either keep old parameters from the previous image or clear
+                // them
+                if (resetViewport) {
+                    _this.reset();
+                }
                 // Sync the cs viewport object to the one stored if it is not 
                 // yet defined.
-                if (!resetViewport && !_this._enabledElementObject.viewport) {
-                    _this._enabledElementObject.viewport = _this._viewportData;
-                }
-
-                // Either keep old parameters from the previous image or clear them
-                if (resetViewport) {
-                    _this.reset(); // requires updated _displayedCornerstoneImageObject & _currentImageResolution
+                else if (!_this._enabledElementObject.viewport || !_this._enabledElement.viewport) {
+                    _this._enabledElementObject.viewport = _this._viewportData; // viewport data is set otherwise #reset would have been called
+                    _this._enabledElement.viewport = _this._viewportData;
                 }
             }
 
             // Adapt data (annotation & viewport parameter). It should only been done in some case (ie. no
             // need to adapt cornerstone viewport when resolution doesn't change). For convenience, these conditions
             // are handled within the synchronizer themselfs.
-
-            // Adapt annotations
-            // scale for now (even if the following syntax says otherwise).
-            // It means of an annotation must only be shown at a single resolution for all the viewports
-            // at a time, otherwise bug will occurs. In practise this is the case.
-            var annotations = newImage.getAnnotations();
-            annotations.forEach(function(annotationsByTool) {
-                CornerstoneAnnotationSynchronizer.syncByAnnotationType(annotationsByTool.type, annotationsByTool.data, oldResolution, newResolution);
-                newImage.setAnnotations(annotationsByTool.type, annotationsByTool.data);
+            var newResolution = _.cloneDeep({
+                width: csImageObject.width,
+                height: csImageObject.height
             });
-            // @todo save annotations?
 
             // Commit cornerstoneTools interactions (because internal cursor positions are cached
             // and based upon previous resolution).
@@ -272,12 +290,27 @@
             
             // Adapt cornerstone viewport parameters. This shouldn't be done if viewport
             // has been reset since the reset method already does the sync.
-            if (!resetViewport || !_firstLoadingResolution) {
-                var csViewportData = _this._enabledElementObject.viewport;
-                CornerstoneViewportSynchronizer.sync(csViewportData, oldResolution, newResolution);
+            var csViewportData = _this._viewportData;
+            // Dunno why we have to do this, but we have!
+            _this._enabledElementObject.viewport = csViewportData; // viewport data is set otherwise #reset would have been called
+            _this._enabledElement.viewport = csViewportData;
+            csViewportData.changeResolution(newResolution);
 
-                // Update _viewportData so it can be kept in sync.
-                this._viewportData = csViewportData;
+            // Adapt annotations' resolution for now (even if the following 
+            // syntax says otherwise). It means an annotation must only be 
+            // shown at a single resolution for all the viewports at a time, 
+            // otherwise bug will occurs. In practise this is the case.
+            if (_this._syncAnnotationResolution) {
+                var annotations = newImage.getAnnotations();
+                annotations.forEach(function(annotationsByTool) {
+                    CornerstoneAnnotationSynchronizer.syncByAnnotationType(
+                        annotationsByTool.type,
+                        annotationsByTool.data,
+                        _firstLoadingResolution ? null : oldResolution,
+                        newResolution
+                    );
+                    newImage.setAnnotations(annotationsByTool.type, annotationsByTool.data);
+                });
             }
 
             // Do stuffs required only when the first resolution is being loaded (cf. reset, etc.)
@@ -397,10 +430,12 @@
      * @return {object} Return cornerstone viewport data (see cornerstone doc).
      * 
      * @description
-     * # @todo abstract from cornerstone
      */
     Viewport.prototype.getViewport = function() {
-        return cornerstone.getViewport(this._enabledElement);
+        // Do not use cornerstone#getViewport directly as it copies the viewport 
+        // data, into a new object - thus, breaking the osimis' cornerstone 
+        // viewport data abstraction. We thus have rewrap it again.
+        return this._viewportData && this._viewportData.clone();
     };
 
     /**
@@ -414,8 +449,26 @@
      * @description
      * # @todo abstract from cornerstone
      */
-    // @todo refactor updateParameters & use displayer
     Viewport.prototype.setViewport = function(viewportData) {
+        // Assert viewportData is a wrapped viewport data, not the cornestone
+        // one.
+        if (viewportData.constructor !== osimis.CornerstoneViewportWrapper) {
+            throw new Error('setViewport called with non wrapped viewport');
+        }
+
+        // Make sure to adapt wrapped viewport's current image resolution to 
+        // the current image resolution, for instance if data are comming from
+        // the external world. Note in those case, the method's user should
+        // make sure setViewport is used after set image has been loaded,
+        // otherwise the new viewport will apply to the current image.
+        if (this._displayedCornerstoneImageObject) {
+            var newResolution = {
+                width: this._displayedCornerstoneImageObject.width,
+                height: this._displayedCornerstoneImageObject.height
+            };
+            viewportData.changeResolution(newResolution);
+        }
+
         // Store viewport data (since the image may not be yet loaded at the
         // moment and cornerstone#setViewport requires the image to be set).
         this._viewportData = viewportData;
@@ -426,9 +479,20 @@
         if (eeoViewport) {
             // Make sure nested objects exist to avoid exception due to copy on empty refactor
             // (see `cornerstone#setViewport` inner function).
-            eeoViewport.translation = eeoViewport.translation || {};
-            eeoViewport.voi = eeoViewport.voi || {};
+            if (!eeoViewport.translation) {
+                eeoViewport.translation = {};
+            }
+            if (!eeoViewport.voi) {
+                eeoViewport.voi = {};
+            }
 
+            // Store the viewport wrapper directly in cornerstone to make sure
+            // cornerstone uses the wrapper object instead of its original
+            // object.
+            this._enabledElement.viewport = viewportData;
+            this._enabledElementObject.viewport = viewportData;
+            // Still, use cornerstone#setViewport to benefits from minimal
+            // scale features (ie. keep scale > 0.005). 
             return cornerstone.setViewport(this._enabledElement, viewportData);
         }
 
@@ -455,10 +519,28 @@
         var cornerstoneImageObject = this._displayedCornerstoneImageObject;
 
         // Get the base viewport data
-        var viewportData = cornerstone.getDefaultViewportForImage(enabledElement, cornerstoneImageObject);
+        var viewportData = cornerstone.getDefaultViewportForImage(
+            enabledElement,
+            cornerstoneImageObject
+        ); 
+
+        // Wrap viewportData in an osimis class handling image resolution
+        // change. We'll configure it as if the image was in full resolution,
+        // even if it's not always the case. We'll therefore be able to perform
+        // resizing calculation based on full resolution information, and do
+        // the resolution conversion afterward.
+        var baseResolution = {
+            width: cornerstoneImageObject.originalWidth,
+            height: cornerstoneImageObject.originalHeight
+        };
+        viewportData = osimis.CornerstoneViewportWrapper.wrapCornerstoneViewport(
+            viewportData,
+            baseResolution,
+            baseResolution
+        );
 
         // Keep original image size if image is smaller than viewport
-        var isImageSmallerThanViewport = cornerstoneImageObject.originalWidth <= this._canvasWidth && cornerstoneImageObject.originalHeight <= this._canvasHeight;
+        var isImageSmallerThanViewport = baseResolution.width <= this._canvasWidth && baseResolution.height <= this._canvasHeight;
         if (isImageSmallerThanViewport) {
             // Show the image at original full width/height
             viewportData.scale = 1.0;
@@ -467,8 +549,8 @@
         else {
             // Choose the smallest between vertical and horizontal scale to show the entire image
             // (and not upscale one of the two)
-            var verticalScale = this._canvasHeight / cornerstoneImageObject.originalHeight;
-            var horizontalScale = this._canvasWidth / cornerstoneImageObject.originalWidth;
+            var verticalScale = this._canvasHeight / baseResolution.height;
+            var horizontalScale = this._canvasWidth / baseResolution.width;
             if(horizontalScale < verticalScale) {
               viewportData.scale = horizontalScale;
             }
@@ -477,19 +559,18 @@
             }
         }
 
-        // Sync viewportData from originalResolution (which is used to make the calculations) to the
-        // real resolution.
-        var baseResolution = {
-            width: cornerstoneImageObject.originalWidth,
-            height: cornerstoneImageObject.originalHeight,
-            scale: 1
+        // Sync viewportData from originalResolution (which is used to make the
+        // calculations) to the current image resolution.
+        var newResolution = {
+            width: cornerstoneImageObject.width,
+            height: cornerstoneImageObject.height
         };
-        var newResolution = this._currentImageResolution;
-        this._CornerstoneViewportSynchronizer.sync(viewportData, baseResolution, newResolution);
+        viewportData.changeResolution(newResolution);
 
         // Replace the viewport data in cornerstone (without redrawing, yet)
         var enabledElementObject = this._enabledElementObject; // enabledElementObject != enabledElementDom
         enabledElementObject.viewport = viewportData;
+        this._enabledElement.viewport = viewportData;
 
         // Update the cached viewportData
         this._viewportData = viewportData;
@@ -500,46 +581,6 @@
 
         // Method's user has to call .draw to avoid dual image redrawing.
     };
-    // Viewport.prototype.reset = function() {
-    //     var enabledElement = this._enabledElement;
-    //     var cornerstoneImageObject = this._displayedCornerstoneImageObject;
-
-    //     // Get the base viewport data
-    //     var viewportData = cornerstone.getDefaultViewportForImage(enabledElement, cornerstoneImageObject);
-
-    //     // Rescale the image to fit it into viewport
-    //     var resolution = this._currentImageResolution;
-
-    //     // Keep original image size if image is smaller than viewport
-    //     var isImageSmallerThanViewport = resolution.originalWidth <= this._canvasWidth && resolution.originalHeight <= this._canvasHeight;
-    //     if (isImageSmallerThanViewport) {
-    //         // Show the image at original full width/height
-    //         viewportData.scale = 1.0 * resolution.scale;
-    //     }
-    //     // Downscale image if it is bigger than viewport
-    //     else {
-    //         // Choose the smallest between vertical and horizontal scale to show the entire image
-    //         // (and not upscale one of the two)
-    //         var verticalScale = this._canvasHeight / resolution.originalHeight * resolution.scale;
-    //         var horizontalScale = this._canvasWidth / resolution.originalWidth * resolution.scale;
-    //         if(horizontalScale < verticalScale) {
-    //           viewportData.scale = horizontalScale;
-    //         }
-    //         else {
-    //           viewportData.scale = verticalScale;
-    //         }
-    //     }
-
-    //     // Replace the viewport data in cornerstone (without redrawing, yet)
-    //     var enabledElementObject = this._enabledElementObject; // enabledElementObject != enabledElementDom
-    //     enabledElementObject.viewport = viewportData;
-
-    //     // allow extensions to extend this behavior
-    //     // Used by invert tool to redefine inversion on viewport reset
-    //     this.onParametersResetting.trigger(viewportData);
-
-    //     // Method's user has to call .draw to avoid dual image redrawing.
-    // };
 
     /**
      * @ngdoc method
@@ -576,4 +617,4 @@
 
     osimis.Viewport = Viewport;
 
-})(this.osimis || (this.osimis = {}));
+})(this.osimis || (this.osimis = {}), this.Promise);
