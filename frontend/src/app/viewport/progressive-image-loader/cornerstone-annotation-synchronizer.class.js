@@ -74,7 +74,7 @@
      * 
      * @name osimis.CornerstoneAnnotationSynchronizer#_retrieveResolutionScaleRatio
      * @param {object} baseResolution The base binary resolution
-     * @param {object} newResolution The new binary resolutio
+     * @param {object} newResolution The new binary resolution
      *
      * @description
      * # @warning This method expect resolution scale to be the same for both side (width and height),
