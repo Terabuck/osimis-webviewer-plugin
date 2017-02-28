@@ -310,15 +310,16 @@
                 if (!wvSizeController) {
                     // @todo resize based on image size and not on element size (wich is always 0)
                     model.resizeCanvas(element.width(), element.height());
+                    model.draw();
                     return null;
                 }
 
-                //model.resizeCanvas(wvSizeController.getWidthInPixel(), wvSizeController.getHeightInPixel());
                 var unlistenWvSizeFn = wvSizeController && wvSizeController.onUpdate(function resizeCanvas() {
                     var width = wvSizeController.getWidthInPixel();
                     var height = wvSizeController.getHeightInPixel();
 
                     model.resizeCanvas(width, height);
+                    model.draw();
                 });
 
                 return function unbind() {

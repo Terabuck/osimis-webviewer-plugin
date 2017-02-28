@@ -598,24 +598,37 @@
      * Resize cornerstone canvas.
      * Must be called when the windows is resized for instance, or when the
      * layout change.
+     *
+     * Need `#draw` to be called after.
      */
-    Viewport.prototype.resizeCanvas = function(width, height) {
+    Viewport.prototype.resizeCanvas = function(newCanvasWidth, newCanvasHeight) {
         var enabledElement = this._enabledElement;
-
+    
+        // Retrieve previous canvas size
+        var oldCanvasWidth = this._canvasWidth;
+        var oldCanvasHeight = this._canvasHeight;
+        
         // Cache canvas size for later
         // (eg. to know if an image is larger than its viewport)
-        this._canvasWidth = width;
-        this._canvasHeight = height;
+        this._canvasWidth = newCanvasWidth;
+        this._canvasHeight = newCanvasHeight;
 
         // Set the canvas size / pixel quantity (? not sure it does that)
         cornerstone.resize(enabledElement, false);
 
-        // fit the image back in the viewport & draw it (only if an image is currently displayed)
-        if (this._displayedImage) {
-            this.reset(); // @todo only clean width/height - not windowing
+        // Scale the image to the new canvas size
+        if (this._viewportData) {
+            var widthScaleRatio = newCanvasWidth / oldCanvasWidth;
+            var heightScaleRatio = newCanvasHeight / oldCanvasHeight;
+
+            // If width as changed more than height, we should rely on width scale. Reverse
+            // apply too.
+            var scaleRatio = Math.abs(1-widthScaleRatio) > Math.abs(1-heightScaleRatio) ? widthScaleRatio : heightScaleRatio;
+
+            // Adapt scale ratio
+            this._viewportData.scale = this._viewportData.scale * scaleRatio;
             
-            // draw (@todo out)
-            this.draw();
+            // We expect method's user to call #draw after.
         }
     };
 
