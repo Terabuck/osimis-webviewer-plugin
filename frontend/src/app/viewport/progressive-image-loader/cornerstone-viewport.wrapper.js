@@ -1,4 +1,9 @@
 /**
+ * @ngdoc object
+ * @memberOf osimis
+ * 
+ * @name osimis.CornerstoneViewportWrapper
+ * 
  * @description 
  * This object wraps cornerstone viewport data object to handle progressive
  * image loading via multiple resolution. For conveniance, it keeps the initial
@@ -52,16 +57,64 @@
         };
     }
 
+    /**
+     * @ngdoc method
+     * @methodOf osimis.CornerstoneViewportWrapper
+     * 
+     * @name osimis.CornerstoneViewportWrapper#getScaleForFullResolution
+     * 
+     * @return {float}
+     * The scale value converted to the full image resolution.
+     * 
+     * @description 
+     * Provide the scale variable based on the full image resolution. The
+     * overlay uses it to display a consistant scale even if the image 
+     * resolution changes.
+     */
+    CornerstoneViewportWrapper.prototype.getScaleForFullResolution = function() {
+        // Check out scale ratio between current res and original resolution.
+        var scaleRatio = this.originalImageResolution.width / this.currentImageResolution.width;
+
+        // We need to divide the scale by that ratio to compensate the change
+        // (as `.scale` property is resolution dependant).
+        var scaleForFullResolution = this._cornerstoneViewportData.scale / scaleRatio;
+
+        return scaleForFullResolution;
+    };
+
+    /**
+     * @ngdoc method
+     * @methodOf osimis.CornerstoneViewportWrapper
+     * 
+     * @name osimis.CornerstoneViewportWrapper#clone
+     * 
+     * @return {osimis.CornerstoneViewportWrapper}
+     * A clone of the current wrapper.
+     * 
+     * @description 
+     * This method clone the current wrapper. It is mostly used to prevent
+     * changes in the original one.
+     */
     CornerstoneViewportWrapper.prototype.clone = function() {
         return osimis.CornerstoneViewportWrapper.wrapCornerstoneViewport(
             this._cornerstoneViewportData,
             this.originalImageResolution,
             this.currentImageResolution
         );
-    }
+    };
 
     /**
-     * @return {[type]} [description]
+     * @ngdoc method
+     * @methodOf osimis.CornerstoneViewportWrapper
+     * 
+     * @name osimis.CornerstoneViewportWrapper#serialize
+     * 
+     * @return {object}
+     * The serialized viewport data object
+     * 
+     * @description 
+     * Provide a serialized version of the viewport data. This version is
+     * image resolution-independant, and can be used to store the data.
      */
     CornerstoneViewportWrapper.prototype.serialize = function() {
         // Clone viewport data to make sure input wont be modified
@@ -79,6 +132,24 @@
         };
     };
 
+    /**
+     * @ngdoc method
+     * @methodOf osimis.CornerstoneViewportWrapper
+     * 
+     * @name osimis.CornerstoneViewportWrapper#deserialize
+     * 
+     * @param {object} serializedObject
+     * The serialized viewport data object
+     * 
+     * @return {osimis.CornerstoneViewportWrapper}
+     * The deserialized viewport data object wrapper
+     * 
+     * @description 
+     * Deserialize a stored serialized viewport data object. Due to
+     * normalization, this version is based on max available image resolution.
+     * You should call `#changeResolution` to adapt the data to the currently
+     * loaded image resolution.
+     */
     CornerstoneViewportWrapper.deserialize = function(serializedObject) {
         return CornerstoneViewportWrapper.wrapCornerstoneViewport(
             serializedObject.csViewportData,
@@ -87,7 +158,21 @@
         );
     };
 
-    // Adapt cornerstone scale and translate based to a new resolution
+    /**
+     * @ngdoc method
+     * @methodOf osimis.CornerstoneViewportWrapper
+     * 
+     * @name osimis.CornerstoneViewportWrapper#changeResolution
+     * 
+     * @param {object} newImageResolution
+     * An object containing the new resolution.
+     *
+     *   * {int} width The new image binary width
+     *   * {int} height The new image binary height
+     * 
+     * @description 
+     * Adapt cornerstone scale and translate based to a new resolution.
+     */
     CornerstoneViewportWrapper.prototype.changeResolution = function(newImageResolution) {
         // Make sure input wont be changed.
         newImageResolution = _.cloneDeep(newImageResolution);
@@ -100,14 +185,36 @@
         this.currentImageResolution = newImageResolution;
     };
 
-    // Resolution-dependent attribut may be set either via cornestone tools
-    // (in terms of current resolution) or via wvb setters (in terms of 
-    // original resolution). The original interface is kept only for
-    // cornerstone interactions as the cornerstone interaction requires us 
-    // to consider the current interface as the cornerstone one, whereas we 
-    // can use a different interface for the wvb setters which need a 
-    // different behavior. The cornerstone implementation uses pixels based on 
-    // the current image resolution.
+    /**
+     * @ngdoc method
+     * @methodOf osimis.CornerstoneViewportWrapper
+     * 
+     * @name osimis.CornerstoneViewportWrapper.wrapCornerstoneViewport
+     * 
+     * @param {object} cornerstoneViewport
+     * The cornerstone viewport data object to wrap. See
+     * `https://github.com/chafey/cornerstone/wiki/viewport`.
+     * 
+     * @param {object} originalImageResolution
+     * An object containing the full image resolution.
+     *
+     *   * {int} width The full-resolution image binary's width
+     *   * {int} height The full-resolution image binary's height
+     *
+     * @param {object} currentImageResolution
+     * An object containing the current image resolution as used in the
+     * _cornerstoneViewport_ object.
+     *
+     *   * {int} width The current image binary width
+     *   * {int} height The current image binary height
+     *
+     * @return {osimis.CornerstoneViewportWrapper}
+     * The wrapped cornerstone viewport data.
+     *
+     * @description 
+     * Return a wrapped cornerstone viewport data objet, managing multiple
+     * image resolution. Every input is garanteed to not change.
+     */
     CornerstoneViewportWrapper.wrapCornerstoneViewport = function(cornerstoneViewport, originalImageResolution, currentImageResolution) {
         // Make sure inputs wont be changed.
         cornerstoneViewport = _.cloneDeep(cornerstoneViewport);
@@ -124,6 +231,15 @@
         // Return the wrapped object
         return wrappedViewportDataObject;
     };
+
+    // Resolution-dependent attribut may be set either via cornestone tools
+    // (in terms of current resolution) or via wvb setters (in terms of 
+    // original resolution). The original interface is kept only for
+    // cornerstone interactions as the cornerstone interaction requires us 
+    // to consider the current interface as the cornerstone one, whereas we 
+    // can use a different interface for the wvb setters which need a 
+    // different behavior. The cornerstone implementation uses pixels based on 
+    // the current image resolution.
     Object.defineProperties(CornerstoneViewportWrapper.prototype, {
         scale: {
             configurable: false,
