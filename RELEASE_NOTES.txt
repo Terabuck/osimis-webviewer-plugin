@@ -4,6 +4,7 @@ Pending changes in the mainline
 => Minimum Orthanc version: 1.1.0 <=
 
 Bug Fixes:
+<<<<<<< 9e84aaeb75f989b8fd5cd0342ded107fb2d98242
 * Display series in order
 * Fit images to the viewports
 * Keep viewport settings when browser's window is resized
@@ -11,6 +12,10 @@ Bug Fixes:
 Breaking changes:
 * `plugin-entrypoint.html` has been renamed to `index.html`
 * New parameter `StudyDownloadEnabled` in the backend config file
+=======
+* Fit images to the viewports
+* Keep viewport parameters when browser's window is resized
+>>>>>>> fix(viewport): keep viewports parameters on window resize
 
 Version 0.5.3
 ========================
