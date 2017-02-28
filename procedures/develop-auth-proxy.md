@@ -59,6 +59,7 @@ The following Orthanc routes are also used:
 ```
 /studies/
 /studies/<uid>
+/studies/<uid>/archive
 /instances/<uid>/simplified-tags
 /instances/<uid>/pdf
 /series/<uid>/study

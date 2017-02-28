@@ -8,7 +8,8 @@ Bug Fixes:
 * Fit images to the viewports
 
 Breaking changes:
-* `plugin-entrypoint.html` as been renamed to `index.html`
+* `plugin-entrypoint.html` has been renamed to `index.html`
+* New parameter `StudyDownloadEnabled` in the backend config file
 
 Version 0.5.3
 ========================

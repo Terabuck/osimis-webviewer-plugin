@@ -124,6 +124,12 @@ This plugin provide a few optional options as well.
     // image is viewed multiple times.
     // Default: false
     "CacheEnabled" : false,
+
+    // Show the `download study` button in the frontend.
+    // You may want to disable this feature if you disable access to
+    // the underlying REST route.
+    // Default: true
+    "StudyDownloadEnabled": true
   }
 }
 ```

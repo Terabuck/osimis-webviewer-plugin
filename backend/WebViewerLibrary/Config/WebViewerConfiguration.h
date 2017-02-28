@@ -45,6 +45,9 @@ public:
   bool restrictTransferSyntaxes;
   std::set<std::string> enabledTransferSyntaxes;
 
+  // Frontend Variables
+  bool enableStudyDownload;
+
   WebViewerConfiguration(OrthancPluginContext* context) : _context(context) {
     // By default, disable storage attachment cache 
     cachedImageStorageEnabled = false;
@@ -53,6 +56,9 @@ public:
     gdcmEnabled = true;
     // By default, use GDCM for everything
     restrictTransferSyntaxes = false;
+
+    // By default, show the study download button in the frontend
+    enableStudyDownload = true;
   }
 
   /**
@@ -70,7 +76,8 @@ public:
    *         "orthanc": x.x.x,
    *         "webviewer": x.x.x,
    *         "db": x.x.x
-   *       }
+   *       },
+   *       "enableStudyDownload": true
    *     }
    *     ```
    */

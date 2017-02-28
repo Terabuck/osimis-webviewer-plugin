@@ -9,6 +9,7 @@
 
 void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
 {
+  // Enable GCM
   static const char* CONFIG_GDCM_ENABLED = "GdcmEnabled";
   if (wvConfig.isMember(CONFIG_GDCM_ENABLED))
   {
@@ -21,13 +22,8 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
       gdcmEnabled = wvConfig[CONFIG_GDCM_ENABLED].asBool();
     }
   }
-  
-  if (wvConfig.isMember("CacheEnabled") &&
-      wvConfig["CacheEnabled"].type() == Json::booleanValue)
-  {
-    cachedImageStorageEnabled = wvConfig["CacheEnabled"].asBool();
-  }
 
+  // Restrict GDCM usage to the specified transfer syntaxes
   static const char* CONFIG_RESTRICT_TRANSFER_SYNTAXES = "RestrictTransferSyntaxes";
   if (gdcmEnabled)
   {
@@ -55,6 +51,20 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
         }
       }
     }
+  }
+  
+  // Enable cache
+  if (wvConfig.isMember("CacheEnabled") &&
+      wvConfig["CacheEnabled"].type() == Json::booleanValue)
+  {
+    cachedImageStorageEnabled = wvConfig["CacheEnabled"].asBool();
+  }
+
+  // Enable Study Download
+  if (wvConfig.isMember("StudyDownloadEnabled") &&
+      wvConfig["StudyDownloadEnabled"].type() == Json::booleanValue)
+  {
+    enableStudyDownload = wvConfig["StudyDownloadEnabled"].asBool();
   }
 }
 
@@ -120,6 +130,9 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
     }
     config["version"]["webviewer"] = plugin["Version"].asString();
   }
+
+  // Register "enableStudyDownload"
+  config["enableStudyDownload"] = enableStudyDownload;
 
   return config;
 }
