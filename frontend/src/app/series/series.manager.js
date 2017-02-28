@@ -203,22 +203,37 @@
                         var _failedResults = []; // @todo @warning forward failed promise somewhere! (the issue here is we must bypass failed request (for SR/bad DICOM tolerance)),
                                                  // so we must "resolve" failing promises, while we most reject them at the same times). Promise can't handle these use cases, either
                                                  // they fails or succeed but not both, they can't succeed partly.
-                        var i = 0;
-                        wvSeriesPromises.forEach(function(wvSeriesPromise) {
+                        var _loadedSeriesCount = 0;
+                        wvSeriesPromises.forEach(function(wvSeriesPromise, i) {
                             wvSeriesPromise.then(function(wvSeries) {
-                                wvSeriesLists.push(wvSeries);
-                                ++i;
-                                // Resolve overall promise once every sub promises have been processed
-                                if (i === wvSeriesPromises.length) {
+                                // Don't use Array#push(), as this would change
+                                // the series' display order due to asynchronicity
+                                wvSeriesLists[i] = wvSeries; 
+
+                                // We can't rely on i as last series can be
+                                // loaded prior to any other one, thus making
+                                // it resolve the promise before all the series
+                                // have been loaded.
+                                ++_loadedSeriesCount;
+
+                                // Resolve overall promise once every sub
+                                // promises have been processed
+                                if (_loadedSeriesCount === wvSeriesPromises.length) {
                                     resolve(wvSeriesLists);
                                 }
                             }, function(error) {
                                 _failedResults.push(error);
                                 console.error('Unable to retrieve a series.', error);
-                                ++i;
-                                // Resolve overall promise once every sub promises have been processed
-                                if(i === wvSeriesPromises.length) {
-                                    // Resolve the overall promise even if one of the sub-promise fails.
+                                
+                                // Incr loaded series count so we can resolve
+                                // the promise, even if loading has failed
+                                ++_loadedSeriesCount;
+
+                                // Resolve overall promise once every sub
+                                // promises have been processed
+                                if(_loadedSeriesCount === wvSeriesPromises.length) {
+                                    // Resolve the overall promise even if one
+                                    // of the sub-promise fails.
                                     resolve(wvSeriesLists);
                                 }
                             })
