@@ -1,6 +1,10 @@
 Pending changes in the mainline
 ===============================
 
+=> Minimum Orthanc version: 1.1.0 <=
+
+* Fit images to the viewports
+
 Version 0.5.3
 ========================
 

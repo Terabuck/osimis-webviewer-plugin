@@ -35,6 +35,9 @@
         // Params
         this._enabledElement = domElement;
         isDiagnosisViewport = (typeof isDiagnosisViewport !== 'undefined') ? isDiagnosisViewport : true;
+        
+        // Fit image to the viewport by default
+        this._fitImageToViewport = true;
 
         // Other stuffs
         this._currentImage = null;
@@ -539,9 +542,10 @@
             baseResolution
         );
 
-        // Keep original image size if image is smaller than viewport
+        // Keep original image size if image is smaller than viewport if
+        // viewport is configured to work as such
         var isImageSmallerThanViewport = baseResolution.width <= this._canvasWidth && baseResolution.height <= this._canvasHeight;
-        if (isImageSmallerThanViewport) {
+        if (!this._fitImageToViewport && isImageSmallerThanViewport) {
             // Show the image at original full width/height
             viewportData.scale = 1.0;
         }
