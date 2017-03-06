@@ -7,6 +7,7 @@ Bug Fixes:
 * Display series in order
 * Fit images to the viewports
 * Keep viewport settings when browser's window is resized
+* Display zoom based on image's full resolution
 
 Breaking changes:
 * `plugin-entrypoint.html` has been renamed to `index.html`

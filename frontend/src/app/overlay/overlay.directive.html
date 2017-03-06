@@ -12,7 +12,7 @@
     
     <div class="wv-overlay-bottomright" ng-show="vm.showBottomRightArea()">
         <span ng-show="vm.wvSeries.currentShownIndex != vm.wvSeries.currentIndex">(image {{vm.wvSeries.currentIndex+1}} in loading, image {{vm.wvSeries.currentShownIndex+1}} displayed)</br></span>
-        zoom: {{vm.wvViewport.scale|number:2}}<br/>
+        zoom: {{vm.wvViewport.getScaleForFullResolution()|number:2}}x<br/>
         ww/wc: {{vm.wvViewport.voi.windowWidth|number:0}}/{{vm.wvViewport.voi.windowCenter|number:0}}
     </div>
 </div>
