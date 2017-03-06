@@ -34,10 +34,24 @@
     background-color: transparent;
 
     // Change background on hover
+    background-color: hsl(0, 0%, 0%);
     &:hover {
-        background-color: hsla(0, 0%, 100%, 0.1);
+        background-color: hsl(0, 0%, 10%);
     }
 
+}
+
+// White modifier to use when the background is white
+.wvButton--white {
+    // Text color
+    color: hsl(0, 0%, 10%);
+    border: 1px solid hsl(0, 0%, 73%);
+
+    // Change background on hover
+    background-color: hsl(0, 0%, 100%);
+    &:hover {
+        background-color: hsl(0, 0%, 90%);
+    }
 }
 
 .wvButton__icon { // used with the same element as glyphicons
