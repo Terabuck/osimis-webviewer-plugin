@@ -22,10 +22,13 @@
 
     font-family: "Open Sans", Helvetica, Arial, sans-serif;
     -webkit-tap-highlight-color: hsla(0, 0%, 0%, 0);
-    font-smoothing: antialiased !important;
-    -webkit-font-smoothing: antialiased !important;
     font-size: 13px;
     font-weight: 400;
     line-height: 1.49;
     font-size-adjust: 100%;
+
+    // Smooth text
+    -moz-osx-font-smoothing: grayscale !important;
+    font-smoothing: antialiased !important;
+    -webkit-font-smoothing: antialiased !important;
 }
