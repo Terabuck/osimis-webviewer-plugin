@@ -50,7 +50,7 @@ This route provides configuration for frontend.
 /osimis-viewer/app/*
 ```
 
-This rouet serves the frontend.
+This route serves the frontend.
 
 ----
 
