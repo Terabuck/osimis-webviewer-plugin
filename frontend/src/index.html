@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html ng-app="webviewer" class="wv-html">
 <head>
     <style>
@@ -28,30 +28,42 @@
     <!-- endbuild -->
 </head>
 <body
-    ng-controller="MainController as vm"
+    ng-controller="MainController as vm" 
     class="wv-body"
 >
     <wv-webviewer
         wv-study-id="vm.studyId"
-        
+        wv-series-id="vm.seriesId"
+
         wv-toolbar-enabled="vm.enableToolbar"
-        wv-serieslist-enabled="vm.enableLayoutLeft"
-        wv-studyinformation-enabled="vm.enableLayoutLeft"
+        wv-serieslist-enabled="vm.enableLayoutLeft && vm.mode !== 'series'"
+        wv-studyinformation-enabled="vm.enableLayoutLeft && vm.mode !== 'series'"
         wv-lefthandles-enabled="vm.enableLayoutLeftHandles"
 
         wv-notice-enabled="vm.enableNotice"
         wv-notice-text="vm.noticeText"
     >
         <!-- Study list (for debug mode) -->
-        <wv-layout-top-left wv-enabled="vm.enableLayoutTopLeft">
+        <wv-layout-top-left
+            wv-enabled="vm.mode === 'dev' &&
+                        vm.enableLayoutTopLeft"
+        >
             <wv-studylist 
+                ng-if="vm.mode === 'dev'"
                 wv-selected-study-id="vm.studyId"
             ></wv-studylist>
         </wv-layout-top-left>
 
         <!-- Download Study Button -->
-        <wv-layout-top-right wv-enabled="!vm.isMobile && vm.enableLayoutTopRight">
-            <wv-study-download-button ng-if="!vm.isMobile" wv-study-id="vm.studyId"></wv-study-download-button>
+        <wv-layout-top-right
+            wv-enabled="!vm.isMobile &&
+                        vm.enableLayoutTopRight &&
+                        vm.enableStudyDownload"
+            >
+            <wv-study-download-button
+                ng-if="!vm.isMobile && vm.enableStudyDownload"
+                wv-study-id="vm.studyId"
+            ></wv-study-download-button>
         </wv-layout-top-right>
     </wv-webviewer>
 
@@ -67,30 +79,76 @@
     <!-- inject:templates:js -->
     <!-- endinject -->
     <!-- endbuild -->
-
-    <!-- Path served by webviewer's backend -->
-    <script src="../config.js" type="text/javascript"></script>
     
+    <!-- Path served by orthanc backend -->
+    <script src="../config.js" type="text/javascript"></script>
+
     <script>
     angular
     .module('webviewer')
     // Remove debug info and improve performances
-    // Can be reactivated on the fly using "angular.reloadWithDebugInfo();" in 
-    // the console see
-    // https://docs.angularjs.org/guide/production#disabling-debug-data
+    // Can be reactivated on the fly using "angular.reloadWithDebugInfo();" in the console
+    // see https://docs.angularjs.org/guide/production#disabling-debug-data
     .config(['$compileProvider', function ($compileProvider) {
-        // $compileProvider.debugInfoEnabled(false);
+        $compileProvider.debugInfoEnabled(false);
     }])
     // Define a basic controller
-    .controller('MainController', ['$scope', '$location', function($scope, $location) {
+    .controller('MainController', [
+        '$scope', '$location', 'wvConfig', 'wvSeriesManager',
+        function($scope, $location, wvConfig, wvSeriesManager)
+    {
         var vm = this;
-
-        // We could retrieve URL parameters here. This is not required for the 
-        // index page though.
 
         // Deactivate study download on mobile
         var uaParser = new UAParser();
         vm.isMobile = (uaParser.getDevice().type === 'mobile');
+
+        // Retrieve URL's params and set study/series
+        var orthancStudyId = $location.search().study;
+        var orthancSeriesId = $location.search().series;
+
+        vm.studyId = undefined;
+        vm.seriesId = undefined;
+
+        // Display orthanc study
+        if (orthancStudyId) {
+            vm.mode = 'study';
+            vm.studyId = orthancStudyId;
+        }
+        // Display & convert orthanc series id (from url parameter) into frontend series id
+        else if (orthancSeriesId) {
+            wvSeriesManager
+                .listFromOrthancSeriesId(orthancSeriesId)
+                .then(function(seriesList) {
+                    // When singleframe, display the frontend series
+                    if (seriesList.length === 1) {
+                        vm.mode = 'series';
+                        vm.seriesId = seriesList[0].id;
+                    }
+                    // When multiframe, consider series as a study
+                    else if (!vm.studyId) {
+                        // @todo @warning multiple series may be shown instead of a single one... study id should also be split...
+                        var request = new osimis.HttpRequest();
+                        request.setHeaders(wvConfig.httpRequestHeaders);
+                        
+                        request
+                            .get(wvConfig.orthancApiURL + '/series/'+orthancSeriesId+'/study')
+                            .then(function(study) {
+                                vm.mode = 'study';
+                                vm.studyId = study.data.ID;
+                            });
+                    }
+                    else {
+                        throw new Error('Invalid URL parameters');
+                    }
+                }, function(err) {
+                    console.error('err', err);
+                });
+        }
+        // Show study list if study & series haven't been set via URL
+        else {
+            vm.mode = 'dev';
+        }
 
         // Configure the user interface depending on the user angent/browser.
         var userInterfacePolicy = new osimis.UserAgentBasedInterfacePolicy();
@@ -114,6 +172,9 @@
                 vm.noticeText = userInterfacePolicy.noticeText;
             });
         });
+
+        // Configure settings based on server side options
+        vm.enableStudyDownload = __webViewerConfig.enableStudyDownload;
     }]);
     </script>
 </body>
