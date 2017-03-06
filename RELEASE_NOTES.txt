@@ -6,6 +6,7 @@ Pending changes in the mainline
 Bug Fixes:
 * Display series in order
 * Fit images to the viewports
+* Keep viewport settings when browser's window is resized
 
 Breaking changes:
 * `plugin-entrypoint.html` has been renamed to `index.html`
