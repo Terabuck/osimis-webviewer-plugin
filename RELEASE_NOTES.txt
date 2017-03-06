@@ -13,6 +13,23 @@ Breaking changes:
 * `plugin-entrypoint.html` has been renamed to `index.html`
 * New parameter `StudyDownloadEnabled` in the backend config file
 
+
+
+Version 0.5.5
+========================
+
+=> Minimum Orthanc version: 1.1.0 <=
+
+* Docker Image: Changed the orthanc.json included in the image.  By default, Orthanc is now accessible from outside the container ("RemoteAccessAllowed": true).
+* Fix crash in Chrome when displaying color JPEG images.
+
+Version 0.5.4
+========================
+
+=> Minimum Orthanc version: 1.1.0 <=
+
+* Docker Image: Updated Orthanc to 1.2.0 
+
 Version 0.5.3
 ========================
 
