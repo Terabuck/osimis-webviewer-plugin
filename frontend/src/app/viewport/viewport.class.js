@@ -305,15 +305,18 @@
             // otherwise bug will occurs. In practise this is the case.
             if (_this._syncAnnotationResolution) {
                 var annotations = newImage.getAnnotations();
-                annotations.forEach(function(annotationsByTool) {
-                    CornerstoneAnnotationSynchronizer.syncByAnnotationType(
-                        annotationsByTool.type,
-                        annotationsByTool.data,
-                        _firstLoadingResolution ? null : oldResolution,
-                        newResolution
-                    );
-                    newImage.setAnnotations(annotationsByTool.type, annotationsByTool.data);
-                });
+                for (var tool in annotations) {
+                    if (annotations.hasOwnProperty(tool)) {
+                        var annotation = annotations[tool];
+                        CornerstoneAnnotationSynchronizer.syncByAnnotationType(
+                            annotation.type,
+                            annotation.data,
+                            _firstLoadingResolution ? null : oldResolution,
+                            newResolution
+                        );
+                        newImage.setAnnotations(annotation.type, annotation.data);
+                    }
+                }
             }
 
             // Do stuffs required only when the first resolution is being loaded (cf. reset, etc.)

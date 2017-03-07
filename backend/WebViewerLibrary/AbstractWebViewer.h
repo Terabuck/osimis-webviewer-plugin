@@ -7,6 +7,7 @@
 class DicomRepository;
 class ImageRepository;
 class SeriesRepository;
+class AnnotationRepository;
 class WebViewerConfiguration;
 
 /**
@@ -28,7 +29,7 @@ protected:
   std::auto_ptr<DicomRepository> _dicomRepository;
   std::auto_ptr<ImageRepository> _imageRepository;
   std::auto_ptr<SeriesRepository> _seriesRepository;
-
+  std::auto_ptr<AnnotationRepository> _annotationRepository;
   std::auto_ptr<WebViewerConfiguration> _config;
 
   /**

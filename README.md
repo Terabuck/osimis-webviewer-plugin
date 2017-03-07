@@ -129,7 +129,12 @@ This plugin provide a few optional options as well.
     // You may want to disable this feature if you disable access to
     // the underlying REST route.
     // Default: true
-    "StudyDownloadEnabled": true
+    "StudyDownloadEnabled": true,
+
+    // Store image annotations made by users as Orthanc Attachment 999 and
+    // retrieve them autommatically each time the viewer is opened.
+    // Default: true
+    "AnnotationStorageEnabled": true
   }
 }
 ```

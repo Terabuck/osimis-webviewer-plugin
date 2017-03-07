@@ -1,7 +1,12 @@
 #include <boost/regex.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp> // for boost::algorithm::split
+#include <boost/algorithm/string.hpp> // for boost::algorithm::split & boost::starts_with
+
+#include <json/json.h>
+#include <json/reader.h>
+#include <json/writer.h>
+#include <json/value.h>
 
 #include <Core/OrthancException.h> // for OrthancException(UnknownResource) catch
 
@@ -24,22 +29,31 @@
 #include <iostream>
 
 ImageRepository* ImageController::imageRepository_ = NULL;
+AnnotationRepository* ImageController::annotationRepository_ = NULL;
 
 template<>
 void ImageController::Inject<ImageRepository>(ImageRepository* obj) {
   ImageController::imageRepository_ = obj;
 }
+template<>
+void ImageController::Inject<AnnotationRepository>(AnnotationRepository* obj) {
+  ImageController::annotationRepository_ = obj;
+}
 
 ImageController::ImageController(OrthancPluginRestOutput* response, const std::string& url, const OrthancPluginHttpRequest* request)
   : BaseController(response, url, request), imageProcessingRouteParser_(), frameIndex_(0)
 {
-  // Register sub routes
-
+  // Register sub routes related to image optimization (doesn't include
+  // annotation routes). Have a look at the _ParseURLPostFix method for more
+  // info.
   imageProcessingRouteParser_.RegisterRoute<LowQualityPolicy>("^low-quality$");
   imageProcessingRouteParser_.RegisterRoute<MediumQualityPolicy>("^medium-quality$");
   imageProcessingRouteParser_.RegisterRoute<HighQualityPolicy>("^high-quality$");
   imageProcessingRouteParser_.RegisterRoute<PixelDataQualityPolicy>("^pixeldata-quality$");
 
+  // These image processing routes can be queued in any order. Some of them
+  // also accept parameters. For instance, we can resize to 150px/150px than
+  // convert to png using the `/resize:150/png` route.
 #if PLUGIN_ENABLE_DEBUG_ROUTE == 1
   imageProcessingRouteParser_.RegisterRoute<CompositePolicy>("^(.+/.+)$"); // regex: at least a single "/"
   imageProcessingRouteParser_.RegisterRoute<ResizePolicy>("^resize:(\\d+)$"); // resize:<maximal height/width: uint>
@@ -53,6 +67,7 @@ ImageController::ImageController(OrthancPluginRestOutput* response, const std::s
 int ImageController::_ParseURLPostFix(const std::string& urlPostfix) {
   BENCH(URL_PARSING);
   // /osimis-viewer/images/<instance_uid:str>/<frame_index:int>/{low|medium|high|pixeldata}-quality
+  // /osimis-viewer/images/<instance_uid:str>/<frame_index:int>/annotations
   boost::regex regexp("^(nocache/|cleancache/)?([^/]+)/(\\d+)(?:/(.+))$");
 
   boost::cmatch matches;
@@ -68,7 +83,24 @@ int ImageController::_ParseURLPostFix(const std::string& urlPostfix) {
       this->cleanCache_ = (std::string(matches[1]) == "cleancache/");
       this->instanceId_ = matches[2];
       this->frameIndex_ = boost::lexical_cast<uint32_t>(matches[3]);
-      this->processingPolicy_.reset(matches.size() < 4 ? NULL : imageProcessingRouteParser_.InstantiatePolicyFromRoute(matches[4]));
+
+      // Return 404 error if no subroute has been set.
+      if (matches.size() < 4) {
+        return this->_AnswerError(404);
+      }
+      // If subroute is an annotation, preprocess the request as such.
+      else if (boost::starts_with(matches[4], "annotations")) {
+        this->isAnnotationRequest_ = true;
+        // See the _ProcessRequest method for request processing.
+      }
+      // If subroute is an image processing route, preprocess the request as
+      // such.
+      else {
+        this->isAnnotationRequest_ = false;
+        this->processingPolicy_.reset(matches.size() < 4 ? NULL : imageProcessingRouteParser_.InstantiatePolicyFromRoute(matches[4]));
+        // See the _ProcessRequest method for request processing.
+      }
+      
 
       BENCH_LOG(INSTANCE, instanceId_);
       BENCH_LOG(FRAME_INDEX, frameIndex_);
@@ -111,30 +143,63 @@ int ImageController::_ProcessRequest()
   BENCH(FULL_PROCESS);
 
   try {
-    // clean cache
-    if (cleanCache_) {
-      imageRepository_->CleanImageCache(this->instanceId_, this->frameIndex_, this->processingPolicy_.get());
-      std::string answer = "{}";
-      return this->_AnswerBuffer(answer, "application/json");
+    // Treat annotation requests
+    if (this->isAnnotationRequest_) {
+      // Process `/images/<instance>/<frame>/annotations` PUT request
+      if (this->request_->method == OrthancPluginHttpMethod_Put) {
+        // Parse PUT request's json body.
+        std::string requestBody(this->request_->body, this->request_->bodySize);
+        Json::Value value;
+        Json::Reader reader;
+        if (!reader.parse(requestBody.c_str(), value)) {
+            // std::cerr  << "Failed to parse" << reader.getFormattedErrorMessages();
+            // @todo Log error
+            return this->_AnswerError(400);
+        }
+
+        // Retrieve the value of the `annotationsByTool` key.
+        value = value["annotationsByTool"];
+
+        // Store annotation in db.
+        annotationRepository_->setByImageId(this->instanceId_, this->frameIndex_, value);
+
+        // Answer request.
+        std::string answer = "{\"success\": true}";
+        return this->_AnswerBuffer(answer, "application/json");
+      }
+      // Answer 404 if method is not PUT, as the only request method accepted
+      // for this route is PUT.
+      else {
+        return this->_AnswerError(404);
+      }
     }
+    // Treat image processing requests
+    else {
+      // clean cache
+      if (cleanCache_) {
+        imageRepository_->CleanImageCache(this->instanceId_, this->frameIndex_, this->processingPolicy_.get());
+        std::string answer = "{}";
+        return this->_AnswerBuffer(answer, "application/json");
+      }
 
-    // all routes point to a processing policy, check there is one
-    assert(this->processingPolicy_.get() != NULL);
+      // all routes point to a processing policy, check there is one
+      assert(this->processingPolicy_.get() != NULL);
 
-    // retrieve processed image
-    std::auto_ptr<Image> image = imageRepository_->GetImage(this->instanceId_, this->frameIndex_, this->processingPolicy_.get(), !this->disableCache_);
-    
-    if (image.get() != NULL)
-    {
-      BENCH(REQUEST_ANSWERING);
+      // retrieve processed image
+      std::auto_ptr<Image> image = imageRepository_->GetImage(this->instanceId_, this->frameIndex_, this->processingPolicy_.get(), !this->disableCache_);
+      
+      if (image.get() != NULL)
+      {
+        BENCH(REQUEST_ANSWERING);
 
-      // Answer rest request
-      return this->_AnswerBuffer(image->GetBinary(), image->GetBinarySize(), "application/octet-stream");
-    }
-    else
-    {
-      // Answer Internal Error
-      return this->_AnswerError(500);
+        // Answer rest request
+        return this->_AnswerBuffer(image->GetBinary(), image->GetBinarySize(), "application/octet-stream");
+      }
+      else
+      {
+        // Answer Internal Error
+        return this->_AnswerError(500);
+      }
     }
   }
   catch (const Orthanc::OrthancException& exc) {

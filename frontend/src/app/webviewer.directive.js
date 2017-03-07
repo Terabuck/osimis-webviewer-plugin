@@ -47,6 +47,10 @@
  * * Using the timeline controls
  * * Using the toolbar & tools
  * * Scrolling through the series via the mousewheel
+ *
+ * @param {boolean} [wvAnnotationstorageEnabled=true]
+ * Retrieve annotations from storage. Store annotations to storage
+ * automatically. This should be set to false when `wvReadonly` is true.
  * 
  * @scope
  * @restrict E
@@ -76,7 +80,7 @@
         .directive('wvWebviewer', wvWebviewer);
 
     /* @ngInject */
-    function wvWebviewer($rootScope, wvSeriesManager) {
+    function wvWebviewer($rootScope, wvStudyManager, wvAnnotationManager, wvSeriesManager) {
         var directive = {
             bindToController: true,
             controller: Controller,
@@ -93,7 +97,8 @@
                 studyinformationEnabled: '=?wvStudyinformationEnabled',
                 leftHandlesEnabled: '=?wvLefthandlesEnabled',
                 noticeEnabled: '=?wvNoticeEnabled',
-                noticeText: '=?wvNoticeText'
+                noticeText: '=?wvNoticeText',
+                annotationStorageEnabled:  '=?wvAnnotationstorageEnabled'
             },
             transclude: {
                 wvLayoutTopLeft: '?wvLayoutTopLeft',
@@ -157,6 +162,16 @@
                 vm.viewports[index] = undefined; // don't use splice since it changes the indexes from the array
             };
 
+            // Enable/Disable annotation storage/retrieval from backend
+            scope.$watch('vm.annotationStorageEnabled', function(isEnabled, wasEnabled) {
+                if (isEnabled) {
+                    wvAnnotationManager.enableAnnotationStorage();
+                }
+                else {
+                    wvAnnotationManager.disableAnnotationStorage();
+                }
+            });
+
             // Preload studies
             scope.$watch('vm.studyId', function(newStudyId, oldStudyId) {
                 // Log study id
@@ -164,12 +179,13 @@
 
                 // Cancel previous preloading
                 if (oldStudyId && newStudyId !== oldStudyId) {
-                    $rootScope.$emit('UserUnSelectedStudyId', oldStudyId);
+                    wvStudyManager.abortStudyLoading(oldStudyId);
                 }
 
                 // Preload study
                 if (newStudyId) {
-                    $rootScope.$emit('UserSelectedStudyId', newStudyId);
+                    wvStudyManager.loadStudy(newStudyId);
+                    wvAnnotationManager.loadStudyAnnotations(newStudyId);
                 }
             });
 

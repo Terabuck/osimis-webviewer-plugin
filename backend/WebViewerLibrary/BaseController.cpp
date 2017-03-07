@@ -1,4 +1,8 @@
 #include "BaseController.h"
+
+#include <json/writer.h>
+#include <json/value.h>
+
 #include "OrthancContextManager.h"
 
 BaseController::BaseController(OrthancPluginRestOutput* response, const std::string& url, const OrthancPluginHttpRequest* request)
@@ -44,5 +48,11 @@ int BaseController::_AnswerBuffer(const std::string& output, const std::string& 
 }
 int BaseController::_AnswerBuffer(const char* output, size_t outputSize, const std::string& mimeType) {
   OrthancPluginAnswerBuffer(OrthancContextManager::Get(), response_, output, outputSize, mimeType.c_str());
+  return 200;
+}
+int BaseController::_AnswerBuffer(const Json::Value& output) {
+  Json::FastWriter fastWriter;
+  std::string outputStr = fastWriter.write(output);
+  OrthancPluginAnswerBuffer(OrthancContextManager::Get(), response_, outputStr.c_str(), outputStr.size(), "application/json");
   return 200;
 }

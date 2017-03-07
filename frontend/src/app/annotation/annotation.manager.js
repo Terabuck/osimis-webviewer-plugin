@@ -9,12 +9,80 @@
 (function(osimis) {
     'use strict';
 
-    function AnnotationManager() {
-        // Hash: invariant is _annotations[type][imageId] === AnnotationValueObject
+    function AnnotationManager(wvConfig) {
+        var _this = this;
+
+        // Hash: invariant is _annotations[imageId][type] === AnnotationValueObject
+        // This maps CornerstoneTools annotation model.
         this._annotations = {};
 
+        // Store wvConfig by reference so we can pass headers each
+        // time we make an http request.
+        this._config = wvConfig;
+
         this.onAnnotationChanged = new osimis.Listener();
+
+        // Disable annotation storage by default
+        this._isAnnotationStorageEnabled = false;
+
+        // Retrieve annotations from the backend:
+        // It's done each time the selected study change using the
+        // `#loadStudyAnnotations` method.
+
+        // Forward set annotations to the CornerstoneTools API:
+        // It's done at the tool-level. See the `osimis.BaseTool` class for
+        // more information.
     }
+
+    /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvAnnotationManager
+     *
+     * @name osimis.AnnotationManager#enableAnnotationStorage
+     *
+     * @description
+     * Load annotations from the backend each time the study changes. If a
+     * study as already been loaded, load its annotations right after the
+     * method call.
+     */
+    AnnotationManager.prototype.enableAnnotationStorage = function() {
+        // If annotation storage is already enabled, do nothing
+        if (this._isAnnotationStorageEnabled) {
+            return;
+        }
+
+        // Flag annotation storage as enabled
+        this._isAnnotationStorageEnabled = true;
+
+        // Load all the annotations for the requested studies
+        var studyId = this._studyIdOfLoadedAnnotations;
+        if (studyId) {
+            this.loadStudyAnnotations(studyId);
+        }
+    };
+
+    /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvAnnotationManager
+     *
+     * @name osimis.AnnotationManager#disableAnnotationStorage
+     *
+     * @description
+     * Stop loading annotations from the backend each time the study changes.
+     */
+    AnnotationManager.prototype.disableAnnotationStorage = function() {
+        // If annotation storage is already disable, do nothing
+        if (!this._isAnnotationStorageEnabled) {
+            return;
+        }
+
+        // Flag annotation storage as disabled
+        this._isAnnotationStorageEnabled = false;
+
+        // @todo Unload all the annotations for studies in
+        // `_requestedStudyIds`. We probably don't need to implement it with 
+        // the current workflows.
+    };
 
     /**
      * @ngdoc method
@@ -23,10 +91,10 @@
      * @name osimis.AnnotationManager#onAnnotationChanged
      * 
      * @param {callback} callback
-     *    Called when an annotation has changed
+     * Called when an annotation has changed
      * 
-     *    Parameters:
-     *    * {object} `annotation` The modified annotation
+     * Parameters:
+     * * {osimis.AnnotationValueObject} `annotation` The modified annotation
      */
     AnnotationManager.prototype.onAnnotationChanged = function() { /* noop */ }; // see constructor
 
@@ -34,24 +102,83 @@
      * @ngdoc method
      * @methodOf webviewer.service:wvAnnotationManager
      *
-     * @name osimis.AnnotationManager#set
+     * @name osimis.AnnotationManager#_storeAnnotationsInBackend
+     *
+     * @param {string} imageId
+     * Id of the image where the annotations lies.
      * 
-     * @param {object} annotation The annotation
+     * @param {string} type
+     * Name of the tool concerned by the annotations.
+     *
+     * @param {object} data
+     * The annotations stored in the CornerstoneTools annotation format.
+     * 
+     * @description
+     * Store a debounced function to update the annotations in the backend,
+     * this method is used in the `this.onAnnotationChanged` call above,
+     * however, it can't be stored contextualy since any
+     * onAnnotationChanged trigger would create a new debounce function,
+     * thus in the end never triggering the same debounced function twice.
      */
-    AnnotationManager.prototype.set = function(annotation) {
+    var delay = 1000; // ms
+    AnnotationManager.prototype._storeAnnotationsInBackend = _.debounce(function(imageId, type, data) {
+        var config = this._config;
         var annotations = this._annotations;
 
-        // as annotations are stateless, we clone them to avoid unexpected behavior
+        var httpRequest = new osimis.HttpRequest();
+        httpRequest.setCache(false);
+        httpRequest.setHeaders(config.httpRequestHeaders);
+        httpRequest.put(config.orthancApiURL + '/osimis-viewer/images/'+imageId.replace(':', '/')+'/annotations', {
+            imageId: imageId,
+            annotationsByTool: annotations[imageId]
+        });
+    }, delay);
+
+    /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvAnnotationManager
+     *
+     * @name osimis.AnnotationManager#set
+     * 
+     * @param {osimis.AnnotationValueObject} annotation
+     * The annotation
+     *
+     * @param {boolean} [setByEndUser=false]
+     * Set this variable when the annotations are set by the end users (by
+     * clicking with the mouse on a canvas with a tool for instance) in
+     * contrast to annotations retrieved from an external source. When set to
+     * true, we know we have to store the annotation in the backend. When set
+     * to false, we can avoid an useless request.
+     * 
+     * @description
+     * Store the annotation in the model layer.
+     */
+    AnnotationManager.prototype.set = function(annotation, setByEndUser) {
+        var annotations = this._annotations;
+        setByEndUser = setByEndUser || false;
+
+        // As annotations are stateless, clone them to avoid unexpected
+        // behavior
         annotation = _.cloneDeep(annotation);
         
-        annotations[annotation.type] = annotations[annotation.type] || {};
-        annotations[annotation.type][annotation.imageId] = annotation;
+        // Set annotations
+        annotations[annotation.imageId] = annotations[annotation.imageId] || {};
+        annotations[annotation.imageId][annotation.type] = annotation.data;
 
+        // Delete annotations when empty
         if (!annotation.data || (typeof annotation.data.length !== 'undefined' && annotation.data.length === 0)) {
-            delete annotations[annotation.type][annotation.imageId];
+            delete annotations[annotation.imageId][annotation.type];
         }
         
+        // Trigger annotation changed event
         this.onAnnotationChanged.trigger(annotation);
+
+        // Post update to the backend once no changes have appear since the
+        // last second, to avoid flooding the server and only updates when
+        // the user has stopped doing interactions.
+        if (setByEndUser) {
+            this._storeAnnotationsInBackend(annotation.imageId, annotation.type, annotation.data);
+        }
     };
 
     /**
@@ -75,11 +202,70 @@
     /**
      * @ngdoc method
      * @methodOf webviewer.service:wvAnnotationManager
+     * 
+     * @name osimis.AnnotationManager#loadStudyAnnotations
+     *
+     * @param {string} studyId
+     * Id of the study (in orthanc format) containing the PDF instance.
+     *
+     * @description
+     * Retrieve and cache set annotations based on a study id. Uses `#setAll`
+     * method internally. Multiple calls to this method using the same studyId
+     * attribute will only trigger one http call.
+     *
+     * @warning
+     * This overrides all the currently defined annotation. It won't work
+     * anymore when we'll implement the study comparison mechanism.
+     */
+    AnnotationManager.prototype.loadStudyAnnotations = function(studyId) {
+        var _this = this;
+        var config = this._config;
+
+        // Retrieve all annotations for this study if annotation storage is
+        // enabled
+        if (this._isAnnotationStorageEnabled && 
+            this._studyIdOfLoadedAnnotations !== studyId
+        ) {
+            var httpRequest = new osimis.HttpRequest();
+            httpRequest.setCache(false);
+            httpRequest.setHeaders(config.httpRequestHeaders);
+
+            httpRequest
+                .get(config.orthancApiURL + '/osimis-viewer/studies/'+studyId+'/annotations')
+                .then(function (response) {
+                    // @warning This remove all previous annotations! In the
+                    // current dataflow, this has no impact. It will break the
+                    // code once we display multiple studies at the same time
+                    // for instance. Also, this may be inconsistent when we 
+                    // switch study before the previous request has been
+                    // finished.
+                    if (response.data) {
+                        _this.setAll(response.data);
+                    }
+                }, function (err) {
+                    // Unflag study id if loading has failed
+                    this._studyIdOfLoadedAnnotations = null;
+
+                    // Forward error
+                    throw err;
+                });
+        }
+
+        // Flag the study's annotations as loaded to prevent duplicate
+        // requests. Also, when annotation storage is enabled back, we can use
+        // this stored id to retrieve the annotations at that moment.
+        this._studyIdOfLoadedAnnotations = studyId;
+    };
+
+
+    /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvAnnotationManager
      *
      * @name osimis.AnnotationManager#setAll
      * 
-     * @param {object} annotations All the annotations (as cornerstone
-     *                             annotations).
+     * @param {object} annotations
+     * All the annotations (as cornerstone annotations).
      *
      * @description
      * Primary intent is to retrieve backup of annotations from storage. For
@@ -92,69 +278,20 @@
                                          // object.
 
         // Trigger events
-        for (var type in this._annotations) {
-            if (this._annotations.hasOwnProperty(type)) {
-                for (var imageId in this._annotations[type]) {
-                    if (this._annotations[type].hasOwnProperty(imageId)) {
-                        // Trigger `onAnnotationChanged event
-                        var annotation = this._annotations[type][imageId];
-                        this.onAnnotationChanged.trigger(annotation);
+        for (var imageId in this._annotations) {
+            if (this._annotations.hasOwnProperty(imageId)) {
+                for (var type in this._annotations[imageId]) {
+                    if (this._annotations[imageId].hasOwnProperty(type)) {
+                        // Recreate the annotation model based on the class.
+                        var data = this._annotations[imageId][type];
+                        var annotation = new osimis.AnnotationValueObject(type, imageId, data);
 
-                        // @todo Recreate the model based on the class (no need
-                        //       yet since the model has no method).
+                        // Trigger `onAnnotationChanged event
+                        this.onAnnotationChanged.trigger(annotation);
                     }
                 }
             }
         }
-
-
-        // // Regenerate annotations based on AnnotationValueObject model, only
-        // // to trigger `onAnnotationChanged` events.
-
-        // // Sync removed annotations.
-        // for (var type in this._annotations) {
-        //     if (this._annotations.hasOwnProperty(type)) {
-        //         var annotationsByType = imageId;
-        //         for (var imageId in annotationsByType) {
-        //             if (annotationByType.hasOwnProperty(imageId)) {
-        //                 if (!annotations || !annotations[type] || !annotations[type][imageId]) {
-        //                     // Create an empty AnnotationValueObject
-        //                     var annotationValueObject = new AnnotationValueObject(
-        //                         type,
-        //                         imageId,
-        //                         null
-        //                     );
-
-        //                     // Remove annotation & trigger update event
-        //                     this.set(annotationValueObject)
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-
-        // // Sync new/existing annotations.
-        // for (var type in annotations) {
-        //     if (annotations.hasOwnProperty(type)) {
-        //         var annotationsByType = imageId;
-        //         for (var imageId in annotationsByType) {
-        //             if (annotationByType.hasOwnProperty(imageId)) {
-        //                 if (this._annotations && this._annotations[type] && this._annotations[type][imageId]) {
-        //                     // Create an empty AnnotationValueObject
-        //                     var data = annotations[type][imageId];
-        //                     var annotationValueObject = new AnnotationValueObject(
-        //                         type,
-        //                         imageId,
-        //                         data
-        //                     );
-
-        //                     // Sync annotation & trigger update event
-        //                     this.set(annotationValueObject)
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
     };
 
     /**
@@ -163,34 +300,38 @@
      *
      * @name osimis.AnnotationManager#getByImageId
      * 
-     * @param {string} imageId The image id 
+     * @param {string} imageId
+     * The image id 
+     * 
      * @param {string} [type] 
      *    If set, either one of those value:
      *    * The annotation type
      *    * The related cornestone tool's name
      *    If undefined, all the available annotations will be returned.
-     * @return {Array<object>} The list of annotation returned
+     * 
+     * @return {Array<osimis.AnnotationValueObject>}
+     * The list of annotation returned
      */
     AnnotationManager.prototype.getByImageId = function(imageId, type) {
-        var annotations = this._annotations;
+        // As annotations are stateless, we clone them to avoid unexpected
+        // behavior. We may want to undo this to gain performance (by only
+        // watching annotations' internal object ids instead of relying on
+        // deep watch). This also permits to map `annotations` without changing
+        // the `this._annotations` later in this function.
+        var annotations = _.cloneDeep(this._annotations);
 
+        // Return filtered annotations (by type).
         if (type) {
-            // Return filtered annotations (by type)
-            
-            // as annotations are stateless, we clone them to avoid unexpected behavior
-            return annotations[type] && _.cloneDeep(annotations[type][imageId]);
+            var data = annotations[imageId] && annotations[imageId][type];
+            return annotations[imageId] && annotations[imageId][type] && new osimis.AnnotationValueObject(type, imageId, data) || [];
         }
+        // Return all annotations.
         else {
-            // Return all annotations
-            return _(annotations)
-                .flatMap(function(annotationByTypes) {
-                    return _.values(annotationByTypes);
+            return _(annotations[imageId])
+                .map(function(data, type) {
+                    return new osimis.AnnotationValueObject(type, imageId, data) || [];
                 })
-                .filter(function(annotation) {
-                    return annotation.imageId === imageId;
-                })
-                // as annotations are stateless, we clone them to avoid unexpected behavior
-                .cloneDeep();
+                .cloneDeep() || [];
         }
     };
 
@@ -203,7 +344,7 @@
         .factory('wvAnnotationManager', wvAnnotationManager);
 
     /* @ngInject */
-    function wvAnnotationManager() {
-        return new AnnotationManager();
+    function wvAnnotationManager(wvConfig) {
+        return new AnnotationManager(wvConfig);
     }
 })(this.osimis || (this.osimis = {}));

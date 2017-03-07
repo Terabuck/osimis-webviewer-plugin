@@ -109,9 +109,9 @@
      *    List of the current instance's qualities available for download.
      *
      * @description
-     * Cache available qualities by instanceId when a series is loaded,
-     * because all images' available qualities are only retrieved in one single series http request
-     * to avoid unnecessary http requests.
+     * Cache available qualities by instanceId when a series is loaded, because
+     * all images' available qualities are only retrieved in one single series
+     * http request to avoid unnecessary http requests.
      */
     ImageManager.prototype.cacheAvailableQualitiesForInstance = function(instanceId, availableQualities) {
         this._availableQualities[instanceId] = availableQualities;
