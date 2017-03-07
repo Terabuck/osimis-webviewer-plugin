@@ -8,10 +8,12 @@ Version 0.6.0
 
 Usability:
 * Enhance overall user interface
+  warning: the 2x1 and 1x2 grid mode have been removed for now
 * Change the shown thumbnail image from the first series' instance to the middle one
 * Set default tool to zoom instead of windowing
 * Provide tooltip helpers for the toolbar
 * Pinch to zoom on mobile
+* Move 3 fingers to change windowing on mobile
 * Optimise mobile display on portrait and landscape mode
 
 Features:
