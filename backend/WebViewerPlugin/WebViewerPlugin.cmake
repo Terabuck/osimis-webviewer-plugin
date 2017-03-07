@@ -49,6 +49,14 @@ message(${PRODUCT_VERSION_SHORT_STRING})
 # Set build parameters
 set(STANDALONE_BUILD ON CACHE BOOL "Standalone build (all the resources are embedded, necessary for releases)")
 set(JS_CLIENT_PATH "${VIEWER_FRONTEND_DIR}/build" CACHE STRING "Path of the front-end build folder")
+
+# Force js download. This is useful to ensure CI always uses the latest 
+# frontend builds, while keeping the progressive build benefits.
+set(JS_CLIENT_CLEAN_FIRST OFF CACHE BOOL "Force downloaded version of the client")
+if(${JS_CLIENT_CLEAN_FIRST} AND EXISTS ${JS_CLIENT_PATH})
+  file(REMOVE_RECURSE ${JS_CLIENT_PATH})
+endif()
+
 if(EXISTS ${JS_CLIENT_PATH}) # If file exists (not var)
   # Set frontend version based on local build if available
   # when building inside the docker container, the frontend/build folder is already there and we don't want to override it.
