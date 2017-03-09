@@ -1,6 +1,21 @@
+/* wvp-ui stuffs */
+wv-webviewer {
+    display: block;
+    height: 100%;
+    overflow: hidden;
+}
+
+@import "button";
+@import "variable";
+@import "helpers";
+@import "notice";
+@import "layout";
+@import "serieList";
+
+/* wvb-ui stuffs */
 @import "wv-overlay.scss";
+@import "wv-pdf-viewer.scss";
 @import "wv-serieslist.scss";
-@import "wv-toolbar.scss";
 @import "wv-studylist.scss";
 @import "wv-splitpane.scss";
 @import "wv-timeline.scss";
@@ -9,45 +24,30 @@
 
 wv-viewport { // make sure the element is sized when using with drag & drop
   display: inline-block;
-}
-wv-toolbar {
-  display: block;
+  width: 100%;
+  height: 100%;
+
+  > div {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  // We don't set 100% width/height to the canvas element, as it would stretch
+  // the pixels. Instead, we center it for more fluid transition when pane's 
+  // width changes (at least the content is kept centered even if the js hasn't
+  // yet reacted to layout reflow).
+  > div > .wv-cornerstone-enabled-image {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+  }
 }
 
 .wv-draggable-clone {
   width: 150px;
   height: 150px;
   background-color: rgba(255,255,255,0.25);
-}
 
-wv-webviewer, .wv-webviewer-container {
-  height: 100%;
-  overflow: hidden;
-}
-.wv-webviewer-menu {
-  float: left;
-  overflow-y: auto;
-  overflow-x: hidden;
-  height: 100%;
-  text-align: center;
-  width: 200px;
-}
-
-.wv-webviewer-main {
-  float: left;
-  height: 100%;
-  width: 100%;
-
-  .wv-webviewer-menu + & {
-    // Let a bit of space left if the menu is also displayed
-    width: calc(100% - 200px);
-  }
-}
-
-.wv-webviewer-content {
-  height: 100%;
-  // Let a bit of space left when the toolbar is displayed
-  wv-toolbar + & {
-    height: calc(100% - 40px);
-  }
+  // No need to set z-index (already done by jquery ui lib).
 }

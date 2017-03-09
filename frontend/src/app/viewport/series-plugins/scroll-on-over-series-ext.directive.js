@@ -1,3 +1,21 @@
+/**
+ * @ngdoc directive
+ * @name webviewer.directive:wvScrollOnOverSeriesExt
+ *
+ * @restrict Attribute
+ * @requires webviewer.directive:wvViewport
+ * @requires webviewer.directive:vpSeriesId
+ *
+ * @description
+ * The `wvScrollOnOverSeriesExt` attribute directive plays images across a  
+ * series when the viewport is hovered. It starts from the first series' image 
+ * and display back the middle image once the mouse is not on top of the 
+ * viewport anymore.
+ *
+ * The directive attribute can either be set on a viewport or on a parent
+ * element. In the second case, the parent will be used to watch the mouse
+ * pointer.
+ */
 (function() {
     'use strict';
 
@@ -15,10 +33,6 @@
 
     /* @ngInject */
     function wvScrollOnOverSeriesExt() {
-        // Usage:
-        //
-        // Creates:
-        //
         var directive = {
             controller: Controller,
             link: link,
@@ -65,6 +79,7 @@
                         return;
                     }
                     
+                    series.goToImage(0); // start from first image
                     series.play();
                 });
             });
@@ -78,7 +93,7 @@
                     }
 
                     series.pause();
-                    series.goToImage(0);
+                    series.goToImage(series.imageCount/2); // go back to middle image
                 });
             });
         }

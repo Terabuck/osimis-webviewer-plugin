@@ -1,9 +1,10 @@
 {
-  "name": "webViewer",
+  "name": "osimisWebViewer",
   "prefix": "wv",
   "ignore": [
-    "**/*.async/**/*.js",
-    "**/*.spec.js"
+    "**/*.worker/**/*.js",
+    "**/*.spec.js",
+    "**/*.mock.js"
   ],
   "dev": {
     "inject:js": [

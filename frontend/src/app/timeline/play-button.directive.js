@@ -1,18 +1,20 @@
 /**
  * @ngdoc directive
- * @name wvPlayButton
- *
+ * @name webviewer.directive:wvPlayButton
+ * 
+ * @param {osimis.Series} wvSeries The model of the series, as provided by the
+ *                                 `wvSeriesId` directive.
+ *                                 
+ * @param {boolean} [wvReadonly=false] Deactivate the directive's inputs.
+ * 
+ * @scope
+ * @restrict Element
+ * 
  * @description
  * The `wvPlayButton` directive displays a play control and a configuration panel.
  * Framerate is controlled via the configuration panel.
  *
  * This directive is used by the `wvTimelineControls` directive.
- *
- * @scope
- *
- * @restrict E
- *
- * @param {series_model} wvSeries (required) The model of the series, as provided by the `wvSeriesId` directive.
  **/
  (function() {
     'use strict';
@@ -30,7 +32,8 @@
             link: link,
             restrict: 'E',
             scope: {
-                series: '=wvSeries'
+                series: '=wvSeries',
+                readonly: '=?wvReadonly'
             },
             templateUrl: 'app/timeline/play-button.directive.html'
         };
@@ -42,6 +45,7 @@
 
     /* @ngInject */
     function Controller() {
-
+        // Set default values
+        this.readonly = (typeof this.readonly === 'undefined') ? false : this.readonly;
     }
 })();

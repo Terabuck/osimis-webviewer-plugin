@@ -1,7 +1,54 @@
 /**
  * @ngdoc directive
- * @name wvViewport
+ * @name webviewer.directive:wvViewport
  *
+ * @param {object} wvSize Please have a look at the `wvSize` directive source code for more information
+ *
+ * @param {string} [wvImageId]
+ *   The id of the displayed image can be set using this attribute.
+ *   It can also be set without attributes, using inter-directive communication. Therefore this attribute may be changed
+ *   by the viewport itself (eg. when a series is dropped on the viewport).
+ *   image_id = <orthanc-instance-id>:<frame-index> where frame-index = n ⊂ [0; 1000]
+ *
+ * @param {osimis.Image} [wvImage] (readonly)
+ *   Share the image model instance.
+ *   The viewport handles the image model loading. Therefore, it also provide access to it.
+ *   This is done through this attribute, which should only be used to retrieve the model, not to set it.
+ *
+ * @param {string} [wvSeriesId]
+ *   Please have a look at the `wvSeriesId` directive source code for more information
+ *   concerning _wvSeriesId_ attribute, and other related attributes (for instance _wvSeries_ and _wvOnSeriesChange_).
+ *
+ * @param {callback} [wvOnImageChange]
+ *   triggered when image has effectively changed
+ *   
+ *   Available Callback Arguments:
+ *   * `$image` - image_model
+ *
+ * @param {object} [wvViewport]
+ *   Share the cornerstone viewport data. It is different from the viewport
+ *   model which is only accessible via viewport plugins. When set to null,
+ *   the viewport data is reset to the default value.
+ *   
+ *   The cornerstone viewport object contains the following attributes (source: https://github.com/chafey/cornerstone/wiki/viewport):
+ *   * `scale` - The scale applied to the image. A scale of 1.0 will display no zoom (one image pixel takes up one screen pixel). A scale of 2.0 will be double zoom and a scale of .5 will be zoomed out by 2x
+ *   * `translation` - an object with properties x and y which describe the translation to apply in the pixel coordinate system. Note that the image is initially displayed centered in the enabled element with a x and y translation of 0 and 0 respectively.
+ *   * `voi` - an object with properties windowWidth and windowCenter.
+ *   * `invert` - true if the image should be inverted, false if not.
+ *   * `pixelReplication` - true if the image smooth / interpolation should be used when zoomed in on the image or false if pixel replication should be used.
+ *   * `hflip` - true if the image is flipped horizontally. Default is false
+ *   * `vflip` - true if the image is flipped vertically. Default is false
+ *   * `rotation` - the rotation of the image (90 degree increments). Default is 0
+ *
+ * @param {boolean} [wvLossless=false] Force lossless quality fetching.
+ *   * `false` - fetch image with quality based on viewport size.
+ *   * `true` - fetch image with the maximum available quality.
+ *   Note it doesn't disable progressive loading.
+ *
+ * @scope
+ * @restrict Element
+ * @requires webviewer.directive:wvSize
+ * 
  * @description
  * The `wvViewport` directive display medical images inside a canvas.
  *
@@ -19,56 +66,12 @@
  * wvOverlay directive by default. It may be overloaded using standard transclusion. It is therefore
  * important to not put any whitespace between the DOM element's start and end tags, otherwise the default
  * overlay will be overloaded with white space.
- * By setting the overlay's css _position_ attribute to _absolute_, the overlay can position information to the top, right, bottom and left sides
+ * By setting the overlay's css _position_ attribute to _absolute_, the ovgetViewporterlay can position information to the top, right, bottom and left sides
  * of the viewport.
- *
- * @scope
- *
- * @restrict E
- *
- * @require wvSize
- *
- * @param {size_object} wvSize (required) Please have a look at the `wvSize` directive source code for more information
- *
- * @param {image_id} wvImageId (optional) The id of the displayed image.
- *   The id of the displayed image can be set using this attribute.
- *   It can also be set without attributes, using inter-directive communication. Therefore this attribute may be changed
- *   by the viewport itself (eg. when a series is dropped on the viewport).
- *   image_id = <orthanc-instance-id>:<frame-index> where frame-index = n ⊂ [0; 1000]
- *
- * @param {image_model} wvImage (optional, readonly) Share the image model instance.
- *   The viewport handles the image model loading. Therefore, it also provide access to it.
- *   This is done through this attribute, which should only be used to retrieve the model, not to set it.
- *
- * @param {series_id} wvSeriesId (optional) Please have a look at the `wvSeriesId` directive source code for more information
- *   concerning _wvSeriesId_ attribute, and other related attributes (for instance _wvSeries_ and _wvOnSeriesChange_).
- *
- * @param {callback} wvOnImageChange (optional, callback) triggered when image has effectively changed
- *   Available Callback Arguments:
- *   * `$image` - image_model
- *
- * @param {cornerstone_viewport} wvViewport (optional, readonly) Share the cornerstone viewport data. It is different from
- *   the web viewer viewport model which is only accessible via viewport plugins.
- *   The cornerstone viewport object contains the following attributes (source: https://github.com/chafey/cornerstone/wiki/viewport):
- *   * `scale` - The scale applied to the image. A scale of 1.0 will display no zoom (one image pixel takes up one screen pixel). A scale of 2.0 will be double zoom and a scale of .5 will be zoomed out by 2x
- *   * `translation` - an object with properties x and y which describe the translation to apply in the pixel coordinate system. Note that the image is initially displayed centered in the enabled element with a x and y translation of 0 and 0 respectively.
- *   * `voi` - an object with properties windowWidth and windowCenter.
- *   * `invert` - true if the image should be inverted, false if not.
- *   * `pixelReplication` - true if the image smooth / interpolation should be used when zoomed in on the image or false if pixel replication should be used.
- *   * `hflip` - true if the image is flipped horizontally. Default is false
- *   * `vflip` - true if the image is flipped vertically. Default is false
- *   * `rotation` - the rotation of the image (90 degree increments). Default is 0
- *
- * @param {boolean} wvEnableOverlay (optional) Display the overlay
- *   default: false
- *
- * @param {boolean} wvLossless (optional) Force lossless quality fetching.
- *   * `false` - fetch image with quality based on viewport size.
- *   * `true` - fetch image with the maximum available quality.
- *   Note it doesn't disable progressive loading.
- *   default: false
- *
- * @example Display a specific image with some informations
+ * 
+ * @example
+ * Display a specific image with some informations
+ * 
  * ```html
  * <wv-viewport wv-image-id="'your-image-id" wv-image="$image" wv-size="{width: '100px', height: '100px'}"
  $              wv-viewport="$viewport" wv-lossless="true"
@@ -77,7 +80,9 @@
  * <p>image position: {{$viewport.translate}}</p>
  * ```
  *
- * @example Display a specific image with custom overlay
+ * @example
+ * Display a specific image with custom overlay
+ * 
  * ```html
  * <wv-viewport wv-image-id="'your-image-id'" wv-image="$image" wv-size="{width: '100px', height: '100px'}"
  *              wv-viewport="$viewport" wv-lossless="true">
@@ -101,11 +106,7 @@
      * Doc available at the head of the file
      * @ngInject
      */
-    function wvViewport($, _, cornerstone, cornerstoneTools, $rootScope, $q, $parse, wvImageManager, WvImageQualities) {
-        // Usage:
-        //
-        // Creates:
-        //
+    function wvViewport($, _, cornerstone, cornerstoneTools, $rootScope, $q, $parse, wvImageManager) {
         var directive = {
             transclude: true,
             bindToController: true,
@@ -115,14 +116,14 @@
             link: link,
             restrict: 'E',
             require: {
-                'wvViewport': 'wvViewport',
-                'wvSize': 'wvSize' // @todo make optional (by setting a canvas size equals to the shown image size)
+                'wvViewportCtrl': 'wvViewport', // Ctrl postfix to avoid conflict w/ scope attribute
+                'wvSizeCtrl': 'wvSize' // @todo make optional (by setting a canvas size equals to the shown image size)
             },
             scope: {
                 wvImageId: '=?',
                 wvImage: '=?',
                 wvOnImageChange: '&?',
-                wvViewport: '=?',
+                csViewport: '=?wvViewport',
                 wvEnableOverlay: '=?', // boolean [false]
                 wvLossless: '@?' // boolean [false] - Always fetch lossless if true
             }
@@ -143,33 +144,39 @@
          */
         function link(scope, element, attrs, ctrls) {
             var enabledElement = element.children('div').children('.wv-cornerstone-enabled-image')[0];
-            var model = new osimis.Viewport(wvImageManager, enabledElement, !!scope.vm.wvLossless);
+            var model = new osimis.Viewport($q, cornerstone, enabledElement, !!scope.vm.wvLossless);
 
             scope.vm.wvEnableOverlay = !!scope.vm.wvEnableOverlay;
             var wvImageIdParser = $parse(attrs.wvImageId);
 
+            var _cancelCyclicCallImageId = false; // cancel cyclic databinding induced by controller calls
+
             // bind directive's sizing (via wv-size controller) to cornerstone
             {
-                var wvSizeCtrl = ctrls.wvSize;
+                var wvSizeCtrl = ctrls.wvSizeCtrl;
                 var unbindWvSize = _bindWvSizeController(wvSizeCtrl, model);
             }
 
             // bind directive's controller to cornerstone (via directive's attributes)
-            var _cancelCyclicCall = false; // cancel databinding induced by controller calls
             {
-                var ctrl = ctrls.wvViewport;
+                var ctrl = ctrls.wvViewportCtrl;
                 ctrl.getImage = function() {
                     return model.getImageId();
                 };
                 ctrl.getModel = function() {
                     return model;
                 }
-                ctrl.setImage = function(id, resetParameters) { // resetParameters is optional
-                    _cancelCyclicCall = true;
+                ctrl.setImage = function(newImageId, resetParameters) {
+                    _cancelCyclicCallImageId = true;
 
-                    scope.vm.wvImageId = id;
+                    scope.vm.wvImageId = newImageId;
 
-                    return model.setImage(id, resetParameters);
+                    return wvImageManager
+                        .get(newImageId)
+                        .then(function(image) {
+                            resetParameters = resetParameters || !scope.vm.csViewport; // reset parameters when no csViewport set
+                            return model.setImage(image, resetParameters);
+                        });
                 };
                 ctrl.clearImage = function() {
                     scope.vm.wvImageId = null;
@@ -178,19 +185,82 @@
 
             // bind directive's attributes to cornerstone
             {
-                scope.$watch('vm.wvImageId', function (wvImageId, old) {
-                    if (_cancelCyclicCall) {
-                        _cancelCyclicCall = false;
-                        return;
+                scope.$watch(function() {
+                    // To make viewport is not reset before the image changes (
+                    // instead of after), we need to treat both variable at the
+                    // same times. scope.$watchGroup doesn't supports deep
+                    // watching, this is the way around. We must use deep watch
+                    // as viewport#setViewport() method creates a copy of
+                    // csViewport parameters, which in turn are set back in 
+                    // viewport directive attribute. If we do not deep watch,
+                    // we will therefore go through an infinite $digest loop.
+                    return [
+                        scope.vm.wvImageId,
+                        scope.vm.csViewport && scope.vm.csViewport.serialize()
+                     ]
+                }, function(newValues, oldValues){
+                    var oldImageId = oldValues[0];
+                    var newImageId = newValues[0];
+                    var oldSerializedCsViewport = oldValues[1];
+                    var newSerializedCsViewport = newValues[1]; // Reset viewport if null/undefined
+                    var newUnserializedCsViewport = newSerializedCsViewport && osimis.CornerstoneViewportWrapper.deserialize(newSerializedCsViewport); // scope.vm.csViewport;
+
+                    // Case 1 : NEW IMAGE (or first one, at directive setup)
+                    //   DOWNLOAD IMAGE
+                    //   WAIT
+                    //   SET IMAGE
+                    //   UPDATE VIEWPORT
+                    //   DRAW IMAGE
+                    // If image has already been set by the model, do not 
+                    // redo the whole stuff again.
+                    if (_cancelCyclicCallImageId) {
+                        _cancelCyclicCallImageId = false;
+                    }
+                    else if (!!newImageId && (_.isEqual(oldValues, newValues) // Is this directive setup?
+                        || newImageId !== oldImageId)
+                    ) {
+                        // Load image model & set it.
+                        return wvImageManager
+                            .get(newImageId)
+                            // Wait
+                            .then(function(newImage) {
+                                // Set/Reset the viewport
+                                var resetViewport = undefined;
+                                if (newSerializedCsViewport) {
+                                    model.setViewport(newUnserializedCsViewport);
+                                    resetViewport = false;
+                                }
+                                else {
+                                    resetViewport = true;
+                                }
+
+                                // Set image & draw
+                                return model.setImage(newImage, resetViewport);
+                            });
                     }
 
-                    if (old && !wvImageId) {
+                    // Case 2 : RESET IMAGE
+                    else if (!newImageId && newImageId != oldImageId) {
                         model.clearImage();
                     }
-                    else if (wvImageId) {
-                        model.setImage(wvImageId);
+
+                    // Case 3 : KEEP IMAGE
+                    //   UPDATE CS VIEWPORT
+                    //   DRAW IMAGE
+                    else if (!!newSerializedCsViewport && !_.isEqual(newSerializedCsViewport, oldSerializedCsViewport)) {
+                        // Update csViewport
+                        model.setViewport(newUnserializedCsViewport);
+                        model.draw();
                     }
-                });
+
+                    // Case 4 : KEEP IMAGE
+                    //   RESET VIEWPORT
+                    //   DRAW IMAGE
+                    else if (!newSerializedCsViewport && newSerializedCsViewport != oldSerializedCsViewport) {
+                        model.reset();
+                        model.draw();
+                    }
+                }, true);
             }
 
             // bind model to directive's attributes
@@ -202,9 +272,29 @@
                 }
             });
             element.on('CornerstoneImageRendered', function(evt, args) { // element.off not needed
-                scope.$evalAsync(function() { // trigger a new digest if needed
-                    scope.vm.wvViewport = args.viewport;
-                });
+                // Copy the viewport (only if not exactly the same to avoid
+                // useless digests) so it can be used to retrieve info for 
+                // overlay or to share data in realtime (for Liveshare).
+                // 
+                // @warning This may override changes introduced by the user (
+                //          eg. if this event occurs after the changes he made).
+                //
+                // To prevent this sync issue, we allow cyclic calls to occur:
+                // if viewport data have been set via model, and then changed 
+                // due to CornerstoneImageRendered for another reason, they
+                // will be reset in the next CornerstoneImageRendered to the
+                // correct value. This come at the performance cost of multiple
+                // useless drawing when viewport is reset.
+                if (!_.isEqual(scope.vm.csViewport, args.viewport)) {
+                    scope.$evalAsync(function() { // trigger a new digest if needed
+                        // We can't trust args.viewport to no have changed:
+                        // retrieve them again.
+                        var newCsViewport = model._enabledElementObject.viewport;
+    
+                        // Clone to be sure the references are not the same
+                        scope.vm.csViewport = _.cloneDeep(newCsViewport);
+                    });
+                }
             });
 
             // unlisten binds
@@ -220,15 +310,16 @@
                 if (!wvSizeController) {
                     // @todo resize based on image size and not on element size (wich is always 0)
                     model.resizeCanvas(element.width(), element.height());
+                    model.draw();
                     return null;
                 }
 
-                //model.resizeCanvas(wvSizeController.getWidthInPixel(), wvSizeController.getHeightInPixel());
                 var unlistenWvSizeFn = wvSizeController && wvSizeController.onUpdate(function resizeCanvas() {
                     var width = wvSizeController.getWidthInPixel();
                     var height = wvSizeController.getHeightInPixel();
 
                     model.resizeCanvas(width, height);
+                    model.draw();
                 });
 
                 return function unbind() {
@@ -307,27 +398,100 @@
         toolStateManager.getStateByToolAndImageId = function(toolName, imageId) {
             return this.toolState[imageId] && this.toolState[imageId][toolName];
         };
+
+        /**
+         * @param {boolean} [redraw=true]
+         *
+         * You can choose to not redraw the image after updating the tools data.
+         * This is usefull to avoid useless dual redrawing when the data changes because the image also changes.
+         *
+         * As long as the listener onImageChanging is used instead of onImageChanged,
+         * the drawing will occurs after the tool reloading,
+         *
+         * @description
+         * Set the annotation data of a specific tool & image in cornerstone.
+         */
         toolStateManager.restoreStateByToolAndImageId = function(toolName, imageId, state, redraw) {
-            /**
-             *
-             * @param redraw: boolean (default: true)
-             *
-             * You can choose to not redraw the image after updating the tools data.
-             * This is usefull to avoid useless dual redrawing when the data changes because the image also changes.
-             *
-             * As long as the listener onImageChanging is used instead of onImageChanged,
-             * the drawing will occurs after the tool reloading,
-             *
-             */
             if (typeof redraw === 'undefined') redraw = true;
 
-            this.toolState[imageId] = this.toolState[imageId] || {};
-            
-            // Merge the data into cornernerstone
-            // We can't simply change the object references because cornerstone would lose link to the handles it's working on.
-            // Strange behavior: merge seems to handle property deletion as well
-            _.merge(this.toolState[imageId][toolName], state);
-            
+            // Merge the data into cornernerstone (if annotation is not removed)
+            // We can't simply change the object references because cornerstone
+            // would lose link to the handles it's working on.
+
+            /**
+             * @descriptiopn
+             * Deep clone src in target but keep target's references.
+             * Make sure both src & target are references (object/array).
+             */
+            function homemadeClone(src, target) {
+                // If we are dealing with arrays, should work too since
+                // changing length will erase values.
+
+                // Remove src keys absent from target
+                for (var prop in target) {
+                    if (!src.hasOwnProperty(prop)) {
+                        delete target[prop];
+                    }
+                }
+
+                // If src is an array, set the right length first (seems like
+                // the length property is somehow not being taken in account
+                // by the for loops). This is required because cornerstone will
+                // ignore (don't draw) random tools' annotations if an array 
+                // has not a proper length (cf. equals to its item count).
+                if (_.isArray(src)) {
+                    // Assert
+                    if (!_.isArray(target)) {
+                        throw new Error('src and target should be the same type');
+                    }
+
+                    // Set the target array length
+                    target.length = src.length;
+                }
+
+                // Copy src content in target
+                for (var prop in src) {
+                    // Copy null value first (just to make sure null is not
+                    // considered as an object).
+                    if (src[prop] === null) {
+                        target[prop] = null;
+                    }
+                    // Go recursively through nested object
+                    else if (_.isObject(src[prop]) && !_.isArray(src[prop])) {
+                        // Create an object in target if none
+                        if (!_.isObject(target[prop])) {
+                            target[prop] = {};
+                        }
+                        // Go deep
+                        homemadeClone(src[prop], target[prop]);
+                    }
+                    // Go recursively through nested array
+                    else if (_.isArray(src[prop])) {
+                        // Create an array in target if none
+                        if (!_.isArray(target[prop])) {
+                            target[prop] = [];
+                        }
+                        // Go deep
+                        homemadeClone(src[prop], target[prop]);
+                    }
+                    // Copy directly every other kind of value
+                    else {
+                        target[prop] = src[prop];
+                    }
+                }
+            }
+
+            // Remove the data from cornerstone (if all the related annotations 
+            // are removed).
+            if (!state && this.toolState[imageId] && this.toolState[imageId][toolName]) {
+                delete this.toolState[imageId][toolName];
+            }
+            else {
+                this.toolState[imageId] = this.toolState[imageId] || {};
+                this.toolState[imageId][toolName] = this.toolState[imageId][toolName] || {};
+                homemadeClone(state, this.toolState[imageId][toolName]);
+            }
+
             if (redraw) {
                 // refresh viewports
                 var enabledElementObjects = cornerstone.getEnabledElementsByImageId(imageId);

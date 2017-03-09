@@ -1,6 +1,44 @@
 Pending changes in the mainline
 ===============================
 
+Version 0.6.0
+========================
+
+=> Minimum Orthanc version: 1.1.0 <=
+
+Usability:
+* Enhance overall user interface
+  warning: the 2x1 and 1x2 grid mode have been removed for now
+* Change the shown thumbnail image from the first series' instance to the middle one
+* Set default tool to zoom instead of windowing
+* Provide tooltip helpers for the toolbar
+* Pinch to zoom on mobile
+* Move 3 fingers to change windowing on mobile
+* Optimise mobile display on portrait and landscape mode
+
+Features:
+* Display PDF embedded in DICOM instances
+
+Optimization:
+* Bypass images recompression when image is already compressed within DICOM
+
+Bug fixes:
+* Play series with Safari Mobile
+* Embed fonts instead of relying on CDN
+* Display precompressed instance images on mobile and EDGE
+* Display series in order
+* Fit images to the viewports
+* Keep viewport settings when browser's window is resized
+* Display zoom based on image's full resolution
+
+Breaking Changes:
+* `plugin-entrypoint.html` has been renamed to `index.html`
+* New parameter `StudyDownloadEnabled` in the backend config file
+* New routes used:
+  - /<orthanc>/instances/<instance-uid>/pdf
+  - /osimis-viewer/app/config.js
+  Have a look at the `/procedures/develop-auth-proxy.md` document.
+
 Version 0.5.5
 ========================
 
@@ -25,7 +63,7 @@ Version 0.5.3
 * Improve compatibility with DICOM SR
 * Fix orthanc crash on some bad http routes
 * Enhance progressive image loading algorithm:
-	- Always load thumbnail quality except on small already-compressed dicom
+  - Always load thumbnail quality except on small already-compressed dicom
 * Reduce simplified-tags requests at study loading: load them during series loading
 * Fix preloader: reduce loading priority or cancel download on series/image switch
 * Improve Safari compatibility

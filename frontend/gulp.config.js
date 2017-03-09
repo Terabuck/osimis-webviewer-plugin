@@ -22,7 +22,6 @@ module.exports = function() {
          */
         // all javascript that we want to vet
         alljs: [
-            '!./src/**/*.worker/**/*.js',
             './src/**/*.js',
             './*.js'
         ],
@@ -31,14 +30,15 @@ module.exports = function() {
         cssDir: cssDir,
         css: cssDir + 'styles.css',
         fonts: [
-            bower.directory + 'font-awesome/fonts/**/*.{eot,svg,ttf,woff,woff2}'
+            bower.directory + 'font-awesome/fonts/**/*.{eot,svg,ttf,woff,woff2}',
+            bower.directory + 'bootstrap/fonts/**/*.{eot,svg,ttf,woff,woff2}',
+            bower.directory + 'open-sans/**/*.{eot,svg,ttf,woff,woff2}'
         ],
         html: client + '/*.html',
         htmltemplates: clientApp + '**/*.html',
         images: client + 'images/**/*.*',
         indexes: [
-            client + 'index.html',
-            client + 'plugin-entrypoint.html'
+            client + 'index.html'
         ],
         config: client + 'config.js.embedded', // config file to copy in build
         // app js, with no specs
@@ -46,7 +46,8 @@ module.exports = function() {
             clientApp + '**/*.module.js',
             clientApp + '**/*.js',
             '!' + clientApp + '**/*.worker/**/*.js',
-            '!' + clientApp + '**/*.spec.js'
+            '!' + clientApp + '**/*.spec.js',
+            '!' + clientApp + '**/*.mock.js'
         ],
         jsOrder: [
             '**/webviewer.module.js',
@@ -64,8 +65,7 @@ module.exports = function() {
         ],
         temp: temp,
         tempIndexes: [
-            temp + 'index.html',
-            temp + 'plugin-entrypoint.html'
+            temp + 'index.html'
         ],
         /**
          * optimized files
@@ -127,8 +127,12 @@ module.exports = function() {
             nodeModules + '/chai/chai.js',
             nodeModules + '/sinon-chai/lib/sinon-chai.js'
         ],
-        specHelpers: [client + 'test-helpers/**/*.js'],
-        specs: [clientApp + '**/*.spec.js'],
+        specHelpers: [
+            client + 'test-helpers/**/*.js'
+        ],
+        specs: [
+            clientApp + '**/*.spec.js'
+        ],
 
         /**
          * Node settings
@@ -184,14 +188,14 @@ module.exports = function() {
                 bower.directory + '/jpeg-lossless-decoder-js/release/current/lossless-min.js',
 
                 config.specHelpers,
-                client + 'config.js', // config file used to run tests
 
                 // Make sure worker files aren't included
                 {pattern: clientApp + '**/*.worker/*.js', included: false, served: true},
 
                 clientApp + '**/*.module.js',
-                clientApp + '*!(.spec).js', // see https://medium.com/@SchizoDuckie/so-your-karma-tests-run-twice-this-is-what-you-need-to-do-be74ce9f257e#.r3kp55lix
                 clientApp + '**/!(*.worker)/*.js',
+                clientApp + '**/*.mock.js',
+                clientApp + '*!(.spec).js', // see https://medium.com/@SchizoDuckie/so-your-karma-tests-run-twice-this-is-what-you-need-to-do-be74ce9f257e#.r3kp55lix
                 temp + config.templateCache.file
             ),
             exclude: [

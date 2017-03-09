@@ -6,7 +6,7 @@
         .factory('WvBaseTool', factory);
 
     /* @ngInject */
-    function factory($rootScope, $timeout, $, _, cornerstoneTools, debounce) {
+    function factory($rootScope, $, _, cornerstoneTools, debounce) {
         
         /** BaseTool
           *
@@ -25,6 +25,14 @@
             var _this = this;
             
             this.viewports.push(viewport)
+        
+            // For tools related to cornerstone (@todo split BaseTool in AnnotationTools & others)
+            if (cornerstoneTools[this.toolName]) {
+                // Set tool in enable mode (it's a 1D state machine with 4
+                // states) - display annotations but ignore inputs.
+                var enabledElement = viewport.getEnabledElement();
+                cornerstoneTools[this.toolName].enable(enabledElement, 1);
+            }
 
             this._listenModelChange(viewport);
 
@@ -35,22 +43,38 @@
 
         // method called by the viewport
         BaseTool.prototype.unregister = function(viewport) {
+            // For tools related to cornerstone (@todo split BaseTool in AnnotationTools & others)
+            if (cornerstoneTools[this.toolName]) {
+                // Set tool in disable mode (it's a 1D state machine with 4
+                // states) - don't display annotations & ignore inputs.
+                var enabledElement = viewport.getEnabledElement();
+                cornerstoneTools[this.toolName].enable(enabledElement, 1);
+            }
+
             this._unlistenModelChange(viewport);
             
             _.pull(this.viewports, viewport);
         };
 
         BaseTool.prototype._activateInputs = function(viewport) {
+            // Listen to events
             var enabledElement = viewport.getEnabledElement();
-
             cornerstoneTools.mouseInput.enable(enabledElement);
-            cornerstoneTools[this.toolName].activate(enabledElement, true);
+            cornerstoneTools.touchInput.enable(enabledElement);
+
+            // Set tool in activate mode (it's a 1D state machine with 4
+            // states) - display annotations and listen to inputs.
+            cornerstoneTools[this.toolName].activate(enabledElement, 1);
         };
         BaseTool.prototype._deactivateInputs = function(viewport) {
+            // Unlisten to events
             var enabledElement = viewport.getEnabledElement();
-
-            cornerstoneTools[this.toolName].deactivate(enabledElement);
             cornerstoneTools.mouseInput.disable(enabledElement);
+            cornerstoneTools.touchInput.disable(enabledElement);
+
+            // Set tool in enable mode (it's a 1D state machine with 4
+            // states) - display annotations but ignore inputs.
+            cornerstoneTools[this.toolName].enable(enabledElement, 1);
         };
 
         var _imageByViewportListenerIds = [];
@@ -117,6 +141,8 @@
             var toolStateManager = cornerstoneTools.getElementToolStateManager(enabledElement);
 
             // for each viewport, listen..
+            // @todo debounce should be throttle when liveshare is "on"
+            // 
             $(enabledElement).on('CornerstoneImageRendered.'+this.toolName, _.debounce(function() {
                 var image = viewport.getImage();
                 var newAnnotationsData = toolStateManager.getStateByToolAndImageId(_this.toolName, image.id);
@@ -128,8 +154,8 @@
                 // The handles visibility is compared as well (highlight & active properties) - for livesharing purpose
                 if (oldAnnotations && _.isEqual(newAnnotationsData, oldAnnotations.data)) return;
                 
-                // do the $apply after the check to avoid an useless $digest cycle in case there is no change
-                $rootScope.$apply(function() {
+                // do the $evalAsync after the check to avoid a potential useless $digest cycle in case there is no change
+                $rootScope.$evalAsync(function() {
                     // avoid having to use angular deep $watch
                     // using a fast shallow object clone
                     var data = _.clone(newAnnotationsData);

@@ -1,16 +1,18 @@
 describe('backend', function() {
 
     beforeEach(function() {
-        bard.asyncModule('webviewer', function(wvConfigProvider) {
-            wvConfigProvider.setApiURL(window.orthancUrl || '/');
+        bard.asyncModule('webviewer', function() {
+          osimis.HttpRequest.timeout = 20000; // limit requests to 20s (for better error feedback)
         });
-        bard.inject('wvSeriesManager', 'WvHttpRequest', 'wvImageBinaryManager', 'WvImageQualities', 'wvInstanceManager');
+        bard.inject('wvSeriesManager', 'wvImageBinaryManager', 'wvInstanceManager', 'wvConfig');
 
         seriesId = '7982dce8-d6a3ce66-d6fac396-d2427a98-61d94367:0';
         seriesId2 = '5910c9dd-4c2f8394-a9d63c4a-983e3837-7acded9b:0';
         imageId = '04389b99-731fd35c-a8ba10a0-a1d9cb32-d7dbd903:0';
+    });
 
-        WvHttpRequest.timeout = 20000; // limit requests to 20s (for better error feedback)
+    afterEach(function() {
+        osimis.HttpRequest.timeout = 0; // reset HttpRequest timeouts
     });
 
     var seriesId, seriesId2;
@@ -174,7 +176,7 @@ describe('backend', function() {
                     assert.deepEqual(series.tags, seriesTags);
                 }, function(error) {
                     // Fail the test - series not found
-                    assert.fail();
+                    assert(false, JSON.stringify(error));
                 });
         });
 
@@ -187,7 +189,7 @@ describe('backend', function() {
                     assert.deepEqual(series.imageIds, seriesOrderedImageIds);
                 }, function(error) {
                     // Fail the test - series not found
-                    assert.fail();
+                    assert(false, JSON.stringify(error));
                 });
         });
         
@@ -200,7 +202,7 @@ describe('backend', function() {
                     assert.deepEqual(series.availableQualities, seriesAvailableImageQualities);
                 }, function(error) {
                     // Fail the test - series not found
-                    assert.fail();
+                    assert(false, JSON.stringify(error));
                 });
         });
 
@@ -238,7 +240,7 @@ describe('backend', function() {
                 .get('my-inexistant-series:35')
                 .then(function(series) {
                     // Fail the test - series shouldn't have been found
-                    assert.fail();
+                    assert(false, 'should not load inexistant thing');
                 }, function(error) {
                     // Succeed on error - if image has not been retrieved
                     assert.equal(error.status, 404);
@@ -260,7 +262,7 @@ describe('backend', function() {
         it('should load an high quality version of the image', function() {
             // Retrieve image with LOSSLESS quality
             return wvImageBinaryManager
-                .get(imageId, WvImageQualities.LOSSLESS)
+                .get(imageId, osimis.quality.LOSSLESS)
                 .then(function(pixelObject) {
                     // Succeed if image has been retrieved
                     assert.ok(true);
@@ -270,17 +272,17 @@ describe('backend', function() {
                     assert.equal(pixelObject.height, imageResolution.highQuality[1]);
                 }, function(error) {
                     // Fail on error - if image should have been retrieved
-                    assert.fail();
+                    assert(false, JSON.stringify(error));
                 });
         });
 
         it('should fail on inexistant image', function() {
             // Retrieve inexistant image
             return wvImageBinaryManager
-                .get('robocop:34', WvImageQualities.LOSSLESS)
+                .get('robocop:34', osimis.quality.LOSSLESS)
                 .then(function() {
                     // Fail if inexistant image request returns successful result
-                    assert.fail();
+                    assert(false, 'should not load inexistant thing');
                 }, function(error) {
                     // Succeed on error - if image has not been retrieved
                     assert.equal(error.status, 404);
@@ -294,7 +296,7 @@ describe('backend', function() {
         it('should load an medium quality version of the image', function() {
             // Retrieve image with MEDIUM quality
             return wvImageBinaryManager
-                .get(imageId, WvImageQualities.MEDIUM)
+                .get(imageId, osimis.quality.MEDIUM)
                 .then(function(pixelObject) {
                     // Succeed if image has been retrieved
                     assert.ok(true);
@@ -305,17 +307,17 @@ describe('backend', function() {
 
                 }, function(error) {
                     // Fail on error - if image should have been retrieved
-                    assert.fail();
+                    assert(false, JSON.stringify(error));
                 });
         });
 
         it('should fail on inexistant image', function() {
             // Retrieve inexistant image
             return wvImageBinaryManager
-                .get('robocop:34', WvImageQualities.MEDIUM)
+                .get('robocop:34', osimis.quality.MEDIUM)
                 .then(function() {
                     // Fail if inexistant image request returns successful result
-                    assert.fail();
+                    assert(false, 'should not load inexistant thing');
                 }, function(error) {
                     // Succeed on error - if image has not been retrieved
                     assert.equal(error.status, 404);
@@ -329,7 +331,7 @@ describe('backend', function() {
         it('should load an low quality version of the image', function() {
             // Retrieve image with LOW quality
             return wvImageBinaryManager
-                .get(imageId, WvImageQualities.LOW)
+                .get(imageId, osimis.quality.LOW)
                 .then(function(pixelObject) {
                     // Succeed if image has been retrieved
                     assert.ok(true);
@@ -339,21 +341,34 @@ describe('backend', function() {
                     assert.equal(pixelObject.height, imageResolution.lowQuality[1]);
                 }, function(error) {
                     // Fail on error - if image should have been retrieved
-                    assert.fail();
+                    assert(false, JSON.stringify(error));
                 });
         });
 
         it('should fail on inexistant image', function() {
             // Retrieve inexistant image
             return wvImageBinaryManager
-                .get('robocop:34', WvImageQualities.LOW)
+                .get('robocop:34', osimis.quality.LOW)
                 .then(function() {
                     // Fail if inexistant image request returns successful result
-                    assert.fail();
+                    assert(false, 'should not load inexistant thing');
                 }, function(error) {
                     // Succeed on error - if image has not been retrieved
                     assert.equal(error.status, 404);
                 });
+        });
+
+    });
+
+    describe('route /config', function() {
+
+        it('should return webviewer version to the frontend', function() {
+            // The retrieval is already done at init time, no need to do it again
+            
+            // Expect frontend config to contain versions
+            assert.match(wvConfig.version.orthanc, /^(mainline|(\d+\.?)+)$/, "bad version format");
+            assert.match(wvConfig.version.db, /^\d+$/, "bad version format");
+            assert.match(wvConfig.version.webviewer, /^(\d+\.?){3,4}(-\w+)?(-dirty)?$/, "bad version format");
         });
 
     });

@@ -2,6 +2,13 @@ module.exports = function(config) {
     var cwd = '../../frontend/';
     var gulpConfig = require(cwd+'gulp.config')();
 
+    var orthancUrl = process.env.ORTHANC_URL || 'http://localhost:8042';
+
+    // Add orthanc served config file
+    // Must not put orthancUrl content, would trigger CORS error. Mocha proxies 
+    // `/osimis-viewer/` route instead.
+    gulpConfig.karma.files.push('http://localhost:9876/osimis-viewer/config.js')
+
     // Add integration tests
     gulpConfig.karma.files.push('../tests/**/*.spec.js')
 
@@ -23,11 +30,13 @@ module.exports = function(config) {
 
         proxies: {
             // Add orthanc route
-            '/orthanc/': process.env.ORTHANC_URL || 'http://localhost:8042/',
+            '/instances/': orthancUrl + '/instances/',
+            '/series/': orthancUrl + '/series/',
+            '/studies/': orthancUrl + '/studies/',
+            '/osimis-viewer/': orthancUrl + '/osimis-viewer/',
             // Proxy for web worker to work with mocha
             '/app/': '/base/src/app/',
-            '/bower_components/': '/base/bower_components/',
-            '/config.js': '/base/src/config.js'
+            '/bower_components/': '/base/bower_components/'
         },
 
         // preprocess matching files before serving them to the browser

@@ -1,24 +1,25 @@
+/**
+ * @ngdoc object
+ * @memberOf osimis
+ * 
+ * @name osimis.OrthancUrlConvertor
+ * 
+ * @description
+ * The `OrthancUrlConvertor` class is used to generate an absolute URL
+ * from a relative URL based on the current page.
+ * It aims to provide orthanc paths instead of local paths, it therefore
+ * detects and removes '/osimis-viewer/app/...' from the actual location.
+ *
+ * Location parameters need to be manually filled at the instantiation for
+ * testing reasons (as opposed to grabbing the global document.location object).
+ *
+ * @param {string} protocol - document.location.protocol (eg: "http:" - double point included!)
+ * @param {string} hostname - document.location.hostname (eg: localhost)
+ * @param {number} port - document.location.port (eg: 1431)
+ * @param {string} pathname - document.location.pathname (eg: /something)
+ */
 (function(module) {
 
-    /**
-     *
-     * @class osi.OrthancUrlConvertor
-     *
-     * @description
-     * The `OrthancUrlConvertor` class is used to generate an absolute URL
-     * from a relative URL based on the current page.
-     * It aims to provide orthanc paths instead of local paths, it therefore
-     * detects and removes '/osimis-viewer/app/...' from the actual location.
-     *
-     * Location parameters need to be manually filled at the instantiation for
-     * testing reasons (as opposed to grabbing the global window.location object).
-     *
-     * @param {string} protocol - window.location.protocol (eg: "http:" - double point included!)
-     * @param {string} hostname - window.location.hostname (eg: localhost)
-     * @param {number} port - window.location.port (eg: 1431)
-     * @param {string} pathname - window.location.pathname (eg: /something)
-     *
-     */
     function OrthancUrlConvertor(protocol, hostname, port, pathname) {
         this.protocol = protocol;
         this.hostname = hostname;
@@ -29,13 +30,16 @@
     };
 
     /**
-     *
-     * @method toAbsoluteURL
+     * @ngdoc method
+     * @methodOf osimis.OrthancUrlConvertor
      * 
-     * @param {string} url - the Orthanc config url
+     * @name osimis.OrthancUrlConvertor#toAbsoluteURL
+     * @param {string} url 
+     *    The Orthanc config url.
      *    `url` must be absolute ('/...' or 'stg://.../...' but not '.../...').
      *    It will be converted to absolute 'stg://.../...'. See 'orthanc-url-convertor.spec.js'
      *    for more details.
+     * @return {string} The absolute URL
      */
     OrthancUrlConvertor.prototype.toAbsoluteURL = function(url) {
         // Check the path is absolute
@@ -56,9 +60,9 @@
             var result = locationUrl.match(regex);
             var locationOrigin = result[1] + result[2];
 
-            // if <1: ...> + <2: /osimis-viewer/app/plugin-entrypoint.html> is present, prefix from that level.
+            // if <1: ...> + <2: /osimis-viewer/app/*.html> is present, prefix from that level.
             if (result.length >= 3 && result[3]) {
-                var regex2 = /^(\/?.*)(\/osimis-viewer\/app)(\/plugin-entrypoint\.html|\/index\.html)/; // <1: prefix> + <2: ...> (eg. /apiroot/osimis-viewer/app/plugin-entrypoint.html?...)
+                var regex2 = /^(\/?.*)(\/osimis-viewer\/app)(\/[\w-]+\.html)/; // <1: prefix> + <2: ...> (eg. /apiroot/osimis-viewer/app/*.html?...)
                 var result2 = result[3].match(regex2);
                 if (result2 && result2.length > 1 && result2[1]) {
                     locationOrigin += result2[1];

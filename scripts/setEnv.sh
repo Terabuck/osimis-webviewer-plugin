@@ -24,7 +24,15 @@ function _setEnvMain {
 	branchName=${1:-$(git rev-parse --abbrev-ref HEAD)} #if no argument defined, get the branch name from git
 	releaseCommitId=$(git rev-parse --short HEAD)
 
-	if [[ $branchName == "master" ]]; then
+	viewerVersion=$(git describe --tags --long --dirty=-dirty) # version as used in cmake for backend build
+
+	if [[ ! $branchName ]]; then
+		# Exit if detached head
+		branchName=$(git rev-parse --abbrev-ref HEAD)
+		if [[ $branchName == HEAD ]]; then
+			exit 2
+		fi
+	elif [[ $branchName == "master" ]]; then
 		
 		# in the master branch, make sure the tag is clean ('1.2.3'; not 1.2.3-alpha) and there has been 0 commits since the tag has been set.
 		if [[ $gitLongTag =~ [0-9]+.[0-9]+.[0-9]+-0-[0-9a-g]{8}$ ]]; then 
@@ -35,7 +43,6 @@ function _setEnvMain {
 			echo "Invalid tag on the master branch.  Make sure you have just tagged the master branch with something like '1.2.3' and that there has been no commit after the tag."
 			exit -1	
 		fi
-
 	else
 		# in other branches than master, the versionNumber is the branchName
 		releaseTag=$branchName
@@ -63,6 +70,14 @@ function _setEnvMain {
 		tag=$TAG
 	fi
 
+
+	# Generate random port
+	if [[ ! $demoPort ]]; then
+		# FIXME look for unallocated ports
+		echo "Using a random demo port in range 20000-39999"
+		demoPort=$((RANDOM % 20000 + 20000))
+	fi
+
 	srcRoot="${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"
 
 	# Export variables (in a file so we can source them in later stages of the build)
@@ -70,23 +85,30 @@ tee <<EOT > .env
 export TAG=$tag
 export SRC_ROOT="$srcRoot"
 export BRANCH_NAME=$branchName
+export VIEWER_VERSION="$viewerVersion" # version as used in cmake for backend build
 
+# Delivery
 export MAIN_IMAGE=osimis/orthanc-webviewer-plugin
 export COMMIT_ID=$releaseCommitId
 export RELEASE_TAG=$releaseTag
+export AWS_URL=s3://orthanc.osimis.io/public/osimisWebViewer/
 
+# Test (c++ & integration)
 export TEST_COMPOSE_PROJECT=wv_test_${tag}
 export TEST_NETWORK=wvtest${tag}_default
 export TEST_COMPOSE_FILE=${srcRoot}/tests/docker-compose.yml
-export TEST_IMAGE=osimis/orthanc-webviewer-plugin/test
-export TEST_RUNNER_IMAGE=osimis/orthanc-webviewer-plugin/test-runner
+export TEST_IMAGE=osimis/orthanc-webviewer-plugin/test # (with specific orthanc config)
+export TEST_RUNNER_IMAGE=osimis/orthanc-webviewer-plugin/test-runner # (with chrome)
 export TEST_TMP_CONTAINER=osimis-orthanc-webviewer-plugin-test-${tag}
 export TEST_CONFIG=${srcRoot}/scripts/ciOrthancTestConfig.json
 
+# Demo (with default dicoms)
+export DEMO_IMAGE=osimis/orthanc-webviewer-plugin/demo
+export DEMO_PORT=${demoPort:-3333}
+
+# Build
 export JS_BUILDER_IMAGE=osimis/orthanc-webviewer-plugin/js-builder
 export JS_BUILDER_CONTAINER=osimis-orthanc-webviewer-plugin-js-builder-${tag}
-
-export AWS_URL=s3://orthanc.osimis.io/public/osimisWebViewer/
 EOT
 	# Print variables
 	cat .env

@@ -9,11 +9,6 @@ describe('configuration', function() {
             // Launch app (do not launch with osimis-helpers so we can inject our own config)
             bard.asyncModule('webviewer', 
                 function(wvConfigProvider) {
-                    // Just make sure we don't get any warning in the console due to version compatibility check.
-                    // No need to take time to mock orthanc for this..
-                    wvConfigProvider.setApiURL(window.orthancUrl || '/');
-                },
-                function(wvConfigProvider) {
                     // ! Set configuration during app initialization
                     wvConfigProvider.setHttpRequestHeaders({
                         'first-attempt': 'attempt number one'

@@ -1,3 +1,9 @@
+/**
+ * @ngdoc object
+ * @memberOf osimis
+ * 
+ * @name osimis.Series
+ */
 (function() {
     'use strict';
 
@@ -6,20 +12,21 @@
         .factory('WvSeries', factory);
 
     /* @ngInject */
-    function factory($rootScope, $timeout, wvImageManager, wvAnnotationManager, WvAnnotationGroup, wvImageBinaryManager, WvImageQualities, uaParser) {
+    function factory($rootScope, $timeout, wvImageManager, wvAnnotationManager, WvAnnotationGroup, wvImageBinaryManager, uaParser) {
 
-        function WvSeries(id, imageIds, tags, availableQualities, instanceTags) {
+        function WvSeries(id, imageIds, pdfIds, tags, availableQualities, instanceTags) {
             var _this = this;
 
-            // Replace PixelData by lossless in safari & internet (for decompression library incompatibility reasons)
+            // Replace PixelData by lossless in safari & internet explorer (for decompression library incompatibility reasons)
             if (uaParser.getBrowser().name.indexOf('Safari') !== -1
                 || uaParser.getBrowser().name.indexOf('IE') !== -1
+                || uaParser.getBrowser().name.indexOf('Edge') !== -1
                 && availableQualities.hasOwnProperty('PIXELDATA'))
             {
                 // @todo Check with edge if this may be disabled (& in latest Safari versions)
                 console.warn && console.warn('Transtypage of PIXELDATA to PNG for of Safari & IE -> Much slower decompression');
                 delete availableQualities.PIXELDATA;
-                availableQualities.LOSSLESS = WvImageQualities.LOSSLESS;
+                availableQualities.LOSSLESS = osimis.quality.LOSSLESS;
             }
 
             this.id = id; // id == orthancId + ':' + subSeriesIndex
@@ -53,7 +60,7 @@
                     .get(middleImageId)
                     .then(function(image) {
                         if (image.tags.RecommendedDisplayFrameRate) {
-                            _this.frameRate = image.tags.RecommendedDisplayFrameRate;
+                            _this.frameRate = +image.tags.RecommendedDisplayFrameRate; // make sure it's a number so input numbers referencing this var don't throw errors
                         }
                     });
             });
@@ -206,6 +213,12 @@
         };
 
         WvSeries.prototype.goToImage = function(newIndex) {
+            // Convert index to integer to be able to simply use expressions 
+            // such as `imageCount/2` in AngularJS declarative code and 
+            // elsewhere.
+            newIndex = Math.floor(newIndex);
+
+            // Limit index to available range of image
             if (newIndex < 0) {
               newIndex = 0;
             }
@@ -249,6 +262,14 @@
                 var desiredFrameRateInMs = 1000 / _this.frameRate; // Convert framerate FPS into MS
                 // Wait for the monitor to attempt refresh
                 _cancelAnimationId = requestAnimationFrame(function(currentTimeInMs) {
+                    // In Safari Mobile 10, currentTimeInMs is undefined. This
+                    // bug is undocumented and doesn't seem to be well known.
+                    // We specify the variable value manually to prevent the
+                    // play feature from not working.
+                    if (typeof currentTimeInMs === 'undefined') {
+                        currentTimeInMs = performance.now();
+                    }
+
                     // Draw series at desired framerate (wait for the desired framerate ms time to be passed,
                     // skip displaying till it has not passed)
                     if (currentTimeInMs - _lastTimeInMs >= desiredFrameRateInMs) {

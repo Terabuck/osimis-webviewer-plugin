@@ -1,3 +1,9 @@
+/**
+ * @ngdoc directive
+ *
+ * @name webviewer.directive:wvSize
+ * @restrict Attribute
+ */
 (function() {
     'use strict';
 
@@ -6,7 +12,7 @@
         .directive('wvSize', wvSize);
 
     /* @ngInject */
-    function wvSize($timeout, $parse, debounce) {
+    function wvSize($parse, debounce) {
         /**
          * Generic directive to handle DOM element sizing via JS
          * Can be used by other directives
@@ -40,15 +46,21 @@
                 ctrl.updateSize(width, height);
             }, true);
 
-            var whenWindowResizedFn = debounce(function() {
-                scope.$apply(function() {
-                    var size = wvSize(scope);
-                    if (_isTag(size.width) || _isTag(size.height)) {
-                        // the tagged element may have been resized by window resize if its size is defined in %
-                        ctrl.updateSize(size.width, size.height);
-                    }
-                });
-            }, 10);
+            // Resize the element when the windows is resized.
+            // @warning performance intensive because we do not debounce the 
+            // resize event. we must avoid debouncing because most
+            // implementations use setTimeout and induce reflows. We may try
+            // out an home-made debounce implementation using asap to fix that.
+            var whenWindowResizedFn = function() {
+                var size = wvSize(scope);
+                
+                // The dom context may have been resized by window resize if 
+                // its size is defined in %. We thus process a resizing only if 
+                // the size is not fixed in pixel.
+                if (!_isSize(size.width) && !_isSize(size.height)) {
+                    ctrl.updateSize(size.width, size.height);
+                }
+            }
             $(window).on('resize', whenWindowResizedFn);
             scope.$on('$destroy', function() {
                 $(window).off('resize', whenWindowResizedFn);
@@ -74,9 +86,13 @@
 
             var setWvSize = wvSize.assign;
             if (setWvSize) {
-                setWvSize($scope, {
-                    width: width,
-                    height: height
+                // Databind new size. We only use $evalAsync here to avoid it
+                // making reflows when changing the element's size.
+                $scope.$evalAsync(function() {
+                    setWvSize($scope, {
+                        width: width,
+                        height: height
+                    });
                 });
 
                 // wvSize change triggers $digest wich trigger _this.updateSize() in $watch
@@ -104,6 +120,9 @@
             }
             else if (_isSize(height) && _isScale(width)) {
                 this.setSpecificHeightAndScaleWidth(height, width);
+            }
+            else if (_isScale(height) && _isScale(width)) {
+                this.scaleHeightAndWidth(height, width);
             }
             else {
                 throw new Error("wv-size: unsupported options");
@@ -173,6 +192,15 @@
                 listener();
             });
         }
+
+        this.scaleHeightAndWidth = function(heightScale, widthScale) {
+            $element.css('height', heightScale * 100 + '%');
+            $element.css('width', widthScale * 100 + '%');
+
+            _onUpdateListeners.forEach(function(listener) {
+                listener();
+            });
+        };
     }
 
     function _isSize(size) {

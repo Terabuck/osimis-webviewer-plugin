@@ -1,39 +1,42 @@
 /**
- * @ngdoc
+ * @ngdoc directive
  *
- * @name wvPanePolicy
+ * @name webviewer.directive:wvPanePolicy
+ * 
+ * @param {integer} [wvPaneIndex] (readonly) 
+ *   Provide the index of the pane
+ * @param {object} [wvPanePosition] (readonly)
+ *   Provide the position of the pane within the splitpane
+ *   
+ *   * `x` The column index - starts from 0
+ *   * `y` The row index - starts from 0
+ * @param {callback} [wvOnPaneAdded] 
+ *   Called when the pane is added.
+ *   Useful to provide external configuration. For instance, save and retrieve the pane
+ *   state on a database.
+ *   
+ *   Callback attributes arguments:
+ *   
+ *   `$index` - provide wvPaneIndex like data
+ *   `$position` - provide wvPanePosition like parameter
+ * @param {callback} [wvOnPaneRemoved]
+ *   Called when the pane is removed
+ *   Useful to provide external cleanup.
+ *   
+ *   Callback attributes arguments:
+ *   
+ *   `$index` - provide `wvPaneIndex` like data
+ *   `$position` - provide `wvPanePosition` like parameter
  *
+ * @requires webviewer.directive:wvSplitpane
+ * @restrict Element
+ * @scope
+ * 
  * @description
  * The `wvPanePolicy` directive configure the content of the `wvSplitpane` directive.
  * It provides standard access to the user scope. Pane properties can be retrieved
  * via additional attributes.
- *
- * @require wvSplitpane
- *
- * @scope
  * 
- * @restrict E
- *
- * @param {integer} wvPaneIndex (optional, readonly) Provide the index of the pane
- *
- * @param {object} wvPanePosition (optional, readonly) Provide the position of the pane within the
- *   splitpane
- *   * `x` The column index - starts from 0
- *   * `y` The row index - starts from 0
- *
- * @param {function} wvOnPaneAdded (optional, callback) Called when the pane is added
- *   Useful to provide external configuration. For instance, save and retrieve the pane
- *   state on a database.
- *   Callback attributes arguments:
- *   `$index` - provide wvPaneIndex like data
- *   `$position` - provide wvPanePosition like parameter
- *
- * @param {function} wvOnPaneRemoved (optional, callback) Called when the pane is removed
- *   Useful to provide external cleanup.
- *   Callback attributes arguments:
- *   `$index` - provide `wvPaneIndex` like data
- *   `$position` - provide `wvPanePosition` like parameter
- *
  * @example
  * The following example display a 2x2 layout of viewports. The series ids are stored on an array.
  * The pane is bound to a context external of the splitpane one, via vm.viewports array,

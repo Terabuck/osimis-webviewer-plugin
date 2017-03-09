@@ -10,6 +10,7 @@ logging.basicConfig(level = logging.INFO)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("branchName")
+parser.add_argument("viewerVersion") # git describe --tags --long --dirty=-dirty
 parser.add_argument('action',
                     choices = ['build',
                                'publish'],
@@ -49,16 +50,14 @@ def build(config):
     logging.info("Building {name} version".format(name = config['name']))
 
     buildFolder = os.path.join(rootFolder, config['buildFolder'])
-    FileHelpers.makeSurePathDoesNotExists(buildFolder)  # cleanup old build folder
     os.makedirs(buildFolder, exist_ok = True)
     os.chdir(buildFolder)
-    shutil.rmtree(buildFolder, ignore_errors = True)
 
     ret = BuildHelpers.buildCMake(cmakeListsFolderPath = os.path.join(rootFolder, 'backend'),
                                   buildFolderPath = buildFolder,
                                   cmakeTargetName = 'OsimisWebViewer',
                                   cmakeTargetsOSX = ['OsimisWebViewer', 'UnitTests'],
-                                  cmakeArguments = ['-DJS_CLIENT_CLEAN_FIRST:BOOL=ON'],
+                                  cmakeArguments = ['-DJS_CLIENT_CLEAN_FIRST:BOOL=ON', '-DVIEWER_VERSION_FULL:STRING='+str(args.viewerVersion)],
                                   builder = config['builder'],
                                   config = BuildHelpers.CONFIG_RELEASE
                                   )

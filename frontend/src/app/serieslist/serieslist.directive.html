@@ -1,18 +1,54 @@
-<ul class="{{wvClass.ul}}">
-  	<li
-  		ng-repeat="id in seriesIds"
-  		class="{{wvClass.li}}"
-  		ng-transclude
-  		wv-size-tag
-	>
-	    <wv-viewport vp-series-id="id" wv-image="$image" wv-series="$series" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}"
-	    	wv-draggable-series-ext wv-scroll-on-over-series-ext
-    	>
-		    <wv-overlay wv-tags="$image.tags">
-		    	<div class="wv-serieslist-overlay">
-	        		{{$series.tags.SeriesDescription}}
-	        	</div>
-		    </wv-overlay>
-	    </wv-viewport>
-  	</li>
+<ul
+    ng-show="vm.studyId"
+    class="list-unstyled mbn"
+>
+    <style>
+    /* @todo out! */
+    .superlist {
+        border-right: 1px solid #222;
+        margin-bottom: 2px;
+    }
+    </style>
+    <li
+        ng-show="vm.pdfInstanceIds.length > 0"
+        ng-repeat="id in vm.pdfInstanceIds"
+        class="list-unstyled superlist wv-serieslist-report"
+        ng-click="vm.openPdf(id)"
+    >
+        <div class="serieList__picture inline-object wh__64">
+            <span class="wv-serieslist-reporticon fa fa-file-text"></span>
+        </div>
+        <div class="serieList__informations float__right pl10">
+            <span class="serieList__label mn">PDF report</span>
+        </div>
+    </li>
+    <li
+        ng-show="!vm.pdfInstanceIds.length"
+        class="list-unstyled superlist wv-serieslist-noreport"
+    >
+        <div class="serieList__picture inline-object wh__64">
+            <span class="wv-serieslist-noreporticon fa fa-file-text"></span>
+        </div>
+        <div class="serieList__informations float__right pl10">
+            <span class="serieList__label mn">No report available</span>
+        </div>
+    </li>
+    <li
+      ng-repeat="id in vm.seriesIds track by id"
+       class="list-unstyled superlist"
+      wv-size-tag
+    >
+        <div class="serieList__picture inline-object wh__64" wv-size-tag wv-draggable-series-ext>
+            <wv-viewport wv-image="$image" wv-image-index="$series.imageCount/2" vp:series-id="id" wv-series="$series" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}"
+                wv-enable-overlay="false"
+                wv-scroll-on-over-series-ext
+            ></wv-viewport>
+            <div class="serieList__badge">{{$series.imageCount}}</div>
+        </div>
+        <div class="serieList__informations float__right pl10">
+            <p class="serieList__label mn">{{$image.tags.SeriesDescription}}</p>
+            <!-- @todo reintegrate hotspots (it triggers recursive $digest atm!)
+            <wvp-hotspotlist wvp-serie-id="$series.id"></wvp-hotspotlist> -->
+        </div>
+    </li>
 </ul>

@@ -32,7 +32,7 @@ var uaParser = (new UAParser()).getResult();
 /* @inline: */ importScripts('/bower_components/bluebird/js/browser/bluebird.min.js');
 
 // Import osimis.HttpRequest
-/* @inline: */ importScripts('/app/http/http-request.class.js');
+/* @inline: */ importScripts('/app/utilities/http-request.class.js');
 
 // Import KLVReader
 /* @inline: */ importScripts('/app/image/image-parser.worker/klvreader.class.js');

@@ -1,10 +1,14 @@
-# Osimis Web Viewer Plugin
+# Osimis Web Viewer
 
-The [Osimis'](htpp://www.osimis.io/) Web Viewer provides medical image visualization straight from the browser.
+The [Osimis'](htpp://www.osimis.io/) Web Viewer provides medical image 
+visualization straight from the browser.
 
-It is distributed as a plugin to [Orthanc](http://www.orthanc-server.com/). In other words, the viewer can be connected to most modalities, but also leveraged through Orthanc's strong architectural extensibility.
+It is distributed as a plugin to [Orthanc](http://www.orthanc-server.com/). In 
+other words, the viewer can be connected to most modalities, but also leveraged
+through Orthanc's strong architectural extensibility.
 
-2D rendering is supported with the most usual tools:
+2D rendering is supported with the usual tools:
+
 - Zooming
 - Panning
 - Windowing
@@ -14,7 +18,15 @@ It is distributed as a plugin to [Orthanc](http://www.orthanc-server.com/). In o
 - Image Flipping/Rotation
 - Multiframe support
 
-You may try the latest stable version [here](http://osimisviewer.osimis.io).
+Have a look at [our blog](http://www.osimis.io/en/blog.html).
+
+## Demo
+
+A demo of the viewer is available at those links:
+
+- [IRM study](http://osimisviewer.osimis.io/osimis-viewer/app/index.html?study=1b4c72ad-5aba2557-9fc396b3-323e190c-07d36585).
+- [Full demo](http://osimisviewer.osimis.io/), embedded within the Orthanc
+  Explorer. Other studies are available from there.
 
 ## What's new
 
@@ -22,17 +34,27 @@ See the [release notes](https://bitbucket.org/osimis/osimis-webviewer-plugin/src
 
 ## Installation & Usage
 
-The latest stable version is available on the [Osimis website](http://www.osimis.io/en/download.html). We recommend to download the binaries for Windows and Mac OS X & the docker image for Linux.
+The latest stable version is available [here](http://www.osimis.io/en/download.html).
 
-[This article](http://www.osimis.io/en/blog/2016/06/03/deploy-Orthanc-on-a-PC-in-38-seconds.html) details the installation process on Windows.
+Nightly builds are available [here](http://orthanc.osimis.io/#/nightly).
+They are still unstable at the moment.
 
-[This procedure](https://bitbucket.org/snippets/osimis/eynLn) details the docker image installation process on Linux.
+We recommend to download the binaries for Windows and Mac OS X & the docker
+image for Linux.
 
-For Mac OS X, the procedure is very similar to the windows' one. Unzip the downloaded folder and double click on the startOrthanc.command file. 
+[This article](http://www.osimis.io/en/blog/2016/06/03/deploy-Orthanc-on-a-PC-in-38-seconds.html)
+details the installation process on Windows.
+
+[This procedure](https://bitbucket.org/snippets/osimis/eynLn) details the
+docker image installation process on Linux.
+
+For Mac OS X, the procedure is very similar to the windows' one. Unzip the
+downloaded folder and double click on the `startOrthanc.command` file.
 
 ## Configuration
 
-Orthanc is configurable via a [JSON file](https://orthanc.chu.ulg.ac.be/book/users/configuration.html). This plugin provide a few optional options as well.
+Orthanc is configurable via a [JSON file](https://orthanc.chu.ulg.ac.be/book/users/configuration.html).
+This plugin provide a few optional options as well.
 
 ```json
 {
@@ -102,45 +124,25 @@ Orthanc is configurable via a [JSON file](https://orthanc.chu.ulg.ac.be/book/use
     // image is viewed multiple times.
     // Default: false
     "CacheEnabled" : false,
-    
-    // Decode instances using GDCM instead of the builtin Orthanc decoder.
-    // GDCM may sometimes be slower but Orthanc's builtin decoder doesn't 
-    // support every format.
-    // Default: true
-    "GdcmEnabled" : true,
 
-    // When the RestrictTransferSyntaxes field is present: GDCM will be used
-    // to decode the transfer syntaxes listed in the array. All other transfer
-    // syntaxes will be decoded by the Orthanc's builtin decoder. When the
-    // RestrictTransferSyntaxes field is not present: GDCM will be used to
-    // decode all transfer syntaxes.
-    // Default: undefined
-    "RestrictTransferSyntaxes": [
-      /* Transfer Syntax UID Transfer Syntax name */
-      //  JPEG 2000 Image Compression (Lossless Only)
-      "1.2.840.10008.1.2.4.90",
-      //  JPEG 2000 Image Compression
-      "1.2.840.10008.1.2.4.91",
-      //  JPEG 2000 Part 2 Multicomponent Image Compression (Lossless Only)
-      "1.2.840.10008.1.2.4.92",
-      //  JPEG 2000 Part 2 Multicomponent Image Compression
-      "1.2.840.10008.1.2.4.93"
-    ]
+    // Show the `download study` button in the frontend.
+    // You may want to disable this feature if you disable access to
+    // the underlying REST route.
+    // Default: true
+    "StudyDownloadEnabled": true
   }
 }
 ```
 
 ## Licensing
 
-The Web viewer plugin for Orthanc is licensed under the AGPL license.
-
-See the COPYING file.
-
-We also kindly ask scientific works and clinical studies that make
-use of Orthanc to cite Orthanc in their associated publications.
-Similarly, we ask open-source and closed-source products that make
-use of Orthanc to warn us about this use. You can cite S. Jodogne's work
-using the following BibTeX entry:
+The Osimis' Web Viewer is licensed under the AGPL license. See the COPYING
+file.
+We also kindly ask scientific works and clinical studies that make use of
+Orthanc to cite Orthanc in their associated publications. Similarly, we ask
+open-source and closed-source products that make use of Orthanc to warn us
+about this use. You can cite S. Jodogne's work using the following BibTeX
+entry:
 
 ```
 @inproceedings{Jodogne:ISBI2013,
@@ -156,152 +158,49 @@ address={San Francisco, {CA}, {USA}}
 }
 ```
 
+## Contact & Bug/Feedback Report
+
+Any question/feedback/bug report are well appreciated. You may send them by mail to osimis' developer Thibault Piront at `tp@osimis.io`.
+
+The full bug/feedback report procedure is available in the 
+`procedures/report-bug-or-feedback.md` file.
+
+## Authentification Proxy Development & Plugin's routes
+
+See the `procedures/develop-auth-proxy.md` file.
+
 ## Development
 
 ### Folder structure
 
-4 folders are available at the root:
-- backend/ contains the C++ plugin source code (& cmake build process)
-- frontend/ contains the HTML/JavaScript source code (& gulp build process)
-- scripts/ contains building scripts used by the continuous integration.
-- tests/ contains the integration tests.
+Six folders are available at the root:
 
-### Backend Development Process 
+- `backend/` contains the C++ plugin source code (& cmake build process).
+- `frontend/` contains the HTML/JavaScript source code (& gulp build process).
+- `reverse-proxy/` contains a security proxy blocking Orthanc non-GET requests.
+- `demo/` contains a standalone docker, proxied version of orthanc and the
+  viewer with sample files.
+- `scripts/` contains building scripts, mostly used by the Continuous
+  Integration System.
+- `tests/` contains the integration tests.
 
-For manual build instructions of the C++ plugin on Mac OS & Linux, the following commands provides the debug flag and add benchmark logs:
+### Build
 
-```shell
-$ cd backend/
-$ mkdir build
-$ cd build/
-$ cmake .. -DCMAKE_BUILD_TYPE=Debug -DALLOW_DOWNLOADS=ON -DSTANDALONE_BUILD=ON -DSTATIC_BUILD=ON -DBENCHMARK=1
-$ make -j2
-```
+See the `procedures/bootstrap-dev-environment.md` file.
 
-You can also have a look at the _scripts/_ folder and the _backend/Resource/BuildInstructions.txt_ file.
+### Development
 
-The backend will embed the _frontend/build/_ folder or download it if unavailable.
-
-Known issues:
-- make sure the _frontend/build/_ folder is full (_js/app.js_ and _js/lib.js_ files must be available). The command _gulp serve-build_ may corrupt it (see _Frontend Development Process_ section).
-
-### Frontend Development Process
-
-Frontend can either be built or launch in development mode. 
-
-For build instructions, you can use docker. Please refer to _scripts/_ and _frontend/scripts/_ folders. You can also use the manual procedure.
-
-For development instructions, you must use the manual procedure.
-
-Manual procedure requires a few dependencies.
-
-#### Prerequisites
-
-1. Install [Node.js](http://nodejs.org)
- - on OSX use [homebrew](http://brew.sh) `brew install node`
- - on Windows use [chocolatey](https://chocolatey.org/) `choco install nodejs`
-
-2. Install ruby
-
-3. Install other dependencies
-
-See the following scripts:
-
-```shell
-    cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"
-    ./scripts/userInstallAdditionalDevTools.sh
-```
-
-    >Refer to these [instructions on how to not require sudo](https://github.com/sindresorhus/guides/blob/master/npm-global-without-sudo.md)
-
-#### Build instructions
-
-As an alternative to docker, you can use the following commands to build the frontend.
-
-```shell
-cd frontend/
-# install npm & bower dependencies
-npm install
-bower install
-# generate build/ folder
-gulp build
-```
-
-#### Dev instructions
-
-It is not required to rebuild the backend to develop the frontend. These commands launch the frontend development server outside of Orthanc.
-
-```shell
-cd frontend/
-# install npm & bower dependencies
-npm install
-bower install
-# launch development server 
-gulp serve-dev --nosync --novet
-```
-
-The file _frontend/server.js_ provides a proxy to the Orthanc server. You may want to change the defined port/ip. You can also use a CORS enabler plugin (for your browser) and change the Orthanc url in the _frontend/src/config.js_ file. 
-
-You may need to set the "RemoteAccessAllowed" configuration option to true in your Orthanc config.json file.
-
-Known issues:
-- the serve-dev command erases the _build/_ folder content.
-- the server must be restarted to update index.html or plugin-entrypoint.html files.
+See the `procedures/bootstrap-dev-environment.md` file.
 
 ### Testing
 
-See comments for testing instruction in tests/osimis-test-runner/osimis-test-runner.py.
+See the `procedures/run-tests.md` file.
 
-The prerequisites are detailled in the _Frontend Development Process_ section. 
+### Release procedure
 
-Unstables may be tested directly from [docker images](https://hub.docker.com/r/osimis/orthanc-webviewer-plugin/builds/) as well.
+See the `procedures/release-version.md` file. The
+`procedures/archive-test-reports.md` file will be mentionned.
 
 ### Pulling changes back from orthanc-webviewer-plugin
 
-This repository is a fork of orthanc-webviewer-plugin.
-
-To retrieve changes from original mercurial repository, use [git-remote-hg](https://github.com/fingolfin/git-remote-hg)
-
-
-### Releasing (Osimis internal procedure)
-
-- merge all your changes in the dev branch
-- docker build will trigger automatically (:dev tag).  Win/OSX builds will trigger during the night.  You may trigger them by hand on Jenkins 1.  The OrthancMainline builds contain the OsimisWebViewer dev branch.  Note that the Win/OSX build slaves are very unstable, you might need to restart the builds ...
-- perform a smoke test of each version
-- if everything is fine, merge dev into master.  Make sur to merge the commit you have validated (someone might have merged another feature since you started your validation)
-- update the versions in `frontend/bower.json`, `frontend/package.js` and `frontend/src/app/config.provider.js`
-- update the release notes in master (review all feature branch merges since the last merge from dev into master)
-- commit
-- create a new tag with 'git tag -a 0.4.1 -m "0.4.1"'
-- push
-- manual master build has to be trigger from jenkins 2 (it will includes the frontend and docker :latest & :0.4.1 tags).  Win/OSX builds will trigger during the night.  You may trigger them by hand on Jenkins 1 once the front-end build has finished.  The OrthancStable builds contain the OsimisWebViewer master branch.
-- from dev branch, rebase master and push
-
-### Plugin's routes
-
-The plugin propose severals GET HTTP routes.
-
-These routes are considered unstable and may change often between MAJOR versions.
-
-- Retrieve an image (embedded in KLV format, see source code for detailed format informations - use 0 for monoframe instances).
-
-```
-/osimis-viewer/images/<instance_uid:str>/<frame_index:int>/{low|medium|high|pixeldata}-quality
-```
-
-- Provide informations about a series:
-
-```
-/osimis-viewer/series/<series_uid:str>
-```
-
-The following Orthanc routes are also used:
-
-```
-/studies/
-/studies/<uid>
-/instances/<uid>/simplified-tags
-/plugins/osimis-web-viewer
-/system
-/series/<uid>/study
-```
+See the `procedures/merge-orthancwebviewer.md` file.

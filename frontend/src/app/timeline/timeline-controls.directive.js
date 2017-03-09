@@ -1,7 +1,15 @@
 /**
  * @ngdoc directive
- * @name wvTimelineControls
+ * @name webviewer.directive:wvTimelineControls
+ * 
+ * @param {osimis.Series} wvSeries The model of the series, as provided by the 
+ *                                 `wvSeriesId` directive.
+ *                                 
+ * @param {boolean} [wvReadonly=false] Deactivate the directive's inputs.
  *
+ * @scope
+ * @restrict Element
+ * 
  * @description
  * The `wvTimelineControls` directive displays the following four controls:
  *   * The previous and next buttons allow the user to switch image by image.
@@ -12,12 +20,6 @@
  * is still shown.
  *
  * This directive is used by the `wvTimeline` directive.
- *
- * @scope
- *
- * @restrict E
- *
- * @param {series_model} wvSeries (required) The model of the series, as provided by the `wvSeriesId` directive.
  **/
  (function() {
     'use strict';
@@ -35,28 +37,41 @@
             link: link,
             restrict: 'E',
             scope: {
-            	series: '=wvSeries'
+            	series: '=wvSeries',
+                readonly: '=?wvReadonly'
             },
             templateUrl: 'app/timeline/timeline-controls.directive.html'
         };
         return directive;
 
         function link(scope, element, attrs) {
-            var vm = scope.vm;
-
-            vm.shownIndex = function(value) {
-                if (typeof value !== 'undefined') {
-                    vm.series.goToImage(value-1);
-                }
-                else {
-                    return vm.series.currentIndex + 1
-                }
-            }
+            
         }
     }
 
     /* @ngInject */
     function Controller() {
+        var vm = this;
 
+        // Set default values
+        this.readonly = (typeof this.readonly === 'undefined') ? false : this.readonly;
+
+        // Process get/set of image index input (the displayed indexes start
+        // from 1 instead of 0).
+        this.shownIndex = function(value) {
+            // Return 0 when no series is set yet - this has to be a number
+            // to avoid console error due to non number value in an input
+            // number field.
+            if (!vm.series) {
+                return 0;
+            }
+
+            if (typeof value !== 'undefined') {
+                vm.series.goToImage(value-1);
+            }
+            else {
+                return vm.series.currentIndex + 1
+            }
+        }
     }
 })();

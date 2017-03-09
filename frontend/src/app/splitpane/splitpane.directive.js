@@ -1,7 +1,16 @@
 /**
- * @ngdoc
+ * @ngdoc directive
  *
- * @name wvSplitpane
+ * @name webviewer.directive:wvSplitpane
+ * 
+ * @param {object} [wvLayout={x: 1, y:1}]
+ *   Define the quantity of row and column:
+ *   
+ *   * `x` The number of row
+ *   * `y` The number of column
+ *
+ * @scope
+ * @restrict Element
  *
  * @description
  * The `wvSplitpane` directive provides multiple pane organized on a grid.
@@ -9,15 +18,6 @@
  * using the `wvPanePolicy` directive. See the example.
  * It triggers $(window).resize() on layout change.
  * For additional configuration option, see the specific `wvPanePolicy` source code.
- *
- * @scope
- * 
- * @restrict E
- *
- * @param {object} wvLayout (optional) Define the quantity of row and column
- *   * `x` The number of row
- *   * `y` The number of column
- *   Default: {x: 1, y: 1}
  *
  * @example
  * ```html
@@ -77,8 +77,11 @@
             vm.rowHeight = 100 / newLayout.y + '%';
             vm.rowWidth = 100 / newLayout.x + '%';
 
-            $scope.$evalAsync(function() {
-                $(window).resize();
+            // Trigger window resizes (so javascript canvas can be resized
+            // adequately). We do this after the digest cycle but prior to
+            // the reflow, using asap.
+            asap(function() {
+                $(window).trigger('resize');
             });
         }
     }
