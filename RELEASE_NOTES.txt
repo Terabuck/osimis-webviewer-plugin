@@ -1,6 +1,14 @@
 Pending changes in the mainline
 ===============================
 
+Version 0.6.1
+========================
+
+=> Minimum Orthanc version: 1.1.0 <=
+
+* Docker Image: set Orthanc version to 1.2.0 and removed Authentication by default.
+
+
 Version 0.6.0
 ========================
 
