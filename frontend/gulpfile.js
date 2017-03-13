@@ -458,7 +458,7 @@ gulp.task('osisync', ['inject'], function() {
         script: config.nodeServer,
         delayTime: 1,
         env: env,
-        watch: [config.server],
+        watch: [config.nodeServer],
         nodeArgs: ['--debug' + '=' + nodeDebugPort],
         stdOut: true
     };
@@ -623,7 +623,7 @@ function getNodeOptions(isDev) {
         script: config.nodeServer,
         delayTime: 1,
         env: env,
-        watch: [config.server],
+        watch: [config.nodeServer],
         stdOut: true
     };
 }
