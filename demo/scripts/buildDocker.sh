@@ -79,7 +79,7 @@ if [ "$syncData" = true ]; then
     docker start ${tmpOrthancContainer}
 
     # Run the populator with the tmp orthanc
-    docker run --rm --net=${network} ${populatorImage} -u http://${tmpOrthancContainer}:8042/
+    docker run --rm --network ${network} ${populatorImage} -u http://${tmpOrthancContainer}:8042/
 
     # Stop tmp webviewer container
     docker stop $(docker ps -a -q --filter name=${tmpOrthancContainer} --format="{{.ID}}")
