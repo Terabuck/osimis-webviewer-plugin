@@ -1,24 +1,28 @@
 #!/bin/bash
 #
+# @pre
+# Sync docker clocks for AWS S3, see 
+# `http://stackoverflow.com/questions/24551592/how-to-make-sure-dockers-time-syncs-with-that-of-the-host
+# 
 # Build the webviewer demo as the docker image `osimis/orthanc-webviewer-plugin/demo:latest-local`.
 # Populate it with DICOM samples retrieved from AWS and use `orthanc.config.json` as the orthanc
 # configuration file.
 # 
-# @param {string} $1 Tag of the docker image being built.
-#                    Default: `osimis/orthanc-webviewer-plugin:latest-local`
-#                    - In CI, we should always use `latest-local` tag to be able to chain Dockerfile
-#                      easily, using the FROM instruction.
-#                    - @warning In the CI, this implies to lock the job to a single build at a time,
-#                      otherwise we may push a wrong image.
+# @param {string} [$1=osimis/orthanc-webviewer-plugin:latest-local]
+# Tag of the docker image being built.
+# - In CI, we should always use `latest-local` tag to be able to chain Dockerfile
+#  easily, using the FROM instruction.
+# - @warning In the CI, this implies to lock the job to a single build at a time,
+#  otherwise we may push a wrong image.
 # 
-# @param {boolean} $2 Sync demo DICOM data with AWS (takes some time. most of the time, cache is enough).
-#                     Default: `true`
+# @param {boolean} [$2=true]
+# Sync demo DICOM data with AWS (takes some time. most of the time, cache is enough).
 # 
-# @env {string} AWS_ACCESS_KEY_ID AWS credential.
-#                                 Only required when $2 === true (to sync aws data).
+# @env {string} AWS_ACCESS_KEY_ID
+# AWS credential. Only required when $2 === true (to sync aws data).
 # 
-# @env {string} AWS_SECRET_ACCESS_KEY AWS credential.
-#                                     Only required when $2 === true (to sync aws data).
+# @env {string} AWS_SECRET_ACCESS_KEY
+# AWS credential. Only required when $2 === true (to sync aws data).
 # 
 # @todo Remove orthanc populator (just add a sync script within the demo Dockerfile instead
 #       and keep a shared volumes to avoid having to rebuild Orthanc DB everytime - like
