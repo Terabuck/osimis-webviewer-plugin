@@ -180,8 +180,9 @@ Six folders are available at the root:
 - `reverse-proxy/` contains a security proxy blocking Orthanc non-GET requests.
 - `demo/` contains a standalone docker, proxied version of orthanc and the
   viewer with sample files.
-- `scripts/` contains building scripts, mostly used by the Continuous
-  Integration System.
+- `scripts/` contains global demo building scripts, it is mostly used by the
+  Continuous Integration System. It also contains scripts to build/run the web
+  viewer demo in a docker environment.
 - `tests/` contains the integration tests.
 
 ### Build

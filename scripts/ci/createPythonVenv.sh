@@ -1,8 +1,10 @@
 #!/bin/bash
+
+# @description
 # prerequisites: sudo apt-get install -y python3 python3-venv
 # create a Python Virtual Environment and adds the current path to the python path
 # eventually, adds another path (passed in argument)
-#
+
 set -x #to debug the script
 
 #remove previous environment

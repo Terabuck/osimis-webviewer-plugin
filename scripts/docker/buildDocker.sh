@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# @description
+# This script builds the whole web viewer demo using only docker. See
+# `./startDocker.sh` to start the docker containers.
 # 
 # @pre
 # Install docker.

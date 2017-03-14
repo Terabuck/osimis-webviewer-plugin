@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# @description
+# This script start the whole web viewer demo using docker containers.
 # 
 # @pre
 # Execute `./buildDocker.sh`

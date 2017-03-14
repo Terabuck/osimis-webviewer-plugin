@@ -1,10 +1,20 @@
 #!/bin/bash
 
+# @description
+# This script builds the viewer plugin, launches orthanc with it, launches a 
+# reverse proxy, and uses gulp to be able to change frontend files without 
+# having to rebuild the backend.
+# 
 # @pre
-# Install xcode using apple store
+# See `scripts/osx/InstallOsXDependencies.sh`. On linux, you must install a
+# simular setup.
 
 set -x
 set -e
+
+# Start from the repository root
+previousDir=$(pwd)
+cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"/
 
 # Build Frontend & install local dependencies (req. by C++ plugin)
 cd frontend/
@@ -15,7 +25,7 @@ gulp build
 cd ../
 
 # Build plugin
-./backend/scripts/buildLocal.sh
+./backend/scripts/buildLocally.sh
 
 # Run nginx
 nginx -p ./reverse-proxy/ -c nginx.local.conf
@@ -35,3 +45,6 @@ cd ../../
 # Kill orthanc, gulp & nginx on CTRL+C
 trap "kill ${orthancPid}; kill ${gulpPid}; nginx -p ./reverse-proxy/ -c nginx.local.conf -s stop" SIGINT
 wait
+
+# Return to the previous folder
+cd previousDir

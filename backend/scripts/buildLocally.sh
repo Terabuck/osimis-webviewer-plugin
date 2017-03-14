@@ -6,8 +6,8 @@
 # @pre
 # If `frontend/build` does not exist,
 # 
-# - Build frontend via `./scripts/ciBuildFrontend.sh ...`
-# - Publish frontend via `./scripts/ciPushFrontend.sh ...`
+# - Build frontend via `./scripts/ci/ciBuildFrontend.sh ...`
+# - Publish frontend via `./scripts/ci/ciPushFrontend.sh ...`
 
 set -x
 set -e

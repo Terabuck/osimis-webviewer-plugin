@@ -5,6 +5,24 @@ It is either possible to build the osimis web viewer plugin via docker or
 manually. The latter method is more suited for development as it reduces the
 build-time overhead.
 
+## Global Procedures
+
+### Docker Build
+
+Build the frontend, backend and the reverse proxy using docker. Most suitable for production.
+
+1. See `scripts/docker/buildDocker.sh` to build everything.
+2. See `scripts/docker/startDocker.sh` to start the environment.
+
+### OsX Dev Build
+
+Build the frontend and backend. Once it's done, launch the backend, a gulp
+process that provides a frontend developement environment, and a nginx
+reverse proxy that mix this frontend dev environment with the built backend.
+
+1. See `scripts/osx/installOsXDependencies.sh`
+2. See `scripts/unix/startUnixDev.sh`
+
 ## Backend Procedures
 
 ### Docker Build
@@ -28,7 +46,7 @@ $ cmake .. -DCMAKE_BUILD_TYPE=Debug -DALLOW_DOWNLOADS=ON -DSTANDALONE_BUILD=ON
 $ make -j2
 ```
 
-You can also have a look at the _scripts/_ folder and the 
+You can also have a look at the _backend/scripts/_ folder and the 
 `backend/Resource/BuildInstructions.txt` file.
 
 The backend will embed the _frontend/build/_ folder or download it if
@@ -47,6 +65,9 @@ Known issues/Notes:
   works.
 - `-DSTANDALONE_BUILD=OFF` is no longer tested.
 - `-DSTATIC_BUILD=OFF` is no longer tested.
+
+If you want to build the backend on windows, you may find the relevant 
+information in the `scripts/ci/` folder.
 
 ## Frontend Procedures
 
@@ -74,7 +95,7 @@ See the following scripts:
 
 ```bash
 cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"
-./scripts/userInstallAdditionalDevTools.sh
+./scripts/unix/installAdditionalDevTools.sh
 ```
 
 Refer to these instructions on how to [not require sudo](https://github.com/sindresorhus/guides/blob/master/npm-global-without-sudo.md)

@@ -10,7 +10,7 @@ def userInput = [
     syncS3DicomSamples: false
 ];
 
-// The built version, defined via `git describe` in scripts/setEnv.sh call
+// The built version, defined via `git describe` in scripts/ci/setEnv.sh call
 def VIEWER_VERSION;
 
 if (/*!isUserDevBranch*/ false) { // @warning @todo uncomment to force windows build on dev
@@ -61,8 +61,8 @@ lock(resource: 'webviewer', inversePrecedence: false) {
             }
 
             checkout scm
-            sh 'scripts/ciLogDockerState.sh prebuild'
-            sh 'scripts/setEnv.sh ${BRANCH_NAME}'
+            sh 'scripts/ci/ciLogDockerState.sh prebuild'
+            sh 'scripts/ci/setEnv.sh ${BRANCH_NAME}'
 
             // Retrieve GIT version `git describe --tags --long --dirty=-dirty` (used to inject version in backend via Version.h)
             sh '. ${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}/.env && echo ${VIEWER_VERSION} > .viewer_version'
@@ -74,7 +74,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
     // Build frontend
     stage('Build: js') {
         node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
-            sh 'scripts/ciBuildFrontend.sh'
+            sh 'scripts/ci/ciBuildFrontend.sh'
         }}}
     }
 
@@ -82,7 +82,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
     stage('Publish: js -> AWS (commitId)') {
         node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
-                sh 'scripts/ciPushFrontend.sh tagWithCommitId'
+                sh 'scripts/ci/ciPushFrontend.sh tagWithCommitId'
             }
         }}}
     }
@@ -106,7 +106,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
                     checkout scm
 
                     //stage('Build C++ Windows plugin') {}
-                    bat "cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% ${VIEWER_VERSION} build"
+                    bat "cd scripts & cd ci & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% ${VIEWER_VERSION} build"
                 }}
             }
         })
@@ -126,7 +126,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
                     checkout scm
 
                     //stage('Build C++ OSX plugin') {}
-                    sh "cd scripts && ./ciBuildOSX.sh $BRANCH_NAME ${VIEWER_VERSION} build"
+                    sh "cd scripts/ci && ./ciBuildOSX.sh $BRANCH_NAME ${VIEWER_VERSION} build"
                 }}
             }
         })
@@ -137,7 +137,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
         buildMap.put('docker', {
             stage('Build: docker') {
                 node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
-                    sh 'scripts/ciBuildDockerImage.sh'
+                    sh 'scripts/ci/ciBuildDockerImage.sh'
                 }}}
             }
 
@@ -145,9 +145,9 @@ lock(resource: 'webviewer', inversePrecedence: false) {
                 node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
                     // @note Requires the built docker image to work
                     // @todo use root docker-compose.yml instead
-                    sh 'scripts/ciPrepareTests.sh'
-                    sh 'scripts/ciRunCppTests.sh'
-                    sh 'scripts/ciRunJsTests.sh'
+                    sh 'scripts/ci/ciPrepareTests.sh'
+                    sh 'scripts/ci/ciRunCppTests.sh'
+                    sh 'scripts/ci/ciRunJsTests.sh'
                 }}}
             }
         })
@@ -228,7 +228,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
                     checkout scm
 
                     //stage('Publish C++ OSX plugin') {}
-                    sh "cd scripts && ./ciBuildOSX.sh $BRANCH_NAME ${VIEWER_VERSION} publish"
+                    sh "cd scripts/ci && ./ciBuildOSX.sh $BRANCH_NAME ${VIEWER_VERSION} publish"
                 }}
             }
         })
@@ -240,7 +240,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
             stage('Publish: C++ Windows plugin') {
                 node('windows && vs2015') { dir(path: workspacePath) {
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
-                        bat "cd scripts & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% ${VIEWER_VERSION} publish"
+                        bat "cd scripts & cd ci & powershell.exe ./ciBuildWindows.ps1 %BRANCH_NAME% ${VIEWER_VERSION} publish"
                     }
                 }}
             }
@@ -253,7 +253,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
             stage('Publish: orthanc -> DockerHub') {
                 node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkinsosimis') {
-                        sh 'scripts/ciPushDockerImage.sh'
+                        sh 'scripts/ci/ciPushDockerImage.sh'
                     }
                 }}}
             }
@@ -266,7 +266,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
     stage('Publish: js -> AWS (release)') {
         node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
-                sh 'scripts/ciPushFrontend.sh tagWithReleaseTag'
+                sh 'scripts/ci/ciPushFrontend.sh tagWithReleaseTag'
             }
         }}}
     }
@@ -275,7 +275,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
     stage('Publish: cpp -> AWS (release)') {
         node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
-                sh 'scripts/ciPushBackend.sh tagWithReleaseTag'
+                sh 'scripts/ci/ciPushBackend.sh tagWithReleaseTag'
             }
         }}}
     }
@@ -283,8 +283,8 @@ lock(resource: 'webviewer', inversePrecedence: false) {
     // Clean up
     stage('Clean up') {
         node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
-            sh 'scripts/ciLogDockerState.sh postbuild'
-            sh 'scripts/ciCleanup.sh'
+            sh 'scripts/ci/ciLogDockerState.sh postbuild'
+            sh 'scripts/ci/ciCleanup.sh'
         }}}
     }
 

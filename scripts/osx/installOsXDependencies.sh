@@ -1,7 +1,35 @@
 #!/bin/bash
 
+# @description
+# This script install all the development dependencies to develop with the web
+# viewer on OSX without using docker.
+# 
+# - Homebrew
+# - xCode CLI Tools
+# - Ruby (updated, w/ `rbenv` package manager)
+# - Compass
+# - NodeJS 6.10 (w/ `n` package manager)
+# - Bower
+# - Gulp
+# - Nodemon
+# - PhantomJS
+# - Protractor (& selenium)
+# - Karma
+# - nginx
+# - wget
+# 
+# It also download the latest OSX Orthanc zip, and extract it in the 
+# `backend/build/` folder so you can test the built plugin straight from that
+# folder.
+# 
 # @pre
 # Install xcode using apple store
+# 
+# @warning
+# You should not run this script directly but rather copy-paste the commands
+# manually in the terminal. It is very likely you already have some of the
+# installed binaries. As most of the things are installed in this script via
+# homebrew, you may ends with duplicate installations.
 
 # Install xcode CLI tools (ruby dependency)
 xcode-select --install
@@ -29,6 +57,10 @@ npm install -g bower gulp
 npm install -g nodemon marked jsonlint jshint eslint jscs phantomjs protractor karma-cli
 webdriver-manager update
 
+# Proxy:
+#   Install nginx
+brew install nginx
+
 # Backend:
 #   Download/Copy orthanc
 mkdir backend/build/ || true
@@ -38,9 +70,3 @@ wget http://orthanc.osimis.io/osx/stable/orthancAndPluginsOSX.stable.zip
 unzip orthancAndPluginsOSX.stable.zip
 rm orthancAndPluginsOSX.stable.zip readme.txt libModalityWorklists.dylib libOrthancDicomWeb.dylib libOrthancPostgreSQLIndex.dylib libOrthancPostgreSQLStorage.dylib libOsimisWebViewer.dylib libServeFolders.dylib 
 cd ../../
-
-# Proxy:
-#   Install nginx
-brew install nginx
-
-# @todo Preinstall images

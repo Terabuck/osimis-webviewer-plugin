@@ -4,10 +4,10 @@
 # Build docker image with name osimis/orthanc-webviewer-plugin:latest-local
 # 
 # @pre
-# If parameter `$3` is not set,
+# If parameter `$3` is not set, you must:
 # 
-# - Build frontend via `./scripts/ciBuildFrontend.sh ...`
-# - Publish frontend via `./scripts/ciPushFrontend.sh ...`
+# - Build frontend via `./scripts/ci/ciBuildFrontend.sh ...`
+# - Publish frontend via `./scripts/ci/ciPushFrontend.sh ...`
 # 
 # @param {string} [$1=osimis/orthanc-webviewer-plugin:latest-local]
 # Tag of the docker image being built.
