@@ -1,6 +1,8 @@
 Pending changes in the mainline
 ===============================
 
+* Increase thumbnail image quality. Quality: from 80% to 100%. Resolution: from 150x150 to 300x300.
+
 Version 0.6.1
 ========================
 
