@@ -131,7 +131,7 @@ This plugin provide a few optional options as well.
     // Default: true
     "StudyDownloadEnabled": true,
 
-    // Store image annotations made by users as Orthanc Attachment 999 and
+    // Store image annotations made by users as Orthanc Attachment 9999 and
     // retrieve them autommatically each time the viewer is opened.
     // Default: true
     "AnnotationStorageEnabled": true
