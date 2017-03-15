@@ -81,7 +81,7 @@ echo "...cleaned up"
 echo "------------------------"
 echo "Cleanup After Status:"
 
-./scripts/ciLogDockerState.sh postclean
+./scripts/ci/ciLogDockerState.sh postclean
 echo "+ images"
 diff --ignore-all-space /tmp/wv-docker-images-prebuild.txt /tmp/wv-docker-images-postclean.txt || true
 echo "+ containers"

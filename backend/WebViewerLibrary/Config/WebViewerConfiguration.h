@@ -47,6 +47,7 @@ public:
 
   // Frontend Variables
   bool enableStudyDownload;
+  bool enableAnnotationStorage;
 
   WebViewerConfiguration(OrthancPluginContext* context) : _context(context) {
     // By default, disable storage attachment cache 
@@ -59,6 +60,9 @@ public:
 
     // By default, show the study download button in the frontend
     enableStudyDownload = true;
+
+    // By default, enable annotation storage
+    enableAnnotationStorage = true;
   }
 
   /**
@@ -77,7 +81,8 @@ public:
    *         "webviewer": x.x.x,
    *         "db": x.x.x
    *       },
-   *       "enableStudyDownload": true
+   *       "enableStudyDownload": true,
+   *       "enableAnnotationStorage": true
    *     }
    *     ```
    */

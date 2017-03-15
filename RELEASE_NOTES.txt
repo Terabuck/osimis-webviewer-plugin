@@ -1,13 +1,22 @@
 Pending changes in the mainline
 ===============================
 
+=> Minimum Orthanc version: 1.1.0 <=
+
+Features:
+* Store annotations in the backend by default
+  Warning: Annotations are overriden when multiple users edit annotations from
+  the same study at the same time.
+
+Breaking Changes:
+* New parameter `AnnotationStorageEnabled` in the backend config file
+
 Version 0.6.1
 ========================
 
 => Minimum Orthanc version: 1.1.0 <=
 
 * Docker Image: set Orthanc version to 1.2.0 and removed Authentication by default.
-
 
 Version 0.6.0
 ========================

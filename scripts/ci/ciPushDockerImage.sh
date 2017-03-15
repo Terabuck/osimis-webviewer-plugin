@@ -6,7 +6,7 @@
 
 # handle errors
 source .env
-source $SRC_ROOT/scripts/ciErrorHandler.sh
+source $SRC_ROOT/scripts/ci/ciErrorHandler.sh
 
 # push to docker hub (with the commit Id)
 docker push $MAIN_IMAGE:$COMMIT_ID

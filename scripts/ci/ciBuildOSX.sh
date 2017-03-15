@@ -9,9 +9,10 @@ action=$3
 
 startScriptDir=$(pwd)
 export PATH=$PATH:/usr/local/bin   #such that pyvenv works
-cd ..
+cd ../..
+
 #create a python virtual environment
-source scripts/createPythonVenv.sh
+source scripts/ci/createPythonVenv.sh
 source env/bin/activate
 
 cd $startScriptDir/

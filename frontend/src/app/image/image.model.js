@@ -89,12 +89,24 @@
      * @methodOf osimis.Image
      * 
      * @name osimis.Image#setAnnotations
-     * @param {string} type Annotation tool's name
-     * @param {object} data cornerstoneTools' annotation array for one instance
+     * 
+     * @param {string} type
+     * Annotation tool's name
+     * 
+     * @param {object} data
+     * CornerstoneTools' annotation array for one instance
+     *
+     * @param {boolean} [setByEndUser=false]
+     * Set this variable when the annotations are set by the end users (by
+     * clicking with the mouse on a canvas with a tool for instance) in
+     * contrast to annotations retrieved from an external source. When set to
+     * true, we know we have to store the annotation in the backend. When set
+     * to false, we can avoid an useless request.
      */
-    Image.prototype.setAnnotations = function(type, data) {
+    Image.prototype.setAnnotations = function(type, data, setByEndUser) {
+        setByEndUser = setByEndUser || false;
         var annotation = new osimis.AnnotationValueObject(type, this.id, data);
-        this._annotationManager.set(annotation);
+        this._annotationManager.set(annotation, setByEndUser);
     };
 
     /**

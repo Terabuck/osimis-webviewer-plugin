@@ -91,7 +91,9 @@
      * @name osimis.CornerstoneAnnotationSynchronizer#syncByAnnotationType
      * 
      * @param {object} annotations
-     * The cornerstone annotations of an imageId (for one tool)
+     * The cornerstone annotations of an imageId (for one tool). This is not
+     * the `osimis.AnnotationValueObject` but rather the
+     * `osimis.AnnotationValueObject.data` property!
      * 
      * @param {object} baseResolution
      * Old resolution, with values {height, width}, it's the binary resolution,

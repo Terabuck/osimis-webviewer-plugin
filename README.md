@@ -129,7 +129,12 @@ This plugin provide a few optional options as well.
     // You may want to disable this feature if you disable access to
     // the underlying REST route.
     // Default: true
-    "StudyDownloadEnabled": true
+    "StudyDownloadEnabled": true,
+
+    // Store image annotations made by users as Orthanc Attachment 9999 and
+    // retrieve them autommatically each time the viewer is opened.
+    // Default: true
+    "AnnotationStorageEnabled": true
   }
 }
 ```
@@ -180,8 +185,9 @@ Six folders are available at the root:
 - `reverse-proxy/` contains a security proxy blocking Orthanc non-GET requests.
 - `demo/` contains a standalone docker, proxied version of orthanc and the
   viewer with sample files.
-- `scripts/` contains building scripts, mostly used by the Continuous
-  Integration System.
+- `scripts/` contains global demo building scripts, it is mostly used by the
+  Continuous Integration System. It also contains scripts to build/run the web
+  viewer demo in a docker environment.
 - `tests/` contains the integration tests.
 
 ### Build

@@ -21,7 +21,7 @@ function errorHandler {
 	cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"/
 	
 	# cleanup (& provide branch name argument)
-	./scripts/ciCleanup.sh $branchName &> /dev/null
+	./scripts/ci/ciCleanup.sh $branchName &> /dev/null
 
 	# move back to the previous folder
 	cd $tmpPwd

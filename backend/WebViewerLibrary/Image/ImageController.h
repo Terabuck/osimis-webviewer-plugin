@@ -5,6 +5,7 @@
 #include <string>
 
 #include "../BaseController.h"
+#include "../Annotation/AnnotationRepository.h"
 #include "ImageRepository.h"
 #include "Utilities/ImageProcessingRouteParser.h"
 #include "ImageProcessingPolicy/IImageProcessingPolicy.h"
@@ -24,8 +25,10 @@ protected:
 
 private:
   static ImageRepository* imageRepository_;
+  static AnnotationRepository* annotationRepository_;
   ImageProcessingRouteParser imageProcessingRouteParser_;
 
+  bool isAnnotationRequest_;
   bool disableCache_;
   bool cleanCache_;
   std::string instanceId_;

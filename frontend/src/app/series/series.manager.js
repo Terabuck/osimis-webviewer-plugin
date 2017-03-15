@@ -14,7 +14,7 @@
         .factory('wvSeriesManager', wvSeriesManager);
 
     /* @ngInject */
-    function wvSeriesManager($rootScope, $q, wvConfig, wvOrthancSeriesAdapter, wvInstanceManager, wvPdfInstanceManager) {
+    function wvSeriesManager($rootScope, $q, wvConfig, wvAnnotationManager, wvOrthancSeriesAdapter, wvInstanceManager, wvPdfInstanceManager) {
         var service = {
             /**
              * @ngdoc method
@@ -140,7 +140,7 @@
                 });
         }
 
-        function listFromOrthancSeriesId(seriesId, studyId) {
+        function listFromOrthancSeriesId(seriesId) {
             // @todo bench this method
             var request = new osimis.HttpRequest();
             request.setHeaders(wvConfig.httpRequestHeaders);
@@ -149,6 +149,32 @@
 
             return seriesPromise
                 .then(function(response) {
+                    // Cache instance tags in wvInstanceManager
+                    var instancesTags = response.data.instancesTags;
+                    _cacheInstancesTags(instancesTags);
+                    
+                    // Look up the study id to be able to retrieve all the
+                    // annotations (only available at the study level). We also
+                    // use the study id to bind the DICOM pdf instances to a
+                    // specific study.
+                    var request = new osimis.HttpRequest();
+                    request.setHeaders(wvConfig.httpRequestHeaders);
+                    request.setCache(true);
+                    return $q.all({
+                        instancesTags: $q.when(instancesTags),
+                        data: $q.when(response.data),
+                        studyId: request
+                            .get(wvConfig.orthancApiURL + '/series/'+seriesId+'/study')
+                            .then(function(studyInfo) {
+                                var studyId = studyInfo.data.ID;
+                                return studyId;
+                            })
+                    });
+                })
+                .then(function (response) {
+                    var instancesTags = response.instancesTags;
+                    var studyId = response.studyId;
+
                     // @note One backend multiframe series is converted into 
                     // multiple front-end series, so the result is an array of
                     // series instead of a single one.
@@ -157,11 +183,7 @@
                     // be cached on this `/series` route response to diminish
                     // the HTTP request count though.
                     var seriesList = wvOrthancSeriesAdapter.process(response.data);
-
-                    // Cache instance tags in wvInstanceManager
-                    var instancesTags = response.data.instancesTags;
-                    _cacheInstancesTags(instancesTags);
-
+                    
                     // Cache pdf instances in the pdf instance manager
                     var pdfIds = _(instancesTags)
                         // Retrieve pdf-related instances
@@ -172,6 +194,9 @@
                         .forEach(function(instanceTags, instanceId) {
                             _cachePdfInstance(studyId, seriesId, instanceId, instanceTags);
                         });
+
+                    // Preload images annotations
+                    wvAnnotationManager.loadStudyAnnotations(studyId);
 
                     // Emit event when series have been loaded.
                     // This is notably used by image manager to cache available
@@ -193,7 +218,7 @@
                     var orthancStudy = response.data;
                     var orthancSeriesIds = orthancStudy.Series;
                     var wvSeriesPromises = orthancSeriesIds.map(function(orthancSeriesId) {
-                        return service.listFromOrthancSeriesId(orthancSeriesId, studyId);
+                        return service.listFromOrthancSeriesId(orthancSeriesId);
                     });
                     
                     // Retrieve every wv-series' ids from orthanc-series ids.

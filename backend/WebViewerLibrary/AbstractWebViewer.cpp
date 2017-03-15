@@ -18,10 +18,12 @@
 #include "OrthancContextManager.h"
 #include "BaseController.h"
 #include "Instance/DicomRepository.h"
+#include "Study/StudyController.h"
 #include "Series/SeriesRepository.h"
 #include "Series/SeriesController.h"
 #include "Image/ImageRepository.h"
 #include "Image/ImageController.h"
+#include "Annotation/AnnotationRepository.h"
 #include "Config/ConfigController.h"
 #include "Config/WebViewerConfiguration.h"
 #include "DecodedImageAdapter.h"
@@ -95,6 +97,7 @@ void AbstractWebViewer::_serveBackEnd()
   RegisterRoute<ImageController>("/osimis-viewer/images/");
   RegisterRoute<SeriesController>("/osimis-viewer/series/");
   RegisterRoute<ConfigController>("/osimis-viewer/config.js");
+  RegisterRoute<StudyController>("/osimis-viewer/studies/");
 
   // OrthancPluginRegisterRestCallbackNoLock(_context, "/osimis-viewer/is-stable-series/(.*)", IsStableSeries);
 }
@@ -113,10 +116,13 @@ AbstractWebViewer::AbstractWebViewer(OrthancPluginContext* context)
   _dicomRepository.reset(new DicomRepository);
   _imageRepository.reset(new ImageRepository(_dicomRepository.get()));
   _seriesRepository.reset(new SeriesRepository(_dicomRepository.get()));
+  _annotationRepository.reset(new AnnotationRepository);
 
   // Inject repositories within controllers (we can't do it without static method
   // since Orthanc API doesn't allow us to pass attributes when processing REST request)
+  StudyController::Inject(_annotationRepository.get());
   ImageController::Inject(_imageRepository.get());
+  ImageController::Inject(_annotationRepository.get());
   SeriesController::Inject(_seriesRepository.get());
 }
 

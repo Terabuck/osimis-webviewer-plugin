@@ -40,6 +40,8 @@ add_library(WebViewerLibrary
   
   ${VIEWER_LIBRARY_DIR}/OrthancContextManager.cpp
   ${VIEWER_LIBRARY_DIR}/BaseController.cpp
+  ${VIEWER_LIBRARY_DIR}/Annotation/AnnotationRepository.cpp
+  ${VIEWER_LIBRARY_DIR}/Study/StudyController.cpp
   ${VIEWER_LIBRARY_DIR}/Instance/DicomRepository.cpp
   ${VIEWER_LIBRARY_DIR}/Series/SeriesFactory.cpp
   ${VIEWER_LIBRARY_DIR}/Series/SeriesRepository.cpp

@@ -6,7 +6,7 @@
 
 # Handle errors
 source .env
-source $SRC_ROOT/scripts/ciErrorHandler.sh
+source $SRC_ROOT/scripts/ci/ciErrorHandler.sh
 
 # Run cpp tests
 docker-compose -f $TEST_COMPOSE_FILE -p $TEST_COMPOSE_PROJECT up --abort-on-container-exit --no-recreate test_cpp # --no-recreate because of ciPrepareTests.sh
