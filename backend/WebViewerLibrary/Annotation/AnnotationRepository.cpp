@@ -98,9 +98,11 @@ void AnnotationRepository::setByImageId(const std::string &instanceId, uint32_t 
   if (error == Orthanc::ErrorCode_Success) {
 
   }
-  // Study should always be found, has its id has been retrieved via Orthanc
+  // Study should always be found, has its id has been retrieved via Orthanc. 
+  // However, study may have been removed in the few millisecond between that,
+  // therefore we rethrow the unknown resource exception.
   else if (error == Orthanc::ErrorCode_UnknownResource) {
-    assert(false);
+    throw Orthanc::OrthancException(error);
   }
   // Throw error on any other failure
   else {
