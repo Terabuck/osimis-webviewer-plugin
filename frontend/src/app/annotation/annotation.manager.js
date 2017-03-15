@@ -206,7 +206,7 @@
      * @name osimis.AnnotationManager#loadStudyAnnotations
      *
      * @param {string} studyId
-     * Id of the study (in orthanc format) containing the PDF instance.
+     * Id of the study (in orthanc format) containing all the images' annotations.
      *
      * @description
      * Retrieve and cache set annotations based on a study id. Uses `#setAll`
