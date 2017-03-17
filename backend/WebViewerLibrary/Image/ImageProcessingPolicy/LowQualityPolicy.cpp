@@ -7,9 +7,9 @@
 
 LowQualityPolicy::LowQualityPolicy()
 {
-  resampleAndJpegPolicy_.AddPolicy(new ResizePolicy(150));
+  resampleAndJpegPolicy_.AddPolicy(new ResizePolicy(300));
   resampleAndJpegPolicy_.AddPolicy(new Uint8ConversionPolicy()); // Does nothing if already 8bit
-  resampleAndJpegPolicy_.AddPolicy(new JpegConversionPolicy(80));
+  resampleAndJpegPolicy_.AddPolicy(new JpegConversionPolicy(100));
   resampleAndJpegPolicy_.AddPolicy(new KLVEmbeddingPolicy());
 
   // @todo move instantiation out of controller

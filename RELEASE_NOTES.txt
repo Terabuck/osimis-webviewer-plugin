@@ -1,19 +1,24 @@
 Pending changes in the mainline
 ===============================
 
-=> Minimum Orthanc version: 1.1.0 <=
+Version 0.7.0
+========================
 
-Fixes:
-* Improvement overall performance
-* Prevent instances with lot of images to stuck the viewer
+=> Minimum Orthanc version: 1.1.0 <=
 
 Features:
 * Store annotations in the backend by default
   Warning: Annotations are overriden when multiple users edit annotations from
   the same study at the same time.
+  New parameter `AnnotationStorageEnabled` in the backend config file
 
-Breaking Changes:
-* New parameter `AnnotationStorageEnabled` in the backend config file
+Fixes:
+* Prevent instances with lot of images to stuck the viewer
+
+Optimization:
+* Improved overall performance
+* Increase thumbnail image quality. Quality: from 80% to 100%. Resolution: from 150x150 to 300x300.
+
 
 Version 0.6.1
 ========================
