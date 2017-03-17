@@ -64,7 +64,7 @@ such.
 15. Update viewer version in the Windows installers:
 
     * Update the viewer vesion in the orthanc-builder repo (2 .json files, one for 32 bits, one for 64 bits)
-    * Open [jenkins osx job](http://jenkins2.osidev.net/job/orthanc/job/orthanc-zip-stable-osx/).
+    * Open [jenkins Orthanc win installers job ](http://jenkins2.osidev.net/job/orthanc/job/win-installers/).
     * Launch a build.
 
 16. Update OSX package:
