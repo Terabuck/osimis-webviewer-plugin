@@ -96,6 +96,7 @@
                 viewportData.voi.windowCenter = windowCenter + (deltaY / scale);
                 
                 viewport.setViewport(viewportData);
+                viewport.draw();
             };
 
             this.pan = function(viewport, deltaX, deltaY) {
@@ -109,6 +110,7 @@
                 viewportData.translation.y = y + (deltaY / scale);
                 
                 viewport.setViewport(viewportData);
+                viewport.draw();
             };
 
             this.zoom = function(viewport, deltaY) {
@@ -118,6 +120,7 @@
                 viewportData.scale = scale + (deltaY / 100);
 
                 viewport.setViewport(viewportData);
+                viewport.draw();
             };
         }
         Controller.prototype = Object.create(WvBaseTool.prototype)

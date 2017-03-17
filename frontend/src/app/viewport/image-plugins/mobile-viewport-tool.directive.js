@@ -69,22 +69,26 @@
                     var viewportData = viewport.getViewport();
                     viewportData.voi.windowWidth += 0.04 * viewportData.voi.windowWidth;
                     viewport.setViewport(viewportData);
+                    viewport.draw();
                 });
                 _hammers[viewport].on("pandown", function(ev) {
                     var viewportData = viewport.getViewport();
                     viewportData.voi.windowWidth -= 0.04 * viewportData.voi.windowWidth;
                     viewport.setViewport(viewportData);
+                    viewport.draw();
                 });
                 // 3. Update window center
                 _hammers[viewport].on("panleft", function(ev) {
                     var viewportData = viewport.getViewport();
                     viewportData.voi.windowCenter += 0.04 * viewportData.voi.windowCenter;
                     viewport.setViewport(viewportData);
+                    viewport.draw();
                 });
                 _hammers[viewport].on("panright", function(ev) {
                     var viewportData = viewport.getViewport();
                     viewportData.voi.windowCenter -= 0.04 * viewportData.voi.windowCenter;
                     viewport.setViewport(viewportData);
+                    viewport.draw();
                 });
             };
 

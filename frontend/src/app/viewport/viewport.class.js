@@ -239,6 +239,8 @@
             var oldImage = _this._displayedImage;
             var newImage = image;
             var oldResolution = _oldResolution || null;
+
+            // Update cached resolution to new values
             _oldResolution = _.cloneDeep({
                 width: csImageObject.width,
                 height: csImageObject.height
@@ -479,31 +481,15 @@
         // moment and cornerstone#setViewport requires the image to be set).
         this._viewportData = viewportData;
 
-        // Change the canvas' viewport if the image is already displayed
-        var enabledElementObject = cornerstone.getEnabledElement(this._enabledElement);
-        var eeoViewport = enabledElementObject.viewport;
-        if (eeoViewport) {
-            // Make sure nested objects exist to avoid exception due to copy on empty refactor
-            // (see `cornerstone#setViewport` inner function).
-            if (!eeoViewport.translation) {
-                eeoViewport.translation = {};
-            }
-            if (!eeoViewport.voi) {
-                eeoViewport.voi = {};
-            }
-
-            // Store the viewport wrapper directly in cornerstone to make sure
-            // cornerstone uses the wrapper object instead of its original
-            // object.
-            this._enabledElement.viewport = viewportData;
-            this._enabledElementObject.viewport = viewportData;
-            // Still, use cornerstone#setViewport to benefits from minimal
-            // scale features (ie. keep scale > 0.005). 
-            return cornerstone.setViewport(this._enabledElement, viewportData);
-        }
+        // Store the viewport wrapper directly in cornerstone to make sure
+        // cornerstone uses the wrapper object instead of its original
+        // object.
+        this._enabledElement.viewport = viewportData;
+        this._enabledElementObject.viewport = viewportData;
 
         // @note If the image is not yet displayed, this._viewportData will
         // be used once it is. See `#setImage` method.
+        // We shouldn't use cornerstone#setViewport as it triggers a draw.
     };
 
     /**

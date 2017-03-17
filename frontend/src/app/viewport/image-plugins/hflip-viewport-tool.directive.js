@@ -65,6 +65,7 @@
                 var viewportData = viewport.getViewport();
                 viewportData.hflip = !viewportData.hflip;
                 viewport.setViewport(viewportData);
+                viewport.draw();
             };
 
             this._listenViewChange = angular.noop;
