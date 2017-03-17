@@ -7,11 +7,11 @@ Version 0.7.0
 => Minimum Orthanc version: 1.1.0 <=
 
 Features:
-* Store annotations in the backend by default
-  Warning: Annotations are overriden when multiple users edit annotations from
+* Store annotations in the backend (disabled by default)
+  - Warning: Annotations are overriden when multiple users edit annotations from
   the same study at the same time.
-  New parameter `AnnotationStorageEnabled` in the backend config file
-
+  - New parameter `AnnotationStorageEnabled` in the backend config file 
+  
 Fixes:
 * Prevent instances with lot of images to stuck the viewer
 

@@ -133,8 +133,8 @@ This plugin provide a few optional options as well.
 
     // Store image annotations made by users as Orthanc Attachment 9999 and
     // retrieve them autommatically each time the viewer is opened.
-    // Default: true
-    "AnnotationStorageEnabled": true
+    // Default: false
+    "AnnotationStorageEnabled": false
   }
 }
 ```

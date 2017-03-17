@@ -62,7 +62,7 @@ public:
     enableStudyDownload = true;
 
     // By default, enable annotation storage
-    enableAnnotationStorage = true;
+    enableAnnotationStorage = false;
   }
 
   /**
@@ -82,7 +82,7 @@ public:
    *         "db": x.x.x
    *       },
    *       "enableStudyDownload": true,
-   *       "enableAnnotationStorage": true
+   *       "enableAnnotationStorage": false
    *     }
    *     ```
    */
