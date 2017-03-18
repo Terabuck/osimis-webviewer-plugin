@@ -46,8 +46,8 @@ public:
   std::set<std::string> enabledTransferSyntaxes;
 
   // Frontend Variables
-  bool enableStudyDownload;
-  bool enableAnnotationStorage;
+  bool studyDownloadEnabled;
+  bool annotationStorageEnabled;
 
   WebViewerConfiguration(OrthancPluginContext* context) : _context(context) {
     // By default, disable storage attachment cache 
@@ -59,10 +59,10 @@ public:
     restrictTransferSyntaxes = false;
 
     // By default, show the study download button in the frontend
-    enableStudyDownload = true;
+    studyDownloadEnabled = true;
 
-    // By default, enable annotation storage
-    enableAnnotationStorage = false;
+    // By default, disable annotation storage
+    annotationStorageEnabled = false;
   }
 
   /**

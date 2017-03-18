@@ -157,6 +157,7 @@ int32_t AbstractWebViewer::start()
 
   // Inject configuration within components
   _imageRepository->enableCachedImageStorage(_config->cachedImageStorageEnabled);
+  _annotationRepository->enableAnnotationStorage(_config->annotationStorageEnabled);
 
   // Configure DICOM decoder policy (GDCM/internal)
   _configureDicomDecoderPolicy();

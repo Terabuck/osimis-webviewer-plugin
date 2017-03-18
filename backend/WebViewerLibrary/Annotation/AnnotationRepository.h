@@ -10,8 +10,15 @@
  * @Responsibility Handle all the I/O operations related to Annotations
  */
 class AnnotationRepository : public boost::noncopyable {
+private:
+  bool _isAnnotationStorageEnabled;
+
 public:
-  Json::Value getByStudyId(const std::string studyId) const; // throws Orthanc::ErrorCode_UnknownResource & any other orthanc exception
-  void setByImageId(const std::string &instanceId, uint32_t frameIndex, const Json::Value& value) const; // throws Orthanc::ErrorCode_UnknownResource & any other orthanc exception
-  ~AnnotationRepository();
+  AnnotationRepository();
+
+  Json::Value getByStudyId(const std::string studyId) const; // throws Orthanc::ErrorCode_UnknownResource, ErrorCode_BadRequest & any other orthanc exception
+  void setByImageId(const std::string &instanceId, uint32_t frameIndex, const Json::Value& value) const; // throws Orthanc::ErrorCode_UnknownResource, ErrorCode_BadRequest & any other orthanc exception
+
+  void enableAnnotationStorage(bool enable) { _isAnnotationStorageEnabled = enable; }
+  bool isAnnotationStorageEnabled() const { return _isAnnotationStorageEnabled; }
 };
