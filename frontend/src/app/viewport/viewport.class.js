@@ -239,6 +239,8 @@
             var oldImage = _this._displayedImage;
             var newImage = image;
             var oldResolution = _oldResolution || null;
+
+            // Update cached resolution to new values
             _oldResolution = _.cloneDeep({
                 width: csImageObject.width,
                 height: csImageObject.height
@@ -305,15 +307,18 @@
             // otherwise bug will occurs. In practise this is the case.
             if (_this._syncAnnotationResolution) {
                 var annotations = newImage.getAnnotations();
-                annotations.forEach(function(annotationsByTool) {
-                    CornerstoneAnnotationSynchronizer.syncByAnnotationType(
-                        annotationsByTool.type,
-                        annotationsByTool.data,
-                        _firstLoadingResolution ? null : oldResolution,
-                        newResolution
-                    );
-                    newImage.setAnnotations(annotationsByTool.type, annotationsByTool.data);
-                });
+                for (var tool in annotations) {
+                    if (annotations.hasOwnProperty(tool)) {
+                        var annotation = annotations[tool];
+                        CornerstoneAnnotationSynchronizer.syncByAnnotationType(
+                            annotation.type,
+                            annotation.data,
+                            _firstLoadingResolution ? null : oldResolution,
+                            newResolution
+                        );
+                        newImage.setAnnotations(annotation.type, annotation.data);
+                    }
+                }
             }
 
             // Do stuffs required only when the first resolution is being loaded (cf. reset, etc.)
@@ -476,31 +481,15 @@
         // moment and cornerstone#setViewport requires the image to be set).
         this._viewportData = viewportData;
 
-        // Change the canvas' viewport if the image is already displayed
-        var enabledElementObject = cornerstone.getEnabledElement(this._enabledElement);
-        var eeoViewport = enabledElementObject.viewport;
-        if (eeoViewport) {
-            // Make sure nested objects exist to avoid exception due to copy on empty refactor
-            // (see `cornerstone#setViewport` inner function).
-            if (!eeoViewport.translation) {
-                eeoViewport.translation = {};
-            }
-            if (!eeoViewport.voi) {
-                eeoViewport.voi = {};
-            }
-
-            // Store the viewport wrapper directly in cornerstone to make sure
-            // cornerstone uses the wrapper object instead of its original
-            // object.
-            this._enabledElement.viewport = viewportData;
-            this._enabledElementObject.viewport = viewportData;
-            // Still, use cornerstone#setViewport to benefits from minimal
-            // scale features (ie. keep scale > 0.005). 
-            return cornerstone.setViewport(this._enabledElement, viewportData);
-        }
+        // Store the viewport wrapper directly in cornerstone to make sure
+        // cornerstone uses the wrapper object instead of its original
+        // object.
+        this._enabledElement.viewport = viewportData;
+        this._enabledElementObject.viewport = viewportData;
 
         // @note If the image is not yet displayed, this._viewportData will
         // be used once it is. See `#setImage` method.
+        // We shouldn't use cornerstone#setViewport as it triggers a draw.
     };
 
     /**

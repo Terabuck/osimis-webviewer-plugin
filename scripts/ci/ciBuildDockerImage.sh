@@ -13,7 +13,7 @@
 
 # handle errors
 source .env
-source $SRC_ROOT/scripts/ciErrorHandler.sh
+source $SRC_ROOT/scripts/ci/ciErrorHandler.sh
 
 # $1 Name of the docker image
 dockerImageName=${1:-"osimis/orthanc-webviewer-plugin:latest-local"}

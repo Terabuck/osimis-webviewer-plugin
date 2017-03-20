@@ -21,7 +21,23 @@ include breaking changes.
 ----
 
 ```
-/osimis-viewer/images/<instance_uid:str>/<frame_index:int>/{low|medium|high|pixeldata}-quality
+GET /osimis-viewer/studies/<study_uid:str>/annotations
+```
+
+This route retrieves the annotations of all the images of a specific study. It may be intercepted by an authentication proxy to only provide the annotations of the connected user.
+
+----
+
+```
+PUT /osimis-viewer/images/<instance_uid:str>/<frame_index:int>/annotations
+```
+
+This route set the annotations of a specific image. It may be intercepted by an authentication proxy to store them in an external database based on the connected user.
+
+----
+
+```
+GET /osimis-viewer/images/<instance_uid:str>/<frame_index:int>/{low|medium|high|pixeldata}-quality
 ```
 
 This route retrieve an image binary (embedded in KLV format, see source code
@@ -30,7 +46,7 @@ for detailed format informations - use 0 for monoframe instances).
 ----
 
 ```
-/osimis-viewer/series/<series_uid:str>
+GET /osimis-viewer/series/<series_uid:str>
 ```
 
 This route provides informations about a series.
@@ -38,7 +54,7 @@ This route provides informations about a series.
 ----
 
 ```
-/osimis-viewer/config.js
+GET /osimis-viewer/config.js
 ```
 
 Called as `../config.js` relative path from `/osimis-viewer/app/`.
@@ -47,7 +63,7 @@ This route provides configuration for frontend.
 ----
 
 ```
-/osimis-viewer/app/*
+GET /osimis-viewer/app/*
 ```
 
 This route serves the frontend.
@@ -57,12 +73,12 @@ This route serves the frontend.
 The following Orthanc routes are also used:
 
 ```
-/studies/
-/studies/<uid>
-/studies/<uid>/archive
-/instances/<uid>/simplified-tags
-/instances/<uid>/pdf
-/series/<uid>/study
-/plugins/osimis-web-viewer
-/system
+GET /studies/
+GET /studies/<uid>
+GET /studies/<uid>/archive
+GET /instances/<uid>/simplified-tags
+GET /instances/<uid>/pdf
+GET /series/<uid>/study
+GET /plugins/osimis-web-viewer
+GET /system
 ```

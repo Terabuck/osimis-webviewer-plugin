@@ -188,8 +188,6 @@
      *
      * @description
      * Send an HTTP POST request to _url_.
-     *
-     * @todo add additional unit test
      */
     HttpRequest.prototype.post = function(url, data) {
         return this._send('POST', url, data);
@@ -207,12 +205,10 @@
      * 
      * @description
      * Send an HTTP PUT request to _url_.
-     *
-     * @note Commented until we really need it. Need additional unit test once uncomment.
      */
-    // HttpRequest.prototype.put = function(url, data) {
-    //     return this._send('PUT', url, data);
-    // };
+    HttpRequest.prototype.put = function(url, data) {
+        return this._send('PUT', url, data);
+    };
 
     /**
      * @ngdoc method

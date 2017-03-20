@@ -181,6 +181,32 @@
         var csViewportSync = new osimis.CornerstoneViewportSynchronizer();
         csViewportSync.sync(this._cornerstoneViewportData, this.currentImageResolution, newImageResolution);
 
+        // Update translation wrapper
+        if (!this._translationWrapper) {
+            this._translationWrapper = {};
+            var translation = this._cornerstoneViewportData.translation;
+            Object.defineProperties(this._translationWrapper, {
+                x: {
+                    get: function() {
+                        return translation.x;
+                    },
+                    set: function(value) {
+                        translation.x = value;
+                    }
+                },
+                y: {
+                    get: function() {
+                        return translation.y;
+                    },
+                    set: function(value) {
+                        translation.y = value;
+                    }
+                }
+            });                    
+        }
+        this._translationWrapper.y = this._cornerstoneViewportData.translation.y;
+        this._translationWrapper.x = this._cornerstoneViewportData.translation.x;
+
         // Cache current image resolution for next call
         this.currentImageResolution = newImageResolution;
     };

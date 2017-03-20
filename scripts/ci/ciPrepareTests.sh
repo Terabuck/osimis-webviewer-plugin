@@ -6,7 +6,7 @@
 
 # Handle errors
 source .env
-source $SRC_ROOT/scripts/ciErrorHandler.sh
+source $SRC_ROOT/scripts/ci/ciErrorHandler.sh
 
 # Create a webviewer docker image with the right configuration (~ authentication disabled)
 echo "Prepare testable orthanc image.."

@@ -43,7 +43,7 @@
             this.onAnnotationChanged = new osimis.Listener();
 
             // Set the framerate
-            $timeout(function() {
+            setTimeout(function() {
                 _this.frameRate = 30; // 30 FPS by default
                 // Retrieve the image from the center of the series (to be sure the framerate is defined)
                 var middleImageId = _this.imageIds[Math.floor(_this.imageIds.length/2)];

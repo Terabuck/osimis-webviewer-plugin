@@ -44,6 +44,8 @@
 
         wv-notice-enabled="vm.enableNotice"
         wv-notice-text="vm.noticeText"
+
+        wv-annotationstorage-enabled="vm.enableAnnotationStorage"
     >
         <!-- Study list (for debug mode) -->
         <wv-layout-top-left
@@ -105,19 +107,20 @@
         var uaParser = new UAParser();
         vm.isMobile = (uaParser.getDevice().type === 'mobile');
 
-        // Retrieve URL's params and set study/series
+        // Retrieve URL's params and set study/series.
         var orthancStudyId = $location.search().study;
         var orthancSeriesId = $location.search().series;
 
         vm.studyId = undefined;
         vm.seriesId = undefined;
 
-        // Display orthanc study
+        // Display orthanc study.
         if (orthancStudyId) {
             vm.mode = 'study';
             vm.studyId = orthancStudyId;
         }
-        // Display & convert orthanc series id (from url parameter) into frontend series id
+        // Display & convert orthanc series id (from url parameter) into
+        // frontend series id.
         else if (orthancSeriesId) {
             wvSeriesManager
                 .listFromOrthancSeriesId(orthancSeriesId)
@@ -177,6 +180,7 @@
 
         // Configure settings based on server side options
         vm.enableStudyDownload = __webViewerConfig.enableStudyDownload;
+        vm.enableAnnotationStorage = __webViewerConfig.enableAnnotationStorage;
     }]);
     </script>
 </body>

@@ -2,6 +2,7 @@
 #define BASE_ROUTE_H
 
 #include <string>
+#include <json/value.h>
 #include <orthanc/OrthancCPlugin.h>
 #include "OrthancContextManager.h"
 
@@ -29,6 +30,7 @@ protected:
   int _AnswerError(int errorCode);
   int _AnswerBuffer(const char* output, size_t outputSize, const std::string& mimeType);
   int _AnswerBuffer(const std::string& output, const std::string& mimeType);
+  int _AnswerBuffer(const Json::Value& output);
 
 protected:
   OrthancPluginRestOutput* response_;

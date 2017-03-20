@@ -18,7 +18,7 @@ parser.add_argument('action',
 
 args = parser.parse_args()
 
-rootFolder = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..')
+rootFolder = os.path.join(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..'), '..')
 
 gitBranchInfo = GitHelpers.getVersion(os.path.dirname(__file__))
 commitId = gitBranchInfo.commitSha1

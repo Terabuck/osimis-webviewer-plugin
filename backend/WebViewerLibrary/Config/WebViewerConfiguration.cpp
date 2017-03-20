@@ -64,7 +64,14 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   if (wvConfig.isMember("StudyDownloadEnabled") &&
       wvConfig["StudyDownloadEnabled"].type() == Json::booleanValue)
   {
-    enableStudyDownload = wvConfig["StudyDownloadEnabled"].asBool();
+    studyDownloadEnabled = wvConfig["StudyDownloadEnabled"].asBool();
+  }
+
+  // Enable Annotation Storage
+  if (wvConfig.isMember("AnnotationStorageEnabled") &&
+      wvConfig["AnnotationStorageEnabled"].type() == Json::booleanValue)
+  {
+    annotationStorageEnabled = wvConfig["AnnotationStorageEnabled"].asBool();
   }
 }
 
@@ -131,8 +138,11 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
     config["version"]["webviewer"] = plugin["Version"].asString();
   }
 
-  // Register "enableStudyDownload"
-  config["enableStudyDownload"] = enableStudyDownload;
+  // Register "studyDownloadEnabled"
+  config["enableStudyDownload"] = studyDownloadEnabled;
+  
+  // Register "annotationStorageEnabled"
+  config["enableAnnotationStorage"] = annotationStorageEnabled;
 
   return config;
 }

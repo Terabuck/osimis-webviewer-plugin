@@ -5,7 +5,7 @@
 
 # handle errors
 source .env
-source $SRC_ROOT/scripts/ciErrorHandler.sh
+source $SRC_ROOT/scripts/ci/ciErrorHandler.sh
 
 # build the lib
 # -------------

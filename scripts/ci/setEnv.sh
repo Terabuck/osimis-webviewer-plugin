@@ -12,7 +12,7 @@
 #                             zips and docker images)
 #
 # Usage:
-#    ./scripts/setEnv.sh [$branchName]
+#    ./scripts/ci/setEnv.sh [$branchName]
 #    source .env
 #
 
@@ -100,7 +100,7 @@ export TEST_COMPOSE_FILE=${srcRoot}/tests/docker-compose.yml
 export TEST_IMAGE=osimis/orthanc-webviewer-plugin/test # (with specific orthanc config)
 export TEST_RUNNER_IMAGE=osimis/orthanc-webviewer-plugin/test-runner # (with chrome)
 export TEST_TMP_CONTAINER=osimis-orthanc-webviewer-plugin-test-${tag}
-export TEST_CONFIG=${srcRoot}/scripts/ciOrthancTestConfig.json
+export TEST_CONFIG=${srcRoot}/scripts/ci/ciOrthancTestConfig.json
 
 # Demo (with default dicoms)
 export DEMO_IMAGE=osimis/orthanc-webviewer-plugin/demo

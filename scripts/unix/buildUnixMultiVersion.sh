@@ -1,7 +1,12 @@
 #!/bin/bash
+
+# @descriptions
+# Launch build in various configuration settings to see differences between 
+# settings. You need to close gulp serve-dev / test / autotest prior to usage
+# (because they break frontend build).
 # 
-# Launch build in various configuration settings to see differences between settings.
-# You need to close gulp serve-dev / test / autotest prior to usage (because they break frontend build).
+# @deprecated
+# This script is rarely used.
 
 set +x
 
