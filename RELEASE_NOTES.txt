@@ -14,7 +14,6 @@ Features:
   
 Fixes:
 * Prevent instances with lot of images to stuck the viewer
-* Prevent annotations to be stored when AnnotationStorageEnabled is disabled
 
 Optimization:
 * Improved overall performance
