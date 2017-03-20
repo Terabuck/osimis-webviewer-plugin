@@ -122,6 +122,10 @@
      */
     var delay = 1000; // ms
     AnnotationManager.prototype._storeAnnotationsInBackend = _.debounce(function(imageId, type, data) {
+        if (!this._isAnnotationStorageEnabled) {
+            throw new Error('Annotation storage is disabled.');
+        }
+
         var config = this._config;
         var annotations = this._annotations;
 
@@ -176,7 +180,7 @@
         // Post update to the backend once no changes have appear since the
         // last second, to avoid flooding the server and only updates when
         // the user has stopped doing interactions.
-        if (setByEndUser) {
+        if (this._isAnnotationStorageEnabled && setByEndUser) {
             this._storeAnnotationsInBackend(annotation.imageId, annotation.type, annotation.data);
         }
     };
