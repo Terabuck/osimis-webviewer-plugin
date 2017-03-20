@@ -47,11 +47,16 @@ int StudyController::_ProcessRequest()
   BENCH(FULL_PROCESS);
   OrthancPluginContext* context = OrthancContextManager::Get();
   try {
-    // Load all the annotations
-    Json::Value annotations = annotationRepository_->getByStudyId(this->studyId_);
 
-    // Answer Request with the study's annotations as JSON
-    return this->_AnswerBuffer(annotations);
+    // Answer 403 Forbidden if annotation storage is disabled
+    if (!this->annotationRepository_->isAnnotationStorageEnabled()) {
+      return this->_AnswerError(403);
+    }
+    // Answer Request with the study's annotations as JSON else
+    else {
+      Json::Value annotations = annotationRepository_->getByStudyId(this->studyId_);
+      return this->_AnswerBuffer(annotations);
+    }
   }
   catch (const Orthanc::OrthancException& exc) {
     OrthancPluginLogInfo(context, exc.What());

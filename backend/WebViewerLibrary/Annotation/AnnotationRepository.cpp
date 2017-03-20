@@ -21,9 +21,18 @@ namespace
   std::string _getAttachmentNumber(const std::string &studyId);
 }
 
+AnnotationRepository::AnnotationRepository() {
+  this->_isAnnotationStorageEnabled = false;
+}
+
 Json::Value AnnotationRepository::getByStudyId(const std::string studyId) const
 {
   Json::Value result;
+
+  // Throw exception if annotation storage is disabled
+  if (!this->_isAnnotationStorageEnabled) {
+    throw Orthanc::OrthancException(Orthanc::ErrorCode_BadRequest);
+  }
 
   // Load json from orthanc
   std::string url = "/studies/" + studyId + "/attachments/" + _getAttachmentNumber(studyId) + "/data";
@@ -64,6 +73,11 @@ void AnnotationRepository::setByImageId(const std::string &instanceId, uint32_t 
 {
   // @warning non-atomic operation, data loss may occurs if multiple
   // annotations are stored within the same study.
+  
+  // Throw exception if annotation storage is disabled
+  if (!this->_isAnnotationStorageEnabled) {
+    throw Orthanc::OrthancException(Orthanc::ErrorCode_BadRequest);
+  }
   
   // Retrieve image's study id, because we store annotations at the study 
   // level (to reduce db calls).
@@ -108,10 +122,6 @@ void AnnotationRepository::setByImageId(const std::string &instanceId, uint32_t 
   else {
     throw Orthanc::OrthancException(error);
   }
-}
-
-AnnotationRepository::~AnnotationRepository()
-{
 }
 
 namespace

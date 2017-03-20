@@ -145,8 +145,17 @@ int ImageController::_ProcessRequest()
   try {
     // Treat annotation requests
     if (this->isAnnotationRequest_) {
+      // Answer 404 if method is not PUT, as the only request method accepted
+      // for this route is PUT.
+      if (this->request_->method != OrthancPluginHttpMethod_Put) {
+        return this->_AnswerError(404);
+      }
+      // Answer 403 Forbidden if annotation storage is disabled
+      else if (!this->annotationRepository_->isAnnotationStorageEnabled()) {
+        return this->_AnswerError(403);
+      }
       // Process `/images/<instance>/<frame>/annotations` PUT request
-      if (this->request_->method == OrthancPluginHttpMethod_Put) {
+      else {
         // Parse PUT request's json body.
         std::string requestBody(this->request_->body, this->request_->bodySize);
         Json::Value value;
@@ -166,11 +175,6 @@ int ImageController::_ProcessRequest()
         // Answer request.
         std::string answer = "{\"success\": true}";
         return this->_AnswerBuffer(answer, "application/json");
-      }
-      // Answer 404 if method is not PUT, as the only request method accepted
-      // for this route is PUT.
-      else {
-        return this->_AnswerError(404);
       }
     }
     // Treat image processing requests

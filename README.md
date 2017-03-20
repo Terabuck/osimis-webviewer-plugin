@@ -119,12 +119,6 @@ This plugin provide a few optional options as well.
    * Osimis WebViewer Configuration
    **/
   "WebViewer" : {
-    // Cache the compressed images on the file system.
-    // Takes more disk space but allow faster image rendering when the
-    // image is viewed multiple times.
-    // Default: false
-    "CacheEnabled" : false,
-
     // Show the `download study` button in the frontend.
     // You may want to disable this feature if you disable access to
     // the underlying REST route.
