@@ -1,16 +1,13 @@
 #include "SeriesFactory.h"
 
 #include <memory>
-#include <boost/foreach.hpp>
-// #include <json/value.h>
 #include <json/json.h>
-#include <Core/OrthancException.h>
-#include <Core/Toolbox.h>
 
-using namespace Orthanc;
+#include <Core/OrthancException.h> // For _getTransferSyntax
+#include <Core/Toolbox.h> // For _getTransferSyntax -> Orthanc::Toolbox::StripSpaces
 
 namespace {
-  // void _removeInstancesRelatedTags(DicomMap& tags);
+  std::string _getTransferSyntax(const Orthanc::DicomMap& headerTags);
 }
 
 SeriesFactory::SeriesFactory(std::auto_ptr<IAvailableQualityPolicy> availableQualityPolicy)
@@ -21,46 +18,81 @@ SeriesFactory::SeriesFactory(std::auto_ptr<IAvailableQualityPolicy> availableQua
 
 std::auto_ptr<Series> SeriesFactory::CreateSeries(const std::string& seriesId,
                                                   const Json::Value& slicesShort,
-                                                  const Orthanc::DicomMap& metaInfoTags,
-                                                  const Json::Value& otherTags,
+                                                  const Orthanc::DicomMap& middleInstanceMetaInfoTags,
+                                                  const Json::Value& middleInstancesTags,
                                                   const Json::Value& instancesTags)
 {
-  // Retrieve available image formats
+  std::string contentType;
   std::set<ImageQuality> imageQualities;
-  try {
-    imageQualities = _availableQualityPolicy->retrieveByTags(metaInfoTags, otherTags);
+
+  // Check the middle instance's type (`[multiframe] image / pdf / image`
+  // instance.
+  Json::Value mimeType = middleInstancesTags["MIMETypeOfEncapsulatedDocument"];
+  std::string transferSyntax = _getTransferSyntax(middleInstanceMetaInfoTags);
+
+  // If the middle instance is a `pdf` instance, set `pdf` type & keep 
+  // available qualities empty.
+  if (mimeType.isString() && mimeType.asString().compare("application/pdf") == 0) {
+    contentType = "pdf";
   }
-  // If the series' middle instance is not an `image` instance, do not propose
-  // available image qualities. This may happen when the instance is a PDF 
-  // embedded within a DICOM instance for example.
-  catch(const std::exception &e) {
-    // @todo Rethrow if not a PDF
-    // Keep imageQualities empty
+  // If the middle instance is a `video` instance, set `video` type & keep
+  // available qualities empty.
+  // 1. MPEG2
+  else if (
+    transferSyntax.compare("1.2.840.10008.1.2.4.100") == 0 ||
+    transferSyntax.compare("1.2.840.10008.1.2.4.101") == 0
+  ) {
+    // @warning probably unsupported by browser, should be converted to mpeg4?
+    contentType = "video/mpeg2";
+  }
+  // 2. MPEG4
+  else if (transferSyntax.compare("1.2.840.10008.1.2.4.102") == 0) {
+    contentType = "video/mpeg4";
+  }
+  // 3. MPEG4 Blueray
+  // @warning .103 (blueray) will probably not work on low end hardware such
+  // as iphone.
+  else if (transferSyntax.compare("1.2.840.10008.1.2.4.103") == 0) {
+    contentType = "video/mpeg4-bd";
+  }
+  // If the middle instance is a `multiframe/image` instance, set `image`
+  // type & suggest available qualities.
+  else {
+    contentType = "image";
+
+    // Retrieve available image formats. This may throw if dicom instance is
+    // in fact not related to image. Therefore, we rely on this exception to 
+    // deliver HTTP 500 error on unsupported format.
+    imageQualities = _availableQualityPolicy->retrieveByTags(middleInstanceMetaInfoTags, middleInstancesTags);
   }
   
   // Create the series
-  return std::auto_ptr<Series>(new Series(seriesId, otherTags, instancesTags, slicesShort, imageQualities));
+  return std::auto_ptr<Series>(new Series(seriesId, contentType, middleInstancesTags, instancesTags, slicesShort, imageQualities));
 }
 
 namespace {
+  std::string _getTransferSyntax(const Orthanc::DicomMap& headerTags)
+  {
+    using namespace Orthanc;
 
-  // void _removeInstancesRelatedTags(DicomMap& tags) {
-  //   DicomTag instanceTags[] = {
-  //     DicomTag(0x0008, 0x0012),   // InstanceCreationDate
-  //     DicomTag(0x0008, 0x0013),   // InstanceCreationTime
-  //     DicomTag(0x0020, 0x0012),   // AcquisitionNumber
-  //     DICOM_TAG_IMAGE_INDEX,
-  //     DICOM_TAG_INSTANCE_NUMBER,
-  //     DICOM_TAG_NUMBER_OF_FRAMES,
-  //     DICOM_TAG_TEMPORAL_POSITION_IDENTIFIER,
-  //     DICOM_TAG_SOP_INSTANCE_UID,
-  //     DICOM_TAG_IMAGE_POSITION_PATIENT,    // New in db v6
-  //     DICOM_TAG_IMAGE_COMMENTS             // New in db v6
-  //   };
+    // Retrieve transfer syntax
+    const DicomValue* transfertSyntaxValue = headerTags.TestAndGetValue(0x0002, 0x0010);
+    std::string transferSyntax;
 
-  //   BOOST_FOREACH(const DicomTag& tag, instanceTags) {
-  //     tags.Remove(tag);
-  //   }
-  // }
+    if (transfertSyntaxValue->IsBinary()) {
+      throw OrthancException(ErrorCode::ErrorCode_CorruptedFile);
+    }
+    else if (transfertSyntaxValue == NULL || transfertSyntaxValue->IsNull()) {
+      // Set default transfer syntax if not found
+      transferSyntax = "1.2.840.10008.1.2";
+    }
+    else {
+      // Stripping spaces should not be required, as this is a UI value
+      // representation whose stripping is supported by the Orthanc
+      // core, but let's be careful...
+      transferSyntax = Orthanc::Toolbox::StripSpaces(transfertSyntaxValue->GetContent());
+    }
 
+    return transferSyntax;
+  }
 }

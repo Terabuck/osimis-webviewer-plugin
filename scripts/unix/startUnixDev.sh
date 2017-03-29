@@ -43,7 +43,7 @@ orthancPid=$!
 cd ../../
 
 # Kill orthanc, gulp & nginx on CTRL+C
-trap "kill ${orthancPid}; kill ${gulpPid}; nginx -p ./reverse-proxy/ -c nginx.local.conf -s stop" SIGINT
+trap "kill ${orthancPid}; kill ${gulpPid}; nginx -p ./reverse-proxy/ -c nginx.local.conf -s stop" SIGINT ERR
 wait
 
 # Return to the previous folder

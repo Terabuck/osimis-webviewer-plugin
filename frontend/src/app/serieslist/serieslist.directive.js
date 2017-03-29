@@ -14,7 +14,7 @@
         .directive('wvSerieslist', wvSerieslist);
 
     /* @ngInject */
-    function wvSerieslist($q, wvSeriesManager, wvPdfInstanceManager) {
+    function wvSerieslist($q, wvSeriesManager, wvPdfInstanceManager, wvVideoManager) {
         var directive = {
             bindToController: true,
             controller: SerieslistVM,
@@ -36,6 +36,7 @@
             // Set initial values.
             vm.seriesIds = [];
             vm.pdfInstanceIds = [];
+            vm.videos = [];
 
             // Adapt serieslist on input change.
             scope.$watch('vm.studyId', _setStudy);
@@ -47,26 +48,39 @@
                 wvSeriesManager
                     .listFromOrthancStudyId(id)
                     .then(function(seriesList) {
+                        // Set image series ids.
                         vm.seriesIds = seriesList.map(function(series) {
                             return series.id;
                         });
 
-                        // Update pdf instance ids (once the series have been
-                        // loaded since the series manager request will load
-                        // the pdf instances too in one single HTTP request).
-                        return $q.all(wvPdfInstanceManager.listFromOrthancStudyId(id));
+                        // Update video & pdf instance ids (once the series 
+                        // have been loaded since the series manager request 
+                        // will load the pdf instances too in one single HTTP
+                        // request).
+                        return $q.all({
+                            videos: $q.all(wvVideoManager.listInstanceIdsFromOrthancStudyId(id)),
+                            pdfInstances: $q.all(wvPdfInstanceManager.listFromOrthancStudyId(id))
+                        });
                     })
-                    .then(function(pdfInstances) {
+                    .then(function(data) {
+                        var videos = data.videos;
+                        var pdfInstances = data.pdfInstances;
+
+                        // Set pdf instances.
                         vm.pdfInstanceIds = _.keys(pdfInstances).length && pdfInstances.map(function(pdfInstance) {
                             return pdfInstance.id;
                         });
-    
-                        // Trigger on-study-loaded (mainly for testing convenience)
+
+                        // Set video models.
+                        vm.videos = videos;
+
+                        // Trigger on-study-loaded (mainly for testing
+                        // convenience).
                         if (vm.onStudyLoaded) {
                             vm.onStudyLoaded();
                         }
                     }, function(err) {
-                        // Trigger on-study-loaded with the error
+                        // Trigger on-study-loaded with the error.
                         if (vm.onStudyLoaded) {
                             vm.onStudyLoaded({$error: err})
                         }

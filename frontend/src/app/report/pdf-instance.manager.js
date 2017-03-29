@@ -82,8 +82,12 @@
              * Set a PdfInstance model.
              * 
              * Used mainly for optimization: retrieving all the pdf instances
-             * tags at one single request within the `wvPdfInstanceManager` instead
-             * of many requests for each instances.
+             * tags at one single request within the `wvSeriesManager` instead
+             * of many requests for each instances. Indeed, a full dicom file
+             * has to be loaded to retrieve additional DICOM tags. As the
+             * backend doesn't have its own database to cache these kind of
+             * information, we rely on Orthanc's one and use a single request
+             * instead.
              */
             setPdfInstance: setPdfInstance
         };

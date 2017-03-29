@@ -4,29 +4,32 @@
  * @name webviewer.directive:wvPanePolicy
  * 
  * @param {integer} [wvPaneIndex] (readonly) 
- *   Provide the index of the pane
+ * Provide the index of the pane
+ * 
  * @param {object} [wvPanePosition] (readonly)
- *   Provide the position of the pane within the splitpane
- *   
- *   * `x` The column index - starts from 0
- *   * `y` The row index - starts from 0
+ * Provide the position of the pane within the splitpane
+ * 
+ * * `x` The column index - starts from 0
+ * * `y` The row index - starts from 0
+ * 
  * @param {callback} [wvOnPaneAdded] 
- *   Called when the pane is added.
- *   Useful to provide external configuration. For instance, save and retrieve the pane
- *   state on a database.
- *   
- *   Callback attributes arguments:
- *   
- *   `$index` - provide wvPaneIndex like data
- *   `$position` - provide wvPanePosition like parameter
+ * Called when the pane is added.
+ * Useful to provide external configuration. For instance, save and retrieve the pane
+ * state on a database.
+ * 
+ * Callback attributes arguments:
+ * 
+ * * `$index` - provide wvPaneIndex like data
+ * * `$position` - provide wvPanePosition like parameter
+ * 
  * @param {callback} [wvOnPaneRemoved]
- *   Called when the pane is removed
- *   Useful to provide external cleanup.
- *   
- *   Callback attributes arguments:
- *   
- *   `$index` - provide `wvPaneIndex` like data
- *   `$position` - provide `wvPanePosition` like parameter
+ * Called when the pane is removed
+ * Useful to provide external cleanup.
+ * 
+ * Callback attributes arguments:
+ * 
+ * * `$index` - provide `wvPaneIndex` like data
+ * * `$position` - provide `wvPanePosition` like parameter
  *
  * @requires webviewer.directive:wvSplitpane
  * @restrict Element
@@ -132,7 +135,7 @@
                 y: $y
             };
 
-            // Call onAdded and onRemoved callbacks
+            // Call `onAdded` and `onRemoved` callbacks
             if (vm.onAdded) {
                 vm.onAdded({
                     $index: vm.paneIndex,

@@ -14,27 +14,27 @@
         .factory('wvSeriesManager', wvSeriesManager);
 
     /* @ngInject */
-    function wvSeriesManager($rootScope, $q, wvConfig, wvAnnotationManager, wvOrthancSeriesAdapter, wvInstanceManager, wvPdfInstanceManager) {
+    function wvSeriesManager($rootScope, $q, wvConfig, wvAnnotationManager, wvOrthancSeriesAdapter, wvInstanceManager, wvPdfInstanceManager, wvVideoManager) {
         var service = {
             /**
              * @ngdoc method
              * @methodOf webviewer.service:wvSeriesManager
              * 
-             * @name osimis.SeriesManager#getTags
+             * @name osimis.SeriesManager#get
              * 
              * @param {string} id
              * Id of the series in wv format, where multiframe instances are
-             * considered as series
-             *    
+             * considered as series.
+             * 
              * * format: <orthancSeriesId>:<instanceNumber>
              * * instanceNumber can be > 0 if the series contain multiframe
              *   instances
              * 
              * @return {Promise<osimis.Series>}
-             * The series model's promise
+             * The series model's promise.
              * 
              * @description
-             * Retrieve a series from a frontend series id
+             * Retrieve a series from a frontend series id.
              */
             get: get,
             /**
@@ -154,9 +154,9 @@
                     _cacheInstancesTags(instancesTags);
                     
                     // Look up the study id to be able to retrieve all the
-                    // annotations (only available at the study level). We also
-                    // use the study id to bind the DICOM pdf instances to a
-                    // specific study.
+                    // annotations (only loadable at the study level) in case
+                    // the series contains images. We also use the study id to
+                    // bind the DICOM pdf instances to a specific study.
                     var request = new osimis.HttpRequest();
                     request.setHeaders(wvConfig.httpRequestHeaders);
                     request.setCache(true);
@@ -175,35 +175,63 @@
                     var instancesTags = response.instancesTags;
                     var studyId = response.studyId;
 
-                    // @note One backend multiframe series is converted into 
-                    // multiple front-end series, so the result is an array of
-                    // series instead of a single one.
-                    // @note PDF dicom instances/series will be ignored as they
-                    // will be managed by the `PdfInstanceManager`.  They will
-                    // be cached on this `/series` route response to diminish
-                    // the HTTP request count though.
-                    var seriesList = wvOrthancSeriesAdapter.process(response.data);
-                    
-                    // Cache pdf instances in the pdf instance manager
-                    var pdfIds = _(instancesTags)
-                        // Retrieve pdf-related instances
-                        .pickBy(function(instanceTags) {
-                            return instanceTags.MIMETypeOfEncapsulatedDocument === 'application/pdf';
-                        })
-                        // Cache the pdfs
-                        .forEach(function(instanceTags, instanceId) {
-                            _cachePdfInstance(studyId, seriesId, instanceId, instanceTags);
+                    var contentType = response.data.contentType;
+
+                    // Return list of image series when series' content is
+                    // images.
+                    var seriesList = [];
+                    if (contentType.indexOf('image') === 0) {
+                        // @note One backend multiframe series is converted into 
+                        // multiple front-end series, so the result is an array of
+                        // series instead of a single one.
+                        // @note PDF dicom instances/series will be ignored as they
+                        // will be managed by the `PdfInstanceManager`.  They will
+                        // be cached on this `/series` route response to diminish
+                        // the HTTP request count though.
+                        seriesList = wvOrthancSeriesAdapter.process(response.data);
+                        
+                        // Preload images annotations
+                        wvAnnotationManager.loadStudyAnnotations(studyId);
+                        
+                        // Emit event when series have been loaded.
+                        // This is notably used by image manager to cache available
+                        // image qualities.
+                        seriesList.forEach(function (series) {
+                            $rootScope.$emit('SeriesHasBeenLoaded', series);
                         });
+                    }
+                    // Cache pdf instances from series' route HTTP request
+                    // content & return empty list of image series.
+                    else if (contentType.indexOf('pdf') === 0) {
+                        // Cache pdf instances in the pdf instance manager
+                        var pdfIds = _(instancesTags)
+                            // Retrieve pdf-related instances
+                            .pickBy(function(instanceTags) {
+                                // Assert
+                                if (instanceTags.MIMETypeOfEncapsulatedDocument !== 'application/pdf') {
+                                    throw new Error('Series of pdf content type contains instances with non-pdf MimeType');
+                                }
 
-                    // Preload images annotations
-                    wvAnnotationManager.loadStudyAnnotations(studyId);
-
-                    // Emit event when series have been loaded.
-                    // This is notably used by image manager to cache available
-                    // image qualities.
-                    seriesList.forEach(function (series) {
-                        $rootScope.$emit('SeriesHasBeenLoaded', series);
-                    });
+                                return instanceTags.MIMETypeOfEncapsulatedDocument === 'application/pdf';
+                            })
+                            // Cache the pdfs
+                            .forEach(function(instanceTags, instanceId) {
+                                _cachePdfInstance(studyId, seriesId, instanceId, instanceTags);
+                            });
+                    }
+                    // Cache video instances from series' route HTTP request
+                    // content & return empty list of image series.
+                    else if (contentType.indexOf('video') === 0) {
+                        // Cache pdf instances in the pdf instance manager
+                        var videoIds = _(instancesTags)
+                            .forEach(function(instanceTags, instanceId) {
+                                _cacheVideoInstance(studyId, instanceId, instanceTags, contentType);
+                            });
+                    }
+                    // Assert series' content type.
+                    else {
+                        throw new Error('Unsupported content type');
+                    }
 
                     return seriesList;
                 });
@@ -286,6 +314,10 @@
 
         function _cachePdfInstance(studyId, seriesId, instanceId, instanceTags) {
             wvPdfInstanceManager.setPdfInstance(instanceId, instanceTags, seriesId, studyId);
+        }
+
+        function _cacheVideoInstance(studyId, instanceId, instanceTags, contentType) {
+            wvVideoManager.setVideoInstanceIdsForStudyId(studyId, instanceId, instanceTags, contentType);
         }
 
         return service;

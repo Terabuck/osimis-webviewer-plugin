@@ -78,8 +78,21 @@
         if (cornerstoneTools[this.toolName]) {
             // Set tool in disable mode (it's a 1D state machine with 4
             // states) - don't display annotations & ignore inputs.
+            // 1. Retrieve DOM element
             var enabledElement = viewport.getEnabledElement();
-            cornerstoneTools[this.toolName].enable(enabledElement, 1);
+            // 2. Ignore exception if no image is shown in the viewport
+            var isElementEnabled = undefined;
+            try {
+                isElementEnabled = true;
+                cornerstone.getEnabledElement(enabledElement); 
+            }
+            catch (exc) {
+                isElementEnabled = false;
+            }
+            // 3. Change tool state
+            if (isElementEnabled) {
+                cornerstoneTools[this.toolName].enable(enabledElement, 1);
+            }
         }
 
         this._unlistenModelChange(viewport);

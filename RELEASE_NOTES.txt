@@ -1,6 +1,12 @@
 Pending changes in the mainline
 ===============================
 
+* Watch MPEG-4 (non-bd) video embedded in DICOM instances.
+
+Breaking Changes:
+* New routes used:
+  - /<orthanc>/instances/<video-instance-uid>/frames/0/raw
+
 Version 0.7.0
 ========================
 

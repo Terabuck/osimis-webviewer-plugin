@@ -206,7 +206,7 @@
      *   cache (only when cache max size is exceeded)
      *
      * # @warning This should be called even if the request has failed, because
-     *            the reference count isn't decreased when a request failed.
+     * the reference count isn't decreased when a request failed.
      * # @todo Rename the method to something like decrBinaryRefCount instead.
      */
     ImageBinaryManager.prototype.abortLoading = function(id, quality, priority) {

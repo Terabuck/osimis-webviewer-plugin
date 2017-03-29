@@ -24,44 +24,8 @@
             // Get tags
             var tags = orthancSeries.tags;
             
-            // When series has no image (for instance for a DICOM PDF 
-            // instance), ignore the series.
-            if (!orthancSeries.availableQualities) {
-                // Assert it's not an image series.
-                if (tags.MIMETypeOfEncapsulatedDocument !== 'application/pdf') {
-                    throw new Error('Empty available qualities for non `application/pdf` series');
-                }
-
-                // Ignore the series since it's a pdf-instance, return an
-                // empty array.
-                else {
-                    return [];
-                }
-            }
-
-            // Retrieve each pdf ids for each instances in one series
-            var pdfInstanceIds = orthancSeries.instances
-                // Check if instance has PDF mimetype
-                .filter(function(instance) {
-                    var instanceId = instance[0];
-                    var frameCount = instance[2];
-                    return orthancSeries.instancesTags[instanceId].MIMETypeOfEncapsulatedDocument === 'application/pdf';
-                })
-                // Convert instances `ordered-slices` orthanc model into a list of id
-                .map(function(instance) {
-                    var instanceId = instance[0];
-                    return instanceId;
-                });
-            
-            // Retrieve each image ids & pdf ids for each instance in one series
+            // Group imageIds by instance
             var imageIdsByInstance = orthancSeries.instances
-                // Ignore pdf instances
-                .filter(function(instance) {
-                    var instanceId = instance[0];
-
-                    return pdfInstanceIds.indexOf(instanceId) === -1;
-                })
-                // Group imageIds by instance
                 .map(function(instance) {
                     var instanceId = instance[0];
                     var frameCount = instance[2];
@@ -113,9 +77,6 @@
             }
 
             // Instantiate series objects
-            // @todo add isPdf attribute?
-            // @todo merge imageIdsBySeries & pdfInstances 
-            // @todo map to wvSeries
             var seriesList = imageIdsBySeries.map(function(imageIds, seriesIndex) {
                 var id = orthancSeries.id + ':' + seriesIndex;
 
