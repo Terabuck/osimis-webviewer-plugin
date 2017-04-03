@@ -52,6 +52,27 @@
  * Retrieve annotations from storage. Store annotations to storage
  * automatically. This should be set to false when `wvReadonly` is true.
  * 
+ * @param {boolean} [wvSeriesSelectionEnabled=false]
+ * Let the end-user select series in the serieslist using a single click. This
+ * selection has no impact on the standalone viewer. However, host applications
+ * can retrieve the selection to do customized actions using the
+ * `wvSelectedSeriesIds` parameter.
+ *
+ * @param {Array<string>} [wvSelectedSeriesIds=EmptyArray]
+ * When `wvSeriesSelectionEnabled` is set to true, this parameter provide the 
+ * list of selected series as orthanc ids. This list can be retrieved to 
+ * customize the viewer by host applications.
+ * 
+ * @param {Array<string>} [wvSelectedReportIds=EmptyArray]
+ * When `wvSeriesSelectionEnabled` is set to true, this parameter provide the 
+ * list of selected series as orthanc ids. This list can be retrieved to 
+ * customize the viewer by host applications.
+ * 
+ * @param {Array<string>} [wvSelectedVideoIds=EmptyArray]
+ * When `wvSeriesSelectionEnabled` is set to true, this parameter provide the 
+ * list of selected series as orthanc ids. This list can be retrieved to 
+ * customize the viewer by host applications.
+ * 
  * @scope
  * @restrict E
  * 
@@ -98,7 +119,11 @@
                 leftHandlesEnabled: '=?wvLefthandlesEnabled',
                 noticeEnabled: '=?wvNoticeEnabled',
                 noticeText: '=?wvNoticeText',
-                annotationStorageEnabled:  '=?wvAnnotationstorageEnabled'
+                annotationStorageEnabled:  '=?wvAnnotationstorageEnabled',
+
+                // Selection-related
+                seriesSelectionEnabled: '=?wvSeriesSelectionEnabled',
+                selectedSeriesIds: '=?wvSelectedSeriesIds'
             },
             transclude: {
                 wvLayoutTopLeft: '?wvLayoutTopLeft',
@@ -141,6 +166,13 @@
                 rotateleft: false,
                 rotateright: false
             };
+
+            // Selection-related
+            // @todo deactivate by default
+            vm.seriesSelectionEnabled = typeof vm.seriesSelectionEnabled !== 'undefined' ? vm.seriesSelectionEnabled : true;
+            vm.selectedSeriesIds = vm.selectedSeriesIds || [];
+            vm.selectedReportIds = vm.selectedReportIds || [];
+            vm.selectedVideoIds = vm.selectedVideoIds || [];
     
             // Activate mobile interaction tools on mobile (not tablet)
             var uaParser = new UAParser();

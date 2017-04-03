@@ -1,0 +1,50 @@
+<ul
+    ng-show="vm.studyId"
+    class="list-unstyled mbn"
+>
+    <style>
+    /* @todo out! */
+    .superlist {
+        border-right: 1px solid #222;
+        /* mimic on hover border for draggable */
+        border-left: 1px solid transparent;
+        border-top: 1px solid transparent;
+        border-bottom: 1px solid transparent;
+
+        line-height: 0px;
+        margin-bottom: 2px;
+    }
+    </style>
+    <li
+        ng-show="vm.pdfInstanceIds.length > 0"
+        ng-repeat="id in vm.pdfInstanceIds track by id"
+        class="list-unstyled superlist wv-serieslist-report"
+        ng-class="{
+            'wvSerieslist__pdfItem--actived': vm.selectedReportIds.indexOf(id) !== -1
+        }"
+        wv-draggable-item="{
+            reportId: id,
+            videoId: null,
+            seriesId: null
+        }"
+        ng-click="vm.toggleSelection(id)"
+    >
+        <div class="serieList__picture inline-object wh__64">
+            <span class="wv-serieslist-reporticon fa fa-file-text"></span>
+        </div>
+        <div class="serieList__informations float__right pl10">
+            <span class="serieList__label mn">PDF report</span>
+        </div>
+    </li>
+    <li
+        ng-show="vm.loaded && !vm.pdfInstanceIds.length"
+        class="list-unstyled superlist wv-serieslist-noreport"
+    >
+        <div class="serieList__picture inline-object wh__64">
+            <span class="wv-serieslist-noreporticon fa fa-file-text"></span>
+        </div>
+        <div class="serieList__informations float__right pl10">
+            <span class="serieList__label mn">No report available</span>
+        </div>
+    </li>
+</ul>
