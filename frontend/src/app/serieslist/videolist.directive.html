@@ -1,0 +1,40 @@
+<ul
+    ng-show="vm.studyId"
+    class="list-unstyled mbn"
+>
+    <style>
+    /* @todo out! */
+    .superlist {
+        border-right: 1px solid #222;
+        /* mimic on hover border for draggable */
+        border-left: 1px solid transparent;
+        border-top: 1px solid transparent;
+        border-bottom: 1px solid transparent;
+
+        line-height: 0px;
+        margin-bottom: 2px;
+    }
+    </style>
+    <li
+        class="list-unstyled superlist wv-serieslist-report"
+        ng-class="{
+            'wvSerieslist__seriesItem--selectable': vm.selectionEnabled,
+            'wvSerieslist__videoItem--activated': vm.selectedVideoIds.indexOf($video.id) !== -1
+        }"
+        ng-show="vm.loaded && vm.videos.length > 0"
+        ng-repeat="$video in vm.videos track by $video.id"
+        wv-draggable-item="{
+            reportId: null,
+            videoId: $video.id,
+            seriesId: null
+        }"
+        ng-click="vm.toggleSelection($video.id)"
+    >
+        <div class="serieList__picture inline-object wh__64">
+            <span class="wv-serieslist-reporticon fa fa-video-camera"></span>
+        </div>
+        <div class="serieList__informations float__right pl10">
+            <span class="serieList__label mn">{{$video.tags.SeriesDescription}}</span>
+        </div>
+    </li>
+</ul>

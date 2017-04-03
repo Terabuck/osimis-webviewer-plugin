@@ -1,24 +1,24 @@
 /**
  * @ngdoc directive
- * @name webviewer.directive:wvSerieslist
+ * @name webviewer.directive:wvVideolist
  * 
  * @restrict Element
  *
  * @scope
  *
- * @param {string} wvStudyId
+ * @param {string} studyId
  * The id of the study.
  * 
- * @param {callback} [wvOnStudyLoaded=undefined]
+ * @param {callback} onStudyLoaded
  * Callback mainly used for unit test.
  *
  * @param {boolean} [wvSelectionEnabled=false]
  * Let the end-user select series in the serieslist using a single click. This
  * selection has no impact on the standalone viewer. However, host applications
  * can retrieve the selection to do customized actions using the
- * `wvSelectedSeriesIds` parameter.
+ * `wvSelectedVideoIds` parameter.
  *
- * @param {Array<string>} [wvSelectedSeriesIds=EmptyArray]
+ * @param {Array<string>} [wvSelectedVideoIds=EmptyArray]
  * When `wvSelectionEnabled` is set to true, this parameter provide the list of
  * selected series as orthanc ids. This list can be retrieved to customize the
  * viewer by host applications.
@@ -28,13 +28,13 @@
 
     angular
         .module('webviewer')
-        .directive('wvSerieslist', wvSerieslist);
+        .directive('wvVideolist', wvVideolist);
 
     /* @ngInject */
-    function wvSerieslist($q, wvSeriesManager) {
+    function wvVideolist($q, wvSeriesManager, wvVideoManager) {
         var directive = {
             bindToController: true,
-            controller: SerieslistVM,
+            controller: VideolistVM,
             controllerAs: 'vm',
             link: link,
             restrict: 'E',
@@ -44,9 +44,9 @@
 
                 // Selection-related
                 selectionEnabled: '=?wvSelectionEnabled',
-                selectedSeriesIds: '=?wvSelectedSeriesIds'
+                selectedVideoIds: '=?wvSelectedVideoIds'
             },
-            templateUrl: 'app/serieslist/serieslist.directive.html'
+            templateUrl: 'app/serieslist/videolist.directive.html'
         };
         return directive;
 
@@ -63,16 +63,26 @@
                 // Clean selection
                 // @todo Only cleanup when selection has not been reset at the
                 // same time as the study id.
-                vm.selectedSeriesIds = [];
+                vm.selectedVideoIds = [];
                 vm.loaded = false;
 
                 wvSeriesManager
                     .listFromOrthancStudyId(id)
                     .then(function(seriesList) {
                         // Set image series ids.
-                        vm.seriesIds = seriesList.map(function(series) {
-                            return series.id;
+                        // Update video & pdf instance ids (once the series 
+                        // have been loaded since the series manager request 
+                        // will load the pdf instances too in one single HTTP
+                        // request).
+                        return $q.all({
+                            videos: $q.all(wvVideoManager.listInstanceIdsFromOrthancStudyId(id)),
                         });
+                    })
+                    .then(function(data) {
+                        var videos = data.videos;
+                        
+                        // Set video models.
+                        vm.videos = videos;
                         vm.loaded = true;
 
                         // Trigger on-study-loaded (mainly for testing
@@ -91,11 +101,11 @@
     }
 
     /* @ngInject */
-    function SerieslistVM() {
+    function VideolistVM() {
         // Set initial values.
-        this.seriesIds = [];
+        this.videos = [];
         this.selectionEnabled = typeof this.selectionEnabled === 'undefined' ? false : this.selectionEnabled;
-        this.selectedSeriesIds = this.selectedSeriesIds || [];
+        this.selectedVideoIds = this.selectedVideoIds || [];
 
         this.toggleSelection = function(seriesId) {
             // Do nothing if selection is disabled
@@ -104,13 +114,13 @@
             }
 
             // Activate selection for seriesId
-            if (this.selectedSeriesIds.indexOf(seriesId) === -1) {
-                this.selectedSeriesIds.push(seriesId);
+            if (this.selectedVideoIds.indexOf(seriesId) === -1) {
+                this.selectedVideoIds.push(seriesId);
             }
             // Deactivate selection for seriesId
             else {
-                var index = this.selectedSeriesIds.indexOf(seriesId);
-                this.selectedSeriesIds.splice(index, 1);
+                var index = this.selectedVideoIds.indexOf(seriesId);
+                this.selectedVideoIds.splice(index, 1);
             }
         };
     }
