@@ -8,27 +8,33 @@
 # @pre
 # See `scripts/osx/InstallOsXDependencies.sh`. On linux, you must install a
 # simular setup.
+# 
+# @param {boolean} [$1=true]
+# Rebuild backend.
 
 set -x
 set -e
 
 # Start from the repository root
 previousDir=$(pwd)
-cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"/
+rootDir="${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"
+cd ${rootDir}/
 
-# Build Frontend & install local dependencies (req. by C++ plugin)
-cd frontend/
-npm install
-git checkout node_modules/gulp-injectInlineWorker/index.js
-bower install
-gulp build
-cd ../
+if [ "$1" = true ]; then
+    # Build Frontend & install local dependencies (req. by C++ plugin)
+    cd frontend/
+    npm install
+    git checkout node_modules/gulp-injectInlineWorker/index.js
+    bower install
+    gulp build
+    cd ../
 
-# Build plugin
-./backend/scripts/buildLocally.sh
+    # Build plugin
+    ./backend/scripts/buildLocally.sh
+fi
 
 # Run nginx
-nginx -p ./reverse-proxy/ -c nginx.local.conf
+nginx -p ${rootDir}/reverse-proxy/ -c nginx.local.conf
 
 # Run Frontend Dev Process
 cd frontend/
@@ -43,7 +49,7 @@ orthancPid=$!
 cd ../../
 
 # Kill orthanc, gulp & nginx on CTRL+C
-trap "kill ${orthancPid}; kill ${gulpPid}; nginx -p ./reverse-proxy/ -c nginx.local.conf -s stop" SIGINT ERR
+trap "nginx -p ${rootDir}/reverse-proxy/ -c nginx.local.conf -s stop; kill ${orthancPid}; kill ${gulpPid};" SIGINT ERR
 wait
 
 # Return to the previous folder
