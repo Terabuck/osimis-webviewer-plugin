@@ -96,7 +96,7 @@
                 viewportData.translation.y = y + (deltaY / scale);
                 
                 viewport.setViewport(viewportData);
-                viewport.draw();
+                viewport.draw(false);
             };
         }
         Controller.prototype = Object.create(WvBaseTool.prototype)

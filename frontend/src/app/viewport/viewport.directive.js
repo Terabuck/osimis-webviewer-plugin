@@ -307,7 +307,7 @@
                     //   DRAW IMAGE
                     else if (!newCsViewport && oldCsViewport) {
                         model.reset();
-                        model.draw();
+                        model.draw(false);
                     }
                     // Case 7:
                     // Update cs viewport if it is different
@@ -338,7 +338,7 @@
                     ) {
                         // Update csViewport
                         model.setViewport(newCsViewport); // newUnserializedCsViewport
-                        model.draw();
+                        model.draw(false);
                     }
 
                     // Update old values
@@ -411,7 +411,7 @@
                 if (!wvSizeController) {
                     // @todo resize based on image size and not on element size (wich is always 0)
                     model.resizeCanvas(element.width(), element.height());
-                    model.draw();
+                    model.draw(false);
                     return null;
                 }
 
@@ -420,7 +420,7 @@
                     var height = wvSizeController.getHeightInPixel();
 
                     model.resizeCanvas(width, height);
-                    model.draw();
+                    model.draw(false);
                 });
 
                 return function unbind() {

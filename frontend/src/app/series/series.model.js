@@ -270,6 +270,11 @@
                 var desiredFrameRateInMs = 1000 / _this.frameRate; // Convert framerate FPS into MS
                 // Wait for the monitor to attempt refresh
                 _cancelAnimationId = requestAnimationFrame(function(currentTimeInMs) {
+                    // Request next frame before anything.
+                    if (_this.isPlaying) {
+                        loop();
+                    }
+
                     // In Safari Mobile 10, currentTimeInMs is undefined. This
                     // bug is undocumented and doesn't seem to be well known.
                     // We specify the variable value manually to prevent the
@@ -295,11 +300,6 @@
                             // Track current time to calculate Frame Rate
                             _lastTimeInMs = currentTimeInMs;
                         });
-                    }
-                    
-                    // Loop
-                    if (_this.isPlaying) {
-                        loop();
                     }
                 });
             })();

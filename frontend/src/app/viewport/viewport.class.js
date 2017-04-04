@@ -162,12 +162,18 @@
      * @methodOf osimis.Viewport
      *
      * @name osimis.Viewport#draw
+     *
+     * @param {boolean} [invalidate=false]
+     * Redraw the image. To set to true when we did change the
+     * cornerstoneImageObject as cornerstone cache it.
+     * warning: setting this to false when switching from viewports w/ the same
+     * image may lead to unexpected behaviors.
      * 
      * @description
      * Draw the image. Mostly used internally. Can sometimes be used by tool
      * also.
      */
-    Viewport.prototype.draw = function() {
+    Viewport.prototype.draw = function(invalidate) {
         var cornerstone = this._cornerstone;
         var enabledElement = this._enabledElement;
         var enabledElementObject = this._enabledElementObject;
@@ -184,7 +190,8 @@
         // changing the cornerstoneImageObject (cornerstone probably cache it).
         // Draw image & invalidate cornerstone cache (multiple viewport with
         // different resolution can be displayed at the same time)
-        cornerstone.updateImage(enabledElement, true);
+        invalidate = typeof invalidate === 'undefined' ? true : invalidate;
+        cornerstone.updateImage(enabledElement, invalidate);
         $(enabledElement).trigger("CornerstoneImageRendered", {
             viewport: enabledElementObject.viewport,
             element : enabledElementObject.element,
@@ -331,7 +338,7 @@
             }
 
             // Draw
-            _this.draw();
+            _this.draw(_firstLoadingResolution?false:true);
 
             // Do stuffs required only when the first resolution is being loaded,
             // but after the image has been drawn
