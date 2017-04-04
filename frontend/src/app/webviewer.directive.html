@@ -5,15 +5,9 @@
 >
     <!--
     Layout: top zones (1, 2, 3 and 4)
-
-    @note
-    At the moment, if toolbarEnabled === false, the whole top part of the
-    application disapear.
-
-    @todo keep some buttons in series mode?
     -->
     <wv-layout-top
-        wv-enabled="$isTopLeftEnabled || vm.toolbarEnabled || $isTopRightEnabled"
+        wv-enabled="$isTopLeftEnabled || $isTopRightEnabled"
     >
         <!--
         Layout: top-left
@@ -38,47 +32,18 @@
         Layout: top2
     
         @description
-        Splitpane Grid configuration buttons.
+        @todo
         -->
-        <wv-layout-top2 ng-show="vm.toolbarEnabled">
-            <button
-                ng-disabled="vm.readonly"
-                bs-tooltip
-                data-placement="bottom"
-                title="Single view"
-                data-original-title="Single view"
-                class="wvViewer__button"
-                ng-click="vm.tools.layout = {x: 1, y: 1}"
-                ng-class="{'active': vm.tools.layout.x === 1 &&  vm.tools.layout.y === 1}"
-            >
-                <span class="glyphicon glyphicon-stop"></span>
-            </button>
-            <button
-                ng-disabled="vm.readonly"
-                bs-tooltip
-                data-placement="bottom"
-                title="Split view"
-                data-original-title="Split view"
-                ng-click="vm.tools.layout = {x: 2, y: 2}"
-                class="wvViewer__button"
-                ng-class="{'active': vm.tools.layout.x === 2 &&  vm.tools.layout.y === 2}"
-            >
-                <span class="glyphicon glyphicon-th-large"></span>
-            </button>
+        <wv-layout-top2>
         </wv-layout-top2>
 
         <!--
         Layout: top3
     
         @description
-        Toolbox zone.
+        @todo
         -->
-        <wv-layout-top3 ng-show="vm.toolbarEnabled">
-            <wv-toolbox
-                wv-readonly="vm.readonly"
-                wv-toolbox-buttons="vm.tools"
-                wv-active-tool="vm.activeTool"
-            ></wv-toolbox>
+        <wv-layout-top3>
         </wv-layout-top3>
 
         <!--
@@ -218,14 +183,28 @@
     Layout: main
 
     @description
-    This zone contains the viewports.
+    This zone contains the viewports & the toolbar.
     -->
     <wv-layout-main>
+        <!--
+        Toolbar
+        -->
+        <wv-toolbox 
+            ng-show="vm.toolbarEnabled"
+            wv-readonly="vm.readonly"
+            wv-toolbox-buttons="vm.tools"
+            wv-active-tool="vm.activeTool"
+        ></wv-toolbox>
+
         <!--
         Splitpane
         -->
         <wv-splitpane
             wv-layout="vm.tools.layout"
+
+            ng-class="{
+                'wvLayout__splitpane--toolbarpadding': vm.toolbarEnabled
+            }"
         >
              <wv-pane-policy
                 wv-pane-index="$index"

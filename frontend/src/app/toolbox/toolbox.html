@@ -1,4 +1,30 @@
 <div class="wvViewer__buttonGroup">
+    <!-- Splitpane Grid configuration buttons. -->
+    <button
+        ng-disabled="vm.readonly"
+        bs-tooltip
+        data-placement="bottom"
+        title="Single view"
+        data-original-title="Single view"
+        class="wvViewer__button"
+        ng-click="vm.buttons.layout = {x: 1, y: 1}"
+        ng-class="{'active': vm.buttons.layout.x === 1 && vm.buttons.layout.y === 1}"
+    >
+        <span class="glyphicon glyphicon-stop"></span>
+    </button>
+    <button
+        ng-disabled="vm.readonly"
+        bs-tooltip
+        data-placement="bottom"
+        title="Split view"
+        data-original-title="Split view"
+        ng-click="vm.buttons.layout = {x: 2, y: 2}"
+        class="wvViewer__button"
+        ng-class="{'active': vm.buttons.layout.x === 2 && vm.buttons.layout.y === 2}"
+    >
+        <span class="glyphicon glyphicon-th-large"></span>
+    </button>
+
     <!-- Invert Colour State -->
     <label style="margin: 0; position: relative;" ng-if="vm.buttons.hasOwnProperty('invert')" class="wvViewer__button glyphicon glyphicon-adjust" ng-class="{active: vm.state.invert}"
         bs-tooltip data-placement="bottom" title="Invert color"

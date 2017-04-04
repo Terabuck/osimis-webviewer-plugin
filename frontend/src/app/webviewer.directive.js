@@ -35,7 +35,7 @@
  * `wvSelectedSeriesItem` parameter. When turned back to false, the selection
  * is kept cached.
  *
- * @param {Array<object>} [wvSelectedSeriesItem=[]]
+ * @param {Array<object>} [wvSelectedSeriesItem=EmptyArray]
  * A list of selected series items. This list can be retrieved to customize the
  * viewer by host applications. See the `wvSeriesItemSelectionEnabled` 
  * parameter. 
