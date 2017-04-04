@@ -47,17 +47,6 @@
 
         wv-annotationstorage-enabled="vm.enableAnnotationStorage"
     >
-        <!-- Study list (for debug mode) -->
-        <wv-layout-top-left
-            wv-enabled="vm.mode === 'dev' &&
-                        vm.enableLayoutTopLeft"
-        >
-            <wv-studylist 
-                ng-if="vm.mode === 'dev'"
-                wv-selected-study-id="vm.studyId"
-            ></wv-studylist>
-        </wv-layout-top-left>
-
         <!-- Download Study Button -->
         <wv-layout-top-right
             wv-enabled="!vm.isMobile &&
