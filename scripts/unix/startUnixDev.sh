@@ -15,12 +15,14 @@
 set -x
 set -e
 
+rebuildBackend=${1:-true}
+
 # Start from the repository root
 previousDir=$(pwd)
 rootDir="${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"
 cd ${rootDir}/
 
-if [ "$1" = true ]; then
+if [ "$rebuildBackend" = true ]; then
     # Build Frontend & install local dependencies (req. by C++ plugin)
     cd frontend/
     npm install
