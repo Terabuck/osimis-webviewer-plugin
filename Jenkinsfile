@@ -208,7 +208,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
                     }
 
                     // Send message on slack with address
-                    slackSend color: '#800080', message: "wvb: ${BRANCH_NAME} deployed.\n- http://qa.lify.io.osidev.net:${demoPort}/osimis-viewer/app/index.html\n- https://osimis.myjetbrains.com/youtrack/issue/${ticketNumber}\n- https://bitbucket.org/osimis/osimis-webviewer-plugin/pull-requests/\n- https://toggl.com/app/reports/detailed/68539/period/thisYear/projects/15802638,11576700,11576708,13082543,13396013,14100173/description/${ticketNumber}%20/billable/both"
+                    slackSend color: '#800080', message: "wvb: ${BRANCH_NAME} deployed.\n- http://qa.wvb.osidev.net:${demoPort}/osimis-viewer/app/index.html\n- https://osimis.myjetbrains.com/youtrack/issue/${ticketNumber}\n- https://bitbucket.org/osimis/osimis-webviewer-plugin/pull-requests/\n- https://toggl.com/app/reports/detailed/68539/period/thisYear/projects/15802638,11576700,11576708,13082543,13396013,14100173/description/${ticketNumber}%20/billable/both"
                 }
             }}}
         }
