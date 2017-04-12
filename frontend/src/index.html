@@ -35,6 +35,7 @@
     ng-cloak
 >
     <wv-webviewer
+        wv-pickable-study-ids="vm.pickableStudyIds"
         wv-selected-study-ids="vm.selectedStudyIds"
         wv-series-id="vm.seriesId"
 
@@ -91,8 +92,8 @@
     }])
     // Define a basic controller
     .controller('MainController', [
-        '$scope', '$location', 'wvConfig', 'wvSeriesManager',
-        function($scope, $location, wvConfig, wvSeriesManager)
+        '$scope', '$location', 'wvConfig', 'wvStudyManager', 'wvSeriesManager',
+        function($scope, $location, wvConfig, wvStudyManager, wvSeriesManager)
     {
         var vm = this;
 
@@ -104,8 +105,16 @@
         var orthancStudyId = $location.search().study;
         var orthancSeriesId = $location.search().series;
 
+        vm.pickableStudyIds = [];
         vm.selectedStudyIds = [];
         vm.seriesId = undefined;
+
+        // Set pickable study ids
+        wvStudyManager
+            .getAllStudyIds()
+            .then(function(studyIds) {
+                vm.pickableStudyIds = studyIds;
+            });
 
         // Display orthanc study.
         if (orthancStudyId) {
