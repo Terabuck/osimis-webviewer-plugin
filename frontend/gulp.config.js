@@ -204,7 +204,7 @@ module.exports = function() {
             ],
             client: {
                 // Remove application log
-                captureConsole: false,
+                captureConsole: true,
 
                 // Mocha config
                 mocha: {

@@ -114,8 +114,8 @@ if uploadInstances is True:
 					instancesIds.append(client.uploadDicomFile(imagePath))
 
 			# List instances for testing purpose
-			# print(colored('Instances:', 'blue'));
-			# print(colored(json.dumps(instancesIds, sort_keys=True, indent=4), 'blue'));
+			print(colored('Instances:', 'blue'));
+			print(colored(json.dumps(instancesIds, sort_keys=True, indent=4), 'blue'));
 
 		# Wait 5 seconds before retry on error
 		except:
@@ -165,9 +165,10 @@ for i in range(0, runCount):
 	# Stop Orthanc once karma has fininshed
 	karmaLastReturnCode = None
 	try:
-		karmaLastReturnCode = karma.wait(timeout = 60*3 if singleRun else None) # kill after 1 min
+	 	# kill after 10 min
+		karmaLastReturnCode = karma.wait(timeout = 60*10 if singleRun else None)
 	except:
-		print(colored('Error: karma run took more than 3 minute (or was killed with ctrl+C)', 'red'))
+		print(colored('Error: karma run took more than 10 minute (or was killed with ctrl+C)', 'red'))
 		
 		# Print error if orthanc is no longer accessible
 		try:
