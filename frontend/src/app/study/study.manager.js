@@ -22,11 +22,31 @@
              * 
              * @name osimis.StudyManager#getAllStudyIds
              *
+             * @return {Promise<Array<string>>}
+             * The list of the study ids.
+             * 
              * @description
              * Retrieve the list of all available study ids from Orthanc. This
              * basically return the content of the `<orthanc>/studies` route.
              */
             getAllStudyIds: getAllStudyIds,
+            /**
+             * @ngdoc method
+             * @methodOf webviewer.service:wvStudyManager
+             * 
+             * @name osimis.StudyManager#getPatientStudyIds
+             *
+             * @param {string} id
+             * The Orthanc id of the patient.
+             *
+             * @return {Promise<Array<string>>}
+             * The list of the study ids.
+             *
+             * @description
+             * Retrieve the list of all study ids related to one single
+             * patient.
+             */
+            getPatientStudyIds: getPatientStudyIds,
             /**
              * @ngdoc method
              * @methodOf webviewer.service:wvStudyManager
@@ -68,6 +88,18 @@
                 .get(wvConfig.orthancApiURL + '/studies/')
                 .then(function(response) {
                     return response.data;
+                });
+        }
+
+        function getPatientStudyIds(id) {
+            var request = new osimis.HttpRequest();
+            request.setHeaders(wvConfig.httpRequestHeaders);
+            request.setCache(true);
+
+            return request
+                .get(wvConfig.orthancApiURL + '/patients/' + id)
+                .then(function(response) {
+                    return response.data.Studies;
                 });
         }
 

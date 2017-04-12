@@ -109,19 +109,25 @@
         vm.selectedStudyIds = [];
         vm.seriesId = undefined;
 
-        // Set pickable study ids
-        wvStudyManager
-            .getAllStudyIds()
-            .then(function(studyIds) {
-                vm.pickableStudyIds = studyIds;
-            });
-
         // Display orthanc study.
         if (orthancStudyId) {
             vm.mode = 'study';
             vm.selectedStudyIds = [
                 orthancStudyId
             ];
+
+            // Set all the patient studies as pickable.
+            var request = new osimis.HttpRequest();
+            request.setHeaders(wvConfig.httpRequestHeaders);
+            request
+                .get(wvConfig.orthancApiURL + '/studies/' + orthancStudyId)
+                .then(function (study) {
+                    return wvStudyManager
+                        .getPatientStudyIds(study.data.ParentPatient);
+                })
+                .then(function (studyIds) {
+                    vm.pickableStudyIds = studyIds;
+                });
         }
         // Display & convert orthanc series id (from url parameter) into
         // frontend series id.
@@ -129,14 +135,15 @@
             wvSeriesManager
                 .listFromOrthancSeriesId(orthancSeriesId)
                 .then(function(seriesList) {
-                    // When singleframe, display the frontend series
+                    // When singleframe, display the frontend series.
                     if (seriesList.length === 1) {
                         vm.mode = 'series';
                         vm.seriesId = seriesList[0].id;
                     }
-                    // When multiframe, consider series as a study
+                    // When multiframe, consider series as a study.
                     else if (!vm.selectedStudyIds.length) {
-                        // @todo @warning multiple series may be shown instead of a single one... study id should also be split...
+                        // @todo @warning multiple series may be shown instead
+                        // of a single one... study id should also be split...
                         var request = new osimis.HttpRequest();
                         request.setHeaders(wvConfig.httpRequestHeaders);
                         
@@ -147,8 +154,16 @@
                                 vm.selectedStudyIds = [
                                     study.data.ID
                                 ];
+
+                                // Set all the patient studies as pickable.
+                                wvStudyManager
+                                    .getPatientStudyIds(study.data.ParentPatient)
+                                    .then(function(studyIds) {
+                                        vm.pickableStudyIds = studyIds;
+                                    });
                             });
                     }
+                    // Otherwise, throw exception.
                     else {
                         throw new Error('Invalid URL parameters');
                     }
@@ -156,9 +171,16 @@
                     console.error('err', err);
                 });
         }
-        // Show study list if study & series haven't been set via URL
+        // Show study list if study & series haven't been set via URL.
         else {
             vm.mode = 'dev';
+
+            // Set all orthanc studies as pickable.
+            wvStudyManager
+                .getAllStudyIds()
+                .then(function(studyIds) {
+                    vm.pickableStudyIds = studyIds;
+                });
         }
 
         // Configure the user interface depending on the user angent/browser.

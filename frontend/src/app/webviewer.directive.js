@@ -158,7 +158,7 @@
                 rotateleft: false,
                 rotateright: false
             };
-            vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefoned' ? vm.pickableStudyIds : [];
+            vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];
             vm.selectedStudyIds = typeof vm.selectedStudyIds !== 'undefined' ? vm.selectedStudyIds : [];
 
             // Selection-related
