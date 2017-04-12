@@ -1,21 +1,15 @@
-/**
- * @description
- * Directive to be transcluded in the layout. It provides configuration
- * attribute that are transmitted to the `wvLayout` directive. The `wvLayout`
- * directive has the responsibility of setting the right css classes.
- */
 (function() {
     'use strict';
 
     angular
         .module('webviewer')
-        .directive('wvLayoutTopRight', wvLayoutTopRight);
+        .directive('wvLayoutLeftBottom', wvLayoutLeftBottom);
 
     /* @ngInject */
-    function wvLayoutTopRight($parse) {
+    function wvLayoutLeftBottom($parse) {
         var directive = {
             bindToController: true,
-            controller: LayoutTopRightVM,
+            controller: LayoutLeftBottomVM,
             controllerAs: 'vm',
             link: link,
             restrict: 'E',
@@ -24,14 +18,14 @@
                 enabled: '=?wvEnabled'
             },
             transclude: true,
-            template: '<div ng-transclude></div>'
+            template: '<div class="wvLayout__leftBottom" ng-transclude></div>'
         };
         return directive;
 
         function link(scope, element, attrs, wvLayout) {
             var vm = scope.vm;
 
-            // Enable top right by default (as long as the directive is used)
+            // Enable left bottom by default (as long as the directive is used)
             if ($parse(attrs.enabled).assign) {
                 vm.enabled = typeof vm.enabled !== 'undefined' ? !!vm.enabled : true;
             }
@@ -39,15 +33,15 @@
             // Transfer states to the wvLayout controller. We delegate state
             // management to wvLayout since this directive may be set up by
             // the wvWebviewer 
-            wvLayout.isTopRightEnabled = vm.enabled;
+            wvLayout.isLeftBottomEnabled = vm.enabled;
             scope.$watch('vm.enabled', function(isEnabled, wasEnabled) {
-                wvLayout.isTopRightEnabled = !!isEnabled;
+                wvLayout.isLeftBottomEnabled = !!isEnabled;
             });
         }
     }
 
     /* @ngInject */
-    function LayoutTopRightVM() {
+    function LayoutLeftBottomVM() {
 
     }
 })();

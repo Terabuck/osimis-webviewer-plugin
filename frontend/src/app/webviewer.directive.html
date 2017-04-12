@@ -146,6 +146,26 @@
                 ></wv-serieslist>
             </section>
         </div>
+
+        <!--
+        Layout: left bottom
+        
+        @description
+        Parameterizablee zone.
+        The user of the `wvWebviewer` directive can inject content here and
+        configure advanced display options. Have a look at the `wvLayoutLeftBottom` 
+        directive for the advanced configuration.
+        -->
+        <ng-transclude
+            ng-transclude-slot="wvLayoutLeftBottom"
+        >   
+            <!-- Default layout left bottom disabled -->
+            <wv-layout-left-bottom
+                ng-init="falseValue = false"
+                wv-enabled="falseValue"
+            >
+            </wv-layout-left-bottom>
+        </ng-transclude>
     </wv-layout-left>
 
     <!--

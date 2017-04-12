@@ -28,6 +28,7 @@
         this.enableLayoutTopLeft = (orientation === 'landscape');
         this.enableLayoutTopRight = (orientation === 'landscape');
         this.enableLayoutLeft = (orientation === 'landscape');
+        this.enableLayoutLeftBottom = (orientation === 'landscape');
         this.enableLayoutRight = (orientation === 'landscape');
         // 3. Never display aside handles on mobile (buttons toggling the aside)
         this.enableLayoutLeftHandles = false;
@@ -44,6 +45,7 @@
         if (orientation === 'portrait') {
             // Disable left layout
             this.enableLayoutLeft = false;
+            this.enableLayoutLeftBottom = false;
             this.enableLayoutRight = false;
             
             // Disable top side
@@ -58,6 +60,7 @@
         if (orientation === 'landscape') {
             // Enable left/right layout
             this.enableLayoutLeft = true;
+            this.enableLayoutLeftBottom = true;
             this.enableLayoutRight = true;
 
             // Enable top side

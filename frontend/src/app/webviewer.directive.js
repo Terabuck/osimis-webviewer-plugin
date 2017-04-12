@@ -38,7 +38,7 @@
  * `wvSelectedSeriesItem` parameter. When turned back to false, the selection
  * is kept cached.
  *
- * @param {Array<object>} [wvSelectedSeriesItem=EmptyArray]
+ * @param {Array<object>} [wvSelectedSeriesItems=EmptyArray] (readonly)
  * A list of selected series items. This list can be retrieved to customize the
  * viewer by host applications. See the `wvSeriesItemSelectionEnabled` 
  * parameter. 
@@ -105,13 +105,13 @@
 
                 // Selection-related
                 seriesItemSelectionEnabled: '=?wvSeriesItemSelectionEnabled',
-                selectedSeriesItemIds: '=?wvSelectedSeriesItem'
-
+                selectedSeriesItems: '=?wvSelectedSeriesItems' // readonly
             },
             transclude: {
                 wvLayoutTopLeft: '?wvLayoutTopLeft',
                 wvLayoutTopRight: '?wvLayoutTopRight',
-                wvLayoutRight: '?wvLayoutRight'
+                wvLayoutRight: '?wvLayoutRight',
+                wvLayoutLeftBottom: '?wvLayoutLeftBottom'
             },
             templateUrl: 'app/webviewer.directive.html'
         };
@@ -152,13 +152,57 @@
             vm.selectedStudyIds = typeof vm.selectedStudyIds !== 'undefined' ? vm.selectedStudyIds : [];
 
             // Selection-related
-            // @warning @todo Set back default `seriesItemSelectionEnabled` to false
-            vm.seriesItemSelectionEnabled = typeof vm.seriesItemSelectionEnabled !== 'undefined' ? vm.seriesItemSelectionEnabled : true;
+            vm.seriesItemSelectionEnabled = typeof vm.seriesItemSelectionEnabled !== 'undefined' ? vm.seriesItemSelectionEnabled : false;
             vm.selectedSeriesIds = vm.selectedSeriesIds || {};
             vm.selectedReportIds = vm.selectedReportIds || {};
             vm.selectedVideoIds = vm.selectedVideoIds || {};
-            vm.selectedSeriesItemIds = vm.selectedSeriesItemIds || {};
-            // Update selectedSeriesItemIds based on selected***Ids
+            vm.selectedSeriesItems = vm.selectedSeriesItems || [];
+            // Update selected***Ids based on selectedSeriesItems
+            // @warning those triggers cycle $digest...
+            var _dropCycle = false;
+            scope.$watch('vm.selectedSeriesItems', function(newValues, oldValues) {
+                if (_dropCycle) {
+                    _dropCycle = false;
+                    return;
+                }
+                else {
+                    _dropCycle = true;
+                }
+
+                vm.selectedSeriesIds = vm.selectedSeriesIds || {};
+                _.forEach(vm.selectedSeriesIds, function(items, studyId) {
+                    vm.selectedSeriesIds[studyId] = [];
+                });
+                vm.selectedVideoIds = vm.selectedVideoIds || {};
+                _.forEach(vm.selectedVideoIds, function(items, studyId) {
+                    vm.selectedVideoIds[studyId] = [];
+                });
+                vm.selectedReportIds = vm.selectedReportIds || {};
+                _.forEach(vm.selectedReportIds, function(items, studyId) {
+                    vm.selectedReportIds[studyId] = [];
+                });
+
+                newValues && newValues
+                    .forEach(function(newValue) {
+                        var studyId = newValue.studyId;
+                        switch (newValue.type) {
+                        case 'series':
+                            vm.selectedSeriesIds[studyId] = vm.selectedSeriesIds[studyId] || [];
+                            vm.selectedSeriesIds[studyId].push(newValue);
+                            break;
+                        case 'report/pdf':
+                            vm.selectedVideoIds[studyId] = vm.selectedVideoIds[studyId] || [];
+                            vm.selectedVideoIds[studyId].push(newValue);
+                            break;
+                        case 'video/mpeg4':
+                            vm.selectedReportIds[studyId] = vm.selectedReportIds[studyId] || [];
+                            vm.selectedReportIds[studyId].push(newValue);
+                            break;
+                        }
+                    });
+            }, true);
+
+            // Update selectedSeriesItems based on selected***Ids
             scope.$watch(function() {
                 return {
                     series: vm.selectedSeriesIds,
@@ -166,6 +210,8 @@
                     videos: vm.selectedVideoIds
                 }
             }, function(newValues, oldValues) {
+                _dropCycle = true;
+
                 var series = _
                     .flatMap(newValues.series, function(seriesIds, studyId) {
                         // @todo manage multiframe instances.
@@ -205,7 +251,7 @@
                             });
                     });
 
-                vm.selectedSeriesItemIds = []
+                vm.selectedSeriesItems = []
                     .concat(series)
                     .concat(reports)
                     .concat(videos);

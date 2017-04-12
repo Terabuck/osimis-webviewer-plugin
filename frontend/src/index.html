@@ -32,6 +32,7 @@
 <body
     ng-controller="MainController as vm" 
     class="wv-body"
+    ng-cloak
 >
     <wv-webviewer
         wv-study-id="vm.studyId"
@@ -46,6 +47,8 @@
         wv-notice-text="vm.noticeText"
 
         wv-annotationstorage-enabled="vm.enableAnnotationStorage"
+        wv-series-item-selection-enabled="vm.seriesItemSelectionEnabled"
+        wv-selected-series-items="vm.selectedSeriesItems"
     >
         <!-- Download Study Button -->
         <wv-layout-top-right
@@ -53,12 +56,29 @@
                         vm.enableLayoutTopRight &&
                         vm.enableStudyDownload &&
                         vm.studyId"
-            >
+        >
             <wv-study-download-button
                 ng-if="!vm.isMobile && vm.enableStudyDownload && vm.studyId"
                 wv-study-id="vm.studyId"
             ></wv-study-download-button>
         </wv-layout-top-right>
+
+        <!-- Selection Zone -->
+        <wv-layout-left-bottom
+            wv-enabled="vm.enableLayoutLeftBottom &&
+                        vm.studyId"
+        >
+            <wv-selection-actionlist
+                wv-selection-enabled="vm.seriesItemSelectionEnabled"
+                wv-data="vm.selectedSeriesItems"
+            >
+                <button
+                    class="wvButton"
+                >
+                    do something
+                </button>
+            </wv-selection-actionlist>
+        </wv-layout-left-bottom>
     </wv-webviewer>
 
     <!-- build:js js/lib.js -->
@@ -151,6 +171,7 @@
         vm.enableLayoutTopRight = userInterfacePolicy.enableLayoutTopRight;
         vm.enableToolbar = userInterfacePolicy.enableToolbar;
         vm.enableLayoutLeft = userInterfacePolicy.enableLayoutLeft;
+        vm.enableLayoutLeftBottom = userInterfacePolicy.enableLayoutLeftBottom;
         vm.enableLayoutLeftHandles = userInterfacePolicy.enableLayoutLeftHandles;
         vm.enableNotice = userInterfacePolicy.enableNotice;
         vm.noticeText = userInterfacePolicy.noticeText;
@@ -162,6 +183,7 @@
                 vm.enableLayoutTopRight = userInterfacePolicy.enableLayoutTopRight;
                 vm.enableToolbar = userInterfacePolicy.enableToolbar;
                 vm.enableLayoutLeft = userInterfacePolicy.enableLayoutLeft;
+                vm.enableLayoutLeftBottom = userInterfacePolicy.enableLayoutLeftBottom;
                 vm.enableLayoutLeftHandles = userInterfacePolicy.enableLayoutLeftHandles;
                 vm.enableNotice = userInterfacePolicy.enableNotice;
                 vm.noticeText = userInterfacePolicy.noticeText;

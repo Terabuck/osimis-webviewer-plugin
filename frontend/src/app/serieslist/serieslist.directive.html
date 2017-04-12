@@ -21,7 +21,7 @@
         wv-scroll-on-over-series-ext
         ng-class="{
             'wvSerieslist__seriesItem--selectable': vm.selectionEnabled,
-            'wvSerieslist__seriesItem--activated': vm.selectedSeriesIds.indexOf($series.id) !== -1
+            'wvSerieslist__seriesItem--activated': vm.selectionEnabled && vm.selectedSeriesIds.indexOf($series.id) !== -1
         }"
         ng-show="vm.loaded"
         wv-draggable-item="{

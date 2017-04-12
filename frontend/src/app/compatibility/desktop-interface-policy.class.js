@@ -13,6 +13,7 @@
         this.enableToolbar = true;
         // 2. Always enable left/right side
         this.enableLayoutLeft = true;
+        this.enableLayoutLeftBottom = true;
         this.enableLayoutLeftHandles = true;
         this.enableLayoutRight = true;
         this.enableLayoutRightHandles = true;
