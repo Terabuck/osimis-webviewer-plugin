@@ -224,15 +224,35 @@
         <!--
         Splitpane
         -->
-        <wv-splitpane wv-layout="vm.tools.layout">
+        <wv-splitpane
+            wv-layout="vm.tools.layout"
+        >
              <wv-pane-policy
-                wv-pane-index="$index" wv-pane-position="$position"
-                wv-on-pane-added="vm.configureViewport($index)" wv-on-pane-removed="vm.cleanupViewport($index)"
+                wv-pane-index="$index"
+                wv-pane-position="$position"
+                wv-on-pane-added="vm.configureViewport($index)"
+                wv-on-pane-removed="vm.cleanupViewport($index)"
+
+                wv-on-item-dropped="
+                    vm.viewports[$index].videoId    = $data.videoId !== undefined    ? $data.videoId    : vm.viewports[$index].videoId;
+                    vm.viewports[$index].seriesId   = $data.seriesId !== undefined   ? $data.seriesId   : vm.viewports[$index].seriesId;
+                    vm.viewports[$index].imageIndex = $data.imageIndex !== undefined ? $data.imageIndex : vm.viewports[$index].imageIndex;
+                    vm.viewports[$index].csViewport = $data.csViewport !== undefined ? $data.csViewport : vm.viewports[$index].csViewport;
+                "
              >
+                <!--
+                Video
+                -->
+                <wv-video
+                    ng-if="!!vm.viewports[$index].videoId"
+                    wv-video-id="vm.viewports[$index].videoId"
+                ></wv-video>
+
                 <!--
                 Viewport
                 -->
-                <wv-viewport 
+                <wv-viewport
+                    ng-if="!!vm.viewports[$index].seriesId"
                     vp:series-id="vm.viewports[$index].seriesId" wv-size="{width: 1.0, height: 1.0}" wv-lossless="true"
                     wv-series="$series" wv-image="$image"
                     wv-droppable-series-ext="!vm.readonly && vm.serieslistEnabled"
@@ -272,12 +292,17 @@
                     <div class="wv-overlay-timeline-wrapper">
                         <wv-timeline wv-series="$series" wv-readonly="vm.readonly"></wv-timeline>
                     </div>
-
-                    <!--
-                    Notice: droppable component
-                    -->
-                    <wv-droppable-series-overlay-item></wv-droppable-series-overlay-item>
                 </wv-viewport>
+
+                <!--
+                Notice: droppable zone
+                -->
+                <wv-droppable-series-overlay-item
+                    ng-if="
+                        !vm.viewports[$index].videoId &&
+                        !vm.viewports[$index].seriesId
+                    "
+                ></wv-droppable-series-overlay-item>
             </wv-pane-policy>
         </wv-splitpane>
     </wv-layout-main>

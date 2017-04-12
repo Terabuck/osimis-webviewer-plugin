@@ -78,6 +78,7 @@ GET /studies/<uid>
 GET /studies/<uid>/archive
 GET /instances/<uid>/simplified-tags
 GET /instances/<uid>/pdf
+GET /instances/<uid>/frames/0/raw
 GET /series/<uid>/study
 GET /plugins/osimis-web-viewer
 GET /system

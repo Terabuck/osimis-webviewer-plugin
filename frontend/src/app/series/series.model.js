@@ -3,6 +3,14 @@
  * @memberOf osimis
  * 
  * @name osimis.Series
+ *
+ * @description
+ * The `Series` model represent a series of images. It does not map the DICOM
+ * series, as it only represents images, either comming from a list of frame of
+ * a DICOM multi-frame instance or from a DICOM mono-frame instance.
+ *
+ * The `Series` model provides helper to play the series, change the shown
+ * image, retrieve the currently shown image, aso.
  */
 (function() {
     'use strict';

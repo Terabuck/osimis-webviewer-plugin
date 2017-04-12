@@ -6,12 +6,17 @@
     /* @todo out! */
     .superlist {
         border-right: 1px solid #222;
+        /* mimic on hover border for draggable */
+        border-left: 1px solid transparent;
+        border-top: 1px solid transparent;
+        border-bottom: 1px solid transparent;
+
         margin-bottom: 2px;
     }
     </style>
     <li
         ng-show="vm.pdfInstanceIds.length > 0"
-        ng-repeat="id in vm.pdfInstanceIds"
+        ng-repeat="id in vm.pdfInstanceIds track by id"
         class="list-unstyled superlist wv-serieslist-report"
         ng-click="vm.openPdf(id)"
     >
@@ -34,14 +39,38 @@
         </div>
     </li>
     <li
-      ng-repeat="id in vm.seriesIds track by id"
-       class="list-unstyled superlist"
-      wv-size-tag
+        class="list-unstyled superlist wv-serieslist-report"
+        ng-show="vm.videos.length > 0"
+        ng-repeat="$video in vm.videos track by $video.id"
+        wv-draggable-item="{
+            videoId: $video.id,
+            seriesId: null
+        }"
     >
-        <div class="serieList__picture inline-object wh__64" wv-size-tag wv-draggable-series-ext>
+        <div class="serieList__picture inline-object wh__64">
+            <span class="wv-serieslist-reporticon fa fa-video-camera"></span>
+        </div>
+        <div class="serieList__informations float__right pl10">
+            <span class="serieList__label mn">{{$video.tags.SeriesDescription}}</span>
+        </div>
+    </li>
+    <li
+        class="list-unstyled superlist"
+        ng-repeat="id in vm.seriesIds track by id"
+        wv-scroll-on-over-series-ext
+        wv-draggable-item="{
+            videoId: null,
+            seriesId: $series.id,
+            imageIndex: 0,
+            csViewport: null
+        }"
+    >
+        <div
+            class="serieList__picture inline-object wh__64"
+            wv-size-tag
+        >
             <wv-viewport wv-image="$image" wv-image-index="$series.imageCount/2" vp:series-id="id" wv-series="$series" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}"
                 wv-enable-overlay="false"
-                wv-scroll-on-over-series-ext
             ></wv-viewport>
             <div class="serieList__badge">{{$series.imageCount}}</div>
         </div>

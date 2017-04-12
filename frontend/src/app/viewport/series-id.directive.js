@@ -65,7 +65,7 @@
                 'vpSeriesId': 'vpSeriesId',
                 'wvViewport': 'wvViewport'
             },
-            controller: SeriesViewModel,
+            controller: SeriesIdVM,
             link: link,
             restrict: 'A',
             scope: false // we use $parse instead to try to not dirty the scope
@@ -170,7 +170,7 @@
             // bind attributes -> view model
             // vp-series-id
             var vpSeriesIdParser = $parse(attrs.vpSeriesId);
-            scope.$watch(vpSeriesIdParser, function(id) {
+            scope.$watch(vpSeriesIdParser, function setSeriesViaWatch(id) {
                 if (!id) {
                     viewmodel.clearSeries();
                 }
@@ -180,9 +180,6 @@
                     // responsibility to set the new image id, but the 
                     // `wvSeriesId`'s user.
                     var imageIndex = wvImageIndexParser(scope) || 0;
-
-                    // Set the new series
-                    viewmodel.setSeries(id, imageIndex);
 
                     // Once series has been loaded, reset back the cornerstone
                     // viewport data as it was first defined by the user.
@@ -214,15 +211,19 @@
                     var wvViewportParser = $parse(attrs.wvViewport);
                     if (wvViewportParser !== angular.noop) {
                         var csViewportAtTheTime = wvViewportParser(scope);
-                        if (!csViewportAtTheTime) {
+                        if (csViewportAtTheTime === null) {
                             _resetViewportOnceImageLoads = true;
                         }
                     }
+
+                    // Set the new series
+                    viewmodel
+                        .setSeries(id, imageIndex);
                 }
             });
 
             // wv-image-index
-            scope.$watch(wvImageIndexParser, function(index) {
+            scope.$watch(wvImageIndexParser, function setImageIndexViaWatch(index) {
                 if (_cancelCyclicCall) {
                     _cancelCyclicCall = false;
                     return;
@@ -274,7 +275,7 @@
 
     /* responsibility: manage the directive states */
     /* @ngInject */
-    function SeriesViewModel(wvSeriesManager) {
+    function SeriesIdVM(wvSeriesManager) {
         var _this = this;
 
         this._seriesManager = wvSeriesManager;
@@ -315,22 +316,22 @@
         });
     }
 
-    SeriesViewModel.prototype.getViewport = angular.noop; // defined inside the linker
+    SeriesIdVM.prototype.getViewport = angular.noop; // defined inside the linker
 
-    SeriesViewModel.prototype.hasSeries = function() {
+    SeriesIdVM.prototype.hasSeries = function() {
         return !!this._seriesId;
     };
 
-    SeriesViewModel.prototype.onSeriesChanged = angular.noop;
+    SeriesIdVM.prototype.onSeriesChanged = angular.noop;
 
-    SeriesViewModel.prototype.clearSeries = function() {
+    SeriesIdVM.prototype.clearSeries = function() {
         var oldSeries = this.series;
         this._seriesId = null;
         this._series = null;
         this.onSeriesChanged.trigger(null, oldSeries);
     };
 
-    SeriesViewModel.prototype.setSeries = function(id, imageIndex) {
+    SeriesIdVM.prototype.setSeries = function(id, imageIndex) {
         var _this = this;
 
         this._seriesId = id;
@@ -357,7 +358,7 @@
             });
     };
 
-    SeriesViewModel.prototype.getSeries = function() {
+    SeriesIdVM.prototype.getSeries = function() {
         return this._series;
     };
 

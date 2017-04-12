@@ -2,7 +2,7 @@
  * @ngdoc directive
  * @name webviewer.directive:wvWebviewer
  * 
- * @param {string} [wvStudyId]
+ * @param {string} [wvStudyId=undefined]
  * Configure the study shown in the serieslist`wvSerieslistEnabled` must be 
  * true. Changing the `wvStudyId` resets the viewports to a (1, 1) layout with
  * the first series of the study shown.
@@ -24,15 +24,15 @@
  * @param {boolean} [wvNoticeEnabled=false]
  * Display a notice in the bottom side of the application.
  * 
- * @param {boolean} [wvNoticeText]
+ * @param {string} [wvNoticeText=undefined]
  * The displayed notice content, for instance instructions over mobile
  * ergonomy, or related series / studies.
  * 
- * @param {string} [wvSeriesId]
+ * @param {string} [wvSeriesId=undefined]
  * Configure the series shown in the main viewport. Viewport's data are reset
  * on change.
  * 
- * @param {object} [wvTools]
+ * @param {object} [wvTools=...]
  * Configure the displayed tools with their default value. See source code for
  * available configuration options.
  *

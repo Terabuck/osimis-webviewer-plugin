@@ -200,13 +200,9 @@
                             // Wait
                             .then(function setImageViaCtrl(newImage) {
                                 // Set/Reset the viewport
-                                var resetViewport = resetViewport || !newCsViewport;
-                                if (newCsViewport) {
-                                    model.setViewport(newCsViewport); // newUnserializedCsViewport
-                                    resetViewport = false;
-                                }
-                                else {
-                                    resetViewport = true;
+                                resetViewport = resetViewport || !newCsViewport;
+                                if (!resetViewport && newCsViewport) {
+                                    model.setViewport(newCsViewport);
                                 }
 
                                 // Set image & draw
@@ -388,7 +384,6 @@
                 if (newCsViewport !== oldCsViewport || !_.isEqual(oldCsViewport, newCsViewport)) {
                     // Update old cs viewport
                     _oldCsViewport = _.cloneDeep(newCsViewport);
-                    console.log('trigger digest');
                     // Trigger a new digest if needed
                     scope.$evalAsync(function() {
                         // Update scope values

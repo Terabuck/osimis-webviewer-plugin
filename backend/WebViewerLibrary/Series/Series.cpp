@@ -25,9 +25,9 @@
 #include <boost/regex.hpp>
 #include <boost/foreach.hpp>
 
-Series::Series(const std::string& seriesId, const Json::Value& seriesTags, const Json::Value& instancesTags, const Json::Value& orderedInstances,
-    const std::set<ImageQuality>& imageQualities)
-    : _seriesId(seriesId), _seriesTags(seriesTags), _instancesTags(instancesTags), _orderedInstances(orderedInstances), _imageQualities(imageQualities)
+Series::Series(const std::string& seriesId, const std::string& contentType, const Json::Value& seriesTags, const Json::Value& instancesTags,
+    const Json::Value& orderedInstances, const std::set<ImageQuality>& imageQualities)
+    : _seriesId(seriesId), _contentType(contentType), _seriesTags(seriesTags), _instancesTags(instancesTags), _orderedInstances(orderedInstances), _imageQualities(imageQualities)
 {
 
 }
@@ -35,6 +35,7 @@ Series::Series(const std::string& seriesId, const Json::Value& seriesTags, const
 std::string Series::ToJson() const {
   Json::Value result;
   result["id"] = _seriesId;
+  result["contentType"] = _contentType;
   result["tags"] = _seriesTags;
   result["instancesTags"] = _instancesTags;
   result["instances"] = _orderedInstances;

@@ -4,7 +4,7 @@
  * @name webviewer.service:wvStudyManager
  *
  * @description
- * Manage study models.
+ * Manage study preloading.
  */
 (function() {
     'use strict';
@@ -14,32 +14,17 @@
         .factory('wvStudyManager', wvStudyManager);
 
     /* @ngInject */
-    function wvStudyManager($rootScope, $q, wvConfig, wvAnnotationManager) {
+    function wvStudyManager($rootScope) {
         var service = {
-            /**
-             * @ngdoc method
-             * @methodOf webviewer.service:wvStudyManager
-             * 
-             * @name osimis.StudyManager#getTags
-             * 
-             * @param {string} id
-             * Id of the study
-             * 
-             * @return {Promise<object>}
-             * The study tags promise
-             * 
-             * @description
-             * Retrieve studies' tags
-             *
-             * @deprecated Not implemented
-             */
-            // getTags: getTags,
             /**
              * @ngdoc method
              * @methodOf webviewer.service:wvStudyManager
              * 
              * @name osimis.StudyManager#loadStudy
              *
+             * @param {string} id
+             * Id of the study.
+             * 
              * @description
              * Load a study and preload its annotations and all its images
              * binaries. Be sure to call `#abortStudyLoading` when you change
@@ -51,22 +36,17 @@
              * @methodOf webviewer.service:wvStudyManager
              * 
              * @name osimis.StudyManager#abortStudyLoading
+             *
+             * @param {string} id
+             * Id of the study.
+             * 
+             * @description
+             * Stop preloading study images / instance tags / ...
              */
             abortStudyLoading: abortStudyLoading
         };
 
         ////////////////
-
-        // function get(id) {
-        //     var idHash = id.split(':');
-        //     var orthancSeriesId = idHash[0];
-        //     var subSeriesIndex = idHash[1] || 0;
-
-        //     return service.listFromOrthancSeriesId(orthancSeriesId)
-        //         .then(function(seriesList) {
-        //             return seriesList[subSeriesIndex];
-        //         });
-        // }
 
         function loadStudy(id) {
             // Preload study images / instance tags / ...
