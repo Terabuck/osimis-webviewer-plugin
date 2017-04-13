@@ -14,7 +14,7 @@
         .factory('wvStudyManager', wvStudyManager);
 
     /* @ngInject */
-    function wvStudyManager($rootScope, wvConfig) {
+    function wvStudyManager($q, $rootScope, wvConfig) {
         var service = {
             /**
              * @ngdoc method
@@ -30,6 +30,25 @@
              * basically return the content of the `<orthanc>/studies` route.
              */
             getAllStudyIds: getAllStudyIds,
+            /**
+             * @ngdoc method
+             * @methodOf webviewer.service:wvStudyManager
+             * 
+             * @name osimis.StudyManager#getRelatedStudyIds
+             *
+             * @param {Array<string>} studyIds
+             * A list of Orthanc study ids.
+             *
+             * @return {Promise<Array<string>>}
+             * The list of the related study ids, including the ones set as
+             * input.
+             *
+             * @description
+             * Retrieve the list of all study ids related to one or multiple
+             * studies. This is done by checking the patients of the input
+             * studies, and returning all the studies of those patients.
+             */
+            getRelatedStudyIds: getRelatedStudyIds,
             /**
              * @ngdoc method
              * @methodOf webviewer.service:wvStudyManager
@@ -82,7 +101,7 @@
         function getAllStudyIds() {
             var request = new osimis.HttpRequest();
             request.setHeaders(wvConfig.httpRequestHeaders);
-            request.setCache(true);
+            request.setCache(false);
 
             return request
                 .get(wvConfig.orthancApiURL + '/studies/')
@@ -91,10 +110,61 @@
                 });
         }
 
+        function getRelatedStudyIds(studyIds) {
+            // 1. Retrieve the patients of all study ids set in input.
+            var patientIdsPromises = studyIds
+                .map(function(studyId) {
+                    var request = new osimis.HttpRequest();
+                    request.setHeaders(wvConfig.httpRequestHeaders);
+                    request.setCache(false);
+                    return request
+                        .get(wvConfig.orthancApiURL + '/studies/' + studyId)
+                        .then(function(result) {
+                            return result.data.ParentPatient;
+                        });
+                });
+
+            var relatedStudyIdsPromise = $q
+                // 2. Wait till' we have all the patients' information.
+                .all(patientIdsPromises)
+
+                // 3. Remove duplicates patient ids.
+                .then(function(patientIds) {
+                    return _.intersection(patientIds);
+                })
+
+                // 4. Retrieve all the studies from those patients.
+                .then(function(patientIds) {
+                    var studyIdsPromises = patientIds
+                        .map(function(patientId) {
+                            return service
+                                .getPatientStudyIds(patientId);
+                        });
+
+                    return $q.all(studyIdsPromises);
+                })
+
+                // 5. Flatten the array (there is at the moment one array of
+                // study ids for each patients, we want one array for every 
+                // study instead).
+                .then(function(arraysOfRelatedStudyIds) {
+                    return _.flatten(arraysOfRelatedStudyIds);
+                })
+
+                // 6. Remove duplicate studies (probably useless, since one
+                // study can't belong to more than one patient).
+                .then(function(relatedStudyIds) {
+                    return _.intersection(relatedStudyIds);
+                });
+
+            // 6. Return the result.
+            return relatedStudyIdsPromise;
+        }
+
         function getPatientStudyIds(id) {
             var request = new osimis.HttpRequest();
             request.setHeaders(wvConfig.httpRequestHeaders);
-            request.setCache(true);
+            request.setCache(false);
 
             return request
                 .get(wvConfig.orthancApiURL + '/patients/' + id)
