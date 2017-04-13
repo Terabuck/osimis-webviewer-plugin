@@ -410,17 +410,70 @@
             function _bindWvSizeController(wvSizeController, model) {
                 if (!wvSizeController) {
                     // @todo resize based on image size and not on element size (wich is always 0)
-                    model.resizeCanvas(element.width(), element.height());
-                    model.draw(false);
+                    var oldCanvasSize = model.getCanvasSize();
+
+                    var newCanvasSize = {
+                        width: element.width(),
+                        height: element.height()
+                    };
+
+                    // Resize canvas & redraw only if value as changed. This
+                    // condition prevent bugs from occuring! Consider there is
+                    // two types of viewports, thumbnails & diagnosis one. They
+                    // have different quality policy. The tend to display low 
+                    // quality whereas the second one switch from low to high
+                    // once downloaded. As such, it is important to invalidate
+                    // cache (using `model.draw(true)` instead of
+                    // `model.draw(false)` each time we draw an image with a
+                    // different resolution. We can have the luxery to avoid
+                    // doing it here since thumbnail viewports always have the
+                    // same size (there is no need to redraw them), while
+                    // viewports displaying the same image have synchronized
+                    // resolution (thus, the cache is invalidated when new
+                    // quality is downloaded). Therefore, we don't need to
+                    // invalidate the cornerstone cache each time the viewport
+                    // is resized.
+                    // @warning If any of the above condition is no longer
+                    // true, the `model.draw(false)` has to be changed into
+                    // `model.draw(true)` (at some performance cost.
+                    if (!_.isEqual(oldCanvasSize, newCanvasSize)) {
+                        model.resizeCanvas(newCanvasSize.width, newCanvasSize.height);
+                        model.draw(false);
+                    }
+
                     return null;
                 }
 
                 var unlistenWvSizeFn = wvSizeController && wvSizeController.onUpdate(function resizeCanvas() {
-                    var width = wvSizeController.getWidthInPixel();
-                    var height = wvSizeController.getHeightInPixel();
+                    var oldCanvasSize = model.getCanvasSize();
+                    var newCanvasSize = {
+                        width: wvSizeController.getWidthInPixel(),
+                        height: wvSizeController.getHeightInPixel()
+                    };
 
-                    model.resizeCanvas(width, height);
-                    model.draw(false);
+                    // Resize canvas & redraw only if value as changed. This
+                    // condition prevent bugs from occuring! Consider there is
+                    // two types of viewports, thumbnails & diagnosis one. They
+                    // have different quality policy. The tend to display low 
+                    // quality whereas the second one switch from low to high
+                    // once downloaded. As such, it is important to invalidate
+                    // cache (using `model.draw(true)` instead of
+                    // `model.draw(false)` each time we draw an image with a
+                    // different resolution. We can have the luxery to avoid
+                    // doing it here since thumbnail viewports always have the
+                    // same size (there is no need to redraw them), while
+                    // viewports displaying the same image have synchronized
+                    // resolution (thus, the cache is invalidated when new
+                    // quality is downloaded). Therefore, we don't need to
+                    // invalidate the cornerstone cache each time the viewport
+                    // is resized.
+                    // @warning If any of the above condition is no longer
+                    // true, the `model.draw(false)` has to be changed into
+                    // `model.draw(true)` (at some performance cost.
+                    if (!_.isEqual(oldCanvasSize, newCanvasSize)) {
+                        model.resizeCanvas(newCanvasSize.width, newCanvasSize.height);
+                        model.draw(false);
+                    }
                 });
 
                 return function unbind() {
