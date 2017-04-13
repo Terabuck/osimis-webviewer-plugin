@@ -45,7 +45,7 @@
         -->
         <wv-layout-top3>
             <wv-study-information-breadcrumb
-                wv-study-id="vm.studyId"
+                wv-study-id="vm.selectedStudyIds[0]"
                 class="clearfix"
             ></wv-study-information-breadcrumb>
         </wv-layout-top3>
@@ -104,8 +104,8 @@
         <!-- Study Picker -->
         <wv-studylist 
             ng-if="vm.serieslistEnabled"
+            wv-readonly="vm.readonly"
             wv-pickable-study-ids="vm.pickableStudyIds"
-            wv-selected-study-id="vm.studyId"
             wv-selected-study-ids="vm.selectedStudyIds"
         ></wv-studylist>
 

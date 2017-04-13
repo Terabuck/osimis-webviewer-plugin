@@ -99,7 +99,6 @@
             restrict: 'E',
             scope: {
                 readonly: '=?wvReadonly',
-                studyId: '=?wvStudyId', // deprecated
                 pickableStudyIds: '=wvPickableStudyIds',
                 selectedStudyIds: '=?wvSelectedStudyIds',
                 seriesId: '=?wvSeriesId',
