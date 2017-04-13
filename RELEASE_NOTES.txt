@@ -2,10 +2,12 @@ Pending changes in the mainline
 ===============================
 
 * Watch MPEG-4 (non-bd) video embedded in DICOM instances.
+* Select other studies from the same patients.
 
 Breaking Changes:
 * New routes used:
   - /<orthanc>/instances/<video-instance-uid>/frames/0/raw
+  - /<orthanc>/patients/<patient-uid>
 
 Version 0.7.0
 ========================
