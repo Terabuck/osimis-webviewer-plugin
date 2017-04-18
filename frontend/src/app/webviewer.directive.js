@@ -1,10 +1,6 @@
 /**
  * @ngdoc directive
  * @name webviewer.directive:wvWebviewer
- * 
- * @deprecated @param {string} [wvStudyId=undefined]
- * Configure the study shown in the serieslist`wvSerieslistEnabled` must be 
- * true.
  *
  * @param {Array<string>} wvPickableStudyIds
  * Define a list of study that can be accessed by the user. Thus, it's possible
@@ -300,6 +296,12 @@
             scope.$watch('vm.selectedStudyIds', function(newValues, oldValues) {
                 // Log study ids
                 console.log('studies: ', newValues);
+
+                // Consider oldValues to be empty if this watch function is 
+                // called at initialization.
+                if (_.isEqual(newValues, oldValues)) {
+                    oldValues = [];
+                }
 
                 // Cancel previous preloading
                 oldValues
