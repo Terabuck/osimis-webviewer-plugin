@@ -2,24 +2,13 @@
     ng-show="vm.studyId"
     class="list-unstyled mbn"
 >
-    <style>
-    /* @todo out! */
-    .superlist {
-        border-right: 1px solid #222;
-        /* mimic on hover border for draggable */
-        border-left: 1px solid transparent;
-        border-top: 1px solid transparent;
-        border-bottom: 1px solid transparent;
-
-        line-height: 0px;
-        margin-bottom: 2px;
-    }
-    </style>
     <li
-        class="list-unstyled superlist"
+        class="wvSerieslist__seriesItem"
         ng-repeat="id in vm.seriesIds track by id"
         wv-scroll-on-over-series-ext
         ng-class="{
+            'wvSerieslist__seriesItem--list': vm.displayMode === 'list',
+            'wvSerieslist__seriesItem--grid': vm.displayMode === 'grid',
             'wvSerieslist__seriesItem--selectable': vm.selectionEnabled,
             'wvSerieslist__seriesItem--activated': vm.selectionEnabled && vm.selectedSeriesIds.indexOf($series.id) !== -1
         }"
@@ -32,6 +21,11 @@
             csViewport: null
         }"
         ng-click="vm.toggleSelection($series.id)"
+
+        bs-tooltip
+        bs-enabled="vm.displayMode === 'grid'"
+        title="{{$series.tags.SeriesDescription}}"
+        placement="right"
     >
         <div
             class="serieList__picture inline-object wh__64"
@@ -42,8 +36,11 @@
             ></wv-viewport>
             <div class="serieList__badge">{{$series.imageCount}}</div>
         </div>
-        <div class="serieList__informations float__right pl10">
-            <p class="serieList__label mn">{{$image.tags.SeriesDescription}}</p>
+        <div 
+            ng-if="vm.displayMode === 'list'"
+            class="serieList__informations float__right pl10"
+        >
+            <p class="serieList__label mn">{{$series.tags.SeriesDescription}}</p>
             <!-- @todo reintegrate hotspots (it triggers recursive $digest atm!)
             <wvp-hotspotlist wvp-serie-id="$series.id"></wvp-hotspotlist> -->
         </div>

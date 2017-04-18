@@ -62,6 +62,7 @@
             vm.studyTags = {};
             vm.patientTags = {};
             vm.studyDownloadEnabled = typeof vm.studyDownloadEnabled !== 'undefined' ? vm.studyDownloadEnabled : false;
+            vm.displayMode = 'list'; // either `grid` or `list`
 
             // Selection-related.
             vm.itemSelectionEnabled = typeof vm.itemSelectionEnabled !== 'undefined' ? vm.itemSelectionEnabled : false;
