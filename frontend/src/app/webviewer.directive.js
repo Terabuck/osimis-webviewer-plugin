@@ -22,7 +22,7 @@
  * Display the list of series based on the `wvStudyId`. 
  * 
  * @param {boolean} [wvStudyinformationEnabled=true]
- * Display the study information based on the `wvStudyId`.
+ * Display the study information (breadcrumb) based on the `wvStudyId`.
  *
  * @param {boolean} [wvLefthandlesEnabled=true]
  * Display buttons to toggle the left side of the interface. The right handles

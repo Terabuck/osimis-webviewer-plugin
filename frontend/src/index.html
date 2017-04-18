@@ -41,7 +41,7 @@
 
         wv-toolbar-enabled="vm.enableToolbar"
         wv-serieslist-enabled="vm.enableLayoutLeft && vm.mode !== 'series'"
-        wv-studyinformation-enabled="vm.enableLayoutLeft && vm.mode !== 'series'"
+        wv-studyinformation-enabled="vm.enableLayoutTop && vm.mode !== 'series'"
         wv-lefthandles-enabled="vm.enableLayoutLeftHandles"
 
         wv-notice-enabled="vm.enableNotice"
@@ -179,6 +179,7 @@
 
         // Configure the user interface depending on the user angent/browser.
         var userInterfacePolicy = new osimis.UserAgentBasedInterfacePolicy();
+        vm.enableLayoutTop = userInterfacePolicy.enableLayoutTop;
         vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
         vm.enableLayoutTopRight = userInterfacePolicy.enableLayoutTopRight;
         vm.enableToolbar = userInterfacePolicy.enableToolbar;
@@ -191,6 +192,7 @@
         // Listen to changes triggered by the user interface policy.    
         userInterfacePolicy.onUpdate(function() {
             $scope.$apply(function() {
+                vm.enableLayoutTop = userInterfacePolicy.enableLayoutTop;
                 vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
                 vm.enableLayoutTopRight = userInterfacePolicy.enableLayoutTopRight;
                 vm.enableToolbar = userInterfacePolicy.enableToolbar;

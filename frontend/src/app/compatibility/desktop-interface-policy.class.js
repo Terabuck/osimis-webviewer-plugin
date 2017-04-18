@@ -8,6 +8,7 @@
 
         // Set initial UI values
         // 1. Always enable top side
+        this.enableLayoutTop = true;
         this.enableLayoutTopLeft = true;
         this.enableLayoutTopRight = true;
         this.enableToolbar = true;
