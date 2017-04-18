@@ -3,6 +3,15 @@
  * @name webviewer.toolbox.directive:wvToolbox
  * 
  * @restrict Element
+ *
+ * @param {string} [wvPosition='top']
+ * The toolbar position on the screen. Note the toolbar is absolutely
+ * positioned.
+ * 
+ * Can either be:
+ * 
+ * * `top`
+ * * `right`
  */
 (function () {
     'use strict';
@@ -22,6 +31,7 @@
             scope: {
                 buttons: '=wvToolboxButtons', // input + output
                 tool: '=?wvActiveTool', // output (duplicate with buttons as an output
+                position: '=?wvPosition',
                 // - avoid lifecycle ordering issue when switching tool though, for instance
                 // deactivated tool always occurs before the activation of another one)
                 readonly: '=?wvReadonly' // default: false
@@ -33,7 +43,8 @@
         function link(scope, element, attrs) {
             var vm = scope.vm || {};
 
-            vm.readonly = (typeof vm.readonly === 'undefined') ? false : vm.readonly;
+            vm.position = typeof vm.position !== 'undefined' ? vm.position : 'top';
+            vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;
 
             vm.tool = vm.tool || 'zoom';
             vm.state = {
@@ -77,7 +88,7 @@
     }
 
     /* @ngInject */
-    function toolboxCtrl() {
+    function toolboxCtrl($element) {
         var vm = this;
     }
 

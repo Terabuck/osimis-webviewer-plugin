@@ -18,6 +18,14 @@
  * Display the toolbar. Note all tools are disabled when the toolbar is 
  * disabled, including the preselected ones (zooming).
  * 
+ * @param {string} [wvToolbarPosition='top']
+ * The toolbar position on the screen.
+ * 
+ * Can either be:
+ * 
+ * * `top`
+ * * `right`
+ *
  * @param {boolean} [wvSerieslistEnabled=true]
  * Display the list of series based on the `wvStudyId`. 
  * 
@@ -121,6 +129,7 @@
                 seriesId: '=?wvSeriesId',
                 tools: '=?wvTools',
                 toolbarEnabled: '=?wvToolbarEnabled',
+                toolbarPosition: '=?wvToolbarPosition',
                 serieslistEnabled: '=?wvSerieslistEnabled',
                 studyinformationEnabled: '=?wvStudyinformationEnabled',
                 leftHandlesEnabled: '=?wvLefthandlesEnabled',
@@ -148,6 +157,7 @@
 
             // Configure attributes default values
             vm.toolbarEnabled = typeof vm.toolbarEnabled !== 'undefined' ? vm.toolbarEnabled : true;
+            vm.toolbarPosition = typeof vm.toolbarPosition !== 'undefined' ? vm.toolbarPosition : 'top';
             vm.serieslistEnabled = typeof vm.serieslistEnabled !== 'undefined' ? vm.serieslistEnabled : true;
             vm.studyinformationEnabled = typeof vm.studyinformationEnabled !== 'undefined' ? vm.studyinformationEnabled : true;
             vm.leftHandlesEnabled = typeof vm.leftHandlesEnabled !== 'undefined' ? vm.leftHandlesEnabled : true;

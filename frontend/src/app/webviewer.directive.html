@@ -205,6 +205,7 @@
             wv-readonly="vm.readonly"
             wv-toolbox-buttons="vm.tools"
             wv-active-tool="vm.activeTool"
+            wv-position="vm.toolbarPosition"
         ></wv-toolbox>
 
         <!--
@@ -214,7 +215,8 @@
             wv-layout="vm.tools.layout"
 
             ng-class="{
-                'wvLayout__splitpane--toolbarpadding': vm.toolbarEnabled
+                'wvLayout__splitpane--toolbarAtTop': vm.toolbarEnabled && vm.toolbarPosition === 'top',
+                'wvLayout__splitpane--toolbarAtRight': vm.toolbarEnabled && vm.toolbarPosition === 'right'
             }"
         >
              <wv-pane-policy

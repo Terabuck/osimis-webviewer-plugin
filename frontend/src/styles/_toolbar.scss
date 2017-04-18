@@ -1,0 +1,30 @@
+.wvToolbar {
+    position: absolute;
+
+    // Make sure the main layout appears behind the toolbar. Button will 
+    // therefore always be clickable even when the windows is small and the
+    // toolbar is split in two vertical bars, one of which appearing on top
+    // of the layout main zone.
+    z-index: 5;
+}
+
+.wvToolbar--top {
+    top: 0;
+    height: $toolbarHeight;
+
+    // Position the toolbar to the right (even if it's positioned
+    // horizontally).
+    right: 0;
+    text-align: right;
+}
+
+.wvToolbar--right {
+    right: 0;
+    width: $toolbarHeight;
+}
+
+.wvToolbar--right .wvViewer__button.wvViewer__button--rotate, label.wvViewer__button.wvViewer__button--rotate.fa { // make sure we have more precedence than .fa class
+    // Align rotated button position when toolbar is positioned at right.
+    left: 0;
+    top: 5px;
+}
