@@ -12,6 +12,9 @@
  * When this parameter is enabled, the study's items can be selected by the
  * end-user using the left mouse click.
  *
+ * @param {boolean} [wvStudyDownloadEnabled=false]
+ * Display a button to download the study.
+ *
  * @param {Array<string>} [wvSelectedSeriesIds=EmptyArray]
  * An array containing the ids of the selected series.
  * 
@@ -43,10 +46,10 @@
             scope: {
                 studyId: '=wvStudyId',
                 seriesItemSelectionEnabled: '=?wvSeriesItemsSelectionEnabled', // default: false
+                studyDownloadEnabled: '=?wvStudyDownloadEnabled',
                 selectedSeriesIds: '=?wvSelectedSeriesIds',
                 selectedReportIds: '=?wvSelectedReportIds',
                 selectedVideoIds: '=?wvSelectedVideoIds'
-
             },
             templateUrl: 'app/study/study-island.directive.html'
         };
@@ -55,9 +58,18 @@
         function link(scope, element, attrs) {
             var vm = scope.vm;
 
-            // load study informations
+            // Default values.
             vm.studyTags = {};
             vm.patientTags = {};
+            vm.studyDownloadEnabled = typeof vm.studyDownloadEnabled !== 'undefined' ? vm.studyDownloadEnabled : false;
+
+            // Selection-related.
+            vm.seriesItemSelectionEnabled = typeof vm.seriesItemSelectionEnabled !== 'undefined' ? vm.seriesItemSelectionEnabled : false;
+            vm.selectedSeriesIds = vm.selectedSeriesIds || [];
+            vm.selectedReportIds = vm.selectedReportIds || [];
+            vm.selectedVideoIds = vm.selectedVideoIds || [];
+
+            // Load study informations.
             scope.$watch('vm.studyId', function(newStudyId) {
                 if (!newStudyId) return; // @todo hide directive
 
@@ -80,12 +92,6 @@
                         vm.patientTags.PatientBirthDate = vm.patientTags.PatientBirthDate && _convertDate(vm.patientTags.PatientBirthDate);
                     });
             });
-
-            // Selection-related
-            vm.seriesItemSelectionEnabled = typeof vm.seriesItemSelectionEnabled !== 'undefined' ? vm.seriesItemSelectionEnabled : false;
-            vm.selectedSeriesIds = vm.selectedSeriesIds || [];
-            vm.selectedReportIds = vm.selectedReportIds || [];
-            vm.selectedVideoIds = vm.selectedVideoIds || [];
         }
     }
 

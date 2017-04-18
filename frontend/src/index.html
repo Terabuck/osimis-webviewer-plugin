@@ -50,19 +50,8 @@
         wv-annotationstorage-enabled="vm.enableAnnotationStorage"
         wv-series-item-selection-enabled="vm.seriesItemSelectionEnabled"
         wv-selected-series-items="vm.selectedSeriesItems"
+        wv-study-download-enabled="vm.enableStudyDownload"
     >
-        <!-- Download Study Button -->
-        <wv-layout-top-right
-            wv-enabled="!vm.isMobile &&
-                        vm.enableLayoutTopRight &&
-                        vm.enableStudyDownload &&
-                        vm.selectedStudyIds.length"
-        >
-            <wv-study-download-button
-                ng-if="!vm.isMobile && vm.enableStudyDownload && vm.selectedStudyIds.length"
-                wv-study-id="vm.selectedStudyIds[0]"
-            ></wv-study-download-button>
-        </wv-layout-top-right>
     </wv-webviewer>
 
     <!-- build:js js/lib.js -->

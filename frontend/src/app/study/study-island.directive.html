@@ -1,7 +1,14 @@
 <div class="wvStudyIsland">
     <div class="wvStudyIsland__header">
+        <!-- Title -->
         <span ng-if="vm.studyTags.StudyDescription">{{vm.studyTags.StudyDescription}}</span>
         <small ng-if="vm.studyTags.StudyDate">({{vm.studyTags.StudyDate}})</small>
+
+        <!-- Actions -->
+        <wv-study-download-button
+            ng-if="vm.studyDownloadEnabled"
+            wv-study-id="vm.studyId"
+        ></wv-study-download-button>
     </div>
 
     <!-- List of series -->
