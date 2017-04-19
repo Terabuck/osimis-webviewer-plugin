@@ -5,6 +5,7 @@ def isUserDevBranch = env.BRANCH_NAME != "dev" && env.BRANCH_NAME != "master" &&
 
 def userInput = [
     buildDocker: true,
+    launchDockerTests: true,
     buildWindows: isUserDevBranch ? false : true,
     buildOSX: isUserDevBranch ? false : true,
     syncS3DicomSamples: false
@@ -25,6 +26,7 @@ else {
             userInput = input(
                 id: 'userInput', message: 'Configure build', parameters: [
                     [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildDocker'], description: 'Build Docker (/!\\ false -> disable tests & deployment)', name: 'buildDocker'],
+                    [$class: 'BooleanParameterDefinition', defaultValue: userInput['launchDockerTests'], description: 'Launch Docker Tests (including JS Unit Tests & Integration Tests)', name: 'launchDockerTests'],
                     [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildWindows'], description: 'Build Windows', name: 'buildWindows'],
                     [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildOSX'], description: 'Build OSX', name: 'buildOSX'],
                     [$class: 'BooleanParameterDefinition', defaultValue: userInput['syncS3DicomSamples'], description: 'Sync S3 DICOM samples', name: 'syncS3DicomSamples']
@@ -141,14 +143,16 @@ lock(resource: 'webviewer', inversePrecedence: false) {
                 }}}
             }
 
-            stage('Test: unit + integration') {
-                node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
-                    // @note Requires the built docker image to work
-                    // @todo use root docker-compose.yml instead
-                    sh 'scripts/ci/ciPrepareTests.sh'
-                    sh 'scripts/ci/ciRunCppTests.sh'
-                    sh 'scripts/ci/ciRunJsTests.sh'
-                }}}
+            if (userInput['launchDockerTests']) {
+                stage('Test: unit + integration') {
+                    node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+                        // @note Requires the built docker image to work
+                        // @todo use root docker-compose.yml instead
+                        sh 'scripts/ci/ciPrepareTests.sh'
+                        sh 'scripts/ci/ciRunCppTests.sh'
+                        sh 'scripts/ci/ciRunJsTests.sh'
+                    }}}
+                }
             }
         })
     }
