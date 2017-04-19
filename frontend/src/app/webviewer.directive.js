@@ -48,6 +48,9 @@
  * * Using the toolbar & tools
  * * Scrolling through the series via the mousewheel
  *
+ * @param {boolean} [wvVideoDisplayEnabled=true]
+ * Display videos in the serieslist.
+ *
  * @param {boolean} [wvAnnotationstorageEnabled=true]
  * Retrieve annotations from storage. Store annotations to storage
  * automatically. This should be set to false when `wvReadonly` is true.
@@ -98,6 +101,7 @@
                 leftHandlesEnabled: '=?wvLefthandlesEnabled',
                 noticeEnabled: '=?wvNoticeEnabled',
                 noticeText: '=?wvNoticeText',
+                videoDisplayEnabled: '=?wvVideoDisplayEnabled',
                 annotationStorageEnabled:  '=?wvAnnotationstorageEnabled'
             },
             transclude: {
@@ -141,6 +145,8 @@
                 rotateleft: false,
                 rotateright: false
             };
+            vm.annotationStorageEnabled = typeof vm.annotationStorageEnabled !== 'undefined' ? vm.annotationStorageEnabled : false;
+            vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
     
             // Activate mobile interaction tools on mobile (not tablet)
             var uaParser = new UAParser();

@@ -5,7 +5,10 @@
  * @restrict Element
  *
  * @scope
- */
+ * 
+ * @param {boolean} [wvVideoDisplayEnabled=true]
+ * Display videos in the serieslist.
+*/
 (function() {
     'use strict';
 
@@ -24,7 +27,8 @@
             scope: {
                 studyId: '=wvStudyId',
                 selectedReportId: '=?wvSelectedReportId', // at the moment, true === an DICOM pdf id which end user has clicked on
-                onStudyLoaded: '&?wvOnStudyLoaded' // For testing convenience
+                onStudyLoaded: '&?wvOnStudyLoaded', // For testing convenience
+                videoDisplayEnabled: '=?wvVideoDisplayEnabled'
             },
             templateUrl: 'app/serieslist/serieslist.directive.html'
         };
@@ -37,6 +41,7 @@
             vm.seriesIds = [];
             vm.pdfInstanceIds = [];
             vm.videos = [];
+            vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
 
             // Adapt serieslist on input change.
             scope.$watch('vm.studyId', _setStudy);

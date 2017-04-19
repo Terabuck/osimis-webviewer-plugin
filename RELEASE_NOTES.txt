@@ -3,6 +3,9 @@ Pending changes in the mainline
 
 * Watch MPEG-4 (non-bd) video embedded in DICOM instances.
 
+New options:
+  - `VideoDisplayEnabled` option is now available in the orthanc config file.
+
 Breaking Changes:
 * New routes used:
   - /<orthanc>/instances/<video-instance-uid>/frames/0/raw
@@ -24,7 +27,6 @@ Fixes:
 Optimization:
 * Improved overall performance
 * Increase thumbnail image quality. Quality: from 80% to 100%. Resolution: from 150x150 to 300x300.
-
 
 Version 0.6.1
 ========================
