@@ -47,21 +47,25 @@ public:
 
   // Frontend Variables
   bool studyDownloadEnabled;
+  bool videoDisplayEnabled;
   bool annotationStorageEnabled;
 
   WebViewerConfiguration(OrthancPluginContext* context) : _context(context) {
-    // By default, disable storage attachment cache 
+    // By default, disable storage attachment cache.
     cachedImageStorageEnabled = false;
 
-    // By default, use GDCM
+    // By default, use GDCM.
     gdcmEnabled = true;
-    // By default, use GDCM for everything
+    // By default, use GDCM for everything.
     restrictTransferSyntaxes = false;
 
-    // By default, show the study download button in the frontend
+    // By default, show the study download button in the frontend.
     studyDownloadEnabled = true;
 
-    // By default, disable annotation storage
+    // By default, display DICOM video in the frontend.
+    videoDisplayEnabled = true;
+
+    // By default, disable annotation storage.
     annotationStorageEnabled = false;
   }
 
@@ -82,6 +86,7 @@ public:
    *         "db": x.x.x
    *       },
    *       "enableStudyDownload": true,
+   *       "enableVideoDisplay": true
    *       "enableAnnotationStorage": false
    *     }
    *     ```

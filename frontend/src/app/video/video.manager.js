@@ -21,7 +21,7 @@
              * @ngdoc method
              * @methodOf webviewer.service:wvVideoManager
              * 
-             * @name osimis.wvVideoManager#get
+             * @name osimis.VideoManager#get
              * 
              * @param {string} instanceId
              * Id of the DICOM instance embedding the PDF (in the orthanc
@@ -38,7 +38,7 @@
              * @ngdoc method
              * @methodOf webviewer.service:wvVideoManager
              * 
-             * @name osimis.wvVideoManager#listFromOrthancStudyId
+             * @name osimis.VideoManager#listFromOrthancStudyId
              * 
              * @param {string} studyId
              * Id of the study (in the orthanc format).
@@ -59,7 +59,7 @@
              * @ngdoc method
              * @methodOf webviewer.service:wvVideoManager
              *
-             * @name osimis.wvVideoManager#setVideoInstanceIdsForStudyId
+             * @name osimis.VideoManager#setVideoInstanceIdsForStudyId
              * 
              * @param {string} studyId
              * Id of the study (in orthanc format) containing the DICOM 
