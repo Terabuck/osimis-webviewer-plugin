@@ -2,9 +2,8 @@
     <div class="wvStudyInformationBreadcrumb__patient">
         <span
             class="wvStudyInformationBreadcrumb__patientName"
-            ng-if="vm.patientTags.PatientName"
         >
-            {{vm.patientTags.PatientName}}
+            {{vm.patientTags.PatientName || 'Undefined patient'}}
         </span>
         <small
             class="wvStudyInformationBreadcrumb__patientBirthDate"
@@ -16,9 +15,8 @@
     <div class="wvStudyInformationBreadcrumb__study">
         <span
             class="wvStudyInformationBreadcrumb__studyDescription"
-            ng-if="vm.studyTags.StudyDescription"
         >
-            {{vm.studyTags.StudyDescription}}
+            {{vm.studyTags.StudyDescription || 'Undefined study'}}
         </span>
         <small
             class="wvStudyInformationBreadcrumb__studyDate"
