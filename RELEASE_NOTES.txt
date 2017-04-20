@@ -1,9 +1,16 @@
 Pending changes in the mainline
 ===============================
 
-* Watch MPEG-4 (non-bd) video embedded in DICOM instances.
+Version 0.8.0
+========================
 
-New options:
+=> Minimum Orthanc version: 1.1.0 <=
+
+Features:
+* Watch MPEG-4 (non-bd) video embedded in DICOM instances.
+  Videos do not load on Mobile and Safari.
+
+Options:
   - `VideoDisplayEnabled` option is now available in the orthanc config file.
 
 Breaking Changes:
