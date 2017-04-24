@@ -3,7 +3,11 @@
     target="_self"
     ng-href="{{vm.downloadLink}}"
     ng-if="!!vm.studyId"
+
+    bs-tooltip
+    container="body"
+    title="Download Study"
+    placement="right"
 >
-    <span class="glyphicon glyphicon-download wvButton__icon"></span>
-    download study
+    <!-- download --> <span class="glyphicon glyphicon-download"></span>
 </a>

@@ -15,6 +15,14 @@
  * @param {boolean} [wvStudyDownloadEnabled=false]
  * Display a button to download the study.
  *
+ * @param {string} [wvDisplayMode='grid']
+ * Display mode of the items.
+ *
+ * The value can either be:
+ *
+ * * `grid` The items are shown in a grid format.
+ * * `list` The items are shown in a list format.
+ * 
  * @param {Array<string>} [wvSelectedSeriesIds=EmptyArray]
  * An array containing the ids of the selected series.
  * 
@@ -45,8 +53,11 @@
             restrict: 'E',
             scope: {
                 studyId: '=wvStudyId',
-                itemSelectionEnabled: '=?wvItemSelectionEnabled',
                 studyDownloadEnabled: '=?wvStudyDownloadEnabled',
+                displayMode: '=?wvDisplayMode',
+
+                // Selection-related
+                itemSelectionEnabled: '=?wvItemSelectionEnabled',
                 selectedSeriesIds: '=?wvSelectedSeriesIds',
                 selectedReportIds: '=?wvSelectedReportIds',
                 selectedVideoIds: '=?wvSelectedVideoIds'
@@ -62,7 +73,7 @@
             vm.studyTags = {};
             vm.patientTags = {};
             vm.studyDownloadEnabled = typeof vm.studyDownloadEnabled !== 'undefined' ? vm.studyDownloadEnabled : false;
-            vm.displayMode = 'list'; // either `grid` or `list`
+            vm.displayMode = typeof vm.displayMode !== 'undefined' ? vm.displayMode : 'grid'; // either `grid` or `list`
 
             // Selection-related.
             vm.itemSelectionEnabled = typeof vm.itemSelectionEnabled !== 'undefined' ? vm.itemSelectionEnabled : false;

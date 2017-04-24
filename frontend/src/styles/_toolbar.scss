@@ -1,11 +1,5 @@
 .wvToolbar {
     position: absolute;
-
-    // Make sure the main layout appears behind the toolbar. Button will 
-    // therefore always be clickable even when the windows is small and the
-    // toolbar is split in two vertical bars, one of which appearing on top
-    // of the layout main zone.
-    z-index: 5;
 }
 
 .wvToolbar--top {
@@ -16,15 +10,30 @@
     // horizontally).
     right: 0;
     text-align: right;
+
+    // Allow user to scroll through the toolbar if screen is too small. Note we
+    // can't use z-index properly to show buttons on top of the viewer, as any
+    // popover will appear behind them (even with higher z-index) due to an
+    // overflow property hidden somewhere.
+    overflow-y: auto;
+    overflow-x: visible;
+    white-space: nowrap;
+    max-width: 100%;
 }
 
 .wvToolbar--right {
     right: 0;
-    width: $toolbarHeight;
+    width: 32px; // != $toolbarHeight since we're in the reverse order.
+
+    // Allow user to scroll through the toolbar if screen is too small. 
+    overflow-x: auto;
+    overflow-y: visible;
+    height: 100%;
 }
 
-.wvToolbar--right .wvViewer__button.wvViewer__button--rotate, .wvToolbar--right label.wvViewer__button.wvViewer__button--rotate.fa { // make sure we have more precedence than .fa class
+.wvToolbar--right .wvButton--rotate, .wvToolbar--right .wvButton--rotate.fa { // make sure we have more precedence than .fa class
     // Align rotated button position when toolbar is positioned at right.
-    left: 0;
+    left: -5px;
     top: 5px;
+    min-width: 42px;
 }

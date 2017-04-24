@@ -1,8 +1,15 @@
-$pictureSize: 64px;
-.serieList__picture{
-    position:relative;
+$pictureSize: 6.5rem;
+.wvSerieslist__picture{
+    display: inline-block;
+    font-size: 14px;
+    width: $pictureSize;
+    height: $pictureSize;
+    position: relative;
+
+    // Move picture behind the `toggle layout@ left` button.
+    z-index: -1;
 }
-.serieList__badge{
+.wvSerieslist__badge{
     position: absolute;
     bottom:5px;
     right:5px;
@@ -16,11 +23,14 @@ $pictureSize: 64px;
     text-align: center;
     font-weight: bold;
 }
-.serieList__informations{
+.wvSerieslist__information{
+    font-size: 14px;
+    float: right;
+    padding-left: 1rem;
     width: calc(100% - #{$pictureSize});
     height: $pictureSize;
 }
-.serieList__label{
+.wvSerieslist__label{
     white-space: nowrap;
     width:calc(100% - 10px);
     overflow:hidden;
@@ -28,52 +38,54 @@ $pictureSize: 64px;
     line-height:$pictureSize/2;
     vertical-align: middle;
 }
-.serieList__timeline{
-    //border-top: 1px solid rgba(255,255,255,0.2);
+.wvSerieslist__timeline{
+    //border-top: 0.1rem solid rgba(255,255,255,0.2);
     height:$pictureSize/2;
     line-height:$pictureSize/2;
     vertical-align: middle;
 }
 
 .wvSerieslist__seriesItem {
+    // anchor
+    position: relative;
+
     // unstyle list
     padding-left: 0;
     list-style: none;
+    font-size: 0;
 
-    /* mimic on hover border for draggable */
-    border-right: 1px solid transparent;
-    border-left: 1px solid transparent;
-    border-top: 1px solid transparent;
-    border-bottom: 1px solid transparent;
+    // mimic on hover border for draggable
+    border-right: 0.2rem solid transparent;
+    border-left: 0.2rem solid transparent;
+    border-top: 0.2rem solid transparent;
+    border-bottom: 0.2rem solid transparent;
+    border-corner-shape: notch;
 
     line-height: 0px;
+    margin: 0.1rem;
 }
 
 .wvSerieslist__seriesItem--list {
     display: block;
-
-    border-right: 1px solid #222; 
-    margin-bottom: 2px;
 }
 .wvSerieslist__seriesItem--grid {
     display: inline-block;
-    margin-left: 1px;
-    margin-bottom: 1px;
 }
 
 .wvSerieslist__seriesItem--activated,
 .wvSerieslist__videoItem--activated,
 .wvSerieslist__pdfItem--activated {
-    border: 1px solid #999 !important;
+    border: 0.2rem solid hsla(204, 70%, 53%, 1) !important;
 }
 
 
-.wv-serieslist {
+.wvSerieslist {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+/*
 .wv-serieslist-item {
   position: relative; // anchor element
 
@@ -98,10 +110,10 @@ $pictureSize: 64px;
   background-color: rgba(0,0,0,0.5);
   text-align: center;
   padding: 0.5em;
-  border: 1px solid rgba(255, 255, 255, 0.13);
+  border: 0.1rem solid rgba(255, 255, 255, 0.13);
 }
+*/
 
-// Report icon
 .wvSerieslist__seriesItem--selectable {
   // Pointer cursor (for `ng-click`)
   cursor: pointer !important;
@@ -112,34 +124,25 @@ $pictureSize: 64px;
   }
 }
 
-.wv-serieslist-reporticon, .wv-serieslist-reporticon.fa { // Make sure it has precedence over .fa class {
+.wvSerieslist__placeholderIcon, .wvSerieslist__placeholderIcon.fa { // Make sure it has precedence over .fa class {
+  position: absolute;
+
   // Fill the li element 
   width: 100%;
   height: 100%;
 
   // Fill the li element with the fontawesome icon
-  font-size: 4em;
-  line-height: 1.25em;
+  font-size: $pictureSize/2;
+  line-height: $pictureSize;
   text-align: center;
 }
 
-// No-report icon & label
-.wv-serieslist-noreport {
+.wvSerieslist__placeholderIcon--strikeout, .wvSerieslist__placeholderIcon--strikeout.fa { // Make sure it has precedence over .fa class
   // Grey out (since no report is available)
-  color: #555;
-}
-.wv-serieslist-noreporticon, .wv-serieslist-noreporticon.fa { // Make sure it has precedence over .fa class
-  // Fill the li element 
-  width: 100%;
-  height: 100%;
-
-  // Fill the li element with the fontawesome icon
-  font-size: 4em;
-  line-height: 1.25em;
-  text-align: center;
+  color: #c3c3c3;
 
   // Diagonal line crossing report icon (to tell none are available)
-  position: relative;
+  // position: relative;
 
   &::after { // use after to not conflicts with font-awesome :before
     position: absolute;
@@ -148,7 +151,7 @@ $pictureSize: 64px;
     top: 50%;
     right: 0;
     
-    transform:rotate(-45deg);
+    transform: rotate(-45deg) scaleX(0.9);
 
     border-top: 5px solid;
     border-color: inherit;
