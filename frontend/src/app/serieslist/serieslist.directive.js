@@ -49,7 +49,7 @@
         .directive('wvSerieslist', wvSerieslist);
 
     /* @ngInject */
-    function wvSerieslist($q, wvSeriesManager, wvVideoManager, wvPdfInstanceManager) {
+    function wvSerieslist($q, wvSeriesManager, wvVideoManager, wvPdfInstanceManager, wvPaneManager) {
         var directive = {
             bindToController: true,
             controller: SerieslistVM,
@@ -88,6 +88,9 @@
                 vm.selectedReportIds = [];
                 vm.selectedVideoIds = [];
                 vm.loaded = false;
+
+                // Databind viewed items.
+                vm.paneManager = wvPaneManager;
 
                 wvSeriesManager
                     .listFromOrthancStudyId(id)

@@ -398,6 +398,21 @@
         }
     }
 
+    /**
+     * @ngdoc method
+     * @methodOf osimis.ImageBinariesCache
+     *
+     * @name osimis.ImageBinariesCache#reset
+     * 
+     * @description
+     * Reset the cache. Meant mainly for testing.
+     */
+    ImageBinariesCache.prototype.reset = function() {
+        this._cache = {};
+        this._binarySizes = {};
+        // this._referenceCount = {};
+    }
+
     module.ImageBinariesCache = ImageBinariesCache;
 
 })(this.osimis || (this.osimis = {}));

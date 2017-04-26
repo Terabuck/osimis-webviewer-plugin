@@ -117,6 +117,11 @@
 .wvButton--border {
     @extend .wvButton;
 
+    // Prevent multi line buttons.
+    max-height: 2.8rem;
+    max-width: 100%;
+    overflow: hidden;
+
     // Set margin
     margin: 0.6rem;
     margin-left: 0rem;

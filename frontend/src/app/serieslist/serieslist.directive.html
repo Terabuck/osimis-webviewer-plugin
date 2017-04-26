@@ -16,9 +16,7 @@
             'wvSerieslist__pdfItem--activated': vm.selectionEnabled && vm.selectedReportIds.indexOf(id) !== -1
         }"
         wv-draggable-item="{
-            reportId: id,
-            videoId: null,
-            seriesId: null
+            reportId: id
         }"
         ng-click="vm.toggleReportSelection(id)"
 
@@ -29,6 +27,10 @@
     >
         <div class="wvSerieslist__picture">
             <span class="wvSerieslist__placeholderIcon fa fa-file-text"></span>
+            
+            <span ng-if="vm.paneManager.hasReportBeenViewed(id)" class="wvSerieslist__badge mr40 mb40">
+                <i class="fa fa-eye" aria-hidden="true"></i>
+            </span>
         </div>
         <div 
             ng-if="vm.displayMode === 'list'"
@@ -72,9 +74,7 @@
         ng-show="vm.loaded && vm.videos.length > 0"
         ng-repeat="$video in vm.videos track by $video.id"
         wv-draggable-item="{
-            reportId: null,
-            videoId: $video.id,
-            seriesId: null
+            videoId: $video.id
         }"
         ng-click="vm.toggleSelection($video.id)"
 
@@ -85,6 +85,10 @@
     >
         <div class="wvSerieslist__picture">
             <span class="wvSerieslist__placeholderIcon fa fa-video-camera"></span>
+            
+            <span ng-if="vm.paneManager.hasVideoBeenViewed($video.id)" class="wvSerieslist__badge mr40 mb40">
+                <i class="fa fa-eye" aria-hidden="true"></i>
+            </span>
         </div>
         <div 
             ng-if="vm.displayMode === 'list'"
@@ -104,11 +108,9 @@
         }"
         ng-show="vm.loaded"
         wv-draggable-item="{
-            reportId: null,
-            videoId: null,
             seriesId: $series.id,
-            imageIndex: 0,
-            csViewport: null
+            csViewport: null,
+            imageIndex: 0
         }"
         ng-click="vm.toggleSeriesSelection($series.id)"
 
@@ -125,6 +127,10 @@
                 wv-enable-overlay="false"
             ></wv-viewport>
             <div class="wvSerieslist__badge">{{$series.imageCount}}</div>
+            
+            <span ng-if="vm.paneManager.hasSeriesBeenViewed($series.id)" class="wvSerieslist__badge mr40 mb40">
+                <i class="fa fa-eye" aria-hidden="true"></i>
+            </span>
         </div>
         <div 
             ng-if="vm.displayMode === 'list'"

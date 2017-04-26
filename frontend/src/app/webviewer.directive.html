@@ -104,7 +104,7 @@
         <wv-layout-left1>
             <!-- Study Picker -->
             <wv-studylist 
-                class="float__left"
+                class="float__left" style="max-width: calc(100% - 4.5rem);"
                 ng-if="vm.serieslistEnabled"
                 wv-readonly="vm.readonly"
                 wv-pickable-study-ids="vm.pickableStudyIds"
@@ -263,38 +263,36 @@
              <wv-pane-policy
                 wv-pane-index="$index"
                 wv-pane-position="$position"
-                wv-on-pane-added="vm.configureViewport($index)"
-                wv-on-pane-removed="vm.cleanupViewport($index)"
 
-                wv-on-item-dropped="!vm.readonly && vm.setViewport($index, $data);"
+                wv-on-item-dropped="!vm.readonly && vm.setPane($index, $data);"
              >
                 <!--
                 PDF Report
                 -->
                 <wv-pdf-viewer
-                    ng-if="vm.viewports[$index].reportId"
-                    wv-report-id="vm.viewports[$index].reportId"
+                    ng-if="vm.panes[$index].reportId"
+                    wv-report-id="vm.panes[$index].reportId"
                 ></wv-pdf-viewer>
 
                 <!--
                 Video
                 -->
                 <wv-video
-                    ng-if="!!vm.viewports[$index].videoId"
-                    wv-video-id="vm.viewports[$index].videoId"
+                    ng-if="!!vm.panes[$index].videoId"
+                    wv-video-id="vm.panes[$index].videoId"
                 ></wv-video>
 
                 <!--
                 Viewport
                 -->
                 <wv-viewport
-                    ng-if="!!vm.viewports[$index].seriesId"
-                    vp:series-id="vm.viewports[$index].seriesId" wv-size="{width: 1.0, height: 1.0}" wv-lossless="true"
+                    ng-if="!!vm.panes[$index].seriesId"
+                    vp:series-id="vm.panes[$index].seriesId" wv-size="{width: 1.0, height: 1.0}" wv-lossless="true"
                     wv-series="$series" wv-image="$image"
                     wv-droppable-series-ext="!vm.readonly && vm.serieslistEnabled"
                     wv-scroll-on-wheel-series-ext="!vm.readonly"
-                    wv-viewport="vm.viewports[$index].csViewport"
-                    wv-image-index="vm.viewports[$index].imageIndex"
+                    wv-viewport="vm.panes[$index].csViewport"
+                    wv-image-index="vm.panes[$index].imageIndex"
 
                     wv-mobile-viewport-tool="!vm.readonly && vm.mobileInteraction"
                     wv-windowing-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.windowing"
@@ -306,7 +304,7 @@
                     wv-pixel-probe-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.pixelprobe"
                     wv-rectangle-roi-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.rectangleroi"
 
-                    wv-invert-contrast-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.invert"
+                    wv-invert-contrast-viewport-tool="!vm.mobileInteraction && vm.tools.invert"
 
                     wv-rotateleft-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.rotateleft"
                     wv-rotateright-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.rotateright"
@@ -316,7 +314,7 @@
                     <!--
                     Overlay
                     -->
-                    <wv-overlay ng-if="vm.tools.overlay" wv-tags="$image.tags" wv-viewport="vm.viewports[$index].csViewport"></wv-overlay>
+                    <wv-overlay ng-if="vm.tools.overlay" wv-tags="$image.tags" wv-viewport="vm.panes[$index].csViewport"></wv-overlay>
 
                     <!--
                     Timeline.
@@ -335,9 +333,9 @@
                 -->
                 <wv-droppable-series-overlay-item
                     ng-if="
-                        !vm.viewports[$index].videoId &&
-                        !vm.viewports[$index].seriesId &&
-                        !vm.viewports[$index].reportId
+                        !vm.panes[$index].videoId &&
+                        !vm.panes[$index].seriesId &&
+                        !vm.panes[$index].reportId
                     "
                 ></wv-droppable-series-overlay-item>
             </wv-pane-policy>

@@ -115,7 +115,7 @@
         .directive('wvWebviewer', wvWebviewer);
 
     /* @ngInject */
-    function wvWebviewer($rootScope, wvStudyManager, wvAnnotationManager, wvSeriesManager) {
+    function wvWebviewer($rootScope, wvStudyManager, wvAnnotationManager, wvSeriesManager, wvPaneManager) {
         var directive = {
             bindToController: true,
             controller: Controller,
@@ -305,32 +305,17 @@
             var uaParser = new UAParser();
             vm.mobileInteraction = uaParser.getDevice().type === 'mobile';
 
-            // Store each viewports' states at this level
-            // so they can be either later changed by external means (ie. Lify
-            // want to retrieve which series is being seen for analysis) or
-            // saved for liveshare for instance. 
-            vm.viewports = [];
-            vm.configureViewport = function(index) {
-                vm.viewports[index] = {
-                    seriesId: index === 0 ? vm.seriesId : undefined,
-                    csViewport: null,
-                    imageIndex: 0
-                };
-            };
-            vm.cleanupViewport = function(index) {
-                vm.viewports[index] = undefined; // don't use splice since it changes the indexes from the array
-            };
+            // Store each panes' states.
+            vm.panes = wvPaneManager.panes;
 
-            // Helper to set the content of a viewport. It also provide a nice
-            // way to register consulted series.
-            vm.setViewport = function(index, config) {
-                // Change viewport's configuration.
-                var viewport = vm.viewports[index];
-                viewport.reportId   = config.reportId !== undefined   ? config.reportId   : viewport.reportId;
-                viewport.videoId    = config.videoId !== undefined    ? config.videoId    : viewport.videoId;
-                viewport.seriesId   = config.seriesId !== undefined   ? config.seriesId   : viewport.seriesId;
-                viewport.imageIndex = config.imageIndex !== undefined ? config.imageIndex : viewport.imageIndex;
-                viewport.csViewport = config.csViewport !== undefined ? config.csViewport : viewport.csViewport;
+            // Keep pane layout model in sync.
+            scope.$watch('vm.tools.layout', function(layout) {
+                // Update panes' layout.
+                wvPaneManager.setLayout(layout.x, layout.y);
+            });
+            vm.setPane = function(index, config) {
+                // Change pane's configuration.
+                wvPaneManager.setPane(index, config);
             };
 
             // Enable/Disable annotation storage/retrieval from backend
@@ -389,7 +374,7 @@
             // Propagate series preloading events
             // @todo Add on-series-dropped callback and move out the rest of the events from wv-droppable-series.
             // @todo Only watch seriesIds & remove deep watch (opti).
-            scope.$watch('vm.viewports', function(newViewports, oldViewports) {
+            scope.$watch('vm.panes', function(newViewports, oldViewports) {
                 for (var i=0; i<newViewports.length || i<oldViewports.length; ++i) {
                     // Ignore changes unrelated to seriesId
                     if (oldViewports[i] && newViewports[i] && oldViewports[i].seriesId === newViewports[i].seriesId
@@ -427,15 +412,15 @@
 
             // Adapt the first viewport to new seriesId
             scope.$watch('vm.seriesId', function(newSeriesId, oldSeriesId) {
-                if (vm.viewports[0]) {
+                if (vm.panes[0]) {
                     // Change the series id
-                    vm.viewports[0].seriesId = newSeriesId;
+                    vm.panes[0].seriesId = newSeriesId;
 
                     // Reset image index
-                    vm.viewports[0].imageIndex = 0;
+                    vm.panes[0].imageIndex = 0;
 
                     // Reset the viewport data
-                    vm.viewports[0].csViewport = null;
+                    vm.panes[0].csViewport = null;
                 }
             });
         }

@@ -218,7 +218,18 @@
         var image = this._image;
         if (this._lastLoadedImageQuality) {
             if (destroyedQualities.indexOf(this._lastLoadedImageQuality) === -1) {
-                image.freeBinary(this._lastLoadedImageQuality);
+                try {
+                    image.freeBinary(this._lastLoadedImageQuality);
+                }
+                catch(e) {
+                    // Rethrow exception in another code flow, so an
+                    // exception doesn't prevent the code from working
+                    // (useful when debugging).
+                    setTimeout(function() {
+                        throw e;
+                    });
+                }
+                
                 destroyedQualities.push(this._lastLoadedImageQuality);
             }
             image = null;
