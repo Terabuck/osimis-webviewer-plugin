@@ -321,6 +321,18 @@
                 vm.viewports[index] = undefined; // don't use splice since it changes the indexes from the array
             };
 
+            // Helper to set the content of a viewport. It also provide a nice
+            // way to register consulted series.
+            vm.setViewport = function(index, config) {
+                // Change viewport's configuration.
+                var viewport = vm.viewports[index];
+                viewport.reportId   = config.reportId !== undefined   ? config.reportId   : viewport.reportId;
+                viewport.videoId    = config.videoId !== undefined    ? config.videoId    : viewport.videoId;
+                viewport.seriesId   = config.seriesId !== undefined   ? config.seriesId   : viewport.seriesId;
+                viewport.imageIndex = config.imageIndex !== undefined ? config.imageIndex : viewport.imageIndex;
+                viewport.csViewport = config.csViewport !== undefined ? config.csViewport : viewport.csViewport;
+            };
+
             // Enable/Disable annotation storage/retrieval from backend
             scope.$watch('vm.annotationStorageEnabled', function(isEnabled, wasEnabled) {
                 if (isEnabled) {
@@ -340,6 +352,13 @@
                 // called at initialization.
                 if (_.isEqual(newValues, oldValues)) {
                     oldValues = [];
+                }
+
+                // If selected study is not in selectable ones, adapt
+                // selectables studies. This may sometime happens due to sync
+                // delay.
+                if (_.intersection(newValues, vm.pickableStudyIds).length !== newValues.length) {
+                    vm.pickableStudyIds = newValues;
                 }
 
                 // Cancel previous preloading

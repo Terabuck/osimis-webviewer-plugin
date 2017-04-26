@@ -266,13 +266,7 @@
                 wv-on-pane-added="vm.configureViewport($index)"
                 wv-on-pane-removed="vm.cleanupViewport($index)"
 
-                wv-on-item-dropped="
-                    vm.viewports[$index].reportId   = !vm.readonly && $data.reportId !== undefined   ? $data.reportId   : vm.viewports[$index].reportId;
-                    vm.viewports[$index].videoId    = !vm.readonly && $data.videoId !== undefined    ? $data.videoId    : vm.viewports[$index].videoId;
-                    vm.viewports[$index].seriesId   = !vm.readonly && $data.seriesId !== undefined   ? $data.seriesId   : vm.viewports[$index].seriesId;
-                    vm.viewports[$index].imageIndex = !vm.readonly && $data.imageIndex !== undefined ? $data.imageIndex : vm.viewports[$index].imageIndex;
-                    vm.viewports[$index].csViewport = !vm.readonly && $data.csViewport !== undefined ? $data.csViewport : vm.viewports[$index].csViewport;
-                "
+                wv-on-item-dropped="!vm.readonly && vm.setViewport($index, $data);"
              >
                 <!--
                 PDF Report

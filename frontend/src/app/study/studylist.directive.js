@@ -46,7 +46,7 @@
                     // @todo Move this inside a study model
                     scope.studies.forEach(function(v) {
                         var studyId = v.value;
-
+                        
                         var request = new osimis.HttpRequest();
                         request.setHeaders(wvConfig.httpRequestHeaders);
                         request.setCache(true);
