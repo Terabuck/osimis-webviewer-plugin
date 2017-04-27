@@ -188,7 +188,7 @@
                         // will be managed by the `PdfInstanceManager`.  They will
                         // be cached on this `/series` route response to diminish
                         // the HTTP request count though.
-                        seriesList = wvOrthancSeriesAdapter.process(response.data);
+                        seriesList = wvOrthancSeriesAdapter.process(response.data, response.studyId);
                         
                         // Preload images annotations
                         wvAnnotationManager.loadStudyAnnotations(studyId);

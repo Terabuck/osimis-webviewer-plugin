@@ -28,7 +28,7 @@
         <div class="wvSerieslist__picture">
             <span class="wvSerieslist__placeholderIcon fa fa-file-text"></span>
             
-            <span ng-if="vm.paneManager.hasReportBeenViewed(id)" class="wvSerieslist__badge mr40 mb40">
+            <span ng-if="vm.paneManager.hasReportBeenViewed(id)" class="wvSerieslist__badge--{{vm.study.color}} mr40 mb40">
                 <i class="fa fa-eye" aria-hidden="true"></i>
             </span>
         </div>
@@ -86,7 +86,7 @@
         <div class="wvSerieslist__picture">
             <span class="wvSerieslist__placeholderIcon fa fa-video-camera"></span>
             
-            <span ng-if="vm.paneManager.hasVideoBeenViewed($video.id)" class="wvSerieslist__badge mr40 mb40">
+            <span ng-if="vm.paneManager.hasVideoBeenViewed($video.id)" class="wvSerieslist__badge--{{vm.study.color}} mr40 mb40">
                 <i class="fa fa-eye" aria-hidden="true"></i>
             </span>
         </div>
@@ -126,9 +126,9 @@
             <wv-viewport wv-image="$image" wv-image-index="$series.imageCount/2" vp:series-id="id" wv-series="$series" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}"
                 wv-enable-overlay="false"
             ></wv-viewport>
-            <div class="wvSerieslist__badge">{{$series.imageCount}}</div>
+            <div class="wvSerieslist__badge--{{vm.study.color}}">{{$series.imageCount}}</div>
             
-            <span ng-if="vm.paneManager.hasSeriesBeenViewed($series.id)" class="wvSerieslist__badge mr40 mb40">
+            <span ng-if="vm.paneManager.hasSeriesBeenViewed($series.id)" class="wvSerieslist__badge--{{vm.study.color}} mr40 mb40">
                 <i class="fa fa-eye" aria-hidden="true"></i>
             </span>
         </div>

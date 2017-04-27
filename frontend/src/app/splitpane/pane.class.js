@@ -1,8 +1,43 @@
+/**
+ * @ngdoc object
+ * @memberOf osimis
+ * 
+ * @name osimis.Pane
+ *
+ * @description
+ * The `Pane` class is used to represent the content of a pane. A pane can
+ * either contain:
+ * 
+ * - a video.
+ * - a (PDF) report.
+ * - a series of images.
+ *
+ * When the pane contains a series of image, the model also store which image
+ * is being viewed within the series, and the state of the viewport (ww/wc,
+ * ...), so the pane can be shared across network as is (ie. via liveshare) or
+ * stored.
+ */
 (function(osimis) {
-    "use strict";
+    'use strict';
 
     function Pane(config) {
-        // @todo Assert config
+        // Assert config
+        if (
+            typeof config.seriesId !== 'undefined' &&
+            typeof config.reportId !== 'undefined' ||
+            typeof config.seriesId !== 'undefined' &&
+            typeof config.videoId  !== 'undefined' ||
+            typeof config.reportId !== 'undefined' &&
+            typeof config.videoId !== 'undefined'
+        ) {
+            throw new Error('A pane can only contain a single reportId/videoId/seriesId at a time.');
+        }
+        else if (!config.seriesId &&
+            (typeof config.csViewport !== 'undefined' ||
+            typeof config.imageIndex !== 'undefined')
+        ) {
+            throw new Error('`csViewport` and `imageIndex` parameter can only be used with a series.');
+        }
 
         // Default values: nothing is shown
         if (!config) {
@@ -24,4 +59,4 @@
 
     osimis.Pane = Pane;
 
-})(osimis || (this.osimis = {}));
+})(this.osimis || (this.osimis = {}));

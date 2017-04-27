@@ -1,9 +1,15 @@
-.wvStudyIsland {
+$gray: gray;
+$blue: hsla(204, 70%, 53%, 0.5);
+$red: rgba(206, 0, 0, 0.5);
+$green: rgba(0, 160, 27, 0.5);
+
+%wvStudyIsland {
     margin: 1rem 1rem 1rem 1rem;
-    border: 0.3rem solid hsla(204, 70%, 53%, 0.5);
+    border: 0.3rem solid $gray;
 }
-.wvStudyIsland__header {
-    background-color: hsla(204, 70%, 53%, 0.5);
+
+%wvStudyIsland__header {
+    background-color: $gray;
     padding: 0.5rem 0.5rem 0.8rem 0.5rem;
     line-height: 1.35rem;
     width: 100%;
@@ -20,4 +26,36 @@
     padding: 0.4rem; // 0.7rem - 0.3rem (2px transparent border + 1px margin)
     color: hsl(0, 0%, 100%);
     width: 100%; // let some space for the 4-columns based items
+}
+
+
+// Color modifiers
+.wvStudyIsland--blue {
+    @extend %wvStudyIsland;
+    border-color: $blue;
+}
+
+.wvStudyIsland__header--blue {
+    @extend %wvStudyIsland__header;
+    background-color: $blue;
+}
+
+.wvStudyIsland--red {
+    @extend %wvStudyIsland;
+    border-color: $red;
+}
+
+.wvStudyIsland__header--red {
+    @extend %wvStudyIsland__header;
+    background-color: $red;
+}
+
+.wvStudyIsland--green {
+    @extend %wvStudyIsland;
+    border-color: $green;
+}
+
+.wvStudyIsland__header--green {
+    @extend %wvStudyIsland__header;
+    background-color: $green;
 }

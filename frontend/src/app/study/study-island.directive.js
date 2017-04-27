@@ -22,7 +22,7 @@
  *
  * * `grid` The items are shown in a grid format.
  * * `list` The items are shown in a list format.
- * 
+ *
  * @param {Array<string>} [wvSelectedSeriesIds=EmptyArray]
  * An array containing the ids of the selected series.
  * 
@@ -44,7 +44,7 @@
         .directive('wvStudyIsland', wvStudyIsland);
 
     /* @ngInject */
-    function wvStudyIsland(wvConfig) {
+    function wvStudyIsland(wvConfig, wvStudyManager) {
         var directive = {
             bindToController: true,
             controller: StudyIslandVM,
@@ -83,25 +83,17 @@
 
             // Load study informations.
             scope.$watch('vm.studyId', function(newStudyId) {
-                if (!newStudyId) return; // @todo hide directive
+                // Clean directive if studyId is reset.
+                if (!newStudyId) {
+                    vm.study = null;
+                    return;
+                }
 
-                var request = new osimis.HttpRequest();
-                request.setHeaders(wvConfig.httpRequestHeaders);
-                request.setCache(true);
-
-                request
-                    .get(wvConfig.orthancApiURL + '/studies/'+newStudyId)
-                    .then(function(response) {
-                        var study = response.data;
-                        vm.studyTags = study.MainDicomTags;
-                        vm.patientTags = study.PatientMainDicomTags;
-
-                        // format datas
-                        function _convertDate(date) {
-                            return date.replace(/^([0-9]{4})([0-9]{2})([0-9]{2})$/, '$1/$2/$3');
-                        }
-                        vm.studyTags.StudyDate = vm.studyTags.StudyDate && _convertDate(vm.studyTags.StudyDate);
-                        vm.patientTags.PatientBirthDate = vm.patientTags.PatientBirthDate && _convertDate(vm.patientTags.PatientBirthDate);
+                // Adapt study model to new studyId;
+                wvStudyManager
+                    .get(newStudyId)
+                    .then(function(study) {
+                        vm.study = study;
                     });
             });
         }

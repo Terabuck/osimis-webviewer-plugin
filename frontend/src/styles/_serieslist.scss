@@ -1,4 +1,62 @@
+$gray: gray;
+$blue: hsl(204, 70%, 53%);
+$red: rgb(206, 0, 0);
+$green: rgb(0, 160, 27);
+
 $pictureSize: 6.5rem;
+
+.wvSerieslist {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.wvSerieslist__seriesItem--selectable {
+    // Pointer cursor (for `ng-click`)
+    cursor: pointer !important;
+
+    // Lighten up the icon on hover
+    &:hover {
+        color: white;
+    }
+}
+
+.wvSerieslist__placeholderIcon, .wvSerieslist__placeholderIcon.fa { // Make sure it has precedence over .fa class {
+    position: absolute;
+
+    // Fill the li element 
+    width: 100%;
+    height: 100%;
+
+    // Fill the li element with the fontawesome icon
+    font-size: $pictureSize/2;
+    line-height: $pictureSize;
+    text-align: center;
+}
+
+.wvSerieslist__placeholderIcon--strikeout, .wvSerieslist__placeholderIcon--strikeout.fa { // Make sure it has precedence over .fa class
+    // Grey out (since no report is available)
+    color: #c3c3c3;
+
+    // Diagonal line crossing report icon (to tell none are available)
+    // position: relative;
+
+    &::after { // use after to not conflicts with font-awesome :before
+        position: absolute;
+
+        left: 0;
+        top: 50%;
+        right: 0;
+        
+        transform: rotate(-45deg) scaleX(0.9);
+
+        border-top: 5px solid;
+        border-color: inherit;
+
+        content: "";
+    }
+}
+
 .wvSerieslist__picture{
     display: inline-block;
     font-size: 14px;
@@ -9,7 +67,7 @@ $pictureSize: 6.5rem;
     // Move picture behind the `toggle layout@ left` button.
     z-index: -1;
 }
-.wvSerieslist__badge{
+.wvSerieslist__badge {
     position: absolute;
     bottom:5px;
     right:5px;
@@ -18,7 +76,7 @@ $pictureSize: 6.5rem;
     width:15px;
     height:15px;
     border-radius: 100%;
-    background-color:$primary;
+    background-color: $gray;
     vertical-align: middle;
     text-align: center;
     font-weight: bold;
@@ -78,84 +136,16 @@ $pictureSize: 6.5rem;
     border: 0.2rem solid hsla(204, 70%, 53%, 1) !important;
 }
 
-
-.wvSerieslist {
-  margin: 0;
-  padding: 0;
-  list-style: none;
+// Color related modifiers
+.wvSerieslist__badge--blue {
+    @extend .wvSerieslist__badge;
+    background-color: $blue;
 }
-
-/*
-.wv-serieslist-item {
-  position: relative; // anchor element
-
-  padding: 0;
-  text-align: center;
-  
-  width: 150px;
-  height: 150px;
-  margin: auto;
-  margin-bottom: 0.5rem;
-
-  // Set text content to grey color
-  color: hsl(0, 0%, 70%);
+.wvSerieslist__badge--red {
+    @extend .wvSerieslist__badge;
+    background-color: $red;
 }
-
-.wv-serieslist-overlay {
-  position: absolute;
-  bottom:0;
-  left:0;
-  right:0;
-  color: #CCC;
-  background-color: rgba(0,0,0,0.5);
-  text-align: center;
-  padding: 0.5em;
-  border: 0.1rem solid rgba(255, 255, 255, 0.13);
-}
-*/
-
-.wvSerieslist__seriesItem--selectable {
-  // Pointer cursor (for `ng-click`)
-  cursor: pointer !important;
-
-  // Lighten up the icon on hover
-  &:hover {
-    color: white;
-  }
-}
-
-.wvSerieslist__placeholderIcon, .wvSerieslist__placeholderIcon.fa { // Make sure it has precedence over .fa class {
-  position: absolute;
-
-  // Fill the li element 
-  width: 100%;
-  height: 100%;
-
-  // Fill the li element with the fontawesome icon
-  font-size: $pictureSize/2;
-  line-height: $pictureSize;
-  text-align: center;
-}
-
-.wvSerieslist__placeholderIcon--strikeout, .wvSerieslist__placeholderIcon--strikeout.fa { // Make sure it has precedence over .fa class
-  // Grey out (since no report is available)
-  color: #c3c3c3;
-
-  // Diagonal line crossing report icon (to tell none are available)
-  // position: relative;
-
-  &::after { // use after to not conflicts with font-awesome :before
-    position: absolute;
-
-    left: 0;
-    top: 50%;
-    right: 0;
-    
-    transform: rotate(-45deg) scaleX(0.9);
-
-    border-top: 5px solid;
-    border-color: inherit;
-
-    content: "";
-  }
+.wvSerieslist__badge--green {
+    @extend .wvSerieslist__badge;
+    background-color: $green;
 }

@@ -20,6 +20,22 @@
              * @ngdoc method
              * @methodOf webviewer.service:wvStudyManager
              * 
+             * @name osimis.StudyManager#get
+             *
+             * @param {string} id
+             * The Orthanc study id.
+             * 
+             * @return {Promise<osimis.Study>}
+             * The Osimis Study Model.
+             * 
+             * @description
+             * Retrieve a study model from an orthanc study id.
+             */
+            get: get,
+            /**
+             * @ngdoc method
+             * @methodOf webviewer.service:wvStudyManager
+             * 
              * @name osimis.StudyManager#getAllStudyIds
              *
              * @return {Promise<Array<string>>}
@@ -97,6 +113,44 @@
         };
 
         ////////////////
+
+        // Cache of study models.
+        var _studies = {};
+
+        function get(id) {
+            var _this = this;
+
+            // If model is not available in cache yet, generate it.
+            if (!_studies[id]) {
+                var request = new osimis.HttpRequest();
+                request.setHeaders(wvConfig.httpRequestHeaders);
+                request.setCache(true);
+
+                _studies[id] = request
+                    .get(wvConfig.orthancApiURL + '/studies/' + id)
+                    .then(function (response) {
+                        var data = response.data;
+
+                        var tags = _.merge(
+                            {},
+                            data.MainDicomTags,
+                            data.PatientMainDicomTags
+                        );
+
+                        var newStudy = new osimis.Study(
+                            $q,
+                            _this, 
+                            id,
+                            tags
+                        );
+
+                        return newStudy;
+                    });
+            }
+
+            // Return model.
+            return _studies[id];
+        }
 
         function getAllStudyIds() {
             var request = new osimis.HttpRequest();
