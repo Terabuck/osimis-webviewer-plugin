@@ -2,6 +2,8 @@ $gray: gray;
 $blue: hsl(204, 70%, 53%);
 $red: rgb(206, 0, 0);
 $green: rgb(0, 160, 27);
+$yellow: rgb(162, 165, 0);
+$violet: rgb(255, 31, 255);
 
 $pictureSize: 6.5rem;
 
@@ -148,4 +150,12 @@ $pictureSize: 6.5rem;
 .wvSerieslist__badge--green {
     @extend .wvSerieslist__badge;
     background-color: $green;
+}
+.wvSerieslist__badge--yellow {
+    @extend .wvSerieslist__badge;
+    background-color: $yellow;
+}
+.wvSerieslist__badge--violet {
+    @extend .wvSerieslist__badge;
+    background-color: $violet;
 }

@@ -387,7 +387,9 @@
                                 var availableColors = [
                                     'blue',
                                     'red',
-                                    'green'
+                                    'green',
+                                    'yellow',
+                                    'violet'
                                 ];
                                 var studyIndex = newValues.indexOf(study.id);
                                 var colorIndex = studyIndex % availableColors.length;
