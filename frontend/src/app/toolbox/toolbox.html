@@ -11,7 +11,7 @@
         ng-if="vm.buttons.hasOwnProperty('layout')"
         class="wvButton--underline glyphicon glyphicon-stop"
         ng-class="{active: vm.buttons.layout.x === 1 && vm.buttons.layout.y === 1}"
-        title="Single view"
+        data-title="Single view"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
@@ -23,7 +23,7 @@
         ng-if="vm.buttons.hasOwnProperty('layout')"
         class="wvButton--underline glyphicon glyphicon-th-large"
         ng-class="{active: vm.buttons.layout.x === 2 && vm.buttons.layout.y === 2}"
-        title="Grid view"
+        data-title="Grid view"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
@@ -36,7 +36,7 @@
         ng-if="vm.buttons.hasOwnProperty('invert')"
         class="wvButton--underline glyphicon glyphicon-adjust"
         ng-class="{active: vm.state.invert}"
-        title="Invert color"
+        data-title="Invert color"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
@@ -49,7 +49,7 @@
         ng-if="vm.buttons.hasOwnProperty('zoom')"
         class="wvButton--underline glyphicon glyphicon-search"
         ng-class="{active: vm.tool === 'zoom'}"
-        title="Zoom"
+        data-title="Zoom"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
@@ -62,7 +62,7 @@
         ng-if="vm.buttons.hasOwnProperty('pan')"
         class="wvButton--underline glyphicon glyphicon-move"
         ng-class="{active: vm.tool === 'pan'}"
-        title="3D panning"
+        data-title="3D panning"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
@@ -75,7 +75,7 @@
         ng-if="vm.buttons.hasOwnProperty('windowing')"
         class="wvButton--underline fa fa-sun-o"
         ng-class="{active: vm.tool === 'windowing'}"
-        title="WW/WL"
+        data-title="WW/WL"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
@@ -88,7 +88,7 @@
         ng-if="vm.buttons.hasOwnProperty('lengthmeasure')"
         class="wvButton--underline glyphicon glyphicon-resize-horizontal"
         ng-class="{active: vm.tool === 'lengthmeasure'}"
-        title="Length Measurement"
+        data-title="Length Measurement"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
@@ -101,7 +101,7 @@
         ng-if="vm.buttons.hasOwnProperty('anglemeasure')"
         class="wvButton--underline glyphicon glyphicon-chevron-left"
         ng-class="{active: vm.tool === 'anglemeasure'}"
-        title="Angle Measurement"
+        data-title="Angle Measurement"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
@@ -114,7 +114,7 @@
         ng-if="vm.buttons.hasOwnProperty('pixelprobe')"
         class="wvButton--underline glyphicon glyphicon-record"
         ng-class="{active: vm.tool === 'pixelprobe'}"
-        title="Pixel Probe"
+        data-title="Pixel Probe"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
@@ -127,7 +127,7 @@
         ng-if="vm.buttons.hasOwnProperty('ellipticalroi')"
         class="wvButton--underline fa fa-circle-o"
         ng-class="{active: vm.tool === 'ellipticalroi'}"
-        title="Elliptical ROI"
+        data-title="Elliptical ROI"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
@@ -140,7 +140,7 @@
         ng-if="vm.buttons.hasOwnProperty('rectangleroi')"
         class="wvButton--underline glyphicon glyphicon glyphicon-unchecked"
         ng-class="{active: vm.tool === 'rectangleroi'}"
-        title="Rectangle ROI"
+        data-title="Rectangle ROI"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
@@ -153,7 +153,7 @@
         ng-if="vm.buttons.hasOwnProperty('rotateleft')"
         class="wvButton--underline fa fa-rotate-left"
         ng-class="{active: vm.tool === 'rotateleft'}"
-        title="Rotate to the left on mouse click"
+        data-title="Rotate to the left on mouse click"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
@@ -166,7 +166,7 @@
         ng-if="vm.buttons.hasOwnProperty('rotateright')"
         class="wvButton--underline fa fa-rotate-right"
         ng-class="{active: vm.tool === 'rotateright'}"
-        title="Rotate to the right on mouse click"
+        data-title="Rotate to the right on mouse click"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
@@ -179,7 +179,7 @@
         ng-if="vm.buttons.hasOwnProperty('hflip')"
         class="wvButton--underline fa fa-exchange"
         ng-class="{active: vm.tool === 'hflip'}"
-        title="Flip horizontally on mouse click"
+        data-title="Flip horizontally on mouse click"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
@@ -192,7 +192,7 @@
         ng-if="vm.buttons.hasOwnProperty('vflip')"
         class="wvButton--underline fa fa-exchange wvButton--rotate"
         ng-class="{active: vm.tool === 'vflip'}"
-        title="Flip vertically on mouse click"
+        data-title="Flip vertically on mouse click"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
@@ -218,7 +218,7 @@ duplicate the whole directive content and keep it static.
         ng-if="vm.buttons.hasOwnProperty('layout')"
         class="wvButton--underline glyphicon glyphicon-stop"
         ng-class="{active: vm.buttons.layout.x === 1 && vm.buttons.layout.y === 1}"
-        title="Single view"
+        data-title="Single view"
         data-placement="left"
         data-container="body"
         bs-tooltip
@@ -230,7 +230,7 @@ duplicate the whole directive content and keep it static.
         ng-if="vm.buttons.hasOwnProperty('layout')"
         class="wvButton--underline glyphicon glyphicon-th-large"
         ng-class="{active: vm.buttons.layout.x === 2 && vm.buttons.layout.y === 2}"
-        title="Grid view"
+        data-title="Grid view"
         data-placement="left"
         data-container="body"
         bs-tooltip
@@ -244,7 +244,7 @@ duplicate the whole directive content and keep it static.
         ng-if="vm.buttons.hasOwnProperty('invert')"
         class="wvButton--underline glyphicon glyphicon-adjust"
         ng-class="{active: vm.state.invert}"
-        title="Invert color"
+        data-title="Invert color"
         data-placement="left"
         data-container="body"
         bs-tooltip
@@ -257,7 +257,7 @@ duplicate the whole directive content and keep it static.
         ng-if="vm.buttons.hasOwnProperty('zoom')"
         class="wvButton--underline glyphicon glyphicon-search"
         ng-class="{active: vm.tool === 'zoom'}"
-        title="Zoom"
+        data-title="Zoom"
         data-placement="left"
         data-container="body"
         bs-tooltip
@@ -270,7 +270,7 @@ duplicate the whole directive content and keep it static.
         ng-if="vm.buttons.hasOwnProperty('pan')"
         class="wvButton--underline glyphicon glyphicon-move"
         ng-class="{active: vm.tool === 'pan'}"
-        title="3D panning"
+        data-title="3D panning"
         data-placement="left"
         data-container="body"
         bs-tooltip
@@ -283,7 +283,7 @@ duplicate the whole directive content and keep it static.
         ng-if="vm.buttons.hasOwnProperty('windowing')"
         class="wvButton--underline fa fa-sun-o"
         ng-class="{active: vm.tool === 'windowing'}"
-        title="WW/WL"
+        data-title="WW/WL"
         data-placement="left"
         data-container="body"
         bs-tooltip
@@ -296,7 +296,7 @@ duplicate the whole directive content and keep it static.
         ng-if="vm.buttons.hasOwnProperty('lengthmeasure')"
         class="wvButton--underline glyphicon glyphicon-resize-horizontal"
         ng-class="{active: vm.tool === 'lengthmeasure'}"
-        title="Length Measurement"
+        data-title="Length Measurement"
         data-placement="left"
         data-container="body"
         bs-tooltip
@@ -309,7 +309,7 @@ duplicate the whole directive content and keep it static.
         ng-if="vm.buttons.hasOwnProperty('anglemeasure')"
         class="wvButton--underline glyphicon glyphicon-chevron-left"
         ng-class="{active: vm.tool === 'anglemeasure'}"
-        title="Angle Measurement"
+        data-title="Angle Measurement"
         data-placement="left"
         data-container="body"
         bs-tooltip
@@ -322,7 +322,7 @@ duplicate the whole directive content and keep it static.
         ng-if="vm.buttons.hasOwnProperty('pixelprobe')"
         class="wvButton--underline glyphicon glyphicon-record"
         ng-class="{active: vm.tool === 'pixelprobe'}"
-        title="Pixel Probe"
+        data-title="Pixel Probe"
         data-placement="left"
         data-container="body"
         bs-tooltip
@@ -335,7 +335,7 @@ duplicate the whole directive content and keep it static.
         ng-if="vm.buttons.hasOwnProperty('ellipticalroi')"
         class="wvButton--underline fa fa-circle-o"
         ng-class="{active: vm.tool === 'ellipticalroi'}"
-        title="Elliptical ROI"
+        data-title="Elliptical ROI"
         data-placement="left"
         data-container="body"
         bs-tooltip
@@ -348,7 +348,7 @@ duplicate the whole directive content and keep it static.
         ng-if="vm.buttons.hasOwnProperty('rectangleroi')"
         class="wvButton--underline glyphicon glyphicon glyphicon-unchecked"
         ng-class="{active: vm.tool === 'rectangleroi'}"
-        title="Rectangle ROI"
+        data-title="Rectangle ROI"
         data-placement="left"
         data-container="body"
         bs-tooltip
@@ -361,7 +361,7 @@ duplicate the whole directive content and keep it static.
         ng-if="vm.buttons.hasOwnProperty('rotateleft')"
         class="wvButton--underline fa fa-rotate-left"
         ng-class="{active: vm.tool === 'rotateleft'}"
-        title="Rotate to the left on mouse click"
+        data-title="Rotate to the left on mouse click"
         data-placement="left"
         data-container="body"
         bs-tooltip
@@ -374,7 +374,7 @@ duplicate the whole directive content and keep it static.
         ng-if="vm.buttons.hasOwnProperty('rotateright')"
         class="wvButton--underline fa fa-rotate-right"
         ng-class="{active: vm.tool === 'rotateright'}"
-        title="Rotate to the right on mouse click"
+        data-title="Rotate to the right on mouse click"
         data-placement="left"
         data-container="body"
         bs-tooltip
@@ -387,7 +387,7 @@ duplicate the whole directive content and keep it static.
         ng-if="vm.buttons.hasOwnProperty('hflip')"
         class="wvButton--underline fa fa-exchange"
         ng-class="{active: vm.tool === 'hflip'}"
-        title="Flip horizontally on mouse click"
+        data-title="Flip horizontally on mouse click"
         data-placement="left"
         data-container="body"
         bs-tooltip
@@ -400,7 +400,7 @@ duplicate the whole directive content and keep it static.
         ng-if="vm.buttons.hasOwnProperty('vflip')"
         class="wvButton--underline fa fa-exchange wvButton--rotate"
         ng-class="{active: vm.tool === 'vflip'}"
-        title="Flip vertically on mouse click"
+        data-title="Flip vertically on mouse click"
         data-placement="left"
         data-container="body"
         bs-tooltip

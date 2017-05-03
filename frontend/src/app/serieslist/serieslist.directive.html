@@ -22,7 +22,7 @@
 
         bs-tooltip
         bs-enabled="vm.displayMode === 'grid'"
-        title="PDF report"
+        data-title="PDF report"
         placement="right"
     >
         <div class="wvSerieslist__picture">
@@ -48,7 +48,7 @@
 
         bs-tooltip
         bs-enabled="vm.displayMode === 'grid'"
-        title="No report available"
+        data-title="No report available"
         placement="right"
     >
         <div class="wvSerieslist__picture">
@@ -80,7 +80,7 @@
 
         bs-tooltip
         bs-enabled="vm.displayMode === 'grid'"
-        title="Video: {{$video.tags.SeriesDescription || 'Untitled video'}}"
+        data-title="Video: {{$video.tags.SeriesDescription || 'Untitled video'}}"
         placement="right"
     >
         <div class="wvSerieslist__picture">
@@ -116,7 +116,7 @@
 
         bs-tooltip
         bs-enabled="vm.displayMode === 'grid'"
-        title="{{$series.tags.SeriesDescription || 'Untitled series'}}"
+        data-title="{{$series.tags.SeriesDescription || 'Untitled series'}}"
         placement="right"
     >
         <div
