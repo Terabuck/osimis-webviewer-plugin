@@ -17,13 +17,16 @@
             y: 1
         };
 
-        this.panes = []; // Must keep reference as it's databound in `wvWebviewer` views.
+        this.panes = [
+            new osimis.Pane()
+        ]; // Must keep reference as it's databound in `wvWebviewer` views.
 
         this.viewedSeriesIds = [];
         this.viewedReportIds = [];
         this.viewedVideoIds = [];
-
         // @todo clean up viewed*Ids when selectable studies change?
+
+        this.selectedPane = 0;
     }
 
     /**
@@ -51,6 +54,7 @@
                 this.panes[i] = undefined; // don't use splice since it changes the indexes from the array/
             }
         }
+
         // Configure new panes.
         else if (newPaneCount > actualPaneCount) {
             for (var i = actualPaneCount; i < newPaneCount; ++i) {
@@ -61,6 +65,12 @@
         // Update layout size.
         this.layout.x = x;
         this.layout.y = y;
+
+        // Update selected pane (if the currently selected one no longer
+        // exists).
+        if (this.selectedPane >= this.layout.x * this.layout.y) {
+            this.selectedPane = 0;
+        }
     };
 
     /**
@@ -96,6 +106,28 @@
         if (config && config.videoId) {
             this.viewedVideoIds = _.union([config.videoId], this.viewedVideoIds);
         }
+    };
+
+    PaneManager.prototype.getPane = function(index) {
+        return this.panes[index];
+    };
+
+    PaneManager.prototype.selectPane = function(index) {
+        // Don't do anything if pane is empty.
+        var pane = this.getPane(index);
+        if (pane.isEmpty()) {
+            return;
+        };
+
+        this.selectedPane = index;
+    };
+
+    PaneManager.prototype.isPaneSelected = function(index) {
+        return this.selectedPane === index;
+    };
+
+    PaneManager.prototype.getPaneIndex = function(x, y) {
+        return (y * this.layout.y) + x;
     };
 
     /**

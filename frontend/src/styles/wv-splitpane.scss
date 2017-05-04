@@ -1,13 +1,34 @@
-.wv-splitpane {
+$blue: hsla(204, 70%, 53%, 0.5);
+
+.wvSplitpane {
     height: 100%;
+    padding: 7px;
 }
-.wv-splitpane-cell {
+.wvSplitpane__cell {
     display: inline-block;
     float: left;
     height: 100%;
+    width: 100%;
 
     // Anchor
     position: relative;
+}
+.wvSplitpane__cellBorder {
+    display: inline-block;
+    float: left;
+    height: calc(100% - 2px);
+    width: calc(100% - 2px);
+
+    border: 2px solid transparent;
+
+    padding: 2px;
+    margin: 1px;
+}
+.wvSplitpane__cellBorder--selected {
+    @extend .wvSplitpane__cellBorder;
+
+    // Add border
+    border: 2px solid $blue;
 }
 
 // Make sure the pane keeps its size

@@ -59,7 +59,7 @@
     }
 
     /* @ngInject */
-    function Controller($scope) {
+    function Controller($scope, wvPaneManager) {
         var vm = this;
 
         /* jshint -W116 */
@@ -84,5 +84,7 @@
                 $(window).trigger('resize');
             });
         }
+
+        this.paneManager = wvPaneManager;
     }
 })();

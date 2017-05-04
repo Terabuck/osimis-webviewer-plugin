@@ -352,7 +352,7 @@
                     vm.pickableStudyIds = newValues;
                 }
 
-                // Cancel previous preloading & disable study colors
+                // Cancel previous preloading & reset studies colors.
                 oldValues
                     .filter(function(newStudyId) {
                         // Retrieve studyIds that are no longer shown.
@@ -376,7 +376,8 @@
                             });
                     });
 
-                // Preload studies
+                // Preload studies, set studies color & fill first pane if
+                // empty.
                 newValues
                     .filter(function(newStudyId) {
                         // Retrieve studyIds that are new.
