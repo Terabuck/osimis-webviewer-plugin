@@ -247,14 +247,14 @@
             wv-toolbox-buttons="vm.tools"
             wv-active-tool="vm.activeTool"
             wv-position="vm.toolbarPosition"
+            wv-on-action-clicked="vm.onActionClicked($action)"
         ></wv-toolbox>
 
         <!--
         Splitpane
         -->
         <wv-splitpane
-            wv-layout="vm.tools.layout"
-
+            wv-readonly="vm.readonly"
             ng-class="{
                 'wvLayout__splitpane--toolbarAtTop': vm.toolbarEnabled && vm.toolbarPosition === 'top',
                 'wvLayout__splitpane--toolbarAtRight': vm.toolbarEnabled && vm.toolbarPosition === 'right'
@@ -264,7 +264,7 @@
                 wv-pane-index="$index"
                 wv-pane-position="$position"
 
-                wv-on-item-dropped="!vm.readonly && vm.setPane($index, $data);"
+                wv-on-item-dropped="!vm.readonly && vm.onItemDroppedToPane($index, $data);"
              >
                 <!--
                 PDF Report

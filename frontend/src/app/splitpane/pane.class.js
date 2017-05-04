@@ -45,24 +45,42 @@
         // Default values: nothing is shown
         if (!config) {
             this.seriesId = undefined;
-            this.csViewport = null;
-            this.imageIndex = 0;
+            this.csViewport = undefined;
+            this.imageIndex = undefined;
             this.reportId = undefined;
             this.videoId = undefined;
+            this.isSelected = false;
         }
         // Custom values.
         else {
             this.seriesId = config.seriesId || undefined;
-            this.csViewport = config.csViewport || null;
-            this.imageIndex = config.imageIndex || 0;
+            this.csViewport = config.csViewport || config.seriesId ? null : undefined;
+            this.imageIndex = config.imageIndex || config.seriesId ? 0 : undefined;
             this.reportId = config.reportId || undefined;
             this.videoId = config.videoId || undefined;
+            this.isSelected = config.isSelected || false;
         }
     }
 
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Pane
+     * 
+     * @name osimis.Pane#isEmpty
+     *
+     * @return {boolean}
+     * True if the pane has no content. False if the pane as contains either:
+     *
+     * * a video
+     * * a series
+     * * a pdf
+     *
+     * @description 
+     * Check if the current pane has no content.
+     */
     Pane.prototype.isEmpty = function() {
         return !this.seriesId && !this.videoId && !this.reportId;
-    }
+    };
 
     osimis.Pane = Pane;
 

@@ -151,7 +151,7 @@
             
             var _watchedValue = {
                 imageId: scope.vm.wvImageId || null,
-                csViewport: scope.vm.csViewport || null
+                csViewport: scope.vm.csViewport && scope.vm.csViewport.clone() || null
             };
 
             // bind directive's sizing (via wv-size controller) to cornerstone
@@ -216,7 +216,7 @@
                     // Update old values
                     _watchedValue = {
                         imageId: scope.vm.wvImageId,
-                        csViewport: scope.vm.csViewport
+                        csViewport: scope.vm.csViewport && scope.vm.csViewport.clone()
                     };
                 };
                 ctrl.clearImage = function() {
@@ -346,7 +346,7 @@
                     // Update old values
                     _watchedValue = {
                         imageId: scope.vm.wvImageId,
-                        csViewport: scope.vm.csViewport
+                        csViewport: scope.vm.csViewport && scope.vm.csViewport.clone()
                     };
 
                     // Always return false, as we do not use the watch function
@@ -367,7 +367,7 @@
                 // Update state values
                 _watchedValue = {
                     imageId: scope.vm.wvImageId,
-                    csViewport: scope.vm.csViewport
+                    csViewport: scope.vm.csViewport && scope.vm.csViewport.clone()
                 };
             });
             var _oldCsViewport = _.cloneDeep(scope.vm.csViewport && scope.vm.csViewport._cornerstoneViewportData) || null;
@@ -394,7 +394,7 @@
                         // Update state values
                         _watchedValue = {
                             imageId: scope.vm.wvImageId,
-                            csViewport: scope.vm.csViewport
+                            csViewport: scope.vm.csViewport && scope.vm.csViewport.clone()
                         };
                     });
                 }

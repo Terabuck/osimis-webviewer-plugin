@@ -13,7 +13,7 @@
                 'wvSplitpane__cellBorder--selected': vm.paneManager.isPaneSelected(vm.paneManager.getPaneIndex($x, $y)) && !vm.paneManager.getPane(vm.paneManager.getPaneIndex($x, $y)).isEmpty()
             }"
             ng-style="{width: 'calc('+vm.rowWidth+' - 2px)'}"
-            ng-click="vm.paneManager.selectPane(vm.paneManager.getPaneIndex($x, $y))"
+            ng-click="!vm.readonly && vm.paneManager.selectPane(vm.paneManager.getPaneIndex($x, $y))"
         >  
             <!-- Content -->
             <ng-transclude
