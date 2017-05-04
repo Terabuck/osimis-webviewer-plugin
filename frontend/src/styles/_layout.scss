@@ -73,15 +73,23 @@ $asideRightPadding: 10px;
     // We have to set a static height since we use floating to make white space
     // disapear in nested content.
     height: 4rem;
-    margin: 0rem 1rem 0rem 1rem;
+    padding: 0rem 1rem 0rem 1rem;
+
+    // Enforce width even if there is a scrollbar on win/IE11.
+    width: 32rem;
 }
 
 .wvLayoutLeft__contentMiddle {
     // Let the middle zone take as much space as required.
     flex: 1 0 auto;
+
+    // Enforce width even if there is a scrollbar on win/IE11.
+    width: 32rem;
 }
 
 .wvLayoutLeft__contentBottom {
+    // Enforce width even if there is a scrollbar on win/IE11.
+    width: 32rem;
 }
 .wvLayout__leftBottom.wvLayout__leftBottom--enabled {
     border-top: 1px solid hsla(0, 0%, 100%, 0.2);
