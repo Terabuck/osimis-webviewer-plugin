@@ -8,6 +8,7 @@ Breaking Changes:
 * New routes used:
   - /<orthanc>/instances/<video-instance-uid>/frames/0/raw
   - /<orthanc>/patients/<patient-uid>
+* Internal calls to orthanc routes are now routed to other plugins.
 
 Version 0.7.0
 ========================
