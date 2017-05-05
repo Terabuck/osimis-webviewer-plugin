@@ -11,20 +11,29 @@
 (function(osimis) {
     'use strict';
 
-    function PaneManager() {
+    function PaneManager(Promise, studyManager) {
+        // Injections.
+        this._Promise = Promise;
+        this._studyManager = studyManager;
+
+        // Default config.
         this.layout = {
             x: 1,   
             y: 1
         };
 
+        // Panes.
+        // Must keep reference as it's databound in `wvWebviewer` views.
         this.panes = [
-            new osimis.Pane()
-        ]; // Must keep reference as it's databound in `wvWebviewer` views.
+            new osimis.Pane(this._Promise, this._studyManager)
+        ];
 
         this.viewedSeriesIds = [];
         this.viewedReportIds = [];
         this.viewedVideoIds = [];
         // @todo clean up viewed*Ids when selectable studies change?
+
+        this.onSelectedPaneChanged = new osimis.Listener();
     }
 
     /**
@@ -45,6 +54,8 @@
     PaneManager.prototype.setLayout = function(x, y) {
         var actualPaneCount = this.layout.x * this.layout.y;
         var newPaneCount = x * y;
+        var oldSelectedPane = this.getSelectedPane();
+        var oldSelectedPaneIndex = this.panes.indexOf(oldSelectedPane);
 
         // Clean up old panes.
         if (newPaneCount < actualPaneCount) {
@@ -56,7 +67,7 @@
         // Configure new panes.
         else if (newPaneCount > actualPaneCount) {
             for (var i = actualPaneCount; i < newPaneCount; ++i) {
-                this.panes[i] = new osimis.Pane();
+                this.panes[i] = new osimis.Pane(this._Promise, this._studyManager);
             }
         }
 
@@ -66,11 +77,13 @@
 
         // Update selected pane (if the currently selected one no longer
         // exists).
-        var selectedPane = this.getSelectedPane();
-        var selectedPaneIndex = this.panes.indexOf(selectedPane);
-        if (selectedPaneIndex >= this.layout.x * this.layout.y) {
-            selectedPane.isSelected = false;
-            this.getPane(0).isSelected = true;
+        if (oldSelectedPaneIndex >= this.layout.x * this.layout.y) {
+            oldSelectedPane.isSelected = false;
+            var newSelectedPane = this.getPane(0);
+            newSelectedPane.isSelected = true;
+
+            // Trigger selected pane changed event.
+            this.onSelectedPaneChanged.trigger(newSelectedPane);
         }
     };
 
@@ -103,24 +116,10 @@
             throw new Error('A pane can only contain a single reportId/videoId/seriesId at a time.');
         }
         else if (!config.seriesId &&
-            (typeof config.csViewport !== 'undefined' ||
-            typeof config.imageIndex !== 'undefined')
+            (config.csViewport || config.imageIndex)
         ) {
             throw new Error('`csViewport` and `imageIndex` parameter can only be used with a series.');
         }
-
-        // If the new pane is selected, unset the actually selected one.
-        if (config.isSelected) {
-            this.getSelectedPane().isSelected = false;
-        }
-        
-        // Update config accordingly.
-        this.panes[index].seriesId = config.seriesId;
-        this.panes[index].reportId = config.reportId;
-        this.panes[index].videoId = config.videoId;
-        this.panes[index].csViewport = config.csViewport;
-        this.panes[index].imageIndex = config.imageIndex;
-        this.panes[index].isSelected = config.isSelected || false;
 
         // Set series as viewed.
         if (config && config.seriesId) {
@@ -135,6 +134,24 @@
         // Set pdf/report as viewed.
         if (config && config.videoId) {
             this.viewedVideoIds = _.union([config.videoId], this.viewedVideoIds);
+        }
+
+        // Update pane's config accordingly.
+        this.panes[index].seriesId = config.seriesId;
+        this.panes[index].reportId = config.reportId;
+        this.panes[index].videoId = config.videoId;
+        this.panes[index].csViewport = config.csViewport;
+        this.panes[index].imageIndex = config.imageIndex;
+        // If the new pane is selected, unset the actually selected one.
+        if (config.isSelected) {
+            var previouslySelectedPane = this.getSelectedPane();
+            var newlySelectedPane = this.panes[index];
+
+            previouslySelectedPane.isSelected = false;
+            newlySelectedPane.isSelected = config.isSelected || false;
+
+            // Trigger selected pane changed event.
+            this.onSelectedPaneChanged.trigger(newlySelectedPane);
         }
     };
 
@@ -173,7 +190,7 @@
         var selectedPaneIndex = 0;
         this.panes
             .forEach(function (pane, index) {
-                if (pane.isSelected) {
+                if (pane && pane.isSelected) {
                     selectedPaneIndex = index;
                 }
             });
@@ -194,17 +211,23 @@
      * Toggle a pane selection via its index.
      */
     PaneManager.prototype.selectPane = function(index) {
+        var previouslySelectedPane = this.getSelectedPane();
+        var newlySelectedPane = this.getPane(index);
+        
         // Don't do anything if pane is empty.
-        var pane = this.getPane(index);
-        if (pane.isEmpty()) {
+        var newlySelectedPane = this.getPane(index);
+        if (newlySelectedPane.isEmpty()) {
             return;
         };
 
         // Unset previously selected pane
-        this.getSelectedPane().isSelected = false;
+        previouslySelectedPane.isSelected = false;
 
         // Set new pane current pane as selected
-        this.getPane(index).isSelected = true;
+        newlySelectedPane.isSelected = true;
+
+        // Trigger selected pane changed event.
+        this.onSelectedPaneChanged.trigger(newlySelectedPane);
     };
 
     /**
@@ -310,7 +333,7 @@
         .factory('wvPaneManager', wvPaneManager);
 
     /* @ngInject */
-    function wvPaneManager() {
-        return new PaneManager();
+    function wvPaneManager($q, wvStudyManager) {
+        return new PaneManager($q, wvStudyManager);
     }
 })(osimis || (this.osimis = {}));

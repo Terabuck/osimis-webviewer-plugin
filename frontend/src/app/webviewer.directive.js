@@ -305,6 +305,21 @@
             var uaParser = new UAParser();
             vm.mobileInteraction = uaParser.getDevice().type === 'mobile';
 
+            // Adapt breadcrumb displayed info based on the selected pane.
+            wvPaneManager
+                .getSelectedPane()
+                .getStudy()
+                .then(function(study) {
+                    vm.selectedPaneStudyId = study && study.id;
+                });
+            wvPaneManager.onSelectedPaneChanged(function(pane) {
+                pane
+                    .getStudy()
+                    .then(function(study) {
+                        vm.selectedPaneStudyId = study && study.id;
+                    });
+            });
+
             // Apply viewport changes when toolbox action are clicked on.
             vm.onActionClicked = function(action) {
                 var selectedPane = wvPaneManager.getSelectedPane();
