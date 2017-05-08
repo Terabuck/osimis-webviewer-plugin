@@ -8,7 +8,7 @@
  * @param {string} wvStudyId
  * The id of the shown study.
  *
- * @param {boolean} [wvSeriesItemSelectionEnabled=false]
+ * @param {boolean} [wvItemSelectionEnabled=false]
  * When this parameter is enabled, the study's items can be selected by the
  * end-user using the left mouse click.
  *
@@ -45,7 +45,7 @@
             restrict: 'E',
             scope: {
                 studyId: '=wvStudyId',
-                seriesItemSelectionEnabled: '=?wvSeriesItemsSelectionEnabled', // default: false
+                itemSelectionEnabled: '=?wvItemSelectionEnabled',
                 studyDownloadEnabled: '=?wvStudyDownloadEnabled',
                 selectedSeriesIds: '=?wvSelectedSeriesIds',
                 selectedReportIds: '=?wvSelectedReportIds',
@@ -64,7 +64,7 @@
             vm.studyDownloadEnabled = typeof vm.studyDownloadEnabled !== 'undefined' ? vm.studyDownloadEnabled : false;
 
             // Selection-related.
-            vm.seriesItemSelectionEnabled = typeof vm.seriesItemSelectionEnabled !== 'undefined' ? vm.seriesItemSelectionEnabled : false;
+            vm.itemSelectionEnabled = typeof vm.itemSelectionEnabled !== 'undefined' ? vm.itemSelectionEnabled : false;
             vm.selectedSeriesIds = vm.selectedSeriesIds || [];
             vm.selectedReportIds = vm.selectedReportIds || [];
             vm.selectedVideoIds = vm.selectedVideoIds || [];

@@ -49,6 +49,24 @@
  * A list of selected series items. This list can be retrieved to customize the
  * viewer by host applications. See the `wvSeriesItemSelectionEnabled` 
  * parameter. 
+ *
+ * Inner objects can contains the following attributes:
+ * 
+ * * {string} `seriesId`
+ *   The orthanc series id. This parameter is not provided for PDF report &
+ *   video. Note this is the original orthanc id, not the webviewer's series
+ *   id. This parameter is always provided.
+ *   
+ * * {number} `frameIndex`
+ *   The frame index. This parameter is not provided for video & pdf instances.
+ *   
+ * * {string} `studyId`
+ *   The orthanc study id. This parameter is always provided.
+ *   
+ * * {string} `instanceId`
+ *   The orthanc instance id. This parameter is only provided for selected PDF
+ *   report or video. Selected multiframe instance do not provide this
+ *   parameter, you have to rely on `seriesId` instead.
  * 
  * @param {string} [wvSeriesId=undefined]
  * Configure the series shown in the main viewport. Viewport's data are reset
@@ -227,14 +245,19 @@
 
                 var series = _
                     .flatMap(newValues.series, function(seriesIds, studyId) {
-                        // @todo manage multiframe instances.
-                        // @todo convert webviewer series id to orthanc series
-                        // id.
                         return seriesIds
                             .map(function (seriesId) {
+                                // Split webviewer series id in orthanc series
+                                // id + frame index.
+                                var arr = seriesId.split(':');
+                                var orthancSeriesId = arr[0];
+                                var frameIndex = arr[1];
+
+                                // Return value.
                                 return {
-                                    seriesId: seriesId,
+                                    seriesId: orthancSeriesId,
                                     studyId: studyId,
+                                    frameIndex: frameIndex,
                                     type: 'series'
                                 }
                             });
