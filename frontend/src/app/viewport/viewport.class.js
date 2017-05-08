@@ -586,9 +586,36 @@
      * @ngdoc method
      * @methodOf osimis.Viewport
      *
+     * @name osimis.Viewport#getCanvasSize
+     *
+     * @return {object}
+     * An object with info about the canvas size.
+     * 
+     * * {int} `width` canvas width (in pixel).
+     * * {int} `height` canvas height (in pixel).
+     * 
+     * @description
+     * Retrieve the current canvas size. As those values are cached, no reflow
+     * is triggered.
+     */
+    Viewport.prototype.getCanvasSize = function() {
+        return {
+            width: this._canvasWidth,
+            height: this._canvasHeight
+        }
+    };
+
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Viewport
+     *
      * @name osimis.Viewport#resizeCanvas
-     * @param {int} width New canvas width (in pixel).
-     * @param {int} height New canvas height (in pixel).
+     * 
+     * @param {int} width
+     * New canvas width (in pixel).
+     * 
+     * @param {int} height
+     * New canvas height (in pixel).
      * 
      * @description
      * Resize cornerstone canvas.
