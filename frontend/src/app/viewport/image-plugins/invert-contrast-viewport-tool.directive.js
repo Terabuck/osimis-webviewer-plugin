@@ -60,14 +60,14 @@
                 var viewportData = viewport.getViewport();
                 viewportData.invert = true;
                 viewport.setViewport(viewportData);
-                viewport.draw();
+                viewport.draw(false);
             };
 
             this._unprocess = function(viewport) {
                 var viewportData = viewport.getViewport();
                 viewportData.invert = false;
                 viewport.setViewport(viewportData);
-                viewport.draw();
+                viewport.draw(false);
             };
 
             this._activateInputs = angular.noop;

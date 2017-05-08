@@ -20,7 +20,8 @@
         ng-repeat="id in vm.seriesIds track by id"
         wv-scroll-on-over-series-ext
         ng-class="{
-'            wvSerieslist__seriesItem--actived': vm.selectedSeriesIds.indexOf($series.id) !== -1
+            'wvSerieslist__seriesItem--selectable': vm.selectionEnabled,
+            'wvSerieslist__seriesItem--activated': vm.selectedSeriesIds.indexOf($series.id) !== -1
         }"
         ng-show="vm.loaded"
         wv-draggable-item="{

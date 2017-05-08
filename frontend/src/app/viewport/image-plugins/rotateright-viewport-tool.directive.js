@@ -65,7 +65,7 @@
                 var viewportData = viewport.getViewport();
                 viewportData.rotation += 90;
                 viewport.setViewport(viewportData);
-                viewport.draw();
+                viewport.draw(false);
             };
 
             this._listenViewChange = angular.noop;

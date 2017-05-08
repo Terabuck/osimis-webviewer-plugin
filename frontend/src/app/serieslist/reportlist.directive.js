@@ -107,8 +107,10 @@
         this.selectedReportIds = this.selectedReportIds || [];
 
         this.toggleSelection = function(id) {
-            // @todo Set video id as its series id (not its instance one...).
-            // @todo Apply toggling to pdf instances
+            // Do nothing if selection is disabled
+            if (!this.selectionEnabled) {
+                return;
+            }
 
             // Activate selection for id
             if (this.selectedReportIds.indexOf(id) === -1) {

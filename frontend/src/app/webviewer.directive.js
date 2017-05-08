@@ -28,6 +28,18 @@
  * The displayed notice content, for instance instructions over mobile
  * ergonomy, or related series / studies.
  * 
+ * @param {boolean} [wvSeriesItemSelectionEnabled=false]
+ * Let the end-user select series in the serieslist using a single click. This
+ * selection has no impact on the standalone viewer. However, host applications
+ * can retrieve the selection to do customized actions using the
+ * `wvSelectedSeriesItem` parameter. When turned back to false, the selection
+ * is kept cached.
+ *
+ * @param {Array<object>} [wvSelectedSeriesItem=EmptyArray]
+ * A list of selected series items. This list can be retrieved to customize the
+ * viewer by host applications. See the `wvSeriesItemSelectionEnabled` 
+ * parameter. 
+ * 
  * @param {string} [wvSeriesId=undefined]
  * Configure the series shown in the main viewport. Viewport's data are reset
  * on change.
@@ -54,27 +66,6 @@
  * @param {boolean} [wvAnnotationstorageEnabled=true]
  * Retrieve annotations from storage. Store annotations to storage
  * automatically. This should be set to false when `wvReadonly` is true.
- * 
- * @param {boolean} [wvSeriesSelectionEnabled=false]
- * Let the end-user select series in the serieslist using a single click. This
- * selection has no impact on the standalone viewer. However, host applications
- * can retrieve the selection to do customized actions using the
- * `wvSelectedSeriesIds` parameter.
- *
- * @param {Array<string>} [wvSelectedSeriesIds=EmptyArray]
- * When `wvSeriesSelectionEnabled` is set to true, this parameter provide the 
- * list of selected series as orthanc ids. This list can be retrieved to 
- * customize the viewer by host applications.
- * 
- * @param {Array<string>} [wvSelectedReportIds=EmptyArray]
- * When `wvSeriesSelectionEnabled` is set to true, this parameter provide the 
- * list of selected series as orthanc ids. This list can be retrieved to 
- * customize the viewer by host applications.
- * 
- * @param {Array<string>} [wvSelectedVideoIds=EmptyArray]
- * When `wvSeriesSelectionEnabled` is set to true, this parameter provide the 
- * list of selected series as orthanc ids. This list can be retrieved to 
- * customize the viewer by host applications.
  * 
  * @scope
  * @restrict E
@@ -122,6 +113,10 @@
                 leftHandlesEnabled: '=?wvLefthandlesEnabled',
                 noticeEnabled: '=?wvNoticeEnabled',
                 noticeText: '=?wvNoticeText',
+                annotationStorageEnabled:  '=?wvAnnotationstorageEnabled',
+                // Selection-related
+                seriesItemSelectionEnabled: '=?wvSeriesItemSelectionEnabled',
+                selectedSeriesItemIds: '=?wvSelectedSeriesItem'
             },
             transclude: {
                 wvLayoutTopLeft: '?wvLayoutTopLeft',
@@ -164,16 +159,59 @@
                 rotateleft: false,
                 rotateright: false
             };
-            vm.annotationStorageEnabled = typeof vm.annotationStorageEnabled !== 'undefined' ? vm.annotationStorageEnabled : false;
-            vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
 
             // Selection-related
-            // @todo deactivate by default
-            vm.seriesSelectionEnabled = typeof vm.seriesSelectionEnabled !== 'undefined' ? vm.seriesSelectionEnabled : true;
             vm.selectedSeriesIds = vm.selectedSeriesIds || [];
             vm.selectedReportIds = vm.selectedReportIds || [];
             vm.selectedVideoIds = vm.selectedVideoIds || [];
-    
+            vm.selectedSeriesItemIds = vm.selectedSeriesItemIds || {};
+            // Update selectedSeriesItemIds based on selected***Ids
+            scope.$watch(function() {
+                return {
+                    series: vm.selectedSeriesIds,
+                    reports: vm.selectedReportIds,
+                    videos: vm.selectedVideoIds
+                }
+            }, function(newValues, oldValues) {
+                var series = newValues
+                    .series
+                    .map(function(seriesId) {
+                        // @todo manage multiframe instances.
+                        // @todo convert webviewer series id to orthanc series
+                        // id.
+                        return {
+                            seriesId: seriesId,
+                            studyId: vm.studyId,
+                            type: 'series'
+                        }
+                    });
+
+                var reports = newValues
+                    .reports
+                    .map(function(reportId) {
+                        return {
+                            instanceId: reportId,
+                            studyId: vm.studyId,
+                            type: 'report/pdf'
+                        }
+                    });
+
+                var videos = newValues
+                    .videos
+                    .map(function(videoId) {
+                        return {
+                            instanceId: videoId,
+                            studyId: vm.studyId,
+                            type: 'video/mpeg4'
+                        }
+                    });
+
+                vm.selectedSeriesItemIds = []
+                    .concat(series)
+                    .concat(reports)
+                    .concat(videos);
+            }, true);
+
             // Activate mobile interaction tools on mobile (not tablet)
             var uaParser = new UAParser();
             vm.mobileInteraction = uaParser.getDevice().type === 'mobile';

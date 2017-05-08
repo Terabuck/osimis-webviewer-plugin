@@ -36,9 +36,9 @@ $pictureSize: 64px;
 }
 
 
-.wvSerieslist__seriesItem--actived,
-.wvSerieslist__videoItem--actived,
-.wvSerieslist__pdfItem--actived {
+.wvSerieslist__seriesItem--activated,
+.wvSerieslist__videoItem--activated,
+.wvSerieslist__pdfItem--activated {
     border: 1px solid #999 !important;
 }
 
@@ -77,9 +77,7 @@ $pictureSize: 64px;
 }
 
 // Report icon
-.wv-serieslist-report {
   // Pointer cursor (for `ng-click`)
-  cursor: pointer;
 
   // Lighten up the icon on hover
   &:hover {

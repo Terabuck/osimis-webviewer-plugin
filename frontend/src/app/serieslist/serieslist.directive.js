@@ -40,7 +40,6 @@
             restrict: 'E',
             scope: {
                 studyId: '=wvStudyId',
-                selectedReportId: '=?wvSelectedReportId', // at the moment, true === an DICOM pdf id which end user has clicked on
                 onStudyLoaded: '&?wvOnStudyLoaded', // For testing convenience
 
                 // Selection-related
@@ -99,8 +98,10 @@
         this.selectedSeriesIds = this.selectedSeriesIds || [];
 
         this.toggleSelection = function(seriesId) {
-            // @todo Set video id as its series id (not its instance one...).
-            // @todo Apply toggling to pdf instances
+            // Do nothing if selection is disabled
+            if (!this.selectionEnabled) {
+                return;
+            }
 
             // Activate selection for seriesId
             if (this.selectedSeriesIds.indexOf(seriesId) === -1) {

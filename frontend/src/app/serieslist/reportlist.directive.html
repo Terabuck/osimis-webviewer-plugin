@@ -20,7 +20,8 @@
         ng-repeat="id in vm.pdfInstanceIds track by id"
         class="list-unstyled superlist wv-serieslist-report"
         ng-class="{
-            'wvSerieslist__pdfItem--actived': vm.selectedReportIds.indexOf(id) !== -1
+            'wvSerieslist__seriesItem--selectable': vm.selectionEnabled,
+            'wvSerieslist__pdfItem--activated': vm.selectedReportIds.indexOf(id) !== -1
         }"
         wv-draggable-item="{
             reportId: id,

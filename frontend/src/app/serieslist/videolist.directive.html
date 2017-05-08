@@ -18,7 +18,8 @@
     <li
         class="list-unstyled superlist wv-serieslist-report"
         ng-class="{
-            'wvSerieslist__videoItem--actived': vm.selectedVideoIds.indexOf($video.id) !== -1
+            'wvSerieslist__seriesItem--selectable': vm.selectionEnabled,
+            'wvSerieslist__videoItem--activated': vm.selectedVideoIds.indexOf($video.id) !== -1
         }"
         ng-show="vm.loaded && vm.videos.length > 0"
         ng-repeat="$video in vm.videos track by $video.id"
