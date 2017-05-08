@@ -35,7 +35,8 @@
     ng-cloak
 >
     <wv-webviewer
-        wv-study-id="vm.studyId"
+        wv-pickable-study-ids="vm.pickableStudyIds"
+        wv-selected-study-ids="vm.selectedStudyIds"
         wv-series-id="vm.seriesId"
 
         wv-toolbar-enabled="vm.enableToolbar"
@@ -56,30 +57,13 @@
             wv-enabled="!vm.isMobile &&
                         vm.enableLayoutTopRight &&
                         vm.enableStudyDownload &&
-                        vm.studyId"
+                        vm.selectedStudyIds.length"
         >
             <wv-study-download-button
-                ng-if="!vm.isMobile && vm.enableStudyDownload && vm.studyId"
-                wv-study-id="vm.studyId"
+                ng-if="!vm.isMobile && vm.enableStudyDownload && vm.selectedStudyIds.length"
+                wv-study-id="vm.selectedStudyIds[0]"
             ></wv-study-download-button>
         </wv-layout-top-right>
-
-        <!-- Selection Zone -->
-        <wv-layout-left-bottom
-            wv-enabled="vm.enableLayoutLeftBottom &&
-                        vm.studyId"
-        >
-            <wv-selection-actionlist
-                wv-selection-enabled="vm.seriesItemSelectionEnabled"
-                wv-data="vm.selectedSeriesItems"
-            >
-                <button
-                    class="wvButton"
-                >
-                    do something
-                </button>
-            </wv-selection-actionlist>
-        </wv-layout-left-bottom>
     </wv-webviewer>
 
     <!-- build:js js/lib.js -->
@@ -109,8 +93,8 @@
     }])
     // Define a basic controller
     .controller('MainController', [
-        '$scope', '$location', 'wvConfig', 'wvSeriesManager',
-        function($scope, $location, wvConfig, wvSeriesManager)
+        '$scope', '$location', 'wvConfig', 'wvStudyManager', 'wvSeriesManager',
+        function($scope, $location, wvConfig, wvStudyManager, wvSeriesManager)
     {
         var vm = this;
 
@@ -122,13 +106,23 @@
         var orthancStudyId = $location.search().study;
         var orthancSeriesId = $location.search().series;
 
-        vm.studyId = undefined;
+        vm.pickableStudyIds = [];
+        vm.selectedStudyIds = [];
         vm.seriesId = undefined;
+
+        // Set pickable study ids
+        wvStudyManager
+            .getAllStudyIds()
+            .then(function(studyIds) {
+                vm.pickableStudyIds = studyIds;
+            });
 
         // Display orthanc study.
         if (orthancStudyId) {
             vm.mode = 'study';
-            vm.studyId = orthancStudyId;
+            vm.selectedStudyIds = [
+                orthancStudyId
+            ];
         }
         // Display & convert orthanc series id (from url parameter) into
         // frontend series id.
@@ -142,7 +136,7 @@
                         vm.seriesId = seriesList[0].id;
                     }
                     // When multiframe, consider series as a study
-                    else if (!vm.studyId) {
+                    else if (!vm.selectedStudyIds.length) {
                         // @todo @warning multiple series may be shown instead of a single one... study id should also be split...
                         var request = new osimis.HttpRequest();
                         request.setHeaders(wvConfig.httpRequestHeaders);
@@ -151,7 +145,9 @@
                             .get(wvConfig.orthancApiURL + '/series/'+orthancSeriesId+'/study')
                             .then(function(study) {
                                 vm.mode = 'study';
-                                vm.studyId = study.data.ID;
+                                vm.selectedStudyIds = [
+                                    study.data.ID
+                                ];
                             });
                     }
                     else {

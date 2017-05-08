@@ -6,6 +6,14 @@
  * Configure the study shown in the serieslist`wvSerieslistEnabled` must be 
  * true.
  *
+ * @param {Array<string>} wvPickableStudyIds
+ * Define a list of study that can be accessed by the user. Thus, it's possible
+ * for host application to restrict access to a specific set of study depending
+ * on the current user. This also allow entry points to set the pickable
+ * studies as the current patient ones. Be aware this does not compensate
+ * server-side security, but provide an easy mechanism to override the studies
+ * shown in the study picker without overriding the <orthanc>/studies route.
+ * 
  * @param {Array<string>} [wvSelectedStudyIds=EmptyArray] 
  * Configure the studies shown in the serieslist. `wvSerieslistEnabled` must be 
  * true.
@@ -95,6 +103,7 @@
             scope: {
                 readonly: '=?wvReadonly',
                 studyId: '=?wvStudyId', // deprecated
+                pickableStudyIds: '=wvPickableStudyIds',
                 selectedStudyIds: '=?wvSelectedStudyIds',
                 seriesId: '=?wvSeriesId',
                 tools: '=?wvTools',
@@ -155,6 +164,7 @@
                 rotateleft: false,
                 rotateright: false
             };
+            vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefoned' ? vm.pickableStudyIds : [];
             vm.selectedStudyIds = typeof vm.selectedStudyIds !== 'undefined' ? vm.selectedStudyIds : [];
 
             // Selection-related

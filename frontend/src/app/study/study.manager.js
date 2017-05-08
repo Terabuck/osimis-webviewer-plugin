@@ -14,8 +14,19 @@
         .factory('wvStudyManager', wvStudyManager);
 
     /* @ngInject */
-    function wvStudyManager($rootScope) {
+    function wvStudyManager($rootScope, wvConfig) {
         var service = {
+            /**
+             * @ngdoc method
+             * @methodOf webviewer.service:wvStudyManager
+             * 
+             * @name osimis.StudyManager#getAllStudyIds
+             *
+             * @description
+             * Retrieve the list of all available study ids from Orthanc. This
+             * basically return the content of the `<orthanc>/studies` route.
+             */
+            getAllStudyIds: getAllStudyIds,
             /**
              * @ngdoc method
              * @methodOf webviewer.service:wvStudyManager
@@ -47,6 +58,18 @@
         };
 
         ////////////////
+
+        function getAllStudyIds() {
+            var request = new osimis.HttpRequest();
+            request.setHeaders(wvConfig.httpRequestHeaders);
+            request.setCache(true);
+
+            return request
+                .get(wvConfig.orthancApiURL + '/studies/')
+                .then(function(response) {
+                    return response.data;
+                });
+        }
 
         function loadStudy(id) {
             // Preload study images / instance tags / ...
