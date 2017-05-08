@@ -251,7 +251,7 @@
                     var newCsViewport = scope.vm.csViewport || null;
 
                     // Case 1:
-                    // Do nothing if no change
+                    // Do nothing if image wasn't displayed and is still not
                     if (!newImageId && !oldImageId) {
 
                     }
@@ -314,7 +314,9 @@
                     //   UPDATE CS VIEWPORT
                     //   KEEP IMAGE
                     //   DRAW IMAGE
-                    else if (oldCsViewport._cornerstoneViewportData.hflip !== newCsViewport._cornerstoneViewportData.hflip || 
+                    else if (
+                        !oldCsViewport ||
+                        oldCsViewport._cornerstoneViewportData.hflip !== newCsViewport._cornerstoneViewportData.hflip || 
                         oldCsViewport._cornerstoneViewportData.invert !== newCsViewport._cornerstoneViewportData.invert ||
                         oldCsViewport._cornerstoneViewportData.modalityLUT !== newCsViewport._cornerstoneViewportData.modalityLUT ||
                         oldCsViewport._cornerstoneViewportData.pixelReplication !== newCsViewport._cornerstoneViewportData.pixelReplication ||
