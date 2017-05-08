@@ -114,44 +114,18 @@
             wv-selected-study-ids="vm.selectedStudyIds"
         ></wv-studylist>
 
-        <div
-            ng-if="vm.studyinformationEnabled || vm.serieslistEnabled"
+        <!-- Study Islands -->
+        <!-- @todo merge vm.studyinformationEnabled && vm.serieslistEnabled -->
+        <wv-study-island
+            ng-if="vm.studyinformationEnabled && vm.serieslistEnabled"
             ng-repeat="$studyId in vm.selectedStudyIds"
-        >
-            <!-- Study's information -->
-            <section
-                ng-if="vm.studyinformationEnabled"
-                class="wvAsideLeft__information fontColor__white"
-            >
-                <h3 class="h2 pt10">Study Information</h3>
-                <wv-study-information
-                    wv-study-id="$studyId"
-                    class="clearfix"
-                ></wv-study-information>
-            </section>
-            <!-- List of series -->
-            <section
-                ng-if="vm.serieslistEnabled"
-                class="wvAsideLeft__serie fontColor__white wv-h pt10"
-            >
-                <h3 class="h2 mtn">List of Series</h3>
-                <wv-reportlist
-                    wv-study-id="$studyId"
-                    wv-selection-enabled="vm.seriesItemSelectionEnabled"
-                    wv-selected-report-ids="vm.selectedReportIds[$studyId]"
-                ></wv-reportlist>
-                <wv-videolist
-                    wv-study-id="$studyId"
-                    wv-selection-enabled="vm.seriesItemSelectionEnabled"
-                    wv-selected-video-ids="vm.selectedVideoIds[$studyId]"
-                ></wv-videolist>
-                <wv-serieslist
-                    wv-study-id="$studyId"
-                    wv-selection-enabled="vm.seriesItemSelectionEnabled"
-                    wv-selected-series-ids="vm.selectedSeriesIds[$studyId]"
-                ></wv-serieslist>
-            </section>
-        </div>
+
+            wv-study-id="$studyId"
+            wv-series-item-selection-enabled="vm.seriesItemSelectionEnabled"
+            wv-selected-series-ids="vm.selectedSeriesIds[$studyId]"
+            wv-selected-report-ids="vm.selectedReportIds[$studyId]"
+            wv-selected-video-ids="vm.selectedVideoIds[$studyId]"
+        ></wv-study-island>
 
         <!--
         Layout: left bottom

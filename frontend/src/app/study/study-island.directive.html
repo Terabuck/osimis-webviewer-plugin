@@ -1,0 +1,27 @@
+<div class="wvStudyIsland">
+    <div class="wvStudyIsland__header">
+        <span ng-if="vm.studyTags.StudyDescription">{{vm.studyTags.StudyDescription}}</span>
+        <small ng-if="vm.studyTags.StudyDate">({{vm.studyTags.StudyDate}})</small>
+    </div>
+
+    <!-- List of series -->
+    <div
+        class="wvStudyIsland__main"
+    >
+        <wv-reportlist
+            wv-study-id="vm.studyId"
+            wv-selection-enabled="vm.seriesItemSelectionEnabled"
+            wv-selected-report-ids="vm.selectedReportIds"
+        ></wv-reportlist>
+        <wv-videolist
+            wv-study-id="vm.studyId"
+            wv-selection-enabled="vm.seriesItemSelectionEnabled"
+            wv-selected-video-ids="vm.selectedVideoIds"
+        ></wv-videolist>
+        <wv-serieslist
+            wv-study-id="vm.studyId"
+            wv-selection-enabled="vm.seriesItemSelectionEnabled"
+            wv-selected-series-ids="vm.selectedSeriesIds"
+        ></wv-serieslist>
+    </div>
+</div>

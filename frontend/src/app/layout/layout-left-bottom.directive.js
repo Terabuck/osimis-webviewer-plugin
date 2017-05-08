@@ -18,7 +18,7 @@
                 enabled: '=?wvEnabled'
             },
             transclude: true,
-            template: '<div class="wvLayout__leftBottom" ng-transclude></div>'
+            templateUrl: 'app/layout/layout-left-bottom.directive.html'
         };
         return directive;
 
