@@ -153,9 +153,11 @@
             vm.selectedStudyIds = typeof vm.selectedStudyIds !== 'undefined' ? vm.selectedStudyIds : [];
 
             // Selection-related
-            vm.selectedSeriesIds = vm.selectedSeriesIds || [];
-            vm.selectedReportIds = vm.selectedReportIds || [];
-            vm.selectedVideoIds = vm.selectedVideoIds || [];
+            // @warning @todo Set back default `seriesItemSelectionEnabled` to false
+            vm.seriesItemSelectionEnabled = typeof vm.seriesItemSelectionEnabled !== 'undefined' ? vm.seriesItemSelectionEnabled : true;
+            vm.selectedSeriesIds = vm.selectedSeriesIds || {};
+            vm.selectedReportIds = vm.selectedReportIds || {};
+            vm.selectedVideoIds = vm.selectedVideoIds || {};
             vm.selectedSeriesItemIds = vm.selectedSeriesItemIds || {};
             // Update selectedSeriesItemIds based on selected***Ids
             scope.$watch(function() {
@@ -165,37 +167,43 @@
                     videos: vm.selectedVideoIds
                 }
             }, function(newValues, oldValues) {
-                var series = newValues
-                    .series
-                    .map(function(seriesId) {
+                var series = _
+                    .flatMap(newValues.series, function(seriesIds, studyId) {
                         // @todo manage multiframe instances.
                         // @todo convert webviewer series id to orthanc series
                         // id.
-                        return {
-                            seriesId: seriesId,
-                            studyId: vm.studyId,
-                            type: 'series'
-                        }
+                        return seriesIds
+                            .map(function (seriesId) {
+                                return {
+                                    seriesId: seriesId,
+                                    studyId: studyId,
+                                    type: 'series'
+                                }
+                            });
                     });
 
-                var reports = newValues
-                    .reports
-                    .map(function(reportId) {
-                        return {
-                            instanceId: reportId,
-                            studyId: vm.studyId,
-                            type: 'report/pdf'
-                        }
+                var reports = _
+                    .flatMap(newValues.reports, function(reportIds, studyId) {
+                        return reportIds
+                            .map(function (instanceId) {
+                                return {
+                                    instanceId: instanceId,
+                                    studyId: studyId,
+                                    type: 'report/pdf'
+                                }
+                            });
                     });
 
-                var videos = newValues
-                    .videos
-                    .map(function(videoId) {
-                        return {
-                            instanceId: videoId,
-                            studyId: vm.studyId,
-                            type: 'video/mpeg4'
-                        }
+                var videos = _
+                    .flatMap(newValues.videos, function(videoIds, studyId) {
+                        return videoIds
+                            .map(function (instanceId) {
+                                return {
+                                    instanceId: instanceId,
+                                    studyId: studyId,
+                                    type: 'video/mpeg4'
+                                }
+                            });
                     });
 
                 vm.selectedSeriesItemIds = []
@@ -235,21 +243,34 @@
             });
 
             // Preload studies
-            scope.$watch('vm.studyId', function(newStudyId, oldStudyId) {
-                // Log study id
-                console.log('study: ', newStudyId);
+            scope.$watch('vm.selectedStudyIds', function(newValues, oldValues) {
+                // Log study ids
+                console.log('studies: ', newValues);
 
                 // Cancel previous preloading
-                if (oldStudyId && newStudyId !== oldStudyId) {
-                    wvStudyManager.abortStudyLoading(oldStudyId);
-                }
+                oldValues
+                    // Retrieve studyIds that have disapeared 
+                    .filter(function(newStudyId) {
+                        return newValues.indexOf(newStudyId) === -1;
+                    })
+                    // Cancel preloading
+                    .forEach(function(oldStudyId) {
+                        wvStudyManager.abortStudyLoading(oldStudyId);
+                    });
 
-                // Preload study
-                if (newStudyId) {
-                    wvStudyManager.loadStudy(newStudyId);
-                    wvAnnotationManager.loadStudyAnnotations(newStudyId);
-                }
-            });
+
+                // Preload studies
+                newValues
+                    // Retrieve studyIds that are new
+                    .filter(function(newStudyId) {
+                        return oldValues.indexOf(newStudyId) === -1;
+                    })
+                    // Preload them
+                    .forEach(function(newStudyId) {
+                        wvStudyManager.loadStudy(newStudyId);
+                        wvAnnotationManager.loadStudyAnnotations(newStudyId);
+                    });
+            }, true);
 
             // Propagate series preloading events
             // @todo Add on-series-dropped callback and move out the rest of the events from wv-droppable-series.
