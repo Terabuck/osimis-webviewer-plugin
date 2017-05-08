@@ -102,7 +102,6 @@
             restrict: 'E',
             scope: {
                 readonly: '=?wvReadonly',
-                studyId: '=?wvStudyId', // deprecated
                 pickableStudyIds: '=wvPickableStudyIds',
                 selectedStudyIds: '=?wvSelectedStudyIds',
                 seriesId: '=?wvSeriesId',
@@ -164,7 +163,7 @@
                 rotateleft: false,
                 rotateright: false
             };
-            vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefoned' ? vm.pickableStudyIds : [];
+            vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];
             vm.selectedStudyIds = typeof vm.selectedStudyIds !== 'undefined' ? vm.selectedStudyIds : [];
 
             // Selection-related

@@ -1,6 +1,15 @@
 Pending changes in the mainline
 ===============================
 
+=> Minimum Orthanc version: 1.1.0 <=
+
+Features:
+* Select other studies from the same patients.
+
+Breaking Changes:
+* New routes used:
+  - /<orthanc>/patients/<patient-uid>
+
 Version 0.8.0
 ========================
 

@@ -6,6 +6,10 @@
  *
  * @param {Array<string>} wvPickableStudyIds
  * The list of available study ids.
+ *
+ * @param {boolean} [readonly=false]
+ * Disable edition of the study picker data. Useful for technology such as
+ * liveshare.
  */
 (function() {
     'use strict';
@@ -15,12 +19,13 @@
         return {
             scope: {
                 pickableStudyIds: '=wvPickableStudyIds',
-                wvSelectedStudyId: '=?wvSelectedStudyId', // @deprecated
-                wvSelectedStudyIds: '=?wvSelectedStudyIds'
+                selectedStudyIds: '=?wvSelectedStudyIds',
+                readonly: '=?wvReadonly'
             },
             template: [
                 '<button type="button" class="btn btn-default wv-studylist" ',
-                'ng-model="wvSelectedStudyIds" placeholder="Study.." ',
+                'ng-model="selectedStudyIds" placeholder="Study.." ',
+                'ng-disabled="readonly" ',
                 'bs-options="study.value as study.label for study in studies" ',
                 'data-multiple="true" bs-select>',
                 '</button>'
@@ -31,23 +36,8 @@
 
                 // Default values
                 scope.pickableStudyIds = typeof scope.pickableStudyIds !== 'undefined' ? scope.pickableStudyIds : [];
-                scope.wvSelectedStudyIds = typeof scope.wvSelectedStudyIds !== 'undefined' ? scope.wvSelectedStudyIds : [];
-
-                // @deprecated keep `wvSelectedStudyId` sync w/
-                // `wvSelectedStudyIds`.
-                if (scope.wvSelectedStudyId) {
-                    scope.wvSelectedStudyIds[0] = scope.wvSelectedStudyId;
-                }
-                Object.defineProperty(scope, 'wvSelectedStudyId', {
-                    get: function() {
-                        return scope.wvSelectedStudyIds[0];
-                    },
-                    set: function(val) {
-                        scope.wvSelectedStudyIds[0] = val;
-                    },
-                    enumerable: true
-                });
-                // /@deprecated
+                scope.selectedStudyIds = typeof scope.selectedStudyIds !== 'undefined' ? scope.selectedStudyIds : [];
+                scope.readonly = typeof scope.readonly !== 'undefined' ? scope.readonly : false;
 
                 // Update shown studies' information based on pickable study
                 // ids.

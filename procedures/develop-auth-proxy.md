@@ -74,6 +74,7 @@ The following Orthanc routes are also used:
 
 ```
 GET /studies/
+GET /patients/<uid>
 GET /studies/<uid>
 GET /studies/<uid>/archive
 GET /instances/<uid>/simplified-tags
