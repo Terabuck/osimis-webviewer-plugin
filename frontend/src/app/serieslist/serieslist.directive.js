@@ -20,6 +20,9 @@
  * * `grid` The items are shown in a grid format.
  * * `list` The items are shown in a list format.
  *
+ * @param {boolean} [wvVideoDisplayEnabled=true]
+ * Display videos in the serieslist.
+ * 
  * @param {boolean} [wvSelectionEnabled=false]
  * Let the end-user select series in the serieslist using a single click. This
  * selection has no impact on the standalone viewer. However, host applications
@@ -60,6 +63,7 @@
                 studyId: '=wvStudyId',
                 onStudyLoaded: '&?wvOnStudyLoaded', // For testing convenience
                 displayMode: '=?wvDisplayMode',
+                videoDisplayEnabled: '=?wvVideoDisplayEnabled',
 
                 // Selection-related
                 selectionEnabled: '=?wvSelectionEnabled',
@@ -81,6 +85,8 @@
                 if (!id) return; 
                 // @todo handle IsStable === false
 
+                vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
+                
                 // Clean selection
                 // @todo Only cleanup when selection has not been reset at the
                 // same time as the study id.
@@ -102,7 +108,7 @@
                         // will load the pdf instances too in one single HTTP
                         // request).
                         return $q.all({
-                            videos: $q.all(wvVideoManager.listInstanceIdsFromOrthancStudyId(id)),
+                            videos: vm.videoDisplayEnabled && $q.all(wvVideoManager.listInstanceIdsFromOrthancStudyId(id)),
                             pdfInstances: $q.all(wvPdfInstanceManager.listFromOrthancStudyId(id))
                         });
                     })

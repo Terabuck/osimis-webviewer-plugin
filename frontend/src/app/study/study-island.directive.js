@@ -15,6 +15,9 @@
  * @param {boolean} [wvStudyDownloadEnabled=false]
  * Display a button to download the study.
  *
+ * @param {boolean} [wvVideoDisplayEnabled=true]
+ * Display videos in the serieslist.
+ * 
  * @param {string} [wvDisplayMode='grid']
  * Display mode of the items.
  *
@@ -54,6 +57,7 @@
             scope: {
                 studyId: '=wvStudyId',
                 studyDownloadEnabled: '=?wvStudyDownloadEnabled',
+                videoDisplayEnabled: '=?wvVideoDisplayEnabled',
                 displayMode: '=?wvDisplayMode',
 
                 // Selection-related
@@ -73,6 +77,7 @@
             vm.studyTags = {};
             vm.patientTags = {};
             vm.studyDownloadEnabled = typeof vm.studyDownloadEnabled !== 'undefined' ? vm.studyDownloadEnabled : false;
+            vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
             vm.displayMode = typeof vm.displayMode !== 'undefined' ? vm.displayMode : 'grid'; // either `grid` or `list`
 
             // Selection-related.

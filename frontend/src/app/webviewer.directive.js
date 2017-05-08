@@ -140,6 +140,7 @@
                 noticeText: '=?wvNoticeText',
                 annotationStorageEnabled: '=?wvAnnotationstorageEnabled',
                 studyDownloadEnabled: '=?wvStudyDownloadEnabled',
+                videoDisplayEnabled: '=?wvVideoDisplayEnabled',
 
                 // Selection-related
                 seriesItemSelectionEnabled: '=?wvSeriesItemSelectionEnabled',
@@ -191,6 +192,7 @@
             vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];
             vm.selectedStudyIds = typeof vm.selectedStudyIds !== 'undefined' ? vm.selectedStudyIds : [];
             vm.studyDownloadEnabled = typeof vm.studyDownloadEnabled !== 'undefined' ? vm.studyDownloadEnabled : false;
+            vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
             vm.studyIslandsDisplayMode = 'grid';
 
             // Selection-related
