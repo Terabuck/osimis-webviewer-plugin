@@ -6,7 +6,7 @@
         ng-show="!vm.selectionEnabled"
     >
         <button
-            class="wvButton"
+            class="wvButton--border"
             ng-click="vm.selectionEnabled = !vm.selectionEnabled"
         >
             perform action
@@ -26,7 +26,6 @@
         <div
             ng-transclude
         >
-            
         </div>
 
         <!-- Close / Reset Buttons -->
@@ -34,13 +33,13 @@
             class="wvSelectionActionlist__bottom"
         >
             <button
-                class="wvButton"
+                class="wvButton--border"
                 ng-show="vm.selectionEnabled"
                 ng-click="vm.selectionEnabled = !vm.selectionEnabled"
             >
                 close
             <button
-                class="wvButton"
+                class="wvButton--border"
                 ng-show="vm.selectionEnabled"
                 ng-click="vm.data = []"
             >

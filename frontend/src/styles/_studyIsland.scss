@@ -1,13 +1,23 @@
 .wvStudyIsland {
-    margin: 2rem 0rem;
-
+    margin: 1rem 1rem 1rem 1rem;
+    border: 0.3rem solid hsla(204, 70%, 53%, 0.5);
 }
 .wvStudyIsland__header {
-    border-top: 1px solid hsla(0, 0%, 100%, 0.2);
-    border-bottom: 1px solid hsla(0, 0%, 100%, 0.2);
-    padding: 0.5rem 0;
+    background-color: hsla(204, 70%, 53%, 0.5);
+    padding: 0.5rem 0.5rem 0.8rem 0.5rem;
+    line-height: 1.35rem;
+    width: 100%;
+}
+.wvStudyIsland__actions {
+    float: right;
+
+    // Compensate header padding (since the inner download study button
+    // actually has margin).
+    margin-top: -0.8rem;
+    margin-right: -0.8rem;
 }
 .wvStudyIsland__main {
-    padding-top: 10px !important;
+    padding: 0.4rem; // 0.7rem - 0.3rem (2px transparent border + 1px margin)
     color: hsl(0, 0%, 100%);
+    width: 100%; // let some space for the 4-columns based items
 }

@@ -67,7 +67,7 @@
                     bs-tooltip
                     data-placement="bottom"
                     title="Viewer mode"
-                    class="wvViewer__button"
+                    class="wvButton"
                     ng-click="vm.hideEditor()"
                     ng-class="{'active': !vm.isEditorShown}"
                 >
@@ -77,13 +77,13 @@
                     bs-tooltip
                     data-placement="bottom"
                     title="Editor mode"
-                    class="wvViewer__button"
+                    class="wvButton"
                     ng-click="vm.showEditor()"
                     ng-class="{'active': vm.isEditorShown}"
                 >
                     <span class="glyphicon glyphicon-notes"></span>
                 </button>
-            </wv-layout-top4>
+            </wv-layout-top-right>
         </wv-webviewer>
         ```
         -->
@@ -101,46 +101,87 @@
         wv-enabled="vm.serieslistEnabled || vm.studyinformationEnabled"
         wv-handles-enabled="vm.leftHandlesEnabled"
     >
-        <!-- Study Picker -->
-        <wv-studylist 
-            ng-if="vm.serieslistEnabled"
-            wv-readonly="vm.readonly"
-            wv-pickable-study-ids="vm.pickableStudyIds"
-            wv-selected-study-ids="vm.selectedStudyIds"
-        ></wv-studylist>
+        <wv-layout-left1>
+            <!-- Study Picker -->
+            <wv-studylist 
+                class="float__left"
+                ng-if="vm.serieslistEnabled"
+                wv-readonly="vm.readonly"
+                wv-pickable-study-ids="vm.pickableStudyIds"
+                wv-selected-study-ids="vm.selectedStudyIds"
+            ></wv-studylist>
 
-        <!-- Study Islands -->
-        <wv-study-island
-            ng-if="vm.serieslistEnabled"
-            ng-repeat="$studyId in vm.selectedStudyIds"
+            <!-- Display mode toggle -->
+            <div
+                class="float__right wvButton"
+                ng-show="vm.studyIslandsDisplayMode !== 'grid'"
+                ng-click="vm.studyIslandsDisplayMode = 'grid'"
 
-            wv-study-id="$studyId"
-            wv-study-download-enabled="vm.studyDownloadEnabled"
-            wv-item-selection-enabled="vm.seriesItemSelectionEnabled"
-            wv-selected-series-ids="vm.selectedSeriesIds[$studyId]"
-            wv-selected-report-ids="vm.selectedReportIds[$studyId]"
-            wv-selected-video-ids="vm.selectedVideoIds[$studyId]"
-        ></wv-study-island>
-
-        <!--
-        Layout: left bottom
-        
-        @description
-        Parameterizablee zone.
-        The user of the `wvWebviewer` directive can inject content here and
-        configure advanced display options. Have a look at the `wvLayoutLeftBottom` 
-        directive for the advanced configuration.
-        -->
-        <ng-transclude
-            ng-transclude-slot="wvLayoutLeftBottom"
-        >   
-            <!-- Default layout left bottom disabled -->
-            <wv-layout-left-bottom
-                ng-init="falseValue = false"
-                wv-enabled="falseValue"
+                bs-tooltip
+                title="Grid Display"
+                placement="right"
             >
-            </wv-layout-left-bottom>
-        </ng-transclude>
+                <span class="glyphicon glyphicon-th"></span>
+            </div>
+            <div
+                class="float__right wvButton"
+                ng-show="vm.studyIslandsDisplayMode !== 'list'"
+                ng-click="vm.studyIslandsDisplayMode = 'list'"
+
+                bs-tooltip
+                title="List Display"
+                placement="right"
+            >
+                <span class="glyphicon glyphicon-th-list"></span>
+            </div>
+        </wv-layout-left1>
+        
+        <wv-layout-left2>
+            <!-- Study Islands -->
+            <wv-study-island
+                ng-if="vm.serieslistEnabled"
+                ng-repeat="$studyId in vm.selectedStudyIds"
+
+                wv-display-mode="vm.studyIslandsDisplayMode"
+                wv-study-id="$studyId"
+                wv-study-download-enabled="vm.studyDownloadEnabled"
+                wv-item-selection-enabled="vm.seriesItemSelectionEnabled"
+                wv-selected-series-ids="vm.selectedSeriesIds[$studyId]"
+                wv-selected-report-ids="vm.selectedReportIds[$studyId]"
+                wv-selected-video-ids="vm.selectedVideoIds[$studyId]"
+            ></wv-study-island>
+        </wv-layout-left2>
+
+        <wv-layout-left3>
+            <!--
+            Layout: left bottom
+            
+            @description
+            Parameterizablee zone.
+            The user of the `wvWebviewer` directive can inject content here and
+            configure advanced display options. Have a look at the
+            `wvLayoutLeftBottom` directive for the advanced configuration.
+
+            @example
+            ```html
+            <wv-webviewer ...>
+                <wv-layout-left-bottom>
+                    User content here...
+                </wv-layout-left-bottom>
+            </wv-webviewer>
+            ```
+            -->
+            <ng-transclude
+                ng-transclude-slot="wvLayoutLeftBottom"
+            >   
+                <!-- Default layout left bottom disabled -->
+                <wv-layout-left-bottom
+                    ng-init="falseValue = false"
+                    wv-enabled="falseValue"
+                >
+                </wv-layout-left-bottom>
+            </ng-transclude>
+        </wv-layout-left3>
     </wv-layout-left>
 
     <!--
@@ -178,7 +219,7 @@
     Layout: bottom
 
     @description
-    This zone contains the notices.
+    This zone contains the notices. It is only used on mobile at the moment.
     -->
     <wv-layout-bottom
         wv-enabled="vm.noticeEnabled"
@@ -187,7 +228,7 @@
             ng-if="vm.noticeEnabled"
             wv-content="vm.noticeText"
             wv-on-close="vm.noticeEnabled = false"
-        ></wv-notice">
+        ></wv-notice>
     </wv-layout-bottom>
 
     <!--
@@ -301,7 +342,8 @@
                 <wv-droppable-series-overlay-item
                     ng-if="
                         !vm.viewports[$index].videoId &&
-                        !vm.viewports[$index].seriesId
+                        !vm.viewports[$index].seriesId &&
+                        !vm.viewports[$index].reportId
                     "
                 ></wv-droppable-series-overlay-item>
             </wv-pane-policy>

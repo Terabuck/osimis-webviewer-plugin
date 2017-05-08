@@ -5,14 +5,14 @@ wv-webviewer {
     overflow: hidden;
 }
 
+@import "variable";
 @import "button";
 @import "exitButton";
 @import "studyIsland";
-@import "variable";
 @import "helpers";
 @import "notice";
 @import "layout";
-@import "serieList";
+@import "serieslist";
 @import "toolbar";
 @import "video";
 @import "studyInformationBreadcrumb";
@@ -21,7 +21,6 @@ wv-webviewer {
 /* wvb-ui stuffs */
 @import "wv-overlay.scss";
 @import "wv-pdf-viewer.scss";
-@import "wv-studylist.scss";
 @import "wv-splitpane.scss";
 @import "wv-timeline.scss";
 @import "wv-timeline-controls.scss";

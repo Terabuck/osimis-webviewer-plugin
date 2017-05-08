@@ -55,7 +55,7 @@
                             .get(wvConfig.orthancApiURL + '/studies/' + studyId)
                             .then(function(response) {
                                 var study = response.data;
-                                v.label = study.MainDicomTags.StudyDescription || 'Undefined study';
+                                v.label = study.MainDicomTags.StudyDescription || 'Untitled study';
                             });
                     });
                 });

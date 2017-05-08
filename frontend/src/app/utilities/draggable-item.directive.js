@@ -95,7 +95,7 @@
         $element.hover(function() {
             // change border to hovered one
             if (_this.isEnabled) {
-                $element.css('border', '1px dashed #585858');
+                $element.css('border', '0.2rem dashed hsla(204, 70%, 53%, 0.8)');
             }
         }, function() {
             $element.css('border', '');

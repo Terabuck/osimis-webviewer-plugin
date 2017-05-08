@@ -11,8 +11,8 @@
         <div style="margin-left: 1rem" class="wvViewer__buttonGroup lh__40 fs18" ng-transclude="1"></div>
         <div class="wvViewer__buttonGroup float__right" ng-transclude="2"></div>
     </div>
-    <div class="float__right wvViewer__buttonGroup--contentWidth">
-        <div class="float__left" ng-transclude="3"></div>
-        <div class="float__right text-right lh40 va-m pr10 pl10" ng-transclude="4"></div>
+    <div class="wvViewer__buttonGroup--contentWidth" style="display: flex; flex: 1; flex-direction: row;">
+        <div ng-transclude="3" style="flex: 1 0 auto;"></div>
+        <div class="pr10" ng-transclude="4"></div>
     </div>
 </div>

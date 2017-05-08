@@ -45,6 +45,6 @@
 
     /* @ngInject */
     function SelectionActionListVM() {
-
+        this.selectionEnabled = typeof this.selectionEnabled !== 'undefined' ? this.selectionEnabled : false;
     }
 })();
