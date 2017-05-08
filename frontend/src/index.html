@@ -118,15 +118,9 @@
             ];
 
             // Set all the patient studies as pickable.
-            var request = new osimis.HttpRequest();
-            request.setHeaders(wvConfig.httpRequestHeaders);
-            request
-                .get(wvConfig.orthancApiURL + '/studies/' + orthancStudyId)
-                .then(function (study) {
-                    return wvStudyManager
-                        .getPatientStudyIds(study.data.ParentPatient);
-                })
-                .then(function (studyIds) {
+            wvStudyManager
+                .getRelatedStudyIds(vm.selectedStudyIds)
+                .then(function(studyIds) {
                     vm.pickableStudyIds = studyIds;
                 });
         }
