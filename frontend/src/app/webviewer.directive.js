@@ -2,10 +2,13 @@
  * @ngdoc directive
  * @name webviewer.directive:wvWebviewer
  * 
- * @param {string} [wvStudyId=undefined]
+ * @deprecated @param {string} [wvStudyId=undefined]
  * Configure the study shown in the serieslist`wvSerieslistEnabled` must be 
- * true. Changing the `wvStudyId` resets the viewports to a (1, 1) layout with
- * the first series of the study shown.
+ * true.
+ *
+ * @param {Array<string>} [wvSelectedStudyIds=EmptyArray] 
+ * Configure the studies shown in the serieslist. `wvSerieslistEnabled` must be 
+ * true.
  * 
  * @param {boolean} [wvToolbarEnabled=true]
  * Display the toolbar. Note all tools are disabled when the toolbar is 
@@ -73,19 +76,6 @@
  * @description
  * The `wvWebviewer` directive display a whole web viewer at full scale (100%
  * width, 100% height).
- * 
- * @example
- * The following example show the toolbar, hide the full list of studies,
- * and display a list of draggable series with a splitable pane of droppable
- * viewports.
- * 
- * ```html
- * <wv-webviewer
- *     wv-toolbar-enabled="true"
- *     
- *     wv-study-id="'your-study-id'"
- * ></wv-webviewer>
- * ```
  **/
  (function () {
     'use strict';
@@ -104,7 +94,8 @@
             restrict: 'E',
             scope: {
                 readonly: '=?wvReadonly',
-                studyId: '=?wvStudyId',
+                studyId: '=?wvStudyId', // deprecated
+                selectedStudyIds: '=?wvSelectedStudyIds',
                 seriesId: '=?wvSeriesId',
                 tools: '=?wvTools',
                 toolbarEnabled: '=?wvToolbarEnabled',
@@ -159,6 +150,7 @@
                 rotateleft: false,
                 rotateright: false
             };
+            vm.selectedStudyIds = typeof vm.selectedStudyIds !== 'undefined' ? vm.selectedStudyIds : [];
 
             // Selection-related
             vm.selectedSeriesIds = vm.selectedSeriesIds || [];

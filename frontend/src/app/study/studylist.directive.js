@@ -11,18 +11,37 @@
     .directive('wvStudylist', function ($rootScope, wvConfig) {
       return {
         scope: {
-          wvSelectedStudyId: '='
+          wvSelectedStudyId: '=?wvSelectedStudyId', // @deprecated
+          wvSelectedStudyIds: '=?wvSelectedStudyIds'
         },
         template: [
           '<button type="button" class="btn btn-default wv-studylist" ',
-          'ng-model="wvSelectedStudyId" placeholder="Study.." ',
-          'bs-options="study.value as study.label for study in studies"',
-          ' bs-select>',
+          'ng-model="wvSelectedStudyIds" placeholder="Study.." ',
+          'bs-options="study.value as study.label for study in studies" ',
+          'data-multiple="true" bs-select>',
           '</button>'
         ].join(''),
         restrict: 'E',
         link: function postLink(scope, element, attrs) {
           scope.studies = [];
+
+          // Default values
+          scope.wvSelectedStudyIds = typeof scope.wvSelectedStudyIds !== 'undefined' ? scope.wvSelectedStudyIds : [];
+
+          // @deprecated keep `wvSelectedStudyId` sync w/ `wvSelectedStudyIds`
+          if (scope.wvSelectedStudyId) {
+            scope.wvSelectedStudyIds[0] = scope.wvSelectedStudyId;
+          }
+          Object.defineProperty(scope, 'wvSelectedStudyId', {
+            get: function() {
+              return scope.wvSelectedStudyIds[0];
+            },
+            set: function(val) {
+              scope.wvSelectedStudyIds[0] = val;
+            },
+            enumerable: true
+          });
+          // /@deprecated
           
           var request = new osimis.HttpRequest();
           request.setHeaders(wvConfig.httpRequestHeaders);
@@ -58,3 +77,4 @@
       };
     });
 })();
+ 

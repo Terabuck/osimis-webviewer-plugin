@@ -106,6 +106,12 @@
         wv-enabled="vm.serieslistEnabled || vm.studyinformationEnabled"
         wv-handles-enabled="vm.leftHandlesEnabled"
     >
+        <!-- Study Picker -->
+        <wv-studylist 
+            wv-selected-study-id="vm.studyId"
+            wv-selected-study-ids="vm.selectedStudyIds"
+        ></wv-studylist>
+
         <!-- Study's inforomation -->
         <section
             ng-if="vm.studyinformationEnabled"
