@@ -35,6 +35,31 @@ $pictureSize: 64px;
     vertical-align: middle;
 }
 
+.wvSerieslist__seriesItem {
+    // unstyle list
+    padding-left: 0;
+    list-style: none;
+
+    /* mimic on hover border for draggable */
+    border-right: 1px solid transparent;
+    border-left: 1px solid transparent;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+
+    line-height: 0px;
+}
+
+.wvSerieslist__seriesItem--list {
+    display: block;
+
+    border-right: 1px solid #222; 
+    margin-bottom: 2px;
+}
+.wvSerieslist__seriesItem--grid {
+    display: inline-block;
+    margin-left: 1px;
+    margin-bottom: 1px;
+}
 
 .wvSerieslist__seriesItem--activated,
 .wvSerieslist__videoItem--activated,

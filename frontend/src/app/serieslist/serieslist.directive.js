@@ -12,6 +12,14 @@
  * @param {callback} [wvOnStudyLoaded=undefined]
  * Callback mainly used for unit test.
  *
+ * @param {string} [wvDisplayMode='list']
+ * Display mode of the list.
+ *
+ * The value can either be:
+ *
+ * * `grid` The items are shown in a grid format.
+ * * `list` The items are shown in a list format.
+ *
  * @param {boolean} [wvSelectionEnabled=false]
  * Let the end-user select series in the serieslist using a single click. This
  * selection has no impact on the standalone viewer. However, host applications
@@ -41,6 +49,7 @@
             scope: {
                 studyId: '=wvStudyId',
                 onStudyLoaded: '&?wvOnStudyLoaded', // For testing convenience
+                displayMode: '=?wvDisplayMode',
 
                 // Selection-related
                 selectionEnabled: '=?wvSelectionEnabled',
@@ -94,7 +103,8 @@
     function SerieslistVM() {
         // Set initial values.
         this.seriesIds = [];
-        this.selectionEnabled = typeof this.selectionEnabled === 'undefined' ? false : this.selectionEnabled;
+        this.displayMode = typeof this.displayMode !== 'undefined' ? this.displayMode : 'list';
+        this.selectionEnabled = typeof this.selectionEnabled !== 'undefined' ? this.selectionEnabled : false;
         this.selectedSeriesIds = this.selectedSeriesIds || [];
 
         this.toggleSelection = function(seriesId) {

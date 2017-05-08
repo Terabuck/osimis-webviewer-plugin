@@ -4,6 +4,21 @@
         <span ng-if="vm.studyTags.StudyDescription">{{vm.studyTags.StudyDescription}}</span>
         <small ng-if="vm.studyTags.StudyDate">({{vm.studyTags.StudyDate}})</small>
 
+        <!-- Display mode toggle -->
+        <button
+            class="wvButton"
+            ng-if="vm.displayMode !== 'grid'"
+            ng-click="vm.displayMode = 'grid'"
+        >
+            grid
+        </button>
+        <button
+            class="wvButton"
+            ng-if="vm.displayMode !== 'list'"
+            ng-click="vm.displayMode = 'list'"
+        >
+            list
+        </button>
         <!-- Actions -->
         <wv-study-download-button
             ng-if="vm.studyDownloadEnabled"
@@ -27,6 +42,7 @@
         ></wv-videolist>
         <wv-serieslist
             wv-study-id="vm.studyId"
+            wv-display-mode="vm.displayMode"
             wv-selection-enabled="vm.itemSelectionEnabled"
             wv-selected-series-ids="vm.selectedSeriesIds"
         ></wv-serieslist>

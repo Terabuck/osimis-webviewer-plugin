@@ -59,8 +59,6 @@
 
         // Dragged data.
         var _data = undefined;
-        var _defaultCursor = $element.css('cursor');
-        var _defaultBorder = $element.css('border');
         this.isEnabled = undefined;
 
         // Update the data.
@@ -86,7 +84,7 @@
 
             $element.draggable('disable');
 
-            $element.css('cursor', _defaultCursor);
+            $element.css('cursor', '');
             _data = undefined;
             this.isEnabled = false;
         };
@@ -95,11 +93,12 @@
         var clone = $('<div class="wv-draggable-clone"></div>');
 
         $element.hover(function() {
+            // change border to hovered one
             if (_this.isEnabled) {
                 $element.css('border', '1px dashed #585858');
             }
         }, function() {
-            $element.css('border', _defaultBorder);
+            $element.css('border', '');
         });
 
         // Make the element draggable.
