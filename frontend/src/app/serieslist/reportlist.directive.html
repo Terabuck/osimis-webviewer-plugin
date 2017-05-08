@@ -21,7 +21,7 @@
         class="list-unstyled superlist wv-serieslist-report"
         ng-class="{
             'wvSerieslist__seriesItem--selectable': vm.selectionEnabled,
-            'wvSerieslist__pdfItem--activated': vm.selectedReportIds.indexOf(id) !== -1
+            'wvSerieslist__pdfItem--activated': vm.selectionEnabled && vm.selectedReportIds.indexOf(id) !== -1
         }"
         wv-draggable-item="{
             reportId: id,

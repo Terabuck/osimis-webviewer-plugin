@@ -1,0 +1,51 @@
+<div 
+    class="wvSelectionActionlist"
+>
+    <!-- State 1: selection disabled -->
+    <div
+        ng-show="!vm.selectionEnabled"
+    >
+        <button
+            class="wvButton"
+            ng-click="vm.selectionEnabled = !vm.selectionEnabled"
+        >
+            perform action
+        </button>
+    </div>
+
+    <!-- State 2: selection enabled -->
+    <div 
+        ng-show="vm.selectionEnabled"
+    >
+        <!-- Notice -->
+        <p>
+            Select one or multiple series items by clicking on them.
+        </p>
+
+        <!-- Injectable Content Zone -->
+        <div
+            ng-transclude
+        >
+            
+        </div>
+
+        <!-- Close / Reset Buttons -->
+        <div
+            class="wvSelectionActionlist__bottom"
+        >
+            <button
+                class="wvButton"
+                ng-show="vm.selectionEnabled"
+                ng-click="vm.selectionEnabled = !vm.selectionEnabled"
+            >
+                close
+            <button
+                class="wvButton"
+                ng-show="vm.selectionEnabled"
+                ng-click="vm.data = []"
+            >
+                reset
+            </button>
+        </div>
+    </div>
+</div>
