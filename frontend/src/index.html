@@ -41,7 +41,7 @@
 
         wv-toolbar-enabled="vm.enableToolbar"
         wv-serieslist-enabled="vm.enableLayoutLeft && vm.mode !== 'series'"
-        wv-studyinformation-enabled="vm.enableLayoutLeft && vm.mode !== 'series'"
+        wv-studyinformation-enabled="vm.enableLayoutTop && vm.mode !== 'series'"
         wv-lefthandles-enabled="vm.enableLayoutLeftHandles"
 
         wv-notice-enabled="vm.enableNotice"
@@ -51,19 +51,8 @@
         wv-annotationstorage-enabled="vm.enableAnnotationStorage"
         wv-series-item-selection-enabled="vm.seriesItemSelectionEnabled"
         wv-selected-series-items="vm.selectedSeriesItems"
+        wv-study-download-enabled="vm.enableStudyDownload"
     >
-        <!-- Download Study Button -->
-        <wv-layout-top-right
-            wv-enabled="!vm.isMobile &&
-                        vm.enableLayoutTopRight &&
-                        vm.enableStudyDownload &&
-                        vm.selectedStudyIds.length"
-        >
-            <wv-study-download-button
-                ng-if="!vm.isMobile && vm.enableStudyDownload && vm.selectedStudyIds.length"
-                wv-study-id="vm.selectedStudyIds[0]"
-            ></wv-study-download-button>
-        </wv-layout-top-right>
     </wv-webviewer>
 
     <!-- build:js js/lib.js -->
@@ -180,6 +169,7 @@
 
         // Configure the user interface depending on the user angent/browser.
         var userInterfacePolicy = new osimis.UserAgentBasedInterfacePolicy();
+        vm.enableLayoutTop = userInterfacePolicy.enableLayoutTop;
         vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
         vm.enableLayoutTopRight = userInterfacePolicy.enableLayoutTopRight;
         vm.enableToolbar = userInterfacePolicy.enableToolbar;
@@ -192,6 +182,7 @@
         // Listen to changes triggered by the user interface policy.    
         userInterfacePolicy.onUpdate(function() {
             $scope.$apply(function() {
+                vm.enableLayoutTop = userInterfacePolicy.enableLayoutTop;
                 vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
                 vm.enableLayoutTopRight = userInterfacePolicy.enableLayoutTopRight;
                 vm.enableToolbar = userInterfacePolicy.enableToolbar;

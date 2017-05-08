@@ -5,14 +5,9 @@
 >
     <!--
     Layout: top zones (1, 2, 3 and 4)
-    @note
-    At the moment, if toolbarEnabled === false, the whole top part of the
-    application disapear.
-
-    @todo keep some buttons in series mode?
     -->
     <wv-layout-top
-        wv-enabled="$isTopLeftEnabled || vm.toolbarEnabled || $isTopRightEnabled"
+        wv-enabled="vm.studyinformationEnabled || vm.toolbarEnabled || $isTopLeftEnabled || $isTopRightEnabled"
     >
         <!--
         Layout: top-left
@@ -48,7 +43,7 @@
         @description
         Zone containing the study information.
         -->
-        <wv-layout-top3 ng-show="vm.toolbarEnabled">
+        <wv-layout-top3 ng-show="vm.studyinformationEnabled">
             <wv-study-information-breadcrumb
                 wv-study-id="vm.selectedStudyIds[0]"
                 class="clearfix"
@@ -115,12 +110,12 @@
         ></wv-studylist>
 
         <!-- Study Islands -->
-        <!-- @todo merge vm.studyinformationEnabled && vm.serieslistEnabled -->
         <wv-study-island
-            ng-if="vm.studyinformationEnabled && vm.serieslistEnabled"
+            ng-if="vm.serieslistEnabled"
             ng-repeat="$studyId in vm.selectedStudyIds"
 
             wv-study-id="$studyId"
+            wv-study-download-enabled="vm.studyDownloadEnabled"
             wv-series-item-selection-enabled="vm.seriesItemSelectionEnabled"
             wv-selected-series-ids="vm.selectedSeriesIds[$studyId]"
             wv-selected-report-ids="vm.selectedReportIds[$studyId]"

@@ -25,6 +25,7 @@
         // 1. Disable toolbar on mobile
         this.enableToolbar = false;
         // 2. Disable left/right side on portrait orientation
+        this.enableLayoutTop = (orientation === 'landscape');
         this.enableLayoutTopLeft = (orientation === 'landscape');
         this.enableLayoutTopRight = (orientation === 'landscape');
         this.enableLayoutLeft = (orientation === 'landscape');
@@ -49,6 +50,7 @@
             this.enableLayoutRight = false;
             
             // Disable top side
+            this.enableLayoutTop = false;
             this.enableLayoutTopLeft = false;
             this.enableLayoutTopRight = false;
 
@@ -64,6 +66,7 @@
             this.enableLayoutRight = true;
 
             // Enable top side
+            this.enableLayoutTop = true;
             this.enableLayoutTopLeft = true;
             this.enableLayoutTopRight = true;
 

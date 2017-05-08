@@ -22,7 +22,10 @@
  * Display the list of series based on the `wvStudyId`. 
  * 
  * @param {boolean} [wvStudyinformationEnabled=true]
- * Display the study information based on the `wvStudyId`.
+ * Display the study information (breadcrumb) based on the `wvStudyId`.
+ *
+ * @param {boolean} [wvStudyDownloadEnabled=false]
+ * Display study download buttons in the study islands.
  *
  * @param {boolean} [wvLefthandlesEnabled=true]
  * Display buttons to toggle the left side of the interface. The right handles
@@ -108,14 +111,12 @@
                 leftHandlesEnabled: '=?wvLefthandlesEnabled',
                 noticeEnabled: '=?wvNoticeEnabled',
                 noticeText: '=?wvNoticeText',
-                annotationStorageEnabled:  '=?wvAnnotationstorageEnabled',
+                annotationStorageEnabled: '=?wvAnnotationstorageEnabled',
+                studyDownloadEnabled: '=?wvStudyDownloadEnabled',
+
                 // Selection-related
                 seriesItemSelectionEnabled: '=?wvSeriesItemSelectionEnabled',
-<<<<<<< HEAD
-                selectedSeriesItemIds: '=?wvSelectedSeriesItem'
-=======
                 selectedSeriesItems: '=?wvSelectedSeriesItems' // readonly
->>>>>>> TP-WVB-213-switch-selection-mode-with-a-button
             },
             transclude: {
                 wvLayoutTopLeft: '?wvLayoutTopLeft',
@@ -161,6 +162,7 @@
             };
             vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];
             vm.selectedStudyIds = typeof vm.selectedStudyIds !== 'undefined' ? vm.selectedStudyIds : [];
+            vm.studyDownloadEnabled = typeof vm.studyDownloadEnabled !== 'undefined' ? vm.studyDownloadEnabled : false;
 
             // Selection-related
             vm.seriesItemSelectionEnabled = typeof vm.seriesItemSelectionEnabled !== 'undefined' ? vm.seriesItemSelectionEnabled : false;
