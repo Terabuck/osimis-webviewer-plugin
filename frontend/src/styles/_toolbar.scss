@@ -23,7 +23,7 @@
     width: $toolbarHeight;
 }
 
-.wvToolbar--right .wvViewer__button.wvViewer__button--rotate, label.wvViewer__button.wvViewer__button--rotate.fa { // make sure we have more precedence than .fa class
+.wvToolbar--right .wvViewer__button.wvViewer__button--rotate, .wvToolbar--right label.wvViewer__button.wvViewer__button--rotate.fa { // make sure we have more precedence than .fa class
     // Align rotated button position when toolbar is positioned at right.
     left: 0;
     top: 5px;

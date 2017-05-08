@@ -1,7 +1,7 @@
 <div class="wvStudyIsland">
     <div class="wvStudyIsland__header">
         <!-- Title -->
-        <span ng-if="vm.studyTags.StudyDescription">{{vm.studyTags.StudyDescription}}</span>
+        <span>{{vm.studyTags.StudyDescription || 'Undefined study'}}</span>
         <small ng-if="vm.studyTags.StudyDate">({{vm.studyTags.StudyDate}})</small>
 
         <!-- Display mode toggle -->

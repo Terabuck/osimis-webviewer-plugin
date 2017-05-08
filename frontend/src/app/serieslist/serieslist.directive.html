@@ -24,7 +24,7 @@
 
         bs-tooltip
         bs-enabled="vm.displayMode === 'grid'"
-        title="{{$series.tags.SeriesDescription}}"
+        title="{{$series.tags.SeriesDescription || 'Undefined series'}}"
         placement="right"
     >
         <div
@@ -40,7 +40,7 @@
             ng-if="vm.displayMode === 'list'"
             class="serieList__informations float__right pl10"
         >
-            <p class="serieList__label mn">{{$series.tags.SeriesDescription}}</p>
+            <p class="serieList__label mn">{{$series.tags.SeriesDescription || 'Undefined series'}}</p>
             <!-- @todo reintegrate hotspots (it triggers recursive $digest atm!)
             <wvp-hotspotlist wvp-serie-id="$series.id"></wvp-hotspotlist> -->
         </div>

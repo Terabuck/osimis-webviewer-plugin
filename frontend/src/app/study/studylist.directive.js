@@ -22,14 +22,7 @@
                 selectedStudyIds: '=?wvSelectedStudyIds',
                 readonly: '=?wvReadonly'
             },
-            template: [
-                '<button type="button" class="btn btn-default wv-studylist" ',
-                'ng-model="selectedStudyIds" placeholder="Study.." ',
-                'ng-disabled="readonly" ',
-                'bs-options="study.value as study.label for study in studies" ',
-                'data-multiple="true" bs-select>',
-                '</button>'
-            ].join(''),
+            templateUrl: 'app/study/studylist.directive.html',
             restrict: 'E',
             link: function postLink(scope, element, attrs) {
                 scope.studies = [];
@@ -62,7 +55,7 @@
                             .get(wvConfig.orthancApiURL + '/studies/' + studyId)
                             .then(function(response) {
                                 var study = response.data;
-                                v.label = study.MainDicomTags.StudyDescription;
+                                v.label = study.MainDicomTags.StudyDescription || 'Undefined study';
                             });
                     });
                 });
