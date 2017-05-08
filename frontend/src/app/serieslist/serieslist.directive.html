@@ -11,60 +11,26 @@
         border-top: 1px solid transparent;
         border-bottom: 1px solid transparent;
 
+        line-height: 0px;
         margin-bottom: 2px;
     }
     </style>
     <li
-        ng-show="vm.pdfInstanceIds.length > 0"
-        ng-repeat="id in vm.pdfInstanceIds track by id"
-        class="list-unstyled superlist wv-serieslist-report"
-        ng-click="vm.openPdf(id)"
-    >
-        <div class="serieList__picture inline-object wh__64">
-            <span class="wv-serieslist-reporticon fa fa-file-text"></span>
-        </div>
-        <div class="serieList__informations float__right pl10">
-            <span class="serieList__label mn">PDF report</span>
-        </div>
-    </li>
-    <li
-        ng-show="!vm.pdfInstanceIds.length"
-        class="list-unstyled superlist wv-serieslist-noreport"
-    >
-        <div class="serieList__picture inline-object wh__64">
-            <span class="wv-serieslist-noreporticon fa fa-file-text"></span>
-        </div>
-        <div class="serieList__informations float__right pl10">
-            <span class="serieList__label mn">No report available</span>
-        </div>
-    </li>
-    <li
-        class="list-unstyled superlist wv-serieslist-report"
-        ng-if="vm.videoDisplayEnabled"
-        ng-show="vm.videos.length > 0"
-        ng-repeat="$video in vm.videos track by $video.id"
-        wv-draggable-item="{
-            videoId: $video.id,
-            seriesId: null
-        }"
-    >
-        <div class="serieList__picture inline-object wh__64">
-            <span class="wv-serieslist-reporticon fa fa-video-camera"></span>
-        </div>
-        <div class="serieList__informations float__right pl10">
-            <span class="serieList__label mn">{{$video.tags.SeriesDescription}}</span>
-        </div>
-    </li>
-    <li
         class="list-unstyled superlist"
         ng-repeat="id in vm.seriesIds track by id"
         wv-scroll-on-over-series-ext
+        ng-class="{
+'            wvSerieslist__seriesItem--actived': vm.selectedSeriesIds.indexOf($series.id) !== -1
+        }"
+        ng-show="vm.loaded"
         wv-draggable-item="{
+            reportId: null,
             videoId: null,
             seriesId: $series.id,
             imageIndex: 0,
             csViewport: null
         }"
+        ng-click="vm.toggleSelection($series.id)"
     >
         <div
             class="serieList__picture inline-object wh__64"

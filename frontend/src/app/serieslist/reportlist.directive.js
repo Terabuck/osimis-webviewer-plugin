@@ -1,6 +1,6 @@
 /**
  * @ngdoc directive
- * @name webviewer.directive:wvSerieslist
+ * @name webviewer.directive:wvReportlist
  * 
  * @restrict Element
  *
@@ -13,12 +13,12 @@
  * Callback mainly used for unit test.
  *
  * @param {boolean} [wvSelectionEnabled=false]
- * Let the end-user select series in the serieslist using a single click. This
+ * Let the end-user select reports in the serieslist using a single click. This
  * selection has no impact on the standalone viewer. However, host applications
  * can retrieve the selection to do customized actions using the
- * `wvSelectedSeriesIds` parameter.
+ * `wvSelectedReportIds` parameter.
  *
- * @param {Array<string>} [wvSelectedSeriesIds=EmptyArray]
+ * @param {Array<string>} [wvSelectedReportIds=EmptyArray]
  * When `wvSelectionEnabled` is set to true, this parameter provide the list of
  * selected series as orthanc ids. This list can be retrieved to customize the
  * viewer by host applications.
@@ -28,26 +28,25 @@
 
     angular
         .module('webviewer')
-        .directive('wvSerieslist', wvSerieslist);
+        .directive('wvReportlist', wvReportlist);
 
     /* @ngInject */
-    function wvSerieslist($q, wvSeriesManager) {
+    function wvReportlist($q, wvSeriesManager, wvPdfInstanceManager) {
         var directive = {
             bindToController: true,
-            controller: SerieslistVM,
+            controller: ReportlistVM,
             controllerAs: 'vm',
             link: link,
             restrict: 'E',
             scope: {
                 studyId: '=wvStudyId',
-                selectedReportId: '=?wvSelectedReportId', // at the moment, true === an DICOM pdf id which end user has clicked on
                 onStudyLoaded: '&?wvOnStudyLoaded', // For testing convenience
 
                 // Selection-related
                 selectionEnabled: '=?wvSelectionEnabled',
-                selectedSeriesIds: '=?wvSelectedSeriesIds'
+                selectedReportIds: '=?wvSelectedReportIds'
             },
-            templateUrl: 'app/serieslist/serieslist.directive.html'
+            templateUrl: 'app/serieslist/reportlist.directive.html'
         };
         return directive;
 
@@ -64,15 +63,24 @@
                 // Clean selection
                 // @todo Only cleanup when selection has not been reset at the
                 // same time as the study id.
-                vm.selectedSeriesIds = [];
+                vm.selectedReportIds = [];
                 vm.loaded = false;
 
                 wvSeriesManager
                     .listFromOrthancStudyId(id)
                     .then(function(seriesList) {
-                        // Set image series ids.
-                        vm.seriesIds = seriesList.map(function(series) {
-                            return series.id;
+                        // Update video & pdf instance ids (once the series 
+                        // have been loaded since the series manager request 
+                        // will load the pdf instances too in one single HTTP
+                        // request).
+                        return $q.all(
+                            wvPdfInstanceManager.listFromOrthancStudyId(id)
+                        );
+                    })
+                    .then(function(pdfInstances) {
+                        // Set pdf instances.
+                        vm.pdfInstanceIds = _.keys(pdfInstances).length && pdfInstances.map(function(pdfInstance) {
+                            return pdfInstance.id;
                         });
                         vm.loaded = true;
 
@@ -92,24 +100,24 @@
     }
 
     /* @ngInject */
-    function SerieslistVM() {
+    function ReportlistVM() {
         // Set initial values.
-        this.seriesIds = [];
+        this.pdfInstanceIds = [];
         this.selectionEnabled = typeof this.selectionEnabled === 'undefined' ? false : this.selectionEnabled;
-        this.selectedSeriesIds = this.selectedSeriesIds || [];
+        this.selectedReportIds = this.selectedReportIds || [];
 
-        this.toggleSelection = function(seriesId) {
+        this.toggleSelection = function(id) {
             // @todo Set video id as its series id (not its instance one...).
             // @todo Apply toggling to pdf instances
 
-            // Activate selection for seriesId
-            if (this.selectedSeriesIds.indexOf(seriesId) === -1) {
-                this.selectedSeriesIds.push(seriesId);
+            // Activate selection for id
+            if (this.selectedReportIds.indexOf(id) === -1) {
+                this.selectedReportIds.push(id);
             }
-            // Deactivate selection for seriesId
+            // Deactivate selection for id
             else {
-                var index = this.selectedSeriesIds.indexOf(seriesId);
-                this.selectedSeriesIds.splice(index, 1);
+                var index = this.selectedReportIds.indexOf(id);
+                this.selectedReportIds.splice(index, 1);
             }
         };
     }

@@ -4,17 +4,6 @@
     wv-right-enabled="$isRightEnabled"
 >
     <!--
-    Layout: fullscreen
-
-    @description
-    PDF viewer takes the whole screen when a PDF report is opened.
-    -->
-    <wv-pdf-viewer
-        ng-if="vm.currentPdfReportId"
-        wv-report-id="vm.currentPdfReportId"
-    ></wv-pdf-viewer>
-
-    <!--
     Layout: top zones (1, 2, 3 and 4)
 
     @note
@@ -148,7 +137,6 @@
             ng-if="vm.studyinformationEnabled"
             class="wvAsideLeft__information fontColor__white"
         >
-            <h3 class="h2 pt10">Study Information</h3>
             <wv-study-information
                 wv-study-id="vm.studyId"
                 class="clearfix"
@@ -159,11 +147,20 @@
             ng-if="vm.serieslistEnabled"
             class="wvAsideLeft__serie fontColor__white wv-h pt10"
         >
-            <h3 class="h2 mtn">List of Series</h3>
+            <wv-reportlist
+                wv-study-id="vm.studyId"
+                wv-selection-enabled="vm.seriesSelectionEnabled"
+                wv-selected-report-ids="vm.selectedReportIds"
+            ></wv-reportlist>
+            <wv-videolist
+                ng-if="vm.videoDisplayEnabled"
+                wv-study-id="vm.studyId"
+                wv-selection-enabled="vm.seriesSelectionEnabled"
+                wv-selected-video-ids="vm.selectedVideoIds"
+            ></wv-videolist>
             <wv-serieslist
                 wv-study-id="vm.studyId"
                 wv-selected-report-id="vm.currentPdfReportId"
-                wv-video-display-enabled="vm.videoDisplayEnabled"
             ></wv-serieslist>
         </section>
     </wv-layout-left>
@@ -235,12 +232,21 @@
                 wv-on-pane-removed="vm.cleanupViewport($index)"
 
                 wv-on-item-dropped="
+                    vm.viewports[$index].reportId   = $data.reportId !== undefined   ? $data.reportId   : vm.viewports[$index].reportId;
                     vm.viewports[$index].videoId    = $data.videoId !== undefined    ? $data.videoId    : vm.viewports[$index].videoId;
                     vm.viewports[$index].seriesId   = $data.seriesId !== undefined   ? $data.seriesId   : vm.viewports[$index].seriesId;
                     vm.viewports[$index].imageIndex = $data.imageIndex !== undefined ? $data.imageIndex : vm.viewports[$index].imageIndex;
                     vm.viewports[$index].csViewport = $data.csViewport !== undefined ? $data.csViewport : vm.viewports[$index].csViewport;
                 "
              >
+                <!--
+                PDF Report
+                -->
+                <wv-pdf-viewer
+                    ng-if="vm.viewports[$index].reportId"
+                    wv-report-id="vm.viewports[$index].reportId"
+                ></wv-pdf-viewer>
+
                 <!--
                 Video
                 -->
