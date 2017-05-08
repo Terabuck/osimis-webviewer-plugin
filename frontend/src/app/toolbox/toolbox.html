@@ -1,11 +1,17 @@
-<div class="wvViewer__buttonGroup">
+<div
+    class="wvToolbar"
+    ng-if="vm.position === 'top'"
+    ng-class="{
+        'wvToolbar--top': vm.position === 'top',
+        'wvToolbar--right': vm.position === 'right'
+    }"
+>
     <!-- Splitpane Grid configuration buttons. -->
     <button
         ng-disabled="vm.readonly"
-        bs-tooltip
-        data-placement="bottom"
         title="Single view"
-        data-original-title="Single view"
+        data-placement="bottom"
+        bs-tooltip
         class="wvViewer__button"
         ng-click="vm.buttons.layout = {x: 1, y: 1}"
         ng-class="{'active': vm.buttons.layout.x === 1 && vm.buttons.layout.y === 1}"
@@ -14,10 +20,9 @@
     </button>
     <button
         ng-disabled="vm.readonly"
-        bs-tooltip
-        data-placement="bottom"
         title="Split view"
-        data-original-title="Split view"
+        data-placement="bottom"
+        bs-tooltip
         ng-click="vm.buttons.layout = {x: 2, y: 2}"
         class="wvViewer__button"
         ng-class="{'active': vm.buttons.layout.x === 2 && vm.buttons.layout.y === 2}"
@@ -26,92 +31,376 @@
     </button>
 
     <!-- Invert Colour State -->
-    <label style="margin: 0; position: relative;" ng-if="vm.buttons.hasOwnProperty('invert')" class="wvViewer__button glyphicon glyphicon-adjust" ng-class="{active: vm.state.invert}"
-        bs-tooltip data-placement="bottom" title="Invert color"
+    <label 
+        tyle="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('invert')"
+        class="wvViewer__button glyphicon glyphicon-adjust"
+        ng-class="{active: vm.state.invert}"
+        title="Invert color"
+        data-placement="bottom"
+        bs-tooltip
     >
         <input type="checkbox" ng-disabled="vm.readonly" ng-model="vm.state.invert" value="invert" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Zoom -->
-    <label style="margin: 0; position: relative;" ng-if="vm.buttons.hasOwnProperty('zoom')" class="wvViewer__button glyphicon glyphicon-search" ng-class="{active: vm.tool === 'zoom'}"
-        bs-tooltip data-placement="bottom" title="Zoom" style
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('zoom')"
+        class="wvViewer__button glyphicon glyphicon-search"
+        ng-class="{active: vm.tool === 'zoom'}"
+        title="Zoom"
+        data-placement="bottom"
+        bs-tooltip
     >
         <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="zoom" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Pan -->
-    <label style="margin: 0; position: relative;" ng-if="vm.buttons.hasOwnProperty('pan')" class="wvViewer__button glyphicon glyphicon-move" ng-class="{active: vm.tool === 'pan'}"
-        bs-tooltip data-placement="bottom" title="3D panning"
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('pan')"
+        class="wvViewer__button glyphicon glyphicon-move"
+        ng-class="{active: vm.tool === 'pan'}"
+        title="3D panning"
+        data-placement="bottom"
+        bs-tooltip
     >
         <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="pan" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Windowing -->
-    <label style="margin: 0; position: relative;" ng-if="vm.buttons.hasOwnProperty('windowing')" class="wvViewer__button fa fa-sun-o" ng-class="{active: vm.tool === 'windowing'}"
-        bs-tooltip data-placement="bottom" title="WW/WL"
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('windowing')"
+        class="wvViewer__button fa fa-sun-o"
+        ng-class="{active: vm.tool === 'windowing'}"
+        title="WW/WL"
+        data-placement="bottom"
+        bs-tooltip
     >
         <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="windowing" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Length Measure -->
-    <label style="margin: 0; position: relative;" ng-if="vm.buttons.hasOwnProperty('lengthmeasure')" class="wvViewer__button glyphicon glyphicon-resize-horizontal" ng-class="{active: vm.tool === 'lengthmeasure'}"
-        bs-tooltip data-placement="bottom" title="Length Measurement"
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('lengthmeasure')"
+        class="wvViewer__button glyphicon glyphicon-resize-horizontal"
+        ng-class="{active: vm.tool === 'lengthmeasure'}"
+        title="Length Measurement"
+        data-placement="bottom"
+        bs-tooltip
     >
         <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="lengthmeasure" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Angle Measure -->
-    <label style="margin: 0; position: relative;" ng-if="vm.buttons.hasOwnProperty('anglemeasure')" class="wvViewer__button glyphicon glyphicon-chevron-left" ng-class="{active: vm.tool === 'anglemeasure'}"
-        bs-tooltip data-placement="bottom" title="Angle Measurement"
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('anglemeasure')"
+        class="wvViewer__button glyphicon glyphicon-chevron-left"
+        ng-class="{active: vm.tool === 'anglemeasure'}"
+        title="Angle Measurement"
+        data-placement="bottom"
+        bs-tooltip
     >
         <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="anglemeasure" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Pixel Probe -->
-    <label style="margin: 0; position: relative;" ng-if="vm.buttons.hasOwnProperty('pixelprobe')" class="wvViewer__button glyphicon glyphicon-record" ng-class="{active: vm.tool === 'pixelprobe'}"
-        bs-tooltip data-placement="bottom" title="Pixel Probe"
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('pixelprobe')"
+        class="wvViewer__button glyphicon glyphicon-record"
+        ng-class="{active: vm.tool === 'pixelprobe'}"
+        title="Pixel Probe"
+        data-placement="bottom"
+        bs-tooltip
     >
         <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="pixelprobe" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Elliptical Region Of Interest -->
-    <label style="margin: 0; position: relative;" ng-if="vm.buttons.hasOwnProperty('ellipticalroi')" class="wvViewer__button fa fa-circle-o" ng-class="{active: vm.tool === 'ellipticalroi'}"
-        bs-tooltip data-placement="bottom" title="Elliptical ROI"
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('ellipticalroi')"
+        class="wvViewer__button fa fa-circle-o"
+        ng-class="{active: vm.tool === 'ellipticalroi'}"
+        title="Elliptical ROI"
+        data-placement="bottom"
+        bs-tooltip
     >
         <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="ellipticalroi" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Rectangle Region Of Interest -->
-    <label style="margin: 0; position: relative;" ng-if="vm.buttons.hasOwnProperty('rectangleroi')" class="wvViewer__button glyphicon glyphicon glyphicon-unchecked" ng-class="{active: vm.tool === 'rectangleroi'}"
-        bs-tooltip data-placement="bottom" title="Rectangle ROI"
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('rectangleroi')"
+        class="wvViewer__button glyphicon glyphicon glyphicon-unchecked"
+        ng-class="{active: vm.tool === 'rectangleroi'}"
+        title="Rectangle ROI"
+        data-placement="bottom"
+        bs-tooltip
     >
         <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="rectangleroi" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Rotate Left -->
-    <label style="margin: 0; position: relative;" ng-if="vm.buttons.hasOwnProperty('rotateleft')" class="wvViewer__button fa fa-rotate-left" ng-class="{active: vm.tool === 'rotateleft'}"
-        bs-tooltip data-placement="bottom" title="Rotate to the left on mouse click"
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('rotateleft')"
+        class="wvViewer__button fa fa-rotate-left"
+        ng-class="{active: vm.tool === 'rotateleft'}"
+        title="Rotate to the left on mouse click"
+        data-placement="bottom"
+        bs-tooltip
     >
         <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="rotateleft" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Rotate Right -->
-    <label style="margin: 0; position: relative;" ng-if="vm.buttons.hasOwnProperty('rotateright')" class="wvViewer__button fa fa-rotate-right" ng-class="{active: vm.tool === 'rotateright'}"
-        bs-tooltip data-placement="bottom" title="Rotate to the right on mouse click"
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('rotateright')"
+        class="wvViewer__button fa fa-rotate-right"
+        ng-class="{active: vm.tool === 'rotateright'}"
+        title="Rotate to the right on mouse click"
+        data-placement="bottom"
+        bs-tooltip
     >
         <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="rotateright" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Flip Horizontally -->
-    <label style="margin: 0; position: relative;" ng-if="vm.buttons.hasOwnProperty('hflip')" class="wvViewer__button fa fa-exchange" ng-class="{active: vm.tool === 'hflip'}"
-        bs-tooltip data-placement="bottom" title="Flip horizontally on mouse click"
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('hflip')"
+        class="wvViewer__button fa fa-exchange"
+        ng-class="{active: vm.tool === 'hflip'}"
+        title="Flip horizontally on mouse click"
+        data-placement="bottom"
+        bs-tooltip
     >
         <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="hflip" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Flip Vertically -->
-    <label style="margin: 0; position: relative;" ng-if="vm.buttons.hasOwnProperty('vflip')" class="wvViewer__button fa fa-exchange wvViewer__button--rotate" ng-class="{active: vm.tool === 'vflip'}"
-        bs-tooltip data-placement="bottom" title="Flip vertically on mouse click"
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('vflip')"
+        class="wvViewer__button fa fa-exchange wvViewer__button--rotate"
+        ng-class="{active: vm.tool === 'vflip'}"
+        title="Flip vertically on mouse click"
+        data-placement="bottom"
+        bs-tooltip
+    >
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="vflip" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+</div>
+
+<!--
+Since I can't manage to make tooltip's data-placement attribute dynamic, I
+duplicate the whole directive content and keep it static.
+-->
+<div
+    class="wvToolbar"
+    ng-if="vm.position === 'right'"
+    ng-class="{
+        'wvToolbar--top': vm.position === 'top',
+        'wvToolbar--right': vm.position === 'right'
+    }"
+>
+    <!-- Splitpane Grid configuration buttons. -->
+    <button
+        ng-disabled="vm.readonly"
+        title="Single view"
+        data-placement="left"
+        bs-tooltip
+        class="wvViewer__button"
+        ng-click="vm.buttons.layout = {x: 1, y: 1}"
+        ng-class="{'active': vm.buttons.layout.x === 1 && vm.buttons.layout.y === 1}"
+    >
+        <span class="glyphicon glyphicon-stop"></span>
+    </button>
+    <button
+        ng-disabled="vm.readonly"
+        title="Split view"
+        data-placement="left"
+        bs-tooltip
+        ng-click="vm.buttons.layout = {x: 2, y: 2}"
+        class="wvViewer__button"
+        ng-class="{'active': vm.buttons.layout.x === 2 && vm.buttons.layout.y === 2}"
+    >
+        <span class="glyphicon glyphicon-th-large"></span>
+    </button>
+
+    <!-- Invert Colour State -->
+    <label 
+        tyle="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('invert')"
+        class="wvViewer__button glyphicon glyphicon-adjust"
+        ng-class="{active: vm.state.invert}"
+        title="Invert color"
+        data-placement="left"
+        bs-tooltip
+    >
+        <input type="checkbox" ng-disabled="vm.readonly" ng-model="vm.state.invert" value="invert" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
+    <!-- Zoom -->
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('zoom')"
+        class="wvViewer__button glyphicon glyphicon-search"
+        ng-class="{active: vm.tool === 'zoom'}"
+        title="Zoom"
+        data-placement="left"
+        bs-tooltip
+    >
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="zoom" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+    
+    <!-- Pan -->
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('pan')"
+        class="wvViewer__button glyphicon glyphicon-move"
+        ng-class="{active: vm.tool === 'pan'}"
+        title="3D panning"
+        data-placement="left"
+        bs-tooltip
+    >
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="pan" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+    
+    <!-- Windowing -->
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('windowing')"
+        class="wvViewer__button fa fa-sun-o"
+        ng-class="{active: vm.tool === 'windowing'}"
+        title="WW/WL"
+        data-placement="left"
+        bs-tooltip
+    >
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="windowing" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
+    <!-- Length Measure -->
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('lengthmeasure')"
+        class="wvViewer__button glyphicon glyphicon-resize-horizontal"
+        ng-class="{active: vm.tool === 'lengthmeasure'}"
+        title="Length Measurement"
+        data-placement="left"
+        bs-tooltip
+    >
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="lengthmeasure" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+    
+    <!-- Angle Measure -->
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('anglemeasure')"
+        class="wvViewer__button glyphicon glyphicon-chevron-left"
+        ng-class="{active: vm.tool === 'anglemeasure'}"
+        title="Angle Measurement"
+        data-placement="left"
+        bs-tooltip
+    >
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="anglemeasure" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+    
+    <!-- Pixel Probe -->
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('pixelprobe')"
+        class="wvViewer__button glyphicon glyphicon-record"
+        ng-class="{active: vm.tool === 'pixelprobe'}"
+        title="Pixel Probe"
+        data-placement="left"
+        bs-tooltip
+    >
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="pixelprobe" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+    
+    <!-- Elliptical Region Of Interest -->
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('ellipticalroi')"
+        class="wvViewer__button fa fa-circle-o"
+        ng-class="{active: vm.tool === 'ellipticalroi'}"
+        title="Elliptical ROI"
+        data-placement="left"
+        bs-tooltip
+    >
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="ellipticalroi" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+    
+    <!-- Rectangle Region Of Interest -->
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('rectangleroi')"
+        class="wvViewer__button glyphicon glyphicon glyphicon-unchecked"
+        ng-class="{active: vm.tool === 'rectangleroi'}"
+        title="Rectangle ROI"
+        data-placement="left"
+        bs-tooltip
+    >
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="rectangleroi" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+    
+    <!-- Rotate Left -->
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('rotateleft')"
+        class="wvViewer__button fa fa-rotate-left"
+        ng-class="{active: vm.tool === 'rotateleft'}"
+        title="Rotate to the left on mouse click"
+        data-placement="left"
+        bs-tooltip
+    >
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="rotateleft" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
+    <!-- Rotate Right -->
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('rotateright')"
+        class="wvViewer__button fa fa-rotate-right"
+        ng-class="{active: vm.tool === 'rotateright'}"
+        title="Rotate to the right on mouse click"
+        data-placement="left"
+        bs-tooltip
+    >
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="rotateright" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
+    <!-- Flip Horizontally -->
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('hflip')"
+        class="wvViewer__button fa fa-exchange"
+        ng-class="{active: vm.tool === 'hflip'}"
+        title="Flip horizontally on mouse click"
+        data-placement="left"
+        bs-tooltip
+    >
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="hflip" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
+    <!-- Flip Vertically -->
+    <label
+        style="margin: 0; position: relative;"
+        ng-if="vm.buttons.hasOwnProperty('vflip')"
+        class="wvViewer__button fa fa-exchange wvViewer__button--rotate"
+        ng-class="{active: vm.tool === 'vflip'}"
+        title="Flip vertically on mouse click"
+        data-placement="left"
+        bs-tooltip
     >
         <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="vflip" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>

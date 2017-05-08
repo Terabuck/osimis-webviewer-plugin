@@ -1,5 +1,4 @@
 $topHeight: 42px;
-$toolbarHeight: 42px;
 $bottomHeightSmall: 7rem; // On small width, we provide two-lines bottom zone to compensate the smaller width
 $bottomHeightLarge: 5rem; // On large width, we provide one-line bottom zone
 
@@ -166,29 +165,19 @@ $asideRightPadding: 10px;
     // Align content (such as toolbar)
     text-align: center;
 
-    // Make sure toolbar is always displayed the same way (even when splitpane
-    // is empty).
-    & wv-toolbox {
-        position: absolute;
-        left: 0;
-        right: 0;
-        height: $toolbarHeight;
-
-        // Make sure the main layout appears behind the toolbar. Button will 
-        // therefore always be clickable even when the windows is small and the
-        // toolbar is split in two vertical bars, one of which appearing on top
-        // of the layout main zone.
-        z-index: 5;
-    }
-
-    // Position splitpane below toolbar when toolbar is present.
-    & .wvLayout__splitpane--toolbarpadding {
+    // Position splitpane considering the toolbar when toolbar is present.
+    & .wvLayout__splitpane--toolbarAtTop {
         display: block;
         height: calc(100% - #{$toolbarHeight});
         width: 100%;
 
         position: relative;
         top: $toolbarHeight;
+    }
+    & .wvLayout__splitpane--toolbarAtRight {
+        display: block;
+        height: 100%;
+        width: calc(100% - #{$toolbarHeight});
     }
 
     // Position the main section below the top zone if the latter is shown
