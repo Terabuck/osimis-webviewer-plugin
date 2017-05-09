@@ -43,28 +43,28 @@
         this.tags.PatientBirthDate = this.tags.PatientBirthDate && _convertDate(this.tags.PatientBirthDate);
     }
 
-    // /**
-    //  * @return {Promise<Array<osimis.Study>>}
-    //  *
-    //  * @description
-    //  */
-    // Study.prototype.getRelatedStudies = function() {
-    //     var Promise = this._Promise; 
-    //     var studyManager = this._studyManager;
+    /**
+     * @return {Promise<Array<osimis.Study>>}
+     *
+     * @description
+     */
+    Study.prototype.getRelatedStudies = function() {
+        var Promise = this._Promise; 
+        var studyManager = this._studyManager;
 
-    //     return studyManager
-    //         // Get related study ids.
-    //         .getRelatedStudyIds(this.id)
-    //         // Convert related study ids to study models.
-    //         .then(function (studyIds) {
-    //             var studyPromises = studyIds
-    //                 .map(function (studyId) {
-    //                     return studyManager.get(studyId);
-    //                 });
+        return studyManager
+            // Get related study ids.
+            .getRelatedStudyIds(this.id)
+            // Convert related study ids to study models.
+            .then(function (studyIds) {
+                var studyPromises = studyIds
+                    .map(function (studyId) {
+                        return studyManager.get(studyId);
+                    });
 
-    //             return Promise.all(studyPromises);
-    //         });
-    // };
+                return Promise.all(studyPromises);
+            });
+    };
 
     /**
      * @ngdoc method

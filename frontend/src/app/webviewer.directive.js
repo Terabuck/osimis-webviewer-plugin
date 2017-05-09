@@ -198,15 +198,15 @@
             vm.selectedSeriesItems = vm.selectedSeriesItems || [];
             // Update selected***Ids based on selectedSeriesItems
             // @warning those triggers cycle $digest...
-            var _dropCycle = false;
+            // var _dropCycle = false;
             scope.$watch('vm.selectedSeriesItems', function(newValues, oldValues) {
-                if (_dropCycle) {
-                    _dropCycle = false;
-                    return;
-                }
-                else {
-                    _dropCycle = true;
-                }
+                // if (_dropCycle) {
+                //     _dropCycle = false;
+                //     return;
+                // }
+                // else {
+                //     _dropCycle = true;
+                // }
 
                 vm.selectedSeriesIds = vm.selectedSeriesIds || {};
                 _.forEach(vm.selectedSeriesIds, function(items, studyId) {
@@ -249,7 +249,7 @@
                     videos: vm.selectedVideoIds
                 }
             }, function(newValues, oldValues) {
-                _dropCycle = true;
+                // _dropCycle = true;
 
                 var series = _
                     .flatMap(newValues.series, function(seriesIds, studyId) {
