@@ -127,15 +127,12 @@
                     else if (!vm.selectedStudyIds.length) {
                         // @todo @warning multiple series may be shown instead
                         // of a single one... study id should also be split...
-                        var request = new osimis.HttpRequest();
-                        request.setHeaders(wvConfig.httpRequestHeaders);
-                        
-                        request
-                            .get(wvConfig.orthancApiURL + '/series/'+orthancSeriesId+'/study')
+                        wvStudyManager
+                            .getBySeriesId(orthancSeriesId)
                             .then(function(study) {
                                 vm.mode = 'study';
                                 vm.selectedStudyIds = [
-                                    study.data.ID
+                                    study.id
                                 ];
 
                                 // Set all the patient studies as pickable.

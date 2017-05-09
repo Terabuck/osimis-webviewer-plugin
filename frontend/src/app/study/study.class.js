@@ -44,9 +44,19 @@
     }
 
     /**
+     * @ngdoc method
+     * @methodOf osimis.Study
+     * 
+     * @name osimis.Study#getRelatedStudies
+     *
      * @return {Promise<Array<osimis.Study>>}
+     * The list of the related study ids, including the ones set as
+     * input.
      *
      * @description
+     * Retrieve the list of all study ids related to this one. This is done by
+     * checking the patient of this study, and returning all the studies of
+     * that patient.
      */
     Study.prototype.getRelatedStudies = function() {
         var Promise = this._Promise; 
@@ -82,7 +92,6 @@
     Study.prototype.setHasBeenViewed = function(hasBeenViewed) {
         this.hasBeenViewed = hasBeenViewed;
     };
-
 
     /**
      * @ngdoc method
