@@ -65,8 +65,10 @@
  *   video. Note this is the original orthanc id, not the webviewer's series
  *   id. This parameter is always provided.
  *   
- * * {number} `frameIndex`
- *   The frame index. This parameter is not provided for video & pdf instances.
+ * * {number} `instanceIndex`
+ *   The instance index. A multiframe instance appears as a series in the 
+ *   Osimis web viewer. Thus, the series id might not be enough in these cases.
+ *   This parameter is not provided for video & pdf instances.
  *   
  * * {string} `studyId`
  *   The orthanc study id. This parameter is always provided.
@@ -192,22 +194,15 @@
 
             // Selection-related
             vm.seriesItemSelectionEnabled = typeof vm.seriesItemSelectionEnabled !== 'undefined' ? vm.seriesItemSelectionEnabled : false;
+            // 1. Values used by our internal directive.
             vm.selectedSeriesIds = vm.selectedSeriesIds || {};
             vm.selectedReportIds = vm.selectedReportIds || {};
             vm.selectedVideoIds = vm.selectedVideoIds || {};
+            // 2. Values used by host applications.
             vm.selectedSeriesItems = vm.selectedSeriesItems || [];
             // Update selected***Ids based on selectedSeriesItems
-            // @warning those triggers cycle $digest...
-            // var _dropCycle = false;
             scope.$watch('vm.selectedSeriesItems', function(newValues, oldValues) {
-                // if (_dropCycle) {
-                //     _dropCycle = false;
-                //     return;
-                // }
-                // else {
-                //     _dropCycle = true;
-                // }
-
+                // Cleanup selected*Ids content
                 vm.selectedSeriesIds = vm.selectedSeriesIds || {};
                 _.forEach(vm.selectedSeriesIds, function(items, studyId) {
                     vm.selectedSeriesIds[studyId] = [];
@@ -221,21 +216,22 @@
                     vm.selectedReportIds[studyId] = [];
                 });
 
+                // Push new values
                 newValues && newValues
                     .forEach(function(newValue) {
                         var studyId = newValue.studyId;
                         switch (newValue.type) {
                         case 'series':
                             vm.selectedSeriesIds[studyId] = vm.selectedSeriesIds[studyId] || [];
-                            vm.selectedSeriesIds[studyId].push(newValue);
+                            vm.selectedSeriesIds[studyId].push(newValue.seriesId + ':' + newValue.instanceIndex);
                             break;
                         case 'report/pdf':
-                            vm.selectedVideoIds[studyId] = vm.selectedVideoIds[studyId] || [];
-                            vm.selectedVideoIds[studyId].push(newValue);
+                            vm.selectedReportIds[studyId] = vm.selectedReportIds[studyId] || [];
+                            vm.selectedReportIds[studyId].push(newValue.instanceId);
                             break;
                         case 'video/mpeg4':
-                            vm.selectedReportIds[studyId] = vm.selectedReportIds[studyId] || [];
-                            vm.selectedReportIds[studyId].push(newValue);
+                            vm.selectedVideoIds[studyId] = vm.selectedVideoIds[studyId] || [];
+                            vm.selectedVideoIds[studyId].push(newValue.instanceId);
                             break;
                         }
                     });
@@ -249,8 +245,6 @@
                     videos: vm.selectedVideoIds
                 }
             }, function(newValues, oldValues) {
-                // _dropCycle = true;
-
                 var series = _
                     .flatMap(newValues.series, function(seriesIds, studyId) {
                         return seriesIds
@@ -259,13 +253,13 @@
                                 // id + frame index.
                                 var arr = seriesId.split(':');
                                 var orthancSeriesId = arr[0];
-                                var frameIndex = arr[1];
+                                var instanceIndex = arr[1];
 
                                 // Return value.
                                 return {
                                     seriesId: orthancSeriesId,
                                     studyId: studyId,
-                                    frameIndex: frameIndex,
+                                    instanceIndex: instanceIndex,
                                     type: 'series'
                                 }
                             });
@@ -402,7 +396,8 @@
                     vm.pickableStudyIds = newValues;
                 }
 
-                // Cancel previous preloading & reset studies colors.
+                // Cancel previous preloading, reset studies colors & remove
+                // study items' selection.
                 oldValues
                     .filter(function(newStudyId) {
                         // Retrieve studyIds that are no longer shown.
@@ -423,6 +418,21 @@
 
                                 // Unbind color from the study.
                                 study.setColor('gray');
+                            });
+
+                        // Reset study items' selection in the serieslist.
+                        if (vm.selectedSeriesIds.hasOwnProperty(oldStudyId)) {
+                            delete vm.selectedSeriesIds[oldStudyId];
+                        }
+                        if (vm.selectedReportIds.hasOwnProperty(oldStudyId)) {
+                            delete vm.selectedReportIds[oldStudyId];
+                        }
+                        if (vm.selectedVideoIds.hasOwnProperty(oldStudyId)) {
+                            delete vm.selectedVideoIds[oldStudyId];
+                        }
+                        vm.selectedSeriesItems = vm.selectedSeriesItems
+                            .filter(function(seriesItem) {
+                                return seriesItem.studyId !== oldStudyId;
                             });
                     });
 
