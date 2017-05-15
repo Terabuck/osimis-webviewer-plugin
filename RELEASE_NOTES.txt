@@ -3,12 +3,28 @@ Pending changes in the mainline
 
 => Minimum Orthanc version: 1.1.0 <=
 
+Version 0.9.0
+========================
+
+=> Minimum Orthanc version: 1.1.0 <=
+
 Features:
-* Select other studies from the same patients.
+* Compare the current study with other studies from the same patients.
+* Select a viewport and apply flip/rotate/color inversion tools to it.
+* Enhance overall interface:
+  - Display consulted series.
+  - Show the list of series as a grid.
+  - Display the selected viewport's study data in the top bar.
+  - ...
+
+Fixes:
+* Prevent double tooltip (text indicators for buttons) display.
 
 Breaking Changes:
 * New routes used:
   - /<orthanc>/patients/<patient-uid>
+  - /<orthanc>/instances/<instance-uid>/study
+  - /<orthanc>/series/<instance-uid>/study
 * Internal calls to orthanc routes are now routed to other plugins.
 
 Version 0.8.0
