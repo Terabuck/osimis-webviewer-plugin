@@ -20,7 +20,11 @@
 (function(osimis) {
     'use strict';
 
-    function Pane(config) {
+    function Pane(Promise, studyManager, config) {
+        // Injections
+        this._Promise = Promise;
+        this._studyManager = studyManager;
+
         // Assert config
         if (
             config &&
@@ -36,8 +40,7 @@
             throw new Error('A pane can only contain a single reportId/videoId/seriesId at a time.');
         }
         else if (config && !config.seriesId &&
-            (typeof config.csViewport !== 'undefined' ||
-            typeof config.imageIndex !== 'undefined')
+            (config.csViewport || config.imageIndex)
         ) {
             throw new Error('`csViewport` and `imageIndex` parameter can only be used with a series.');
         }
@@ -80,6 +83,38 @@
      */
     Pane.prototype.isEmpty = function() {
         return !this.seriesId && !this.videoId && !this.reportId;
+    };
+
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Pane
+     * 
+     * @name osimis.Pane#getStudy
+     *
+     * @return {Promise<osimis.Study>}
+     * Return a Promise with `undefined` value if the pane is empty, or the
+     * study related to the inner content.
+     */
+    Pane.prototype.getStudy = function() {
+        var Promise = this._Promise;
+        var studyManager = this._studyManager;
+
+        // Return undefined if the pane contians nothing.
+        if (this.isEmpty()) {
+            return Promise.when(undefined);
+        }
+        else if (this.seriesId) {
+            return studyManager
+                .getBySeriesId(this.seriesId);
+        }
+        else if (this.videoId) {
+            return studyManager
+                .getByInstanceId(this.videoId);
+        }
+        else if (this.reportId) {
+            return studyManager
+                .getByInstanceId(this.reportId);
+        }
     };
 
     osimis.Pane = Pane;

@@ -36,6 +36,38 @@
              * @ngdoc method
              * @methodOf webviewer.service:wvStudyManager
              * 
+             * @name osimis.StudyManager#getByInstanceId
+             *
+             * @param {string} id
+             * The Orthanc instance id.
+             * 
+             * @return {Promise<osimis.Study>}
+             * The Osimis Study Model.
+             * 
+             * @description
+             * Retrieve a study model from an orthanc instance id.
+             */
+            getByInstanceId: getByInstanceId,
+            /**
+             * @ngdoc method
+             * @methodOf webviewer.service:wvStudyManager
+             * 
+             * @name osimis.StudyManager#getBySeriesId
+             *
+             * @param {string} id
+             * The webviewer series id.
+             * 
+             * @return {Promise<osimis.Study>}
+             * The Osimis Study Model.
+             * 
+             * @description
+             * Retrieve a study model from a webviewer series id.
+             */
+            getBySeriesId: getBySeriesId,
+            /**
+             * @ngdoc method
+             * @methodOf webviewer.service:wvStudyManager
+             * 
              * @name osimis.StudyManager#getAllStudyIds
              *
              * @return {Promise<Array<string>>}
@@ -150,6 +182,38 @@
 
             // Return model.
             return _studies[id];
+        }
+
+        function getByInstanceId(id) {
+            var _this = this;
+            var request = new osimis.HttpRequest();
+            request.setHeaders(wvConfig.httpRequestHeaders);
+            request.setCache(true);
+
+            return request
+                .get(wvConfig.orthancApiURL + '/instances/' + id + '/study')
+                .then(function(response) {
+                    var studyId = response.data.ID;
+                    return _this.get(studyId);
+                });
+        }
+
+        function getBySeriesId(id) {
+            var _this = this;
+
+            // Retrieve orthanc series id from webviewer series id.
+            var orthancSeriesId = id.split(':')[0];
+            
+            var request = new osimis.HttpRequest();
+            request.setHeaders(wvConfig.httpRequestHeaders);
+            request.setCache(true);
+
+            return request
+                .get(wvConfig.orthancApiURL + '/series/' + orthancSeriesId + '/study')
+                .then(function(response) {
+                    var studyId = response.data.ID;
+                    return _this.get(studyId);
+                });
         }
 
         function getAllStudyIds() {
