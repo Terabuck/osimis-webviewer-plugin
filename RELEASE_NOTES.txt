@@ -9,6 +9,7 @@ Features:
 Breaking Changes:
 * New routes used:
   - /<orthanc>/patients/<patient-uid>
+* Internal calls to orthanc routes are now routed to other plugins.
 
 Version 0.8.0
 ========================
