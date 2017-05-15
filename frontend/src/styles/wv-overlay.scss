@@ -2,6 +2,8 @@ $gray: gray;
 $blue: hsla(204, 70%, 53%, 0.5);
 $red: rgba(206, 0, 0, 0.5);
 $green: rgba(0, 160, 27, 0.5);
+$yellow: rgba(162, 165, 0, 0.5);
+$violet: rgba(255, 31, 255, 0.5);
 
 .wv-overlay {
     // width&height is 0x0 to avoid capturing viewport events
@@ -118,4 +120,12 @@ $green: rgba(0, 160, 27, 0.5);
 .wvOverlay__studyBadge--green {
     @extend .wvOverlay__studyBadge;
     background-color: $green;
+}
+.wvOverlay__studyBadge--yellow {
+    @extend .wvOverlay__studyBadge;
+    background-color: $yellow;
+}
+.wvOverlay__studyBadge--violet {
+    @extend .wvOverlay__studyBadge;
+    background-color: $violet;
 }

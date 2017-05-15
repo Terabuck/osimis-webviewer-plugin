@@ -32,7 +32,8 @@
          * * blue
          * * red
          * * green
-         * * ...
+         * * yellow
+         * * violet
          */
         this.color = 'gray';
 
@@ -90,15 +91,21 @@
      * @name osimis.Study#setColor
      *
      * @param {string} [color='gray']
-     * The color to set. Can be any correct css value. It's recommanded to set 
-     * a `0.5` opacity value within the color.
+     * The color to set. Can be one of these values:
+     * 
+     * * gray
+     * * blue
+     * * red
+     * * green
+     * * yellow
+     * * violet
      * 
      * @description
      * Define the study color. This method is mostly used to differentiate
      * studies from each others.
      */
     Study.prototype.setColor = function(color) {
-        this.color = color;
+        this.color = color || 'gray';
     };
 
     osimis.Study = Study;
