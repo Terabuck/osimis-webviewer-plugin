@@ -108,6 +108,22 @@
         this.color = color || 'gray';
     };
 
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Study
+     * 
+     * @name osimis.Study#hasColor
+     *
+     * @return {boolean}
+     * Return true when the color is not the default one (gray).
+     * 
+     * @description
+     * Method used to know if a study already has a default color.
+     */
+    Study.prototype.hasColor = function() {
+        return this.color !== 'gray';
+    };
+
     osimis.Study = Study;
 
 })(this.osimis || (this.osimis = {}));

@@ -333,7 +333,13 @@
                 }
             });
 
-            // Preload studies
+            vm.studiesColors = {
+                blue: [],
+                red: [],
+                green: [],
+                yellow: [],
+                violet: []
+            };
             scope.$watch('vm.selectedStudyIds', function(newValues, oldValues) {
                 // Log study ids
                 console.log('studies: ', newValues);
@@ -367,6 +373,10 @@
                         wvStudyManager
                             .get(oldStudyId)
                             .then(function(study) {
+                                // Decr color usage.
+                                vm.studiesColors[study.color].splice(vm.studiesColors[study.color].indexOf(study.id), 1);
+
+                                // Unbind color from the study.
                                 study.setColor('gray');
                             });
                     });
@@ -389,17 +399,29 @@
                         wvStudyManager
                             .get(newStudyId)
                             .then(function (study) {
-                                var availableColors = [
-                                    'blue',
-                                    'red',
-                                    'green',
-                                    'yellow',
-                                    'violet'
-                                ];
-                                var studyIndex = newValues.indexOf(study.id);
-                                var colorIndex = studyIndex % availableColors.length;
-                                var colorName = availableColors[colorIndex];
-                                study.setColor(colorName);
+                                // Check the study doesn't already have a color
+                                // defined (through liveshare or external
+                                // world).
+                                if (!study.hasColor()) {
+                                    // Get a color that has not been used yet.
+                                    var availableColors = Object.keys(vm.studiesColors);
+                                    var minColorUsageCount = undefined;
+                                    var minColorUsageName;
+                                    for (var i=0; i<availableColors.length; ++i) {
+                                        var colorName = availableColors[i];
+                                        var colorUsageCount = vm.studiesColors[colorName].length;
+                                        if (typeof minColorUsageCount === 'undefined' || colorUsageCount < minColorUsageCount) {
+                                            minColorUsageCount = colorUsageCount;
+                                            minColorUsageName = colorName;
+                                        }
+                                    }
+
+                                    // Bind color to the study.
+                                    study.setColor(minColorUsageName);
+
+                                    // Incr color usage index.
+                                    vm.studiesColors[minColorUsageName].push(study.id);
+                                }
                             });
 
                     });

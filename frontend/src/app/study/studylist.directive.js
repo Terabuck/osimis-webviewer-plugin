@@ -32,6 +32,42 @@
                 scope.selectedStudyIds = typeof scope.selectedStudyIds !== 'undefined' ? scope.selectedStudyIds : [];
                 scope.readonly = typeof scope.readonly !== 'undefined' ? scope.readonly : false;
 
+                scope.onSelect = function(value, index) {
+                    console.log('ho!', value, index);
+                };
+
+                // sortedSelectedStudyIds <-> [chronological] selectedStudyIds.
+                scope.sortedSelectedStudyIds = [];
+                // Case 1: Chronological array changes (an actor external to
+                // the directive changes the value via the directive's
+                // attribute).
+                // -> Just replace the sorted array (as both structure will
+                //    work fine with the `bs-select` directive).
+                scope.$watchCollection('selectedStudyIds', function(newChronological, oldChronological) {
+                    scope.sortedSelectedStudyIds = newChronological;
+                });
+
+                // Case 2:
+                // Sorted array changes (the angularstrap `bs-select` directive 
+                // changes the content of the array).
+                // -> Convert the sorted array to a chronological one (required
+                //    to display serieslists in chronological order, especially
+                //    to preserve the studies colors when a new study is
+                //    added).
+                scope.$watchCollection('sortedSelectedStudyIds', function(newSorted, oldSorted) {
+                    // Remove old values.
+                    scope.selectedStudyIds = _.intersection(
+                        scope.selectedStudyIds,
+                        newSorted
+                    );
+
+                    // Add new values, at the end of the array though.
+                    scope.selectedStudyIds = _.concat(
+                        scope.selectedStudyIds,
+                        _.difference(newSorted, scope.selectedStudyIds)
+                    );
+                });
+
                 // Update shown studies' information based on pickable study
                 // ids.
                 scope.$watchCollection('pickableStudyIds', function(studyIds) {
