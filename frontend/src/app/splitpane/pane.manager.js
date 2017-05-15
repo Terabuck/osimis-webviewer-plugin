@@ -1,8 +1,15 @@
+/**
+ * @ngdoc object
+ * @memberOf osimis
+ * 
+ * @name osimis.PaneManager
+ *
+ * @description
+ * The `PaneManager` class is used to manager the content of the panes. It also
+ * stores which series/report/video have been viewed.
+ */
 (function(osimis) {
     'use strict';
-
-    // Not used in splitpane directive.
-    // Only used in webviewer directive.
 
     function PaneManager() {
         this.layout = {
@@ -12,18 +19,28 @@
 
         this.panes = []; // Must keep reference as it's databound in `wvWebviewer` views.
 
-        // scope.$watch('vm.seriesId', function(seriesId) {
-        //     // Set default series id when opening a new pane.
-        //     paneManager.setDefaultSeriesId(vm.seriesId);
-        // });
-
         this.viewedSeriesIds = [];
         this.viewedReportIds = [];
         this.viewedVideoIds = [];
 
-        // @todo clean up viewed*Ids when selectable studies change.
+        // @todo clean up viewed*Ids when selectable studies change?
     }
 
+    /**
+     * @ngdoc method
+     * @methodOf osimis.PaneManager
+     * 
+     * @name osimis.PaneManager#setLayout
+     *
+     * @param {number} x
+     * The number of columns.
+     * 
+     * @param {number} y
+     * The number of rows.
+     * 
+     * @description
+     * Change the actual layout of the splitpane.
+     */
     PaneManager.prototype.setLayout = function(x, y) {
         var actualPaneCount = this.layout.x * this.layout.y;
         var newPaneCount = x * y;
@@ -46,6 +63,22 @@
         this.layout.y = y;
     };
 
+    /**
+     * @ngdoc method
+     * @methodOf osimis.PaneManager
+     * 
+     * @name osimis.PaneManager#setPane
+     *
+     * @param {number} index
+     * The index of the pane.
+     *
+     * @param {object} config
+     * See the `osimis.Pane` model for config.
+     * 
+     * @description
+     * Change the configuration of a pane (its content). Also, consider the
+     * content of the pane to have been viewed.
+     */
     PaneManager.prototype.setPane = function(index, config) {
         this.panes[index] = new osimis.Pane(config);
 
@@ -65,12 +98,59 @@
         }
     };
 
+    /**
+     * @ngdoc method
+     * @methodOf osimis.PaneManager
+     * 
+     * @name osimis.PaneManager#hasReportBeenViewed
+     *
+     * @param {string} id
+     * The id of the report.
+     *
+     * @return {boolean}
+     * The value.
+     *
+     * @description
+     * Return true when a report has been put in a pane.
+     */
     PaneManager.prototype.hasReportBeenViewed = function(id) {
         return this.viewedReportIds.indexOf(id) !== -1;
     };
+
+    /**
+     * @ngdoc method
+     * @methodOf osimis.PaneManager
+     * 
+     * @name osimis.PaneManager#hasVideoBeenViewed
+     *
+     * @param {string} id
+     * The id of the video.
+     *
+     * @return {boolean}
+     * The value.
+     *
+     * @description
+     * Return true when a video has been put in a pane.
+     */
     PaneManager.prototype.hasVideoBeenViewed = function(id) {
         return this.viewedVideoIds.indexOf(id) !== -1;
     };
+
+    /**
+     * @ngdoc method
+     * @methodOf osimis.PaneManager
+     * 
+     * @name osimis.PaneManager#hasSeriesBeenViewed
+     *
+     * @param {string} id
+     * The id of the series.
+     *
+     * @return {boolean}
+     * The value.
+     *
+     * @description
+     * Return true when a series has been put in a pane.
+     */
     PaneManager.prototype.hasSeriesBeenViewed = function(id) {
         return this.viewedSeriesIds.indexOf(id) !== -1;
     };

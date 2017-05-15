@@ -1,6 +1,21 @@
+$gray: gray;
+$blue: hsla(204, 70%, 53%, 0.5);
+$red: rgba(206, 0, 0, 0.5);
+$green: rgba(0, 160, 27, 0.5);
+
 .wv-overlay {
     // width&height is 0x0 to avoid capturing viewport events
     color: orange;
+}
+
+.wvOverlay__studyBadge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    background-color: $gray;
+    z-index: 1;
 }
 
 .wv-overlay-topleft {
@@ -49,7 +64,7 @@
     background-color: rgba(0, 0, 0, 0.9);
 }
 
-.wv-droppable-series-overlay-item {
+.wvPaneOverlay {
     position: absolute;
     top: 50%;
     width: 100%;
@@ -89,4 +104,18 @@
     color: red;
     font-size: 0.8em;
     font-family: helvetica;
+}
+
+// Color related modifiers
+.wvOverlay__studyBadge--blue {
+    @extend .wvOverlay__studyBadge;
+    background-color: $blue;
+}
+.wvOverlay__studyBadge--red {
+    @extend .wvOverlay__studyBadge;
+    background-color: $red;
+}
+.wvOverlay__studyBadge--green {
+    @extend .wvOverlay__studyBadge;
+    background-color: $green;
 }

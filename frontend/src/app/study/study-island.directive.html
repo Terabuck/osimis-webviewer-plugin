@@ -1,5 +1,5 @@
-<div class="wvStudyIsland">
-    <div class="wvStudyIsland__header">
+<div class="wvStudyIsland--{{vm.study.color}}" ng-if="vm.studyId">
+    <div class="wvStudyIsland__header--{{vm.study.color}}">
         <!-- Actions -->
         <div class="wvStudyIsland__actions">
             <wv-study-download-button
@@ -9,8 +9,8 @@
         </div>
 
         <!-- Title -->
-        <span>{{vm.studyTags.StudyDescription || 'Untitled study'}}</span> <br/>
-        <small ng-if="vm.studyTags.StudyDate">({{vm.studyTags.StudyDate}})</small>
+        <span>{{vm.study.tags.StudyDescription || 'Untitled study'}}</span> <br/>
+        <small ng-if="vm.study.tags.StudyDate">({{vm.study.tags.StudyDate}})</small>
     </div>
 
     <!-- List of series -->

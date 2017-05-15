@@ -140,7 +140,7 @@
             <!-- Study Islands -->
             <wv-study-island
                 ng-if="vm.serieslistEnabled"
-                ng-repeat="$studyId in vm.selectedStudyIds"
+                ng-repeat="$studyId in vm.selectedStudyIds track by $index"
 
                 wv-display-mode="vm.studyIslandsDisplayMode"
                 wv-study-id="$studyId"
@@ -315,7 +315,7 @@
                     <!--
                     Overlay
                     -->
-                    <wv-overlay ng-if="vm.tools.overlay" wv-tags="$image.tags" wv-viewport="vm.panes[$index].csViewport"></wv-overlay>
+                    <wv-overlay ng-if="vm.tools.overlay" wv-study-id="$series.studyId" wv-tags="$image.tags" wv-viewport="vm.panes[$index].csViewport"></wv-overlay>
 
                     <!--
                     Timeline.
@@ -332,13 +332,14 @@
                 <!--
                 Notice: droppable zone
                 -->
-                <wv-droppable-series-overlay-item
+                <wv-pane-overlay
+                    wv-pane="vm.panes[$index]"
                     ng-if="
                         !vm.panes[$index].videoId &&
                         !vm.panes[$index].seriesId &&
                         !vm.panes[$index].reportId
                     "
-                ></wv-droppable-series-overlay-item>
+                ></wv-pane-overlay>
             </wv-pane-policy>
         </wv-splitpane>
     </wv-layout-main>

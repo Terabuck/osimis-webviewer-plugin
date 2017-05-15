@@ -22,7 +22,7 @@
     /* @ngInject */
     function factory($rootScope, $timeout, wvImageManager, wvAnnotationManager, WvAnnotationGroup, wvImageBinaryManager, uaParser) {
 
-        function WvSeries(id, imageIds, pdfIds, tags, availableQualities, instanceTags) {
+        function WvSeries(id, studyId, imageIds, pdfIds, tags, availableQualities) {
             var _this = this;
 
             // Replace PixelData by lossless in safari & internet explorer (for decompression library incompatibility reasons)
@@ -38,6 +38,7 @@
             }
 
             this.id = id; // id == orthancId + ':' + subSeriesIndex
+            this.studyId = studyId;
             this.imageIds = imageIds;
             this.imageCount = imageIds.length;
             this.currentIndex = 0; // real index of the image, waiting loading to be shown

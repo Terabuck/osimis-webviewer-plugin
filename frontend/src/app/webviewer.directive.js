@@ -351,28 +351,55 @@
                     vm.pickableStudyIds = newValues;
                 }
 
-                // Cancel previous preloading
+                // Cancel previous preloading & disable study colors
                 oldValues
-                    // Retrieve studyIds that have disapeared 
                     .filter(function(newStudyId) {
+                        // Retrieve studyIds that are no longer shown.
                         return newValues.indexOf(newStudyId) === -1;
                     })
-                    // Cancel preloading
                     .forEach(function(oldStudyId) {
+                        // Cancel preloading.
                         wvStudyManager.abortStudyLoading(oldStudyId);
-                    });
 
+                        // Set none color. Nice color for instance if a
+                        // series is still displayed in a viewport but it's
+                        // related study is no longer shown in the serieslist.
+                        wvStudyManager
+                            .get(oldStudyId)
+                            .then(function(study) {
+                                study.setColor('gray');
+                            });
+                    });
 
                 // Preload studies
                 newValues
-                    // Retrieve studyIds that are new
                     .filter(function(newStudyId) {
+                        // Retrieve studyIds that are new.
                         return oldValues.indexOf(newStudyId) === -1;
                     })
-                    // Preload them
                     .forEach(function(newStudyId) {
+                        // Preload them.
                         wvStudyManager.loadStudy(newStudyId);
                         wvAnnotationManager.loadStudyAnnotations(newStudyId);
+
+                        // Set study color based on its position within the
+                        // selected study ids. Used to attribute a color in
+                        // the viewports so the end user can see directly which
+                        // study is being displayed.
+                        wvStudyManager
+                            .get(newStudyId)
+                            .then(function (study) {
+                                var availableColors = [
+                                    'blue',
+                                    'red',
+                                    'green'
+                                ];
+                                var studyIndex = newValues.indexOf(study.id);
+                                var colorIndex = studyIndex % availableColors.length;
+                                var colorName = availableColors[colorIndex];
+                                study.setColor(colorName);
+                            });
+
                     });
             }, true);
 
