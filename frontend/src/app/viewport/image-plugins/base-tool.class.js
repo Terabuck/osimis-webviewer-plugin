@@ -373,7 +373,7 @@
                     if (data && data.data.length) {
                         // Store current image resolution in annotations
                         data.data.forEach(function(data) {
-                            if (data && !data.imageResolution) {
+                            if (data) {
                                 data.imageResolution = {
                                     width: viewport._displayedCornerstoneImageObject.width,
                                     height: viewport._displayedCornerstoneImageObject.height

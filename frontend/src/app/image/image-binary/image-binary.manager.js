@@ -358,6 +358,22 @@
         return highestQuality;
     };
 
+    /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvImageBinaryManager
+     *
+     * @name osimis.ImageBinaryManager#resetCache
+     *
+     * @description
+     * Clean up the cache. Can also be called via the global
+     * `osimis.resetChache()` function call. This is only mean to be used for
+     * testing.
+     */
+    ImageBinaryManager.prototype.resetCache = function() {
+        this._cache.reset();
+        this._loadedCacheIndex = {};
+    };
+
     osimis.ImageBinaryManager = ImageBinaryManager;
 
     // Inject module in angular
@@ -386,7 +402,14 @@
         });
 
         // Init binary manager
-        return new osimis.ImageBinaryManager($q, wvConfig.httpRequestHeaders, wvCornerstoneImageAdapter, cache, workerPool);
+        var binaryManager = new osimis.ImageBinaryManager($q, wvConfig.httpRequestHeaders, wvCornerstoneImageAdapter, cache, workerPool);
+
+        // For dev, provide an easy way to reset the cache
+        osimis.resetCache = function() {
+            binaryManager.resetCache();
+        };
+
+        return binaryManager;
     }
 
 })(this.osimis || (this.osimis = {}));

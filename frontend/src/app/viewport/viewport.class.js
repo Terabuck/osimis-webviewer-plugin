@@ -43,6 +43,14 @@
         this._currentImage = null;
         this._currentImageResolution = null; // resolution === quality
 
+        // Stored to be able to abort loading when image change.
+        this._progressiveImageLoader = null;
+
+        // Initialize cornerstone (and canvas)
+        cornerstone.enable(this._enabledElement);
+        this._enabledElementObject = cornerstone.getEnabledElement(this._enabledElement); // enabledElementObject != enabledElementDom
+        this._canvas = $(this._enabledElementObject.canvas);
+
         // Set quality policy
         if (isDiagnosisViewport) {
             this._qualityPolicy = osimis.QualityForDiagnosis;
@@ -63,14 +71,9 @@
         } else {
             this._syncAnnotationResolution = false;
         }
-
-        // Stored to be able to abort loading when image change.
-        this._progressiveImageLoader = null;
-
-        // Initialize cornerstone (and canvas)
-        cornerstone.enable(this._enabledElement);
-        this._enabledElementObject = cornerstone.getEnabledElement(this._enabledElement); // enabledElementObject != enabledElementDom
-        this._canvas = $(this._enabledElementObject.canvas);
+        // Set it up in cornerstone so we can easily patch the cornerstone
+        // toolStateManager.
+        this._enabledElementObject._syncAnnotationResolution = this._syncAnnotationResolution;
 
         // Taken from old viewport
         

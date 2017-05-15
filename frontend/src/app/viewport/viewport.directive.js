@@ -570,6 +570,8 @@
         toolStateManager.restoreStateByToolAndImageId = function(toolName, imageId, state, redraw) {
             if (typeof redraw === 'undefined') redraw = true;
 
+            var _this = this;
+
             // Merge the data into cornernerstone (if annotation is not removed)
             // We can't simply change the object references because cornerstone
             // would lose link to the handles it's working on.
@@ -651,19 +653,31 @@
             if (redraw) {
                 // refresh viewports
                 var enabledElementObjects = cornerstone.getEnabledElementsByImageId(imageId);
-                enabledElementObjects.forEach(function(enabledElementObject) {
-                    var enabledElement = enabledElementObject.element;
+                var csAnnotationSynchronizer = new osimis.CornerstoneAnnotationSynchronizer();
+                enabledElementObjects
+                    // Bypass thumbnails (as they wont ever be used w/ annotations)
+                    .filter(function(enabledElementObject) {
+                        return enabledElementObject._syncAnnotationResolution;
+                    })
                     // Redraw the image - don't use cornerstone#draw because bugs occurs (only when debugger is off)
                     // those issues may come from changing the cornerstoneImageObject when image resolution change (cornerstone probably cache it)
-                    cornerstone.updateImage(enabledElement, true); // draw image & invalidate cornerstone cache
-                    $(enabledElementObject.element).trigger("CornerstoneImageRendered", {
-                        viewport: enabledElementObject.viewport,
-                        element : enabledElementObject.element,
-                        image : enabledElementObject.image,
-                        enabledElement : enabledElementObject,
-                        canvasContext: enabledElementObject.canvas.getContext('2d')
+                    .forEach(function(enabledElementObject) {
+                        // Map annotation to current viewports' image qualities
+                        // first.
+                        var currentImageResolution = _.clone(enabledElementObject.viewport.currentImageResolution);
+                        csAnnotationSynchronizer.syncByAnnotationType(toolName, _this.toolState[imageId][toolName], undefined, currentImageResolution);
+
+                        // Then draw viewport.
+                        var enabledElement = enabledElementObject.element;
+                        cornerstone.updateImage(enabledElement, false); // Draw image. Do not invalidate cornerstone cache!
+                        $(enabledElementObject.element).trigger("CornerstoneImageRendered", {
+                            viewport: enabledElementObject.viewport,
+                            element : enabledElementObject.element,
+                            image : enabledElementObject.image,
+                            enabledElement : enabledElementObject,
+                            canvasContext: enabledElementObject.canvas.getContext('2d')
+                        });
                     });
-                });
             }
         };
         cornerstoneTools.globalImageIdSpecificToolStateManager = toolStateManager;
