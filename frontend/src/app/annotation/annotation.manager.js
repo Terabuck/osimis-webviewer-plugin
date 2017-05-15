@@ -12,7 +12,8 @@
     function AnnotationManager(wvConfig) {
         var _this = this;
 
-        // Hash: invariant is _annotations[imageId][type] === AnnotationValueObject
+        // Hash: invariant is `_annotations[imageId][type] ===
+        // AnnotationValueObject`.
         // This maps CornerstoneTools annotation model.
         this._annotations = {};
 
@@ -24,6 +25,10 @@
 
         // Disable annotation storage by default
         this._isAnnotationStorageEnabled = false;
+
+        // Store loaded annotation studies so we can load annotations when
+        // storage is enabled back.
+        this._studyIdsOfLoadedAnnotations = [];
 
         // Retrieve annotations from the backend:
         // It's done each time the selected study change using the
@@ -54,11 +59,13 @@
         // Flag annotation storage as enabled
         this._isAnnotationStorageEnabled = true;
 
-        // Load all the annotations for the requested studies
-        var studyId = this._studyIdOfLoadedAnnotations;
-        if (studyId) {
-            this.loadStudyAnnotations(studyId);
-        }
+        // @todo Load all the annotations for the requested studies. Might be
+        // required for lify, if the storage enabled setting is switched
+        // between studies.
+        // this._studyIdsOfLoadedAnnotations
+        //     .forEach(function(studyId) {
+        //         this.loadStudyAnnotations(studyId);
+        //     });
     };
 
     /**
@@ -127,7 +134,7 @@
         }
 
         var config = this._config;
-        var annotations = this._annotations;
+        // var annotations = this._annotations;
 
         var httpRequest = new osimis.HttpRequest();
         httpRequest.setCache(false);
@@ -228,7 +235,7 @@
         // Retrieve all annotations for this study if annotation storage is
         // enabled
         if (this._isAnnotationStorageEnabled && 
-            this._studyIdOfLoadedAnnotations !== studyId
+            this._studyIdsOfLoadedAnnotations.indexOf(studyId) === -1
         ) {
             var httpRequest = new osimis.HttpRequest();
             httpRequest.setCache(false);
@@ -237,30 +244,63 @@
             httpRequest
                 .get(config.orthancApiURL + '/osimis-viewer/studies/'+studyId+'/annotations')
                 .then(function (response) {
-                    // @warning This remove all previous annotations! In the
-                    // current dataflow, this has no impact. It will break the
-                    // code once we display multiple studies at the same time
-                    // for instance. Also, this may be inconsistent when we 
-                    // switch study before the previous request has been
-                    // finished.
                     if (response.data) {
-                        _this.setAll(response.data);
+                        _this.setAllStudyAnnotations(studyId, response.data);
                     }
                 }, function (err) {
                     // Unflag study id if loading has failed
-                    this._studyIdOfLoadedAnnotations = null;
+                    this._studyIdsOfLoadedAnnotations.splice(this._studyIdsOfLoadedAnnotations.indexOf(studyId), 1);
 
                     // Forward error
                     throw err;
                 });
-        }
 
-        // Flag the study's annotations as loaded to prevent duplicate
-        // requests. Also, when annotation storage is enabled back, we can use
-        // this stored id to retrieve the annotations at that moment.
-        this._studyIdOfLoadedAnnotations = studyId;
+            // Flag the study's annotations as loaded to prevent duplicate
+            // requests. Also, when annotation storage is enabled back, we can
+            // use this stored id to retrieve the annotations at that moment.
+            this._studyIdsOfLoadedAnnotations.push(studyId);
+        }
     };
 
+    /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvAnnotationManager
+     *
+     * @name osimis.AnnotationManager#setAllStudyAnnotations
+     *
+     * @param {string} studyId
+     * The Orthanc Id of the study.
+     * 
+     * @param {object} annotationsByStudy
+     * All the annotations (as cornerstone annotations) for a single study.
+     *
+     * @description
+     * Primary intent is to retrieve backup of annotations from storage. For
+     * instance LiveShare.
+     *
+     * * @warning This does not remove annotations that no longer exists. We
+     *   skip this as this method is only used at the study's loading for the
+     *   moment.
+     */
+    AnnotationManager.prototype.setAllStudyAnnotations = function(studyId, annotationsByStudy) {
+        // Update `this._annotations` & Trigger events.
+        for (var studyId in annotationsByStudy) {
+            for (var imageId in annotationsByStudy[studyId]) {
+                // Update annotaitons.
+                this._annotations[imageId] = annotationsByStudy[studyId][imageId];
+
+                for (var type in this._annotations[imageId]) {
+                    // Recreate the annotation model based on the class.
+                    var data = this._annotations[imageId][type];
+                    var annotation = new osimis.AnnotationValueObject(type, imageId, data);
+
+                    // Trigger `onAnnotationChanged event.
+                    // @warning This won't trigger deletion events.
+                    this.onAnnotationChanged.trigger(annotation);
+                }
+            }
+        }
+    };
 
     /**
      * @ngdoc method
