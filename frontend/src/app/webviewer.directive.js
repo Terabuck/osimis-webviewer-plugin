@@ -310,6 +310,38 @@
             var uaParser = new UAParser();
             vm.mobileInteraction = uaParser.getDevice().type === 'mobile';
 
+            // Apply viewport changes when toolbox action are clicked on.
+            vm.onActionClicked = function(action) {
+                var selectedPane = wvPaneManager.getSelectedPane();
+
+                if (this.readonly) {
+                    return;
+                }
+                if (!selectedPane.csViewport) {
+                    return;
+                }
+
+                switch (action) {
+                case 'invert':
+                    selectedPane.csViewport.invert = !selectedPane.csViewport.invert;
+                    break;
+                case 'vflip':
+                    selectedPane.csViewport.vflip = !selectedPane.csViewport.vflip;
+                    break;
+                case 'hflip':
+                    selectedPane.csViewport.hflip = !selectedPane.csViewport.hflip;
+                    break;
+                case 'rotateleft':
+                    selectedPane.csViewport.rotation = selectedPane.csViewport.rotation - 90;
+                    break;
+                case 'rotateright':
+                    selectedPane.csViewport.rotation = selectedPane.csViewport.rotation + 90;
+                    break;
+                default:
+                    throw new Error('Unknown toolbar action.');
+                }
+            };
+
             // Store each panes' states.
             vm.panes = wvPaneManager.panes;
 
@@ -318,7 +350,10 @@
                 // Update panes' layout.
                 wvPaneManager.setLayout(layout.x, layout.y);
             });
-            vm.setPane = function(index, config) {
+            vm.onItemDroppedToPane = function(index, config) {
+                // Set dropped pane as selected
+                config.isSelected = true;
+                
                 // Change pane's configuration.
                 wvPaneManager.setPane(index, config);
             };

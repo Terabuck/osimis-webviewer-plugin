@@ -31,6 +31,7 @@
             scope: {
                 buttons: '=wvToolboxButtons', // input + output
                 tool: '=?wvActiveTool', // output (duplicate with buttons as an output
+                onActionClicked: '&?wvOnActionClicked', 
                 position: '=?wvPosition',
                 // - avoid lifecycle ordering issue when switching tool though, for instance
                 // deactivated tool always occurs before the activation of another one)

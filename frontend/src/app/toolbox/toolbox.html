@@ -35,13 +35,12 @@
     <label 
         ng-if="vm.buttons.hasOwnProperty('invert')"
         class="wvButton--underline glyphicon glyphicon-adjust"
-        ng-class="{active: vm.state.invert}"
         data-title="Invert color"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
     >
-        <input type="checkbox" ng-disabled="vm.readonly" ng-model="vm.state.invert" value="invert" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'invert'})" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Zoom -->
@@ -152,52 +151,48 @@
     <label
         ng-if="vm.buttons.hasOwnProperty('rotateleft')"
         class="wvButton--underline fa fa-rotate-left"
-        ng-class="{active: vm.tool === 'rotateleft'}"
-        data-title="Rotate to the left on mouse click"
+        data-title="Rotate to the left"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="rotateleft" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'rotateleft'})" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Rotate Right -->
     <label
         ng-if="vm.buttons.hasOwnProperty('rotateright')"
         class="wvButton--underline fa fa-rotate-right"
-        ng-class="{active: vm.tool === 'rotateright'}"
-        data-title="Rotate to the right on mouse click"
+        data-title="Rotate to the right"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="rotateright" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'rotateright'})" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Flip Horizontally -->
     <label
         ng-if="vm.buttons.hasOwnProperty('hflip')"
         class="wvButton--underline fa fa-exchange"
-        ng-class="{active: vm.tool === 'hflip'}"
-        data-title="Flip horizontally on mouse click"
+        data-title="Flip horizontally"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="hflip" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'hflip'})" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Flip Vertically -->
     <label
         ng-if="vm.buttons.hasOwnProperty('vflip')"
         class="wvButton--underline fa fa-exchange wvButton--rotate"
-        ng-class="{active: vm.tool === 'vflip'}"
-        data-title="Flip vertically on mouse click"
+        data-title="Flip vertically"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="vflip" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'vflip'})" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 </div>
 
@@ -243,13 +238,12 @@ duplicate the whole directive content and keep it static.
         tyle="margin: 0; position: relative;"
         ng-if="vm.buttons.hasOwnProperty('invert')"
         class="wvButton--underline glyphicon glyphicon-adjust"
-        ng-class="{active: vm.state.invert}"
         data-title="Invert color"
         data-placement="left"
         data-container="body"
         bs-tooltip
     >
-        <input type="checkbox" ng-disabled="vm.readonly" ng-model="vm.state.invert" value="invert" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'invert'})" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Zoom -->
@@ -360,51 +354,47 @@ duplicate the whole directive content and keep it static.
     <label
         ng-if="vm.buttons.hasOwnProperty('rotateleft')"
         class="wvButton--underline fa fa-rotate-left"
-        ng-class="{active: vm.tool === 'rotateleft'}"
-        data-title="Rotate to the left on mouse click"
+        data-title="Rotate to the left"
         data-placement="left"
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="rotateleft" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'rotateleft'})" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Rotate Right -->
     <label
         ng-if="vm.buttons.hasOwnProperty('rotateright')"
         class="wvButton--underline fa fa-rotate-right"
-        ng-class="{active: vm.tool === 'rotateright'}"
-        data-title="Rotate to the right on mouse click"
+        data-title="Rotate to the right"
         data-placement="left"
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="rotateright" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'rotateright'})" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Flip Horizontally -->
     <label
         ng-if="vm.buttons.hasOwnProperty('hflip')"
         class="wvButton--underline fa fa-exchange"
-        ng-class="{active: vm.tool === 'hflip'}"
-        data-title="Flip horizontally on mouse click"
+        data-title="Flip horizontally"
         data-placement="left"
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="hflip" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'hflip'})" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Flip Vertically -->
     <label
         ng-if="vm.buttons.hasOwnProperty('vflip')"
         class="wvButton--underline fa fa-exchange wvButton--rotate"
-        ng-class="{active: vm.tool === 'vflip'}"
-        data-title="Flip vertically on mouse click"
+        data-title="Flip vertically"
         data-placement="left"
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="vflip" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'vflip'})" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 </div>

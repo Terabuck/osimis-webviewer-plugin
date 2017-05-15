@@ -82,7 +82,7 @@
         .directive('wvPanePolicy', wvPanePolicy);
 
     /* @ngInject */
-    function wvPanePolicy() {
+    function wvPanePolicy(wvPaneManager) {
         var directive = {
             bindToController: true,
             controller: Controller,
@@ -127,9 +127,8 @@
             // Set wvPanePolicy directive attributes based on $index, $x and $y from wvSplitpane context
             var $x = contextScope.$x;
             var $y = contextScope.$y;
-            var layout = contextScope.wvLayout;
             
-            vm.paneIndex = ($y*contextScope.vm.layout.x) + ($x);
+            vm.paneIndex = ($y*wvPaneManager.layout.x) + ($x);
             vm.panePosition = {
                 x: $x,
                 y: $y
