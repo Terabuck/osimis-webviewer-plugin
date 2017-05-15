@@ -1,13 +1,25 @@
-<div class="wv-splitpane">
+<div class="wvSplitpane">
+    <!-- Columns -->
     <div 
-        ng-repeat="$y in [vm.layout.y] | range track by $index"
-        class="wv-splitpane-row" ng-style="{height: vm.rowHeight}"
+        ng-repeat="$y in [vm.paneManager.layout.y] | range track by $index"
+        class="wvSplitpane__row"
+        ng-style="{height: vm.rowHeight}"
     >
+        <!-- Row (within column) / Cell -->
         <div
-            ng-repeat="$x in [vm.layout.x] | range track by $index"
-            class="wv-splitpane-cell" ng-style="{width: vm.rowWidth}"
+            ng-repeat="$x in [vm.paneManager.layout.x] | range track by $index"
+            ng-class="{
+                'wvSplitpane__cellBorder': !vm.paneManager.isPaneSelected(vm.paneManager.getPaneIndex($x, $y)) || vm.paneManager.getPane(vm.paneManager.getPaneIndex($x, $y)).isEmpty(),
+                'wvSplitpane__cellBorder--selected': vm.paneManager.isPaneSelected(vm.paneManager.getPaneIndex($x, $y)) && !vm.paneManager.getPane(vm.paneManager.getPaneIndex($x, $y)).isEmpty()
+            }"
+            ng-style="{width: 'calc('+vm.rowWidth+' - 2px)'}"
+            ng-click="vm.paneManager.selectPane(vm.paneManager.getPaneIndex($x, $y))"
         >  
-            <ng-transclude ng-transclude-slot="panePolicy"></ng-transclude>
+            <!-- Content -->
+            <ng-transclude
+                class="wvSplitpane__cell"
+                ng-transclude-slot="panePolicy"
+            ></ng-transclude>
       </div>
     </div>
 </div>

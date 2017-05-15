@@ -23,16 +23,19 @@
     function Pane(config) {
         // Assert config
         if (
+            config &&
             typeof config.seriesId !== 'undefined' &&
             typeof config.reportId !== 'undefined' ||
+            config &&
             typeof config.seriesId !== 'undefined' &&
             typeof config.videoId  !== 'undefined' ||
+            config &&
             typeof config.reportId !== 'undefined' &&
             typeof config.videoId !== 'undefined'
         ) {
             throw new Error('A pane can only contain a single reportId/videoId/seriesId at a time.');
         }
-        else if (!config.seriesId &&
+        else if (config && !config.seriesId &&
             (typeof config.csViewport !== 'undefined' ||
             typeof config.imageIndex !== 'undefined')
         ) {
@@ -55,6 +58,10 @@
             this.reportId = config.reportId || undefined;
             this.videoId = config.videoId || undefined;
         }
+    }
+
+    Pane.prototype.isEmpty = function() {
+        return !this.seriesId && !this.videoId && !this.reportId;
     }
 
     osimis.Pane = Pane;

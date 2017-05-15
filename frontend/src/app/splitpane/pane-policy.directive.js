@@ -99,7 +99,7 @@
                 onRemoved: '&?wvOnPaneRemoved' // called once by pane removed
             },
             transclude: true,
-            template: '<div ng-transclude></div>'
+            templateUrl: 'app/splitpane/pane-policy.directive.html'
         };
         return directive;
 
@@ -155,6 +155,5 @@
 
     /* @ngInject */
     function Controller() {
-
     }
 })();
