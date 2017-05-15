@@ -66,7 +66,7 @@
                 <button
                     bs-tooltip
                     data-placement="bottom"
-                    title="Viewer mode"
+                    data-title="Viewer mode"
                     class="wvButton"
                     ng-click="vm.hideEditor()"
                     ng-class="{'active': !vm.isEditorShown}"
@@ -76,7 +76,7 @@
                 <button
                     bs-tooltip
                     data-placement="bottom"
-                    title="Editor mode"
+                    data-title="Editor mode"
                     class="wvButton"
                     ng-click="vm.showEditor()"
                     ng-class="{'active': vm.isEditorShown}"
@@ -118,7 +118,7 @@
                 ng-click="vm.studyIslandsDisplayMode = 'grid'"
 
                 bs-tooltip
-                title="Grid Display"
+                data-title="Grid Display"
                 placement="right"
             >
                 <span class="glyphicon glyphicon-th"></span>
@@ -129,7 +129,7 @@
                 ng-click="vm.studyIslandsDisplayMode = 'list'"
 
                 bs-tooltip
-                title="List Display"
+                data-title="List Display"
                 placement="right"
             >
                 <span class="glyphicon glyphicon-th-list"></span>
