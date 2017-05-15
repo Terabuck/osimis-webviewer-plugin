@@ -15,7 +15,7 @@
     'use strict';
 
     angular.module('webviewer')
-    .directive('wvStudylist', function ($rootScope, wvConfig) {
+    .directive('wvStudylist', function ($rootScope, wvStudyManager) {
         return {
             scope: {
                 pickableStudyIds: '=wvPickableStudyIds',
@@ -83,15 +83,13 @@
                     scope.studies.forEach(function(v) {
                         var studyId = v.value;
                         
-                        var request = new osimis.HttpRequest();
-                        request.setHeaders(wvConfig.httpRequestHeaders);
-                        request.setCache(true);
-
-                        request
-                            .get(wvConfig.orthancApiURL + '/studies/' + studyId)
-                            .then(function(response) {
-                                var study = response.data;
-                                v.label = study.MainDicomTags.StudyDescription || 'Untitled study';
+                        wvStudyManager
+                            .get(studyId)
+                            .then(function(study) {
+                                v.label  = study.tags.StudyDescription || 'Untitled study';;
+                                if (study.tags.StudyDate) {
+                                    v.label += ' [' + study.tags.StudyDate + ']';
+                                }
                             });
                     });
                 });
