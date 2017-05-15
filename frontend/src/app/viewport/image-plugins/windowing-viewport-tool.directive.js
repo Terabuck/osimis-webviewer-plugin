@@ -45,17 +45,21 @@
                 var _this = this;
                 var $enabledElement = $(viewport.getEnabledElement());
 
-                $enabledElement.on('mousedown.dvt', function(e) {
-                    var lastX = e.pageX;
-                    var lastY = e.pageY;
-                    var mouseButton = e.which;
+                $enabledElement.on('touchstart.dvt mousedown.dvt', function(e) {
+                    var isTouchEvent = !e.pageX && !e.pageY && !!e.originalEvent.touches;
+                    var mouseButton = !isTouchEvent ? e.which : 1;
+                    var lastX = !isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX;
+                    var lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
 
-                    $(document).on('mousemove.dvt', function(e) {
+                    $(document).on('touchmove.dvt mousemove.dvt', function(e) {
+                        // Prevent issues on touchscreens.
+                        e.preventDefault();
+
                         $scope.$apply(function() {  // @todo necessary ?
-                            var deltaX = e.pageX - lastX; 
-                            var deltaY = e.pageY - lastY;
-                            lastX = e.pageX;
-                            lastY = e.pageY;
+                            var deltaX = (!isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX) - lastX; 
+                            var deltaY = (!isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY) - lastY;
+                            lastX = !isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX;
+                            lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
 
                             if (mouseButton === 1) { // left-click + move
                                 _this.setWindowing(viewport, deltaX, deltaY);
@@ -68,8 +72,8 @@
                             }
                         });
 
-                        $(document).one('mouseup', function(e) {
-                            $(document).unbind('mousemove.dvt');
+                        $(document).one('touchstart mouseup', function(e) {
+                            $(document).unbind('touchmove.dvt mousemove.dvt');
                         });
                     });
                 });
@@ -77,7 +81,7 @@
 
             this._deactivateInputs = function(viewport) {
                 var $enabledElement = $(viewport.getEnabledElement());
-                $enabledElement.off('mousedown.dvt');
+                $enabledElement.off('touchstart.dvt mousedown.dvt');
             };
 
             this._listenModelChange = angular.noop;

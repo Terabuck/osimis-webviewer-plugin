@@ -43,7 +43,7 @@
 
         /* @ngInject */
         function Controller() {
-            WvBaseTool.call(this, 'probe');
+            WvBaseTool.call(this, 'probe', 'probeTouch');
         }
         Controller.prototype = Object.create(WvBaseTool.prototype)
         Controller.prototype.constructor = Controller;
