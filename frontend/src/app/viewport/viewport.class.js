@@ -40,6 +40,7 @@
         this._fitImageToViewport = true;
 
         // Other stuffs
+        // @deprecated?
         this._currentImage = null;
         this._currentImageResolution = null; // resolution === quality
 
@@ -309,6 +310,14 @@
             // Dunno why we have to do this, but we have!
             _this._enabledElementObject.viewport = csViewportData; // viewport data is set otherwise #reset would have been called
             _this._enabledElement.viewport = csViewportData;
+
+            // Track a displayed zone if it exists.
+            // @todo merge with `osimis.CornerstoneViewportWrapper` class.
+            if (_firstLoadingResolution && csViewportData._trackImageZone) {
+                // Fit old bounding boxes into new canvas.
+                csViewportData._displayImageZone(csViewportData._trackImageZone, _this._canvasWidth, _this._canvasHeight)
+            }
+
             csViewportData.changeResolution(newResolution);
 
             // Adapt annotations' resolution for now (even if the following 
@@ -680,15 +689,14 @@
 
         // Scale the image to the new canvas size
         if (this._viewportData) {
-            var widthScaleRatio = newCanvasWidth / oldCanvasWidth;
-            var heightScaleRatio = newCanvasHeight / oldCanvasHeight;
+            // Retrieve bounding boxes from old canvas.
+            var displayedImageZone = this._viewportData._trackImageZone || this._viewportData._getDisplayedImageZone(
+                oldCanvasWidth,
+                oldCanvasHeight
+            );
 
-            // If width as changed more than height, we should rely on width scale. Reverse
-            // apply too.
-            var scaleRatio = Math.abs(1-widthScaleRatio) > Math.abs(1-heightScaleRatio) ? widthScaleRatio : heightScaleRatio;
-
-            // Adapt scale ratio
-            this._viewportData.scale = this._viewportData.scale * scaleRatio;
+            // Fit old bounding boxes into new canvas.
+            this._viewportData._displayImageZone(displayedImageZone, this._canvasWidth, this._canvasHeight);
             
             // We expect method's user to call #draw after.
         }

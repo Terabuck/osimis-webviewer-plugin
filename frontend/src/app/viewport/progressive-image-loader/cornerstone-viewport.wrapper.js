@@ -26,7 +26,7 @@
 (function(osimis) {
     'use strict';
 
-    function CornerstoneViewportWrapper(originalImageResolution, currentImageResolution, cornerstoneViewportData) {
+    function CornerstoneViewportWrapper(originalImageResolution, currentImageResolution, cornerstoneViewportData, canvasWidth, canvasHeight, trackedImageZone) {
         // Image resolution at full scale (the resolution from the dicom
         // pixeldata).
         this.originalImageResolution = originalImageResolution || {
@@ -55,6 +55,20 @@
             modalityLUT: {}, // not handled - left to cornerstone API
             voiLUT: {} // not handled - left to cornerstone API
         };
+
+        // Display this specific image zone on every window resize etc. The
+        // tracking occurs within the `osimis.Viewport` class.
+        // @todo merge with `osimis.Viewport` class. The value of this object
+        // must follow the structure returend by the `_getDisplayedImageZone` method.
+        this._trackImageZone = trackedImageZone || null;
+
+        // Adapt cornerstoneViewportData to display tracked image zone based on
+        // canvas dimensions. Not required if there is no tracked image zone.
+        this._canvasWidth = canvasWidth || null;
+        this._canvasHeight = canvasHeight || null;
+        if (canvasWidth && canvasHeight) {
+            this._displayImageZone(this._trackImageZone, canvasWidth, canvasHeight);
+        }
     }
 
     /**
@@ -99,7 +113,10 @@
         return osimis.CornerstoneViewportWrapper.wrapCornerstoneViewport(
             this._cornerstoneViewportData,
             this.originalImageResolution,
-            this.currentImageResolution
+            this.currentImageResolution,
+            this._canvasWidth,
+            this._canvasHeight,
+            this._trackImageZone
         );
     };
 
@@ -116,20 +133,29 @@
      * Provide a serialized version of the viewport data. This version is
      * image resolution-independant, and can be used to store the data.
      */
-    CornerstoneViewportWrapper.prototype.serialize = function() {
-        // Clone viewport data to make sure input wont be modified
-        var csViewportData = _.cloneDeep(this._cornerstoneViewportData);
+    CornerstoneViewportWrapper.prototype.serialize = function(canvasWidth, canvasHeight) {
+        // Consider ourself to max resolution.
+        var oldResolution = this.currentImageResolution;
+        this.changeResolution(this.originalImageResolution);
 
-        // Normalize cornerstone data to the original image resolution 
-        var csViewportSync = new osimis.CornerstoneViewportSynchronizer();
-        csViewportSync.sync(csViewportData, this.currentImageResolution, this.originalImageResolution);
-
-        // Return serialized object
-        return {
+        // Create serialized object.
+        var result = {
             imageId: this.imageId,
-            imageResolution: this.originalImageResolution,
-            csViewportData: csViewportData
+            // Clone data to make sure they wont be modified
+            imageResolution: _.cloneDeep(this.originalImageResolution),
+            csViewportData: _.cloneDeep(this._cornerstoneViewportData),
+            // Share displayed the image zone as well. The cornerstone's
+            // `scale` and `translate` attributes are not enough to retrieve
+            // the exact part of the image that has been displayed to the user
+            // since this also depends on the canvas width & canvas height.
+            displayedImageZone: this._getDisplayedImageZone(canvasWidth, canvasHeight)
         };
+
+        // Switch back to original resultion.
+        this.changeResolution(oldResolution);
+
+        // Return serialized object.
+        return result;
     };
 
     /**
@@ -150,11 +176,15 @@
      * You should call `#changeResolution` to adapt the data to the currently
      * loaded image resolution.
      */
-    CornerstoneViewportWrapper.deserialize = function(serializedObject) {
+    CornerstoneViewportWrapper.deserialize = function(serializedObject, canvasWidth, canvasHeight) {
+        // Return wrapped object (with max resolution).
         return CornerstoneViewportWrapper.wrapCornerstoneViewport(
             serializedObject.csViewportData,
             serializedObject.imageResolution,
-            serializedObject.imageResolution // Current Viewport's Image Resolution === Max Resolution when serialized (due to normazilation)
+            serializedObject.imageResolution, // Current Viewport's Image Resolution === Max Resolution when serialized (due to normazilation)
+            canvasWidth,
+            canvasHeight,
+            serializedObject.displayedImageZone
         );
     };
 
@@ -215,6 +245,202 @@
      * @ngdoc method
      * @methodOf osimis.CornerstoneViewportWrapper
      * 
+     * @name osimis.CornerstoneViewportWrapper#_displayImageZone
+     * 
+     * @param {object} imageZone
+     * The displayed image zone. The structure must match the one returned by
+     * the `_getDisplayedImageZone` method.
+     * 
+     * @param  {number} canvas_width
+     * The width of the canvas, so we can fit the image zone within it.
+     * 
+     * @param  {number} canvas_height
+     * The height of the canvas, so we can fit the image zone within it.
+     * 
+     * @description
+     * Fit a specific zone of the image within the canvas. Useful to ensure a
+     * viewport shared across multiple screen always display the same zone,
+     * even if the dimension and proportion of the canvas differ.
+     */
+    CornerstoneViewportWrapper.prototype._displayImageZone = function(imageZone, canvas_width, canvas_height) {
+        // Consider we are in full resolution (for now).
+        var oldRes = this.currentImageResolution;
+        this.changeResolution(this.originalImageResolution);
+    
+        // Get host parameters.
+        var imgtl_bbtl_translate_top = imageZone.imgtl_bbtl_translate_top;
+        var imgtl_bbtl_translate_right = imageZone.imgtl_bbtl_translate_right;
+        var imgtl_bbtl_translate_bottom = imageZone.imgtl_bbtl_translate_bottom;
+        var imgtl_bbtl_translate_left = imageZone.imgtl_bbtl_translate_left;
+
+        // Calculate bounding box w/h
+        var img_bb_width = imgtl_bbtl_translate_right - imgtl_bbtl_translate_left;
+        var img_bb_height = imgtl_bbtl_translate_bottom - imgtl_bbtl_translate_top;
+        
+        // scale bounding box to viewport
+        var width_scale =  canvas_width / img_bb_width;
+        var height_scale =  canvas_height / img_bb_height;
+
+        this.scale = Math.min(width_scale, height_scale);
+        
+        // retrieve scaled bounding box size
+        var vp_bb_width = img_bb_width * this.scale;
+        var vp_bb_height = img_bb_height * this.scale;
+        
+        // retrieve scaled bounding box position
+        var vptl_bbtl_x = (canvas_width - vp_bb_width) / 2;
+        var vptl_bbtl_y = (canvas_height - vp_bb_height) / 2;
+    
+        // retrieve image position (tltl)
+        var vp_img_width = this.originalImageResolution.width * this.scale; 
+        var vp_img_height = this.originalImageResolution.height * this.scale;
+        
+        var vptl_bbtl_right = vptl_bbtl_x + vp_bb_width;
+        var vptl_imgtl_x = - (imgtl_bbtl_translate_left * this.scale) + vptl_bbtl_x;
+        var vptl_bbtl_bottom = vptl_bbtl_y + vp_bb_height;
+        var vptl_imgtl_y = - (imgtl_bbtl_translate_top * this.scale) + vptl_bbtl_y;
+        
+        var vptl_img_center_x = vptl_imgtl_x + vp_img_width/2;
+        var vptl_img_center_y = vptl_imgtl_y + vp_img_height/2;
+
+        var vp_offset_x = canvas_width/2 - vptl_img_center_x;
+        var vp_offset_y = canvas_height/2 - vptl_img_center_y;
+
+        // translation must be in img coordinates
+        this.translation.x = - vp_offset_x / this.scale;
+        this.translation.y = - vp_offset_y / this.scale;
+
+        // Reset resolution to normal one.
+        this.changeResolution(oldRes);
+    };
+
+    /**
+     * @ngdoc method
+     * @methodOf osimis.CornerstoneViewportWrapper
+     * 
+     * @name osimis.CornerstoneViewportWrapper#_getDisplayedImageZone
+     * 
+     * @param  {number} canvas_width
+     * The width of the canvas, so we can fit the image zone within it.
+     * 
+     * @param  {number} canvas_height
+     * The height of the canvas, so we can fit the image zone within it.
+     * 
+     * @description
+     * Retrieve the currently displayed image zone. Used to share the displayed
+     * zone with other devices.
+     */
+    CornerstoneViewportWrapper.prototype._getDisplayedImageZone = function(canvas_width, canvas_height) {
+        // Switch temporary to max resolution.
+        var oldResolution = this.currentImageResolution;
+        this.changeResolution(this.originalImageResolution);
+
+        // Retrieve general data.
+        var viewportData = this._cornerstoneViewportData;
+        var s = viewportData.scale; // scale is in max resolution also.
+        var h_vp_image_width = this.currentImageResolution.width * s; // this is screen pixel width
+        var h_vp_image_height = this.currentImageResolution.height * s; // this is screen pixel height
+
+        // cornerstone vp. x,y coordinate do not change depending
+        // on the image scaling (at least after the 
+        // `csViewport.serialize` call), we have invariable x,y
+        // coordinates. We want x, y to change when the scale 
+        // change, as the image then takes much or less space
+        // within the viewport.
+        var h_img_imagemc_translate_x = viewportData.translation.x; // this is image pixel coord in max res 
+        var h_img_imagemc_translate_y = viewportData.translation.y; 
+        var h_vpmc_imagemc_translate_x = h_img_imagemc_translate_x * s;
+        var h_vpmc_imagemc_translate_y = h_img_imagemc_translate_y * s;
+        // cornerstone vp. x,y coordinate are positive & negative
+        // coordinates relative to the image center. we want them
+        // positive only, relative to the image top left so we can
+        // have a clear indication of which pixel actually are
+        // visible within the viewport. also, we need to compensate
+        // scaling also, as cornerstone consider coordinates of the
+        // scaled image.
+        var h_vp_image_half_width = h_vp_image_width / 2;
+        var h_vp_image_half_height = h_vp_image_height / 2;
+        var h_vpmc_imagetl_translate_x = - (h_vp_image_half_width) + h_vpmc_imagemc_translate_x;
+        var h_vpmc_imagetl_translate_y = - (h_vp_image_half_height) + h_vpmc_imagemc_translate_y;
+        // cornerstone vp. x,y coordinate are positive & negative
+        // coordinates relative to the viewport center. we want
+        // them positive only, relative to the viewport top left so
+        // we can have a clear indication of which pixel actually
+        // are visible within the viewport.
+        var canvas_half_width = canvas_width / 2;
+        var canvas_half_height = canvas_height / 2;
+        var h_vptl_imagetl_translate_x = canvas_half_width + h_vpmc_imagetl_translate_x;
+        var h_vptl_imagetl_translate_y = canvas_half_height + h_vpmc_imagetl_translate_y;
+        // Set the position of the bouding box.
+        var h_vptl_bb_left = Math.max(0, Math.min(canvas_width, h_vptl_imagetl_translate_x));
+        var h_vptl_bb_top = Math.max(0, Math.min(canvas_height, h_vptl_imagetl_translate_y));
+        // Set the dimension of the bounding box.
+        var h_vptl_bb_right = Math.min(canvas_width, h_vptl_imagetl_translate_x + h_vp_image_width);
+        var h_vptl_bb_bottom = Math.min(canvas_height, h_vptl_imagetl_translate_y + h_vp_image_height);
+
+        var h_vp_bb_width = Math.max(0, h_vptl_bb_right - h_vptl_bb_left);
+        var h_vp_bb_height = Math.max(0, h_vptl_bb_bottom - h_vptl_bb_top);
+
+        // Create result.
+        var result = {
+            // Position of the bounding box relative to the full image. This is
+            // used to know what to display in liveshare attendee's viewport.
+            imgtl_bbtl_translate_top: (h_vptl_bb_top - h_vptl_imagetl_translate_y) / s,
+            imgtl_bbtl_translate_right: (h_vptl_bb_right - h_vptl_imagetl_translate_x) / s,
+            imgtl_bbtl_translate_bottom: (h_vptl_bb_bottom - h_vptl_imagetl_translate_y) / s,
+            imgtl_bbtl_translate_left: (h_vptl_bb_left - h_vptl_imagetl_translate_x) / s,
+
+            // Position of the bounding box relative to the viewport. This is
+            // used to know where to track the liveshare host's cursor.
+            vptl_imgtl_t: h_vptl_imagetl_translate_y,
+            vptl_imgtl_r: h_vptl_imagetl_translate_x + h_vp_image_width,
+            vptl_imgtl_b: h_vptl_imagetl_translate_y + h_vp_image_height,
+            vptl_imgtl_l: h_vptl_imagetl_translate_x,
+        };
+
+        // Switch back to previous resolution.
+        this.changeResolution(oldResolution);
+
+        // Return result.
+        return result;
+    };
+
+    CornerstoneViewportWrapper.prototype.convertImageCoordToViewportCoord = function(imgtl_coord_x, imgtl_coord_y, canvas_width, canvas_height) {
+        var vptl_coord_x, vptl_coord_y;
+
+        // Consider ourself in HQ image coordinates (since inputs imgtl_x,
+        // imgtl__y are considered HQ).
+        var tmpCurrentImageResolution = this.currentImageResolution;
+        this.changeResolution(this.originalImageResolution);
+
+        // Get image in viewport coordinates (considering scale).
+        var viewportData = this._cornerstoneViewportData;
+        var vpmc_imgmc_x = viewportData.translation.x * viewportData.scale;
+        var vpmc_imgmc_y = viewportData.translation.y * viewportData.scale;
+
+        var vptl_imagemc_x = vpmc_imgmc_x + canvas_width/2;
+        var vptl_imagemc_y = vpmc_imgmc_y + canvas_height/2;
+
+        var vptl_imagetl_x = vptl_imagemc_x - (this.currentImageResolution.width/2 * viewportData.scale);
+        var vptl_imagetl_y = vptl_imagemc_y - (this.currentImageResolution.height/2 * viewportData.scale);
+
+        // Convert image coordinates to viewport coordinates
+        vptl_coord_x = vptl_imagetl_x + (imgtl_coord_x * viewportData.scale);
+        vptl_coord_y = vptl_imagetl_y + (imgtl_coord_y * viewportData.scale);
+
+        // Switch image resolution back.
+        this.changeResolution(tmpCurrentImageResolution);
+
+        return {
+            x: vptl_coord_x,
+            y: vptl_coord_y
+        }
+    };
+    
+    /**
+     * @ngdoc method
+     * @methodOf osimis.CornerstoneViewportWrapper
+     * 
      * @name osimis.CornerstoneViewportWrapper.wrapCornerstoneViewport
      * 
      * @param {object} cornerstoneViewport
@@ -229,10 +455,23 @@
      *
      * @param {object} currentImageResolution
      * An object containing the current image resolution as used in the
-     * _cornerstoneViewport_ object.
+     * _cornerstonecanvas_ object.
      *
      *   * {int} width The current image binary width
      *   * {int} height The current image binary height
+     *
+     * @param {number} [canvasWidth=null]
+     * Canvas width - required to be able to display a specific zone of an
+     * image (see the `trackedImageZone` parameter).
+     * 
+     * @param {number} [canvasHeight=null]
+     * Canvas height - required to be able to display a specific zone of an
+     * image (see the `trackedImageZone` parameter).
+     * 
+     * @param {object} [trackedImageZone=null]
+     * Display this specific image zone each time the window is resized. The
+     * value of this object must follow the structure returned by the 
+     * `_getDisplayedImageZone` method.
      *
      * @return {osimis.CornerstoneViewportWrapper}
      * The wrapped cornerstone viewport data.
@@ -241,17 +480,21 @@
      * Return a wrapped cornerstone viewport data objet, managing multiple
      * image resolution. Every input is garanteed to not change.
      */
-    CornerstoneViewportWrapper.wrapCornerstoneViewport = function(cornerstoneViewport, originalImageResolution, currentImageResolution) {
+    CornerstoneViewportWrapper.wrapCornerstoneViewport = function(cornerstoneViewport, originalImageResolution, currentImageResolution, canvasWidth, canvasHeight, trackedImageZone) {
         // Make sure inputs wont be changed.
         cornerstoneViewport = _.cloneDeep(cornerstoneViewport);
         originalImageResolution = _.cloneDeep(originalImageResolution);
         currentImageResolution = _.cloneDeep(currentImageResolution);
+        trackedImageZone = trackedImageZone && _.cloneDeep(trackedImageZone);
 
         // Wrap viewport data
         var wrappedViewportDataObject = new CornerstoneViewportWrapper(
             originalImageResolution,
             currentImageResolution,
-            cornerstoneViewport
+            cornerstoneViewport,
+            canvasWidth,
+            canvasHeight,
+            trackedImageZone
         );
 
         // Return the wrapped object
