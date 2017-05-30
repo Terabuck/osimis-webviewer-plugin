@@ -49,27 +49,29 @@
                 var _this = this;
                 var $enabledElement = $(viewport.getEnabledElement());
 
-                $enabledElement.on('mousedown.pan', function(e) {
-                    var lastX = e.pageX;
-                    var lastY = e.pageY;
-                    var mouseButton = e.which;
+                $enabledElement.on('touchstart.pan mousedown.pan', function(e) {
+                    // Retrieve touch events if available.
+                    var isTouchEvent = !e.pageX && !e.pageY && !!e.originalEvent.touches;
+                    var mouseButton = !isTouchEvent ? e.which : 1;
+                    var lastX = !isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX;
+                    var lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
 
                   // e.stopImmediatePropagation();
 
-                    $(document).on('mousemove.pan', function(e) {
+                    $(document).on('touchmove.pan mousemove.pan', function(e) {
                         $scope.$apply(function() {
-                            var deltaX = e.pageX - lastX; 
-                            var deltaY = e.pageY - lastY;
-                            lastX = e.pageX;
-                            lastY = e.pageY;
+                            var deltaX = (!isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX) - lastX; 
+                            var deltaY = (!isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY) - lastY;
+                            lastX = !isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX;
+                            lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
 
                             if (mouseButton === 1) { // left-click + move
                                 _this.pan(viewport, deltaX, deltaY);
                             };
                         });
 
-                        $(document).one('mouseup', function(e) {
-                            $(document).unbind('mousemove.pan');
+                        $(document).one('touchstart mouseup', function(e) {
+                            $(document).unbind('touchmove.pan mousemove.pan');
                         });
                     });
                 });
@@ -77,7 +79,7 @@
 
             this._deactivateInputs = function(viewport) {
                 var $enabledElement = $(viewport.getEnabledElement());
-                $enabledElement.off('mousedown.pan');
+                $enabledElement.off('touchstart.pan mousedown.pan');
             };
 
             this._listenModelChange = angular.noop;

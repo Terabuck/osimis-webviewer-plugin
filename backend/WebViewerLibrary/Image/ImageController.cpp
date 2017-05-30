@@ -57,7 +57,7 @@ ImageController::ImageController(OrthancPluginRestOutput* response, const std::s
 #if PLUGIN_ENABLE_DEBUG_ROUTE == 1
   imageProcessingRouteParser_.RegisterRoute<CompositePolicy>("^(.+/.+)$"); // regex: at least a single "/"
   imageProcessingRouteParser_.RegisterRoute<ResizePolicy>("^resize:(\\d+)$"); // resize:<maximal height/width: uint>
-  imageProcessingRouteParser_.RegisterRoute<JpegConversionPolicy>("^jpeg:?(\\d{0,3})$"); // regex: jpeg:<compression rate: int[0;100]>
+  imageProcessingRouteParser_.RegisterRoute<JpegConversionPolicy>("^jpeg:?(\\d{0,3})$"); // regex: jpeg:<quality level: int[0;100]>
   imageProcessingRouteParser_.RegisterRoute<PngConversionPolicy>("^png$");
   imageProcessingRouteParser_.RegisterRoute<Uint8ConversionPolicy>("^8bit$");
   imageProcessingRouteParser_.RegisterRoute<KLVEmbeddingPolicy>("^klv$");

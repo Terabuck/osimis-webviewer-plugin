@@ -19,10 +19,11 @@
 (function(osimis) {
     'use strict';
 
-    function BaseTool(toolName) {
+    function BaseTool(toolName, toolName2) {
         this.viewports = [];
 
         this.toolName = toolName;
+        this.toolName2 = toolName2; // in case of additional mobile tool.
         this.isActivated = false;
     }
 
@@ -92,6 +93,9 @@
             // 3. Change tool state
             if (isElementEnabled) {
                 cornerstoneTools[this.toolName].enable(enabledElement, 1);
+                if (this.toolName2) {
+                    cornerstoneTools[this.toolName2].activate(enabledElement);
+                }
             }
         }
 
@@ -123,6 +127,9 @@
         // Set tool in activate mode (it's a 1D state machine with 4
         // states) - display annotations and listen to inputs.
         cornerstoneTools[this.toolName].activate(enabledElement, 1);
+        if (this.toolName2) {
+            cornerstoneTools[this.toolName2].activate(enabledElement);
+        }
     };
 
     /**
@@ -148,6 +155,9 @@
         // Set tool in enable mode (it's a 1D state machine with 4
         // states) - display annotations but ignore inputs.
         cornerstoneTools[this.toolName].enable(enabledElement, 1);
+        if (this.toolName2) {
+            cornerstoneTools[this.toolName2].enable(enabledElement);
+        }
     };
 
     /**

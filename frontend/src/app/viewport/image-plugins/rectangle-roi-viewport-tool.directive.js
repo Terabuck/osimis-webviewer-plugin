@@ -43,7 +43,7 @@
 
         /* @ngInject */
         function Controller() {
-            WvBaseTool.call(this, 'rectangleRoi');
+            WvBaseTool.call(this, 'rectangleRoi', 'rectangleRoiTouch');
         }
         Controller.prototype = Object.create(WvBaseTool.prototype)
         Controller.prototype.constructor = Controller;

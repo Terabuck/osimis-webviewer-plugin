@@ -43,7 +43,7 @@
 
         /* @ngInject */
         function Controller() {
-            WvBaseTool.call(this, 'zoom');
+            WvBaseTool.call(this, 'zoom', 'zoomTouchPinch');
         }
         Controller.prototype = Object.create(WvBaseTool.prototype)
         Controller.prototype.constructor = Controller;
