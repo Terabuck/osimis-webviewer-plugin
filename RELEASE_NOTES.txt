@@ -11,6 +11,7 @@ Version 0.9.0
 Features:
 * Compare the current study with other studies from the same patients.
 * Select a viewport and apply flip/rotate/color inversion tools to it.
+* Support for windows touchscreen.
 * Enhance overall interface:
   - Display consulted series.
   - Show the list of series as a grid.
@@ -19,6 +20,8 @@ Features:
 
 Fixes:
 * Prevent double tooltip (text indicators for buttons) display.
+* Display studies containing incompatible series.
+* Use 3 fingers to change windowing instead of 2 on mobile.
 
 Breaking Changes:
 * New routes used:
