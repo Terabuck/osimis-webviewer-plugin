@@ -15,6 +15,7 @@
 
 namespace {
   bool _isDicomSr(const Json::Value &tags);
+  bool _isDicomPr(const Json::Value &tags);
 }
 
 SeriesRepository::SeriesRepository(DicomRepository* dicomRepository)
@@ -73,11 +74,13 @@ std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId) {
   // Get middle instance's tags (the other tags)
   const Json::Value& tags2 = instancesTags[middleInstanceId];
 
-  // Ignore DICOM SR files (they can't be processed by our SeriesFactory)
-  // Note this line is only here to provide better error message, also
-  // @warning We make the assumption DICOM SR are always a single alone instance
-  //          contained within a separate series.
-  if (::_isDicomSr(tags2)) {
+  // Ignore DICOM SR (DICOM report) and PR (DICOM Presentation State, which are
+  // `views` referencing other instances) files (they can't be processed by our
+  // SeriesFactory) Note this line is only here to provide better error
+  // message, also
+  // @warning We make the assumption DICOM SR & PR are always a single alone
+  //          instance contained within a separate series.
+  if (::_isDicomSr(tags2) || ::_isDicomPr(tags2)) {
     throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_IncompatibleImageFormat));
   }
   
@@ -94,5 +97,15 @@ namespace {
     std::string modality = tags["Modality"].asString();
 
     return (modality == "SR");
+  }
+
+  bool _isDicomPr(const Json::Value &tags) {
+    if (tags["Modality"].empty()) {
+      return false;
+    }
+
+    std::string modality = tags["Modality"].asString();
+
+    return (modality == "PR");
   }
 }
