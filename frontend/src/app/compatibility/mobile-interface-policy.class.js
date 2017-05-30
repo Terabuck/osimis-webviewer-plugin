@@ -22,12 +22,12 @@
         // @todo Unlisten to changes on destroy
 
         // Set initial UI values
-        // 1. Disable toolbar on mobile
+        // 1. Disable toolbar & top side on mobile
         this.enableToolbar = false;
+        this.enableLayoutTop = false;
+        this.enableLayoutTopLeft = false;
+        this.enableLayoutTopRight = false;
         // 2. Disable left/right side on portrait orientation
-        this.enableLayoutTop = (orientation === 'landscape');
-        this.enableLayoutTopLeft = (orientation === 'landscape');
-        this.enableLayoutTopRight = (orientation === 'landscape');
         this.enableLayoutLeft = (orientation === 'landscape');
         this.enableLayoutLeftBottom = (orientation === 'landscape');
         this.enableLayoutRight = (orientation === 'landscape');
@@ -49,11 +49,6 @@
             this.enableLayoutLeftBottom = false;
             this.enableLayoutRight = false;
             
-            // Disable top side
-            this.enableLayoutTop = false;
-            this.enableLayoutTopLeft = false;
-            this.enableLayoutTopRight = false;
-
             // Show text notice
             this.enableNotice = true;
         }
@@ -64,11 +59,6 @@
             this.enableLayoutLeft = true;
             this.enableLayoutLeftBottom = true;
             this.enableLayoutRight = true;
-
-            // Enable top side
-            this.enableLayoutTop = true;
-            this.enableLayoutTopLeft = true;
-            this.enableLayoutTopRight = true;
 
             // Hide text notice
             this.enableNotice = false;
