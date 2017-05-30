@@ -7,7 +7,8 @@ describe('webviewer', function() {
 
         describe('webviewer#series-id attribute', function() {
 
-            it('should be used to initialize viewports', function() {
+            // This is no longer relevant.
+            xit('should be used to initialize viewports', function() {
                 // Instantiate & test directive with the series-id attribute
                 return osi.directive(
                     '<wv-webviewer wv-series-id="seriesId"></wv-webviewer>'
