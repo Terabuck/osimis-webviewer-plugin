@@ -62,7 +62,7 @@
                 _hammers[viewport] = new Hammer(enabledElement);
                 _hammers[viewport].get('pan').set({
                     direction: Hammer.DIRECTION_ALL,
-                    pointers: 2
+                    pointers: 3
                 });
                 // 2. Update window width
                 _hammers[viewport].on("panup", function(ev) {
