@@ -11,6 +11,50 @@
         .module('webviewer')
         .directive('wvSize', wvSize);
 
+    // Inject jquery getHiddenDimensions plugin so resize is calculated well
+    // even if ancestor elements are hidden. This happen on mobile when the
+    // left area is toggled when switching the mobile between 
+    // portait/landscape.
+    // see `https://stackoverflow.com/questions/1472303/jquery-get-width-of-element-when-not-visible-display-none`
+    (function ($) {
+        // Optional parameter includeMargin is used when calculating outer dimensions  
+        $.fn.getHiddenDimensions = function (includeMargin) {
+            var $item = this,
+            props = { position: 'absolute', visibility: 'hidden', display: 'block' },
+            dim = { width: 0, height: 0, innerWidth: 0, innerHeight: 0, outerWidth: 0, outerHeight: 0 },
+            $hiddenParents = $item.parents().andSelf().not(':visible'),
+            includeMargin = (includeMargin == null) ? false : includeMargin;
+
+            var oldProps = [];
+            $hiddenParents.each(function () {
+                var old = {};
+
+                for (var name in props) {
+                    old[name] = this.style[name];
+                    this.style[name] = props[name];
+                }
+
+                oldProps.push(old);
+            });
+
+            dim.width = $item.width();
+            dim.outerWidth = $item.outerWidth(includeMargin);
+            dim.innerWidth = $item.innerWidth();
+            dim.height = $item.height();
+            dim.innerHeight = $item.innerHeight();
+            dim.outerHeight = $item.outerHeight(includeMargin);
+
+            $hiddenParents.each(function (i) {
+                var old = oldProps[i];
+                for (var name in props) {
+                    this.style[name] = old[name];
+                }
+            });
+
+            return dim;
+        }
+    }(jQuery));
+
     /* @ngInject */
     function wvSize($parse, debounce) {
         /**
@@ -99,17 +143,23 @@
                 // @note might slow things down: wait next $digest..
             }
             
-            if (_isTag(width)) {
+            if (_isTag(width) || _isTag(width)) {
+                // Retrieve `wv-size-tag` dimensions.
                 _tag = _tag || $element.closest('[wv-size-tag]');
-                if (!_tag.length) throw new Error('wv-size#updateSize: [wv-size-tag] not found');
-                // @note might cause reflow
-                width = _tag.width() + 'px';
-            }
-            if (_isTag(height)) {
-                _tag = _tag || $element.closest('[wv-size-tag]');
-                if (!_tag.length) throw new Error('wv-size#updateSize: [wv-size-tag] not found');
-                // @note might cause reflow
-                height = _tag.height() + 'px';
+                if (!_tag.length) {
+                    throw new Error('wv-size#updateSize: [wv-size-tag] not found');
+                }
+                var dim = _tag.getHiddenDimensions();
+
+                // Update `wvSize` dimensions based on `wv-size-tag` ones.
+                if (_isTag(width)) {
+                    // @note might cause reflow
+                    width = dim.width + 'px';
+                }
+                if (_isTag(height)) {
+                    // @note might cause reflow
+                    height = dim.height + 'px';
+                }
             }
 
             if (_isSize(width) && _isSize(height)) {

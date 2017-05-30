@@ -105,7 +105,7 @@
             <!-- Study Picker -->
             <wv-studylist 
                 class="float__left" style="max-width: calc(100% - 4.5rem);"
-                ng-if="vm.serieslistEnabled"
+                ng-show="vm.serieslistEnabled"
                 wv-readonly="vm.readonly"
                 wv-pickable-study-ids="vm.pickableStudyIds"
                 wv-selected-study-ids="vm.selectedStudyIds"
@@ -139,7 +139,7 @@
         <wv-layout-left2>
             <!-- Study Islands -->
             <wv-study-island
-                ng-if="vm.serieslistEnabled"
+                ng-show="vm.serieslistEnabled"
                 ng-repeat="$studyId in vm.selectedStudyIds track by $index"
 
                 wv-display-mode="vm.studyIslandsDisplayMode"
