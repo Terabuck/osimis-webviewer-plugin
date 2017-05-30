@@ -7,20 +7,19 @@
      */
     angular
         .module('webviewer')
-        .directive('wvDroppableSeriesOverlayItem', wvDroppableSeriesOverlayItem);
+        .directive('wvPaneOverlay', wvPaneOverlay);
 
     /* @ngInject */
-    function wvDroppableSeriesOverlayItem() {
+    function wvPaneOverlay() {
         var directive = {
             bindToController: true,
-            controller: Controller,
+            controller: PaneOverlayVM,
             controllerAs: 'vm',
             link: link,
             restrict: 'E',
             transclude: true,
             templateUrl: 'app/splitpane/pane-overlay.directive.html',
             scope: {
-                pane: 'wvPane'
             }
         };
         return directive;
@@ -31,7 +30,7 @@
     }
 
     /* @ngInject */
-    function Controller() {
+    function PaneOverlayVM() {
         this.pane = undefined;
     }
 })();

@@ -55,6 +55,8 @@
 
     /* @ngInject */
     function Controller($scope, $element, $attrs, hamster) {
+        var vm = this;
+
         var _wvSeriesIdViewModels = [];
     	this.register = function(viewmodel) {
             _wvSeriesIdViewModels.push(viewmodel);
@@ -136,7 +138,7 @@
             // avoid conflicts with other tools such as paning.
             var uaParser = new UAParser();
             vm.isMobile = (uaParser.getDevice().type === 'mobile');
-            if (!isMobile) {
+            if (!vm.isMobile) {
                 return;
             }
 
