@@ -232,9 +232,12 @@ BinaryRequest.prototype.execute = function() {
             }
 
             // Answer request to the main thread
-            if(uaParser.browser.name.indexOf('IE') !== -1 && uaParser.browser.major <= 10) {
-                // IE10 fallback for transferable objects
-                // see https://connect.microsoft.com/IE/feedback/details/783468/ie10-window-postmessage-throws-datacloneerror-for-transferrable-arraybuffers
+            if(uaParser.browser.name.indexOf('IE') !== -1 && uaParser.browser.major <= 11) {
+                // IE10 fallback for transferable objects. see
+                // `https://connect.microsoft.com/IE/feedback/details/783468/ie10-window-postmessage-throws-datacloneerror-for-transferrable-arraybuffers`
+                // For some reason, it doesn't work on IE11 either, even if
+                // support is stated in official doc and no reported bug has
+                // been found (perhaps only when WIN SP1 is not installed?).
                 self.postMessage({
                     type: 'success',
                     cornerstoneMetaData: data.cornerstone,
