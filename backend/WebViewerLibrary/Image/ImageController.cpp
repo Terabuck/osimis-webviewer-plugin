@@ -1,6 +1,11 @@
+#include "ImageController.h"
+
+#include <iostream>
+#include <string>
+
 #include <boost/regex.hpp>
 #include <boost/foreach.hpp>
-#include <boost/lexical_cast.hpp>
+#include <boost/lexical_cast.hpp> // to retrieve exception error code for log + parse routes
 #include <boost/algorithm/string.hpp> // for boost::algorithm::split & boost::starts_with
 
 #include <json/json.h>
@@ -25,8 +30,6 @@
 #include "ImageProcessingPolicy/KLVEmbeddingPolicy.h"
 #endif // PLUGIN_ENABLE_DEBUG_ROUTE == 1
 
-#include "ImageController.h"
-#include <iostream>
 
 ImageRepository* ImageController::imageRepository_ = NULL;
 AnnotationRepository* ImageController::annotationRepository_ = NULL;
@@ -65,20 +68,26 @@ ImageController::ImageController(OrthancPluginRestOutput* response, const std::s
 }
 
 int ImageController::_ParseURLPostFix(const std::string& urlPostfix) {
-  BENCH(URL_PARSING);
-  // /osimis-viewer/images/<instance_uid:str>/<frame_index:int>/{low|medium|high|pixeldata}-quality
-  // /osimis-viewer/images/<instance_uid:str>/<frame_index:int>/annotations
-  boost::regex regexp("^(nocache/|cleancache/)?([^/]+)/(\\d+)(?:/(.+))$");
+  // Retrieve context so we can use orthanc's logger.
+  OrthancPluginContext* context = OrthancContextManager::Get();
+  
+  try {
+    BENCH(URL_PARSING);
+    // /osimis-viewer/images/<instance_uid:str>/<frame_index:int>/{low|medium|high|pixeldata}-quality
+    // /osimis-viewer/images/<instance_uid:str>/<frame_index:int>/annotations
+    boost::regex regexp("^(nocache/|cleancache/)?([^/]+)/(\\d+)(?:/(.+))$");
 
-  boost::cmatch matches;
-  if (!boost::regex_match(urlPostfix.c_str(), matches, regexp)) {
-    std::cerr << "BAD REGEX";
+    boost::cmatch matches;
+    if (!boost::regex_match(urlPostfix.c_str(), matches, regexp)) {
+      // Log bad regex match.
+      std::string message("(ImageController) unmatched regex for ");
+      message += urlPostfix;
+      OrthancPluginLogInfo(context, message.c_str());
 
-    // Return 404 error on badly formatted URL - @todo use ErrorCode_UriSyntax instead
-    return this->_AnswerError(404);
-  }
-  else {
-    try {
+      // Return 404 error on badly formatted URL - @todo use ErrorCode_UriSyntax instead
+      return this->_AnswerError(404);
+    }
+    else {
       this->disableCache_ = (std::string(matches[1]) == "nocache/");
       this->cleanCache_ = (std::string(matches[1]) == "cleancache/");
       this->instanceId_ = matches[2];
@@ -105,44 +114,73 @@ int ImageController::_ParseURLPostFix(const std::string& urlPostfix) {
       BENCH_LOG(INSTANCE, instanceId_);
       BENCH_LOG(FRAME_INDEX, frameIndex_);
     }
-    catch (const std::invalid_argument& exc) {
-      std::cerr << exc.what();
 
-      // probably because processingPolicy has not been found
-      return this->_AnswerError(404);
-    }
-    catch (const boost::bad_lexical_cast& exc) {
-      std::cerr << exc.what();
-
-      // should be prevented by the regex
-      return this->_AnswerError(500);
-    }
-    catch (const Orthanc::OrthancException& exc) {
-      std::cerr << exc.What();
-
-      return this->_AnswerError(exc.GetHttpStatus());
-    }
-    catch (const std::exception& exc) {
-      std::cerr << exc.what();
-      // @note if the exception has been thrown from some constructor,
-      // memory leaks may happen. we should fix the bug instead of focusing on those memory leaks.
-      // however, in case of memory leak due to bad alloc, we should clean memory.
-      // @todo avoid memory allocation within constructor
-
-      // @todo better control
-      return this->_AnswerError(500);
-    }
-
+    return 200;
   }
+  catch (const std::invalid_argument& exc) {
+    // Log invalid_argument (probably because processingPolicy has not been
+    // found).
+    std::string message("(ImageController) std::invalid_argument during URL parsing ");
+    message += "(processing policy not found?)";
+    message += exc.what();
+    OrthancPluginLogError(context, message.c_str());
 
-  return 200;
+    // Return 404 instead of 500 (it's most likely a not-found issue).
+    return this->_AnswerError(404);
+  }
+  catch (const boost::bad_lexical_cast& exc) {
+    // Log bad lexical cast (should have been prevented by the regex).
+    std::string message("(ImageController) boost::bad_lexical_cast during URL parsing ");
+    message += exc.what();
+    OrthancPluginLogError(context, message.c_str());
+
+    return this->_AnswerError(500);
+  }
+  catch (const Orthanc::OrthancException& exc) {
+    // Log detailed Orthanc error.
+    std::string message("(ImageController) Orthanc::OrthancException during URL parsing ");
+    message += boost::lexical_cast<std::string>(exc.GetErrorCode());
+    message += "/";
+    message += boost::lexical_cast<std::string>(exc.GetHttpStatus());
+    message += " ";
+    message += exc.What();
+    OrthancPluginLogError(context, message.c_str());
+
+    return this->_AnswerError(exc.GetHttpStatus());
+  }
+  catch (const std::exception& exc) {
+    // Log detailed std error.
+    std::string message("(ImageController) std::exception during URL parsing ");
+    message += exc.what();
+    OrthancPluginLogError(context, message.c_str());
+
+    return this->_AnswerError(500);
+  }
+  catch (const std::string& exc) {
+    // Log string error (shouldn't happen).
+    std::string message("(ImageController) std::string during URL parsing ");
+    message += exc;
+    OrthancPluginLogError(context, message.c_str());
+
+    return this->_AnswerError(500);
+  }
+  catch (...) {
+    // Log unknown error (shouldn't happen).
+    std::string message("(ImageController) Unknown Exception during URL parsing");
+    OrthancPluginLogError(context, message.c_str());
+
+    return this->_AnswerError(500);
+  }
 }
 
 int ImageController::_ProcessRequest()
 {
-  BENCH(FULL_PROCESS);
+  // Retrieve context so we can use orthanc's logger.
+  OrthancPluginContext* context = OrthancContextManager::Get();
 
   try {
+    BENCH(FULL_PROCESS);
+
     // Treat annotation requests
     if (this->isAnnotationRequest_) {
       // Answer 404 if method is not PUT, as the only request method accepted
@@ -161,9 +199,10 @@ int ImageController::_ProcessRequest()
         Json::Value value;
         Json::Reader reader;
         if (!reader.parse(requestBody.c_str(), value)) {
-            // std::cerr  << "Failed to parse" << reader.getFormattedErrorMessages();
-            // @todo Log error
-            return this->_AnswerError(400);
+          std::string message("(ImageController) Failed to parse annotation request's json body.");
+          OrthancPluginLogInfo(context, message.c_str());
+          
+          return this->_AnswerError(400);
         }
 
         // Retrieve the value of the `annotationsByTool` key.
@@ -206,11 +245,43 @@ int ImageController::_ProcessRequest()
       }
     }
   }
+  // @note if the exception has been thrown from some constructor,
+  // memory leaks may happen. we should fix the bug instead of focusing on those memory leaks.
+  // however, in case of memory leak due to bad alloc, we should clean memory.
+  // @todo avoid memory allocation within constructor
   catch (const Orthanc::OrthancException& exc) {
+    // Log detailed Orthanc error.
+    std::string message("(ImageController) Orthanc::OrthancException ");
+    message += boost::lexical_cast<std::string>(exc.GetErrorCode());
+    message += "/";
+    message += boost::lexical_cast<std::string>(exc.GetHttpStatus());
+    message += " ";
+    message += exc.What();
+    OrthancPluginLogError(context, message.c_str());
+
     return this->_AnswerError(exc.GetHttpStatus());
   }
   catch (const std::exception& exc) {
-    std::cerr << exc.what();
+    // Log detailed std error.
+    std::string message("(ImageController) std::exception ");
+    message += exc.what();
+    OrthancPluginLogError(context, message.c_str());
+
+    return this->_AnswerError(500);
+  }
+  catch (const std::string& exc) {
+    // Log string error (shouldn't happen).
+    std::string message("(ImageController) std::string ");
+    message += exc;
+    OrthancPluginLogError(context, message.c_str());
+
+    return this->_AnswerError(500);
+  }
+  catch (...) {
+    // Log unknown error (shouldn't happen).
+    std::string message("(ImageController) Unknown Exception");
+    OrthancPluginLogError(context, message.c_str());
+
     return this->_AnswerError(500);
   }
 }
