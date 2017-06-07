@@ -18,10 +18,11 @@
 (function(osimis) {
     'use strict';
 
-    function ImageBinaryManager(Promise, httpRequestHeaders, cornerstoneImageAdapter, cache, workerPool) {
+    function ImageBinaryManager(Promise, httpRequestHeaders, instanceManager, cornerstoneImageAdapter, cache, workerPool) {
         // Declare dependencies
         this._Promise = Promise;
         this._httpRequestHeaders = httpRequestHeaders; // may change dynamically, must keep reference
+        this._instanceManager = instanceManager;
         this._cornerstoneImageAdapter = cornerstoneImageAdapter;
         this._workerPool = workerPool;
         this._cache = cache;
@@ -97,6 +98,7 @@
     ImageBinaryManager.prototype.requestLoading = function(id, quality, priority) {
         var Promise = this._Promise;
         var httpRequestHeaders = this._httpRequestHeaders;
+        var instanceManager = this._instanceManager;
         var cornerstoneImageAdapter = this._cornerstoneImageAdapter;
         var pool = this._workerPool;
         var cache = this._cache;
@@ -111,25 +113,40 @@
         var request = cache.get(id, quality);
         if (!request) {
             // Set http headers
-            // @note Since the request is queued, headers configuration might changes in the meanwhile (before the request execution).
-            //       However, since they are linked by reference (and not copied), changes will be bound.
+            // @note Since the request is queued, headers configuration might
+            //     changes in the meanwhile (before the request execution).
+            //     However, since they are linked by reference (and not
+            //     copied), changes will be bound.
             var headers = httpRequestHeaders; // used to set user auth tokens for instance
 
+            // Retrieve dicom tags of the instance, as they may be required to uncompress the
+            // image in the right format (ie. tags such as BitsStored, BitsAllocated,
+            // PixelRepresentation, ...).
+            var instanceId = id.split(':')[0];
+            var requestPromise = instanceManager
+                .getTags(instanceId)
             // Download klv, extract metadata & decompress data to raw image
-            var requestPromise = pool
-                .queueTask({
-                    type: 'getBinary',
-                    id: id,
-                    quality: quality,
-                    headers: headers
+                .then(function(tags) {
+                    return pool
+                        .queueTask({
+                            type: 'getBinary',
+                            id: id,
+                            quality: quality,
+                            headers: headers,
+                            tags: tags
+                        });
                 })
+            // Reconstruct cornerstone object from buffer (we can't transfer pixel view through web worker -
+            // only buffer), manage cache & trigger events.
                 .then(function(result) {
                     // Loading done
 
-                    // Abort the finished loading when an abortion has been asked but not made in time
+                    // Abort the finished loading when an abortion has been
+                    // asked but not made in time
                     if (!cache.getRefCount(id, quality)) {
                         // Remove promise from cache
-                        // @note Things will be cleaned by `.then(null, function(err))`
+                        // @note Things will be cleaned by `.then(null,
+                        //     function(err))`
                         return Promise.reject(new Error('aborted'));
                     }
 
@@ -153,12 +170,17 @@
                 .then(null, function(err) {
                     // Loading aborted
 
-                    // This is called even when the error comes from the adapter (promise <.then(null, function(err) {...})> syntax)
-                    // to be sure the promise is uncached anytime the promise is rejected
+                    // This is called even when the error comes from the
+                    // adapter (promise <.then(null, function(err) {...})>
+                    // syntax) to be sure the promise is uncached anytime the
+                    // promise is rejected
 
-                    // Remove promise from cache in case of request failure. We need to check if it's in the cache
-                    // though, since it's possible the item has already be removed in the abortLoading method. We
-                    // keep things that way to avoid synchronization issues (see the abortLoading method source). 
+                    // Remove promise from cache in case of request failure. We
+                    // need to check if it's in the cache though, since it's
+                    // possible the item has already be removed in the
+                    // abortLoading method. We keep things that way to avoid
+                    // synchronization issues (see the abortLoading method
+                    // source).
                     if (cache.get(id, quality)) {
                         cache.remove(id, quality);
                     }
@@ -166,7 +188,8 @@
                         delete loadedCacheIndex[id][quality];
                     }
                     
-                    // Trigger binary has been unloaded (used by torrent-like loading bar)
+                    // Trigger binary has been unloaded (used by torrent-like
+                    // loading bar).
                     _this.onBinaryUnLoaded.trigger(id, quality);
 
                     // Propagate promise error
@@ -382,7 +405,7 @@
         .factory('wvImageBinaryManager', wvImageBinaryManager);
 
     /* @ngInject */
-    function wvImageBinaryManager($q, wvConfig, wvCornerstoneImageAdapter) {
+    function wvImageBinaryManager($q, wvConfig, wvInstanceManager, wvCornerstoneImageAdapter) {
         // Init binary cache
         var cache = new osimis.ImageBinariesCache();
 
@@ -402,7 +425,7 @@
         });
 
         // Init binary manager
-        var binaryManager = new osimis.ImageBinaryManager($q, wvConfig.httpRequestHeaders, wvCornerstoneImageAdapter, cache, workerPool);
+        var binaryManager = new osimis.ImageBinaryManager($q, wvConfig.httpRequestHeaders, wvInstanceManager, wvCornerstoneImageAdapter, cache, workerPool);
 
         // For dev, provide an easy way to reset the cache
         osimis.resetCache = function() {

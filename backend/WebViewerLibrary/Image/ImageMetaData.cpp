@@ -253,8 +253,8 @@ ImageMetaData::ImageMetaData(const DicomMap& headerTags, const Json::Value& dico
   }
   else {
     // Stripping spaces should not be required, as this is a UI value
-    // representation whose stripping is supported by the Orthanc
-    // core, but let's be careful...
+    // representation whose stripping is supported by the Orthanc core, but
+    // let's be careful...
     transferSyntax = Toolbox::StripSpaces(transfertSyntaxValue->GetContent());
   }
 
@@ -303,6 +303,7 @@ ImageMetaData::ImageMetaData(const DicomMap& headerTags, const Json::Value& dico
 
     default:
       // @todo @warning can be called via route pixeldata! throw exception instead (may change in long term)
+      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       assert(true);
       break;
     }

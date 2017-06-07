@@ -62,9 +62,11 @@ var KLVReader = WorkerGlobalScope.KLVReader;
  * Configure the Orthanc API Url
  *
  **/
+var OrthancApiURL = undefined;
 var ImageApiURL = undefined;
 function setImageApiUrl(orthancApiUrl) {
     // Set the route
+    OrthancApiURL = orthancApiUrl;
     ImageApiURL = orthancApiUrl + '/osimis-viewer/images/';
 }
 
@@ -93,8 +95,9 @@ self.addEventListener('message', function(evt) {
         var id = evt.data.id;
         var quality = evt.data.quality;
         var headers = evt.data.headers;
+        var tags = evt.data.tags;
 
-        getCommand(id, quality, headers);
+        getCommand(id, quality, headers, tags);
         break;
     case 'abort':
         // Abort a getCommand.
@@ -121,19 +124,22 @@ function abortCommand() {
 }
 
 /** Get & Decompress Image from Orthanc **/
-function getCommand(id, quality, headers) {
+function getCommand(id, quality, headers, tags) {
     if (_processingRequest) {
         throw new Error('Another request is already in process within worker thread.');
     }
 
-    // Execute request
-    _processingRequest = new BinaryRequest(id, quality, headers);
+    // Retrieve & process image data.
+    _processingRequest = new BinaryRequest(id, quality, headers, tags);
     _processingRequest.execute();
 }
 
-function BinaryRequest(id, quality, headers) {
+function BinaryRequest(id, quality, headers, tags) {
     this.id = id;
     this.quality = quality;
+    this.tags = tags;
+    this.compressionFormatPromise = null;
+    this.headers = headers;
 
     // Parse url
     var splittedId = id.split(':');
@@ -145,15 +151,65 @@ function BinaryRequest(id, quality, headers) {
     switch (quality) {
     case Qualities.PIXELDATA:
         url = ImageApiURL + instanceId + '/' + frameIndex + '/pixeldata-quality';
+
+        // Compression format depends on transfer synthax - either jpeg or
+        // jpeg-lossless.
+        var transferSyntaxRequest = new osimis.HttpRequest();
+        transferSyntaxRequest.setResponseType('text');
+        transferSyntaxRequest.setHeaders(headers);
+        this.compressionFormatPromise = transferSyntaxRequest
+            .get(OrthancApiURL + '/instances/' + instanceId + '/metadata/TransferSyntax')
+            .then(function(response) {
+                var transferSyntax = response.data;
+                return transferSyntax;
+            }, function(error) {
+                // Request has failed. This is most likely because the
+                // TransferSyntax metadata isn't available (instance must
+                // either have been uploaded when Orthanc was at least 1.2.0 or
+                // have been processed with the `/reconstruct` route
+                // afterward).
+
+                // We thus send an Orthanc 1.1.0 compatible request, although
+                // much slower.
+                var transferSyntaxRequest2 = new osimis.HttpRequest();
+                transferSyntaxRequest2.setResponseType('json');
+                transferSyntaxRequest2.setHeaders(headers);
+
+                return transferSyntaxRequest2
+                    .get(OrthancApiURL + '/instances/' + instanceId + '/header?simplify')
+                    .then(function(response) {
+                        var transferSyntax = response.data.TransferSyntaxUID;
+                        return transferSyntax;
+                    });
+            })
+            .then(function(transferSyntax) {
+                switch(transferSyntax) {
+                // Lossy JPEG 8-bit Image Compression.
+                case '1.2.840.10008.1.2.4.50':
+                    return 'jpeg';
+                // JPEG Lossless, Nonhierarchical, First-Order Prediction
+                // (Default Transfer Syntax for Lossless JPEG Image
+                // Compression). -- jpeg FFC3
+                case '1.2.840.10008.1.2.4.70':
+                    return 'jpeg-lossless';
+                default:
+                    throw new Error('Unsupported transfer syntax ' + transferSyntax);
+                }
+
+            });
+
         break;
     case Qualities.LOSSLESS:
         url = ImageApiURL + instanceId + '/' + frameIndex + '/high-quality';
+        this.compressionFormatPromise = Promise.resolve('png');
         break;
     case Qualities.MEDIUM:
         url = ImageApiURL + instanceId + '/' + frameIndex + '/medium-quality';
+        this.compressionFormatPromise = Promise.resolve('jpeg');
         break;
     case Qualities.LOW:
         url = ImageApiURL + instanceId + '/' + frameIndex + '/low-quality';
+        this.compressionFormatPromise = Promise.resolve('jpeg');
         break;
     default:
         _processingRequest = null; // cleaning request
@@ -170,35 +226,157 @@ BinaryRequest.prototype.execute = function() {
     var request = this.request;
     var url = this.url;
     var quality = this.quality;
+    var compressionFormatPromise = this.compressionFormatPromise;
+    var tags = this.tags;
 
     // Trigger request
-    request
-        .get(url)
-        .then(function(response) {
-            try {
-                // Process binary out of the klv
-                var arraybuffer = response.data;
-                var data = parseKLV(arraybuffer);
+    Promise
+        .all([
+            request.get(url),
+            compressionFormatPromise
+        ])
+        .then(function(resp) {
+            var imageResponse = resp[0];
+            var compressionFormat = resp[1];
 
-                if (data.decompression.compression.toLowerCase() === 'jpeg') {
+            try {
+                // Process binary out of the klv.
+                var arraybuffer = imageResponse.data;
+                var data = parseKLV(arraybuffer);
+                var decompressionOpts = {};
+                
+                // Decompress image binary into raw pixel.
+                // @todo Use latest browser methods to do this faster.
+                switch (compressionFormat.toLowerCase()) {
+                case 'jpeg':
                     // Decompress lossy jpeg into 16bit
                     // @note IE10 & safari tested/compatible
-                    var pixelArray = parseJpeg(data.decompression);
-                    pixelArray = convertBackTo16bit(pixelArray, data.decompression);
-                }
-                else if (data.decompression.compression.toLowerCase() === 'png') {
+                    var pixelArray = parseJpeg(data.decompression.binary);
+                    pixelArray = convertBackTo16bit(pixelArray, {
+                        hasColor: tags.PhotometricInterpretation !== "MONOCHROME1" && tags.PhotometricInterpretation !== "MONOCHROME2",
+                        isSigned: !!(+tags.PixelRepresentation),
+                        stretching: +tags.BitsStored === 8 ? null : {
+                            // @note we still need
+                            //     data.decompression.stretching as we'll lose
+                            //     a ton' of dynamic if we stretch to
+                            //     `2^tags.BitStored` (many jpeg only use 9
+                            //     bits out of the 12 `said` to be stored by
+                            //     the BitsStored tag).
+                            low: data.decompression.stretching.low || 0,
+                            high: data.decompression.stretching.high || Math.pow(2, tags.BitsStored)
+                        }
+                    });
+                    break;
+                case 'png':
                     // Decompress lossless png
                     // @note IE10 & safari tested/compatible
-                    var pixelArray = parsePng(data.decompression)
-                }
-                else if (data.decompression.compression.toLowerCase() === 'jpeg-lossless') { // jpeg FFC3       
+                    var pixelArray = parsePng({
+                        binary: data.decompression.binary,
+                        hasColor: tags.PhotometricInterpretation !== "MONOCHROME1" && tags.PhotometricInterpretation !== "MONOCHROME2",
+                        isSigned: !!(+tags.PixelRepresentation)
+                    });
+                    break;
+                case 'jpeg-lossless':
                     // Decompress lossless jpeg
-                    // @warning IE11 & safari uncompatible - actual fix is to always ask PNG
-                    //          conversion of PIXELDATA requested quality in LOSSLESS. This may provide issues
-                    //          if we for instance require availableQualities for other things than chosing
-                    //          the desired image formats (ie. add an indicator), but is not likely.
-                    var pixelArray = parseJpegLossless(data.decompression);
+                    // @warning IE11 & safari uncompatible - actual fix is to
+                    //     always ask PNG conversion of PIXELDATA requested
+                    //     quality in LOSSLESS. This may provide issues if we
+                    //     for instance require availableQualities for other
+                    //     things than chosing the desired image formats (ie.
+                    //     add an indicator), but is not likely.
+                    var pixelArray = parseJpegLossless({
+                        binary: data.decompression.binary,
+                        isSigned: !!(+tags.PixelRepresentation)
+                    });
+                    break;
                 }
+
+                // Calculate Min/Max values
+                var maxPossiblePixelValue = Math.pow(2, tags.BitsStored);
+                var minPixelValue = null;
+                var maxPixelValue = null;
+                if (tags.PhotometricInterpretation !== "MONOCHROME1" && tags.PhotometricInterpretation !== "MONOCHROME2") {
+                    // Do not bother calculating values for rgb images (the dynamic is small for 8 bit luminosity, there is
+                    // no point in having something specific)
+                    minPixelValue = 0;
+                    maxPixelValue = maxPossiblePixelValue;
+                }
+                else {
+                    // Calculate min/max pixel value for greyscale images (can be more than 8 bits).
+                    minPixelValue = maxPossiblePixelValue;
+                    maxPixelValue = 0;
+                    for (var i=0; i<pixelArray.length; ++i) {
+                        if (pixelArray[i] < minPixelValue) {
+                            minPixelValue = pixelArray[i];
+                        }
+                        if (pixelArray[i] > maxPixelValue) {
+                            maxPixelValue = pixelArray[i];
+                        }
+                    }
+                }
+
+                data.cornerstone.minPixelValue = minPixelValue;
+                data.cornerstone.maxPixelValue = maxPixelValue;
+
+                // Calculate windowing
+                var windowCenter = 0;
+                var windowWidth = 0;
+                // If windowing dicom tags are available, use them
+                if (tags.WindowCenter && tags.WindowWidth) {
+                    var windowCenters = tags.WindowCenter.split('\\');
+                    var windowWidths = tags.WindowWidth.split('\\');
+
+                    // Only take the first ww/wc available, ignore others (if 
+                    // there is any).
+                    windowCenter = +windowCenters[0];
+                    windowWidth = +windowWidths[0];
+                }
+                // If windowing dicom tags are not available, generate
+                // default windowing values using min/max pixel values.
+                else if (tags.PhotometricInterpretation !== "MONOCHROME1" && tags.PhotometricInterpretation !== "MONOCHROME2") {
+                    // Do not bother calculating values for rgb images (the dynamic is small for 8 bit luminosity, there is
+                    // no point in having something specific)
+                    windowCenter = 127.5;
+                    windowWidth = 256;
+                }
+                else {
+                    // For grayscale (8 bits or more) images, process default windowing.
+                    // Ignore lower/higher bound for windowing calculus, since
+                    // many image include an overlay of that color.
+                    var minPixelValueForWWWC = maxPixelValue;
+                    var maxPixelValueForWWWC = minPixelValue;
+                    var margin = (maxPixelValue - minPixelValue) / (2 * tags.BitsStored);
+                    for (var i=0; i<pixelArray.length; ++i) {
+                        if (pixelArray[i] < minPixelValueForWWWC && pixelArray[i] > minPixelValue + margin) {
+                            minPixelValueForWWWC = pixelArray[i];
+                        }
+                        if (pixelArray[i] > maxPixelValueForWWWC && pixelArray[i] < maxPixelValue - margin) {
+                            maxPixelValueForWWWC = pixelArray[i];
+                        }
+                    }
+                    // Make sure min/max for wwwc is realistic.
+                    minPixelValueForWWWC = minPixelValueForWWWC + margin > maxPixelValueForWWWC ? minPixelValue : minPixelValueForWWWC;
+                    maxPixelValueForWWWC = minPixelValueForWWWC + margin > maxPixelValueForWWWC ? maxPixelValue : maxPixelValueForWWWC;
+
+                    windowCenter = minPixelValueForWWWC + (maxPixelValueForWWWC - minPixelValueForWWWC) / 2;
+                    windowWidth = (maxPixelValueForWWWC - minPixelValueForWWWC) / 2 || 256;
+                }
+
+                // Adapt window width/center with the slope & intercept values.
+                // Those calculation will be made internally by cornerstone,
+                // with the following formulas:
+                // windowCenter = windowCenter * slope + intercept;
+                // windowWidth = windowWidth * slope;
+                var slope = +tags.RescaleSlope || 1;
+                var intercept = +tags.RescaleIntercept || 0;
+
+                // Inject data in model.
+                data.cornerstone.slope = slope;
+                data.cornerstone.intercept = intercept;
+                data.cornerstone.windowCenter = windowCenter;
+                data.cornerstone.windowWidth = windowWidth;
+
+                // if data.decompression.stretching !== null, update data.decompression.stretching's min|maxPixelValue
             }
             catch (e) {
                 // Clean the processing request
@@ -295,17 +473,21 @@ function parseKLV(arraybuffer) {
         RowPixelSpacing: 5,
 
         // LUT
-        MinPixelValue: 6,
-        MaxPixelValue: 7,
         Slope: 8,
         Intercept: 9,
         WindowCenter: 10,
         WindowWidth: 11,
 
-
         // - WebViewer related
         IsSigned: 12,
+
+        // When 16bit image is converted to 8 bit, used convert image back to 16bit
+        // in the web frontend with `minPixelValue` & `maxPixelValue`.
+        MinPixelValue: 6,
+        MaxPixelValue: 7,
         Stretched: 13, // set back 8bit to 16bit if true
+        
+        // Compression format
         Compression: 14,
 
         // used to zoom downsampled images back to original size
@@ -316,7 +498,8 @@ function parseKLV(arraybuffer) {
         // - Image binary
         ImageBinary: 17
     };
-
+    
+    // Data required by cornerstone to display the image correctly.
     var cornerstoneMetaData = {
         color: klvReader.getUInt(keys.Color),
         height: klvReader.getUInt(keys.Height),
@@ -327,13 +510,23 @@ function parseKLV(arraybuffer) {
 
         columnPixelSpacing: klvReader.getFloat(keys.ColumnPixelSpacing),
         rowPixelSpacing: klvReader.getFloat(keys.RowPixelSpacing),
-
+    
+        // These value are processed by the frontend (within this worker) instead
+        // because it's the only place we *always* have access to raw pixel (as  
+        // we want to avoid having to decompress/recompress compressed images in 
+        // the backend, for performance reason).
         minPixelValue: klvReader.getInt(keys.MinPixelValue),
         maxPixelValue: klvReader.getInt(keys.MaxPixelValue),
         slope: klvReader.getFloat(keys.Slope),
         intercept: klvReader.getFloat(keys.Intercept),
         windowCenter: klvReader.getFloat(keys.WindowCenter),
         windowWidth: klvReader.getFloat(keys.WindowWidth),
+        // minPixelValue: null,
+        // maxPixelValue: null,
+        // slope: null,
+        // intercept: null,
+        // windowCenter: null,
+        // windowWidth: null,
 
         originalHeight: klvReader.getUInt(keys.OriginalHeight),
         originalWidth: klvReader.getUInt(keys.OriginalWidth)
@@ -345,7 +538,8 @@ function parseKLV(arraybuffer) {
         _processingRequest = null; // cleaning request
         throw new Error('unknown compression: ' + compression);
     }
-
+    
+    // Data required to decompress the binary (inside this worker).
     var decompressionMetaData = {
         binary: klvReader.getBinary(keys.ImageBinary),
         compression: compression,
@@ -365,10 +559,10 @@ function parseKLV(arraybuffer) {
     };
 }
 
-function parseJpeg(config) {
+function parseJpeg(binary) {
     var jpegReader = new JpegImage();
-    jpegReader.parse(config.binary);
-    var s = jpegReader.getData(config.width, config.height);
+    jpegReader.parse(binary);
+    var s = jpegReader.getData(jpegReader.width, jpegReader.height);
     return s;
 }
 

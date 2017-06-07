@@ -162,21 +162,25 @@ namespace Orthanc
       return;
     }
 
-    minValue = std::numeric_limits<PixelType>::max();
-    maxValue = std::numeric_limits<PixelType>::min();
+    PixelType minPossibleValue = std::numeric_limits<PixelType>::min();
+    PixelType maxPossibleValue = std::numeric_limits<PixelType>::max();
+    minValue = maxPossibleValue;
+    maxValue = minPossibleValue;
 
+    // Ignore max & min possible values are they are often used to display
+    // overlay over the image and thus break the windowing calculus.
     for (unsigned int y = 0; y < source.GetHeight(); y++)
     {
       const PixelType* p = reinterpret_cast<const PixelType*>(source.GetConstRow(y));
 
       for (unsigned int x = 0; x < source.GetWidth(); x++, p++)
       {
-        if (*p < minValue)
+        if (*p < minValue && *p != minPossibleValue)
         {
           minValue = *p;
         }
 
-        if (*p > maxValue)
+        if (*p > maxValue && *p != maxPossibleValue)
         {
           maxValue = *p;
         }
