@@ -99,7 +99,7 @@
                 var minPixelValue = viewport.getCurrentImageMinPixelValue();
                 var maxPixelValue = viewport.getCurrentImageMaxPixelValue();
                 var pixelValueDelta = maxPixelValue - minPixelValue;
-                var strength = Math.max(1, Math.log2(pixelValueDelta) - 8);
+                var strength = Math.max(1, Math.log2(pixelValueDelta) - 7);
 
                 // Retrieve the current scale of the image, so user has more
                 // refined control over zoomed images. For instance, when user
@@ -108,7 +108,8 @@
                 // whole image. A better solution would be to define the
                 // strength based on the currently viewed image zone dynamic, 
                 // instead of the whole image dynamic, but that's fine for now.
-                var scale = +viewportData.getScaleForFullResolution();
+                // var scale = Math.max(1, Math.min(+viewportData.getScaleForFullResolution(), 3));
+                var scale = 1;
 
                 // Calculate the new ww/wc.
                 var newWindowWidth = +viewportData.voi.windowWidth + (deltaX / scale * strength);
