@@ -24,6 +24,7 @@ Fixes:
 * Use 3 fingers to change windowing instead of 2 on mobile.
 * Support for MONOCHROME1 photometric interpolation.
 * Enhance windowing tool ergonomy on images with high dynamic.
+* Support default windowing for compressed dicom images without windowing tags.
 
 Breaking Changes:
 * New routes used:
