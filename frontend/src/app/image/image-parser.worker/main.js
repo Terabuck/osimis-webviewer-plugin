@@ -376,6 +376,13 @@ BinaryRequest.prototype.execute = function() {
                 data.cornerstone.windowCenter = windowCenter;
                 data.cornerstone.windowWidth = windowWidth;
 
+                // Support MONOCHROME1 photometric interpretation (this line
+                // will invert the grayscale map for monochrome1 images, so `0`
+                // pixel value is considered as white instead of black).
+                // This fixes wrong plugin/orthanc image interpretation (see 
+                // `https://bitbucket.org/sjodogne/orthanc/issues/44/bad-interpretation-of-photometric`).
+                data.cornerstone.invert = tags.PhotometricInterpretation === "MONOCHROME1";
+
                 // if data.decompression.stretching !== null, update data.decompression.stretching's min|maxPixelValue
             }
             catch (e) {

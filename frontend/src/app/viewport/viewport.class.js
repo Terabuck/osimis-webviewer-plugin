@@ -606,13 +606,6 @@
         };
         viewportData.changeResolution(newResolution);
         
-        // Invert color by default if photometric interpretation is monochrome1,
-        // to fix bad orthanc image interpretation (see 
-        // `https://bitbucket.org/sjodogne/orthanc/issues/44/bad-interpretation-of-photometric`).
-        if (this._displayedImage.tags.PhotometricInterpretation === 'MONOCHROME1') {
-            viewportData.invert = true;
-        }
-
         // Replace the viewport data in cornerstone (without redrawing, yet)
         var enabledElementObject = this._enabledElementObject; // enabledElementObject != enabledElementDom
         enabledElementObject.viewport = viewportData;
