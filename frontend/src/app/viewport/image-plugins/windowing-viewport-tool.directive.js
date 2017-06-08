@@ -92,12 +92,19 @@
             this.setWindowing = function(viewport, deltaX, deltaY) {
                 var viewportData = viewport.getViewport();
 
-                var scale = +viewportData.scale;
-                var windowWidth = +viewportData.voi.windowWidth;
-                var windowCenter = +viewportData.voi.windowCenter;
+                var pixelValueDelta = viewport._displayedCornerstoneImageObject.maxPixelValue - viewport._displayedCornerstoneImageObject.minPixelValue;
+                var strength = 1;
+                strength += Math.log2(pixelValueDelta) - 9 || 1;
 
-                viewportData.voi.windowWidth = windowWidth + (deltaX / scale);
-                viewportData.voi.windowCenter = windowCenter + (deltaY / scale);
+                var scale = +viewportData.getScaleForFullResolution();
+                var newWindowWidth = +viewportData.voi.windowWidth + (deltaX / scale * strength);
+                var newWindowCenter = +viewportData.voi.windowCenter + (deltaY / scale * strength);
+                if (newWindowWidth >= viewport._displayedCornerstoneImageObject.minPixelValue && newWindowWidth <= viewport._displayedCornerstoneImageObject.maxPixelValue) {
+                    viewportData.voi.windowWidth = newWindowWidth;
+                }
+                if (newWindowCenter >= viewport._displayedCornerstoneImageObject.minPixelValue && newWindowCenter <= viewport._displayedCornerstoneImageObject.maxPixelValue) {
+                    viewportData.voi.windowCenter = newWindowCenter;
+                }
                 
                 viewport.setViewport(viewportData);
                 viewport.draw(false);
