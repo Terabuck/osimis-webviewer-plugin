@@ -28,53 +28,28 @@ struct ImageMetaData : public boost::noncopyable {
   // recompress it).
   ImageMetaData(const Orthanc::DicomMap& headerTags, const Json::Value& dicomTags);
 
-  // - Cornerstone (frontend) related
-
-  // -> Dicom Tags -> photometricInterpretation != "MONOCHROME1" && photometricInterpretation != "MONOCHROME2"
-  bool color;
-
-  // -> Compression format -> jpeg | Dicom Tags else
+  // The following attributes are attributes required to process the image in
+  // the frontend that are not available from the dicom tags.
+  
+  // The width and height of the image. Different from the Rows & Columns dicom
+  // tags if the image has been resized (using an image processing policy).
   uint32_t height;
   uint32_t width;
+  // The size in raw prior to compression, it's equals to the dicom tag formula 
+  // `Rows * Cols * BitsAllocated * (isColor ? 3 : 1)` if the image has not
+  // been resized.
+  uint32_t sizeInBytes; 
 
-  // -> Dicom Tags -> Row * Col * BitsAllocated.
-  uint32_t sizeInBytes; // size in raw prior to compression
-
-  // Pixel size / aspect ratio
-  // -> Dicom Tags
-  float columnPixelSpacing;
-  float rowPixelSpacing;
-
-  // LUT
-  // @deprecated
-  // -> Dicom Tag
-  float slope;
-  float intercept;
-  float windowCenter;
-  float windowWidth;
-
-  // - WebViewer (frontend) related
-
-  // -> Dicom Tag (PixelRepresentation)
-  bool isSigned;
-
-  // -> Plugin
-  // When 16bit image is converted to 8 bit, used convert image back to 16bit
-  // in the web frontend with `minPixelValue` & `maxPixelValue`.
-  // !
-  // From route + BitsAllocated - if jpeg -> always stretched to 8bit.
+  // When 16bit image is converted to 8 bit (for instance if we want to
+  // compress an image in jpeg, which is limited to 8bits). We unstretch the
+  // image in the frontend so we can use similar windowing values in
+  // cornerstone either when we use low quality image (jpeg 8 bits) or lossless
+  // (8-16bits).
   bool stretched;
-  // -> Dicom Tags (from BitsStored)
+  // When we stretch an image dynamic from 16bits to 8bits, we only stretch the
+  // useful bits (so we avoid losing a lot of quality for instance if the raw
+  // image is in 16bits but only use 10 of those). The following values allow
+  // to unstretch the image back to the right value in the frontend.
   int32_t minPixelValue;
   int32_t maxPixelValue;
-
-  // -> Dicom Tag (Row / Column)
-  // Used to retrieve original coordinate when resampling is applied.
-  uint32_t originalHeight;
-  uint32_t originalWidth;
-  
-  // Compression Pormat
-  // !
-  // From route
-  std::string compression;
 };
