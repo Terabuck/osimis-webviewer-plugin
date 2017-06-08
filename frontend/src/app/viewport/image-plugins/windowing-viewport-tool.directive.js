@@ -99,8 +99,7 @@
                 var minPixelValue = viewport.getCurrentImageMinPixelValue();
                 var maxPixelValue = viewport.getCurrentImageMaxPixelValue();
                 var pixelValueDelta = maxPixelValue - minPixelValue;
-                var strength = 1;
-                strength += Math.log2(pixelValueDelta) - 9 || 1;
+                var strength = Math.max(1, Math.log2(pixelValueDelta) - 8);
 
                 // Retrieve the current scale of the image, so user has more
                 // refined control over zoomed images. For instance, when user
