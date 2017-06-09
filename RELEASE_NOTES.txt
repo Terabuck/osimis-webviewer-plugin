@@ -22,7 +22,8 @@ Fixes:
 * Prevent double tooltip (text indicators for buttons) display.
 * Display studies containing incompatible series.
 * Use 3 fingers to change windowing instead of 2 on mobile.
-* Support for MONOCHROME1 photometric interpolation
+* Support for MONOCHROME1 photometric interpolation.
+* Enhance windowing tool ergonomy on images with high dynamic.
 
 Breaking Changes:
 * New routes used:

@@ -460,6 +460,42 @@
      * @ngdoc method
      * @methodOf osimis.Viewport
      *
+     * @name osimis.Viewport#getCurrentImageMinPixelValue
+     * 
+     * @return {number}
+     * The minimum pixel value of the current image.
+     * 
+     * @description
+     * This method return the minimum pixel value (in term of color shade) of 
+     * the current image. It is used by the windowing tool to fine-tune its
+     * sensitivity.
+     */
+    Viewport.prototype.getCurrentImageMinPixelValue = function() {
+        return this._displayedCornerstoneImageObject.minPixelValue;
+    };
+
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Viewport
+     *
+     * @name osimis.Viewport#getCurrentImageMaxPixelValue
+     * 
+     * @return {number}
+     * The maximum pixel value of the current image.
+     * 
+     * @description
+     * This method return the maximum pixel value (in term of color shade) of 
+     * the current image. It is used by the windowing tool to fine-tune its
+     * sensitivity.
+     */
+    Viewport.prototype.getCurrentImageMaxPixelValue = function() {
+        return this._displayedCornerstoneImageObject.maxPixelValue;
+    };
+
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Viewport
+     *
      * @name osimis.Viewport#setViewport
      * @param {object} viewportData Set cornerstone viewport data (see
      *                              cornerstone doc).
