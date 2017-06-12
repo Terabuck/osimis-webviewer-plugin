@@ -12,6 +12,7 @@ Features:
 * Compare the current study with other studies from the same patients.
 * Select a viewport and apply flip/rotate/color inversion tools to it.
 * Support for windows touchscreen.
+* Support 1x2 and 2x1 viewport grid layout.
 * Enhance overall interface:
   - Display consulted series.
   - Show the list of series as a grid.

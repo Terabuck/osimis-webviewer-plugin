@@ -246,7 +246,17 @@
      * Check if a specific pane is selected.
      */
     PaneManager.prototype.isPaneSelected = function(index) {
-        return this.getPane(index).isSelected;
+        var pane = this.getPane(index);
+
+        // Return false if the pane doesn't exists. This happens when we switch
+        // from 1x2 layout to 2x1 layout. It appears that the switch happens
+        // asynchronously between the imperative code and the declarative one.
+        // @warning may cause asynchronicity issues.
+        if (!pane) {
+            return false;
+        }
+
+        return pane.isSelected;
     };
 
     /**
