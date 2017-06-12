@@ -17,10 +17,10 @@ private:
   bool _isLargerThan(uint32_t width, uint32_t height, const Json::Value& otherTags);
 
   // Used to choose either PIXELDATA or LOSSLESS based on transferSyntax
-  bool _isAlreadyCompressedWithinDicom(const Orthanc::DicomMap& headerTags);
+  bool _isAlreadyCompressedWithinDicom(const Json::Value& headerTags);
 
 public:
   // Returns available qualities depending on the image DICOM tags
   // @todo use image as an input
-  virtual std::set<ImageQuality> retrieveByTags(const Orthanc::DicomMap& headerTags, const Json::Value& otherTags);
+  virtual std::set<ImageQuality> retrieveByTags(const Json::Value& headerTags, const Json::Value& otherTags);
 };

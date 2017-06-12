@@ -2,7 +2,6 @@
 
 #include <set>
 #include <json/value.h>
-#include <Core/DicomFormat/DicomMap.h>
 #include "ImageQuality.h"
 
 /** IAvailableQualityPolicy
@@ -13,5 +12,5 @@
  */
 class IAvailableQualityPolicy {
 public:
-  virtual std::set<ImageQuality> retrieveByTags(const Orthanc::DicomMap& headerTags, const Json::Value& otherTags) = 0;
+  virtual std::set<ImageQuality> retrieveByTags(const Json::Value& headerTags, const Json::Value& otherTags) = 0;
 };
