@@ -1,0 +1,84 @@
+<div class="popover wvToolbar__splitpaneConfigPopover"  ng-show="content">
+  <div class="arrow"></div>
+  <h3 class="popover-title" ng-bind-html="title" ng-show="title"></h3>
+  <div class="popover-content">
+
+    <form name="popoverForm">
+
+      <!-- 
+      1x1 icon.
+      -->
+      <label
+          class="wvToolbar__splitpaneConfigButton glyphicon glyphicon-stop""
+          ng-class="{active: vm.tool === 'zoom'}"
+      >
+          <input
+              class="wvToolbar__splitpaneConfigButtonInput"
+              type="radio"
+
+              ng-disabled="vm.readonly"
+              ng-model="vm.splitpaneLayout"
+              ng-value="{x: 1, y: 1}" 
+              ng-click="vm.popover.hide()"
+          />
+      </label>
+
+      <!-- 
+      2x1 icon.
+      -->
+      <label
+          class="wvToolbar__splitpaneConfigButton glyphicon glyphicon-pause""
+          ng-class="{active: vm.tool === 'zoom'}"
+      >
+          <input
+              class="wvToolbar__splitpaneConfigButtonInput"
+              type="radio"
+
+              ng-disabled="vm.readonly"
+              ng-model="vm.splitpaneLayout"
+              ng-value="{x: 2, y: 1}" 
+              ng-click="vm.popover.hide()"
+          />
+      </label>
+
+      <!-- 
+      1x2 icon.
+      -->
+      <label
+          class="wvToolbar__splitpaneConfigButton--rotate glyphicon glyphicon-pause"
+          ng-class="{active: vm.tool === 'zoom'}"
+      >
+          <input
+              class="wvToolbar__splitpaneConfigButtonInput"
+              type="radio"
+
+              ng-disabled="vm.readonly"
+              ng-model="vm.splitpaneLayout"
+              ng-value="{x: 1, y: 2}" 
+              ng-click="vm.popover.hide()"
+          />
+      </label>
+
+      <!-- 
+      2x2 icon.
+      -->
+      <label
+          class="wvToolbar__splitpaneConfigButton glyphicon glyphicon-th-large"
+          ng-class="{active: vm.tool === 'zoom'}"
+      >
+          <input
+              class="wvToolbar__splitpaneConfigButtonInput"
+              type="radio"
+
+              ng-disabled="vm.readonly"
+              ng-model="vm.splitpaneLayout"
+              ng-value="{x: 2, y: 2}" 
+              ng-click="vm.popover.hide()"
+          />
+      </label>
+
+    </form>
+
+
+  </div>
+</div>

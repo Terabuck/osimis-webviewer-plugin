@@ -7,29 +7,12 @@
     }"
 >
     <!-- Splitpane Grid configuration buttons. -->
-    <label 
+    <wv-splitpane-config-button
         ng-if="vm.buttons.hasOwnProperty('layout')"
-        class="wvButton--underline glyphicon glyphicon-stop"
-        ng-class="{active: vm.buttons.layout.x === 1 && vm.buttons.layout.y === 1}"
-        data-title="Single view"
-        data-placement="bottom"
-        data-container="body"
-        bs-tooltip
-    >
-        <input type="checkbox" ng-disabled="vm.readonly" ng-click="vm.buttons.layout = {x: 1, y: 1}" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
-    </label><!--
-    Remove text white space.
-    --><label 
-        ng-if="vm.buttons.hasOwnProperty('layout')"
-        class="wvButton--underline glyphicon glyphicon-th-large"
-        ng-class="{active: vm.buttons.layout.x === 2 && vm.buttons.layout.y === 2}"
-        data-title="Grid view"
-        data-placement="bottom"
-        data-container="body"
-        bs-tooltip
-    >
-        <input type="checkbox" ng-disabled="vm.readonly" ng-click="vm.buttons.layout = {x: 2, y: 2}" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
-    </label>
+        wv-readonly="vm.readonly"
+        wv-splitpane-layout="vm.buttons.layout"
+        wv-popover-placement="bottom"
+    ></wv-splitpane-config-button>
 
     <!-- Invert Colour State -->
     <label 
@@ -197,8 +180,9 @@
 </div>
 
 <!--
-Since I can't manage to make tooltip's data-placement attribute dynamic, I
-duplicate the whole directive content and keep it static.
+Since I couldn't manage to make tooltip's data-placement attribute dynamic, 
+I've duplicated the whole directive content and have kept it static, using an
+`ng-if` to distinguish between its two possible values instead.
 -->
 <div
     class="wvToolbar"
@@ -209,29 +193,12 @@ duplicate the whole directive content and keep it static.
     }"
 >
     <!-- Splitpane Grid configuration buttons. -->
-    <label 
+    <wv-splitpane-config-button
         ng-if="vm.buttons.hasOwnProperty('layout')"
-        class="wvButton--underline glyphicon glyphicon-stop"
-        ng-class="{active: vm.buttons.layout.x === 1 && vm.buttons.layout.y === 1}"
-        data-title="Single view"
-        data-placement="left"
-        data-container="body"
-        bs-tooltip
-    >
-        <input type="checkbox" ng-disabled="vm.readonly" ng-click="vm.buttons.layout = {x: 1, y: 1}" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
-    </label><!--
-    Remove text white space.
-    --><label 
-        ng-if="vm.buttons.hasOwnProperty('layout')"
-        class="wvButton--underline glyphicon glyphicon-th-large"
-        ng-class="{active: vm.buttons.layout.x === 2 && vm.buttons.layout.y === 2}"
-        data-title="Grid view"
-        data-placement="left"
-        data-container="body"
-        bs-tooltip
-    >
-        <input type="checkbox" ng-disabled="vm.readonly" ng-click="vm.buttons.layout = {x: 2, y: 2}" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
-    </label>
+        wv-readonly="vm.readonly"
+        wv-splitpane-layout="vm.buttons.layout"
+        wv-popover-placement="left"
+    ></wv-splitpane-config-button>
 
     <!-- Invert Colour State -->
     <label 
