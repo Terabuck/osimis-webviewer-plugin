@@ -4,10 +4,8 @@
 #include <json/json.h>
 
 #include <Core/OrthancException.h> // For _getTransferSyntax
-#include <Core/Toolbox.h> // For _getTransferSyntax -> Orthanc::Toolbox::StripSpaces
 
 namespace {
-  std::string _getTransferSyntax(const Orthanc::DicomMap& headerTags);
 }
 
 SeriesFactory::SeriesFactory(std::auto_ptr<IAvailableQualityPolicy> availableQualityPolicy)
@@ -18,7 +16,7 @@ SeriesFactory::SeriesFactory(std::auto_ptr<IAvailableQualityPolicy> availableQua
 
 std::auto_ptr<Series> SeriesFactory::CreateSeries(const std::string& seriesId,
                                                   const Json::Value& slicesShort,
-                                                  const Orthanc::DicomMap& middleInstanceMetaInfoTags,
+                                                  const Json::Value& middleInstanceMetaInfoTags,
                                                   const Json::Value& middleInstancesTags,
                                                   const Json::Value& instancesTags)
 {
@@ -28,7 +26,7 @@ std::auto_ptr<Series> SeriesFactory::CreateSeries(const std::string& seriesId,
   // Check the middle instance's type (`[multiframe] image / pdf / image`
   // instance.
   Json::Value mimeType = middleInstancesTags["MIMETypeOfEncapsulatedDocument"];
-  std::string transferSyntax = _getTransferSyntax(middleInstanceMetaInfoTags);
+  std::string transferSyntax = middleInstanceMetaInfoTags["TransferSyntax"].asString();
 
   // If the middle instance is a `pdf` instance, set `pdf` type & keep 
   // available qualities empty.
@@ -68,31 +66,4 @@ std::auto_ptr<Series> SeriesFactory::CreateSeries(const std::string& seriesId,
   
   // Create the series
   return std::auto_ptr<Series>(new Series(seriesId, contentType, middleInstancesTags, instancesTags, slicesShort, imageQualities));
-}
-
-namespace {
-  std::string _getTransferSyntax(const Orthanc::DicomMap& headerTags)
-  {
-    using namespace Orthanc;
-
-    // Retrieve transfer syntax
-    const DicomValue* transfertSyntaxValue = headerTags.TestAndGetValue(0x0002, 0x0010);
-    std::string transferSyntax;
-
-    if (transfertSyntaxValue->IsBinary()) {
-      throw OrthancException(ErrorCode::ErrorCode_CorruptedFile);
-    }
-    else if (transfertSyntaxValue == NULL || transfertSyntaxValue->IsNull()) {
-      // Set default transfer syntax if not found
-      transferSyntax = "1.2.840.10008.1.2";
-    }
-    else {
-      // Stripping spaces should not be required, as this is a UI value
-      // representation whose stripping is supported by the Orthanc
-      // core, but let's be careful...
-      transferSyntax = Orthanc::Toolbox::StripSpaces(transfertSyntaxValue->GetContent());
-    }
-
-    return transferSyntax;
-  }
 }
