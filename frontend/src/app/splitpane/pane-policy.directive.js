@@ -11,6 +11,9 @@
  * 
  * * `x` The column index - starts from 0
  * * `y` The row index - starts from 0
+ *
+ * @param {osimis.Pane} [wvPane] (readonly)
+ * The pane object.
  * 
  * @param {callback} [wvOnPaneAdded] 
  * Called when the pane is added.
@@ -93,6 +96,7 @@
                 splitpane: '^^wvSplitpane'
             },
             scope: {
+                pane: '=?wvPane',
                 paneIndex: '=?wvPaneIndex',
                 panePosition: '=?wvPanePosition',
                 onAdded: '&?wvOnPaneAdded', // called once by pane added
@@ -106,25 +110,32 @@
         function link(scope, element, attrs) {
             var vm = scope.vm;
             
-            // Retrieve the splitpane ng-repeat context scope to access the position of the pane within the splitpane
+            // Retrieve the splitpane ng-repeat context scope to access the
+            // position of the pane within the splitpane.
             //
-            // Using $parent is the simplest way to retrieve the ng-repeat context scope from wvSplitpane
-            // The first $parent is used to get out of wvPanePolicy directive isolate scope
-            // The second $parent is used to get out of wvPanePolicy transclusion scope
-            // It won't ever cause any issues in this case, especially because the wvPanePolicy directive is also
-            // a transclusion slot of wvSplitpane (its position in the dom will therefore always be the same),
-            // and because the wvSplitpane and wvPanePolicy directives are interdependent.
+            // Using $parent is the simplest way to retrieve the ng-repeat
+            // context scope from wvSplitpane The first $parent is used to get
+            // out of wvPanePolicy directive isolate scope The second $parent
+            // is used to get out of wvPanePolicy transclusion scope It won't
+            // ever cause any issues in this case, especially because the
+            // wvPanePolicy directive is also a transclusion slot of
+            // wvSplitpane (its position in the dom will therefore always be
+            // the same), and because the wvSplitpane and wvPanePolicy
+            // directives are interdependent.
             //
             // The other way arounds to avoid using $parent are:
-            // 1. make wvPanePolicy act as ng-repeat and share the desired context scope to
-            //    wvSplitpane through inter-directive communication using `require`.
-            // 2. override the standard transclusion scope behavior using a transclusion function in wvSplitpane
-            //    and don't use an isolate scope for the wvPanePolicy directive.
+            // 1. make wvPanePolicy act as ng-repeat and share the desired
+            //    context scope to wvSplitpane through inter-directive
+            //    communication using `require`.
+            // 2. override the standard transclusion scope behavior using a
+            //    transclusion function in wvSplitpane and don't use an isolate
+            //    scope for the wvPanePolicy directive.
             var contextScope = scope.$parent.$parent;
             
             // Configure paneIndex and panePosition
 
-            // Set wvPanePolicy directive attributes based on $index, $x and $y from wvSplitpane context
+            // Set wvPanePolicy directive attributes based on $index, $x and $y
+            // from wvSplitpane context.
             var $x = contextScope.$x;
             var $y = contextScope.$y;
             
@@ -134,7 +145,9 @@
                 y: $y
             };
 
-            // Call `onAdded` and `onRemoved` callbacks
+            vm.pane = wvPaneManager.getPane($x, $y);
+
+            // Call `onAdded` and `onRemoved` callbacks.
             if (vm.onAdded) {
                 vm.onAdded({
                     $index: vm.paneIndex,

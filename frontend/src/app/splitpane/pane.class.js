@@ -20,10 +20,14 @@
 (function(osimis) {
     'use strict';
 
-    function Pane(Promise, studyManager, config) {
+    function Pane(Promise, studyManager, x, y, config) {
         // Injections
         this._Promise = Promise;
         this._studyManager = studyManager;
+
+        // Position of the pane
+        this.x = x;
+        this.y = y;
 
         // Assert config
         if (
@@ -116,6 +120,10 @@
                 .getByInstanceId(this.reportId);
         }
     };
+
+    Pane.prototype.isAtPosition = function(x, y) {
+        return this.x === x && this.y === y;
+    }
 
     osimis.Pane = Pane;
 

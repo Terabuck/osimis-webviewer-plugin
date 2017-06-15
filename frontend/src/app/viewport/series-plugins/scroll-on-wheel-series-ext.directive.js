@@ -201,7 +201,7 @@
             // avoid conflicts with other tools such as paning.
             var uaParser = new UAParser();
             vm.isMobile = (uaParser.getDevice().type === 'mobile');
-            if (!isMobile) {
+            if (!vm.isMobile) {
                 return;
             }
             

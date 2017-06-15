@@ -9,11 +9,11 @@
         <div
             ng-repeat="$x in [vm.paneManager.layout.x] | range track by $index"
             ng-class="{
-                'wvSplitpane__cellBorder': !vm.paneManager.isPaneSelected(vm.paneManager.getPaneIndex($x, $y)) || vm.paneManager.getPane(vm.paneManager.getPaneIndex($x, $y)).isEmpty(),
-                'wvSplitpane__cellBorder--selected': vm.paneManager.isPaneSelected(vm.paneManager.getPaneIndex($x, $y)) && !vm.paneManager.getPane(vm.paneManager.getPaneIndex($x, $y)).isEmpty()
+                'wvSplitpane__cellBorder': !vm.paneManager.isPaneSelected($x, $y) || vm.paneManager.getPane($x, $y).isEmpty(),
+                'wvSplitpane__cellBorder--selected': vm.paneManager.isPaneSelected($x, $y) && !vm.paneManager.getPane($x, $y).isEmpty()
             }"
             ng-style="{width: 'calc('+vm.rowWidth+' - 2px)'}"
-            ng-click="!vm.readonly && vm.paneManager.selectPane(vm.paneManager.getPaneIndex($x, $y))"
+            ng-click="!vm.readonly && vm.paneManager.selectPane($x, $y)"
         >  
             <!-- Content -->
             <ng-transclude

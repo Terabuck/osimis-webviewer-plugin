@@ -358,13 +358,13 @@
             scope.$watch('vm.tools.layout', function(layout) {
                 // Update panes' layout.
                 wvPaneManager.setLayout(layout.x, layout.y);
-            });
-            vm.onItemDroppedToPane = function(index, config) {
+            }, true);
+            vm.onItemDroppedToPane = function(x, y, config) {
                 // Set dropped pane as selected
                 config.isSelected = true;
                 
                 // Change pane's configuration.
-                wvPaneManager.setPane(index, config);
+                wvPaneManager.setPane(x, y, config);
             };
 
             // Enable/Disable annotation storage/retrieval from backend
