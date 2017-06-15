@@ -64,9 +64,7 @@
 
         // Adapt cornerstoneViewportData to display tracked image zone based on
         // canvas dimensions. Not required if there is no tracked image zone.
-        this._canvasWidth = canvasWidth || null;
-        this._canvasHeight = canvasHeight || null;
-        if (canvasWidth && canvasHeight) {
+        if (this._trackImageZone && canvasWidth && canvasHeight) {
             this._displayImageZone(this._trackImageZone, canvasWidth, canvasHeight);
         }
     }
@@ -114,8 +112,15 @@
             this._cornerstoneViewportData,
             this.originalImageResolution,
             this.currentImageResolution,
-            this._canvasWidth,
-            this._canvasHeight,
+            
+            // Do not clone `canvasWidth` & `canvasHeight`, as they are only
+            // used to update cornerstone viewport data based on the tracked
+            // image zone and are not saved). The will trigger recursive
+            // $digest cycle if they're set though, as it will make the
+            // cornerstone viewport data match the tracked image zone
+            // recursively since the `clone` method is used inside a $watcher.
+            null,
+            null,
             this._trackImageZone
         );
     };
