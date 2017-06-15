@@ -27,6 +27,7 @@ Fixes:
 * Enhance windowing tool ergonomy on images with high dynamic.
 * Support default windowing for compressed dicom images without windowing tags.
 * Parse DICOM instances whose `DICM` header at [128..131] does not exist.
+* Keep the same images' displayed zones when the window is resized.
 
 Breaking Changes:
 * New routes used:
