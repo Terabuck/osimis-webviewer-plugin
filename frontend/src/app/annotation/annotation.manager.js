@@ -134,7 +134,7 @@
         }
 
         var config = this._config;
-        // var annotations = this._annotations;
+        var annotations = this._annotations;
 
         var httpRequest = new osimis.HttpRequest();
         httpRequest.setCache(false);
