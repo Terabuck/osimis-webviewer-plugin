@@ -61,7 +61,7 @@
         this.layout.x = columnCount;
         this.layout.y = rowCount;
 
-        // 1. Remove old panes.`
+        // 1. Remove old panes.
         var removedPanes = [];
         var hasSelectedPaneBeenRemoved = false;
         for (i=this.panes.length-1; i>=0; --i) {
@@ -73,7 +73,9 @@
                 // Store removed pane so we can move it (for instance if the
                 // end-user switches columns/rows, so he can keep the panes'
                 // content).
-                removedPanes.push(pane);
+                if (!pane.isEmpty()) {
+                    removedPanes.push(pane);
+                }
 
                 // Make sure we reselect a pane later if none is selected
                 // anymore.
@@ -84,18 +86,27 @@
         }
 
         // 3. Create new panes.
-        var columnCountDiff = columnCount - oldColumnCount;
-        var rowCountDiff = rowCount - oldRowCount;
-        if (columnCountDiff > 0 || rowCountDiff > 0) {
+        var columnCountDiff = Math.abs(columnCount - oldColumnCount);
+        var rowCountDiff = Math.abs(rowCount - oldRowCount);
+        if (columnCountDiff + rowCountDiff > 0) {
             for (y=0; y<rowCount; ++y) {
                 for (x=0; x<columnCount; ++x) {
                     // Ignore already created panes.
-                    if (y < oldRowCount && x < oldColumnCount) {
+                    if (y < oldRowCount && x < oldColumnCount && !this.getPane(x, y).isEmpty()) {
                         continue;
+                    }
+                    
+                    // Remove empty pane so it can be replaced (or recreated).
+                    if (y < oldRowCount && x < oldColumnCount) {
+                        var paneToRemove = this.getPane(x, y);
+                        this.panes.splice(this.panes.indexOf(paneToRemove), 1);
+                        if (paneToRemove.isSelected) {
+                            hasSelectedPaneBeenRemoved = true; 
+                        }
                     }
 
                     // Retrieve panes from the previously removed one.
-                    var pane = removedPanes.pop()
+                    var pane = removedPanes.pop();
                     // If none exist, create a new one.
                     if (!pane) {
                         pane = new osimis.Pane(this._Promise, this._studyManager, x, y);
@@ -120,6 +131,7 @@
 
         // 4. Ensure one pane is selected.
         if (hasSelectedPaneBeenRemoved) {
+            // Select first filled pane if available.
             for (var i=0; i<this.panes.length; ++i) {
                 var pane = this.panes[i];
                 if (!pane.isEmpty()) {
