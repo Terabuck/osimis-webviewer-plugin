@@ -54,7 +54,5 @@ std::auto_ptr<IImageContainer> JpegConversionPolicy::Apply(std::auto_ptr<IImageC
   BENCH_LOG(COMPRESSION_JPEG_QUALITY, (int) quality_);
   BENCH_LOG(COMPRESSION_JPEG_SIZE, buffer.size);
 
-  metaData->compression = "jpeg";
-  
   return std::auto_ptr<IImageContainer>(new CompressedImageContainer(buffer));
 }

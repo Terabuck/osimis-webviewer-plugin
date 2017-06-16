@@ -1,26 +1,26 @@
 (function() {
     'use strict';
     
-    /** <wvDroppableSeriesOverlayItem><wvDroppableSeriesOverlayItem/>
+    /** <wv-pane-overlay><wv-pane-overlay/>
      *
      * Shows a notice if the overlay can be dropped.
-     * Only show the notice when ^^wvDroppableSerieExt is present
      */
     angular
         .module('webviewer')
-        .directive('wvDroppableSeriesOverlayItem', wvDroppableSeriesOverlayItem);
+        .directive('wvPaneOverlay', wvPaneOverlay);
 
     /* @ngInject */
-    function wvDroppableSeriesOverlayItem() {
+    function wvPaneOverlay() {
         var directive = {
             bindToController: true,
-            controller: Controller,
+            controller: PaneOverlayVM,
             controllerAs: 'vm',
             link: link,
             restrict: 'E',
             transclude: true,
-            templateUrl: 'app/overlay/droppable-series-overlay-item.directive.html',
-            scope: {} // isolated scope is required to avoid scope.vm override
+            templateUrl: 'app/splitpane/pane-overlay.directive.html',
+            scope: {
+            }
         };
         return directive;
 
@@ -30,7 +30,7 @@
     }
 
     /* @ngInject */
-    function Controller() {
-
+    function PaneOverlayVM() {
+        this.pane = undefined;
     }
 })();

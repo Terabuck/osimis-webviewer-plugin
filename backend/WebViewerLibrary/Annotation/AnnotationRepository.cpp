@@ -37,7 +37,7 @@ Json::Value AnnotationRepository::getByStudyId(const std::string studyId) const
   // Load json from orthanc
   std::string url = "/studies/" + studyId + "/attachments/" + _getAttachmentNumber(studyId) + "/data";
   ScopedOrthancPluginMemoryBuffer buffer(OrthancContextManager::Get());
-  Orthanc::ErrorCode error = static_cast<Orthanc::ErrorCode>(OrthancPluginRestApiGet(OrthancContextManager::Get(), buffer.getPtr(), url.c_str()));
+  Orthanc::ErrorCode error = static_cast<Orthanc::ErrorCode>(OrthancPluginRestApiGetAfterPlugins(OrthancContextManager::Get(), buffer.getPtr(), url.c_str()));
 
   // Return JSON on success
   if (error == Orthanc::ErrorCode_Success) {
@@ -106,7 +106,7 @@ void AnnotationRepository::setByImageId(const std::string &instanceId, uint32_t 
   Json::FastWriter fastWriter;
   std::string annotationsByImageIdsStr = fastWriter.write(annotationsByImageIds);
   ScopedOrthancPluginMemoryBuffer buffer(OrthancContextManager::Get());
-  Orthanc::ErrorCode error = static_cast<Orthanc::ErrorCode>(OrthancPluginRestApiPut(OrthancContextManager::Get(), buffer.getPtr(), url.c_str(), annotationsByImageIdsStr.c_str(), annotationsByImageIdsStr.size()));
+  Orthanc::ErrorCode error = static_cast<Orthanc::ErrorCode>(OrthancPluginRestApiPutAfterPlugins(OrthancContextManager::Get(), buffer.getPtr(), url.c_str(), annotationsByImageIdsStr.c_str(), annotationsByImageIdsStr.size()));
 
   // Do nothing of success (`value` is modified by reference, no need to return)
   if (error == Orthanc::ErrorCode_Success) {

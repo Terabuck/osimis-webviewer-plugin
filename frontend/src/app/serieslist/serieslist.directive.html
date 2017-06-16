@@ -1,84 +1,144 @@
 <ul
     ng-show="vm.studyId"
-    class="list-unstyled mbn"
+    class="wvSerieslist"
 >
-    <style>
-    /* @todo out! */
-    .superlist {
-        border-right: 1px solid #222;
-        /* mimic on hover border for draggable */
-        border-left: 1px solid transparent;
-        border-top: 1px solid transparent;
-        border-bottom: 1px solid transparent;
-
-        margin-bottom: 2px;
-    }
-    </style>
+    <!--
+    Reports
+    -->
     <li
         ng-show="vm.pdfInstanceIds.length > 0"
         ng-repeat="id in vm.pdfInstanceIds track by id"
-        class="list-unstyled superlist wv-serieslist-report"
-        ng-click="vm.openPdf(id)"
+        class="wvSerieslist__seriesItem"
+        ng-class="{
+            'wvSerieslist__seriesItem--list': vm.displayMode === 'list',
+            'wvSerieslist__seriesItem--grid': vm.displayMode === 'grid',
+            'wvSerieslist__seriesItem--selectable': vm.selectionEnabled,
+            'wvSerieslist__pdfItem--activated': vm.selectionEnabled && vm.selectedReportIds.indexOf(id) !== -1
+        }"
+        wv-draggable-item="{
+            reportId: id
+        }"
+        ng-click="vm.toggleReportSelection(id)"
+
+        bs-tooltip
+        bs-enabled="vm.displayMode === 'grid'"
+        data-title="PDF report"
+        placement="right"
     >
-        <div class="serieList__picture inline-object wh__64">
-            <span class="wv-serieslist-reporticon fa fa-file-text"></span>
+        <div class="wvSerieslist__picture">
+            <span class="wvSerieslist__placeholderIcon fa fa-file-text"></span>
+            
+            <span ng-if="vm.paneManager.hasReportBeenViewed(id)" class="wvSerieslist__badge--{{vm.study.color}} mr40 mb40">
+                <i class="fa fa-eye" aria-hidden="true"></i>
+            </span>
         </div>
-        <div class="serieList__informations float__right pl10">
-            <span class="serieList__label mn">PDF report</span>
+        <div 
+            ng-if="vm.displayMode === 'list'"
+            class="wvSerieslist__information"
+        >
+            <span class="wvSerieslist__label mn">PDF report</span>
         </div>
-    </li>
     <li
-        ng-show="!vm.pdfInstanceIds.length"
-        class="list-unstyled superlist wv-serieslist-noreport"
+        ng-show="vm.loaded && !vm.pdfInstanceIds.length"
+        class="wvSerieslist__seriesItem wvSerieslist__noReport"
+        ng-class="{
+            'wvSerieslist__seriesItem--list': vm.displayMode === 'list',
+            'wvSerieslist__seriesItem--grid': vm.displayMode === 'grid'
+        }"
+
+        bs-tooltip
+        bs-enabled="vm.displayMode === 'grid'"
+        data-title="No report available"
+        placement="right"
     >
-        <div class="serieList__picture inline-object wh__64">
-            <span class="wv-serieslist-noreporticon fa fa-file-text"></span>
+        <div class="wvSerieslist__picture">
+            <span class="wvSerieslist__placeholderIcon wvSerieslist__placeholderIcon--strikeout fa fa-file-text"></span>
         </div>
-        <div class="serieList__informations float__right pl10">
-            <span class="serieList__label mn">No report available</span>
+        <div 
+            ng-if="vm.displayMode === 'list'"
+            class="wvSerieslist__information"
+        >
+            <span class="wvSerieslist__label mn">No report available</span>
         </div>
-    </li>
+    <!--
+    Videos
+    -->
     <li
-        class="list-unstyled superlist wv-serieslist-report"
         ng-if="vm.videoDisplayEnabled"
-        ng-show="vm.videos.length > 0"
+        class="wvSerieslist__seriesItem"
+        ng-class="{
+            'wvSerieslist__seriesItem--list': vm.displayMode === 'list',
+            'wvSerieslist__seriesItem--grid': vm.displayMode === 'grid',
+            'wvSerieslist__seriesItem--selectable': vm.selectionEnabled,
+            'wvSerieslist__videoItem--activated': vm.selectionEnabled && vm.selectedVideoIds.indexOf($video.id) !== -1
+        }"
+        ng-show="vm.loaded && vm.videos.length > 0"
         ng-repeat="$video in vm.videos track by $video.id"
         wv-draggable-item="{
-            videoId: $video.id,
-            seriesId: null
+            videoId: $video.id
         }"
+        ng-click="vm.toggleSelection($video.id)"
+
+        bs-tooltip
+        bs-enabled="vm.displayMode === 'grid'"
+        data-title="Video: {{$video.tags.SeriesDescription || 'Untitled video'}}"
+        placement="right"
     >
-        <div class="serieList__picture inline-object wh__64">
-            <span class="wv-serieslist-reporticon fa fa-video-camera"></span>
+        <div class="wvSerieslist__picture">
+            <span class="wvSerieslist__placeholderIcon fa fa-video-camera"></span>
+            
+            <span ng-if="vm.paneManager.hasVideoBeenViewed($video.id)" class="wvSerieslist__badge--{{vm.study.color}} mr40 mb40">
+                <i class="fa fa-eye" aria-hidden="true"></i>
+            </span>
         </div>
-        <div class="serieList__informations float__right pl10">
-            <span class="serieList__label mn">{{$video.tags.SeriesDescription}}</span>
+        <div 
+            ng-if="vm.displayMode === 'list'"
+            class="wvSerieslist__information"
+        >
+            <span class="wvSerieslist__label mn">{{$video.tags.SeriesDescription || 'Untitled video'}}</span>
         </div>
-    </li>
     <li
-        class="list-unstyled superlist"
+        class="wvSerieslist__seriesItem"
         ng-repeat="id in vm.seriesIds track by id"
         wv-scroll-on-over-series-ext
-        wv-draggable-item="{
-            videoId: null,
-            seriesId: $series.id,
-            imageIndex: 0,
-            csViewport: null
+        ng-class="{
+            'wvSerieslist__seriesItem--list': vm.displayMode === 'list',
+            'wvSerieslist__seriesItem--grid': vm.displayMode === 'grid',
+            'wvSerieslist__seriesItem--selectable': vm.selectionEnabled,
+            'wvSerieslist__seriesItem--activated': vm.selectionEnabled && vm.selectedSeriesIds.indexOf($series.id) !== -1
         }"
+        ng-show="vm.loaded"
+        wv-draggable-item="{
+            seriesId: $series.id,
+            csViewport: null,
+            imageIndex: 0
+        }"
+        ng-click="vm.toggleSeriesSelection($series.id)"
+
+        bs-tooltip
+        bs-enabled="vm.displayMode === 'grid'"
+        data-title="{{$series.tags.SeriesDescription || 'Untitled series'}}"
+        placement="right"
     >
         <div
-            class="serieList__picture inline-object wh__64"
+            class="wvSerieslist__picture"
             wv-size-tag
         >
             <wv-viewport wv-image="$image" wv-image-index="$series.imageCount/2" vp:series-id="id" wv-series="$series" wv-size="{width: '[wv-size-tag]', height: '[wv-size-tag]'}"
                 wv-enable-overlay="false"
             ></wv-viewport>
-            <div class="serieList__badge">{{$series.imageCount}}</div>
+            <div class="wvSerieslist__badge--{{vm.study.color}}">{{$series.imageCount}}</div>
+            
+            <span ng-if="vm.paneManager.hasSeriesBeenViewed($series.id)" class="wvSerieslist__badge--{{vm.study.color}} mr40 mb40">
+                <i class="fa fa-eye" aria-hidden="true"></i>
+            </span>
         </div>
-        <div class="serieList__informations float__right pl10">
-            <p class="serieList__label mn">{{$image.tags.SeriesDescription}}</p>
+        <div 
+            ng-if="vm.displayMode === 'list'"
+            class="wvSerieslist__information"
+        >
+            <p class="wvSerieslist__label mn">{{$series.tags.SeriesDescription || 'Untitled series'}}</p>
             <!-- @todo reintegrate hotspots (it triggers recursive $digest atm!)
             <wvp-hotspotlist wvp-serie-id="$series.id"></wvp-hotspotlist> -->
         </div>
-    </li>
 </ul>

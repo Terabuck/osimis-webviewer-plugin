@@ -75,6 +75,7 @@ describe('serieslist', function() {
                             // AngularJS wrap the callback?
                             try {
                                 if (err) {
+                                    reject(err);
                                     assert(false, JSON.stringify(err));
                                 }
                                 else {

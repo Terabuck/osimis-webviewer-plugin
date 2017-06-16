@@ -3,24 +3,24 @@
 
     angular
         .module('webviewer')
-        .directive('wvHflipViewportTool', wvHflipViewportTool)
+        .directive('wvRotaterightViewportTool', wvRotaterightViewportTool)
         .config(function($provide) {
             $provide.decorator('wvViewportDirective', function($delegate) {
                 var directive = $delegate[0];
-                directive.require['wvHflipViewportTool'] = '?^wvHflipViewportTool';
+                directive.require['wvRotaterightViewportTool'] = '?^wvRotaterightViewportTool';
 
                 return $delegate;
             });
         });
 
     /* @ngInject */
-    function wvHflipViewportTool($parse, WvBaseTool) {
+    function wvRotaterightViewportTool($parse, WvBaseTool) {
         // Usage:
         //
         // Creates:
         //
         var directive = {
-            require: 'wvHflipViewportTool',
+            require: 'wvRotaterightViewportTool',
             controller: Controller,
             link: link,
             restrict: 'A',
@@ -28,10 +28,10 @@
         };
 
         function link(scope, element, attrs, tool) {
-            var wvHflipViewportToolParser = $parse(attrs.wvHflipViewportTool);
+            var wvRotaterightViewportToolParser = $parse(attrs.wvRotaterightViewportTool);
             
             // bind attributes -> tool
-            scope.$watch(wvHflipViewportToolParser, function(isActivated) {
+            scope.$watch(wvRotaterightViewportToolParser, function(isActivated) {
                 if (isActivated) {
                     tool.activate();
                 }
@@ -45,7 +45,7 @@
         function Controller() {
             var _this = this;
 
-            WvBaseTool.call(this, 'hflip');
+            WvBaseTool.call(this, 'rotateRight');
 
             this._process = function(viewport) {
                 // set viewport selection overlay
@@ -63,9 +63,9 @@
             this.onViewportSelected = function(viewport) {
                 // apply rotation
                 var viewportData = viewport.getViewport();
-                viewportData.hflip = !viewportData.hflip;
+                viewportData.rotation += 90;
                 viewport.setViewport(viewportData);
-                viewport.draw();
+                viewport.draw(false);
             };
 
             this._listenViewChange = angular.noop;

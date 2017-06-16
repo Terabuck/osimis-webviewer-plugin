@@ -15,7 +15,7 @@
     function wvLayoutTopRight($parse) {
         var directive = {
             bindToController: true,
-            controller: LayouTopRightVM,
+            controller: LayoutTopRightVM,
             controllerAs: 'vm',
             link: link,
             restrict: 'E',
@@ -47,7 +47,7 @@
     }
 
     /* @ngInject */
-    function LayouTopRightVM() {
+    function LayoutTopRightVM() {
 
     }
 })();

@@ -1,18 +1,18 @@
 <aside
-    class="wvLayout__left"
+    class="wvLayoutLeft"
     ng-show="vm.enabled"
     ng-class="{
-        'wvLayout__left--toppadding': vm.isTopPaddingEnabled,
-        'wvLayout__left--bottompadding': vm.isBottomPaddingEnabled,
-        'wvLayout__left--closed': vm.closed
+        'wvLayoutLeft--toppadding': vm.isTopPaddingEnabled,
+        'wvLayoutLeft--bottompadding': vm.isBottomPaddingEnabled,
+        'wvLayoutLeft--closed': vm.closed
     }"
 >
-    <!-- Buttons -->
+    <!-- Actions -->
     <div
         ng-if="vm.handlesEnabled"
         ng-class="{
-            'wvAsideLeft__actions': !vm.closed,
-            'wvAsideLeft__actions--outside': vm.closed
+            'wvLayoutLeft__actions': !vm.closed,
+            'wvLayoutLeft__actions--outside': vm.closed
         }"
     >
         <!-- State 1: opened -->
@@ -20,11 +20,11 @@
             ng-show="!vm.closed"
             class="list-unstyled fs16"
         >
-            <!-- Button: close -->
+            <!-- Action: close -->
             <button
-                bs-tooltip data-placement="right" title="Close"
+                bs-tooltip data-placement="right" data-title="Close"
                 ng-click="vm.closed = true;"
-                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
+                class="wvLayoutLeft__action button__base wh__25 lh__25 va-m text-center"
             >
                 <span class="fa fa-angle-double-left"></span>
             </button>
@@ -36,11 +36,11 @@
             ng-show="vm.closed"
             class="list-unstyled fs16"
         >
-            <!-- Button: open -->
+            <!-- Action: open -->
             <button
-                bs-tooltip data-placement="right" title="Open"
+                bs-tooltip data-placement="right" data-title="Open"
                 ng-click="vm.closed = false;"
-                class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
+                class="wvLayoutLeft__action button__base wh__25 lh__25 va-m text-center"
             >
                 <span class="fa fa-angle-double-right"></span>
             </button>
@@ -49,9 +49,25 @@
 
     </div>
 
-    <!-- Main Content -->
-    <div class="wvAsideLeft__content pl15 pr15 scrollable">
-        <ng-transclude></ng-transclude>
+    <!-- Main [injectable] content -->
+    <div class="wvLayoutLeft__content">
+        <!-- Top Zone -->
+        <div
+            class="wvLayoutLeft__contentTop"
+            ng-transclude="1"
+        ></div>
+
+        <!-- Middle Zone -->
+        <div
+            class="wvLayoutLeft__contentMiddle"
+            ng-transclude="2"
+        ></div>
+
+        <!-- Bottom Zone -->
+        <div
+            class="wvLayoutLeft__contentBottom"
+            ng-transclude="3"
+        ></div>
     </div>
 
 </aside>

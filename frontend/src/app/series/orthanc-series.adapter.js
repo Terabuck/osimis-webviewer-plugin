@@ -20,7 +20,7 @@
 
         ////////////////
 
-        function process(orthancSeries) {
+        function process(orthancSeries, studyId) {
             // Get tags
             var tags = orthancSeries.tags;
             
@@ -80,7 +80,7 @@
             var seriesList = imageIdsBySeries.map(function(imageIds, seriesIndex) {
                 var id = orthancSeries.id + ':' + seriesIndex;
 
-                return new WvSeries(id, imageIds, [], tags, availableQualities);
+                return new WvSeries(id, studyId, imageIds, [], tags, availableQualities);
             });
 
             return seriesList;

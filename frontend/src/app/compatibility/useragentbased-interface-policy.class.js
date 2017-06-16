@@ -23,10 +23,12 @@
         }
 
         // Set initial UI values
+        this.enableLayoutTop = userInterfacePolicy.enableLayoutTop;
         this.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
         this.enableLayoutTopRight = userInterfacePolicy.enableLayoutTopRight;
         this.enableToolbar = userInterfacePolicy.enableToolbar;
         this.enableLayoutLeft = userInterfacePolicy.enableLayoutLeft;
+        this.enableLayoutLeftBottom = userInterfacePolicy.enableLayoutLeftBottom;
         this.enableLayoutLeftHandles = userInterfacePolicy.enableLayoutLeftHandles;
         this.enableLayoutRight = userInterfacePolicy.enableLayoutRight;
         this.enableLayoutRightHandles = userInterfacePolicy.enableLayoutRightHandles;
@@ -35,10 +37,12 @@
 
         // Listen to changes triggered by the user interface policy
         userInterfacePolicy.onUpdate(function() {
+            _this.enableLayoutTop = userInterfacePolicy.enableLayoutTop;
             _this.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
             _this.enableLayoutTopRight = userInterfacePolicy.enableLayoutTopRight;
             _this.enableToolbar = userInterfacePolicy.enableToolbar;
             _this.enableLayoutLeft = userInterfacePolicy.enableLayoutLeft;
+            _this.enableLayoutLeftBottom = userInterfacePolicy.enableLayoutLeftBottom;
             _this.enableLayoutLeftHandles = userInterfacePolicy.enableLayoutLeftHandles;
             _this.enableLayoutRight = userInterfacePolicy.enableLayoutRight;
             _this.enableLayoutRightHandles = userInterfacePolicy.enableLayoutRightHandles;

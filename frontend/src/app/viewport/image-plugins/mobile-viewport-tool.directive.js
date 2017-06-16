@@ -62,33 +62,33 @@
                 _hammers[viewport] = new Hammer(enabledElement);
                 _hammers[viewport].get('pan').set({
                     direction: Hammer.DIRECTION_ALL,
-                    pointers: 2
+                    pointers: 3
                 });
                 // 2. Update window width
                 _hammers[viewport].on("panup", function(ev) {
                     var viewportData = viewport.getViewport();
                     viewportData.voi.windowWidth += 0.04 * viewportData.voi.windowWidth;
                     viewport.setViewport(viewportData);
-                    viewport.draw();
+                    viewport.draw(false);
                 });
                 _hammers[viewport].on("pandown", function(ev) {
                     var viewportData = viewport.getViewport();
                     viewportData.voi.windowWidth -= 0.04 * viewportData.voi.windowWidth;
                     viewport.setViewport(viewportData);
-                    viewport.draw();
+                    viewport.draw(false);
                 });
                 // 3. Update window center
                 _hammers[viewport].on("panleft", function(ev) {
                     var viewportData = viewport.getViewport();
                     viewportData.voi.windowCenter += 0.04 * viewportData.voi.windowCenter;
                     viewport.setViewport(viewportData);
-                    viewport.draw();
+                    viewport.draw(false);
                 });
                 _hammers[viewport].on("panright", function(ev) {
                     var viewportData = viewport.getViewport();
                     viewportData.voi.windowCenter -= 0.04 * viewportData.voi.windowCenter;
                     viewport.setViewport(viewportData);
-                    viewport.draw();
+                    viewport.draw(false);
                 });
             };
 

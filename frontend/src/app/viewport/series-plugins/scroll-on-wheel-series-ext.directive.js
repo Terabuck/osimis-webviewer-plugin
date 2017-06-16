@@ -55,6 +55,8 @@
 
     /* @ngInject */
     function Controller($scope, $element, $attrs, hamster) {
+        var vm = this;
+
         var _wvSeriesIdViewModels = [];
     	this.register = function(viewmodel) {
             _wvSeriesIdViewModels.push(viewmodel);
@@ -132,6 +134,14 @@
         var _mobileEvtBySeriesVM = {};
 
         function registerMobileEvents(viewmodel) {
+            // Prevent on non-mobile platform (ie. desktop touchscreen) to 
+            // avoid conflicts with other tools such as paning.
+            var uaParser = new UAParser();
+            vm.isMobile = (uaParser.getDevice().type === 'mobile');
+            if (!vm.isMobile) {
+                return;
+            }
+
             // Configure the dom element
             // Use the enabledElement instead of the current element 
             // to avoid hammertime making the overlay unselectable
@@ -187,6 +197,14 @@
             }
         };
         function unregisterMobileEvents(viewmodel) {
+            // Prevent on non-mobile platform (ie. desktop touchscreen) to 
+            // avoid conflicts with other tools such as paning.
+            var uaParser = new UAParser();
+            vm.isMobile = (uaParser.getDevice().type === 'mobile');
+            if (!vm.isMobile) {
+                return;
+            }
+            
             if (_hammertimeObjectsByViewport[viewmodel]) {
                 var hammertime = _hammertimeObjectsByViewport[viewmodel];
                 hammertime.off('pan', _mobileEvtBySeriesVM[viewmodel])

@@ -3,24 +3,24 @@
 
     angular
         .module('webviewer')
-        .directive('wvVflipViewportTool', wvVflipViewportTool)
+        .directive('wvHflipViewportTool', wvHflipViewportTool)
         .config(function($provide) {
             $provide.decorator('wvViewportDirective', function($delegate) {
                 var directive = $delegate[0];
-                directive.require['wvVflipViewportTool'] = '?^wvVflipViewportTool';
+                directive.require['wvHflipViewportTool'] = '?^wvHflipViewportTool';
 
                 return $delegate;
             });
         });
 
     /* @ngInject */
-    function wvVflipViewportTool($parse, WvBaseTool) {
+    function wvHflipViewportTool($parse, WvBaseTool) {
         // Usage:
         //
         // Creates:
         //
         var directive = {
-            require: 'wvVflipViewportTool',
+            require: 'wvHflipViewportTool',
             controller: Controller,
             link: link,
             restrict: 'A',
@@ -28,10 +28,10 @@
         };
 
         function link(scope, element, attrs, tool) {
-            var wvVflipViewportToolParser = $parse(attrs.wvVflipViewportTool);
+            var wvHflipViewportToolParser = $parse(attrs.wvHflipViewportTool);
             
             // bind attributes -> tool
-            scope.$watch(wvVflipViewportToolParser, function(isActivated) {
+            scope.$watch(wvHflipViewportToolParser, function(isActivated) {
                 if (isActivated) {
                     tool.activate();
                 }
@@ -45,12 +45,11 @@
         function Controller() {
             var _this = this;
 
-            WvBaseTool.call(this, 'vflip');
-            // @todo use .apply 
+            WvBaseTool.call(this, 'hflip');
 
             this._process = function(viewport) {
                 // set viewport selection overlay
-                var onViewportSelectedCallback = _onViewportSelected.bind(this);
+                var onViewportSelectedCallback = this.onViewportSelected.bind(this);
                 viewport.enableSelection(onViewportSelectedCallback);
             };
 
@@ -61,12 +60,12 @@
                 });
             };
 
-            function _onViewportSelected(viewport) {
-                // apply flip
+            this.onViewportSelected = function(viewport) {
+                // apply rotation
                 var viewportData = viewport.getViewport();
-                viewportData.vflip = !viewportData.vflip;
+                viewportData.hflip = !viewportData.hflip;
                 viewport.setViewport(viewportData);
-                viewport.draw();
+                viewport.draw(false);
             };
 
             this._listenViewChange = angular.noop;

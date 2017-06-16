@@ -188,8 +188,14 @@
                         // will be managed by the `PdfInstanceManager`.  They will
                         // be cached on this `/series` route response to diminish
                         // the HTTP request count though.
-                        seriesList = wvOrthancSeriesAdapter.process(response.data);
+                        seriesList = wvOrthancSeriesAdapter.process(response.data, response.studyId);
                         
+                        // Ignore series that have failed loading.
+                        // @todo Show error instead.
+                        seriesList = seriesList.filter(function(series) {
+                            return !!series;
+                        });
+
                         // Preload images annotations
                         wvAnnotationManager.loadStudyAnnotations(studyId);
                         
@@ -272,6 +278,12 @@
                                 // Resolve overall promise once every sub
                                 // promises have been processed
                                 if (_loadedSeriesCount === wvSeriesPromises.length) {
+                                    // Ignore series that have failed loading.
+                                    // @todo Show error instead.
+                                    wvSeriesLists = wvSeriesLists.filter(function(series) {
+                                        return !!series;
+                                    });
+
                                     resolve(wvSeriesLists);
                                 }
                             }, function(error) {
@@ -285,6 +297,12 @@
                                 // Resolve overall promise once every sub
                                 // promises have been processed
                                 if(_loadedSeriesCount === wvSeriesPromises.length) {
+                                    // Ignore series that have failed loading.
+                                    // @todo Show error instead.
+                                    wvSeriesLists = wvSeriesLists.filter(function(series) {
+                                        return !!series;
+                                    });
+                                    
                                     // Resolve the overall promise even if one
                                     // of the sub-promise fails.
                                     resolve(wvSeriesLists);

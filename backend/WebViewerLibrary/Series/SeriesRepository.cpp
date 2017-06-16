@@ -6,7 +6,8 @@
 #include <boost/scope_exit.hpp>
 #include <boost/pointer_cast.hpp>
 #include <Core/OrthancException.h>
-#include <Core/DicomFormat/DicomMap.h>
+#include <Core/DicomFormat/DicomMap.h> // To retrieve transfer syntax
+#include <Core/Toolbox.h> // For _getTransferSyntax -> Orthanc::Toolbox::StripSpaces
 
 #include "../OrthancContextManager.h"
 #include "../BenchmarkHelper.h"
@@ -14,7 +15,9 @@
 #include "ViewerToolbox.h"
 
 namespace {
+  std::string _getTransferSyntax(const Orthanc::DicomMap& headerTags);
   bool _isDicomSr(const Json::Value &tags);
+  bool _isDicomPr(const Json::Value &tags);
 }
 
 SeriesRepository::SeriesRepository(DicomRepository* dicomRepository)
@@ -64,20 +67,30 @@ std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId) {
   } BOOST_SCOPE_EXIT_END;
 
   // Get middle instance's tags (the DICOM meta-informations)
-  Orthanc::DicomMap tags1;
-  if (!Orthanc::DicomMap::ParseDicomMetaInformation(tags1, reinterpret_cast<const char*>(dicom.data), dicom.size))
+  Orthanc::DicomMap dicomMapToFillTags1;
+  Json::Value tags1;
+  if (!Orthanc::DicomMap::ParseDicomMetaInformation(dicomMapToFillTags1, reinterpret_cast<const char*>(dicom.data), dicom.size))
   {
-    throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_CorruptedFile));
+    // Consider implicit VR if `ParseDicomMetaInformation` has failed (it fails
+    // because `DICM` header at [128..131] is not present in the DICOM instance  
+    // binary file). In our tests, while being visible in some other viewers,
+    // those files didn't have any TransferSyntax either.
+    tags1["TransferSyntax"] = "1.2.840.10008.1.2";
+  }
+  else {
+    tags1["TransferSyntax"] = _getTransferSyntax(dicomMapToFillTags1);
   }
 
   // Get middle instance's tags (the other tags)
   const Json::Value& tags2 = instancesTags[middleInstanceId];
 
-  // Ignore DICOM SR files (they can't be processed by our SeriesFactory)
-  // Note this line is only here to provide better error message, also
-  // @warning We make the assumption DICOM SR are always a single alone instance
-  //          contained within a separate series.
-  if (::_isDicomSr(tags2)) {
+  // Ignore DICOM SR (DICOM report) and PR (DICOM Presentation State, which are
+  // `views` referencing other instances) files (they can't be processed by our
+  // SeriesFactory) Note this line is only here to provide better error
+  // message, also
+  // @warning We make the assumption DICOM SR & PR are always a single alone
+  //          instance contained within a separate series.
+  if (::_isDicomSr(tags2) || ::_isDicomPr(tags2)) {
     throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_IncompatibleImageFormat));
   }
   
@@ -86,6 +99,31 @@ std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId) {
 }
 
 namespace {
+  std::string _getTransferSyntax(const Orthanc::DicomMap& headerTags)
+  {
+    using namespace Orthanc;
+
+    // Retrieve transfer syntax
+    const DicomValue* transfertSyntaxValue = headerTags.TestAndGetValue(0x0002, 0x0010);
+    std::string transferSyntax;
+
+    if (transfertSyntaxValue->IsBinary()) {
+      throw OrthancException(ErrorCode::ErrorCode_CorruptedFile);
+    }
+    else if (transfertSyntaxValue == NULL || transfertSyntaxValue->IsNull()) {
+      // Set default transfer syntax if not found
+      transferSyntax = "1.2.840.10008.1.2";
+    }
+    else {
+      // Stripping spaces should not be required, as this is a UI value
+      // representation whose stripping is supported by the Orthanc
+      // core, but let's be careful...
+      transferSyntax = Orthanc::Toolbox::StripSpaces(transfertSyntaxValue->GetContent());
+    }
+
+    return transferSyntax;
+  }
+
   bool _isDicomSr(const Json::Value &tags) {
     if (tags["Modality"].empty()) {
       return false;
@@ -94,5 +132,15 @@ namespace {
     std::string modality = tags["Modality"].asString();
 
     return (modality == "SR");
+  }
+
+  bool _isDicomPr(const Json::Value &tags) {
+    if (tags["Modality"].empty()) {
+      return false;
+    }
+
+    std::string modality = tags["Modality"].asString();
+
+    return (modality == "PR");
   }
 }

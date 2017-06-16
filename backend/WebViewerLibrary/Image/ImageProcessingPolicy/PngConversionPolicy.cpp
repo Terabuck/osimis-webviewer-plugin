@@ -40,7 +40,5 @@ std::auto_ptr<IImageContainer> PngConversionPolicy::Apply(std::auto_ptr<IImageCo
 
   BENCH_LOG(COMPRESSION_PNG_SIZE, buffer.size);
 
-  metaData->compression = "png";
-  
   return std::auto_ptr<IImageContainer>(new CompressedImageContainer(buffer));
 }

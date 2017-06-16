@@ -1,6 +1,41 @@
 Pending changes in the mainline
 ===============================
 
+=> Minimum Orthanc version: 1.1.0 <=
+
+Version 0.9.0
+========================
+
+=> Minimum Orthanc version: 1.1.0 <=
+
+Features:
+* Compare the current study with other studies from the same patients.
+* Select a viewport and apply flip/rotate/color inversion tools to it.
+* Support for windows touchscreen.
+* Support 1x2 and 2x1 viewport grid layout.
+* Enhance overall interface:
+  - Display consulted series.
+  - Show the list of series as a grid.
+  - Display the selected viewport's study data in the top bar.
+  - ...
+
+Fixes:
+* Prevent double tooltip (text indicators for buttons) display.
+* Display studies containing incompatible series.
+* Use 3 fingers to change windowing instead of 2 on mobile.
+* Support for MONOCHROME1 photometric interpolation.
+* Enhance windowing tool ergonomy on images with high dynamic.
+* Support default windowing for compressed dicom images without windowing tags.
+* Parse DICOM instances whose `DICM` header at [128..131] does not exist.
+* Keep the same images' displayed zones when the window is resized.
+
+Breaking Changes:
+* New routes used:
+  - /<orthanc>/patients/<patient-uid>
+  - /<orthanc>/instances/<instance-uid>/study
+  - /<orthanc>/series/<instance-uid>/study
+* Internal calls to orthanc routes are now routed to other plugins.
+
 Version 0.8.0
 ========================
 

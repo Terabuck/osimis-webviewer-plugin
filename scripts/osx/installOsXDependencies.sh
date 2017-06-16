@@ -6,6 +6,7 @@
 # 
 # - Homebrew
 # - xCode CLI Tools
+# - python3
 # - Ruby (updated, w/ `rbenv` package manager)
 # - Compass
 # - NodeJS 6.10 (w/ `n` package manager)
@@ -36,6 +37,9 @@ xcode-select --install
 
 # Install homebrew
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+# Install python 3 (& pyvenv)
+brew install python3
 
 # Frontend:
 #   Install Ruby

@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <json/value.h>
-#include <Core/DicomFormat/DicomMap.h>
 #include "../Image/AvailableQuality/IAvailableQualityPolicy.h"
 #include "Series.h"
 
@@ -11,7 +10,7 @@ public:
   SeriesFactory(std::auto_ptr<IAvailableQualityPolicy> availableQualityPolicy); // takes ownership
 
   std::auto_ptr<Series> CreateSeries(const std::string& seriesId, const Json::Value& slicesShort,
-      const Orthanc::DicomMap& middleInstanceMetaInfoTags, const Json::Value& middleInstancesTags, const Json::Value& instancesTags);
+      const Json::Value& middleInstanceMetaInfoTags, const Json::Value& middleInstancesTags, const Json::Value& instancesTags);
 
 private:
   const std::auto_ptr<IAvailableQualityPolicy> _availableQualityPolicy;

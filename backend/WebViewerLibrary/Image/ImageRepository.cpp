@@ -69,7 +69,7 @@ void ImageRepository::CleanImageCache(const std::string& instanceId, uint32_t fr
   OrthancPluginErrorCode error;
   {
     BENCH(FILE_CACHE_CLEAN);
-    error = OrthancPluginRestApiDelete(OrthancContextManager::Get(), url.c_str());
+    error = OrthancPluginRestApiDeleteAfterPlugins(OrthancContextManager::Get(), url.c_str());
     // @todo manage error
   }
 }
@@ -112,7 +112,7 @@ std::auto_ptr<Image> ImageRepository::_LoadImageFromOrthanc(const std::string& i
     // Retrieve the frame as Raw PixelData
     OrthancPluginMemoryBuffer frame;
     std::string url = "/instances/" + instanceId + "/frames/" + boost::lexical_cast<std::string>(frameIndex) + "/raw";
-    OrthancPluginErrorCode error = OrthancPluginRestApiGet(OrthancContextManager::Get(), &frame, url.c_str());
+    OrthancPluginErrorCode error = OrthancPluginRestApiGetAfterPlugins(OrthancContextManager::Get(), &frame, url.c_str());
 
     // Throw exception on error
     if (error != OrthancPluginErrorCode_Success) {
@@ -178,7 +178,7 @@ std::auto_ptr<Image> ImageRepository::_GetProcessedImageFromCache(const std::str
   std::string url = "/instances/" + instanceId + "/attachments/" + attachmentNumber + "/data";
   {
     BENCH(FILE_CACHE_RETRIEVAL);
-    error = OrthancPluginRestApiGet(OrthancContextManager::Get(), &getResultBuffer, url.c_str());
+    error = OrthancPluginRestApiGetAfterPlugins(OrthancContextManager::Get(), &getResultBuffer, url.c_str());
   }
 
   // Except Orthanc to accept attachmentNumber (it should be a number > 1024)
@@ -217,7 +217,7 @@ void ImageRepository::_CacheProcessedImage(const std::string &attachmentNumber, 
   ScopedOrthancPluginMemoryBuffer putResultBuffer(OrthancContextManager::Get());
   std::string url = "/instances/" + image->GetId() + "/attachments/" + attachmentNumber; // no "/data"
   // @todo avoid Orthanc throwing PluginsManager.cpp:194] Exception while invoking plugin service 3001: Unknown resource
-  OrthancPluginErrorCode error = OrthancPluginRestApiPut(OrthancContextManager::Get(), putResultBuffer.getPtr(), url.c_str(), image->GetBinary(), image->GetBinarySize());
+  OrthancPluginErrorCode error = OrthancPluginRestApiPutAfterPlugins(OrthancContextManager::Get(), putResultBuffer.getPtr(), url.c_str(), image->GetBinary(), image->GetBinarySize());
 
   // Throw exception on error
   if (error != OrthancPluginErrorCode_Success) {

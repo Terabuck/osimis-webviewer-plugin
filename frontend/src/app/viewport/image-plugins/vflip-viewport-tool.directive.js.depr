@@ -3,24 +3,24 @@
 
     angular
         .module('webviewer')
-        .directive('wvRotaterightViewportTool', wvRotaterightViewportTool)
+        .directive('wvVflipViewportTool', wvVflipViewportTool)
         .config(function($provide) {
             $provide.decorator('wvViewportDirective', function($delegate) {
                 var directive = $delegate[0];
-                directive.require['wvRotaterightViewportTool'] = '?^wvRotaterightViewportTool';
+                directive.require['wvVflipViewportTool'] = '?^wvVflipViewportTool';
 
                 return $delegate;
             });
         });
 
     /* @ngInject */
-    function wvRotaterightViewportTool($parse, WvBaseTool) {
+    function wvVflipViewportTool($parse, WvBaseTool) {
         // Usage:
         //
         // Creates:
         //
         var directive = {
-            require: 'wvRotaterightViewportTool',
+            require: 'wvVflipViewportTool',
             controller: Controller,
             link: link,
             restrict: 'A',
@@ -28,10 +28,10 @@
         };
 
         function link(scope, element, attrs, tool) {
-            var wvRotaterightViewportToolParser = $parse(attrs.wvRotaterightViewportTool);
+            var wvVflipViewportToolParser = $parse(attrs.wvVflipViewportTool);
             
             // bind attributes -> tool
-            scope.$watch(wvRotaterightViewportToolParser, function(isActivated) {
+            scope.$watch(wvVflipViewportToolParser, function(isActivated) {
                 if (isActivated) {
                     tool.activate();
                 }
@@ -45,11 +45,12 @@
         function Controller() {
             var _this = this;
 
-            WvBaseTool.call(this, 'rotateRight');
+            WvBaseTool.call(this, 'vflip');
+            // @todo use .apply 
 
             this._process = function(viewport) {
                 // set viewport selection overlay
-                var onViewportSelectedCallback = this.onViewportSelected.bind(this);
+                var onViewportSelectedCallback = _onViewportSelected.bind(this);
                 viewport.enableSelection(onViewportSelectedCallback);
             };
 
@@ -60,12 +61,12 @@
                 });
             };
 
-            this.onViewportSelected = function(viewport) {
-                // apply rotation
+            function _onViewportSelected(viewport) {
+                // apply flip
                 var viewportData = viewport.getViewport();
-                viewportData.rotation += 90;
+                viewportData.vflip = !viewportData.vflip;
                 viewport.setViewport(viewportData);
-                viewport.draw();
+                viewport.draw(false);
             };
 
             this._listenViewChange = angular.noop;

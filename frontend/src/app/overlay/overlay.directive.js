@@ -13,7 +13,7 @@
         .directive('wvOverlay', wvOverlay);
 
     /* @ngInject */
-    function wvOverlay() {
+    function wvOverlay(wvStudyManager) {
         var directive = {
             bindToController: true,
             controller: Controller,
@@ -29,6 +29,7 @@
             scope: {
                 'wvTags': '=?',
             	'wvSeries': '=?',
+                'studyId': '=?wvStudyId',
             	'wvViewport': '=?',
             	'wvShowTimeline': '=?'
             }
@@ -37,35 +38,53 @@
 
         function link(scope, element, attrs, ctrls) {
             var _this = this;
+            var vm = scope.vm;
 
-            scope.vm.showTopLeftArea = function() {
-                return !!scope.vm.wvTags;
+            vm.showTopLeftArea = function() {
+                return !!vm.wvTags;
             };
-            scope.vm.showTopRightArea = function() {
-                return !!scope.vm.wvTags &&
-                    !!scope.vm.wvTags.SeriesDescription &&
-                    !!scope.vm.wvTags.SeriesNumber;
+            vm.showTopRightArea = function() {
+                return !!vm.wvTags &&
+                    !!vm.wvTags.SeriesDescription &&
+                    !!vm.wvTags.SeriesNumber;
             };
-            scope.vm.showBottomRightArea = function() {
-                return !!scope.vm.wvViewport && !!scope.vm.wvTags;
+            vm.showBottomRightArea = function() {
+                return !!vm.wvViewport && !!vm.wvTags;
             };
-            scope.vm.wvShowTimeline = typeof scope.vm.wvShowTimeline === 'undefined' ? true : scope.vm.wvShowTimeline;
-            scope.vm.showTimeline = false;
+            vm.wvShowTimeline = typeof vm.wvShowTimeline === 'undefined' ? true : vm.wvShowTimeline;
+            vm.showTimeline = false;
 
             // auto grab series model
-            if (scope.vm.wvShowTimeline && ctrls.series) {
+            if (vm.wvShowTimeline && ctrls.series) {
                 var series = ctrls.series.getSeries();
-                scope.vm.wvSeries = series;
-                scope.vm.showTimeline = series && scope.vm.wvShowTimeline && !!series.imageCount;
+                vm.wvSeries = series;
+                vm.showTimeline = series && vm.wvShowTimeline && !!series.imageCount;
 
                 ctrls.series.onSeriesChanged(_this, function(series) {
-                    scope.vm.wvSeries = series;
-                    scope.vm.showTimeline = scope.vm.wvShowTimeline && series && series.imageCount > 1;
+                    vm.wvSeries = series;
+                    vm.showTimeline = vm.wvShowTimeline && series && series.imageCount > 1;
                 });
                 scope.$on('$destroy', function() {
                     ctrls.series.onSeriesChanged.close(_this);
                 });
             }
+
+            // Update study model.
+            vm.study = undefined;
+            scope.$watch('vm.studyId', function(studyId) {
+                // Clear study if studyId is removed.
+                if (!studyId) {
+                    vm.study = undefined;
+                    return;
+                }
+
+                // Load new study.
+                wvStudyManager
+                    .get(studyId)
+                    .then(function(study) {
+                        vm.study = study;
+                    });
+            });
 
             // function _onViewportData(viewport) {
             //     scope.$viewport = viewport;

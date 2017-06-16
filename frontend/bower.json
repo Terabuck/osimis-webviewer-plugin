@@ -1,7 +1,7 @@
 {
   "name": "webViewer",
   "description": "Orthanc & component based viewer",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "main": [
     "js/app.js",
     "styles/app.css"
@@ -40,10 +40,11 @@
     "font-awesome": "fontawesome#^4.7.0",
     "cornerstone": "^0.9.0",
     "cornerstoneTools": "^0.7.7",
+    "cornerstoneMath": "0.1.3",
     "jpgjs": "notmasteryet/jpgjs",
     "hamsterjs": "~1.1.0",
     "angular-dragdrop": "~1.0.12",
-    "angular-strap": "~2.3.6",
+    "angular-strap": "~2.3.12",
     "jqueryui-touch-punch": "*",
     "ng-debounce": "^0.1.7",
     "hammerjs": "^2.0.8",
@@ -56,6 +57,7 @@
     "pdf.js-viewer": "^0.3.3"
   },
   "resolutions": {
+    "cornerstoneMath": "0.1.3",
     "angular": "^1.5.8",
     "jquery": "^2.2.0",
     "sinon": "^1.17.6"

@@ -22,7 +22,7 @@
     /* @ngInject */
     function factory($rootScope, $timeout, wvImageManager, wvAnnotationManager, WvAnnotationGroup, wvImageBinaryManager, uaParser) {
 
-        function WvSeries(id, imageIds, pdfIds, tags, availableQualities, instanceTags) {
+        function WvSeries(id, studyId, imageIds, pdfIds, tags, availableQualities) {
             var _this = this;
 
             // Replace PixelData by lossless in safari & internet explorer (for decompression library incompatibility reasons)
@@ -38,6 +38,7 @@
             }
 
             this.id = id; // id == orthancId + ':' + subSeriesIndex
+            this.studyId = studyId;
             this.imageIds = imageIds;
             this.imageCount = imageIds.length;
             this.currentIndex = 0; // real index of the image, waiting loading to be shown
@@ -270,6 +271,11 @@
                 var desiredFrameRateInMs = 1000 / _this.frameRate; // Convert framerate FPS into MS
                 // Wait for the monitor to attempt refresh
                 _cancelAnimationId = requestAnimationFrame(function(currentTimeInMs) {
+                    // Request next frame before anything.
+                    if (_this.isPlaying) {
+                        loop();
+                    }
+
                     // In Safari Mobile 10, currentTimeInMs is undefined. This
                     // bug is undocumented and doesn't seem to be well known.
                     // We specify the variable value manually to prevent the
@@ -295,11 +301,6 @@
                             // Track current time to calculate Frame Rate
                             _lastTimeInMs = currentTimeInMs;
                         });
-                    }
-                    
-                    // Loop
-                    if (_this.isPlaying) {
-                        loop();
                     }
                 });
             })();

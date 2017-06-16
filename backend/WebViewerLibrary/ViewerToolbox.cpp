@@ -167,7 +167,7 @@ namespace OrthancPlugins
   {
     OrthancPluginMemoryBuffer answer;
 
-    if (OrthancPluginRestApiGet(context, &answer, uri.c_str()))
+    if (OrthancPluginRestApiGetAfterPlugins(context, &answer, uri.c_str()))
     {
       return false;
     }
@@ -196,7 +196,7 @@ namespace OrthancPlugins
   {
     std::string uri = "/instances/" + instanceId + "/file";
 
-    if (OrthancPluginRestApiGet(context, content, uri.c_str()))
+    if (OrthancPluginRestApiGetAfterPlugins(context, content, uri.c_str()))
     {
       return false;
     }
@@ -211,7 +211,7 @@ namespace OrthancPlugins
   {
     OrthancPluginMemoryBuffer answer;
 
-    if (OrthancPluginRestApiGet(context, &answer, uri.c_str()))
+    if (OrthancPluginRestApiGetAfterPlugins(context, &answer, uri.c_str()))
     {
       return false;
     }

@@ -32,14 +32,16 @@
 <body
     ng-controller="MainController as vm" 
     class="wv-body"
+    ng-cloak
 >
     <wv-webviewer
-        wv-study-id="vm.studyId"
+        wv-pickable-study-ids="vm.pickableStudyIds"
+        wv-selected-study-ids="vm.selectedStudyIds"
         wv-series-id="vm.seriesId"
 
         wv-toolbar-enabled="vm.enableToolbar"
         wv-serieslist-enabled="vm.enableLayoutLeft && vm.mode !== 'series'"
-        wv-studyinformation-enabled="vm.enableLayoutLeft && vm.mode !== 'series'"
+        wv-studyinformation-enabled="vm.enableLayoutTop && vm.mode !== 'series'"
         wv-lefthandles-enabled="vm.enableLayoutLeftHandles"
 
         wv-notice-enabled="vm.enableNotice"
@@ -47,29 +49,10 @@
 
         wv-video-display-enabled="vm.enableVideoDisplay"
         wv-annotationstorage-enabled="vm.enableAnnotationStorage"
+        wv-series-item-selection-enabled="vm.seriesItemSelectionEnabled"
+        wv-selected-series-items="vm.selectedSeriesItems"
+        wv-study-download-enabled="vm.enableStudyDownload"
     >
-        <!-- Study list (for debug mode) -->
-        <wv-layout-top-left
-            wv-enabled="vm.mode === 'dev' &&
-                        vm.enableLayoutTopLeft"
-        >
-            <wv-studylist 
-                ng-if="vm.mode === 'dev'"
-                wv-selected-study-id="vm.studyId"
-            ></wv-studylist>
-        </wv-layout-top-left>
-
-        <!-- Download Study Button -->
-        <wv-layout-top-right
-            wv-enabled="!vm.isMobile &&
-                        vm.enableLayoutTopRight &&
-                        vm.enableStudyDownload"
-            >
-            <wv-study-download-button
-                ng-if="!vm.isMobile && vm.enableStudyDownload"
-                wv-study-id="vm.studyId"
-            ></wv-study-download-button>
-        </wv-layout-top-right>
     </wv-webviewer>
 
     <!-- build:js js/lib.js -->
@@ -99,8 +82,8 @@
     }])
     // Define a basic controller
     .controller('MainController', [
-        '$scope', '$location', 'wvConfig', 'wvSeriesManager',
-        function($scope, $location, wvConfig, wvSeriesManager)
+        '$scope', '$location', 'wvConfig', 'wvStudyManager', 'wvSeriesManager',
+        function($scope, $location, wvConfig, wvStudyManager, wvSeriesManager)
     {
         var vm = this;
 
@@ -112,13 +95,23 @@
         var orthancStudyId = $location.search().study;
         var orthancSeriesId = $location.search().series;
 
-        vm.studyId = undefined;
+        vm.pickableStudyIds = [];
+        vm.selectedStudyIds = [];
         vm.seriesId = undefined;
 
         // Display orthanc study.
         if (orthancStudyId) {
             vm.mode = 'study';
-            vm.studyId = orthancStudyId;
+            vm.selectedStudyIds = [
+                orthancStudyId
+            ];
+
+            // Set all the patient studies as pickable.
+            wvStudyManager
+                .getRelatedStudyIds(vm.selectedStudyIds)
+                .then(function(studyIds) {
+                    vm.pickableStudyIds = studyIds;
+                });
         }
         // Display & convert orthanc series id (from url parameter) into
         // frontend series id.
@@ -126,24 +119,32 @@
             wvSeriesManager
                 .listFromOrthancSeriesId(orthancSeriesId)
                 .then(function(seriesList) {
-                    // When singleframe, display the frontend series
+                    // When singleframe, display the frontend series.
                     if (seriesList.length === 1) {
                         vm.mode = 'series';
                         vm.seriesId = seriesList[0].id;
                     }
-                    // When multiframe, consider series as a study
-                    else if (!vm.studyId) {
-                        // @todo @warning multiple series may be shown instead of a single one... study id should also be split...
-                        var request = new osimis.HttpRequest();
-                        request.setHeaders(wvConfig.httpRequestHeaders);
-                        
-                        request
-                            .get(wvConfig.orthancApiURL + '/series/'+orthancSeriesId+'/study')
+                    // When multiframe, consider series as a study.
+                    else if (!vm.selectedStudyIds.length) {
+                        // @todo @warning multiple series may be shown instead
+                        // of a single one... study id should also be split...
+                        wvStudyManager
+                            .getBySeriesId(orthancSeriesId)
                             .then(function(study) {
                                 vm.mode = 'study';
-                                vm.studyId = study.data.ID;
+                                vm.selectedStudyIds = [
+                                    study.id
+                                ];
+
+                                // Set all the patient studies as pickable.
+                                study
+                                    .getRelatedStudies()
+                                    .then(function(studyIds) {
+                                        vm.pickableStudyIds = studyIds;
+                                    });
                             });
                     }
+                    // Otherwise, throw exception.
                     else {
                         throw new Error('Invalid URL parameters');
                     }
@@ -151,17 +152,26 @@
                     console.error('err', err);
                 });
         }
-        // Show study list if study & series haven't been set via URL
+        // Show study list if study & series haven't been set via URL.
         else {
             vm.mode = 'dev';
+
+            // Set all orthanc studies as pickable.
+            wvStudyManager
+                .getAllStudyIds()
+                .then(function(studyIds) {
+                    vm.pickableStudyIds = studyIds;
+                });
         }
 
         // Configure the user interface depending on the user angent/browser.
         var userInterfacePolicy = new osimis.UserAgentBasedInterfacePolicy();
+        vm.enableLayoutTop = userInterfacePolicy.enableLayoutTop;
         vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
         vm.enableLayoutTopRight = userInterfacePolicy.enableLayoutTopRight;
         vm.enableToolbar = userInterfacePolicy.enableToolbar;
         vm.enableLayoutLeft = userInterfacePolicy.enableLayoutLeft;
+        vm.enableLayoutLeftBottom = userInterfacePolicy.enableLayoutLeftBottom;
         vm.enableLayoutLeftHandles = userInterfacePolicy.enableLayoutLeftHandles;
         vm.enableNotice = userInterfacePolicy.enableNotice;
         vm.noticeText = userInterfacePolicy.noticeText;
@@ -169,10 +179,12 @@
         // Listen to changes triggered by the user interface policy.    
         userInterfacePolicy.onUpdate(function() {
             $scope.$apply(function() {
+                vm.enableLayoutTop = userInterfacePolicy.enableLayoutTop;
                 vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
                 vm.enableLayoutTopRight = userInterfacePolicy.enableLayoutTopRight;
                 vm.enableToolbar = userInterfacePolicy.enableToolbar;
                 vm.enableLayoutLeft = userInterfacePolicy.enableLayoutLeft;
+                vm.enableLayoutLeftBottom = userInterfacePolicy.enableLayoutLeftBottom;
                 vm.enableLayoutLeftHandles = userInterfacePolicy.enableLayoutLeftHandles;
                 vm.enableNotice = userInterfacePolicy.enableNotice;
                 vm.noticeText = userInterfacePolicy.noticeText;

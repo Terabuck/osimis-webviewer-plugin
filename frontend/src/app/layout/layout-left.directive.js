@@ -14,7 +14,11 @@
             link: link,
             restrict: 'E',
             require: '^^wvLayout',
-            transclude: true,
+            transclude: {
+                '1': '?wvLayoutLeft1',
+                '2': '?wvLayoutLeft2',
+                '3': '?wvLayoutLeft3'
+            },
             scope: {
                 enabled: '=?wvEnabled',
                 closed: '=?wvClosed',

@@ -3,20 +3,20 @@
 
     angular
         .module('webviewer')
-        .directive('wvStudyInformation', wvStudyInformation);
+        .directive('wvStudyInformationBreadcrumb', wvStudyInformationBreadcrumb);
 
     /* @ngInject */
-    function wvStudyInformation() {
+    function wvStudyInformationBreadcrumb() {
         var directive = {
             bindToController: true,
-            controller: informationsCtrl,
+            controller: StudyInformationBreadcrumbVM,
             controllerAs: 'vm',
             link: link,
             restrict: 'E',
             scope: {
                 studyId: '=wvStudyId'
             },
-            templateUrl: 'app/study/study-information.html'
+            templateUrl: 'app/study/study-information-breadcrumb.directive.html'
         };
         return directive;
 
@@ -25,7 +25,7 @@
     }
 
     /* @ngInject */
-    function informationsCtrl($scope, $http, wvConfig) {
+    function StudyInformationBreadcrumbVM($scope, $http, wvConfig) {
         var vm = this;
 
         vm.studyTags = {};

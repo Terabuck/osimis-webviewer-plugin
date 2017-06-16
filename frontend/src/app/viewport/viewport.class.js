@@ -40,8 +40,17 @@
         this._fitImageToViewport = true;
 
         // Other stuffs
+        // @deprecated?
         this._currentImage = null;
         this._currentImageResolution = null; // resolution === quality
+
+        // Stored to be able to abort loading when image change.
+        this._progressiveImageLoader = null;
+
+        // Initialize cornerstone (and canvas)
+        cornerstone.enable(this._enabledElement);
+        this._enabledElementObject = cornerstone.getEnabledElement(this._enabledElement); // enabledElementObject != enabledElementDom
+        this._canvas = $(this._enabledElementObject.canvas);
 
         // Set quality policy
         if (isDiagnosisViewport) {
@@ -63,14 +72,9 @@
         } else {
             this._syncAnnotationResolution = false;
         }
-
-        // Stored to be able to abort loading when image change.
-        this._progressiveImageLoader = null;
-
-        // Initialize cornerstone (and canvas)
-        cornerstone.enable(this._enabledElement);
-        this._enabledElementObject = cornerstone.getEnabledElement(this._enabledElement); // enabledElementObject != enabledElementDom
-        this._canvas = $(this._enabledElementObject.canvas);
+        // Set it up in cornerstone so we can easily patch the cornerstone
+        // toolStateManager.
+        this._enabledElementObject._syncAnnotationResolution = this._syncAnnotationResolution;
 
         // Taken from old viewport
         
@@ -162,12 +166,18 @@
      * @methodOf osimis.Viewport
      *
      * @name osimis.Viewport#draw
+     *
+     * @param {boolean} [invalidate=false]
+     * Redraw the image. To set to true when we did change the
+     * cornerstoneImageObject as cornerstone cache it.
+     * warning: setting this to false when switching from viewports w/ the same
+     * image may lead to unexpected behaviors.
      * 
      * @description
      * Draw the image. Mostly used internally. Can sometimes be used by tool
      * also.
      */
-    Viewport.prototype.draw = function() {
+    Viewport.prototype.draw = function(invalidate) {
         var cornerstone = this._cornerstone;
         var enabledElement = this._enabledElement;
         var enabledElementObject = this._enabledElementObject;
@@ -184,7 +194,8 @@
         // changing the cornerstoneImageObject (cornerstone probably cache it).
         // Draw image & invalidate cornerstone cache (multiple viewport with
         // different resolution can be displayed at the same time)
-        cornerstone.updateImage(enabledElement, true);
+        invalidate = typeof invalidate === 'undefined' ? true : invalidate;
+        cornerstone.updateImage(enabledElement, invalidate);
         $(enabledElement).trigger("CornerstoneImageRendered", {
             viewport: enabledElementObject.viewport,
             element : enabledElementObject.element,
@@ -299,6 +310,14 @@
             // Dunno why we have to do this, but we have!
             _this._enabledElementObject.viewport = csViewportData; // viewport data is set otherwise #reset would have been called
             _this._enabledElement.viewport = csViewportData;
+
+            // Track a displayed zone if it exists.
+            // @todo merge with `osimis.CornerstoneViewportWrapper` class.
+            if (_firstLoadingResolution && csViewportData._trackImageZone) {
+                // Fit old bounding boxes into new canvas.
+                csViewportData._displayImageZone(csViewportData._trackImageZone, _this._canvasWidth, _this._canvasHeight)
+            }
+
             csViewportData.changeResolution(newResolution);
 
             // Adapt annotations' resolution for now (even if the following 
@@ -331,7 +350,7 @@
             }
 
             // Draw
-            _this.draw();
+            _this.draw(_firstLoadingResolution?false:true);
 
             // Do stuffs required only when the first resolution is being loaded,
             // but after the image has been drawn
@@ -450,6 +469,42 @@
      * @ngdoc method
      * @methodOf osimis.Viewport
      *
+     * @name osimis.Viewport#getCurrentImageMinPixelValue
+     * 
+     * @return {number}
+     * The minimum pixel value of the current image.
+     * 
+     * @description
+     * This method return the minimum pixel value (in term of color shade) of 
+     * the current image. It is used by the windowing tool to fine-tune its
+     * sensitivity.
+     */
+    Viewport.prototype.getCurrentImageMinPixelValue = function() {
+        return this._displayedCornerstoneImageObject.minPixelValue;
+    };
+
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Viewport
+     *
+     * @name osimis.Viewport#getCurrentImageMaxPixelValue
+     * 
+     * @return {number}
+     * The maximum pixel value of the current image.
+     * 
+     * @description
+     * This method return the maximum pixel value (in term of color shade) of 
+     * the current image. It is used by the windowing tool to fine-tune its
+     * sensitivity.
+     */
+    Viewport.prototype.getCurrentImageMaxPixelValue = function() {
+        return this._displayedCornerstoneImageObject.maxPixelValue;
+    };
+
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Viewport
+     *
      * @name osimis.Viewport#setViewport
      * @param {object} viewportData Set cornerstone viewport data (see
      *                              cornerstone doc).
@@ -559,7 +614,7 @@
             height: cornerstoneImageObject.height
         };
         viewportData.changeResolution(newResolution);
-
+        
         // Replace the viewport data in cornerstone (without redrawing, yet)
         var enabledElementObject = this._enabledElementObject; // enabledElementObject != enabledElementDom
         enabledElementObject.viewport = viewportData;
@@ -579,9 +634,36 @@
      * @ngdoc method
      * @methodOf osimis.Viewport
      *
+     * @name osimis.Viewport#getCanvasSize
+     *
+     * @return {object}
+     * An object with info about the canvas size.
+     * 
+     * * {int} `width` canvas width (in pixel).
+     * * {int} `height` canvas height (in pixel).
+     * 
+     * @description
+     * Retrieve the current canvas size. As those values are cached, no reflow
+     * is triggered.
+     */
+    Viewport.prototype.getCanvasSize = function() {
+        return {
+            width: this._canvasWidth,
+            height: this._canvasHeight
+        }
+    };
+
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Viewport
+     *
      * @name osimis.Viewport#resizeCanvas
-     * @param {int} width New canvas width (in pixel).
-     * @param {int} height New canvas height (in pixel).
+     * 
+     * @param {int} width
+     * New canvas width (in pixel).
+     * 
+     * @param {int} height
+     * New canvas height (in pixel).
      * 
      * @description
      * Resize cornerstone canvas.
@@ -602,23 +684,29 @@
         this._canvasWidth = newCanvasWidth;
         this._canvasHeight = newCanvasHeight;
 
-        // Set the canvas size / pixel quantity (? not sure it does that)
-        cornerstone.resize(enabledElement, false);
+        // Set the canvas size / pixel quantity.
+        // We don't use `cornerstone.resize` since it sets its canvas size
+        // based on the canvas' parent element size. For safety, we want to
+        // rely on this method's parameters instead.
+        var canvas = this._enabledElementObject.canvas;
+        canvas.width = newCanvasWidth;
+        canvas.height = newCanvasHeight;
+        canvas.style.width = newCanvasWidth + "px";
+        canvas.style.height = newCanvasHeight + "px";
 
         // Scale the image to the new canvas size
         if (this._viewportData) {
-            var widthScaleRatio = newCanvasWidth / oldCanvasWidth;
-            var heightScaleRatio = newCanvasHeight / oldCanvasHeight;
+            // Retrieve bounding boxes from old canvas.
+            var displayedImageZone = this._viewportData._trackImageZone || this._viewportData._getDisplayedImageZone(
+                oldCanvasWidth,
+                oldCanvasHeight
+            );
 
-            // If width as changed more than height, we should rely on width scale. Reverse
-            // apply too.
-            var scaleRatio = Math.abs(1-widthScaleRatio) > Math.abs(1-heightScaleRatio) ? widthScaleRatio : heightScaleRatio;
-
-            // Adapt scale ratio
-            this._viewportData.scale = this._viewportData.scale * scaleRatio;
-            
-            // We expect method's user to call #draw after.
+            // Fit old bounding boxes into new canvas.
+            this._viewportData._displayImageZone(displayedImageZone, this._canvasWidth, this._canvasHeight);
         }
+        
+        // We expect method's user to call #draw after.
     };
 
     osimis.Viewport = Viewport;

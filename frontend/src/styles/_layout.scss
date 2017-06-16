@@ -1,37 +1,33 @@
-$toolbarHeight: 42px;
+$topHeight: 42px;
 $bottomHeightSmall: 7rem; // On small width, we provide two-lines bottom zone to compensate the smaller width
 $bottomHeightLarge: 5rem; // On large width, we provide one-line bottom zone
 
-$asideWidth: 300px;
+$asideWidth: 32rem;
 $asideMinifyWidth: 64px;
 
 $asideRightMinifyWidth: 85px; // eq. 7.5rem * 12px - ( $asideRightPadding / 2 )
 $asideRightPadding: 10px;
 
-/* layout */
+/* layout: left section */
 
-
-/* left section */
-
-// Adapt left aside based on state (opened/closed)
-.wvLayout__left {
-    display:block;
+// Adapt left aside based on state (opened/closed).
+.wvLayoutLeft {
+    // Set general properties.
     position:absolute;
     z-index:2;
     background-color:black;
     width: $asideWidth;
-    // transition: 0.6s width ease, 0.6s transform ease;
 
-    // Position the left side below the toolbar if it is shown
-    &.wvLayout__left--toppadding {
-        top: $toolbarHeight;
+    // Position the left side below the top zone if it is shown
+    &.wvLayoutLeft--toppadding {
+        top: $topHeight;
     }
-    &:not(.wvLayout__left--toppadding) {
+    &:not(.wvLayoutLeft--toppadding) {
         top: 0;
     }
 
     // Position the left section over the bottom one if the latter is shown
-    &.wvLayout__left--bottompadding {
+    &.wvLayoutLeft--bottompadding {
         @media screen and (max-device-width: 374px) {
             bottom: $bottomHeightSmall;
         }
@@ -39,7 +35,7 @@ $asideRightPadding: 10px;
             bottom: $bottomHeightLarge;
         }
     }
-    &:not(.wvLayout__left--bottompadding) {
+    &:not(.wvLayoutLeft--bottompadding) {
         bottom: 0;
     }
 
@@ -47,27 +43,91 @@ $asideRightPadding: 10px;
     left: 0;
 
     // When layout left is shown, nothing special happens (default state)
-    &:not(.wvLayout__left--closed) {
+    &:not(.wvLayoutLeft--closed) {
     }
 
     // When layout left is closed, move it aside
-    &.wvLayout__left--closed {
+    &.wvLayoutLeft--closed {
         transform: translateX(- $asideWidth); // Move all out of the screen
-
-        // Display back the aside when buttons are hovered
-        // &:hover{
-        //     transform: translateX(0); // Show full
-        // }
     }
+}
 
-    // Set children to full height (so border-right appears at 100% height)
-    & > .wvViewer__asideLeft {
-        height: 100%;
+// Layout-Left Flexbox containers for the content.
+.wvLayoutLeft__content {
+    border-right: 1px solid #AAA;
+
+    width: $asideWidth;
+
+    // Display flex mode so optional actions can be positionned at the bottom
+    // side.
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    // Make it scrollable.
+    overflow-y: auto;
+    height: 100%;
+}
+
+.wvLayoutLeft__contentTop {
+    // We have to set a static height since we use floating to make white space
+    // disapear in nested content.
+    height: 4rem;
+    padding: 0rem 1rem 0rem 1rem;
+
+    // Enforce width even if there is a scrollbar on win/IE11 (-1 px for
+    // border).
+    width: calc(32rem - 1px);
+}
+
+.wvLayoutLeft__contentMiddle {
+    // Let the middle zone take as much space as required.
+    flex: 1 0 auto;
+
+    // Enforce width even if there is a scrollbar on win/IE11 (-1 px for
+    // border).
+    width: calc(32rem - 1px);
+}
+
+.wvLayoutLeft__contentBottom {
+    // Enforce width even if there is a scrollbar on win/IE11 (-1 px for
+    // border).
+    width: calc(32rem - 1px);
+}
+.wvLayout__leftBottom.wvLayout__leftBottom--enabled {
+    border-top: 1px solid hsla(0, 0%, 100%, 0.2);
+    margin-top: 1rem;
+    padding: 1rem;
+
+    // Prevent from taking more space than intended.
+    // flex-grow: 0;
+}
+
+.wvLayoutLeft__actions,
+%wvLayoutLeft__actions{
+    display:block;
+    position:absolute;
+    right:1px; // border
+    top: 50%;
+    transform: translateY(-50%);
+    width:25px;
+}
+.wvLayoutLeft__actions--outside{
+    @extend.wvLayoutLeft__actions;
+    right:-25px; // width + border
+}
+.wvLayoutLeft__action{
+    background-color:$primary;
+    opacity: 0.5;
+    color:white;
+    transition: none;
+    &:hover, &:focus{
+        opacity: 1;
     }
 }
 
 
-/* right section */
+/* layout: right section */
 
 // Adapt right aside based on state (opened/closed).
 .wvLayout__right {
@@ -76,11 +136,10 @@ $asideRightPadding: 10px;
     z-index:2;
     background-color:black;
     width: $asideRightMinifyWidth;
-    // transition: 0.6s width ease, 0.6s transform ease;
 
-    // Position the left side below the toolbar if it is shown
+    // Position the left side below the top zone if it is shown
     &.wvLayout__right--toppadding {
-        top: $toolbarHeight;
+        top: $topHeight;
     }
     &:not(.wvLayout__right--toppadding) {
         top: 0;
@@ -109,11 +168,6 @@ $asideRightPadding: 10px;
     // When layout right is closed, move it aside
     &.wvLayout__right--closed {
         transform: translateX(+ $asideRightMinifyWidth); // Move all out of the screen
-
-        // Display back the aside when buttons are hovered
-        // &:hover{
-        //     transform: translateX(0); // Show full
-        // }
     }
 
     // Set childrens to full height (so border-left appears at 100% height)
@@ -126,8 +180,49 @@ $asideRightPadding: 10px;
     }
 }
 
+.wvAsideRight__content {
+    height: 100%;
+    float: left;
 
-/* bottom section */
+    border-left: 1px solid #AAA;
+
+    padding: 0 $asideRightPadding/2;
+    width: $asideWidth;
+}
+
+.wvAsideRight__actions,
+%wvAsideRight__actions{
+    display:block;
+    position:absolute;
+    left:1px; // border
+    top: 50%;
+    transform: translateY(-50%);
+    width:25px;
+
+    // Compensate aside z-index to let user click on button when another button
+    // is behind the actions.
+    z-index: 3;
+}
+.wvAsideRight__actions--outside{
+    @extend.wvAsideRight__actions;
+    left:-25px; // width + border
+}
+.wvAsideRight__action{
+    background-color:$primary;
+    opacity: 0.5;
+    color:white;
+    transition: none;
+    &:hover, &:focus{
+        opacity: 1;
+    }
+}
+.wvAsideRight__fixOpenFullyTooltip + .tooltip { // Fix the "open fully" bad tooltip placement of the asideRight
+    left: -6.633em !important;
+    top: 1px !important;
+}
+
+
+/* layout: bottom section */
 
 // Set bottom section size & position 
 .wvLayout__bottom {
@@ -150,15 +245,33 @@ $asideRightPadding: 10px;
 }
 
 
-/* main section */
+/* layout: main section */
 
 // Set main section size & position 
 .wvLayout__main {
     position: absolute;
 
-    // Position the main section below the toolbar if the latter is shown
-    &.wvLayout__main--toppadding {
+    // Align content (such as toolbar)
+    text-align: center;
+
+    // Position splitpane considering the toolbar when toolbar is present.
+    & .wvLayout__splitpane--toolbarAtTop {
+        display: block;
+        height: calc(100% - #{$toolbarHeight});
+        width: 100%;
+
+        position: relative;
         top: $toolbarHeight;
+    }
+    & .wvLayout__splitpane--toolbarAtRight {
+        display: block;
+        height: 100%;
+        width: calc(100% - #{$toolbarHeight});
+    }
+
+    // Position the main section below the top zone if the latter is shown
+    &.wvLayout__main--toppadding {
+        top: $topHeight;
     }
     &:not(.wvLayout__main--toppadding) {
         top: 0;
@@ -235,81 +348,17 @@ $asideRightPadding: 10px;
     }
 }
 
-.wvViewer__button, .fa.wvViewer__button{ // make sure we have precedence over .fa class
-    background-color:inherit;
-    text-decoration: none;
-    text-align:left;
-    cursor: pointer;
-    *{
-        pointer-events: none;
-    }
-    &:hover, &:active, &:focus{
-        outline:0;
-    }
-
-    transition: 0.3s text-decoration ease, 0.3s background-color ease, 0.3s color ease, 0.3s border ease, 0.3s opacity ease;
-
-    padding: 0 10px;
-    line-height:40px;
-    vertical-align: middle;
-    color:white;
-    opacity: 0.75;
-    border:none;
-    border-bottom: 2px solid rgba(255,255,255,0.1);
-    &:hover, &:focus{
-        border-color: rgba(255,255,255,1);
-        opacity:1;
-    }
-    &.active{
-        opacity: 1;
-        border-color: $primary;
-    }
-
-    // Make sure the 2px border is not hidden by viewports and other parts of
-    // the layout (.glyphicon class sets top to 1px)
-    top: 0px;
-
-    // Adapt font-awesome icon to glyphicon styles
-    &.fa {
-        top: 0px;
-        font-weight: 800;
-    }
-}
-.wvViewer__button.wvViewer__button--rotate, label.wvViewer__button.wvViewer__button--rotate.fa { // make sure we have more precedence than .fa class
-    // Rotate
-    transform: rotate(90deg);
-
-    // Prevent antialiasing issue on chrome when mouse is over the button
-    -webkit-backface-visibility: hidden;
-    outline: 1px solid transparent;
-
-    // Compensate rotation
-    border-bottom: none;
-    border-right: 2px solid hsla(0, 0%, 100%, 0.1);
-    width: 42px;
-    height: 32px;
-    line-height: 32px;
-    padding: 0 0 0 13px;
-    left: -5px;
-    &:hover, &:focus {
-        border-color: rgba(255,255,255,1);
-        opacity: 1;
-    }
-    &.active {
-        opacity: 1;
-        border-color: $primary;
-    }
-}
 .wvViewer__topBar{
     width:100%;
     // margin-top: 0.5rem;
-
-    // Make sure the main layout appears behind the toolbar. Button will 
-    // therefore always be clickable even when the windows is small and the
-    // toolbar is split in two vertical bars, one of which appearing on top
-    // of the layout main zone.
-    position: absolute;
-    z-index: 3;
+    
+    // Allow user to scroll through the toolbar if screen is too small. Note we
+    // can't use z-index properly to show buttons on top of the viewer, as any
+    // popover will appear behind them (even with higher z-index) due to an
+    // overflow property hidden somewhere.
+    overflow-y: auto;
+    white-space: nowrap;
+    max-width: 100%;
 }
 .wvViewer__buttonGroup{
     display:inline-block;
@@ -412,83 +461,4 @@ $asideRightPadding: 10px;
     border-right: 1px solid $border-color;
 }
 .wvTimeline__wrapper{
-}
-
-/* aside Left */
-
-.wvAsideLeft__content {
-    height: 100%;
-    float: right;
-
-    border-right: 1px solid #AAA;
-
-    width: $asideWidth;
-}
-
-.wvAsideLeft__information,
-.wvAsideLeft__reports {
-    overflow-x: visible;
-}
-.wvAsideLeft__actions,
-%wvAsideLeft__actions{
-    display:block;
-    position:absolute;
-    right:1px; // border
-    top:1rem;
-    width:25px;
-}
-.wvAsideLeft__actions--outside{
-    @extend.wvAsideLeft__actions;
-    right:-25px; // width + border
-}
-.wvAsideLeft__action{
-    background-color:$primary;
-    opacity: 0.5;
-    color:white;
-    transition: none;
-    &:hover, &:focus{
-        opacity: 1;
-    }
-}
-
-/* aside right */
-
-.wvAsideRight__content {
-    height: 100%;
-    float: left;
-
-    border-left: 1px solid #AAA;
-
-    padding: 0 $asideRightPadding/2;
-    width: $asideWidth;
-}
-
-.wvAsideRight__actions,
-%wvAsideRight__actions{
-    display:block;
-    position:absolute;
-    left:1px; // border
-    top:1rem;
-    width:25px;
-
-    // Compensate aside z-index to let user click on button when another button
-    // is behind the actions.
-    z-index: 3;
-}
-.wvAsideRight__actions--outside{
-    @extend.wvAsideRight__actions;
-    left:-25px; // width + border
-}
-.wvAsideRight__action{
-    background-color:$primary;
-    opacity: 0.5;
-    color:white;
-    transition: none;
-    &:hover, &:focus{
-        opacity: 1;
-    }
-}
-.wvAsideRight__fixOpenFullyTooltip + .tooltip { // Fix the "open fully" bad tooltip placement of the asideRight
-    left: -6.633em !important;
-    top: 1px !important;
 }

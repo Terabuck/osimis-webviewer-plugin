@@ -11,27 +11,14 @@ CornerstoneKLVContainer::CornerstoneKLVContainer(std::auto_ptr<IImageContainer> 
   KLVWriter klvWriter;
 
   // set metadata
-  klvWriter.setValue(Color, metaData->color);
   klvWriter.setValue(Height, metaData->height);
   klvWriter.setValue(Width, metaData->width);
   klvWriter.setValue(SizeInBytes, metaData->sizeInBytes); 
 
-  klvWriter.setValue(ColumnPixelSpacing, metaData->columnPixelSpacing);
-  klvWriter.setValue(RowPixelSpacing, metaData->rowPixelSpacing);
-  
   klvWriter.setValue(MinPixelValue, metaData->minPixelValue);
   klvWriter.setValue(MaxPixelValue, metaData->maxPixelValue);
-  klvWriter.setValue(Slope, metaData->slope);
-  klvWriter.setValue(Intercept, metaData->intercept);
-  klvWriter.setValue(WindowCenter, metaData->windowCenter);
-  klvWriter.setValue(WindowWidth, metaData->windowWidth);
 
-  klvWriter.setValue(IsSigned, metaData->isSigned);
   klvWriter.setValue(Stretched, metaData->stretched);
-  klvWriter.setValue(Compression, metaData->compression);
-
-  klvWriter.setValue(OriginalHeight, metaData->originalHeight);
-  klvWriter.setValue(OriginalWidth, metaData->originalWidth);
 
   // set image binary
   klvWriter.setValue(ImageBinary, data->GetBinarySize(), data->GetBinary());

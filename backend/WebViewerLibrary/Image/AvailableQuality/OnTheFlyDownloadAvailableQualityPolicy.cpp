@@ -19,27 +19,12 @@ bool OnTheFlyDownloadAvailableQualityPolicy::_isLargerThan(
 }
 
 bool OnTheFlyDownloadAvailableQualityPolicy::_isAlreadyCompressedWithinDicom(
-                                                              const Orthanc::DicomMap& headerTags)
+                                                              const Json::Value& headerTags)
 {
   using namespace Orthanc;
 
   // Retrieve transfer syntax
-  const DicomValue* transfertSyntaxValue = headerTags.TestAndGetValue(0x0002, 0x0010);
-  std::string transferSyntax;
-
-  if (transfertSyntaxValue->IsBinary()) {
-    throw OrthancException(static_cast<ErrorCode>(OrthancPluginErrorCode_CorruptedFile));
-  }
-  else if (transfertSyntaxValue == NULL || transfertSyntaxValue->IsNull()) {
-    // Set default transfer syntax if not found
-    transferSyntax = "1.2.840.10008.1.2";
-  }
-  else {
-    // Stripping spaces should not be required, as this is a UI value
-    // representation whose stripping is supported by the Orthanc
-    // core, but let's be careful...
-    transferSyntax = Toolbox::StripSpaces(transfertSyntaxValue->GetContent());
-  }
+  std::string transferSyntax = headerTags["TransferSyntax"].asString();
 
   BENCH_LOG("TRANSFER_SYNTAX", transferSyntax);
 
@@ -79,7 +64,7 @@ bool OnTheFlyDownloadAvailableQualityPolicy::_isAlreadyCompressedWithinDicom(
 }
 
 std::set<ImageQuality> OnTheFlyDownloadAvailableQualityPolicy::retrieveByTags(
-                                                              const Orthanc::DicomMap& headerTags,
+                                                              const Json::Value& headerTags,
                                                               const Json::Value& otherTags)
 {
   using namespace Orthanc;

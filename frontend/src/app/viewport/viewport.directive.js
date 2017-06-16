@@ -151,7 +151,7 @@
             
             var _watchedValue = {
                 imageId: scope.vm.wvImageId || null,
-                csViewport: scope.vm.csViewport || null
+                csViewport: scope.vm.csViewport && scope.vm.csViewport.clone() || null
             };
 
             // bind directive's sizing (via wv-size controller) to cornerstone
@@ -216,7 +216,7 @@
                     // Update old values
                     _watchedValue = {
                         imageId: scope.vm.wvImageId,
-                        csViewport: scope.vm.csViewport
+                        csViewport: scope.vm.csViewport && scope.vm.csViewport.clone()
                     };
                 };
                 ctrl.clearImage = function() {
@@ -251,7 +251,7 @@
                     var newCsViewport = scope.vm.csViewport || null;
 
                     // Case 1:
-                    // Do nothing if no change
+                    // Do nothing if image wasn't displayed and is still not
                     if (!newImageId && !oldImageId) {
 
                     }
@@ -307,14 +307,16 @@
                     //   DRAW IMAGE
                     else if (!newCsViewport && oldCsViewport) {
                         model.reset();
-                        model.draw();
+                        model.draw(false);
                     }
                     // Case 7:
                     // Update cs viewport if it is different
                     //   UPDATE CS VIEWPORT
                     //   KEEP IMAGE
                     //   DRAW IMAGE
-                    else if (oldCsViewport._cornerstoneViewportData.hflip !== newCsViewport._cornerstoneViewportData.hflip || 
+                    else if (
+                        !oldCsViewport ||
+                        oldCsViewport._cornerstoneViewportData.hflip !== newCsViewport._cornerstoneViewportData.hflip || 
                         oldCsViewport._cornerstoneViewportData.invert !== newCsViewport._cornerstoneViewportData.invert ||
                         oldCsViewport._cornerstoneViewportData.modalityLUT !== newCsViewport._cornerstoneViewportData.modalityLUT ||
                         oldCsViewport._cornerstoneViewportData.pixelReplication !== newCsViewport._cornerstoneViewportData.pixelReplication ||
@@ -338,13 +340,13 @@
                     ) {
                         // Update csViewport
                         model.setViewport(newCsViewport); // newUnserializedCsViewport
-                        model.draw();
+                        model.draw(false);
                     }
 
                     // Update old values
                     _watchedValue = {
                         imageId: scope.vm.wvImageId,
-                        csViewport: scope.vm.csViewport
+                        csViewport: scope.vm.csViewport && scope.vm.csViewport.clone()
                     };
 
                     // Always return false, as we do not use the watch function
@@ -365,7 +367,7 @@
                 // Update state values
                 _watchedValue = {
                     imageId: scope.vm.wvImageId,
-                    csViewport: scope.vm.csViewport
+                    csViewport: scope.vm.csViewport && scope.vm.csViewport.clone()
                 };
             });
             var _oldCsViewport = _.cloneDeep(scope.vm.csViewport && scope.vm.csViewport._cornerstoneViewportData) || null;
@@ -392,7 +394,7 @@
                         // Update state values
                         _watchedValue = {
                             imageId: scope.vm.wvImageId,
-                            csViewport: scope.vm.csViewport
+                            csViewport: scope.vm.csViewport && scope.vm.csViewport.clone()
                         };
                     });
                 }
@@ -410,17 +412,70 @@
             function _bindWvSizeController(wvSizeController, model) {
                 if (!wvSizeController) {
                     // @todo resize based on image size and not on element size (wich is always 0)
-                    model.resizeCanvas(element.width(), element.height());
-                    model.draw();
+                    var oldCanvasSize = model.getCanvasSize();
+
+                    var newCanvasSize = {
+                        width: element.width(),
+                        height: element.height()
+                    };
+
+                    // Resize canvas & redraw only if value as changed. This
+                    // condition prevent bugs from occuring! Consider there is
+                    // two types of viewports, thumbnails & diagnosis one. They
+                    // have different quality policy. The tend to display low 
+                    // quality whereas the second one switch from low to high
+                    // once downloaded. As such, it is important to invalidate
+                    // cache (using `model.draw(true)` instead of
+                    // `model.draw(false)` each time we draw an image with a
+                    // different resolution. We can have the luxery to avoid
+                    // doing it here since thumbnail viewports always have the
+                    // same size (there is no need to redraw them), while
+                    // viewports displaying the same image have synchronized
+                    // resolution (thus, the cache is invalidated when new
+                    // quality is downloaded). Therefore, we don't need to
+                    // invalidate the cornerstone cache each time the viewport
+                    // is resized.
+                    // @warning If any of the above condition is no longer
+                    // true, the `model.draw(false)` has to be changed into
+                    // `model.draw(true)` (at some performance cost.
+                    if (!_.isEqual(oldCanvasSize, newCanvasSize)) {
+                        model.resizeCanvas(newCanvasSize.width, newCanvasSize.height);
+                        model.draw(false);
+                    }
+
                     return null;
                 }
 
                 var unlistenWvSizeFn = wvSizeController && wvSizeController.onUpdate(function resizeCanvas() {
-                    var width = wvSizeController.getWidthInPixel();
-                    var height = wvSizeController.getHeightInPixel();
+                    var oldCanvasSize = model.getCanvasSize();
+                    var newCanvasSize = {
+                        width: wvSizeController.getWidthInPixel(),
+                        height: wvSizeController.getHeightInPixel()
+                    };
 
-                    model.resizeCanvas(width, height);
-                    model.draw();
+                    // Resize canvas & redraw only if value as changed. This
+                    // condition prevent bugs from occuring! Consider there is
+                    // two types of viewports, thumbnails & diagnosis one. They
+                    // have different quality policy. The tend to display low 
+                    // quality whereas the second one switch from low to high
+                    // once downloaded. As such, it is important to invalidate
+                    // cache (using `model.draw(true)` instead of
+                    // `model.draw(false)` each time we draw an image with a
+                    // different resolution. We can have the luxery to avoid
+                    // doing it here since thumbnail viewports always have the
+                    // same size (there is no need to redraw them), while
+                    // viewports displaying the same image have synchronized
+                    // resolution (thus, the cache is invalidated when new
+                    // quality is downloaded). Therefore, we don't need to
+                    // invalidate the cornerstone cache each time the viewport
+                    // is resized.
+                    // @warning If any of the above condition is no longer
+                    // true, the `model.draw(false)` has to be changed into
+                    // `model.draw(true)` (at some performance cost.
+                    if (!_.isEqual(oldCanvasSize, newCanvasSize)) {
+                        model.resizeCanvas(newCanvasSize.width, newCanvasSize.height);
+                        model.draw(false);
+                    }
                 });
 
                 return function unbind() {
@@ -515,6 +570,8 @@
         toolStateManager.restoreStateByToolAndImageId = function(toolName, imageId, state, redraw) {
             if (typeof redraw === 'undefined') redraw = true;
 
+            var _this = this;
+
             // Merge the data into cornernerstone (if annotation is not removed)
             // We can't simply change the object references because cornerstone
             // would lose link to the handles it's working on.
@@ -596,19 +653,31 @@
             if (redraw) {
                 // refresh viewports
                 var enabledElementObjects = cornerstone.getEnabledElementsByImageId(imageId);
-                enabledElementObjects.forEach(function(enabledElementObject) {
-                    var enabledElement = enabledElementObject.element;
+                var csAnnotationSynchronizer = new osimis.CornerstoneAnnotationSynchronizer();
+                enabledElementObjects
+                    // Bypass thumbnails (as they wont ever be used w/ annotations)
+                    .filter(function(enabledElementObject) {
+                        return enabledElementObject._syncAnnotationResolution;
+                    })
                     // Redraw the image - don't use cornerstone#draw because bugs occurs (only when debugger is off)
                     // those issues may come from changing the cornerstoneImageObject when image resolution change (cornerstone probably cache it)
-                    cornerstone.updateImage(enabledElement, true); // draw image & invalidate cornerstone cache
-                    $(enabledElementObject.element).trigger("CornerstoneImageRendered", {
-                        viewport: enabledElementObject.viewport,
-                        element : enabledElementObject.element,
-                        image : enabledElementObject.image,
-                        enabledElement : enabledElementObject,
-                        canvasContext: enabledElementObject.canvas.getContext('2d')
+                    .forEach(function(enabledElementObject) {
+                        // Map annotation to current viewports' image qualities
+                        // first.
+                        var currentImageResolution = _.clone(enabledElementObject.viewport.currentImageResolution);
+                        csAnnotationSynchronizer.syncByAnnotationType(toolName, _this.toolState[imageId][toolName], undefined, currentImageResolution);
+
+                        // Then draw viewport.
+                        var enabledElement = enabledElementObject.element;
+                        cornerstone.updateImage(enabledElement, false); // Draw image. Do not invalidate cornerstone cache!
+                        $(enabledElementObject.element).trigger("CornerstoneImageRendered", {
+                            viewport: enabledElementObject.viewport,
+                            element : enabledElementObject.element,
+                            image : enabledElementObject.image,
+                            enabledElement : enabledElementObject,
+                            canvasContext: enabledElementObject.canvas.getContext('2d')
+                        });
                     });
-                });
             }
         };
         cornerstoneTools.globalImageIdSpecificToolStateManager = toolStateManager;

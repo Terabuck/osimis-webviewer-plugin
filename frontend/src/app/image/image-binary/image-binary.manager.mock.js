@@ -15,6 +15,9 @@
         opts.cache = opts.cache || new osimis.ImageBinariesCache(); 
         opts.workerPool = opts.workerPool || null;
         opts.imageBinaries = opts.imageBinaries || {};
+        opts.instanceManager = opts.instanceManager || {
+            getTags: function() { /* noop */ }
+        };
 
         var httpRequestHeaders = null;
         var cornerstoneImageAdapter = null;
@@ -23,7 +26,7 @@
         this._timeoutByQuality = opts.timeoutByQuality;
         this._imageBinaries = opts.imageBinaries;
 
-    	osimis.ImageBinaryManager.call(this, opts.Promise, httpRequestHeaders, cornerstoneImageAdapter, opts.cache, opts.workerPool);
+    	osimis.ImageBinaryManager.call(this, opts.Promise, httpRequestHeaders, opts.instanceManager, cornerstoneImageAdapter, opts.cache, opts.workerPool);
     };
     ImageBinaryManager.prototype = Object.create(osimis.ImageBinaryManager.prototype);
 

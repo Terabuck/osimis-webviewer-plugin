@@ -22,12 +22,14 @@
         // @todo Unlisten to changes on destroy
 
         // Set initial UI values
-        // 1. Disable toolbar on mobile
+        // 1. Disable toolbar & top side on mobile
         this.enableToolbar = false;
+        this.enableLayoutTop = false;
+        this.enableLayoutTopLeft = false;
+        this.enableLayoutTopRight = false;
         // 2. Disable left/right side on portrait orientation
-        this.enableLayoutTopLeft = (orientation === 'landscape');
-        this.enableLayoutTopRight = (orientation === 'landscape');
         this.enableLayoutLeft = (orientation === 'landscape');
+        this.enableLayoutLeftBottom = (orientation === 'landscape');
         this.enableLayoutRight = (orientation === 'landscape');
         // 3. Never display aside handles on mobile (buttons toggling the aside)
         this.enableLayoutLeftHandles = false;
@@ -44,12 +46,9 @@
         if (orientation === 'portrait') {
             // Disable left layout
             this.enableLayoutLeft = false;
+            this.enableLayoutLeftBottom = false;
             this.enableLayoutRight = false;
             
-            // Disable top side
-            this.enableLayoutTopLeft = false;
-            this.enableLayoutTopRight = false;
-
             // Show text notice
             this.enableNotice = true;
         }
@@ -58,11 +57,8 @@
         if (orientation === 'landscape') {
             // Enable left/right layout
             this.enableLayoutLeft = true;
+            this.enableLayoutLeftBottom = true;
             this.enableLayoutRight = true;
-
-            // Enable top side
-            this.enableLayoutTopLeft = true;
-            this.enableLayoutTopRight = true;
 
             // Hide text notice
             this.enableNotice = false;

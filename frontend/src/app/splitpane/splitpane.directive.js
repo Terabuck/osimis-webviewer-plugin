@@ -3,11 +3,8 @@
  *
  * @name webviewer.directive:wvSplitpane
  * 
- * @param {object} [wvLayout={x: 1, y:1}]
- *   Define the quantity of row and column:
- *   
- *   * `x` The number of row
- *   * `y` The number of column
+ * @param {boolean} [wvReadonly=false]
+ * Prevent the user from changing the selected pane.
  *
  * @scope
  * @restrict Element
@@ -21,7 +18,7 @@
  *
  * @example
  * ```html
- * <wv-splitpane wv-layout="{x: 2, y: 2}">
+ * <wv-splitpane>
  *     <wv-pane-policy>
  *         This will be repeated 4 times.
  *     </wv-pane-policy>
@@ -44,7 +41,7 @@
             link: link,
             restrict: 'E',
             scope: {
-                layout: '=?wvLayout'
+                readonly: '=?wvReadonly'
             },
             templateUrl: 'app/splitpane/splitpane.directive.html',
             transclude: {
@@ -59,18 +56,13 @@
     }
 
     /* @ngInject */
-    function Controller($scope) {
+    function Controller($scope, wvPaneManager) {
         var vm = this;
 
-        /* jshint -W116 */
-        vm.layout = vm.layout || {
-            x: 1,
-            y: 1
-        };
-        /* jshint +W116 */
+        vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;
 
         // Trigger $(window).resize() on layout change & set row & columns width
-        $scope.$watch('vm.layout', _updateLayout, true);
+        $scope.$watch('vm.paneManager.layout', _updateLayout, true);
         function _updateLayout(newLayout) {
             if (!newLayout) return;
 
@@ -84,5 +76,7 @@
                 $(window).trigger('resize');
             });
         }
+
+        this.paneManager = wvPaneManager;
     }
 })();

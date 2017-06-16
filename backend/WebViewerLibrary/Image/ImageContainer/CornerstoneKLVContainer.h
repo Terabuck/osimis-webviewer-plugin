@@ -24,23 +24,12 @@ private:
   enum Keys
   {
     // - Meta Data (see ImageMetaData.h for informations)
-    Color,
     Height,
     Width,
     SizeInBytes,
-    ColumnPixelSpacing,
-    RowPixelSpacing,
     MinPixelValue,
     MaxPixelValue,
-    Slope,
-    Intercept,
-    WindowCenter,
-    WindowWidth,
-    IsSigned,
     Stretched,
-    Compression,
-    OriginalHeight,
-    OriginalWidth,
 
     // - Image binary
     ImageBinary

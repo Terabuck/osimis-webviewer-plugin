@@ -27,6 +27,7 @@
                 isRightClosed: '=?wvRightClosed', // readonly
                 isBottomEnabled: '=?wvBottomEnabled', // readonly
                 isLeftEnabled: '=?wvLeftEnabled', // readonly
+                isLeftBottomEnabled: '=?wvLeftBottomEnabled', // readonly
                 isLeftClosed: '=?wvLeftClosed', // readonly
             },
             templateUrl: 'app/layout/layout.html'
@@ -50,6 +51,7 @@
         this.isRightClosed = undefined;
         this.isBottomEnabled = undefined;
         this.isLeftEnabled = undefined;
+        this.isLeftBottomEnabled = undefined;
         this.isLeftClosed = undefined;
 
         // Trigger window resizes (so javascript canvas can be resized
@@ -64,6 +66,7 @@
             'vm.isRightClosed',
             'vm.isBottomEnabled',
             'vm.isLeftEnabled',
+            'vm.isLeftBottomEnabled',
             'vm.isLeftClosed',
         ], function() {
             // Go to the end of the digest cycle, when
