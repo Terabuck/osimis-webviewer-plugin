@@ -684,8 +684,15 @@
         this._canvasWidth = newCanvasWidth;
         this._canvasHeight = newCanvasHeight;
 
-        // Set the canvas size / pixel quantity (? not sure it does that)
-        cornerstone.resize(enabledElement, false);
+        // Set the canvas size / pixel quantity.
+        // We don't use `cornerstone.resize` since it sets its canvas size
+        // based on the canvas' parent element size. For safety, we want to
+        // rely on this method's parameters instead.
+        var canvas = this._enabledElementObject.canvas;
+        canvas.width = newCanvasWidth;
+        canvas.height = newCanvasHeight;
+        canvas.style.width = newCanvasWidth + "px";
+        canvas.style.height = newCanvasHeight + "px";
 
         // Scale the image to the new canvas size
         if (this._viewportData) {
@@ -697,9 +704,9 @@
 
             // Fit old bounding boxes into new canvas.
             this._viewportData._displayImageZone(displayedImageZone, this._canvasWidth, this._canvasHeight);
-            
-            // We expect method's user to call #draw after.
         }
+        
+        // We expect method's user to call #draw after.
     };
 
     osimis.Viewport = Viewport;

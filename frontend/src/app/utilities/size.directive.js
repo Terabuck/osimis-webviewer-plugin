@@ -78,7 +78,7 @@
             if (!element.parent().length) return;
 
             var wvSize = $parse(attrs.wvSize);
-
+            
             scope.$watch(wvSize, function (wvSize, old) {
                 var width = wvSize.width;
                 var height = wvSize.height;
