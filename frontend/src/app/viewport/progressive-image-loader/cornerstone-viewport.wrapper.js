@@ -271,6 +271,23 @@
         // Consider we are in full resolution (for now).
         var oldRes = this.currentImageResolution;
         this.changeResolution(this.originalImageResolution);
+
+        // Get image boundaries (& adapt to rotation).
+        var image_width, image_height;
+        var viewportData = this._cornerstoneViewportData;
+        viewportData.rotation = viewportData.rotation || 0;
+        if (Math.abs(viewportData.rotation) % 180 === 90) {
+            // Invert width & height if image has been rotated.
+            image_width = this.originalImageResolution.height;
+            image_height = this.originalImageResolution.width;
+        }
+        else if (Math.abs(viewportData.rotation) % 180 === 0) {
+            image_width = this.originalImageResolution.width;
+            image_height = this.originalImageResolution.height;
+        }
+        else {
+            throw new Error('Unexpected rotation ' + viewportData.rotate)
+        }
     
         // Get host parameters.
         var imgtl_bbtl_translate_top = imageZone.imgtl_bbtl_translate_top;
@@ -278,27 +295,27 @@
         var imgtl_bbtl_translate_bottom = imageZone.imgtl_bbtl_translate_bottom;
         var imgtl_bbtl_translate_left = imageZone.imgtl_bbtl_translate_left;
 
-        // Calculate bounding box w/h
+        // Calculate bounding box w/h.
         var img_bb_width = imgtl_bbtl_translate_right - imgtl_bbtl_translate_left;
         var img_bb_height = imgtl_bbtl_translate_bottom - imgtl_bbtl_translate_top;
         
-        // scale bounding box to viewport
+        // Scale bounding box to viewport.
         var width_scale =  canvas_width / img_bb_width;
         var height_scale =  canvas_height / img_bb_height;
 
         this.scale = Math.min(width_scale, height_scale);
         
-        // retrieve scaled bounding box size
+        // Retrieve scaled bounding box size.
         var vp_bb_width = img_bb_width * this.scale;
         var vp_bb_height = img_bb_height * this.scale;
         
-        // retrieve scaled bounding box position
+        // Retrieve scaled bounding box position.
         var vptl_bbtl_x = (canvas_width - vp_bb_width) / 2;
         var vptl_bbtl_y = (canvas_height - vp_bb_height) / 2;
     
-        // retrieve image position (tltl)
-        var vp_img_width = this.originalImageResolution.width * this.scale; 
-        var vp_img_height = this.originalImageResolution.height * this.scale;
+        // Retrieve image position (tltl).
+        var vp_img_width = image_width * this.scale; 
+        var vp_img_height = image_height * this.scale;
         
         var vptl_bbtl_right = vptl_bbtl_x + vp_bb_width;
         var vptl_imgtl_x = - (imgtl_bbtl_translate_left * this.scale) + vptl_bbtl_x;
@@ -311,7 +328,7 @@
         var vp_offset_x = canvas_width/2 - vptl_img_center_x;
         var vp_offset_y = canvas_height/2 - vptl_img_center_y;
 
-        // translation must be in img coordinates
+        // Translation must be in img coordinates.
         this.translation.x = - vp_offset_x / this.scale;
         this.translation.y = - vp_offset_y / this.scale;
 
@@ -340,11 +357,27 @@
         var oldResolution = this.currentImageResolution;
         this.changeResolution(this.originalImageResolution);
 
-        // Retrieve general data.
+        // Get image boundaries (& adapt to rotation).
+        var image_width, image_height;
         var viewportData = this._cornerstoneViewportData;
+        viewportData.rotation = viewportData.rotation || 0;
+        if (Math.abs(viewportData.rotation) % 180 === 90) {
+            // Invert width & height if image has been rotated.
+            image_width = this.originalImageResolution.height;
+            image_height = this.originalImageResolution.width;
+        }
+        else if (Math.abs(viewportData.rotation) % 180 === 0) {
+            image_width = this.originalImageResolution.width;
+            image_height = this.originalImageResolution.height;
+        }
+        else {
+            throw new Error('Unexpected rotation ' + viewportData.rotate)
+        }
+
+        // Retrieve general data.
         var s = viewportData.scale; // scale is in max resolution also.
-        var h_vp_image_width = this.currentImageResolution.width * s; // this is screen pixel width
-        var h_vp_image_height = this.currentImageResolution.height * s; // this is screen pixel height
+        var h_vp_image_width = image_width * s; // this is screen pixel width
+        var h_vp_image_height = image_height * s; // this is screen pixel height
 
         // cornerstone vp. x,y coordinate do not change depending
         // on the image scaling (at least after the 
@@ -418,6 +451,23 @@
         var tmpCurrentImageResolution = this.currentImageResolution;
         this.changeResolution(this.originalImageResolution);
 
+        // Get image boundaries (& adapt to rotation).
+        var image_width, image_height;
+        var viewportData = this._cornerstoneViewportData;
+        viewportData.rotation = viewportData.rotation || 0;
+        if (Math.abs(viewportData.rotation) % 180 === 90) {
+            // Invert width & height if image has been rotated.
+            image_width = this.originalImageResolution.height;
+            image_height = this.originalImageResolution.width;
+        }
+        else if (Math.abs(viewportData.rotation) % 180 === 0) {
+            image_width = this.originalImageResolution.width;
+            image_height = this.originalImageResolution.height;
+        }
+        else {
+            throw new Error('Unexpected rotation ' + viewportData.rotate)
+        }
+
         // Get image in viewport coordinates (considering scale).
         var viewportData = this._cornerstoneViewportData;
         var vpmc_imgmc_x = viewportData.translation.x * viewportData.scale;
@@ -426,8 +476,8 @@
         var vptl_imagemc_x = vpmc_imgmc_x + canvas_width/2;
         var vptl_imagemc_y = vpmc_imgmc_y + canvas_height/2;
 
-        var vptl_imagetl_x = vptl_imagemc_x - (this.currentImageResolution.width/2 * viewportData.scale);
-        var vptl_imagetl_y = vptl_imagemc_y - (this.currentImageResolution.height/2 * viewportData.scale);
+        var vptl_imagetl_x = vptl_imagemc_x - (image_width/2 * viewportData.scale);
+        var vptl_imagetl_y = vptl_imagemc_y - (image_height/2 * viewportData.scale);
 
         // Convert image coordinates to viewport coordinates
         vptl_coord_x = vptl_imagetl_x + (imgtl_coord_x * viewportData.scale);
