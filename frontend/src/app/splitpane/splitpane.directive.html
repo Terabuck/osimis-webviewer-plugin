@@ -1,25 +1,25 @@
 <div class="wvSplitpane">
-    <!-- Columns -->
+
     <div 
-        ng-repeat="$y in [vm.paneManager.layout.y] | range track by $index"
-        class="wvSplitpane__row"
-        ng-style="{height: vm.rowHeight}"
+        ng-repeat="(id, $pane) in vm.paneManager.panes track by id"
+        ng-class="{
+            'wvSplitpane__cellBorder': !vm.paneManager.isPaneSelected($pane.x, $pane.y) || vm.paneManager.getPane($pane.x, $pane.y).isEmpty(),
+            'wvSplitpane__cellBorder--selected': vm.paneManager.isPaneSelected($pane.x, $pane.y) && !vm.paneManager.getPane($pane.x, $pane.y).isEmpty()
+        }"
+        ng-style="{
+            'position': 'absolute',
+            'width': 'calc('+vm.rowWidth+' - 4px)',
+            'height': 'calc('+vm.rowHeight+' - 4px)',
+            'left': 'calc('+$pane.x+' * '+vm.rowWidth+' + 2px)',
+            'top': 'calc('+$pane.y+' * '+vm.rowHeight+' + 2px)'
+        }"
+        ng-click="!vm.readonly && vm.paneManager.selectPane($pane.x, $pane.y)"
     >
-        <!-- Row (within column) / Cell -->
-        <div
-            ng-repeat="$x in [vm.paneManager.layout.x] | range track by $index"
-            ng-class="{
-                'wvSplitpane__cellBorder': !vm.paneManager.isPaneSelected($x, $y) || vm.paneManager.getPane($x, $y).isEmpty(),
-                'wvSplitpane__cellBorder--selected': vm.paneManager.isPaneSelected($x, $y) && !vm.paneManager.getPane($x, $y).isEmpty()
-            }"
-            ng-style="{width: 'calc('+vm.rowWidth+' - 2px)'}"
-            ng-click="!vm.readonly && vm.paneManager.selectPane($x, $y)"
-        >  
-            <!-- Content -->
-            <ng-transclude
-                class="wvSplitpane__cell"
-                ng-transclude-slot="panePolicy"
-            ></ng-transclude>
-      </div>
+        <!-- Content -->
+        <ng-transclude
+            class="wvSplitpane__cell"
+            ng-transclude-slot="panePolicy"
+        ></ng-transclude>
     </div>
+
 </div>

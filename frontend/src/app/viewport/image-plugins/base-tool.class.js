@@ -361,6 +361,11 @@
             // events..
             $(enabledElement).on('CornerstoneImageRendered.'+this.toolName, _.throttle(function() {
                 var image = viewport.getImage();
+
+                if (!image) {
+                    return;
+                }
+                
                 var newAnnotationsData = toolStateManager.getStateByToolAndImageId(_this.toolName, image.id);
                 var oldAnnotations = image.getAnnotations(_this.toolName);
                 
