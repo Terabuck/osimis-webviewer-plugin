@@ -68,9 +68,9 @@
     function SplitpaneConfigButtonVM($element, $scope, $popover) {
         var _this = this;
 
-        this.splitpaneLayout = typeof splitpaneLayout !== 'undefined' ? splitpaneLayout : {x: 1, y: 1};
-        this.readonly = typeof readonly !== 'undefined' ? readonly : false;
-        this.popoverPlacement = typeof popoverPlacement !== 'undefined' ? popoverPlacement : 'bottom';
+        this.splitpaneLayout = typeof this.splitpaneLayout !== 'undefined' ? this.splitpaneLayout : {x: 1, y: 1};
+        this.readonly = typeof this.readonly !== 'undefined' ? this.readonly : false;
+        this.popoverPlacement = typeof this.popoverPlacement !== 'undefined' ? this.popoverPlacement : 'bottom';
 
         var popoverScope = $scope.$new();
         this.popover = $popover($element.children().first(), {

@@ -23,7 +23,7 @@
 
 .wvToolbar--right {
     right: 0;
-    width: 32px; // != $toolbarHeight since we're in the reverse order.
+    width: 33px; // != $toolbarHeight since we're in the reverse order.
 
     // Allow user to scroll through the toolbar if screen is too small. 
     overflow-x: auto;
