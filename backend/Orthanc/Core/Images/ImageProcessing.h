@@ -72,5 +72,7 @@ namespace Orthanc
     static void ShiftScale(ImageAccessor& image,
                            float offset,
                            float scaling);
+
+    static void Invert(ImageAccessor& image);
   };
 }
