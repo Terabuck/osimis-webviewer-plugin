@@ -6,7 +6,12 @@
 
 class JpegConversionPolicy : public IImageProcessingPolicy {
 public:
-  // quality: [0:100]
+  /**
+   * @class JpegConversionPolicy
+   *
+   * @param quality
+   * The quality of the resulting jpeg, between 0 and 100.
+   */
   JpegConversionPolicy(int quality);
   virtual ~JpegConversionPolicy();
 

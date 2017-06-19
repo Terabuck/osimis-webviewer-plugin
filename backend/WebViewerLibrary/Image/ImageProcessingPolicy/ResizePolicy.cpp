@@ -2,12 +2,19 @@
 
 #include <boost/gil/extension/resample.hpp>
 #include <boost/gil/extension/sampler.hpp>
+#include <Core/OrthancException.h>
 
 #include "../../Logging.h"
 #include "../../BenchmarkHelper.h"
 
 ResizePolicy::ResizePolicy(unsigned int maxWidthHeight)
 {
+  // Limit resizing between 25x25 & 1000x1000.
+  if (maxWidthHeight < 25 || maxWidthHeight > 1000) {
+    throw Orthanc::OrthancException(Orthanc::ErrorCode_ParameterOutOfRange);
+  }
+
+  // Set the max width/height variable.
   maxWidthHeight_ = maxWidthHeight;
 }
 
@@ -17,9 +24,14 @@ std::auto_ptr<IImageContainer> ResizePolicy::Apply(std::auto_ptr<IImageContainer
   OrthancPluginLogDebug(OrthancContextManager::Get(), "ImageProcessingPolicy: ResizePolicy");
 
   // Except *raw* image
-  // @todo real cast
   RawImageContainer* inRawImage = dynamic_cast<RawImageContainer*>(input.get());
-  assert(inRawImage != NULL);
+  if (inRawImage == NULL) {
+    // Throw bad request exception if this policy has been used with 
+    // non-raw-data image. This happen for instance when we use the jpeg policy
+    // two times (<...>/jpeg:80/resize:1000). The second one wont have access to
+    // raw pixels since the first policy compresses the pixels.
+    throw Orthanc::OrthancException(Orthanc::ErrorCode_BadRequest);
+  }
 
   Orthanc::ImageAccessor* accessor = inRawImage->GetOrthancImageAccessor();
 

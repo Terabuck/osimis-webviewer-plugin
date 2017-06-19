@@ -13,7 +13,10 @@
 
 JpegConversionPolicy::JpegConversionPolicy(int quality) : quality_(quality)
 {
-  assert(quality <= 100);
+  // Limit quality between 0 & 100.
+  if (quality < 0 || quality > 100) {
+    throw Orthanc::OrthancException(Orthanc::ErrorCode_ParameterOutOfRange);
+  }
 }
 
 JpegConversionPolicy::~JpegConversionPolicy()
@@ -26,7 +29,13 @@ std::auto_ptr<IImageContainer> JpegConversionPolicy::Apply(std::auto_ptr<IImageC
 
   // Except *raw* image
   RawImageContainer* rawImage = dynamic_cast<RawImageContainer*>(input.get());
-  assert(rawImage != NULL);
+  if (rawImage == NULL) {
+    // Throw bad request exception if this policy has been used with 
+    // non-raw-data image. This happen for instance when we use the jpeg policy
+    // two times (<...>/jpeg:80/jpeg:80). The second one wont have access to
+    // raw pixels since the first policy compresses the pixels.
+    throw Orthanc::OrthancException(Orthanc::ErrorCode_BadRequest);
+  }
 
   Orthanc::ImageAccessor* accessor = rawImage->GetOrthancImageAccessor();
 
@@ -42,8 +51,14 @@ std::auto_ptr<IImageContainer> JpegConversionPolicy::Apply(std::auto_ptr<IImageC
    accessor->GetConstBuffer(), quality_
   );
 
-  // Except 8bit image (OrthancPluginErrorCode_ParameterOutOfRange means image is not the right format)
-  assert(error != OrthancPluginErrorCode_ParameterOutOfRange);
+  // Except 8bit image (OrthancPluginErrorCode_ParameterOutOfRange means image
+  // is not the right format).
+  if (error == OrthancPluginErrorCode_ParameterOutOfRange) {
+    // Throw bad request exception if this policy has been used without 8bit
+    // image. Jpeg compression indeed sometime requires iamge dynamic reduction
+    // since jpeg doesn't handle 16bits dynamic.
+    throw Orthanc::OrthancException(Orthanc::ErrorCode_BadRequest);
+  }
 
   // Check compression result (may throw on bad_alloc)
   if (error != OrthancPluginErrorCode_Success)

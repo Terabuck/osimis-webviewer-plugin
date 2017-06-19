@@ -36,6 +36,8 @@ ImageMetaData::ImageMetaData()
   minPixelValue = 0;
   maxPixelValue = 0;
 
+  inverted = false;
+
   // frontend webviewer related
   stretched = false;
 }
@@ -81,6 +83,10 @@ ImageMetaData::ImageMetaData(RawImageContainer* rawImage, const Json::Value& dic
   // set sizeInBytes
   sizeInBytes = accessor->GetSize();
 
+  // Invert color in the backend if the photometric interpretation is
+  // MONOCHROME1.
+  inverted = (dicomTags["PhotometricInterpretation"].asString() == "MONOCHROME1");
+
   // frontend webviewer related
   stretched = false;
 
@@ -119,6 +125,12 @@ ImageMetaData::ImageMetaData(const DicomMap& headerTags, const Json::Value& dico
 
   // set stretched image (16bit -> 8bit dynamic compression)
   stretched = false;
+
+  // We never invert the color in the backend when the input image is
+  // compressed, even if the photometric interpretation is MONOCHROME1.
+  // Therefore, we avoid having to decompress the image in the backend, while
+  // we do the color inversion processing in the frontend.
+  inverted = false;
 
   BENCH_LOG(IMAGE_WIDTH, width);
   BENCH_LOG(IMAGE_HEIGHT, height);
