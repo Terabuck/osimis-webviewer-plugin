@@ -59,6 +59,7 @@ add_library(WebViewerLibrary
   ${VIEWER_LIBRARY_DIR}/Image/ImageProcessingPolicy/LowQualityPolicy.cpp
   ${VIEWER_LIBRARY_DIR}/Image/ImageProcessingPolicy/ResizePolicy.cpp
   ${VIEWER_LIBRARY_DIR}/Image/ImageProcessingPolicy/Uint8ConversionPolicy.cpp
+  ${VIEWER_LIBRARY_DIR}/Image/ImageProcessingPolicy/Monochrome1InversionPolicy.cpp
   ${VIEWER_LIBRARY_DIR}/Image/ImageProcessingPolicy/JpegConversionPolicy.cpp
   ${VIEWER_LIBRARY_DIR}/Image/ImageProcessingPolicy/PngConversionPolicy.cpp
   ${VIEWER_LIBRARY_DIR}/Image/ImageProcessingPolicy/KLVEmbeddingPolicy.cpp

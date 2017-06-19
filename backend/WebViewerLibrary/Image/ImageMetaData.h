@@ -52,4 +52,14 @@ struct ImageMetaData : public boost::noncopyable {
   // to unstretch the image back to the right value in the frontend.
   int32_t minPixelValue;
   int32_t maxPixelValue;
+
+  // This parameter is set to true, when the photometric interpretation is
+  // MONOCHROME1. The `Monochrome1InversionPolicy` is therefore effective if
+  // applied. Note it is actually only used for VSOL as for now, since we do
+  // the color inversion in the frontend for the webviewer because it brings
+  // the possibility to bypass decompression of compressed image in the
+  // backend (which would need to do if we wanted to revert colors). Thus, it's
+  // more optimize to do this in the frontend for already compressed images.
+  // This parameter is not transmitted to the frontend.
+  bool inverted;
 };

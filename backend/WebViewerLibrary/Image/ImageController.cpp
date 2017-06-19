@@ -21,15 +21,13 @@
 #include "ImageProcessingPolicy/HighQualityPolicy.h"
 #include "ImageProcessingPolicy/PixelDataQualityPolicy.h"
 
-#if PLUGIN_ENABLE_DEBUG_ROUTE == 1
 #include "ImageProcessingPolicy/CompositePolicy.h"
 #include "ImageProcessingPolicy/ResizePolicy.h"
 #include "ImageProcessingPolicy/JpegConversionPolicy.h"
 #include "ImageProcessingPolicy/PngConversionPolicy.h"
 #include "ImageProcessingPolicy/Uint8ConversionPolicy.h"
 #include "ImageProcessingPolicy/KLVEmbeddingPolicy.h"
-#endif // PLUGIN_ENABLE_DEBUG_ROUTE == 1
-
+#include "ImageProcessingPolicy/Monochrome1InversionPolicy.h"
 
 ImageRepository* ImageController::imageRepository_ = NULL;
 AnnotationRepository* ImageController::annotationRepository_ = NULL;
@@ -57,14 +55,13 @@ ImageController::ImageController(OrthancPluginRestOutput* response, const std::s
   // These image processing routes can be queued in any order. Some of them
   // also accept parameters. For instance, we can resize to 150px/150px than
   // convert to png using the `/resize:150/png` route.
-#if PLUGIN_ENABLE_DEBUG_ROUTE == 1
   imageProcessingRouteParser_.RegisterRoute<CompositePolicy>("^(.+/.+)$"); // regex: at least a single "/"
   imageProcessingRouteParser_.RegisterRoute<ResizePolicy>("^resize:(\\d+)$"); // resize:<maximal height/width: uint>
   imageProcessingRouteParser_.RegisterRoute<JpegConversionPolicy>("^jpeg:?(\\d{0,3})$"); // regex: jpeg:<quality level: int[0;100]>
   imageProcessingRouteParser_.RegisterRoute<PngConversionPolicy>("^png$");
   imageProcessingRouteParser_.RegisterRoute<Uint8ConversionPolicy>("^8bit$");
   imageProcessingRouteParser_.RegisterRoute<KLVEmbeddingPolicy>("^klv$");
-#endif // PLUGIN_ENABLE_DEBUG_ROUTE
+  imageProcessingRouteParser_.RegisterRoute<Monochrome1InversionPolicy>("^invert-monochrome1$");
 }
 
 int ImageController::_ParseURLPostFix(const std::string& urlPostfix) {
@@ -286,7 +283,6 @@ int ImageController::_ProcessRequest()
   }
 }
 
-#if PLUGIN_ENABLE_DEBUG_ROUTE == 1
 // Parse JpegConversionPolicy compression parameter from its route regex matches
 // may throws lexical_cast on bad route
 template<>
@@ -325,6 +321,7 @@ inline CompositePolicy* ImageProcessingRouteParser::_Instantiate<CompositePolicy
   imageProcessingRouteParser.RegisterRoute<PngConversionPolicy>("^png$");
   imageProcessingRouteParser.RegisterRoute<Uint8ConversionPolicy>("^8bit$");
   imageProcessingRouteParser.RegisterRoute<KLVEmbeddingPolicy>("^klv$");
+  imageProcessingRouteParser.RegisterRoute<Monochrome1InversionPolicy>("^invert-monochrome1$");
 
   CompositePolicy* compositePolicy = new CompositePolicy();
 
@@ -340,4 +337,3 @@ inline CompositePolicy* ImageProcessingRouteParser::_Instantiate<CompositePolicy
 
   return compositePolicy;
 };
-#endif // PLUGIN_ENABLE_DEBUG_ROUTE

@@ -17,7 +17,13 @@ std::auto_ptr<IImageContainer> PngConversionPolicy::Apply(std::auto_ptr<IImageCo
 
   // Except *raw* image
   RawImageContainer* rawImage = dynamic_cast<RawImageContainer*>(input.get());
-  assert(rawImage != NULL);
+  if (rawImage == NULL) {
+    // Throw bad request exception if this policy has been used with 
+    // non-raw-data image. This happen for instance when we use the jpeg policy
+    // two times (<...>/jpeg:80/png). The second one wont have access to
+    // raw pixels since the first policy compresses the pixels.
+    throw Orthanc::OrthancException(Orthanc::ErrorCode_BadRequest);
+  }
 
   Orthanc::ImageAccessor* accessor = rawImage->GetOrthancImageAccessor();
 
@@ -28,9 +34,6 @@ std::auto_ptr<IImageContainer> PngConversionPolicy::Apply(std::auto_ptr<IImageCo
    accessor->GetWidth(), accessor->GetHeight(), accessor->GetPitch(),
    accessor->GetConstBuffer()
   );
-
-  // Except 8bit image (OrthancPluginErrorCode_ParameterOutOfRange means image is not the right format)
-  assert(error != OrthancPluginErrorCode_ParameterOutOfRange);
 
   // Check compression result (may throw on bad_alloc)
   if (error != OrthancPluginErrorCode_Success)
