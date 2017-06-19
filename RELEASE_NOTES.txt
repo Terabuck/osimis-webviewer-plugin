@@ -3,6 +3,9 @@ Pending changes in the mainline
 
 => Minimum Orthanc version: 1.1.0 <=
 
+Fixes:
+* Enhance default windowing algorithm.
+
 Version 0.9.0
 ========================
 

@@ -28,15 +28,15 @@
         // Decompress image.
         var pixels = _decompressImage(compressionFormat, klvData, tags)
 
-        // Calculate Min/Max pixel values. We don't rely on the one
+        // Process Min/Max pixel values. We don't rely on the one
         // given in the klvData, as it is unaccurate when the image has
         // been received in pixeldata quality. The cause is the
         // performance optimisation we do to avoid decompressing
         // precompressed dicom images in the backend.
-        var pixelValuesBoundaries = _calculatePixelValuesBoundaries(pixels, tags);
+        var pixelValuesBoundaries = _processPixelValuesBoundaries(pixels, tags);
 
-        // Calculate windowing default values.
-        var windowing = _calculateWindowing(pixels, tags, pixelValuesBoundaries.min, pixelValuesBoundaries.max);
+        // Process windowing default values.
+        var windowing = _processWindowing(pixels, klvData, tags, pixelValuesBoundaries.min, pixelValuesBoundaries.max);
 
         // Retrieve pixel spacing if available in dicom tags, so we can 
         // map pixel coordinates with physical ones.
@@ -461,7 +461,7 @@
         }    
     }
 
-    function _calculatePixelValuesBoundaries(pixelArray, tags) {
+    function _processPixelValuesBoundaries(pixelArray, tags) {
         var isRgb32 = tags.PhotometricInterpretation !== 'MONOCHROME1' && tags.PhotometricInterpretation !== 'MONOCHROME2';
 
         var maxPossiblePixelValue = Math.pow(2, +tags.BitsStored);
@@ -475,7 +475,7 @@
             maxPixelValue = maxPossiblePixelValue;
         }
         else {
-            // Calculate min/max pixel value for greyscale images (can
+            // Process min/max pixel value for greyscale images (can
             // be more than 8 bits).
             minPixelValue = maxPossiblePixelValue;
             maxPixelValue = 0;
@@ -496,7 +496,7 @@
         }
     }
 
-    function _calculateWindowing(pixelArray, tags, minPixelValue, maxPixelValue) {
+    function _processWindowing(pixelArray, klvData, tags, minPixelValue, maxPixelValue) {
         var isRgb32 = tags.PhotometricInterpretation !== 'MONOCHROME1' && tags.PhotometricInterpretation !== 'MONOCHROME2';
         
         var windowCenter = 0;
@@ -521,27 +521,49 @@
             windowWidth = 256;
         }
         else {
+            // Process the threshold delta. When we process the windowing, we
+            // need to set a threshold to bypass pixels used for overlay to
+            // print information such as a 'G' position label printed in the
+            // image. This can be achieved by bypassing the highest and lowest
+            // pixels, from the min/max algorithm used to determine the default
+            // windowing. In our samples, those overlay can also have value 
+            // `0x010101` instead of `0x000`, that's why we bypass 2 values
+            // insteead of just one.
+            var thresholdDelta = 2;
+
+            // However, consider the case when the image dynamic has been
+            // compressed by the backend to 8 bits and stretched back for
+            // instance to 16 bits. In this case, the lowest and topmost pixels
+            // will have been multiplied by a value range of 255 (instead of
+            // just 1 for the extreme value). We thus need to bypass those 255
+            // values instead of just the topmost.
+            if (klvData.isStretched) {
+                // [0; 2^8] (8bits jpeg) -> stretched to [0;2^tags.BitsStored] (original image).
+                // Q? how much values is done `n[0;255] = [0;2^tags.BitsStored]`.
+                // -> What is n? Here is the solution:
+                thresholdDelta *= Math.pow(2, tags.BitsStored)/Math.pow(2, 8);
+            }
+
             // For grayscale (8 bits or more) images, process default
             // windowing. Ignore lower/higher bound for windowing
             // calculus, since many image include an overlay of that
             // color.
             var minPixelValueForWWWC = maxPixelValue;
             var maxPixelValueForWWWC = minPixelValue;
-            var margin = (maxPixelValue - minPixelValue) / (2 * (+tags.BitsStored));
             for (var i=0; i<pixelArray.length; ++i) {
-                if (pixelArray[i] < minPixelValueForWWWC && pixelArray[i] > minPixelValue + margin) {
+                if (pixelArray[i] < minPixelValueForWWWC && pixelArray[i] > minPixelValue + thresholdDelta) {
                     minPixelValueForWWWC = pixelArray[i];
                 }
-                if (pixelArray[i] > maxPixelValueForWWWC && pixelArray[i] < maxPixelValue - margin) {
+                if (pixelArray[i] > maxPixelValueForWWWC && pixelArray[i] < maxPixelValue - thresholdDelta) {
                     maxPixelValueForWWWC = pixelArray[i];
                 }
             }
             // Make sure min/max for wwwc is realistic.
-            minPixelValueForWWWC = minPixelValueForWWWC + margin > maxPixelValueForWWWC ? minPixelValue : minPixelValueForWWWC;
-            maxPixelValueForWWWC = minPixelValueForWWWC + margin > maxPixelValueForWWWC ? maxPixelValue : maxPixelValueForWWWC;
+            minPixelValueForWWWC = minPixelValueForWWWC + thresholdDelta > maxPixelValueForWWWC ? minPixelValue : minPixelValueForWWWC;
+            maxPixelValueForWWWC = minPixelValueForWWWC + thresholdDelta > maxPixelValueForWWWC ? maxPixelValue : maxPixelValueForWWWC;
 
             windowCenter = minPixelValueForWWWC + (maxPixelValueForWWWC - minPixelValueForWWWC) / 2 || 127.5;
-            windowWidth = (maxPixelValueForWWWC - minPixelValueForWWWC) / 2 || 256;
+            windowWidth = (maxPixelValueForWWWC - minPixelValueForWWWC) || 256;
         }
 
         // Adapt window width/center with the slope & intercept values.
