@@ -3,6 +3,14 @@ Pending changes in the mainline
 
 => Minimum Orthanc version: 1.1.0 <=
 
+Version 0.9.1
+========================
+
+Features:
+* Added a route to retrieve resized/resampled/recompressed images (i.e:
+  osimis-viewer/images/<instance-uid>/<frame-id>/8bit/invert-monochrome1/jpeg:90
+  osimis-viewer/images/<instance-uid>/<frame-id>/resize:256/8bit/png
+
 Fixes:
 * Enhance default windowing algorithm.
 
