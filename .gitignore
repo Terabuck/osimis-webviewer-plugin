@@ -12,6 +12,7 @@
 /backend/ThirdPartyDownloads/
 /backend/CMakeLists.txt.user
 /backend/env/
+/backend-build/
 
 # Generated doc/report
 /frontend/docs/

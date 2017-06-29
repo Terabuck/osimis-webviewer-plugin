@@ -27,6 +27,11 @@
 #include "Config/ConfigController.h"
 #include "Config/WebViewerConfiguration.h"
 #include "DecodedImageAdapter.h"
+#include "ShortTermCache/CacheContext.h"
+#include "ShortTermCache/CacheScheduler.h"
+#include "ShortTermCache/ViewerPrefetchPolicy.h"
+#include "DecodedImageAdapter.h"
+#include "SeriesInformationAdapter.h"
 
 namespace
 {
@@ -114,7 +119,7 @@ AbstractWebViewer::AbstractWebViewer(OrthancPluginContext* context)
 
   // Instantiate repositories @warning member declaration order is important
   _dicomRepository.reset(new DicomRepository);
-  _imageRepository.reset(new ImageRepository(_dicomRepository.get()));
+  _imageRepository.reset(new ImageRepository(_dicomRepository.get(), _cache.get()));
   _seriesRepository.reset(new SeriesRepository(_dicomRepository.get()));
   _annotationRepository.reset(new AnnotationRepository);
 
@@ -124,6 +129,26 @@ AbstractWebViewer::AbstractWebViewer(OrthancPluginContext* context)
   ImageController::Inject(_imageRepository.get());
   ImageController::Inject(_annotationRepository.get());
   SeriesController::Inject(_seriesRepository.get());
+
+
+  _cache.reset(new CacheContext("./Cache2", _context)); //TODO: get this path from configuration
+
+  OrthancPlugins::CacheScheduler& scheduler = _cache->GetScheduler();
+  scheduler.RegisterPolicy(new OrthancPlugins::ViewerPrefetchPolicy(_context));
+  scheduler.Register(CacheBundle_SeriesInformation,
+                     new OrthancPlugins::SeriesInformationAdapter(_context, scheduler), 1);
+  /* Set the quotas */
+  scheduler.SetQuota(CacheBundle_SeriesInformation, 1000, 0);    // Keep info about 1000 series
+
+  int numDecoderThreads = 4; //TODO: get from config
+  scheduler.Register(CacheBundle_DecodedImage,
+                     new ImageControllerCacheFactory(_imageRepository.get()),
+                     numDecoderThreads);
+  int cacheSize = 500; //TODO: get from config
+  scheduler.SetQuota(CacheBundle_DecodedImage, 0, static_cast<uint64_t>(cacheSize) * 1024 * 1024);
+
+  ImageController::Inject(_cache.get());
+
 }
 
 int32_t AbstractWebViewer::start()

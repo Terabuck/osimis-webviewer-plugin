@@ -28,8 +28,10 @@
 #include "ImageProcessingPolicy/Uint8ConversionPolicy.h"
 #include "ImageProcessingPolicy/KLVEmbeddingPolicy.h"
 #include "ImageProcessingPolicy/Monochrome1InversionPolicy.h"
+#include "ShortTermCache/CacheContext.h"
 
 ImageRepository* ImageController::imageRepository_ = NULL;
+CacheContext* ImageController::cacheContext_ = NULL;
 AnnotationRepository* ImageController::annotationRepository_ = NULL;
 
 template<>
@@ -37,12 +39,16 @@ void ImageController::Inject<ImageRepository>(ImageRepository* obj) {
   ImageController::imageRepository_ = obj;
 }
 template<>
+void ImageController::Inject<CacheContext>(CacheContext* obj) {
+  ImageController::cacheContext_ = obj;
+}
+template<>
 void ImageController::Inject<AnnotationRepository>(AnnotationRepository* obj) {
   ImageController::annotationRepository_ = obj;
 }
 
 ImageController::ImageController(OrthancPluginRestOutput* response, const std::string& url, const OrthancPluginHttpRequest* request)
-  : BaseController(response, url, request), imageProcessingRouteParser_(), frameIndex_(0)
+  : BaseController(response, url, request), imageProcessingRouteParser_() //, frameIndex_(0)
 {
   // Register sub routes related to image optimization (doesn't include
   // annotation routes). Have a look at the _ParseURLPostFix method for more
@@ -67,6 +73,7 @@ ImageController::ImageController(OrthancPluginRestOutput* response, const std::s
 int ImageController::_ParseURLPostFix(const std::string& urlPostfix) {
   // Retrieve context so we can use orthanc's logger.
   OrthancPluginContext* context = OrthancContextManager::Get();
+  urlPostfix_ = urlPostfix;
   
   try {
     BENCH(URL_PARSING);
@@ -225,20 +232,37 @@ int ImageController::_ProcessRequest()
       // all routes point to a processing policy, check there is one
       assert(this->processingPolicy_.get() != NULL);
 
-      // retrieve processed image
-      std::auto_ptr<Image> image = imageRepository_->GetImage(this->instanceId_, this->frameIndex_, this->processingPolicy_.get(), !this->disableCache_);
-      
-      if (image.get() != NULL)
+      if (cacheContext_ != NULL)  //if there is a cache enabled
       {
-        BENCH(REQUEST_ANSWERING);
+        std::string content;
+        if (cacheContext_->GetScheduler().Access(content, CacheBundle_DecodedImage, this->urlPostfix_))
+        {
+          BENCH(REQUEST_ANSWERING);
 
-        // Answer rest request
-        return this->_AnswerBuffer(image->GetBinary(), image->GetBinarySize(), "application/octet-stream");
+          return this->_AnswerBuffer(content.c_str(), content.size(), "application/octet-stream");
+        }
+        else
+        {
+          return this->_AnswerError(500);
+        }
       }
-      else
+      else // no cache enabled
       {
-        // Answer Internal Error
-        return this->_AnswerError(500);
+        // retrieve processed image
+        std::auto_ptr<Image> image = imageRepository_->GetImage(this->instanceId_, this->frameIndex_, this->processingPolicy_.get(), !this->disableCache_);
+
+        if (image.get() != NULL)
+        {
+          BENCH(REQUEST_ANSWERING);
+
+          // Answer rest request
+          return this->_AnswerBuffer(image->GetBinary(), image->GetBinarySize(), "application/octet-stream");
+        }
+        else
+        {
+          // Answer Internal Error
+          return this->_AnswerError(500);
+        }
       }
     }
   }
@@ -337,3 +361,66 @@ inline CompositePolicy* ImageProcessingRouteParser::_Instantiate<CompositePolicy
 
   return compositePolicy;
 };
+
+ImageControllerCacheFactory::ImageControllerCacheFactory(ImageRepository* imageRepository) :
+  imageRepository_(imageRepository)
+{
+  imageProcessingRouteParser_.RegisterRoute<LowQualityPolicy>("^low-quality$");
+  imageProcessingRouteParser_.RegisterRoute<MediumQualityPolicy>("^medium-quality$");
+  imageProcessingRouteParser_.RegisterRoute<HighQualityPolicy>("^high-quality$");
+
+}
+
+
+
+bool ImageControllerCacheFactory::Create(std::string& content,
+                                         const std::string& uri)
+{
+  std::string instanceId;
+  uint32_t frameIndex;
+  std::auto_ptr<IImageProcessingPolicy> processingPolicy;
+
+  if (!ImageControllerUrlParser::parseUrlPostfix(uri, instanceId, frameIndex, processingPolicy))
+  {
+    OrthancPluginContext* context = OrthancContextManager::Get();
+    std::string message("(ImageController) unmatched regex for ");
+    message += uri;
+    OrthancPluginLogInfo(context, message.c_str());
+    return false;
+  }
+
+  // retrieve processed image
+  std::auto_ptr<Image> image = imageRepository_->GetImage(instanceId, frameIndex, processingPolicy.get(), false);
+
+  //transform the image to a string that can be stored in cache
+  content = std::string(image->GetBinary(), image->GetBinarySize());
+  return true;
+}
+
+std::auto_ptr<ImageProcessingRouteParser> ImageControllerUrlParser::imageProcessingRouteParser_;
+
+bool ImageControllerUrlParser::parseUrlPostfix(const std::string urlPostfix, std::string& instanceId, uint32_t& frameIndex, std::auto_ptr<IImageProcessingPolicy>& processingPolicy)
+{
+  if (imageProcessingRouteParser_.get() == NULL)
+  {
+    imageProcessingRouteParser_.reset(new ImageProcessingRouteParser());
+    imageProcessingRouteParser_->RegisterRoute<LowQualityPolicy>("^low-quality$");
+    imageProcessingRouteParser_->RegisterRoute<MediumQualityPolicy>("^medium-quality$");
+    imageProcessingRouteParser_->RegisterRoute<HighQualityPolicy>("^high-quality$");
+  }
+
+  boost::regex regexp("^(nocache/|cleancache/)?([^/]+)/(\\d+)(?:/(.+))$");
+  boost::cmatch matches;
+  if (!boost::regex_match(urlPostfix.c_str(), matches, regexp)) {
+    return false;
+  }
+
+  instanceId = matches[2];
+  frameIndex = boost::lexical_cast<uint32_t>(matches[3]);
+
+  if (matches.size() < 4)
+    return false;
+
+  processingPolicy.reset(matches.size() < 4 ? NULL : imageProcessingRouteParser_->InstantiatePolicyFromRoute(matches[4]));
+  return true;
+}
