@@ -407,6 +407,7 @@ bool ImageControllerUrlParser::parseUrlPostfix(const std::string urlPostfix, std
     imageProcessingRouteParser_->RegisterRoute<LowQualityPolicy>("^low-quality$");
     imageProcessingRouteParser_->RegisterRoute<MediumQualityPolicy>("^medium-quality$");
     imageProcessingRouteParser_->RegisterRoute<HighQualityPolicy>("^high-quality$");
+    imageProcessingRouteParser_->RegisterRoute<PixelDataQualityPolicy>("^pixeldata-quality$");
   }
 
   boost::regex regexp("^(nocache/|cleancache/)?([^/]+)/(\\d+)(?:/(.+))$");
