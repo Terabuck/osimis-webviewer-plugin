@@ -47,3 +47,19 @@ std::string Series::ToJson() const {
 
   return result.toStyledString();
 }
+
+std::vector<ImageQuality> Series::GetOrderedImageQualities(ImageQuality::EImageQuality higherThan) const
+{
+  std::vector<ImageQuality> toReturn;
+
+  if (_imageQualities.find(ImageQuality(ImageQuality::LOW)) != _imageQualities.end() && ImageQuality::LOW > higherThan)
+    toReturn.push_back(ImageQuality(ImageQuality::LOW));
+  if (_imageQualities.find(ImageQuality(ImageQuality::MEDIUM)) != _imageQualities.end() && ImageQuality::MEDIUM > higherThan)
+    toReturn.push_back(ImageQuality(ImageQuality::MEDIUM));
+  if (_imageQualities.find(ImageQuality(ImageQuality::LOSSLESS)) != _imageQualities.end() && ImageQuality::LOSSLESS > higherThan)
+    toReturn.push_back(ImageQuality(ImageQuality::LOSSLESS));
+  if (_imageQualities.find(ImageQuality(ImageQuality::PIXELDATA)) != _imageQualities.end() && ImageQuality::PIXELDATA > higherThan)
+    toReturn.push_back(ImageQuality(ImageQuality::PIXELDATA));
+
+  return toReturn;
+}

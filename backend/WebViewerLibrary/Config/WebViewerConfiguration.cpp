@@ -3,8 +3,39 @@
 #include <orthanc/OrthancCPlugin.h>
 #include <json/json.h>
 #include <Core/OrthancException.h>
+#include <boost/thread.hpp>
+#include <algorithm>
 
 #include "ViewerToolbox.h"
+
+
+WebViewerConfiguration::WebViewerConfiguration(OrthancPluginContext* context)
+  : _context(context)
+{
+  // By default, disable storage attachment cache.
+  persistentCachedImageStorageEnabled = false;
+
+  // By default, use GDCM.
+  gdcmEnabled = true;
+  // By default, use GDCM for everything.
+  restrictTransferSyntaxes = false;
+
+  // By default, show the study download button in the frontend.
+  studyDownloadEnabled = true;
+
+  // By default, display DICOM video in the frontend.
+  videoDisplayEnabled = true;
+
+  // By default, disable annotation storage.
+  annotationStorageEnabled = false;
+
+  // By default, enable the short term storage cached
+  shortTermCacheEnabled = true;
+  shortTermCacheDebugLogsEnabled = false;
+  shortTermCachePrefetchOnInstanceStored = false;
+  shortTermCacheDecoderThreadsCound = std::max(boost::thread::hardware_concurrency() / 2, 1u);
+  shortTermCacheSize = 1000;
+}
 
 
 void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
@@ -57,7 +88,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   if (wvConfig.isMember("CacheEnabled") &&
       wvConfig["CacheEnabled"].type() == Json::booleanValue)
   {
-    cachedImageStorageEnabled = wvConfig["CacheEnabled"].asBool();
+    persistentCachedImageStorageEnabled = wvConfig["CacheEnabled"].asBool();
   }
 
   // Enable Study Download
@@ -80,6 +111,13 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   {
     annotationStorageEnabled = wvConfig["AnnotationStorageEnabled"].asBool();
   }
+
+  shortTermCachePrefetchOnInstanceStored = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCachePrefetchOnInstanceStored", shortTermCachePrefetchOnInstanceStored);
+  shortTermCacheEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheEnabled", shortTermCacheEnabled);
+  shortTermCacheDebugLogsEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheDebugLogsEnabled", false);
+  shortTermCachePath = OrthancPlugins::GetStringValue(wvConfig, "CachePath", shortTermCachePath.string());
+  shortTermCacheSize = OrthancPlugins::GetIntegerValue(wvConfig, "CacheSize", shortTermCacheSize);
+  shortTermCacheDecoderThreadsCound = OrthancPlugins::GetIntegerValue(wvConfig, "Threads", shortTermCacheDecoderThreadsCound);
 }
 
 void WebViewerConfiguration::parseFile()
@@ -92,6 +130,9 @@ void WebViewerConfiguration::parseFile()
     {
       throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);    
     }
+
+    shortTermCachePath = OrthancPlugins::GetStringValue(configuration, "StorageDirectory", "."); // By default, the cache of the Web viewer is located inside the "StorageDirectory" of Orthanc
+    shortTermCachePath /= "WebViewerCache";
 
     static const char* CONFIG_WEB_VIEWER = "WebViewer";
     if (configuration.isMember(CONFIG_WEB_VIEWER))

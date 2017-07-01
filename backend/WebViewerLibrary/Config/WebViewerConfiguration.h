@@ -21,6 +21,7 @@
 #include <set>
 #include <orthanc/OrthancCPlugin.h>
 #include <json/value.h>
+#include <boost/filesystem.hpp>
 
 // copiable
 class WebViewerConfiguration
@@ -38,7 +39,13 @@ protected:
   virtual void _parseFile(const Json::Value& wvConfig);
 
 public:
-  bool cachedImageStorageEnabled;
+  bool persistentCachedImageStorageEnabled;
+  bool shortTermCacheEnabled;
+  bool shortTermCacheDebugLogsEnabled;
+  bool shortTermCachePrefetchOnInstanceStored;
+  boost::filesystem::path shortTermCachePath;
+  int shortTermCacheDecoderThreadsCound;
+  int shortTermCacheSize;
 
   bool gdcmEnabled;
   bool restrictTransferSyntaxes;
@@ -49,25 +56,7 @@ public:
   bool videoDisplayEnabled;
   bool annotationStorageEnabled;
 
-  WebViewerConfiguration(OrthancPluginContext* context) : _context(context) {
-    // By default, disable storage attachment cache.
-    cachedImageStorageEnabled = false;
-
-    // By default, use GDCM.
-    gdcmEnabled = true;
-    // By default, use GDCM for everything.
-    restrictTransferSyntaxes = false;
-
-    // By default, show the study download button in the frontend.
-    studyDownloadEnabled = true;
-
-    // By default, display DICOM video in the frontend.
-    videoDisplayEnabled = true;
-
-    // By default, disable annotation storage.
-    annotationStorageEnabled = false;
-  }
-
+  WebViewerConfiguration(OrthancPluginContext* context);
   /**
    * Retrieve a specific set of options for the frontend.
    * This only return the version at the moment, but is inherited in wvp.

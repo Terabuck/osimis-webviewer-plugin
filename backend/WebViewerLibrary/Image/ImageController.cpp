@@ -365,10 +365,6 @@ inline CompositePolicy* ImageProcessingRouteParser::_Instantiate<CompositePolicy
 ImageControllerCacheFactory::ImageControllerCacheFactory(ImageRepository* imageRepository) :
   imageRepository_(imageRepository)
 {
-  imageProcessingRouteParser_.RegisterRoute<LowQualityPolicy>("^low-quality$");
-  imageProcessingRouteParser_.RegisterRoute<MediumQualityPolicy>("^medium-quality$");
-  imageProcessingRouteParser_.RegisterRoute<HighQualityPolicy>("^high-quality$");
-
 }
 
 

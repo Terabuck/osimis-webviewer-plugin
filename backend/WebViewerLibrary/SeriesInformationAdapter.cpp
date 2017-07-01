@@ -60,7 +60,7 @@ namespace OrthancPlugins
       boost::cmatch what;
       if (regex_match(result["Slices"][i].asCString(), what, pattern))
       {
-        result["Slices"][i] = std::string(what[1]) + "_" + std::string(what[2]);
+        result["Slices"][i] = std::string(what[1]) + "/" + std::string(what[2]);
       }
       else
       {

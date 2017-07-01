@@ -13,7 +13,7 @@
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  **/
@@ -24,6 +24,7 @@
 #include "IPrefetchPolicy.h"
 
 #include <orthanc/OrthancCPlugin.h>
+class SeriesRepository;
 
 namespace OrthancPlugins
 {
@@ -31,6 +32,7 @@ namespace OrthancPlugins
   {
   private:
     OrthancPluginContext* context_;
+    SeriesRepository* seriesRepository_;
 
     void ApplySeries(std::list<CacheIndex>& toPrefetch,
                      CacheScheduler& cache,
@@ -41,8 +43,13 @@ namespace OrthancPlugins
                        CacheScheduler& cache,
                        const std::string& path);
 
+    void PrefetchSeries(std::list<CacheIndex>& toPrefetch,
+                        const std::string& seriesContent,
+                        unsigned int startIndex,
+                        unsigned int endIndex);
+
   public:
-    ViewerPrefetchPolicy(OrthancPluginContext* context) : context_(context)
+    ViewerPrefetchPolicy(OrthancPluginContext* context, SeriesRepository* seriesRepository) : context_(context), seriesRepository_(seriesRepository)
     {
     }
 

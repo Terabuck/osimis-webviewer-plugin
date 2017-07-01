@@ -12,11 +12,26 @@
 #include "jsoncpp/json/json.h"
 #include "ViewerToolbox.h"
 
+class SeriesRepository;
+
 enum CacheBundle
 {
   CacheBundle_DecodedImage = 1,
 //  CacheBundle_InstanceInformation = 2,
   CacheBundle_SeriesInformation = 3
+};
+
+class CacheLogger
+{
+  bool debugLogsEnabled_;
+  OrthancPluginContext* pluginContext_;
+public:
+  CacheLogger(OrthancPluginContext* pluginContext, bool debugLogsEnabled)
+    : pluginContext_(pluginContext),
+      debugLogsEnabled_(debugLogsEnabled)
+  {}
+
+  void LogCacheDebugInfo(const std::string& message);
 };
 
 
@@ -43,67 +58,36 @@ private:
   Orthanc::FilesystemStorage  storage_;
   Orthanc::SQLite::Connection  db_;
 
-  std::auto_ptr<OrthancPlugins::CacheManager>  cache_;
+  std::auto_ptr<OrthancPlugins::CacheManager>  cacheManager_;
   std::auto_ptr<OrthancPlugins::CacheScheduler>  scheduler_;
+  std::auto_ptr<CacheLogger> logger_;
+  SeriesRepository* seriesRepository_;
 
   Orthanc::SharedMessageQueue  newInstances_;
   bool stop_;
   boost::thread newInstancesThread_;
   OrthancPlugins::GdcmDecoderCache  decoder_;
+  bool prefetchOnInstanceStored_;
 
-
-  static void NewInstancesThread(CacheContext* cache)
-  {
-    while (!cache->stop_)
-    {
-      std::auto_ptr<Orthanc::IDynamicObject> obj(cache->newInstances_.Dequeue(100));
-      if (obj.get() != NULL)
-      {
-        const std::string& instanceId = dynamic_cast<DynamicString&>(*obj).GetValue();
-
-        // On the reception of a new instance, indalidate the parent series of the instance
-        std::string uri = "/instances/" + std::string(instanceId);
-        Json::Value instance;
-        if (OrthancPlugins::GetJsonFromOrthanc(instance, cache->pluginContext_, uri))
-        {
-          std::string seriesId = instance["ParentSeries"].asString();
-          cache->GetScheduler().Invalidate(OrthancPlugins::CacheBundle_SeriesInformation, seriesId);
-        }
-      }
-    }
-  }
-
+  static void NewInstancesThread(CacheContext* cache);
 
 public:
 
-  CacheContext(const std::string& path, OrthancPluginContext* pluginContext) : storage_(path), stop_(false), pluginContext_(pluginContext)
-  {
-    boost::filesystem::path p(path);
-    db_.Open((p / "cache.db").string());
-
-    cache_.reset(new OrthancPlugins::CacheManager(pluginContext_, db_, storage_));
-    //cache_->SetSanityCheckEnabled(true);  // For debug
-
-    scheduler_.reset(new OrthancPlugins::CacheScheduler(*cache_, 100));  // TODO: get 100 from configuration file
-
-    newInstancesThread_ = boost::thread(NewInstancesThread, this);
-  }
-
-  ~CacheContext()
-  {
-    stop_ = true;
-    if (newInstancesThread_.joinable())
-    {
-      newInstancesThread_.join();
-    }
-
-    scheduler_.reset(NULL);
-    cache_.reset(NULL);
-  }
+  CacheContext(const std::string& path,
+               OrthancPluginContext* pluginContext,
+               bool debugLogsEnabled,
+               bool prefetchOnInstanceStored,
+               SeriesRepository* seriesRepository);
+  ~CacheContext();
 
   OrthancPlugins::CacheScheduler& GetScheduler()
   {
     return *scheduler_;
+  }
+
+  CacheLogger* GetLogger()
+  {
+    return logger_.get();
   }
 
   void SignalNewInstance(const char* instanceId)
@@ -115,5 +99,6 @@ public:
   {
     return decoder_;
   }
+
 };
 

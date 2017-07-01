@@ -56,7 +56,6 @@ class ImageControllerCacheFactory: public OrthancPlugins::ICacheFactory
 {
   ImageRepository* imageRepository_;
   AnnotationRepository* annotationRepository_;
-  ImageProcessingRouteParser imageProcessingRouteParser_;
 
 public:
   ImageControllerCacheFactory(ImageRepository* imageRepository);

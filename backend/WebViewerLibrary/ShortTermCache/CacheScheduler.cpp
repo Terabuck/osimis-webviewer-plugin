@@ -25,6 +25,7 @@
 
 #include "../../Orthanc/Core/OrthancException.h"
 #include <stdio.h>
+#include "ShortTermCache/CacheContext.h"
 
 namespace OrthancPlugins
 {
@@ -97,7 +98,8 @@ namespace OrthancPlugins
   private:
     int             bundleIndex_;
     ICacheFactory&  factory_;
-    CacheManager&   cache_;
+    CacheManager&   cacheManager_;
+    CacheLogger*    cacheLogger_;
     boost::mutex&   cacheMutex_;
     PrefetchQueue&  queue_;
 
@@ -125,7 +127,7 @@ namespace OrthancPlugins
 
             {
               boost::mutex::scoped_lock lock(that->cacheMutex_);
-              if (that->cache_.IsCached(that->bundleIndex_, prefetch->GetValue()))
+              if (that->cacheManager_.IsCached(that->bundleIndex_, prefetch->GetValue()))
               {
                 // This item is already cached
                 continue;
@@ -136,13 +138,12 @@ namespace OrthancPlugins
 
             try
             {
-              OrthancPluginLogInfo(that->cache_.GetPluginContext(),
-                                    (std::string("Cache: prefetching ") + prefetch->GetValue()).c_str());
+              that->cacheLogger_->LogCacheDebugInfo(std::string("prefetching ") + prefetch->GetValue());
 
               if (!that->factory_.Create(content, prefetch->GetValue()))
               {
-                OrthancPluginLogWarning(that->cache_.GetPluginContext(),
-                                      (std::string("Cache: could not prefetch ") + prefetch->GetValue()).c_str());
+                that->cacheLogger_->LogCacheDebugInfo(std::string("could not prefetch ") + prefetch->GetValue());
+
                 // The factory cannot generate this item
                 continue;
               }
@@ -163,19 +164,20 @@ namespace OrthancPlugins
               
               {
                 boost::mutex::scoped_lock lock2(that->cacheMutex_);
-                that->cache_.Store(that->bundleIndex_, prefetch->GetValue(), content);
+                that->cacheManager_.Store(that->bundleIndex_, prefetch->GetValue(), content);
+                that->cacheLogger_->LogCacheDebugInfo(std::string("stored ") + prefetch->GetValue());
               }
             }
           }
         }
         catch (std::bad_alloc&)
         {
-          OrthancPluginLogError(that->cache_.GetPluginContext(), 
+          OrthancPluginLogError(that->cacheManager_.GetPluginContext(),
                                 "Not enough memory for the prefetcher of the Web viewer to work");
         }
         catch (...)
         {
-          OrthancPluginLogError(that->cache_.GetPluginContext(), 
+          OrthancPluginLogError(that->cacheManager_.GetPluginContext(),
                                 "Unhandled native exception inside the prefetcher of the Web viewer");
         }
       }
@@ -185,13 +187,15 @@ namespace OrthancPlugins
   public:
     Prefetcher(int             bundleIndex,
                ICacheFactory&  factory,
-               CacheManager&   cache,
+               CacheManager&   cacheManager,
+               CacheLogger*    cacheLogger,
                boost::mutex&   cacheMutex,
                PrefetchQueue&  queue) :
       bundleIndex_(bundleIndex),
       factory_(factory),
-      cache_(cache),
+      cacheManager_(cacheManager),
       cacheMutex_(cacheMutex),
+      cacheLogger_(cacheLogger),
       queue_(queue)
     {
       done_ = false;
@@ -230,7 +234,8 @@ namespace OrthancPlugins
   public:
     BundleScheduler(int bundleIndex,
                     ICacheFactory* factory,
-                    CacheManager&   cache,
+                    CacheManager&   cacheManager,
+                    CacheLogger* cacheLogger,
                     boost::mutex&   cacheMutex,
                     size_t numThreads,
                     size_t queueSize) :
@@ -241,7 +246,7 @@ namespace OrthancPlugins
 
       for (size_t i = 0; i < numThreads; i++)
       {
-        prefetchers_[i] = new Prefetcher(bundleIndex, *factory_, cache, cacheMutex, queue_);
+        prefetchers_[i] = new Prefetcher(bundleIndex, *factory_, cacheManager, cacheLogger, cacheMutex, queue_);
       }
     }
 
@@ -298,10 +303,12 @@ namespace OrthancPlugins
 
 
   
-  CacheScheduler::CacheScheduler(CacheManager& cache,
+  CacheScheduler::CacheScheduler(CacheManager& cacheManager,
+                                 CacheLogger* cacheLogger,
                                  unsigned int maxPrefetchSize) :
     maxPrefetchSize_(maxPrefetchSize),
-    cache_(cache),
+    cacheManager_(cacheManager),
+    cacheLogger_(cacheLogger),
     policy_(NULL)
   {
   }
@@ -330,7 +337,7 @@ namespace OrthancPlugins
       throw Orthanc::OrthancException(Orthanc::ErrorCode_BadSequenceOfCalls);
     }
 
-    bundles_[bundle] = new BundleScheduler(bundle, factory, cache_, cacheMutex_, numThreads, maxPrefetchSize_);
+    bundles_[bundle] = new BundleScheduler(bundle, factory, cacheManager_, cacheLogger_, cacheMutex_, numThreads, maxPrefetchSize_);
   }
 
 
@@ -339,7 +346,7 @@ namespace OrthancPlugins
                                 uint64_t maxSpace)
   {
     boost::mutex::scoped_lock lock(cacheMutex_);
-    cache_.SetBundleQuota(bundle, maxCount, maxSpace);
+    cacheManager_.SetBundleQuota(bundle, maxCount, maxSpace);
   }
 
 
@@ -348,7 +355,7 @@ namespace OrthancPlugins
   {
     {
       boost::mutex::scoped_lock lock(cacheMutex_);
-      cache_.Invalidate(bundle, item);
+      cacheManager_.Invalidate(bundle, item);
     }
 
     GetBundleScheduler(bundle).Invalidate(item);
@@ -386,15 +393,17 @@ namespace OrthancPlugins
 
     {
       boost::mutex::scoped_lock lock(cacheMutex_);
-      existing = cache_.Access(content, bundle, item);
+      existing = cacheManager_.Access(content, bundle, item);
     }
 
     if (existing)
     {
-      ApplyPrefetchPolicy(bundle, item, content);
+      cacheLogger_->LogCacheDebugInfo(std::string("found ") + item);
+//      ApplyPrefetchPolicy(bundle, item, content);
       return true;
     }
 
+    cacheLogger_->LogCacheDebugInfo(std::string("item not found, creating ") + item);
     if (!GetBundleScheduler(bundle).CallFactory(content, item))
     {
       // This item cannot be generated by the factory
@@ -403,7 +412,7 @@ namespace OrthancPlugins
 
     {
       boost::mutex::scoped_lock lock(cacheMutex_);
-      cache_.Store(bundle, item, content);
+      cacheManager_.Store(bundle, item, content);
     }
 
     ApplyPrefetchPolicy(bundle, item, content);
@@ -436,7 +445,7 @@ namespace OrthancPlugins
                    const std::string& value)
   {
     boost::mutex::scoped_lock lock(cacheMutex_);
-    cache_.SetProperty(property, value);
+    cacheManager_.SetProperty(property, value);
   }
 
   
@@ -444,13 +453,13 @@ namespace OrthancPlugins
                                       CacheProperty property)
   {
     boost::mutex::scoped_lock lock(cacheMutex_);
-    return cache_.LookupProperty(target, property);
+    return cacheManager_.LookupProperty(target, property);
   }
 
 
   void CacheScheduler::Clear()
   {
     boost::mutex::scoped_lock lock(cacheMutex_);
-    return cache_.Clear();
+    return cacheManager_.Clear();
   }
 }

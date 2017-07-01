@@ -29,6 +29,8 @@
 #include <boost/thread.hpp>
 #include <stdio.h>
 
+class CacheLogger;
+
 namespace OrthancPlugins
 {
   class CacheScheduler : public boost::noncopyable
@@ -44,7 +46,8 @@ namespace OrthancPlugins
     boost::mutex                    cacheMutex_;
     boost::mutex                    factoryMutex_;
     boost::recursive_mutex          policyMutex_;
-    CacheManager&                   cache_;
+    CacheManager&                   cacheManager_;
+    CacheLogger*                    cacheLogger_;
     std::auto_ptr<IPrefetchPolicy>  policy_;
     BundleSchedulers                bundles_;
 
@@ -55,7 +58,8 @@ namespace OrthancPlugins
     BundleScheduler&  GetBundleScheduler(unsigned int bundleIndex);
 
   public:
-    CacheScheduler(CacheManager& cache,
+    CacheScheduler(CacheManager& cacheManager,
+                   CacheLogger* cacheLogger,
                    unsigned int maxPrefetchSize);
 
     ~CacheScheduler();
