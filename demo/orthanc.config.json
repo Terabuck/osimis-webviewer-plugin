@@ -3,5 +3,10 @@
 	"RemoteAccessAllowed": true,
 	"StorageDirectory": "/orthancStorage",
 	"IndexDirectory": "/orthancStorage",
-	"Plugins": ["/usr/share/orthanc/plugins"]
+	"Plugins": ["/usr/share/orthanc/plugins"],
+	
+	"WebViewer": {
+        "ShortTermCacheDebugLogsEnabled" : true,
+        "ShortTermCachePrefetchOnInstanceStored" : true
+    }
 }
