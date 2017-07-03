@@ -1,0 +1,107 @@
+<div class="popover wvToolbar__windowingPresetConfigPopover" ng-show="content">
+    <div class="arrow"></div>
+    <div class="popover-content">
+        <form name="popoverForm">
+            <!--
+            Notice
+            -->
+            <p class="wvToolbar__windowingPresetConfigNotice">
+                Click on the button to toggle the windowing tool or apply a preset to the selected viewport.
+            </p>
+
+            <ul class="wvToolbar__windowingPresetList">
+                <!--
+                Windowing presets (as set in dicom tag) of the
+                currently selected viewport.
+                -->
+                <li class="wvToolbar__windowingPresetListItem"
+                    ng-repeat="voi in embeddedWindowings "
+                    ng-click="applyWindowing(voi.windowWidth, voi.windowCenter)"
+                >
+                    Preset <small>#{{$index+1}} (L {{voi.windowCenter | number:0}}, W {{voi.windowWidth | number:0}})</small>
+                </li>
+
+                <!--
+                CT Lung
+                -->
+                <li class="wvToolbar__windowingPresetListItem"
+                    ng-click="applyWindowing(1600, -400)"
+                >
+                    CT Lung <small>(L -400, W 1600)</small>
+                </li>
+
+                <!--
+                CT Abdomen
+                -->
+                <li class="wvToolbar__windowingPresetListItem"
+                    ng-click="applyWindowing(400, 60)"
+                >
+                    CT Abdomen <small>(L 60, W 400)</small>
+                </li>
+
+                <!--
+                CT Bone
+                -->
+                <li class="wvToolbar__windowingPresetListItem"
+                    ng-click="applyWindowing(1500, 300)"
+                >
+                    CT Bone <small>(L 300, W 1500)</small>
+                </li>
+
+                <!--
+                CT Brain
+                -->
+                <li class="wvToolbar__windowingPresetListItem"
+                    ng-click="applyWindowing(80, 40)"
+                >
+                    CT Brain <small>(L 40, W 80)</small>
+                </li>
+
+                <!--
+                CT Chest
+                -->
+                <li class="wvToolbar__windowingPresetListItem"
+                    ng-click="applyWindowing(400, 40)"
+                >
+                    CT Chest <small>(L40, W 400)</small>
+                </li>
+
+                <!--
+                @todo
+                <li class="wvToolbar__windowingPresetListItem"
+                    ng-click="applyWindowing()"
+                >
+                    CT Extremity,
+                </li>
+                -->
+
+                <!--
+                CT Angio
+                -->
+                <li class="wvToolbar__windowingPresetListItem"
+                    ng-click="applyWindowing(600, 300)"
+                >
+                    CT Angio <small>(L 300, W 600)</small>
+                </li>
+
+                <!--
+                @todo
+                <li class="wvToolbar__windowingPresetListItem"
+                    ng-click="applyWindowing()"
+                >
+                    DX Bone
+                </li>
+                -->
+
+                <!-- 
+                @todo
+                <li class="wvToolbar__windowingPresetListItem"
+                    ng-click="applyWindowing()"
+                >
+                    MR Brain
+                </li>
+                -->
+            </ul>
+        </form>
+    </div>
+</div>

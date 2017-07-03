@@ -32,6 +32,7 @@
                 buttons: '=wvToolboxButtons', // input + output
                 tool: '=?wvActiveTool', // output (duplicate with buttons as an output
                 onActionClicked: '&?wvOnActionClicked', 
+                onWindowingPresetSelected: '&?wvOnWindowingPresetSelected',
                 position: '=?wvPosition',
                 // - avoid lifecycle ordering issue when switching tool though, for instance
                 // deactivated tool always occurs before the activation of another one)
@@ -90,7 +91,15 @@
 
     /* @ngInject */
     function toolboxCtrl($element) {
-        var vm = this;
+        var _this = this;
+
+        // Apply windowing preset to the selected pane.
+        this.applyWindowing = function(windowWidth, windowCenter) {
+            _this.onWindowingPresetSelected({
+                $windowWidth: windowWidth,
+                $windowCenter: windowCenter
+            });
+        };
     }
 
 })();

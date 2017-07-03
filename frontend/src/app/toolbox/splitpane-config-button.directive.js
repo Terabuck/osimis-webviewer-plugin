@@ -43,7 +43,7 @@
         .directive('wvSplitpaneConfigButton', wvSplitpaneConfigButton);
 
     /* @ngInject */
-    function wvSplitpaneConfigButton() {
+    function wvSplitpaneConfigButton($timeout) {
         var directive = {
             bindToController: true,
             controller: SplitpaneConfigButtonVM,
@@ -61,24 +61,64 @@
 
         function link(scope, element, attrs) {
             var vm = scope.vm;
+
+            var buttonEl = element.children().first();
+            
+            // Toggle popover on mouse over/out.
+            buttonEl.bind('mouseenter', function (e) {
+                if (!vm.readonly && !vm.insidePopover) {
+                    try {
+                        vm.popover.show();
+                    }
+                    catch (e) {
+                        // Ignore `Cannot read property '0' of undefined` exception when 
+                        // the button is hovered at app startup. This as no negative
+                        // effect.
+                    }
+                    vm.attachEventsToPopoverContent();
+                }
+            });
+
+            buttonEl.bind('mouseout', function (e) {
+                // Timeout to make sure the user can move it's cursor from the button
+                // to the popover without having the popover to hide in between.
+                $timeout(function () {
+                    if (!vm.insidePopover) {
+                        vm.popover.hide();
+                    }
+                }, 100);
+            });
         }
     }
 
     /* @ngInject */
     function SplitpaneConfigButtonVM($element, $scope, $popover) {
         var _this = this;
+        var buttonEl = $element.children().first();
 
         this.splitpaneLayout = typeof this.splitpaneLayout !== 'undefined' ? this.splitpaneLayout : {x: 1, y: 1};
         this.readonly = typeof this.readonly !== 'undefined' ? this.readonly : false;
         this.popoverPlacement = typeof this.popoverPlacement !== 'undefined' ? this.popoverPlacement : 'bottom';
+        this.insidePopover = false;
 
+        // Don't exit popover on when mouse leave the button.
+        this.attachEventsToPopoverContent = function () {
+            $(_this.popover.$element).on('mouseenter', function () {
+                _this.insidePopover = true;
+            });
+            $(_this.popover.$element).on('mouseleave', function () {
+                _this.insidePopover = false;
+                _this.popover.hide();
+            });
+        };
+
+        // Popover configuration
         var popoverScope = $scope.$new();
         this.popover = $popover($element.children().first(), {
             // title: 'Viewport Grid\'s Layout',
             content: 'Viewport Grid\'s Layout',
             placement: _this.popoverPlacement,
             container: 'body',
-            autoClose: 1,
             trigger: 'manual',
             templateUrl: 'app/toolbox/splitpane-config-button.popover.html',
 
@@ -89,12 +129,5 @@
         $scope.$on('$destroy', function() {
             popoverScope.$destroy();
         });
-
-        this.toggleConfig = function() {
-            this.popover.$promise
-                .then(function() {
-                    _this.popover.toggle();
-                });
-        };
     }
 })();

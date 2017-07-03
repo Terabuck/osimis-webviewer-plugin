@@ -11,21 +11,22 @@
 (function(osimis) {
     'use strict';
 
-    function PaneManager(Promise, studyManager) {
+    function PaneManager(Promise, studyManager, seriesManager) {
         // Injections.
         this._Promise = Promise;
         this._studyManager = studyManager;
+        this._seriesManager = seriesManager;
 
         // Default config.
         this.layout = {
-            x: 1,   
+            x: 1,
             y: 1
         };
 
         // Panes.
         // Must keep reference as it's databound in `wvWebviewer` views.
         this.panes = [
-            new osimis.Pane(this._Promise, this._studyManager, 0, 0)
+            new osimis.Pane(this._Promise, this._studyManager, this._seriesManager, 0, 0)
         ];
         this.panes[0].isSelected = true;
 
@@ -109,7 +110,7 @@
                     var pane = removedPanes.pop();
                     // If none exist, create a new one.
                     if (!pane) {
-                        pane = new osimis.Pane(this._Promise, this._studyManager, x, y);
+                        pane = new osimis.Pane(this._Promise, this._studyManager, this._seriesManager, x, y);
                     }
                     // Otherwise, move the previously removed pane into its new
                     // position.
@@ -272,7 +273,9 @@
             }
         }
 
-        // Throw exception if not found.
+        // Throw exception if not found. Should never be thrown, as one pane 
+        // should always be selected, even if it is empty (thus not visible
+        // as selected by the end-user).
         throw new Error('Assert: No selected pane.');
     }
 
@@ -427,7 +430,7 @@
         .factory('wvPaneManager', wvPaneManager);
 
     /* @ngInject */
-    function wvPaneManager($q, wvStudyManager) {
-        return new PaneManager($q, wvStudyManager);
+    function wvPaneManager($q, wvStudyManager, wvSeriesManager) {
+        return new PaneManager($q, wvStudyManager, wvSeriesManager);
     }
 })(osimis || (this.osimis = {}));
