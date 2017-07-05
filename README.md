@@ -134,7 +134,19 @@ This plugin provide a few optional options as well.
     // Store image annotations made by users as Orthanc Attachment 9999 and
     // retrieve them autommatically each time the viewer is opened.
     // Default: false
-    "AnnotationStorageEnabled": false
+    "AnnotationStorageEnabled": false,
+
+    // This option displays a button on each viewport. When the user clicks 
+    // on the button, a new DICOM series is created with the image of the
+    // viewport, including the annotations. You must ensure your server allows
+    // large requests. You must also includes a new dicom tag in the
+    // dictionary (see the Dictionary json attribute below).
+    // Default: false
+    "KeyImageCaptureEnabled": false
+  },
+  "Dictionary" : {
+    // Tag required when setting `KeyImageCaptureEnabled` to true.
+    "7331,1000" : [ "LT", "OsimisNote", 1, 1 ]
   }
 }
 ```

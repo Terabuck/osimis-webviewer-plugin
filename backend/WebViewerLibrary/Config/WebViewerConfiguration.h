@@ -50,6 +50,12 @@ public:
   bool videoDisplayEnabled;
   bool annotationStorageEnabled;
 
+  // If activated, this feature displays a button on each viewport. When the button is
+  // clicked, a new series is created with the image of the viewport, including the
+  // annotations. This image is considered as a DICOM Key Image Note (see 
+  // `http://wiki.ihe.net/index.php/Key_Image_Note`).
+  bool keyImageCaptureEnabled;
+
   WebViewerConfiguration(OrthancPluginContext* context) : _context(context) {
     // By default, disable storage attachment cache.
     cachedImageStorageEnabled = false;
@@ -67,6 +73,9 @@ public:
 
     // By default, disable annotation storage.
     annotationStorageEnabled = false;
+
+    // By default, disable key image capture.
+    keyImageCaptureEnabled = false;
   }
 
   /**
@@ -86,8 +95,9 @@ public:
    *         "db": x.x.x
    *       },
    *       "enableStudyDownload": true,
-   *       "enableVideoDisplay": true
-   *       "enableAnnotationStorage": false
+   *       "enableVideoDisplay": true,
+   *       "enableAnnotationStorage": false,
+   *       "enableKeyImageCapture": false
    *     }
    *     ```
    */

@@ -132,6 +132,10 @@
             <span ng-if="vm.paneManager.hasSeriesBeenViewed($series.id)" class="wvSerieslist__badge--{{vm.study.color}} mr40 mb40">
                 <i class="fa fa-eye" aria-hidden="true"></i>
             </span>
+
+            <span ng-if="!!$series.tags.OsimisNote" class="wvSerieslist__badge--{{vm.study.color}} mr40 mb40">
+                <i class="fa fa-star" aria-hidden="true"></i>
+            </span>
         </div>
         <div 
             ng-if="vm.displayMode === 'list'"

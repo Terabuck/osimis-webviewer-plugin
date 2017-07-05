@@ -80,6 +80,13 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   {
     annotationStorageEnabled = wvConfig["AnnotationStorageEnabled"].asBool();
   }
+
+  // Enable Key Image Capture
+  if (wvConfig.isMember("KeyImageCaptureEnabled") &&
+      wvConfig["KeyImageCaptureEnabled"].type() == Json::booleanValue)
+  {
+    keyImageCaptureEnabled = wvConfig["KeyImageCaptureEnabled"].asBool();
+  }
 }
 
 void WebViewerConfiguration::parseFile()
@@ -153,6 +160,9 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
 
   // Register "annotationStorageEnabled"
   config["enableAnnotationStorage"] = annotationStorageEnabled;
+
+  // Register "keyImageCaptureEnabled"
+  config["enableKeyImageCapture"] = keyImageCaptureEnabled;
 
   return config;
 }

@@ -1,7 +1,7 @@
 /*jshint node:true*/
 
-// This server purpose is for development only, in production, the frontend is served by the C++ Plugin:
-// see `backend/` folder.
+// This server purpose is for development only, in production, the frontend is
+// served by the C++ Plugin: see `backend/` folder.
 
 'use strict';
 
@@ -34,8 +34,9 @@ orthancProxy.on('error', function (err, req, res) {
 });
 
 app.all('/config.js', function(req, res, next) {
-    // Prefix config.js with osimis-viewer/. The proxy has lost the "osimis-viewer" because it's the
-    // relative path `../config.js` -> `/../config.js` -> `/config.js`
+    // Prefix config.js with osimis-viewer/. The proxy has lost the "osimis-
+    // viewer" because it's the relative path `../config.js` -> `/../config.js`
+    // -> `/config.js`
     req.url = '/osimis-viewer/' + req.url;
     next();
 })
@@ -44,7 +45,8 @@ app.all("/:service/*", function(req, res, next) {
         'osimis-viewer',
         'studies',
         'instances',
-        'series'
+        'series',
+        'tools'
     ];
 
     // Keep serving
@@ -55,8 +57,9 @@ app.all("/:service/*", function(req, res, next) {
     else {
         console.log('redirecting ' + req.url + ' to Orthanc server ' + orthancUrl);
 
-        // There's a problem when handling post requests, replace the bodyParser middleware as in https://github.com/nodejitsu/node-http-proxy/issues/180
-        // and handle manually the body parsing
+        // There's a problem when handling post requests, replace the
+        // bodyParser middleware as in https://github.com/nodejitsu/node-http-
+        // proxy/issues/180 and handle manually the body parsing
         req.removeAllListeners('data');
         req.removeAllListeners('end');
 
@@ -80,7 +83,8 @@ switch (environment){
     case 'build':
         console.log('** BUILD **');
         app.use(express.static('./build/'));
-        // Any invalid calls for templateUrls are under app/* and should return 404
+        // Any invalid calls for templateUrls are under app/* and should return
+        // 404
         app.use('/app/*', function(req, res, next) {
             // @todo 404
             // four0four.send404(req, res);
@@ -100,7 +104,8 @@ switch (environment){
         app.use(express.static('./src/'));
         app.use(express.static('./'));
 
-        // Any invalid calls for templateUrls are under app/* and should return 404
+        // Any invalid calls for templateUrls are under app/* and should return
+        // 404.
         app.use('/app/*', function(req, res, next) {
             // @todo 404
             // four0four.send404(req, res);

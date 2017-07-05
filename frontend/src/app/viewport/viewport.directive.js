@@ -244,11 +244,14 @@
                 //    optimized order.
                 //
                 // The following function is performed at each $digest cycle.
+                var _firstWatch = true;
                 scope.$watch(function fromWatch() {
                     var oldImageId = _watchedValue.imageId || null;
                     var newImageId = scope.vm.wvImageId || null;
                     var oldCsViewport = _watchedValue.csViewport || null;
                     var newCsViewport = scope.vm.csViewport || null;
+                    
+                    _firstWatch = _firstWatch && newImageId === oldImageId;
 
                     // Case 1:
                     // Do nothing if image wasn't displayed and is still not
@@ -268,7 +271,7 @@
                     //   SET IMAGE
                     //   UPDATE VIEWPORT
                     //   DRAW IMAGE
-                    else if (newImageId !== oldImageId) {
+                    else if (newImageId !== oldImageId || _firstWatch) {
                         // Load image model & set it.
                         wvImageManager
                             .get(newImageId)
@@ -344,6 +347,7 @@
                     }
 
                     // Update old values
+                    _firstWatch = false;
                     _watchedValue = {
                         imageId: scope.vm.wvImageId,
                         csViewport: scope.vm.csViewport && scope.vm.csViewport.clone()
