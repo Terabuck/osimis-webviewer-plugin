@@ -21,6 +21,10 @@
                             // Select the lowest quality available
                             var quality = Math.min.apply(Math, _.toArray(series.availableQualities));
                             _preload(series, quality, 2);
+
+                            if ()
+                            var maxQuality = Math.max.apply(Math, _.toArray(series.availableQualities));
+                            _preload(series, maxQuality, 2);
                         });
                     });
             });
@@ -35,6 +39,8 @@
                             // Select the lowest quality available
                             var quality = Math.min.apply(Math, _.toArray(series.availableQualities));
                             _abortPreload(series, quality, 2);
+                            var maxQuality = Math.max.apply(Math, _.toArray(series.availableQualities));
+                            _abortPreload(series, maxQuality, 2);
                         });
                     });
             });
