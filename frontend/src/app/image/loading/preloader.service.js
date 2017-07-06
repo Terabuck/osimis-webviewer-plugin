@@ -19,12 +19,12 @@
                         // Preload every series' thumbnails
                         seriesList.forEach(function(series) {
                             // Select the lowest quality available
-                            var quality = Math.min.apply(Math, _.toArray(series.availableQualities));
-                            _preload(series, quality, 2);
+                            var minQuality = Math.min.apply(Math, _.toArray(series.availableQualities));
+                            _preload(series, minQuality, 2);
 
                             // TODO_PREFETCH if ()
-                            // var maxQuality = Math.max.apply(Math, _.toArray(series.availableQualities));
-                            // _preload(series, maxQuality, 2);
+                            var maxQuality = Math.max.apply(Math, _.toArray(series.availableQualities));
+                            _preload(series, maxQuality, 3);
                         });
                     });
             });
@@ -37,10 +37,12 @@
                         // Abort preloading
                         seriesList.forEach(function(series) {
                             // Select the lowest quality available
-                            var quality = Math.min.apply(Math, _.toArray(series.availableQualities));
-                            _abortPreload(series, quality, 2);
-                            // TODO_PREFETCH var maxQuality = Math.max.apply(Math, _.toArray(series.availableQualities));
-                            // _abortPreload(series, maxQuality, 2);
+                            var minQuality = Math.min.apply(Math, _.toArray(series.availableQualities));
+                            _abortPreload(series, minQuality, 2);
+
+                            // TODO_PREFETCH if ()
+                            var maxQuality = Math.max.apply(Math, _.toArray(series.availableQualities));
+                            _abortPreload(series, maxQuality, 3);
                         });
                     });
             });

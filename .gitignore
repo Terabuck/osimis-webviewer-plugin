@@ -6,6 +6,7 @@
 
 # Build directory
 /frontend/build*/
+/frontend/*.zip
 
 /backend/Build*/
 /backend/build*/
