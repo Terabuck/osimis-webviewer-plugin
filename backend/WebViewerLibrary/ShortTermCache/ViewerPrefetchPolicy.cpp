@@ -57,7 +57,7 @@ namespace OrthancPlugins
     }
 
     // preload the first frames of the series in all available qualities
-    std::auto_ptr<Series> series = seriesRepository_->GetSeries(json["ID"].asString());
+    std::auto_ptr<Series> series = seriesRepository_->GetSeries(json["ID"].asString(), false);
 
     BOOST_FOREACH(ImageQuality quality, series->GetOrderedImageQualities()) {
 
@@ -100,7 +100,7 @@ namespace OrthancPlugins
     }
 
     // request the prefetch of all higher qualities in their order of quality
-    std::auto_ptr<Series> series = seriesRepository_->GetSeries(instanceJson["ParentSeries"].asString());
+    std::auto_ptr<Series> series = seriesRepository_->GetSeries(instanceJson["ParentSeries"].asString(), false);
     // if the current quality is low, start to prefetch the higher quality:
     std::string currentQuality = processingPolicy->ToString();
 

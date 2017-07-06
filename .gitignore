@@ -33,3 +33,4 @@ npm-debug.log
 build/
 scripts/__pycache__/
 scripts/env/
+scripts/ci/.env
