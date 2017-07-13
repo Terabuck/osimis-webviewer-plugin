@@ -23,7 +23,7 @@
         data-container="body"
         bs-tooltip
     >
-        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'invert'})" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'invert'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Zoom -->
@@ -36,7 +36,7 @@
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="zoom" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="zoom" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Pan -->
@@ -49,7 +49,7 @@
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="pan" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="pan" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Windowing -->
@@ -61,6 +61,16 @@
         wv-on-windowing-preset-selected="vm.applyWindowing($windowWidth, $windowCenter)"
     ></wv-windowing-preset-button>
 
+    <!-- Magnifying Glass -->
+    <wv-magnifying-glass-config-button
+        ng-if="vm.buttons.hasOwnProperty('magnify')"
+        wv-selected-tool="vm.tool"
+        wv-magnification-level="vm.buttons.magnify.magnificationLevel"
+        wv-magnifying-glass-size="vm.buttons.magnify.magnifyingGlassSize"
+        wv-readonly="vm.readonly"
+        wv-popover-placement="bottom"
+    ></wv-magnifying-glass-config-button>
+
     <!-- Length Measure -->
     <label
         ng-if="vm.buttons.hasOwnProperty('lengthmeasure')"
@@ -71,7 +81,7 @@
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="lengthmeasure" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="lengthmeasure" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Angle Measure -->
@@ -84,7 +94,7 @@
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="anglemeasure" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="anglemeasure" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Pixel Probe -->
@@ -97,7 +107,7 @@
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="pixelprobe" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="pixelprobe" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Elliptical Region Of Interest -->
@@ -110,7 +120,7 @@
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="ellipticalroi" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="ellipticalroi" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Rectangle Region Of Interest -->
@@ -123,7 +133,7 @@
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="rectangleroi" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="rectangleroi" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Rotate Left -->
@@ -135,7 +145,7 @@
         data-container="body"
         bs-tooltip
     >
-        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'rotateleft'})" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'rotateleft'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Rotate Right -->
@@ -147,7 +157,7 @@
         data-container="body"
         bs-tooltip
     >
-        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'rotateright'})" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'rotateright'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Flip Horizontally -->
@@ -159,7 +169,7 @@
         data-container="body"
         bs-tooltip
     >
-        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'hflip'})" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'hflip'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Flip Vertically -->
@@ -171,7 +181,7 @@
         data-container="body"
         bs-tooltip
     >
-        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'vflip'})" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'vflip'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 </div>
 
@@ -206,7 +216,7 @@ I've duplicated the whole directive content and have kept it static, using an
         data-container="body"
         bs-tooltip
     >
-        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'invert'})" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'invert'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Zoom -->
@@ -219,7 +229,7 @@ I've duplicated the whole directive content and have kept it static, using an
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="zoom" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="zoom" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Pan -->
@@ -232,7 +242,7 @@ I've duplicated the whole directive content and have kept it static, using an
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="pan" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="pan" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Windowing -->
@@ -244,6 +254,14 @@ I've duplicated the whole directive content and have kept it static, using an
         wv-on-windowing-preset-selected="vm.applyWindowing($windowWidth, $windowCenter)"
     ></wv-windowing-preset-button>
 
+    <!-- Magnifying Glass -->
+    <wv-magnifying-glass-config-button
+        ng-if="vm.buttons.hasOwnProperty('magnify')"
+        wv-selected-tool="vm.tool"
+        wv-readonly="vm.readonly"
+        wv-popover-placement="left"
+    ></wv-magnifying-glass-config-button>
+
     <!-- Length Measure -->
     <label
         ng-if="vm.buttons.hasOwnProperty('lengthmeasure')"
@@ -254,7 +272,7 @@ I've duplicated the whole directive content and have kept it static, using an
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="lengthmeasure" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="lengthmeasure" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Angle Measure -->
@@ -267,7 +285,7 @@ I've duplicated the whole directive content and have kept it static, using an
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="anglemeasure" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="anglemeasure" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Pixel Probe -->
@@ -280,7 +298,7 @@ I've duplicated the whole directive content and have kept it static, using an
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="pixelprobe" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="pixelprobe" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Elliptical Region Of Interest -->
@@ -293,7 +311,7 @@ I've duplicated the whole directive content and have kept it static, using an
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="ellipticalroi" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="ellipticalroi" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Rectangle Region Of Interest -->
@@ -306,7 +324,7 @@ I've duplicated the whole directive content and have kept it static, using an
         data-container="body"
         bs-tooltip
     >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="rectangleroi" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="rectangleroi" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
     <!-- Rotate Left -->
@@ -318,7 +336,7 @@ I've duplicated the whole directive content and have kept it static, using an
         data-container="body"
         bs-tooltip
     >
-        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'rotateleft'})" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'rotateleft'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Rotate Right -->
@@ -330,7 +348,7 @@ I've duplicated the whole directive content and have kept it static, using an
         data-container="body"
         bs-tooltip
     >
-        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'rotateright'})" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'rotateright'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Flip Horizontally -->
@@ -342,7 +360,7 @@ I've duplicated the whole directive content and have kept it static, using an
         data-container="body"
         bs-tooltip
     >
-        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'hflip'})" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'hflip'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Flip Vertically -->
@@ -354,6 +372,6 @@ I've duplicated the whole directive content and have kept it static, using an
         data-container="body"
         bs-tooltip
     >
-        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'vflip'})" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.readonly" ng-click="vm.onActionClicked({$action: 'vflip'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 </div>
