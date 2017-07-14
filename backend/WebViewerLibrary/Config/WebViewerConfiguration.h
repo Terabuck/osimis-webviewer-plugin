@@ -25,10 +25,9 @@
 // copiable
 class WebViewerConfiguration
 {
-private:
+protected:
   OrthancPluginContext* _context;
 
-protected:
   /**
    * Register the configuration options within this class, using config file content.
    * This method is extended in webviewerpro.
