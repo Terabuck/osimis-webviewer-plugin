@@ -28,9 +28,7 @@ extern "C"
   {
     _webViewer = new WebViewer(context);
 
-    _webViewer->start();
-
-    return 0;
+    return _webViewer->start();
   }
 
 
