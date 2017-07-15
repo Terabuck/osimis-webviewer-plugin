@@ -268,6 +268,13 @@
      * even if the dimension and proportion of the canvas differ.
      */
     CornerstoneViewportWrapper.prototype._displayImageZone = function(imageZone, canvas_width, canvas_height) {
+        // Assert imageZone content (we may otherwise receive Infinity/NaN values).
+        _.forEach(imageZone, function(value, propName) {
+            if (!_.isFinite(value)) {
+                throw new Error('Bad `imageZone` input variable format: '+propName+'='+value);
+            }
+        });
+
         // Consider we are in full resolution (for now).
         var oldRes = this.currentImageResolution;
         this.changeResolution(this.originalImageResolution);
