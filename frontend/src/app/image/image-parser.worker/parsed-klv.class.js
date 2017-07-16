@@ -226,9 +226,12 @@
         // @todo Use latest browser methods to do this faster.
         switch (compressionFormat.toLowerCase()) {
         case 'jpeg':
-            // Decompress lossy jpeg into 16bit
+            // Decompress lossy jpeg
             // @note IE10 & safari tested/compatible
-            pixelArray = _convert8bitsDynamicTo16bits(_decompressJpeg(klvData.binary), {
+            pixelArray = _decompressJpeg(klvData.binary);
+            
+            // Stretch back dynamic if needed
+            pixelArray = _stretchBackDynamic(pixelArray, {
                 isRgb32: isRgb32,
                 isSigned: isSigned,
                 stretching: !klvData.isStretched ? null : {
@@ -416,7 +419,7 @@
     // if !isRgb32 && !IsSigned
     //  -> Uint16
     // 
-    function _convert8bitsDynamicTo16bits(s, config) {
+    function _stretchBackDynamic(s, config) {
         var pixels = null;
         var buf, index, i;
 

@@ -321,6 +321,7 @@
 
             // Apply viewport changes when toolbox action are clicked on.
             vm.onActionClicked = function(action) {
+                // Retrieve selected pane (or leave the function if none).
                 var selectedPane = wvPaneManager.getSelectedPane();
 
                 if (this.readonly) {
@@ -349,6 +350,23 @@
                 default:
                     throw new Error('Unknown toolbar action.');
                 }
+            };
+            // Apply viewport change when a windowing preset has been
+            // selected (from the toolbar).
+            vm.onWindowingPresetSelected = function(windowWidth, windowCenter) {
+                // Retrieve selected pane (or leave the function if none).
+                var selectedPane = wvPaneManager.getSelectedPane();
+
+                if (this.readonly) {
+                    return;
+                }
+                if (!selectedPane.csViewport) {
+                    return;
+                }
+
+                // Apply windowing.
+                selectedPane.csViewport.voi.windowWidth = windowWidth;
+                selectedPane.csViewport.voi.windowCenter = windowCenter;
             };
 
             // Store each panes' states.

@@ -172,12 +172,30 @@
      * @ngdoc method
      * @methodOf osimis.Image
      * 
-     * @name osimis.Image#getBinaryOfHighestQualityAvailable
-     * @return {Promise<object>} cornerstoneImageObject,
-     *         See https://github.com/chafey/cornerstone/wiki/image
+     * @name osimis.Image#getBestQualityInCache
+     * 
+     * @return {osimis.Quality}
+     * The best level of quality already loaded.
      */
     Image.prototype.getBestQualityInCache = function() {
         return this._imageBinaryManager.getBestQualityInCache(this.id);
+    };
+
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Image
+     * 
+     * @name osimis.Image#getBestBinaryInCache
+     *
+     * @return {Promise<object>}
+     * A promise containing a Cornerstone ImageObject of the image's
+     * best-quality binary or an empty promise if no binary has been
+     * loaded yet.
+     * See `https://github.com/chafey/cornerstone/wiki/image` for the
+     * interface.
+     */
+    Image.prototype.getBestBinaryInCache = function() {
+        return this._imageBinaryManager.getBestBinaryInCache(this.id);
     };
 
     /**

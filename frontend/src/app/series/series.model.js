@@ -195,6 +195,27 @@
             return wvImageManager.get(imageId);
         };
 
+        /**
+         * @ngdoc method
+         * @methodOf osimis.Series
+         * 
+         * @name osimis.Series#getImageByIndex
+         * 
+         * @param {number} index
+         * The index of the image within the series.
+         *
+         * @return {Promise<osimis.Image>}
+         * Returns a promise with the image model of the series'
+         * <index>th image.
+         *
+         * @description
+         * Retrieve an image model based on its index within the series.
+         */
+        WvSeries.prototype.getImageByIndex = function(index) {
+            var imageId = this.imageIds[index];
+            return wvImageManager.get(imageId);
+        };
+
         WvSeries.prototype.goToNextImage = function(restartWhenSeriesEnd) {
             restartWhenSeriesEnd = restartWhenSeriesEnd || false;
 

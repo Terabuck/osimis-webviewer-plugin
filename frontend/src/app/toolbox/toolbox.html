@@ -53,17 +53,13 @@
     </label>
     
     <!-- Windowing -->
-    <label
+    <wv-windowing-preset-button
         ng-if="vm.buttons.hasOwnProperty('windowing')"
-        class="wvButton--underline fa fa-sun-o"
-        ng-class="{active: vm.tool === 'windowing'}"
-        data-title="WW/WL"
-        data-placement="bottom"
-        data-container="body"
-        bs-tooltip
-    >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="windowing" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
-    </label>
+        wv-selected-tool="vm.tool"
+        wv-readonly="vm.readonly"
+        wv-popover-placement="bottom"
+        wv-on-windowing-preset-selected="vm.applyWindowing($windowWidth, $windowCenter)"
+    ></wv-windowing-preset-button>
 
     <!-- Length Measure -->
     <label
@@ -240,17 +236,13 @@ I've duplicated the whole directive content and have kept it static, using an
     </label>
     
     <!-- Windowing -->
-    <label
+    <wv-windowing-preset-button
         ng-if="vm.buttons.hasOwnProperty('windowing')"
-        class="wvButton--underline fa fa-sun-o"
-        ng-class="{active: vm.tool === 'windowing'}"
-        data-title="WW/WL"
-        data-placement="left"
-        data-container="body"
-        bs-tooltip
-    >
-        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="windowing" style="position: absolute; width:0; height:0; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
-    </label>
+        wv-selected-tool="vm.tool"
+        wv-readonly="vm.readonly"
+        wv-popover-placement="left"
+        wv-on-windowing-preset-selected="vm.applyWindowing($windowWidth, $windowCenter)"
+    ></wv-windowing-preset-button>
 
     <!-- Length Measure -->
     <label

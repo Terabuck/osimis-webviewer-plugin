@@ -364,8 +364,12 @@
      * @methodOf webviewer.service:wvImageBinaryManager
      *
      * @name osimis.ImageBinaryManager#getCachedHighestQuality
-     * @param {string} id Id of the image (<instanceId>:<frameIndex>)
-     * @return {osimis.quality} Highest qualities in cache *and* already loaded
+     *
+     * @param {string} id
+     * Id of the image (<instanceId>:<frameIndex>)
+     *
+     * @return {osimis.quality}
+     * Highest qualities in cache *and* already loaded
      *
      * @description
      * Return the highest quality of the loaded binaries of an image.
@@ -380,6 +384,35 @@
 
         return highestQuality;
     };
+
+    /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvImageBinaryManager
+     * 
+     * @name osimis.ImageBinaryManager#getBestBinaryInCache
+     *
+     * @param {string} id
+     * Id of the image (<instanceId>:<frameIndex>)
+     *
+     * @return {Promise<object>}
+     * A promise containing a Cornerstone ImageObject of the image's
+     * best-quality binary or an empty promise if no binary has been
+     * loaded yet.
+     * See `https://github.com/chafey/cornerstone/wiki/image` for the
+     * interface.
+     */
+    ImageBinaryManager.prototype.getBestBinaryInCache = function(id) {
+        var Promise = this._Promise;
+        var loadedCacheIndex = this._loadedCacheIndex;
+        var cache = this._cache;
+
+        if (!loadedCacheIndex[id]) {
+            return Promise.when(undefined);
+        }
+
+        var highestQuality = +_.max(_.keys(loadedCacheIndex[id]));
+        return cache.get(id, highestQuality).promise;
+    }
 
     /**
      * @ngdoc method

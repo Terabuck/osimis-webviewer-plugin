@@ -20,10 +20,11 @@
 (function(osimis) {
     'use strict';
 
-    function Pane(Promise, studyManager, x, y, config) {
+    function Pane(Promise, studyManager, seriesManager, x, y, config) {
         // Injections
         this._Promise = Promise;
         this._studyManager = studyManager;
+        this._seriesManager = seriesManager;
 
         // Position of the pane
         this.x = x;
@@ -119,6 +120,38 @@
             return studyManager
                 .getByInstanceId(this.reportId);
         }
+    };
+
+    /**
+     * @ngdoc method
+     * @methodOf osimis.Pane
+     * 
+     * @name osimis.Pane#getImage
+     *
+     * @return {Promise<osimis.Image>}
+     * Return a Promise with `undefined` value if the pane does not contain
+     * an image, or the image contained in the pane.
+     */
+    Pane.prototype.getImage = function() {
+        var Promise = this._Promise;
+        var seriesManager = this._seriesManager;
+        var seriesId = this.seriesId;
+        var imageIndex = this.imageIndex;
+
+        // Return an empty promise if the pane does
+        // not contains an image.
+        if (!seriesId) {
+            return Promise.when(undefined);
+        }
+
+        // Return a promise of the image otherwise.
+        return Promise
+            // Retrieve the series.
+            .when(seriesManager.get(seriesId))
+            // Retrieve the iamage
+            .then(function(series) {
+                return series.getImageByIndex(imageIndex);
+            });
     };
 
     Pane.prototype.isAtPosition = function(x, y) {
