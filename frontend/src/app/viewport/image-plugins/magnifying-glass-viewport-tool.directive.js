@@ -36,19 +36,11 @@
                     magnificationLevel: newConfig.magnificationLevel
                 };
 
-
-                // The `cornerstoneTools.magnify.setConfiguration` method doesn't update the glass size.
-                // We have to manually change the magnifying glass size.
-                if (oldConfig.magnifyingGlassSize !== newConfig.magnifyingGlassSize) {
-                    var magnifyingGlassCanvasEl = $('.magnifyTool')[0];
-                    magnifyingGlassCanvasEl.width = csConfig.magnifySize;
-                    magnifyingGlassCanvasEl.height = csConfig.magnifySize;
-                }
-
                 cornerstoneTools.magnify.setConfiguration(csConfig);
 
-                // The `cornerstoneTools.magnify.setConfiguration` method doesn't update the configuration.
-                // We have to manualy disable the magnify tool to reset it.
+                // The `cornerstoneTools.magnify.setConfiguration` method
+                // doesn't update the configuration. We have to manualy disable
+                // the magnify tool to reset it.
                 if (oldConfig.enabled) {
                     tool.deactivate();
                 }
@@ -60,22 +52,22 @@
                 // else {
                 //     tool.deactivate();
                 // }
+
+                setTimeout(function() {
+                    // Ensure the magnifying glass always stay on top of
+                    // everything.
+                    var magnifyingGlassCanvasEl = $('.magnifyTool')[0];
+                    magnifyingGlassCanvasEl.style.zIndex = "1000000";
+
+                    // The `cornerstoneTools.magnify.setConfiguration` method
+                    // doesn't update the glass size. We have to manually change
+                    // the magnifying glass size.
+                    if (oldConfig.magnifyingGlassSize !== newConfig.magnifyingGlassSize) {
+                        magnifyingGlassCanvasEl.width = csConfig.magnifySize;
+                        magnifyingGlassCanvasEl.height = csConfig.magnifySize;
+                    }
+                });
             }, true);
-
-            // var magLevelRange = $("#magLevelRange");
-            // magLevelRange.on("change", function() {
-            //     var config = cornerstoneTools.magnify.getConfiguration();
-            //     config.magnificationLevel = parseInt(magLevelRange.val(), 10);
-            // });
-
-            // var magSizeRange = $("#magSizeRange")
-            // magSizeRange.on("change", function() {
-            //     var config = cornerstoneTools.magnify.getConfiguration();
-            //     config.magnifySize = parseInt(magSizeRange.val(), 10)
-            //     var magnify = $(".magnifyTool").get(0);
-            //     magnify.width = config.magnifySize;
-            //     magnify.height = config.magnifySize;
-            // });
         }
 
         /* @ngInject */
