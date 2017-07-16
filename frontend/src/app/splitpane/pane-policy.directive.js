@@ -90,6 +90,11 @@
                 };
 
                 vm.pane = wvPaneManager.getPane($x, $y);
+
+                // Add pane index in element so WVP can retrieve it for
+                // liveshare cursor sync.
+                var paneIndex = wvPaneManager.panes.indexOf(vm.pane);
+                element.data('indexInSplitpane', paneIndex);
             });
             scope.$on('$destroy', function() {
                 _unlisten();

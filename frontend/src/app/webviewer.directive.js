@@ -175,6 +175,10 @@
                 zoom: true,
                 pan: false,
                 invert: false,
+                magnify: {
+                    magnificationLevel: 5,
+                    magnifyingGlassSize: 300
+                },
                 lengthmeasure: false,
                 anglemeasure: false,
                 pixelprobe: false,

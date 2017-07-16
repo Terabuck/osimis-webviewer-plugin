@@ -77,11 +77,15 @@
                 if (tool == oldTool) return;
 
                 if (vm.buttons.hasOwnProperty(oldTool)) {
-                    vm.buttons[oldTool] = false;
+                    if (typeof vm.buttons[oldTool] === 'boolean') {
+                        vm.buttons[oldTool] = false;
+                    }
                 }
                 $timeout(function () {
                     if (vm.buttons.hasOwnProperty(tool)) {
-                        vm.buttons[tool] = true;
+                        if (typeof vm.buttons[tool] === 'boolean') {
+                            vm.buttons[tool] = true;
+                        }
                     }
                 });
 
