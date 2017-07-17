@@ -24,7 +24,7 @@
 
                             // TODO_PREFETCH if ()
                             var maxQuality = Math.max.apply(Math, _.toArray(series.availableQualities));
-                            _preload(series, maxQuality, 3);
+                            _preload(series, maxQuality, 2);
                         });
                     });
             });
@@ -42,7 +42,7 @@
 
                             // TODO_PREFETCH if ()
                             var maxQuality = Math.max.apply(Math, _.toArray(series.availableQualities));
-                            _abortPreload(series, maxQuality, 3);
+                            _abortPreload(series, maxQuality, 2);
                         });
                     });
             });

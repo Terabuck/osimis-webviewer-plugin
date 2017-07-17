@@ -9,7 +9,7 @@
 #include "../Orthanc/Plugins/Samples/GdcmDecoder/GdcmDecoderCache.h"
 #include "CacheManager.h"
 #include "CacheScheduler.h"
-#include "jsoncpp/json/json.h"
+#include "json/json.h"
 #include "ViewerToolbox.h"
 
 class SeriesRepository;
