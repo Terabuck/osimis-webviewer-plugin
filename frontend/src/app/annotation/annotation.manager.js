@@ -127,7 +127,7 @@
      * onAnnotationChanged trigger would create a new debounce function,
      * thus in the end never triggering the same debounced function twice.
      */
-    var delay = 1000; // ms
+    var delay = 250; // ms
     AnnotationManager.prototype._storeAnnotationsInBackend = _.debounce(function(imageId, type, data) {
         if (!this._isAnnotationStorageEnabled) {
             throw new Error('Annotation storage is disabled.');
@@ -271,7 +271,7 @@
      * @param {string} studyId
      * The Orthanc Id of the study.
      * 
-     * @param {object} annotationsByStudy
+     * @param {object} annotationsOfStudy
      * All the annotations (as cornerstone annotations) for a single study.
      *
      * @description
@@ -282,22 +282,21 @@
      *   skip this as this method is only used at the study's loading for the
      *   moment.
      */
-    AnnotationManager.prototype.setAllStudyAnnotations = function(studyId, annotationsByStudy) {
+    AnnotationManager.prototype.setAllStudyAnnotations = function(studyId, annotationsOfStudy) {
+        // Wrong param?
         // Update `this._annotations` & Trigger events.
-        for (var studyId in annotationsByStudy) {
-            for (var imageId in annotationsByStudy[studyId]) {
-                // Update annotaitons.
-                this._annotations[imageId] = annotationsByStudy[studyId][imageId];
+        for (var imageId in annotationsOfStudy) {
+            // Update annotaitons.
+            this._annotations[imageId] = annotationsOfStudy[imageId];
 
-                for (var type in this._annotations[imageId]) {
-                    // Recreate the annotation model based on the class.
-                    var data = this._annotations[imageId][type];
-                    var annotation = new osimis.AnnotationValueObject(type, imageId, data);
+            for (var type in this._annotations[imageId]) {
+                // Recreate the annotation model based on the class.
+                var data = this._annotations[imageId][type];
+                var annotation = new osimis.AnnotationValueObject(type, imageId, data);
 
-                    // Trigger `onAnnotationChanged event.
-                    // @warning This won't trigger deletion events.
-                    this.onAnnotationChanged.trigger(annotation);
-                }
+                // Trigger `onAnnotationChanged event.
+                // @warning This won't trigger deletion events.
+                this.onAnnotationChanged.trigger(annotation);
             }
         }
     };
