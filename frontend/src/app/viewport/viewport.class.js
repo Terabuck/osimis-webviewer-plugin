@@ -350,7 +350,8 @@
             }
 
             // Draw
-            _this.draw(_firstLoadingResolution?false:true);
+            // _this.draw(_firstLoadingResolution?false:true);
+            _this.draw(true);
 
             // Do stuffs required only when the first resolution is being loaded,
             // but after the image has been drawn
