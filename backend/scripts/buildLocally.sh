@@ -26,7 +26,7 @@ cd ${buildDir}
 cmake ${backendRoot} -DCMAKE_BUILD_TYPE=Debug -DALLOW_DOWNLOADS=ON -DSTANDALONE_BUILD=ON -DSTATIC_BUILD=ON
 
 # Build C++
-make -j2
+make -j7
 
 # Return to previous dir
 cd ${prevPath}
