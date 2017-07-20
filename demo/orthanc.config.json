@@ -6,6 +6,6 @@
 	"Plugins": ["/usr/share/orthanc/plugins"],
 	
 	"WebViewer": {
-        "ShortTermCacheEnabled" : false
+        "ShortTermCacheEnabled" : false  // we don't want 2 deployments in QA to write to the DB (until https://osimis.myjetbrains.com/youtrack/issue/WVB-306 is fixed)
     }
 }
