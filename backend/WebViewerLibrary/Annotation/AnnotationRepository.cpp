@@ -93,8 +93,13 @@ void AnnotationRepository::setByImageId(const std::string &instanceId, uint32_t 
   // First, retrieve the whole study's annotations.
   Json::Value annotationsByImageIds = this->getByStudyId(studyId);
 
-  // Add the current image's annotation to the json.
+  // Cleanup removed annotations from the json.
   std::string imageId = instanceId + std::string(":") + boost::lexical_cast<std::string>(frameIndex);
+  if (annotationsByImageIds.isMember(imageId)) {
+    annotationsByImageIds[imageId] = Json::Value(Json::objectValue);
+  }
+
+  // Add the current image's annotation to the json.
   for (Json::ValueIterator it = value.begin(); it != value.end(); it++) {
     std::string tool = it.key().asString();
     Json::Value &annotations = *it;
