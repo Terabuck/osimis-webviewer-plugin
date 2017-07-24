@@ -3,7 +3,10 @@
 set -e #to exit script at first command failure
 set -x #to debug the script
 
-cd /osimis-webviewer-plugin/frontend
+# Start from the right place
+previousDir=$(pwd)
+cd "${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"/
+cd "frontend/"
 
 # npm cache clean # make sure install is fine
 npm install --unsafe-perm --python=python2.7
@@ -20,5 +23,4 @@ bower install --allow-root
 gulp build
 
 # npm cache clean
- 
-
+cd "$previousDir"
