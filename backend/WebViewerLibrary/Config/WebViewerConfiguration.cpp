@@ -80,6 +80,14 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   {
     annotationStorageEnabled = wvConfig["AnnotationStorageEnabled"].asBool();
   }
+
+  // Retrieve windowing preset (if set).
+  if (wvConfig.isMember("WindowingPresets") &&
+      wvConfig["WindowingPresets"].type() == Json::arrayValue)
+  {
+    windowingPresets = wvConfig["WindowingPresets"];
+    // @todo validate the content of the input.
+  }
 }
 
 void WebViewerConfiguration::parseFile()
@@ -153,6 +161,9 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
 
   // Register "annotationStorageEnabled"
   config["enableAnnotationStorage"] = annotationStorageEnabled;
+
+  // Register "windowingPresets"
+  config["windowingPresets"] = windowingPresets;
 
   return config;
 }

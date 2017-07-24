@@ -47,6 +47,7 @@
         wv-notice-enabled="vm.enableNotice"
         wv-notice-text="vm.noticeText"
 
+        wv-windowing-presets="vm.windowingPresets"
         wv-video-display-enabled="vm.enableVideoDisplay"
         wv-annotationstorage-enabled="vm.enableAnnotationStorage"
         wv-series-item-selection-enabled="vm.seriesItemSelectionEnabled"
@@ -192,6 +193,7 @@
         });
 
         // Configure settings based on server side options
+        vm.windowingPresets = __webViewerConfig.windowingPresets;
         vm.enableStudyDownload = __webViewerConfig.enableStudyDownload;
         vm.enableVideoDisplay = __webViewerConfig.enableVideoDisplay;
         vm.enableAnnotationStorage = __webViewerConfig.enableAnnotationStorage;
