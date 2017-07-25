@@ -52,7 +52,7 @@
                                                               // @todo use ../../ instead
                                                               
         this.httpRequestHeaders = {};
-        // TODO_PREFETCH this.toto = __webViewerConfig.toto;
+        this.enableHighQualityImagePreloading = __webViewerConfig.enableHighQualityImagePreloading;
     };
 
     /**

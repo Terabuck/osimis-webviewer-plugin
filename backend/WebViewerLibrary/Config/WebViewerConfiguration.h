@@ -55,6 +55,7 @@ public:
   bool studyDownloadEnabled;
   bool videoDisplayEnabled;
   bool annotationStorageEnabled;
+  bool highQualityImagePreloadingEnabled;
 
   WebViewerConfiguration(OrthancPluginContext* context);
   /**

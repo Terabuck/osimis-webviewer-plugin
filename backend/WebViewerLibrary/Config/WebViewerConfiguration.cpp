@@ -26,6 +26,9 @@ WebViewerConfiguration::WebViewerConfiguration(OrthancPluginContext* context)
   // By default, display DICOM video in the frontend.
   videoDisplayEnabled = true;
 
+  // By default, the frontend will download the high quality images before the user needs them.
+  highQualityImagePreloadingEnabled = true;
+
   // By default, disable annotation storage.
   annotationStorageEnabled = false;
 
@@ -114,10 +117,11 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
 
   shortTermCachePrefetchOnInstanceStored = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCachePrefetchOnInstanceStored", shortTermCachePrefetchOnInstanceStored);
   shortTermCacheEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheEnabled", shortTermCacheEnabled);
-  shortTermCacheDebugLogsEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheDebugLogsEnabled", false);
-  shortTermCachePath = OrthancPlugins::GetStringValue(wvConfig, "CachePath", shortTermCachePath.string());
-  shortTermCacheSize = OrthancPlugins::GetIntegerValue(wvConfig, "CacheSize", shortTermCacheSize);
+  shortTermCacheDebugLogsEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheDebugLogsEnabled", shortTermCacheDebugLogsEnabled);
+  shortTermCachePath = OrthancPlugins::GetStringValue(wvConfig, "ShortTermCachePath", shortTermCachePath.string());
+  shortTermCacheSize = OrthancPlugins::GetIntegerValue(wvConfig, "ShortTermCacheSize", shortTermCacheSize);
   shortTermCacheDecoderThreadsCound = OrthancPlugins::GetIntegerValue(wvConfig, "Threads", shortTermCacheDecoderThreadsCound);
+  highQualityImagePreloadingEnabled = OrthancPlugins::GetBoolValue(wvConfig, "HighQualityImagePreloadingEnabled", highQualityImagePreloadingEnabled);
 }
 
 void WebViewerConfiguration::parseFile()
@@ -194,6 +198,8 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
 
   // Register "annotationStorageEnabled"
   config["enableAnnotationStorage"] = annotationStorageEnabled;
+
+  config["enableHighQualityImagePreloading"] = highQualityImagePreloadingEnabled;
 
   return config;
 }

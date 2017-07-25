@@ -9,7 +9,7 @@
 
     angular
         .module('webviewer')
-        .run(function($rootScope, wvSeriesManager, wvImageManager, wvImageBinaryManager) {
+        .run(function($rootScope, wvSeriesManager, wvImageManager, wvImageBinaryManager, wvConfig) {
 
             // Preload thumbnail when user has selected a study (on left menu)
             $rootScope.$on('UserSelectedStudyId', function(evt, studyId) {
@@ -21,11 +21,15 @@
                             // Select the lowest quality available
                             var minQuality = Math.min.apply(Math, _.toArray(series.availableQualities));
                             _preload(series, minQuality, 2);
-
-                            // TODO_PREFETCH if ()
-                            var maxQuality = Math.max.apply(Math, _.toArray(series.availableQualities));
-                            _preload(series, maxQuality, 2);
                         });
+                        // Prefetch high quality images
+                        if (wvConfig.enableHighQualityImagePreloading)
+                        {
+                            seriesList.forEach(function(series) {
+                                var maxQuality = Math.max.apply(Math, _.toArray(series.availableQualities));
+                                _preload(series, maxQuality, 2);
+                            });
+                        }
                     });
             });
 
@@ -39,11 +43,16 @@
                             // Select the lowest quality available
                             var minQuality = Math.min.apply(Math, _.toArray(series.availableQualities));
                             _abortPreload(series, minQuality, 2);
-
-                            // TODO_PREFETCH if ()
-                            var maxQuality = Math.max.apply(Math, _.toArray(series.availableQualities));
-                            _abortPreload(series, maxQuality, 2);
                         });
+
+                        // Prefetch high quality images
+                        if (wvConfig.enableHighQualityImagePreloading)
+                        {
+                            seriesList.forEach(function(series) {
+                                var maxQuality = Math.max.apply(Math, _.toArray(series.availableQualities));
+                                _abortPreload(series, maxQuality, 2);
+                            });
+                        }
                     });
             });
 
