@@ -11,6 +11,9 @@
 # See `scripts/osx/InstallOsXDependencies.sh`. On linux, you must install a
 # simular setup.
 # 
+# @pre
+# See `scripts/unix/installAdditionalDevTools.sh`.
+# 
 # @param {boolean} [$1=true]
 # Reinstall frontend dependencies.
 # 
