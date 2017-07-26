@@ -27,7 +27,7 @@
                         {
                             seriesList.forEach(function(series) {
                                 var maxQuality = Math.max.apply(Math, _.toArray(series.availableQualities));
-                                _preload(series, maxQuality, 2);
+                                _preload(series, maxQuality, 3);
                             });
                         }
                     });
@@ -50,7 +50,7 @@
                         {
                             seriesList.forEach(function(series) {
                                 var maxQuality = Math.max.apply(Math, _.toArray(series.availableQualities));
-                                _abortPreload(series, maxQuality, 2);
+                                _abortPreload(series, maxQuality, 3);
                             });
                         }
                     });
