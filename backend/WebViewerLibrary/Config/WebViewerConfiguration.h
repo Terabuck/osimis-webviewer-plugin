@@ -58,6 +58,7 @@ public:
   bool videoDisplayEnabled;
   bool annotationStorageEnabled;
   bool highQualityImagePreloadingEnabled;
+  Json::Value windowingPresets;
 
   WebViewerConfiguration(OrthancPluginContext* context);
   /**
