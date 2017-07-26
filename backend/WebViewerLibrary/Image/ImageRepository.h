@@ -8,6 +8,8 @@
 #include "../Instance/DicomRepository.h"
 #include "Image.h"
 
+class CacheContext;
+
 /** ImageRepository [@Repository]
  *
  * Retrieve an Image from an instance uid and a frame index.
@@ -19,7 +21,7 @@
  */
 class ImageRepository : public boost::noncopyable {
 public:
-  ImageRepository(DicomRepository* dicomRepository);
+  ImageRepository(DicomRepository* dicomRepository, CacheContext* cache);
 
   // gives memory ownership
   std::auto_ptr<Image> GetImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy, bool enableCache) const;
@@ -32,6 +34,7 @@ private:
    // _imageLoadingPolicy;
 
   DicomRepository* _dicomRepository;
+  CacheContext* _shortTermCacheContext;
   bool _cachedImageStorageEnabled;
   mutable boost::mutex mutex_;
 

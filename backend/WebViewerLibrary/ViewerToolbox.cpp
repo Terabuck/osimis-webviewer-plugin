@@ -414,6 +414,21 @@ namespace OrthancPlugins
     }
   }
 
+  bool GetBoolValue(const Json::Value& configuration,
+                    const std::string& key,
+                    bool defaultValue)
+  {
+    if (configuration.type() != Json::objectValue ||
+        !configuration.isMember(key) ||
+        configuration[key].type() != Json::booleanValue)
+    {
+      return defaultValue;
+    }
+    else
+    {
+      return configuration[key].asBool();
+    }
+  }
 
   OrthancPluginPixelFormat Convert(Orthanc::PixelFormat format)
   {

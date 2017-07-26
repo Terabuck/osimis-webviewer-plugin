@@ -23,6 +23,7 @@ include(${ORTHANC_DIR}/Resources/CMake/GoogleTestConfiguration.cmake)
 # Set orthanc config
 add_definitions(
   -DORTHANC_SQLITE_STANDALONE=1
+  -DORTHANC_SANDBOXED=0
   )
 
 add_definitions(
@@ -71,6 +72,7 @@ add_library(WebViewerDependencies
   ${ORTHANC_DIR}/Core/SQLite/StatementReference.cpp
   ${ORTHANC_DIR}/Core/SQLite/Transaction.cpp
   ${ORTHANC_DIR}/Core/Toolbox.cpp
+  ${ORTHANC_DIR}/Core/SystemToolbox.cpp
   ${ORTHANC_DIR}/Core/Uuid.cpp
   ${ORTHANC_DIR}/Core/DicomFormat/DicomMap.cpp
   ${ORTHANC_DIR}/Core/DicomFormat/DicomTag.cpp

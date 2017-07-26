@@ -17,6 +17,7 @@
 #include "ImageContainer/CompressedImageContainer.h" // For orthanc pixeldata retrieval
 #include "ImageProcessingPolicy/PixelDataQualityPolicy.h" // For orthanc pixeldata retrieval
 #include "Utilities/ScopedBuffers.h"
+#include "ShortTermCache/CacheContext.h"
 
 namespace
 {
@@ -24,8 +25,8 @@ void _loadDicomTags(Json::Value& jsonOutput, const std::string& instanceId);
 std::string _getAttachmentNumber(int frameIndex, const IImageProcessingPolicy* policy);
 }
 
-ImageRepository::ImageRepository(DicomRepository* dicomRepository)
-  : _dicomRepository(dicomRepository), _cachedImageStorageEnabled(true)
+ImageRepository::ImageRepository(DicomRepository* dicomRepository, CacheContext* cache)
+  : _dicomRepository(dicomRepository), _cachedImageStorageEnabled(true), _shortTermCacheContext(cache)
 {
 }
 

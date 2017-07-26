@@ -73,6 +73,9 @@ namespace OrthancPlugins
                       const std::string& key,
                       int defaultValue);
 
+  bool GetBoolValue(const Json::Value& configuration,
+                    const std::string& key,
+                    bool defaultValue);
 
 
   OrthancPluginPixelFormat Convert(Orthanc::PixelFormat format);

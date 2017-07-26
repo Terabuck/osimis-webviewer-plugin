@@ -18,7 +18,7 @@ public:
   SeriesRepository(DicomRepository* dicomRepository);
 
   // @throws Orthanc::OrthancException(OrthancPluginErrorCode_InexistentItem)
-  std::auto_ptr<Series> GetSeries(const std::string& seriesId);
+  std::auto_ptr<Series> GetSeries(const std::string& seriesId, bool getInstanceTags = true);
 
 private:
   DicomRepository* _dicomRepository;

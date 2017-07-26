@@ -134,7 +134,32 @@ This plugin provide a few optional options as well.
     // Store image annotations made by users as Orthanc Attachment 9999 and
     // retrieve them autommatically each time the viewer is opened.
     // Default: false
-    "AnnotationStorageEnabled": false
+    "AnnotationStorageEnabled": false,
+
+    // Store low/high quality images in a short term cache
+    "ShortTermCacheEnabled": true,
+
+    // Path where the short term cache is stored
+    "ShortTermCachePath": "/OrthancStorage/WebViewerCache",
+
+    // Maximum size of the short term cache (in MB)
+    "ShortTermCacheSize": 1000,
+
+    // Start pre-computing the low/high quality images as soon as they are 
+    // received in Orthanc.
+    "ShortTermCachePrefetchOnInstanceStored": false,
+
+    // Number of threads used by the short term cache to pre-compute the
+    // low/high quality images.
+    "ShortTermCacheThreads": 4,
+
+    // Display cache debug logs (mainly for developers)
+    "ShortTermCacheDebugLogsEnabled": false,
+
+    // Preload high quality images on the frontend before the user actually
+    // needs them
+    "HighQualityImagePreloadingEnabled": true
+
   }
 }
 ```
