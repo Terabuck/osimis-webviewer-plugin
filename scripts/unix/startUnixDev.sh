@@ -12,27 +12,35 @@
 # simular setup.
 # 
 # @param {boolean} [$1=true]
+# Reinstall frontend dependencies.
+# 
+# @param {boolean} [$1=true]
 # Rebuild backend.
 
 set -x
 set -e
 
-rebuildBackend=${1:-true}
+reinstallFrontendDep=${1:-true}
+rebuildBackend=${2:-true}
 
 # Start from the repository root
 previousDir=$(pwd)
 rootDir="${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"
 cd ${rootDir}/
 
-if [ "$rebuildBackend" = true ]; then
-    # Build Frontend & install local dependencies (req. by C++ plugin)
+if [ "$reinstallFrontendDep" = true ]; then
+    # install frontend local dependencies
     cd frontend/
     npm install
     git checkout node_modules/gulp-injectInlineWorker/index.js
     bower install
+    cd ../
+fi
+if [ "$rebuildBackend" = true ]; then
+    # Build Frontend (req. by C++ plugin)
+    cd frontend/
     gulp build
     cd ../
-
     # Build plugin
     ./backend/scripts/buildLocally.sh
 fi
