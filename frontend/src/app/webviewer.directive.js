@@ -193,7 +193,8 @@
                 vflip: false,
                 hflip: false,
                 rotateleft: false,
-                rotateright: false
+                rotateright: false,
+                arrowAnnotate: false
             };
             vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];
             vm.selectedStudyIds = typeof vm.selectedStudyIds !== 'undefined' ? vm.selectedStudyIds : [];

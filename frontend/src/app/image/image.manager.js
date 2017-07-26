@@ -186,6 +186,7 @@
                     'wv-pan-viewport-tool="true"',
                     'wv-pixel-probe-viewport-tool="true"',
                     'wv-rectangle-roi-viewport-tool="true"',
+                    'wv-arrow-annotate-viewport-tool="true"',
     //                    'wv-invert-contrast-viewport-tool="???"',
                     'wv-orientation-marker-viewport-tool',
                 '>',
