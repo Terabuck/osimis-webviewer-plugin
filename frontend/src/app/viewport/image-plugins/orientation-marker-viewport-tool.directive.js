@@ -1,6 +1,12 @@
 (function() {
     'use strict';
-
+    /**
+     * @ngdoc directive
+     * @name webviewer.directive:wvOrientationMarkerViewportTool
+     *
+     * @restrict A
+     * @requires wvViewport
+     */
     angular
         .module('webviewer')
         .directive('wvOrientationMarkerViewportTool', wvOrientationMarkerViewportTool)
@@ -99,9 +105,9 @@
         
         /**
          * @ngdoc method
-         * @methodOf osimis.OrientationMarkerViewportTool
+         * @methodOf webviewer.directive:wvOrientationMarkerViewportTool
          *
-         * @name osimis.OrientationMarkerViewportTool#register
+         * @name webviewer.directive:OrientationMarkerViewportTool#register
          * 
          * @param {osimis.Viewport} viewport
          * The registered viewport class.

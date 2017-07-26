@@ -12,6 +12,11 @@
  * 
  * * `top`
  * * `right`
+ *
+ * @param {Array<Object {{string} name, {number} windowWidth, {number} windowCenter}>} wvWindowingPresets
+ * Sets the list of windowing presets. This parameter will most likely be set
+ * via the backend json configuration file or resolve into a default list (set
+ * from the backend).
  */
 (function () {
     'use strict';
@@ -32,13 +37,14 @@
                 buttons: '=wvToolboxButtons', // input + output
                 tool: '=?wvActiveTool', // output (duplicate with buttons as an output
                 onActionClicked: '&?wvOnActionClicked', 
+                windowingPresets: '=wvWindowingPresets',
                 onWindowingPresetSelected: '&?wvOnWindowingPresetSelected',
                 position: '=?wvPosition',
                 // - avoid lifecycle ordering issue when switching tool though, for instance
                 // deactivated tool always occurs before the activation of another one)
                 readonly: '=?wvReadonly' // default: false
             },
-            templateUrl: 'app/toolbox/toolbox.html'
+            templateUrl: 'app/toolbox/toolbox.directive.html'
         };
         return directive;
 

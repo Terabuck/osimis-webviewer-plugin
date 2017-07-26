@@ -26,11 +26,40 @@ WebViewerConfiguration::WebViewerConfiguration(OrthancPluginContext* context)
   // By default, display DICOM video in the frontend.
   videoDisplayEnabled = true;
 
-  // By default, the frontend will download the high quality images before the user needs them.
+  // By default, the frontend will download the high quality images before the
+  // user needs them.
   highQualityImagePreloadingEnabled = true;
 
   // By default, disable annotation storage.
   annotationStorageEnabled = false;
+
+  // By default, set these windowing presets.
+  windowingPresets = Json::Value(Json::arrayValue);
+  windowingPresets.append(Json::Value(Json::arrayValue));
+  windowingPresets[0] = Json::Value(Json::objectValue);
+  windowingPresets[0]["name"] = "Ct Lung";
+  windowingPresets[0]["windowWidth"] = -400;
+  windowingPresets[0]["windowCenter"] = 1600;
+  windowingPresets[1] = Json::Value(Json::objectValue);
+  windowingPresets[1]["name"] = "Ct Abdomen";
+  windowingPresets[1]["windowWidth"] = 300;
+  windowingPresets[1]["windowCenter"] = 1500;
+  windowingPresets[2] = Json::Value(Json::objectValue);
+  windowingPresets[2]["name"] = "Ct Bone";
+  windowingPresets[2]["windowWidth"] = 40;
+  windowingPresets[2]["windowCenter"] = 80;
+  windowingPresets[3] = Json::Value(Json::objectValue);
+  windowingPresets[3]["name"] = "Ct Brain";
+  windowingPresets[3]["windowWidth"] = 40;
+  windowingPresets[3]["windowCenter"] = 400;
+  windowingPresets[4] = Json::Value(Json::objectValue);
+  windowingPresets[4]["name"] = "Ct Chest";
+  windowingPresets[4]["windowWidth"] = -400;
+  windowingPresets[4]["windowCenter"] = 1600;
+  windowingPresets[5] = Json::Value(Json::objectValue);
+  windowingPresets[5]["name"] = "Ct Angio";
+  windowingPresets[5]["windowWidth"] = 300;
+  windowingPresets[5]["windowCenter"] = 600;
 
   // By default, enable the short term storage cached
   shortTermCacheEnabled = true;
@@ -113,6 +142,14 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
       wvConfig["AnnotationStorageEnabled"].type() == Json::booleanValue)
   {
     annotationStorageEnabled = wvConfig["AnnotationStorageEnabled"].asBool();
+  }
+
+  // Retrieve windowing preset (if set).
+  if (wvConfig.isMember("WindowingPresets") &&
+      wvConfig["WindowingPresets"].type() == Json::arrayValue)
+  {
+    windowingPresets = wvConfig["WindowingPresets"];
+    // @todo validate the content of the input.
   }
 
   shortTermCachePrefetchOnInstanceStored = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCachePrefetchOnInstanceStored", shortTermCachePrefetchOnInstanceStored);
@@ -198,6 +235,9 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
 
   // Register "annotationStorageEnabled"
   config["enableAnnotationStorage"] = annotationStorageEnabled;
+
+  // Register "windowingPresets"
+  config["windowingPresets"] = windowingPresets;
 
   config["enableHighQualityImagePreloading"] = highQualityImagePreloadingEnabled;
 
