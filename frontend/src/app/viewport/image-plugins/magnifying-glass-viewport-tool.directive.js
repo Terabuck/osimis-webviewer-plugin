@@ -46,14 +46,9 @@
                 }
 
                 // Activate back the magnifying.
-                var magnifyingGlassCanvasEl = $('.magnifyTool')[0];
                 if (newConfig.enabled) {
                     tool.activate();
                     (function() {
-                        // Ensure the magnifying glass always stay on top of
-                        // everything.
-                        magnifyingGlassCanvasEl.style.zIndex = "1000000";
-
                         // The `cornerstoneTools.magnify.setConfiguration` method
                         // doesn't update the glass size. We have to manually change
                         // the magnifying glass size.
@@ -63,8 +58,12 @@
                         }
                     });
                 }
-                else {
-                }
+
+                // Ensure the magnifying glass always stay on top of
+                // everything.
+                var magnifyingGlassCanvasJqEl = $('.magnifyTool');
+                var magnifyingGlassCanvasEl = magnifyingGlassCanvasJqEl[0];
+                magnifyingGlassCanvasJqEl.css('z-index', 1000000);
             }, true);
         }
 
