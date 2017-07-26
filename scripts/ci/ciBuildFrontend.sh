@@ -16,7 +16,7 @@ cd $SRC_ROOT/frontend/
 rm -f *.zip
 rm -rf build/
 
-docker build --tag=$JS_BUILDER_IMAGE --file=DockerfileFrontEndBuilder $SRC_ROOT/frontend/
+docker build --no-cache --tag=$JS_BUILDER_IMAGE --file=DockerfileFrontEndBuilder $SRC_ROOT/frontend/
 
 # we first need to create the container before we can copy files to it
 JS_BUILDER_CONTAINER_ID=$(docker create --name $JS_BUILDER_CONTAINER $JS_BUILDER_IMAGE)

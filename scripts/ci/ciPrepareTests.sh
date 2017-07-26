@@ -20,4 +20,4 @@ echo "Prepare karma unit test environment.."
 echo "Create network ${TEST_NETWORK}"
 subnet=10.$(($RANDOM % 256)).$(($RANDOM % 256)).$(($RANDOM % (256 / 8) * 8))/29 # (8 for /29 mask)
 docker network create ${TEST_NETWORK} --subnet=${subnet} || true # manual network create, see https://github.com/docker/compose/issues/3068 (also, limit to 4 ips / class A)
-docker-compose -f $TEST_COMPOSE_FILE -p $TEST_COMPOSE_PROJECT create --build # do not use --force-recreate (invalidate images cache - not stated in doc)
+docker-compose -f $TEST_COMPOSE_FILE -p $TEST_COMPOSE_PROJECT create --build --no-cache --force-recreate # do not use --force-recreate (invalidate images cache - not stated in doc)
