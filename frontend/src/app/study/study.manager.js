@@ -14,7 +14,7 @@
         .factory('wvStudyManager', wvStudyManager);
 
     /* @ngInject */
-    function wvStudyManager($q, $rootScope, wvConfig) {
+    function wvStudyManager($q, $rootScope, wvConfig, wvSeriesManager) {
         var service = {
             /**
              * @ngdoc method
@@ -169,14 +169,22 @@
                             data.PatientMainDicomTags
                         );
 
-                        var newStudy = new osimis.Study(
-                            $q,
-                            _this, 
-                            id,
-                            tags
-                        );
+                        // load series via the wvSeriesManager to get the right postfix in the seriesId
+                        // in order to get consistent with the multiFrame instances
+                        // (for example: used to get the eye symbol for the viewedSeriesId array in the paneManager)
+                        return wvSeriesManager.listFromOrthancStudyId(id).then(function(series){
+                            var newStudy = new osimis.Study(
+                                $q,
+                                _this, 
+                                id,
+                                tags,
+                                series.map(function(series){
+                                    return series.id;
+                                })
+                            );
 
-                        return newStudy;
+                            return newStudy;
+                            })
                     });
             }
 

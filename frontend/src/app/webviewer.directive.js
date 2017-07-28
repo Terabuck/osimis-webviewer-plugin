@@ -508,6 +508,17 @@
                             });
 
                     });
+
+
+                // if first pane is empty, set the first series in the first study.
+                if(newValues && newValues[0]){
+                    wvStudyManager.get(newValues[0]).then(function(firstStudy){
+                        var firstPane = wvPaneManager.getPane(0, 0);
+                        if(firstStudy && firstPane.isEmpty()){
+                            wvPaneManager.setPane(0, 0, {seriesId: firstStudy.series[0]})
+                        };
+                    });
+                }
             }, true);
 
             // Propagate series preloading events

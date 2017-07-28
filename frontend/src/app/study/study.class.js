@@ -15,10 +15,13 @@
         return date.replace(/^([0-9]{4})([0-9]{2})([0-9]{2})$/, '$1/$2/$3');
     }
 
-    function Study(Promise, studyManager, id, tags) {
+    function Study(Promise, studyManager, id, tags, series) {
         // Injections.
         this._Promise = Promise;
         this._studyManager = studyManager;
+        
+        // constructor
+        this.series = series;
 
         // Default values.
         this.id = id;
