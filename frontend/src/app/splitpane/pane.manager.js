@@ -221,6 +221,18 @@
         }
     };
 
+    PaneManager.prototype.getAllPanes = function(){
+        return this.panes;
+    }
+
+    PaneManager.prototype.isViewportItemDisplayed = function(itemId){
+        var isDisplayed = false;
+        this.panes.forEach(function(pane){
+            isDisplayed |= pane.seriesId === itemId || pane.videoId === itemId || pane.reportId === itemId;
+        })
+        return isDisplayed
+    }
+
     /**
      * @ngdoc method
      * @methodOf osimis.PaneManager
@@ -277,6 +289,18 @@
         // should always be selected, even if it is empty (thus not visible
         // as selected by the end-user).
         throw new Error('Assert: No selected pane.');
+    }
+
+    PaneManager.prototype.getHoveredPane = function() {
+        // Return the selected pane.
+        for (var i=0; i<this.panes.length; ++i) {
+            var pane = this.panes[i];
+            if (pane.isHovered) {
+                return pane;
+            }
+        }
+
+        return undefined;
     }
 
     /**

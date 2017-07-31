@@ -58,6 +58,7 @@
             this.reportId = undefined;
             this.videoId = undefined;
             this.isSelected = false;
+            this.isHovered = false;
         }
         // Custom values.
         else {
@@ -67,6 +68,7 @@
             this.reportId = config.reportId || undefined;
             this.videoId = config.videoId || undefined;
             this.isSelected = config.isSelected || false;
+            this.isHovered = config.isHovered || false;
         }
     }
 
