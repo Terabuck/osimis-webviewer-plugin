@@ -137,12 +137,12 @@
         <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="rectangleroi" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
-    <!-- Arrow Annotate -->
+    <!-- Arrow/Text Annotate -->
     <label
         ng-if="vm.buttons.hasOwnProperty('arrowAnnotate')"
         class="wvButton--underline fa fa-arrow-right"
         ng-class="{active: vm.tool === 'arrowAnnotate'}"
-        data-title="Annotate the Image"
+        data-title="Annotate the image with text"
         data-placement="bottom"
         data-container="body"
         bs-tooltip
@@ -273,6 +273,8 @@ I've duplicated the whole directive content and have kept it static, using an
     <wv-magnifying-glass-config-button
         ng-if="vm.buttons.hasOwnProperty('magnify')"
         wv-selected-tool="vm.tool"
+        wv-magnification-level="vm.buttons.magnify.magnificationLevel"
+        wv-magnifying-glass-size="vm.buttons.magnify.magnifyingGlassSize"
         wv-readonly="vm.readonly"
         wv-popover-placement="left"
     ></wv-magnifying-glass-config-button>
@@ -342,6 +344,19 @@ I've duplicated the whole directive content and have kept it static, using an
         <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="rectangleroi" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
     
+    <!-- Arrow/Text Annotate -->
+    <label
+        ng-if="vm.buttons.hasOwnProperty('arrowAnnotate')"
+        class="wvButton--underline fa fa-arrow-right"
+        ng-class="{active: vm.tool === 'arrowAnnotate'}"
+        data-title="Annotate the image with text"
+        data-placement="left"
+        data-container="body"
+        bs-tooltip
+    >
+        <input type="radio" ng-disabled="vm.readonly" ng-model="vm.tool" value="arrowAnnotate" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
     <!-- Rotate Left -->
     <label
         ng-if="vm.buttons.hasOwnProperty('rotateleft')"
