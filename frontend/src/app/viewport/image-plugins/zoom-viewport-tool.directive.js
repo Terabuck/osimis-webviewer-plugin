@@ -48,6 +48,26 @@
         Controller.prototype = Object.create(WvBaseTool.prototype)
         Controller.prototype.constructor = Controller;
         
+        Controller.prototype._listenViewChange = function(viewport) {
+            var _this = this;
+            var enabledElement = viewport.getEnabledElement();
+
+            // For some reason, glitches happens on some images when the image 
+            // is zoomed in/out. We redraw the image a second time everytime 
+            // the zooming action finishes so glitches are cleaned.
+            $(enabledElement).on('mouseup.'+this.toolName, function() {
+                setTimeout(function() {
+                    viewport.draw(false);
+                });
+            });
+        };
+
+        Controller.prototype._unlistenViewChange = function(viewport) {
+            var enabledElement = viewport.getEnabledElement();
+
+            $(enabledElement).off('mouseup.'+this.toolName);
+        };
+
         return directive;
     }
 

@@ -150,6 +150,14 @@
                             wvImageIndexParser.assign(scope, series.currentIndex);
                         }
                     }
+
+                    // For some reason, glitches happens on the image once it's
+                    // dropped. We thus redraw it to remove them...
+                    if (_resetViewportOnceImageLoads) {
+                        setTimeout(function() {
+                            viewportController.getModel().draw(false);
+                        });
+                    }
                 }
                 else {
                     viewportController.clearImage();
