@@ -35,7 +35,6 @@
     "angular-cookies": "^1.5.8",
     "bootstrap": "^3.3.6",
     "lodash": "^4.5.1",
-    "ng-range-filter": "~0.1.0",
     "open-sans": "./local_dependencies/open-sans/",
     "font-awesome": "fontawesome#^4.7.0",
     "cornerstone": "^0.12.1",
@@ -103,9 +102,6 @@
       "main": [
         "css/font-awesome.css"
       ]
-    },
-    "ng-range-filter": {
-      "main": "src/ngRangeFilter.js"
     },
     "png.js": {
       "main": [
