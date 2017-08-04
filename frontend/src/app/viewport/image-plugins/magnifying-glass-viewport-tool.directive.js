@@ -41,7 +41,7 @@
                 // The `cornerstoneTools.magnify.setConfiguration` method
                 // doesn't update the configuration. We have to manualy disable
                 // the magnify tool to reset it.
-                if (oldConfig.enabled || !newConfig.enabled) {
+                if (oldConfig.enabled || !newConfig.enabled && oldConfig !== newConfig) {
                     tool.deactivate();
                 }
 

@@ -86,11 +86,17 @@
                     if (typeof vm.buttons[oldTool] === 'boolean') {
                         vm.buttons[oldTool] = false;
                     }
+                    else if (typeof vm.buttons[oldTool] === 'object') {
+                        vm.buttons[oldTool].enabled = false;
+                    }
                 }
                 $timeout(function () {
                     if (vm.buttons.hasOwnProperty(tool)) {
                         if (typeof vm.buttons[tool] === 'boolean') {
                             vm.buttons[tool] = true;
+                        }
+                        else if (typeof vm.buttons[tool] === 'object') {
+                            vm.buttons[tool].enabled = true;
                         }
                     }
                 });

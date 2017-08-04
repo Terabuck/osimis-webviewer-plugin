@@ -307,7 +307,7 @@
                     wv-pixel-probe-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.pixelprobe"
                     wv-rectangle-roi-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.rectangleroi"
                     wv-magnifying-glass-viewport-tool="!vm.readonly && !vm.mobileInteraction && {
-                        enabled: vm.activeTool === 'magnify',
+                        enabled: vm.tools.magnify.enabled,
                         magnificationLevel: vm.tools.magnify.magnificationLevel,
                         magnifyingGlassSize: vm.tools.magnify.magnifyingGlassSize
                     }"
