@@ -35,12 +35,11 @@
     "angular-cookies": "^1.5.8",
     "bootstrap": "^3.3.6",
     "lodash": "^4.5.1",
-    "ng-range-filter": "~0.1.0",
     "open-sans": "./local_dependencies/open-sans/",
     "font-awesome": "fontawesome#^4.7.0",
-    "cornerstone": "^0.9.0",
+    "cornerstone": "^0.12.1",
     "cornerstoneTools": "^0.7.7",
-    "cornerstoneMath": "0.1.3",
+    "cornerstoneMath": "^0.1.6",
     "jpgjs": "notmasteryet/jpgjs",
     "hamsterjs": "~1.1.0",
     "angular-dragdrop": "~1.0.12",
@@ -60,9 +59,25 @@
     "cornerstoneMath": "0.1.3",
     "angular": "^1.5.8",
     "jquery": "^2.2.0",
-    "sinon": "^1.17.6"
+    "sinon": "^1.17.6",
+    "cornerstone": "^0.12.1"
   },
   "overrides": {
+    "cornerstone": {
+      "main": [
+        "dist/cornerstone.js"
+      ]
+    },
+    "cornerstoneTools": {
+      "main": [
+        "dist/cornerstoneTools.js"
+      ]
+    },
+    "cornerstoneMath": {
+      "main": [
+        "dist/cornerstoneMath.js"
+      ]
+    },
     "pdf.js-viewer": {
       "main": [
         "pdf.js"
@@ -87,9 +102,6 @@
       "main": [
         "css/font-awesome.css"
       ]
-    },
-    "ng-range-filter": {
-      "main": "src/ngRangeFilter.js"
     },
     "png.js": {
       "main": [

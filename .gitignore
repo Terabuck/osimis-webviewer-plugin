@@ -10,6 +10,7 @@
 
 /backend/Build*/
 /backend/build*/
+/backend-build/
 /backend/ThirdPartyDownloads/
 /backend/CMakeLists.txt.user
 /backend/env/
@@ -17,7 +18,8 @@
 
 # Generated doc/report
 /frontend/docs/
-
+/frontend/*.zip
+scripts/ci/.env
 # other
 /.env
 /report/

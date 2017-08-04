@@ -1,4 +1,5 @@
 # @note `.dockerignore` files are not recursive.
+# this is mainly used by the test-runner container
 # At time of writing, this file reduce context from ~1.5go to 125mo.
 # This makes OSX docker build gain ~1 minute.
 
@@ -7,6 +8,7 @@ backend/BenchmarksSources/
 
 backend/Build/
 backend/build/
+backend-build/ # for AM dev machine !
 backend/ThirdPartyDownloads/
 backend/CMakeLists.txt.user
 backend/env/
@@ -22,9 +24,22 @@ Build*/
 # reverse-proxy/
 reverse-proxy/
 
-# tests/
-# tests/
+procedures/
 
-# frontend (frontend is required by build, but it's built from another docker image and 
-# downloaded back from aws).
-# frontend/
+# frontend (frontend is required by the test-runner)
+
+frontend/build/
+frontend/bower_components/
+frontend/node_modules/*
+!frontend/node_modules/gulp-injectInlineWorker              # this folder is the only one in the git repo and it must be copied to the container
+!frontend/node_modules/gulp-injectInlineWorker/index.js
+
+frontend/report/
+frontend/docs/
+frontend/.tmp/
+frontend/.sass-cache/
+frontend/.osisync/
+frontend/.idea/
+frontend/.DS_Store
+frontend/npm-debug.log
+frontend/*.zip
