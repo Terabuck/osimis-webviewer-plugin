@@ -37,7 +37,7 @@
 
         // Process windowing default values.
         var windowing = _processWindowing(pixels, klvData, tags, pixelValuesBoundaries.min, pixelValuesBoundaries.max);
-        console.log(tags);
+
         // Retrieve pixel spacing if available in dicom tags, so we can 
         // map pixel coordinates with physical ones.
         var columnPixelSpacing = 0;  // use really invalid values to make sure the user realizes the measure is invald (note: cornerstone will display pixels dimensions in this case)
@@ -67,7 +67,6 @@
                 rowPixelSpacing = usRegion.PhysicalDeltaY * 10;     // columnPixelSpacing is in mm -> *10
             }
         }
-
 
         // Data required by cornerstone to display the image correctly.
         var cornerstoneMetaData = {
