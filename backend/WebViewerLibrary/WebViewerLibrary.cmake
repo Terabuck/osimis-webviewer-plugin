@@ -36,7 +36,6 @@ add_library(WebViewerLibrary
   STATIC
 
   # The following files depend on GDCM
-  ${VIEWER_LIBRARY_DIR}/DecodedImageAdapter.cpp
   ${VIEWER_LIBRARY_DIR}/SeriesInformationAdapter.cpp
 
   ${VIEWER_LIBRARY_DIR}/OrthancContextManager.cpp

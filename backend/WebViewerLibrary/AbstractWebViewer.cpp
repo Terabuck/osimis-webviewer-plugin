@@ -26,11 +26,9 @@
 #include "Annotation/AnnotationRepository.h"
 #include "Config/ConfigController.h"
 #include "Config/WebViewerConfiguration.h"
-#include "DecodedImageAdapter.h"
 #include "ShortTermCache/CacheContext.h"
 #include "ShortTermCache/CacheScheduler.h"
 #include "ShortTermCache/ViewerPrefetchPolicy.h"
-#include "DecodedImageAdapter.h"
 #include "SeriesInformationAdapter.h"
 
 namespace
