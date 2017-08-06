@@ -41,7 +41,7 @@
         // Retrieve pixel spacing if available in dicom tags, so we can 
         // map pixel coordinates with physical ones.
         var columnPixelSpacing = 0;  // use really invalid values to make sure the user realizes the measure is invald (note: cornerstone will display pixels dimensions in this case)
-        var rowPixelSpacing = 0;     // TODO: disable the measure tools in this case (note: this can be done later)
+        var rowPixelSpacing = 0;     // @todo Disable the measure tools in this case (note: this can be done later).
         if (tags.PixelSpacing) {
             var pixelSpacing = tags.PixelSpacing.split('\\');
             if (pixelSpacing.length === 2) {
