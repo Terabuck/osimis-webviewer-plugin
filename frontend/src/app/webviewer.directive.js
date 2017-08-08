@@ -201,6 +201,8 @@
             vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
             vm.studyIslandsDisplayMode = 'grid';
 
+            vm.paneManager = wvPaneManager;
+
             // Selection-related
             vm.seriesItemSelectionEnabled = typeof vm.seriesItemSelectionEnabled !== 'undefined' ? vm.seriesItemSelectionEnabled : false;
             // 1. Values used by our internal directive.

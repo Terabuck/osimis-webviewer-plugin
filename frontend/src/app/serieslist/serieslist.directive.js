@@ -52,7 +52,7 @@
         .directive('wvSerieslist', wvSerieslist);
 
     /* @ngInject */
-    function wvSerieslist($q, wvStudyManager, wvSeriesManager, wvVideoManager, wvPdfInstanceManager, wvPaneManager) {
+    function wvSerieslist($q, wvStudyManager, wvPaneManager) {
         var directive = {
             bindToController: true,
             controller: SerieslistVM,
@@ -101,37 +101,11 @@
                 wvStudyManager
                     .get(id)
                     .then(function(study) {
+                        // Bind study and item to the view model.
                         vm.study = study;
-                    });
-
-                wvSeriesManager
-                    .listFromOrthancStudyId(id)
-                    .then(function(seriesList) {
-                        // Set image series ids.
-                        vm.seriesIds = seriesList.map(function(series) {
-                            return series.id;
-                        });
-
-                        // Update video & pdf instance ids (once the series 
-                        // have been loaded since the series manager request 
-                        // will load the pdf instances too in one single HTTP
-                        // request).
-                        return $q.all({
-                            videos: vm.videoDisplayEnabled && $q.all(wvVideoManager.listInstanceIdsFromOrthancStudyId(id)),
-                            pdfInstances: $q.all(wvPdfInstanceManager.listFromOrthancStudyId(id))
-                        });
-                    })
-                    .then(function(data) {
-                        var videos = data.videos;
-                        var pdfInstances = data.pdfInstances;
-                        
-                        // Set video models.
-                        vm.videos = videos;
-
-                        // Set pdf instances.
-                        vm.pdfInstanceIds = _.keys(pdfInstances).length && pdfInstances.map(function(pdfInstance) {
-                            return pdfInstance.id;
-                        });
+                        vm.seriesIds = study.seriesIds;
+                        vm.videos = study.videoIds;
+                        vm.pdfInstanceIds = study.pdfInstanceIds;
 
                         // Display the content.
                         vm.loaded = true;

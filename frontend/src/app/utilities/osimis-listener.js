@@ -13,9 +13,11 @@
  *
  * user:
  * ```js
- *  object.onSomethingHappened(function(arg1, arg2) { 
+ *  object.onSomethingHappened(this, function(arg1, arg2) { 
  *      // react..
  *  });
+ * 
+ * object.onSomethingHappened.close(this)
  * ```
  */
 (function(root) {

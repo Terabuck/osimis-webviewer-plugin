@@ -11,11 +11,12 @@
 (function(osimis) {
     'use strict';
 
-    function PaneManager(Promise, studyManager, seriesManager) {
+    function PaneManager(Promise, studyManager, seriesManager, $timeout) {
         // Injections.
         this._Promise = Promise;
         this._studyManager = studyManager;
         this._seriesManager = seriesManager;
+        this.$timeout = $timeout;
 
         // Default config.
         this.layout = {
@@ -185,21 +186,28 @@
         ) {
             throw new Error('`csViewport` and `imageIndex` parameter can only be used with a series.');
         }
+        var _this = this;
+        var seriesId = config.seriesId;
+        this.$timeout(function(){
+            pane = _this.getPane(x, y)
+            if(pane.seriesId === seriesId){
+                // Set series as viewed.
+                if (config && config.seriesId) {
+                    _this.viewedSeriesIds = _.union([config.seriesId], _this.viewedSeriesIds);
+                }
 
-        // Set series as viewed.
-        if (config && config.seriesId) {
-            this.viewedSeriesIds = _.union([config.seriesId], this.viewedSeriesIds);
-        }
+                // Set video as viewed.
+                if (config && config.reportId) {
+                    _this.viewedReportIds = _.union([config.reportId], _this.viewedReportIds);
+                }
 
-        // Set video as viewed.
-        if (config && config.reportId) {
-            this.viewedReportIds = _.union([config.reportId], this.viewedReportIds);
-        }
-
-        // Set pdf/report as viewed.
-        if (config && config.videoId) {
-            this.viewedVideoIds = _.union([config.videoId], this.viewedVideoIds);
-        }
+                // Set pdf/report as viewed.
+                if (config && config.videoId) {
+                    _this.viewedVideoIds = _.union([config.videoId], _this.viewedVideoIds);
+                }
+            }
+        }, 1000);
+        
 
         // Update pane's config accordingly.
         var pane = this.getPane(x, y);
@@ -454,7 +462,7 @@
         .factory('wvPaneManager', wvPaneManager);
 
     /* @ngInject */
-    function wvPaneManager($q, wvStudyManager, wvSeriesManager) {
-        return new PaneManager($q, wvStudyManager, wvSeriesManager);
+    function wvPaneManager($q, wvStudyManager, wvSeriesManager, $timeout) {
+        return new PaneManager($q, wvStudyManager, wvSeriesManager, $timeout);
     }
 })(osimis || (this.osimis = {}));
