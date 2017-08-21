@@ -145,6 +145,9 @@
      * @param {int} height
      * Height of the output
      *
+     * @param {string} note
+     * a note to store in OsimisNote private tag
+     *
      * @param {object} [serializedCsViewport=null]
      * The cornerstone viewport object of the image. This viewport
      * defines the windowing, paning, ... settings of the image.
@@ -160,6 +163,8 @@
      * 
      * @todo move in @RootAggregate (ie. image-model)
      */
+     ImageManager.prototype.captureViewportAsKeyImage = function(imageId, width, height, note, serializedCsViewport) {
+
         var instanceManager = this._instanceManager;
         var studyManager = this._studyManager;
         var config = this._config;
