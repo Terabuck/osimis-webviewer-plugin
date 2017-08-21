@@ -7,6 +7,8 @@ var del = require('del');
 var glob = require('glob');
 var gulp = require('gulp');
 var path = require('path');
+var gutil = require('gulp-util');
+var plumber = require('gulp-plumber');
 var _ = require('lodash');
 var $ = require('gulp-load-plugins')({lazy: true});
 var osisync = require('osisync');
@@ -28,6 +30,19 @@ var browserSyncPort = osisync.getPort() || 3000;
 var browserSyncUiPort = osisync.getPort() || 3001;
 var weinrePort = osisync.getPort() || 9090;
 var nodeDebugPort = osisync.getPort() || 5858;
+
+var gulp_src = gulp.src;
+gulp.src = function() {
+  return gulp_src.apply(gulp, arguments)
+    .pipe(plumber(function(error) {
+      // Output an error message
+      //gutil.log(gutil.colors.red('Error (' + error.plugin + '): ' + error.message));
+      gutil.log(error);
+      // emit the end event, to properly end the task
+      process.exit(1);
+    })
+  );
+};
 
 /**
  * yargs variables can be passed in to alter the behavior, when present.
