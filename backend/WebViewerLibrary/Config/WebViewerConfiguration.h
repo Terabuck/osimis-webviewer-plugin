@@ -66,28 +66,6 @@ public:
   // `http://wiki.ihe.net/index.php/Key_Image_Note`).
   bool keyImageCaptureEnabled;
 
-  WebViewerConfiguration(OrthancPluginContext* context) : _context(context) {
-    // By default, disable storage attachment cache.
-    cachedImageStorageEnabled = false;
-
-    // By default, use GDCM.
-    gdcmEnabled = true;
-    // By default, use GDCM for everything.
-    restrictTransferSyntaxes = false;
-
-    // By default, show the study download button in the frontend.
-    studyDownloadEnabled = true;
-
-    // By default, display DICOM video in the frontend.
-    videoDisplayEnabled = true;
-
-    // By default, disable annotation storage.
-    annotationStorageEnabled = false;
-
-    // By default, disable key image capture.
-    keyImageCaptureEnabled = false;
-  }
-
   WebViewerConfiguration(OrthancPluginContext* context);
   /**
    * Retrieve a specific set of options for the frontend.
