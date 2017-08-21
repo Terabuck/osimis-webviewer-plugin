@@ -52,6 +52,7 @@
                                                               // @todo use ../../ instead
                                                               
         this.httpRequestHeaders = {};
+        this.enableHighQualityImagePreloading = __webViewerConfig.enableHighQualityImagePreloading;
     };
 
     /**

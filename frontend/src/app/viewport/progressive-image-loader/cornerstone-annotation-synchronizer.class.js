@@ -65,6 +65,16 @@
         probe: [
             'handles.end.x',
             'handles.end.y',
+        ],
+        arrowAnnotate: [
+            'handles.start.x',
+            'handles.start.y',
+            'handles.end.x',
+            'handles.end.y',
+            'handles.textBox.x',
+            'handles.textBox.y',
+            'handles.textBox.boundingBox.left',
+            'handles.textBox.boundingBox.top',
         ]
     };
 

@@ -98,6 +98,11 @@
  * * Using the toolbar & tools
  * * Scrolling through the series via the mousewheel
  *
+ * @param {Array<Object {{string} name, {number} windowWidth, {number} windowCenter}>} wvWindowingPresets
+ * Sets the list of windowing presets. This parameter will most likely be set
+ * via the backend json configuration file or resolve into a default list (set
+ * from the backend).
+ *
  * @param {boolean} [wvVideoDisplayEnabled=true]
  * Display videos in the serieslist.
  *
@@ -140,6 +145,7 @@
                 leftHandlesEnabled: '=?wvLefthandlesEnabled',
                 noticeEnabled: '=?wvNoticeEnabled',
                 noticeText: '=?wvNoticeText',
+                windowingPresets: '=wvWindowingPresets',
                 annotationStorageEnabled: '=?wvAnnotationstorageEnabled',
                 studyDownloadEnabled: '=?wvStudyDownloadEnabled',
                 videoDisplayEnabled: '=?wvVideoDisplayEnabled',
@@ -193,7 +199,8 @@
                 vflip: false,
                 hflip: false,
                 rotateleft: false,
-                rotateright: false
+                rotateright: false,
+                arrowAnnotate: false
             };
             vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];
             vm.selectedStudyIds = typeof vm.selectedStudyIds !== 'undefined' ? vm.selectedStudyIds : [];

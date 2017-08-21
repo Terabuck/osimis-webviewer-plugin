@@ -6,16 +6,20 @@
 
 # Build directory
 /frontend/build*/
+/frontend/*.zip
 
 /backend/Build*/
 /backend/build*/
+/backend-build/
 /backend/ThirdPartyDownloads/
 /backend/CMakeLists.txt.user
 /backend/env/
+/backend-build/
 
 # Generated doc/report
 /frontend/docs/
-
+/frontend/*.zip
+scripts/ci/.env
 # other
 /.env
 /report/
@@ -32,3 +36,4 @@ npm-debug.log
 build/
 scripts/__pycache__/
 scripts/env/
+scripts/ci/.env
