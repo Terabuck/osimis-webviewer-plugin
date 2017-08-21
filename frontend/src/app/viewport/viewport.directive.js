@@ -396,10 +396,9 @@
                         model.draw(false);
                     }
 
-<<<<<<< HEAD
                     // Update old values
                     _firstWatch = false;
-=======
+
                     // Update old values if they have changed.
                     if (newImageId !== oldImageId) {
                         _watchedValue.imageId = newImageId;
@@ -430,13 +429,6 @@
                     )) {
                         _watchedValue.csViewport = newImageId && newCsViewport && newCsViewport.clone() || null; // the `.clone` is only here to be able to deep compare new values with old ones (otherwise both old & new variable would reference the same object)
                     }
-                    /*
->>>>>>> dev
-                    _watchedValue = {
-                        imageId: newImageId,
-                        csViewport: newCsViewport// scope.vm.wvImageId && scope.vm.csViewport && scope.vm.csViewport.clone() // the `.clone` is only here to be able to deep compare new values with old ones (otherwise both old & new variable would reference the same object)
-                    };
-                    */
 
                     // Always return false, as we do not use the watch function
                     return false;
