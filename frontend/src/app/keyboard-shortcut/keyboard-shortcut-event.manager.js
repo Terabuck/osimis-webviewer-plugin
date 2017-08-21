@@ -38,4 +38,4 @@
         }
     }
 
-})(this.osimis || (this.osimis = {}))
+})(this.osimis || (this.osimis = {}));
