@@ -2,6 +2,7 @@ FROM osimis/webapp-builder:1.1.1
 
 # Install frontend dependencies
 WORKDIR /frontend
+
 COPY package.json .
 COPY bower.json .
 COPY local_dependencies/ local_dependencies/

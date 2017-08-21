@@ -5,6 +5,10 @@ It is either possible to build the osimis web viewer plugin via docker or
 manually. The latter method is more suited for development as it reduces the
 build-time overhead.
 
+## Warning
+
+Please always check bash script source header before running them!
+
 ## Global Procedures
 
 ### Docker Build

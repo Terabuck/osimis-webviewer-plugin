@@ -25,7 +25,7 @@ SeriesRepository::SeriesRepository(DicomRepository* dicomRepository)
 {
 }
 
-std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId) {
+std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId, bool getInstanceTags) {
   OrthancPluginContext* context = OrthancContextManager::Get();
   
   // Retrieve series' slices (instances & frames)
@@ -38,6 +38,12 @@ std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId) {
   // Get each instance's tags (to avoid an additional request at each series' images)
   const Json::Value &slicesShort = orderedSlices["SlicesShort"];
   Json::Value instancesTags;
+
+  // Retrieve middle instance id
+  int instanceCount = slicesShort.size();
+  std::string middleInstanceId = slicesShort[instanceCount / 2][0].asString();
+
+  if (getInstanceTags)
   {
     BENCH(RETRIEVE_ALL_INSTANCES_TAGS)
     for(Json::ValueIterator itr = slicesShort.begin(); itr != slicesShort.end(); itr++) {
@@ -52,10 +58,16 @@ std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId) {
       instancesTags[instanceId] = instanceTags;
     }
   }
+  else
+  {// only get the middle instance tags
+    Json::Value instanceTags;
+    if (!OrthancPlugins::GetJsonFromOrthanc(instanceTags, context, "/instances/" + middleInstanceId + "/simplified-tags"))
+    {
+      throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
+    }
+    instancesTags[middleInstanceId] = instanceTags;
+  }
 
-  // Retrieve middle instance id
-  int instanceCount = slicesShort.size();
-  std::string middleInstanceId = slicesShort[instanceCount / 2][0].asString();
 
   // Get middle instance's dicom file
   OrthancPluginMemoryBuffer dicom; // no need to free - memory managed by dicomRepository

@@ -28,7 +28,7 @@ if [ "$rebuildTestEnv" = true ]; then
     pyvenv env
 fi
 
-# Load ptython context.
+# Load python context.
 . env/bin/activate
 
 # Install python dep.

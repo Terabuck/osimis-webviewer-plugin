@@ -15,6 +15,7 @@
             restrict: 'E',
             scope: {
                 onWindowingPresetSelected: '&wvOnWindowingPresetSelected',
+                windowingPresets: '=wvWindowingPresets',
                 selectedTool: '=wvSelectedTool',
                 readonly: '=?wvReadonly',
                 popoverPlacement: '@?wvPopoverPlacement'
@@ -90,6 +91,9 @@
 
                 // Clean up scope.
                 popoverScope.embeddedWindowings = [];
+
+                // Set up windowing presets.
+                popoverScope.windowingPresets = _this.windowingPresets;
 
                 // Set windowings specific to the selected viewport (either preset set in the dicom file
                 // or which has been processed by the viewer in the web workers).

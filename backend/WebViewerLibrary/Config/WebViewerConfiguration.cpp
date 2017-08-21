@@ -3,8 +3,71 @@
 #include <orthanc/OrthancCPlugin.h>
 #include <json/json.h>
 #include <Core/OrthancException.h>
+#include <boost/thread.hpp>
+#include <algorithm>
 
 #include "ViewerToolbox.h"
+
+
+WebViewerConfiguration::WebViewerConfiguration(OrthancPluginContext* context)
+  : _context(context)
+{
+  // By default, disable storage attachment cache.
+  persistentCachedImageStorageEnabled = false;
+
+  // By default, use GDCM.
+  gdcmEnabled = true;
+  // By default, use GDCM for everything.
+  restrictTransferSyntaxes = false;
+
+  // By default, show the study download button in the frontend.
+  studyDownloadEnabled = true;
+
+  // By default, display DICOM video in the frontend.
+  videoDisplayEnabled = true;
+
+  // By default, the frontend will download the high quality images before the
+  // user needs them.
+  highQualityImagePreloadingEnabled = true;
+
+  // By default, disable annotation storage.
+  annotationStorageEnabled = false;
+
+  // By default, set these windowing presets.
+  windowingPresets = Json::Value(Json::arrayValue);
+  windowingPresets.append(Json::Value(Json::arrayValue));
+  windowingPresets[0] = Json::Value(Json::objectValue);
+  windowingPresets[0]["name"] = "Ct Lung";
+  windowingPresets[0]["windowWidth"] = -400;
+  windowingPresets[0]["windowCenter"] = 1600;
+  windowingPresets[1] = Json::Value(Json::objectValue);
+  windowingPresets[1]["name"] = "Ct Abdomen";
+  windowingPresets[1]["windowWidth"] = 300;
+  windowingPresets[1]["windowCenter"] = 1500;
+  windowingPresets[2] = Json::Value(Json::objectValue);
+  windowingPresets[2]["name"] = "Ct Bone";
+  windowingPresets[2]["windowWidth"] = 40;
+  windowingPresets[2]["windowCenter"] = 80;
+  windowingPresets[3] = Json::Value(Json::objectValue);
+  windowingPresets[3]["name"] = "Ct Brain";
+  windowingPresets[3]["windowWidth"] = 40;
+  windowingPresets[3]["windowCenter"] = 400;
+  windowingPresets[4] = Json::Value(Json::objectValue);
+  windowingPresets[4]["name"] = "Ct Chest";
+  windowingPresets[4]["windowWidth"] = -400;
+  windowingPresets[4]["windowCenter"] = 1600;
+  windowingPresets[5] = Json::Value(Json::objectValue);
+  windowingPresets[5]["name"] = "Ct Angio";
+  windowingPresets[5]["windowWidth"] = 300;
+  windowingPresets[5]["windowCenter"] = 600;
+
+  // By default, enable the short term storage cached
+  shortTermCacheEnabled = true;
+  shortTermCacheDebugLogsEnabled = false;
+  shortTermCachePrefetchOnInstanceStored = false;
+  shortTermCacheDecoderThreadsCound = std::max(boost::thread::hardware_concurrency() / 2, 1u);
+  shortTermCacheSize = 1000;
+}
 
 
 void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
@@ -57,7 +120,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   if (wvConfig.isMember("CacheEnabled") &&
       wvConfig["CacheEnabled"].type() == Json::booleanValue)
   {
-    cachedImageStorageEnabled = wvConfig["CacheEnabled"].asBool();
+    persistentCachedImageStorageEnabled = wvConfig["CacheEnabled"].asBool();
   }
 
   // Enable Study Download
@@ -87,6 +150,22 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   {
     keyImageCaptureEnabled = wvConfig["KeyImageCaptureEnabled"].asBool();
   }
+
+  // Retrieve windowing preset (if set).
+  if (wvConfig.isMember("WindowingPresets") &&
+      wvConfig["WindowingPresets"].type() == Json::arrayValue)
+  {
+    windowingPresets = wvConfig["WindowingPresets"];
+    // @todo validate the content of the input.
+  }
+
+  shortTermCachePrefetchOnInstanceStored = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCachePrefetchOnInstanceStored", shortTermCachePrefetchOnInstanceStored);
+  shortTermCacheEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheEnabled", shortTermCacheEnabled);
+  shortTermCacheDebugLogsEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheDebugLogsEnabled", shortTermCacheDebugLogsEnabled);
+  shortTermCachePath = OrthancPlugins::GetStringValue(wvConfig, "ShortTermCachePath", shortTermCachePath.string());
+  shortTermCacheSize = OrthancPlugins::GetIntegerValue(wvConfig, "ShortTermCacheSize", shortTermCacheSize);
+  shortTermCacheDecoderThreadsCound = OrthancPlugins::GetIntegerValue(wvConfig, "Threads", shortTermCacheDecoderThreadsCound);
+  highQualityImagePreloadingEnabled = OrthancPlugins::GetBoolValue(wvConfig, "HighQualityImagePreloadingEnabled", highQualityImagePreloadingEnabled);
 }
 
 void WebViewerConfiguration::parseFile()
@@ -99,6 +178,9 @@ void WebViewerConfiguration::parseFile()
     {
       throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);    
     }
+
+    shortTermCachePath = OrthancPlugins::GetStringValue(configuration, "StorageDirectory", "."); // By default, the cache of the Web viewer is located inside the "StorageDirectory" of Orthanc
+    shortTermCachePath /= "WebViewerCache";
 
     static const char* CONFIG_WEB_VIEWER = "WebViewer";
     if (configuration.isMember(CONFIG_WEB_VIEWER))
@@ -163,6 +245,11 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
 
   // Register "keyImageCaptureEnabled"
   config["enableKeyImageCapture"] = keyImageCaptureEnabled;
+
+  // Register "windowingPresets"
+  config["windowingPresets"] = windowingPresets;
+
+  config["enableHighQualityImagePreloading"] = highQualityImagePreloadingEnabled;
 
   return config;
 }

@@ -1,10 +1,21 @@
 Pending changes in the mainline
 ===============================
 
-Features:
-* Set selected viewport's windowing based on presets.
-
 => Minimum Orthanc version: 1.1.0 <=
+
+Features:
+* Added a short term cache to store low/high quality images in the backend.
+* Added prefetching on the backend to pre-compute low/high quality images
+  before the frontend requests them.
+* Added an option to preload high quality images on the frontend before
+  the user needs them.
+
+Version 1.0.0
+========================
+
+Features:
+* Zoom in the viewport using a magnifying glass.
+* Apply windowing preset.
 
 Version 0.9.1
 ========================

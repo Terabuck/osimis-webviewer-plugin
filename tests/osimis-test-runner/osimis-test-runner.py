@@ -82,6 +82,7 @@ orthancUrl = 'http://' + orthancHost + ':' + str(orthancHttpPort)
 client = OrthancClient(orthancUrl)
 
 if launchOrthanc is True:
+	print(colored('Launching Orthanc', 'blue'))
 	# Download Orthanc server (if not in path)
 	OrthancServer.loadExecutable(orthancFolder, OrthancServerVersion.NIGHTLY)
 
@@ -94,6 +95,8 @@ if launchOrthanc is True:
 	server.launch()
 
 if uploadInstances is True:
+	print(colored('Uploading instances', 'blue'))
+
 	# Uploading dicom files
 	dicomSamplesFolder = 'dicom-samples/'
 
@@ -136,6 +139,7 @@ if uploadInstances is True:
 			print(e)
 			sys.exit(-1)
 
+print(colored('Starting gulp inject', 'blue'))
 # Pre process: dependency injection, angular template cache & SASS (because testing requires development-mode preprocessors to be applied)
 # Wait for result before launching tests
 # @warning this call destroys the frontend/build/ directory content!
@@ -152,6 +156,7 @@ except:
 	gulp.kill()
 	sys.exit(50)
 
+print(colored('Launching Karma', 'blue'))
 # Launch karma
 karmaEnv = os.environ.copy()
 karmaEnv["ORTHANC_URL"] = "http://" + orthancHost + ":" + str(orthancHttpPort)

@@ -249,6 +249,7 @@
             wv-active-tool="vm.activeTool"
             wv-position="vm.toolbarPosition"
             wv-on-action-clicked="vm.onActionClicked($action)"
+            wv-windowing-presets="vm.windowingPresets"
             wv-on-windowing-preset-selected="vm.onWindowingPresetSelected($windowWidth, $windowCenter);"
         ></wv-toolbox>
 
@@ -305,6 +306,13 @@
                     wv-pan-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.pan"
                     wv-pixel-probe-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.pixelprobe"
                     wv-rectangle-roi-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.rectangleroi"
+                    wv-magnifying-glass-viewport-tool="!vm.readonly && !vm.mobileInteraction && {
+                        enabled: vm.tools.magnify.enabled,
+                        magnificationLevel: vm.tools.magnify.magnificationLevel,
+                        magnifyingGlassSize: vm.tools.magnify.magnifyingGlassSize
+                    }"
+                    wv-arrow-annotate-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.arrowAnnotate"
+                    wv-orientation-marker-viewport-tool
                 >
                     <!--
                     Overlay

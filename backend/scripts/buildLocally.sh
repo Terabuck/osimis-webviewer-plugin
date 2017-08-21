@@ -6,8 +6,7 @@
 # @pre
 # If `frontend/build` does not exist,
 # 
-# - Build frontend via `./scripts/ci/ciBuildFrontend.sh ...`
-# - Publish frontend via `./scripts/ci/ciPushFrontend.sh ...`
+# - Build frontend via `./frontend/scripts/buildJsLocally.sh ...`
 
 set -x
 set -e
@@ -26,7 +25,7 @@ cd ${buildDir}
 cmake ${backendRoot} -DCMAKE_BUILD_TYPE=Debug -DALLOW_DOWNLOADS=ON -DSTANDALONE_BUILD=ON -DSTATIC_BUILD=ON
 
 # Build C++
-make -j2
+make -j7
 
 # Return to previous dir
 cd ${prevPath}

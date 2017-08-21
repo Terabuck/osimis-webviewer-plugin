@@ -11,28 +11,45 @@
 # See `scripts/osx/InstallOsXDependencies.sh`. On linux, you must install a
 # simular setup.
 # 
+# @post
+# See `scripts/unix/installAdditionalDevTools.sh`. 
+#
+# @warning
+# You have to install additional dev tools (see `@post` section) after
+# launching `startUnixDev.sh` and then rerun the `startUnixDev.sh` command with
+# the $1 parameter set to false, as `npm install` will remove the additional
+# dependencies.
+# 
+# @param {boolean} [$1=true]
+# Reinstall frontend dependencies.
+# 
 # @param {boolean} [$1=true]
 # Rebuild backend.
 
 set -x
 set -e
 
-rebuildBackend=${1:-true}
+reinstallFrontendDep=${1:-true}
+rebuildBackend=${2:-true}
 
 # Start from the repository root
 previousDir=$(pwd)
 rootDir="${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"
 cd ${rootDir}/
 
-if [ "$rebuildBackend" = true ]; then
-    # Build Frontend & install local dependencies (req. by C++ plugin)
+if [ "$reinstallFrontendDep" = true ]; then
+    # install frontend local dependencies
     cd frontend/
     npm install
-    git checkout node_modules/gulp-injectInlineWorker/index.js
     bower install
+    cd ../
+fi
+if [ "$rebuildBackend" = true ]; then
+    # Build Frontend (req. by C++ plugin)
+    cd frontend/
+    git checkout node_modules/gulp-injectInlineWorker/index.js
     gulp build
     cd ../
-
     # Build plugin
     ./backend/scripts/buildLocally.sh
 fi
@@ -42,6 +59,7 @@ nginx -p ${rootDir}/reverse-proxy/ -c nginx.local.conf
 
 # Run Frontend Dev Process
 cd frontend/
+git checkout node_modules/gulp-injectInlineWorker/index.js
 gulp serve-dev &
 gulpPid=$!
 cd ../

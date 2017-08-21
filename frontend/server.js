@@ -31,6 +31,7 @@ var orthancUrl = 'http://localhost:8042';
 
 // avoid crash on request cancel
 orthancProxy.on('error', function (err, req, res) {
+    console.log('crash avoided?');
 });
 
 app.all('/config.js', function(req, res, next) {
@@ -105,7 +106,7 @@ switch (environment){
         app.use(express.static('./'));
 
         // Any invalid calls for templateUrls are under app/* and should return
-        // 404.
+        // 404
         app.use('/app/*', function(req, res, next) {
             // @todo 404
             // four0four.send404(req, res);

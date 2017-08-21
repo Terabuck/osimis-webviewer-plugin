@@ -70,7 +70,7 @@ This plugin provide a few optional options as well.
 
   // Enable the HTTP server. If this parameter is set to "false",
   // Orthanc acts as a pure DICOM server. The REST API and Orthanc
-  // Explorer will not be available.
+  // Explorer will not be available. 
   "HttpServerEnabled" : true,
 
   // HTTP port for the REST services and for the GUI
@@ -143,6 +143,30 @@ This plugin provide a few optional options as well.
     // dictionary (see the Dictionary json attribute below).
     // Default: false
     "KeyImageCaptureEnabled": false
+
+    // Store low/high quality images in a short term cache
+    "ShortTermCacheEnabled": true,
+
+    // Path where the short term cache is stored
+    "ShortTermCachePath": "/OrthancStorage/WebViewerCache",
+
+    // Maximum size of the short term cache (in MB)
+    "ShortTermCacheSize": 1000,
+
+    // Start pre-computing the low/high quality images as soon as they are 
+    // received in Orthanc.
+    "ShortTermCachePrefetchOnInstanceStored": false,
+
+    // Number of threads used by the short term cache to pre-compute the
+    // low/high quality images.
+    "ShortTermCacheThreads": 4,
+
+    // Display cache debug logs (mainly for developers)
+    "ShortTermCacheDebugLogsEnabled": false,
+
+    // Preload high quality images on the frontend before the user actually
+    // needs them
+    "HighQualityImagePreloadingEnabled": true
   },
   "Dictionary" : {
     // Tag required when setting `KeyImageCaptureEnabled` to true.
@@ -194,7 +218,8 @@ Six folders are available at the root:
 
 - `backend/` contains the C++ plugin source code (& cmake build process).
 - `frontend/` contains the HTML/JavaScript source code (& gulp build process).
-- `reverse-proxy/` contains a security proxy blocking Orthanc non-GET requests.
+- `reverse-proxy/` contains a security proxy blocking Orthanc non-GET requests
+  and a reverse proxy suitable for development.
 - `demo/` contains a standalone docker, proxied version of orthanc and the
   viewer with sample files.
 - `scripts/` contains global demo building scripts, it is mostly used by the
