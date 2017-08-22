@@ -36,7 +36,7 @@ services:
         # Must be built via demo/scripts/buildDocker.sh
         image: osimis/orthanc-webviewer-plugin/demo:latest-local
         volumes:
-            - "orthancSamplesDb2b:/orthancStorage"
+            - "orthancSamplesDb2b:/var/lib/orthanc/db"
         expose:
             - "8042"
     
