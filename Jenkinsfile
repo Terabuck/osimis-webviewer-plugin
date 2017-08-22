@@ -180,17 +180,14 @@ lock(resource: 'webviewer', inversePrecedence: false) {
 
                     // Load docker registry (required by docker-compose)
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkinsosimis') {
-                        // Build proxy (in case config has changed)
-                        sh "SUBNET=${demoSubnet} PORT=${demoPort} docker-compose build proxy"
-
                         // Set docker-compose project name
                         def dockerProject = "wvb_demo_${BRANCH_NAME}"
 
                         // Stop previous demo (if already exists)
                         sh "SUBNET=${demoSubnet} PORT=${demoPort} docker-compose -p ${dockerProject} down || true"
                         
-                        // Start demo (with proxy)
-                        sh "SUBNET=${demoSubnet} PORT=${demoPort} docker-compose -p ${dockerProject} up -d proxy"
+                        // Start demo
+                        sh "SUBNET=${demoSubnet} PORT=${demoPort} docker-compose -p ${dockerProject} up -d orthanc_populated"
                     }
 
                     // Retrieve ticket number
