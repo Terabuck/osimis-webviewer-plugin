@@ -218,8 +218,7 @@ Six folders are available at the root:
 
 - `backend/` contains the C++ plugin source code (& cmake build process).
 - `frontend/` contains the HTML/JavaScript source code (& gulp build process).
-- `reverse-proxy/` contains a security proxy blocking Orthanc non-GET requests
-  and a reverse proxy suitable for development.
+- `reverse-proxy/` contains a reverse proxy suitable for development.
 - `demo/` contains a standalone docker, proxied version of orthanc and the
   viewer with sample files.
 - `scripts/` contains global demo building scripts, it is mostly used by the

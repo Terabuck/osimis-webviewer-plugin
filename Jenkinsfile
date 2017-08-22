@@ -176,7 +176,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
                     int demoPort = random.nextInt(maxPort - minPort + 1) + minPort;
 
                     // Build demo
-                    sh demo/scripts/buildDocker.sh
+                    sh "demo/scripts/buildDocker.sh"
 
                     // Load docker registry (required by docker-compose)
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkinsosimis') {
