@@ -16,6 +16,8 @@
 /backend/env/
 /backend-build/
 
+/demo/binaries/
+
 # Generated doc/report
 /frontend/docs/
 /frontend/*.zip
