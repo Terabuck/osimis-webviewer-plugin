@@ -5,7 +5,7 @@
     "WebViewer" : {
         "StudyDownloadEnabled": true,
         "VideoDisplayEnabled": true,
-        "AnnotationStorageEnabled": false,
+        "AnnotationStorageEnabled": true,
         "ShortTermCacheEnabled" : true,
         "KeyImageCaptureEnabled" : true
     }
