@@ -71,7 +71,7 @@ docker network create ${network}
 # Create temporary webviewer container (to push dicom data into and then commit as an image)
 tmpOrthancContainer=wv-demo-tmpcontainer
 docker rm -f $tmpOrthancContainer || true # @todo Use trap to clean container instead
-docker create --network ${network} --name ${tmpOrthancContainer} -v ${dataVolumeName}:/orthancStorage osimis/orthanc-webviewer-plugin/tmp-populated-image:latest
+docker create --network ${network} --name ${tmpOrthancContainer} -v ${dataVolumeName}:/var/lib/orthanc/db osimis/orthanc-webviewer-plugin/tmp-populated-image:latest
 
 # Copy the populated data inside the demo image
 if [ "$syncData" = true ]; then

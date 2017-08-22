@@ -4,7 +4,6 @@
 	"AuthenticationEnabled": false,
 
 	"StorageDirectory": "/var/lib/orthanc/db",
-	"IndexDirectory": "/var/lib/orthanc/db",
 	"Plugins": ["/usr/share/orthanc/plugins"],
 	
 	"WebViewer": {
