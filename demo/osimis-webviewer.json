@@ -1,0 +1,12 @@
+{
+    /**
+     * Osimis WebViewer Configuration
+     **/
+    "WebViewer" : {
+        "StudyDownloadEnabled": true,
+        "VideoDisplayEnabled": true,
+        "AnnotationStorageEnabled": false,
+        "ShortTermCacheEnabled" : true,
+        "KeyImageCaptureEnabled" : true
+    }
+}
