@@ -7,6 +7,8 @@
         "VideoDisplayEnabled": true,
         "AnnotationStorageEnabled": true,
         "ShortTermCacheEnabled" : true,
+        "ShortTermCacheDebugLogsEnabled" : true,
+        "ShortTermCachePrefetchOnInstanceStored" : true,
         "KeyImageCaptureEnabled" : true
     }
 }
