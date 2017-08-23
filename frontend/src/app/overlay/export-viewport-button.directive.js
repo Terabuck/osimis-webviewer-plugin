@@ -61,11 +61,18 @@
             var canvasHeight = viewportEl.height();
             csViewport = csViewport.serialize(canvasWidth, canvasHeight);
 
-            wvImageManager
-                .captureViewportAsKeyImage(imageId, 600, 400, note, csViewport)
-                .then(function(data) {
-                    console.log(data)
-                });
+            wvImageManager.get(imageId).then(function(image){
+                console.log(image);
+                var captureWidth = image.tags["Columns"] || 600;
+                var captureHeight = image.tags["Rows"] || 400;
+
+
+                wvImageManager
+                    .captureViewportAsKeyImage(imageId, captureWidth, captureHeight, note, csViewport)
+                    .then(function(data) {
+                        console.log(data)
+                    });
+            });
         };
     }
 })();
