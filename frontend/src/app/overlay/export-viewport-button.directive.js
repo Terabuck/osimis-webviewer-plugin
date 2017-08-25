@@ -28,7 +28,8 @@
             templateUrl: 'app/overlay/export-viewport-button.directive.html',
             scope: {
                 imageId: '=wvImageId',
-                csViewport: '=wvViewport'
+                csViewport: '=wvViewport',
+                onExportEnded: '&?wvOnExportEnded'
             }
         };
         return directive;
@@ -39,7 +40,7 @@
     }
 
     /* @ngInject */
-    function ExportViewportButton(wvImageManager, $element, $timeout, wvPaneManager) {
+    function ExportViewportButton(wvImageManager, $element, $timeout, $rootScope, wvPaneManager) {
         var _this = this;
 
         this.captureViewportAsKeyImage = function(note) {
@@ -61,7 +62,7 @@
             var canvasHeight = viewportEl.height();
             csViewport = csViewport.serialize(canvasWidth, canvasHeight);
 
-            wvImageManager.get(imageId).then(function(image){
+            return wvImageManager.get(imageId).then(function(image){
                 console.log(image);
                 var captureWidth = image.tags["Columns"] || 600;
                 var captureHeight = image.tags["Rows"] || 400;
@@ -70,7 +71,10 @@
                 wvImageManager
                     .captureViewportAsKeyImage(imageId, captureWidth, captureHeight, note, csViewport)
                     .then(function(data) {
-                        console.log(data)
+                        $rootScope.$emit('studyChanged', data.Parent); // To make the series list reload the study                                        
+                        if (_this.onExportEnded){
+                            _this.onExportEnded();                            
+                        }
                     });
             });
         };

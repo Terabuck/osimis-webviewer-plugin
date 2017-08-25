@@ -168,6 +168,7 @@
         var instanceManager = this._instanceManager;
         var studyManager = this._studyManager;
         var config = this._config;
+        var studyId = undefined;
 
         return this
             // Create annoted image.
@@ -205,6 +206,7 @@
                             .getByInstanceId(instanceId)
                             .then(function(study) {
                                 // Return POST request body.
+                                studyId = study.id;
                                 return {
                                     Tags: tags,
                                     Content: b64PixelData,
@@ -222,6 +224,7 @@
             // Retrieve new DICOM id.
             .then(function(resp) {
                 var id = resp['ID'];
+                return {'ID': id, Parent: studyId}
             });
     };
 

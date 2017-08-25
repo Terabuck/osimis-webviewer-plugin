@@ -51,7 +51,7 @@
                 }
             });
 
-            buttonEl.bind('mouseout', function (e) {
+            buttonEl.bind('mouseleave', function (e) {
                 // Timeout to make sure the user can move it's cursor from the button
                 // to the popover without having the popover to hide in between.
                 $timeout(function () {
@@ -72,6 +72,13 @@
         this.readonly = typeof this.readonly !== 'undefined' ? this.readonly : false;
         this.popoverPlacement = typeof this.popoverPlacement !== 'undefined' ? this.popoverPlacement : 'bottom';
         this.insidePopover = false;
+        this.onExportEnded = function(){
+            _this.popover.hide();
+            if(_this.onKeyimagenoteCreated){
+                _this.insidePopover = false;                
+                _this.onKeyimagenoteCreated();
+            }
+        }
 
         // Don't exit popover on when mouse leave the button.
         this.attachEventsToPopoverContent = function () {
@@ -116,6 +123,7 @@
                         if (!image) {
                             return;
                         }
+                        popoverScope.onExportEnded = _this.onExportEnded;
                         popoverScope.imageId = image.id;
                     });
             }

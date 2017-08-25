@@ -52,7 +52,7 @@
         .directive('wvSerieslist', wvSerieslist);
 
     /* @ngInject */
-    function wvSerieslist($q, wvStudyManager, wvSeriesManager, wvVideoManager, wvPdfInstanceManager, wvPaneManager) {
+    function wvSerieslist($q, $rootScope, wvStudyManager, wvSeriesManager, wvVideoManager, wvPdfInstanceManager, wvPaneManager) {
         var directive = {
             bindToController: true,
             controller: SerieslistVM,
@@ -79,11 +79,29 @@
             var vm = scope.vm;
 
             // Adapt serieslist on input change.
-            scope.$watch('vm.studyId', _setStudy);
+            scope.$watch('vm.studyId', function(id, old){
+                _setStudy(id);
+            });
 
-            function _setStudy(id, old) {
+            var rootscopeEventCleanerFunction = $rootScope.$on('studyChanged', function(event, studyId){
+                if(studyId === vm.study.id){
+                    _reloadStudy(studyId);                    
+                }
+            })
+
+            scope.$on('$destroy', function(){rootscopeEventCleanerFunction()});
+            
+
+            function _reloadStudy(id){
+                _setStudy(id, true);
+            }
+
+
+            function _setStudy(id, refresh) {
                 if (!id) return; 
                 // @todo handle IsStable === false
+
+                var useCache = !refresh;
 
                 vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
                 
@@ -105,7 +123,7 @@
                     });
 
                 wvSeriesManager
-                    .listFromOrthancStudyId(id)
+                    .listFromOrthancStudyId(id, useCache)
                     .then(function(seriesList) {
                         // Set image series ids.
                         vm.seriesIds = seriesList.map(function(series) {
