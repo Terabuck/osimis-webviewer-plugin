@@ -119,6 +119,7 @@
                 wvStudyManager
                     .get(id)
                     .then(function(study) {
+                        // Bind study and item to the view model.
                         vm.study = study;
                     });
 
@@ -170,7 +171,7 @@
     }
 
     /* @ngInject */
-    function SerieslistVM() {
+    function SerieslistVM(wvPaneManager) {
         // Set initial values.
         this.seriesIds = [];
         this.pdfInstanceIds = [];
@@ -180,6 +181,26 @@
         this.selectedSeriesIds = this.selectedSeriesIds || [];
         this.selectedVideoIds = this.selectedVideoIds || [];
         this.selectedReportIds = this.selectedReportIds || [];
+
+        this.isActive = function(seriesId){
+            return wvPaneManager.isViewportItemDisplayed(seriesId);
+        };
+
+        this.isHighlighted = function(seriesId){
+            var selectedPane = wvPaneManager.getSelectedPane(),
+                hoveredPane = wvPaneManager.getHoveredPane();
+            return (selectedPane && 
+                (selectedPane.seriesId === seriesId 
+                    || selectedPane.videoId === seriesId 
+                    || selectedPane.reportId === seriesId
+                ))
+                || (hoveredPane && 
+                (
+                    hoveredPane.seriesId === seriesId 
+                    || hoveredPane.videoId === seriesId 
+                    || hoveredPane.reportId === seriesId
+                ))
+        };
 
         this.toggleSeriesSelection = function(seriesId) {
             // Do nothing if selection is disabled

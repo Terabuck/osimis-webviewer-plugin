@@ -26,6 +26,15 @@
         this._studyManager = studyManager;
         this._seriesManager = seriesManager;
 
+        // @warning This parameter is used for other services to access the
+        // series model. As the series manager is ill-formed and always create
+        // a new series model on `.get` call, this variable is filled within
+        // the webviewer directive declarative code, as it is currently the
+        // only way to retrieve it. We should split the series model and be
+        // able to retrieve the local/pane-dependant series
+        // controller/navigator split from the global/cached series model.
+        this.series = undefined;
+
         // Position of the pane
         this.x = x;
         this.y = y;
@@ -58,6 +67,7 @@
             this.reportId = undefined;
             this.videoId = undefined;
             this.isSelected = false;
+            this.isHovered = false;
         }
         // Custom values.
         else {
@@ -67,6 +77,7 @@
             this.reportId = config.reportId || undefined;
             this.videoId = config.videoId || undefined;
             this.isSelected = config.isSelected || false;
+            this.isHovered = config.isHovered || false;
         }
     }
 

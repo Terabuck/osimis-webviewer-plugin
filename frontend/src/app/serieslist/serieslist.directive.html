@@ -13,7 +13,9 @@
             'wvSerieslist__seriesItem--list': vm.displayMode === 'list',
             'wvSerieslist__seriesItem--grid': vm.displayMode === 'grid',
             'wvSerieslist__seriesItem--selectable': vm.selectionEnabled,
-            'wvSerieslist__pdfItem--activated': vm.selectionEnabled && vm.selectedReportIds.indexOf(id) !== -1
+            'wvSerieslist__pdfItem--activated': vm.selectionEnabled && vm.selectedReportIds.indexOf(id) !== -1,
+            'active': vm.isActive(id),
+            'highlighted': vm.isHighlighted(id)
         }"
         wv-draggable-item="{
             reportId: id
@@ -70,7 +72,9 @@
             'wvSerieslist__seriesItem--list': vm.displayMode === 'list',
             'wvSerieslist__seriesItem--grid': vm.displayMode === 'grid',
             'wvSerieslist__seriesItem--selectable': vm.selectionEnabled,
-            'wvSerieslist__videoItem--activated': vm.selectionEnabled && vm.selectedVideoIds.indexOf($video.id) !== -1
+            'wvSerieslist__videoItem--activated': vm.selectionEnabled && vm.selectedVideoIds.indexOf($video.id) !== -1,
+            'active': vm.isActive(id),
+            'highlighted': vm.isHighlighted(id)
         }"
         ng-show="vm.loaded && vm.videos.length > 0"
         ng-repeat="$video in vm.videos track by $video.id"
@@ -105,7 +109,9 @@
             'wvSerieslist__seriesItem--list': vm.displayMode === 'list',
             'wvSerieslist__seriesItem--grid': vm.displayMode === 'grid',
             'wvSerieslist__seriesItem--selectable': vm.selectionEnabled,
-            'wvSerieslist__seriesItem--activated': vm.selectionEnabled && vm.selectedSeriesIds.indexOf($series.id) !== -1
+            'wvSerieslist__seriesItem--activated': vm.selectionEnabled && vm.selectedSeriesIds.indexOf($series.id) !== -1,
+            'active': vm.isActive(id),
+            'highlighted': vm.isHighlighted(id)
         }"
         ng-show="vm.loaded"
         wv-draggable-item="{

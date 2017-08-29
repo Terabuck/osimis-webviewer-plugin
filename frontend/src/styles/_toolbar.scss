@@ -29,6 +29,7 @@
     overflow-x: auto;
     overflow-y: visible;
     height: 100%;
+    z-index: 2;
 }
 
 .wvToolbar--right .wvButton--rotate, .wvToolbar--right .wvButton--rotate.fa { // make sure we have more precedence than .fa class

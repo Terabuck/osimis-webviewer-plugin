@@ -5,6 +5,9 @@ $green: rgb(0, 160, 27);
 $yellow: rgb(162, 165, 0);
 $violet: rgb(255, 31, 255);
 
+$borderColor: rgba(255, 255, 255, 0.8);
+$borderColorActive: rgba(255, 255, 255, 0.6);
+$borderColorHighlighted: rgba(255, 255, 255, 1);
 $pictureSize: 6.5rem;
 
 .wvSerieslist {
@@ -123,6 +126,21 @@ $pictureSize: 6.5rem;
 
     line-height: 0px;
     margin: 0.1rem;
+
+    &.active{
+        border-color: $borderColorActive;
+        border-style: solid;
+    }
+
+    &.highlighted{
+        border-color: $borderColorHighlighted;
+        border-style: solid;
+    }
+
+    &:hover, &:focus, &.focused{
+        border-style: dashed;
+        border-color: $borderColor;
+    }
 }
 
 .wvSerieslist__seriesItem--list {

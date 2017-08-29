@@ -2,6 +2,8 @@
     wv-topleft-enabled="$isTopLeftEnabled"
     wv-topright-enabled="$isTopRightEnabled"
     wv-right-enabled="$isRightEnabled"
+
+    wv-keyboard-shortcut
 >
     <!--
     Layout: top zones (1, 2, 3 and 4)
@@ -290,8 +292,8 @@
                 -->
                 <wv-viewport
                     ng-if="!!$pane.seriesId"
-                    vp:series-id="$pane.seriesId" wv-size="{width: 1.0, height: 1.0}" wv-lossless="true"
-                    wv-series="$series" wv-image="$image"
+                    vp-series-id="$pane.seriesId" wv-size="{width: 1.0, height: 1.0}" wv-lossless="true"
+                    wv-series="$pane.series" wv-image="$image"
                     wv-droppable-series-ext="!vm.readonly && vm.serieslistEnabled"
                     wv-scroll-on-wheel-series-ext="!vm.readonly"
                     wv-viewport="$pane.csViewport"
@@ -319,7 +321,7 @@
                     -->
                     <wv-overlay
                         ng-if="vm.tools.overlay"
-                        wv-study-id="$series.studyId"
+                        wv-study-id="$pane.series.studyId"
                         wv-tags="$image.tags"
                         wv-viewport="$pane.csViewport"
                         wv-image="$image"
@@ -334,7 +336,7 @@
                     to display the image quality
                     -->
                     <div class="wv-overlay-timeline-wrapper">
-                        <wv-timeline wv-series="$series" wv-readonly="vm.readonly"></wv-timeline>
+                        <wv-timeline wv-series="$pane.series" wv-readonly="vm.readonly"></wv-timeline>
                     </div>
                 </wv-viewport>
 

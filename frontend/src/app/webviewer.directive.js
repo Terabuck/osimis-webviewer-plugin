@@ -219,6 +219,8 @@
             vm.keyImageCaptureEnabled = typeof vm.keyImageCaptureEnabled !== 'undefined' ? vm.keyImageCaptureEnabled : false;
             vm.studyIslandsDisplayMode = 'grid';
 
+            vm.paneManager = wvPaneManager;
+
             // Selection-related
             vm.seriesItemSelectionEnabled = typeof vm.seriesItemSelectionEnabled !== 'undefined' ? vm.seriesItemSelectionEnabled : false;
             // 1. Values used by our internal directive.
@@ -526,6 +528,17 @@
                             });
 
                     });
+
+
+                // if first pane is empty, set the first series in the first study.
+                if(newValues && newValues[0]){
+                    wvStudyManager.get(newValues[0]).then(function(firstStudy){
+                        var firstPane = wvPaneManager.getPane(0, 0);
+                        if(firstStudy && firstPane.isEmpty()){
+                            wvPaneManager.setPane(0, 0, {seriesId: firstStudy.series[0]})
+                        };
+                    });
+                }
             }, true);
 
             // Propagate series preloading events

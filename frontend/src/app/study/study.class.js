@@ -15,15 +15,23 @@
         return date.replace(/^([0-9]{4})([0-9]{2})([0-9]{2})$/, '$1/$2/$3');
     }
 
-    function Study(Promise, studyManager, id, tags) {
+    function Study(Promise, studyManager, seriesManager, id, tags, seriesIds, pdfInstanceIds, videoIds) {
         // Injections.
         this._Promise = Promise;
         this._studyManager = studyManager;
+        this._seriesManager = seriesManager
+        
+        // constructor
+        this.series = seriesIds; // @todo remove, use seriesIds instead
+        this.videoIds = videoIds;
+        this.reportIds = pdfInstanceIds;
+        this.seriesIds = seriesIds;
 
         // Default values.
         this.id = id;
         this.tags = tags;
         this.hasBeenViewed = false;
+
 
         /**
          * @type {string}
@@ -131,6 +139,174 @@
      */
     Study.prototype.hasColor = function() {
         return this.color !== 'gray';
+    };
+
+
+    /**
+     * Get the next itemId with the type of the item next to it.
+     * 
+     * The ordering is make by type of the item
+     * series > video > report
+     * 
+     * @param itemId
+     * the item id or undefined. If it is undefined, it will return the first item found following the function logic.
+     * 
+     * @return Array[nextItemId, nextItemType<"series"|"video"|"report">]
+     */
+    Study.prototype.getNextItemId = function(itemId){
+        var currentItemType,
+            nextItemType,
+            _itemId,
+            _nextIndex;
+        if(itemId){
+            if(this.seriesIds.indexOf(itemId) > -1){
+                currentItemType = "series";
+                _nextIndex = this.seriesIds.indexOf(itemId) + 1;
+                if(_nextIndex >= this.seriesIds.length){
+                    nextItemType = "video";
+                    _nextIndex = 0;
+                }else{
+                    nextItemType = "series";
+                }
+            }else if(this.videoIds.indexOf(itemId) > -1){
+                currentItemType = "video";
+                _nextIndex = this.videoIds.indexOf(itemId) + 1;
+                if(_nextIndex >= this.videoIds.length){
+                    nextItemType = "report";
+                    _nextIndex = 0;
+                }else{
+                    nextItemType = "video";
+                }
+            }else if(this.reportIds.indexOf(itemId) > -1){
+                currentItemType = "report";
+                _nextIndex = this.reportIds.indexOf(itemId) + 1;
+                if(_nextIndex >= this.reportIds.length){
+                    nextItemType = "series";
+                    _nextIndex = 0;
+                }else{
+                    nextItemType = "report";
+                }
+            }else{
+                throw new Error("This itemId is not found in the study");
+            }
+        }else{
+            nextItemType = "series";
+            _nextIndex = 0;
+        }
+
+        while(!_itemId){
+            if(nextItemType === "series"){
+                if(_nextIndex < this.seriesIds.length){
+                    _itemId = this.seriesIds[_nextIndex];
+                }else{
+                    _nextIndex = 0;
+                    nextItemType = "video";
+                }
+            }else if(nextItemType === "video"){
+                if(_nextIndex < this.videoIds.length){
+                    _itemId = this.videoIds[_nextIndex];
+                }else{
+                    _nextIndex = 0;
+                    nextItemType = "report";
+                }
+            } else if(nextItemType === "report"){
+                if(_nextIndex < this.reportIds.length){
+                    _itemId = this.reportIds[_nextIndex];
+                }else{
+                    _nextIndex = 0;
+                    nextItemType = "series";
+                }
+            } else {
+                throw new Error("Unexpected itemType");
+            }
+        }
+
+        return [_itemId, nextItemType]
+        
+    };
+
+    /**
+     * Get the previoud itemId with the type of the item next to it.
+     * 
+     * The ordering is make by type of the item
+     * series > video > report
+     * 
+     * @param itemId
+     * the item id or undefined. If it is undefined, it will return the first item found following the function logic.
+     * 
+     * @return Array[previousItemId, previousItemType<"series"|"video"|"report">]
+     */
+    Study.prototype.getPreviousItemId = function(itemId){
+        var currentItemType,
+            previousItemType,
+            _itemId,
+            _previousIndex;
+        
+        if(itemId){
+            if(this.seriesIds.indexOf(itemId) > -1){
+                currentItemType = "series";
+                _previousIndex = this.seriesIds.indexOf(itemId) - 1
+                if(_previousIndex < 0){
+                    previousItemType = "video";
+                    _previousIndex = 0;
+                }else{
+                    previousItemType = "series";
+                }
+            }else if(this.videoIds.indexOf(itemId) > -1){
+                currentItemType = "video";
+                _previousIndex = this.videoIds.indexOf(itemId) - 1
+                if(_previousIndex < 0){
+                    previousItemType = "report";
+                    _previousIndex = 0;
+                }else{
+                    previousItemType = "video";
+                }
+            }else if(this.reportIds.indexOf(itemId) > -1){
+                currentItemType = "report";
+                _previousIndex = this.reportIds.indexOf(itemId) - 1
+                if(_previousIndex < 0){
+                    previousItemType = "series";
+                    _previousIndex = 0;
+                }else{
+                    previousItemType = "report";
+                }
+            }else{
+                throw new Error("This itemId is not found in the study");
+            }
+        }else{
+            previousItemType = "series";
+            _previousIndex = 0;
+        }
+
+        while(!_itemId){
+            if(previousItemType === "series"){
+                if(_previousIndex < this.seriesIds.length && _previousIndex >= 0){
+                    _itemId = this.seriesIds[_previousIndex];
+                }else{
+                    _previousIndex = this.videoIds.length - 1;
+                    previousItemType = "video";
+                }
+            }else if(previousItemType === "video"){
+                if(_previousIndex < this.videoIds.length && _previousIndex >= 0){
+                    _itemId = this.videoIds[_previousIndex];
+                }else{
+                    _previousIndex = this.reportIds.length - 1;
+                    previousItemType = "report";
+                }
+            } else if(previousItemType === "report"){
+                if(_previousIndex < this.reportIds.length && _previousIndex >= 0){
+                    _itemId = this.reportIds[_previousIndex];
+                }else{
+                    _previousIndex = this.seriesIds.length - 1;
+                    previousItemType = "series";
+                }
+            } else {
+                throw new Error("Unexpected itemType");
+            }
+        }
+
+        return [_itemId, previousItemType]
+        
     };
 
     osimis.Study = Study;

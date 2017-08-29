@@ -232,13 +232,17 @@
             }
         };
 
-        WvSeries.prototype.goToPreviousImage = function() {
+        WvSeries.prototype.goToPreviousImage = function(restartWhenSeriesEnd) {
             if (this.currentIndex > 0) {
                 this.currentIndex--;
                 this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
             }
+            else if (this.currentIndex <= 0) {
+                this.currentIndex = this.imageCount -1;
+                this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
+            }
             else {
-                // Don't trigger event when nothing happens (the series is already at the first image)
+                // Don't trigger event when nothing happens (the series is already at its end)
             }
         };
 
