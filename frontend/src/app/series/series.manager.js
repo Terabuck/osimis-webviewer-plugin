@@ -243,10 +243,11 @@
                 });
         }
 
-        function listFromOrthancStudyId(studyId) {
+        function listFromOrthancStudyId(studyId, useCache) {
             var request = new osimis.HttpRequest();
+            var useCache = useCache !== undefined ? useCache : true;
             request.setHeaders(wvConfig.httpRequestHeaders);
-            request.setCache(true);
+            request.setCache(useCache);
             return request.get(wvConfig.orthancApiURL + '/studies/'+studyId)
                 .then(function(response) {
                     var orthancStudy = response.data;

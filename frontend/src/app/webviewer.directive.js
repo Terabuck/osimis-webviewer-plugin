@@ -110,6 +110,12 @@
  * Retrieve annotations from storage. Store annotations to storage
  * automatically. This should be set to false when `wvReadonly` is true.
  * 
+ * @param {boolean} [wvKeyImageCaptureEnabled=false]
+ * When activated, this option displays a button on each viewport. When the button is
+ * clicked, a new DICOM series is created with the image of the viewport, including the
+ * annotations. This image is considered as a DICOM Key Image Note (see 
+ * `http://wiki.ihe.net/index.php/Key_Image_Note`).
+ *
  * @scope
  * @restrict E
  * 
@@ -149,6 +155,7 @@
                 annotationStorageEnabled: '=?wvAnnotationstorageEnabled',
                 studyDownloadEnabled: '=?wvStudyDownloadEnabled',
                 videoDisplayEnabled: '=?wvVideoDisplayEnabled',
+                keyImageCaptureEnabled: '=?wvKeyImageCaptureEnabled',
 
                 // Selection-related
                 seriesItemSelectionEnabled: '=?wvSeriesItemSelectionEnabled',
@@ -202,10 +209,14 @@
                 rotateright: false,
                 arrowAnnotate: false
             };
+            if (vm.keyImageCaptureEnabled) { // activate
+                vm.tools.keyimagenote = false;
+            }
             vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];
             vm.selectedStudyIds = typeof vm.selectedStudyIds !== 'undefined' ? vm.selectedStudyIds : [];
             vm.studyDownloadEnabled = typeof vm.studyDownloadEnabled !== 'undefined' ? vm.studyDownloadEnabled : false;
             vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
+            vm.keyImageCaptureEnabled = typeof vm.keyImageCaptureEnabled !== 'undefined' ? vm.keyImageCaptureEnabled : false;
             vm.studyIslandsDisplayMode = 'grid';
 
             // Selection-related

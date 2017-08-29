@@ -3,12 +3,20 @@
 
     <div class="wv-overlay-topleft" ng-show="vm.showTopLeftArea()">
         {{vm.wvSeries.tags.PatientName}}<br/>
-        {{vm.wvSeries.tags.PatientID}}
+        {{vm.wvSeries.tags.PatientID}}<br/>
+        <p style="margin-top: 1rem; white-space: pre;"><!--
+            -->{{vm.wvSeries.tags.OsimisNote}}<!--
+        --></p>
     </div>
     <div class="wv-overlay-topright" ng-show="vm.showTopRightArea()">
         {{vm.wvSeries.tags.StudyDescription}}<br/>
         {{vm.wvSeries.tags.StudyDate}}<br/>
         #{{vm.wvSeries.tags.SeriesNumber}} - {{vm.wvSeries.tags.SeriesDescription}}<br/>
+        <!--<wv-export-viewport-button
+            ng-if="vm.keyImageCaptureEnabled"
+            wv-image-id="vm.image.id"
+            wv-viewport="vm.wvViewport"
+        ></wv-export-viewport-button>-->
     </div>
     
     <div class="wv-overlay-bottomright" ng-show="vm.showBottomRightArea()">

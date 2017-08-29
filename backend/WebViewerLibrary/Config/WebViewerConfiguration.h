@@ -60,6 +60,12 @@ public:
   bool highQualityImagePreloadingEnabled;
   Json::Value windowingPresets;
 
+  // If activated, this feature displays a button on each viewport. When the button is
+  // clicked, a new series is created with the image of the viewport, including the
+  // annotations. This image is considered as a DICOM Key Image Note (see 
+  // `http://wiki.ihe.net/index.php/Key_Image_Note`).
+  bool keyImageCaptureEnabled;
+
   WebViewerConfiguration(OrthancPluginContext* context);
   /**
    * Retrieve a specific set of options for the frontend.
@@ -82,6 +88,7 @@ public:
    *   "enableStudyDownload": true,
    *   "enableVideoDisplay": true
    *   "enableAnnotationStorage": false,
+   *   "enableKeyImageCapture": false
    *   "windowingPresets": [{
    *     "name": "Ct Lung",
    *     "windowWidth": -400,

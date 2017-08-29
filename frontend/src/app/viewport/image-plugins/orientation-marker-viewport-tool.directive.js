@@ -127,6 +127,10 @@
             // This tool also requires imagePlane cornerstone meta data. Those
             // are filled in the instance manager.
         }
+        
+        Controller.prototype.unregister = function(viewport) {
+            // noop (at least AM-JE think so)
+        }
 
         return directive;
     }

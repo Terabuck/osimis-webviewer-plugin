@@ -14,10 +14,12 @@
 (function(osimis) {
     'use strict';
 
-    function ImageManager(instanceManager, imageBinaryManager, annotationManager) {
+    function ImageManager(studyManager, instanceManager, imageBinaryManager, annotationManager, config) {
+        this._studyManager = studyManager;
         this._instanceManager = instanceManager;
         this._imageBinaryManager = imageBinaryManager;
         this._annotationManager = annotationManager;
+        this._config = config; // so we can retrieve http request headers
 
         this._postProcessorClasses = {};
 
@@ -128,6 +130,104 @@
         postProcessorClasses[name] = PostProcessor;
     };
 
+    /**
+     * @ngdoc method
+     * @methodOf webviewer.service:wvImageManager
+     *
+     * @name osimis.ImageManager#captureViewportAsKeyImage
+     * 
+     * @param {string} imageId
+     * Id of the image (<instance-id>:<frame-index>)
+     * 
+     * @param {int} width
+     * Width of the output
+     * 
+     * @param {int} height
+     * Height of the output
+     *
+     * @param {string} note
+     * a note to store in OsimisNote private tag
+     *
+     * @param {object} [serializedCsViewport=null]
+     * The cornerstone viewport object of the image. This viewport
+     * defines the windowing, paning, ... settings of the image.
+     * See cornerstone documentation for interface specification.
+     * 
+     * @return {Promise<string>}
+     * A data64 string containing the image in 96 dpi png.
+     *
+     * @description
+     * Creates a new DICOM series is created with the image of the viewport,
+     * including the annotations. This image is considered as a DICOM Key 
+     * Image Note (see `http://wiki.ihe.net/index.php/Key_Image_Note`).
+     * 
+     * @todo move in @RootAggregate (ie. image-model)
+     */
+     ImageManager.prototype.captureViewportAsKeyImage = function(imageId, width, height, note, serializedCsViewport) {
+
+        var instanceManager = this._instanceManager;
+        var studyManager = this._studyManager;
+        var config = this._config;
+        var studyId = undefined;
+
+        return this
+            // Create annoted image.
+            .createAnnotedImage(imageId, width, height, serializedCsViewport)
+            // Prepare new dicom tags for captured image.
+            .then(function(b64PixelData) {
+                var instanceId = imageId.split(':')[0];
+
+                // Takes original instance's dicom tags, and add the PixelData.
+                return instanceManager
+                    .getTags(instanceId)
+                    .then(function(tags) {
+                        // Clone tags to ensure we don't corrupt them (they may
+                        // be passed by reference).
+                        tags = _.cloneDeep(tags);
+
+                        // Use KO as a modality, as requested by the client.
+                        tags.Modality = 'KO';
+
+                        // Avoid `Use "Content" to inject an image into a new
+                        // DICOM instance` & `Trying to override a value
+                        // inherited from a parent module` backend error.
+                        delete tags.PixelData;
+                        delete tags.SeriesInstanceUID;
+                        delete tags.StudyInstanceUID;
+
+                        tags = {
+                            Modality: 'KO',
+                            SeriesDescription: '*' + tags.SeriesDescription,
+                            OsimisNote: note
+                        };
+
+                        // Retrieve study Id
+                        return studyManager
+                            .getByInstanceId(instanceId)
+                            .then(function(study) {
+                                // Return POST request body.
+                                studyId = study.id;
+                                return {
+                                    Tags: tags,
+                                    Content: b64PixelData,
+                                    Parent: study.id
+                                };
+                            });
+                    });
+            })
+            // Create new DICOM from captured image.
+            .then(function(requestBody) {
+                var req = new osimis.HttpRequest();
+                req.setHeaders(config.httpRequestHeaders);
+                return req.post(config.orthancApiURL + '/tools/create-dicom', requestBody)
+            })
+            // Retrieve new DICOM id.
+            .then(function(resp) {
+                var id = resp['ID'];
+                return {'ID': id, Parent: studyId}
+            });
+    };
+
     osimis.ImageManager = ImageManager;
 
     angular
@@ -135,8 +235,8 @@
         .factory('wvImageManager', wvImageManager);
 
     /* @ngInject */
-    function wvImageManager($rootScope, $q, $compile, $timeout, wvInstanceManager, wvImageBinaryManager, wvAnnotationManager) {
-        var imageManager = new ImageManager(wvInstanceManager, wvImageBinaryManager, wvAnnotationManager);
+    function wvImageManager($rootScope, $q, $compile, $timeout, wvStudyManager, wvInstanceManager, wvImageBinaryManager, wvAnnotationManager, wvConfig) {
+        var imageManager = new ImageManager(wvStudyManager, wvInstanceManager, wvImageBinaryManager, wvAnnotationManager, wvConfig);
 
         // Cache available binary qualities for instance
         $rootScope.$on('SeriesHasBeenLoaded', function(evt, series) {
@@ -152,16 +252,29 @@
          *
          * @name osimis.ImageManager#createAnnotedImage
          * 
-         * @param {string} id Id of the image (<instance-id>:<frame-index>)
-         * @param {int} width Width of the output
-         * @param {int} height Height of the output
+         * @param {string} id
+         * Id of the image (<instance-id>:<frame-index>)
+         * 
+         * @param {int} width
+         * Width of the output
+         * 
+         * @param {int} height
+         * Height of the output
+         *
+         * @param {object} [serializedCsViewport=null]
+         * The cornerstone viewport object of the image. This viewport
+         * defines the windowing, paning, ... settings of the image.
+         * See cornerstone documentation for interface specification.
+         * 
+         * @return {Promise<string>}
+         * A data64 string containing the image in 96 dpi png.
          *
          * @description
          * Retrieve an image picture from an image id.
          * 
          * @todo move in @RootAggregate (ie. image-model)
          */
-        imageManager.createAnnotedImage = function(id, width, height) {
+        imageManager.createAnnotedImage = function(id, width, height, serializedCsViewport) {
             // create a fake viewport containing the image to save it with the annotations
 
             // create a fake scope for the viewport
@@ -171,13 +284,14 @@
                 height: height + 'px'
             };
             $scope.imageId = id;
+            $scope.csViewport = serializedCsViewport && osimis.CornerstoneViewportWrapper.deserialize(serializedCsViewport, width, height) || null;
 
             var fakeViewport = $compile([
                 '<wv-viewport id="FAKE-VIEWPORT-USED-IN-IMAGE-SERVICE"',
                     'wv-image-id="imageId"',
-    //                    'wv-viewport="$viewport"',
+                    'wv-viewport="csViewport"',
                     'wv-size="size"',
-                    'wv-enable-overlay="false"',
+                    'wv-lossless="true"',
 
                     'wv-angle-measure-viewport-tool="true"',
                     'wv-length-measure-viewport-tool="true"',
@@ -199,9 +313,9 @@
             var body = $('body');
             var _oldBodyOverflow = body.css('overflow');
             body.css('overflow', 'hidden');
-            fakeViewport.css('position', 'absolute');
+            fakeViewport.css('position$', 'absolute');
             fakeViewport.css('left', '-50000px');
-            body.append(fakeViewport)
+            body.append(fakeViewport);
 
             function _destroyFakeViewport() {
                 // revert body state
@@ -231,7 +345,9 @@
             })
         };
 
+
         return imageManager;
-    }
+    };
+
 
 })(this.osimis || (this.osimis = {}));

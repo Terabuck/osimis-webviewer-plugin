@@ -136,6 +136,14 @@ This plugin provide a few optional options as well.
     // Default: false
     "AnnotationStorageEnabled": false,
 
+    // This option displays a button on each viewport. When the user clicks 
+    // on the button, a new DICOM series is created with the image of the
+    // viewport, including the annotations. You must ensure your server allows
+    // large requests. You must also includes a new dicom tag in the
+    // dictionary (see the Dictionary json attribute below).
+    // Default: false
+    "KeyImageCaptureEnabled": false
+
     // Store low/high quality images in a short term cache
     "ShortTermCacheEnabled": true,
 
@@ -159,7 +167,6 @@ This plugin provide a few optional options as well.
     // Preload high quality images on the frontend before the user actually
     // needs them
     "HighQualityImagePreloadingEnabled": true
-
   }
 }
 ```
@@ -207,8 +214,7 @@ Six folders are available at the root:
 
 - `backend/` contains the C++ plugin source code (& cmake build process).
 - `frontend/` contains the HTML/JavaScript source code (& gulp build process).
-- `reverse-proxy/` contains a security proxy blocking Orthanc non-GET requests
-  and a reverse proxy suitable for development.
+- `reverse-proxy/` contains a reverse proxy suitable for development.
 - `demo/` contains a standalone docker, proxied version of orthanc and the
   viewer with sample files.
 - `scripts/` contains global demo building scripts, it is mostly used by the

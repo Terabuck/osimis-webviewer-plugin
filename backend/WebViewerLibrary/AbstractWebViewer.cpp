@@ -188,6 +188,17 @@ int32_t AbstractWebViewer::start()
     ImageController::Inject(_cache.get());
   }
 
+  if (_config->keyImageCaptureEnabled) {
+    // register the OsimisNote tag
+    OrthancPluginRegisterDictionaryTag(_context,
+                                       0x7331,
+                                       0x1000,
+                                       OrthancPluginValueRepresentation_LT,
+                                       "OsimisNote",
+                                       1,
+                                       1
+                                       );
+  }
 
   // Inject configuration within components
   _imageRepository->enableCachedImageStorage(_config->persistentCachedImageStorageEnabled);

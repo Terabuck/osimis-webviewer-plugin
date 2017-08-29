@@ -46,7 +46,8 @@ app.all("/:service/*", function(req, res, next) {
         'osimis-viewer',
         'studies',
         'instances',
-        'series'
+        'series',
+        'tools'
     ];
 
     // Keep serving

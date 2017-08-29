@@ -1,26 +1,33 @@
+/**
+ * @ngdoc directive
+ * @name webviewer.toolbox.directive:wvKeyimagenoteButton
+ * 
+ * @restrict Element
+ * @scope
+ *
+ * @description
+ */
 (function() {
     'use strict';
 
     angular
         .module('webviewer')
-        .directive('wvMagnifyingGlassConfigButton', wvMagnifyingGlassConfigButton);
+        .directive('wvKeyimagenoteButton', wvKeyimagenoteButton);
 
     /* @ngInject */
-    function wvMagnifyingGlassConfigButton($timeout) {
+    function wvKeyimagenoteButton($timeout) {
         var directive = {
             bindToController: true,
-            controller: MagnifyingGlassConfigButtonVM,
+            controller: KeyImageNoteButtonVM,
             controllerAs: 'vm',
             link: link,
             restrict: 'E',
             scope: {
-                selectedTool: '=wvSelectedTool',
-                magnificationLevel: '=wvMagnificationLevel',
-                magnifyingGlassSize: '=wvMagnifyingGlassSize',
                 readonly: '=?wvReadonly',
-                popoverPlacement: '@?wvPopoverPlacement'
+                popoverPlacement: '@?wvPopoverPlacement',
+                onKeyimagenoteCreated: '&onKeyimagenoteCreated'
             },
-            templateUrl: 'app/toolbox/magnifying-glass-config-button.directive.html'
+            templateUrl: 'app/toolbox/keyimagenote-button.directive.html'
         };
         return directive;
 
@@ -57,13 +64,21 @@
     }
 
     /* @ngInject */
-    function MagnifyingGlassConfigButtonVM($q, $element, $scope, $popover, wvPaneManager) {
+    function KeyImageNoteButtonVM($element, $scope, $popover, wvPaneManager) {
         var _this = this;
         var buttonEl = $element.children().first();
 
+        this.splitpaneLayout = typeof this.splitpaneLayout !== 'undefined' ? this.splitpaneLayout : {x: 1, y: 1};
         this.readonly = typeof this.readonly !== 'undefined' ? this.readonly : false;
         this.popoverPlacement = typeof this.popoverPlacement !== 'undefined' ? this.popoverPlacement : 'bottom';
         this.insidePopover = false;
+        this.onExportEnded = function(){
+            _this.popover.hide();
+            if(_this.onKeyimagenoteCreated){
+                _this.insidePopover = false;                
+                _this.onKeyimagenoteCreated();
+            }
+        }
 
         // Don't exit popover on when mouse leave the button.
         this.attachEventsToPopoverContent = function () {
@@ -75,44 +90,46 @@
                 _this.popover.hide();
             });
         };
-        
+
         // Popover configuration
         var popoverScope = $scope.$new();
-        this.popover = $popover(buttonEl, {
+        this.popover = $popover($element.children().first(), {
+            // title: 'Viewport Grid\'s Layout',
             placement: _this.popoverPlacement,
             container: 'body',
             trigger: 'manual',
-            templateUrl: 'app/toolbox/magnifying-glass-config-button.popover.html',
-            onBeforeShow: function() {
-                // @warning The following source code is not databound in real time.
-
-                // Clean up scope.
-                // popoverScope.embeddedWindowings = [];
-                // vm.magnificationLevel inherited
-                // vm.magnifyingGlassSize inherited
-            },
+            templateUrl: 'app/toolbox/keyimagenote-button.popover.html',
 
             // Option documented in `ngTooltip`, not `ngPopover`, see
             // `https://stackoverflow.com/questions/28021917/angular-strap-popover-programmatic-use`.
-            scope: popoverScope
+            scope: popoverScope,
+
+            onBeforeShow: function() {
+                // @warning The following source code is not databound in real time. If one of the used 
+                //    model changes, the windowing presets will only be adapted next time  the popover is
+                //    displayed.
+
+                // Clean up scope.
+                popoverScope.viewport = null;
+                popoverScope.imageId = null;
+
+                // Set windowings specific to the selected viewport (either preset set in the dicom file
+                // or which has been processed by the viewer in the web workers).
+                var selectedPane = wvPaneManager.getSelectedPane();
+                popoverScope.viewport = selectedPane.csViewport;
+                selectedPane
+                    .getImage()
+                    .then(function(image) {
+                        if (!image) {
+                            return;
+                        }
+                        popoverScope.onExportEnded = _this.onExportEnded;
+                        popoverScope.imageId = image.id;
+                    });
+            }
         });
         $scope.$on('$destroy', function() {
             popoverScope.$destroy();
         });
-
-        // var values = {
-        //     enabled: false,
-        //     magnificationLevel: 5
-        //     magnifyingGlassSize: 400
-        // };
-
-
-        // Apply windowing preset to the selected pane.
-        // popoverScope.applyWindowing = function(windowWidth, windowCenter) {
-        //     _this.onWindowingPresetSelected({
-        //         $windowWidth: windowWidth,
-        //         $windowCenter: windowCenter
-        //     });
-        // };
     }
 })();

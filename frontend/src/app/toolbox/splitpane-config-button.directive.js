@@ -79,7 +79,7 @@
                 }
             });
 
-            buttonEl.bind('mouseout', function (e) {
+            buttonEl.bind('mouseleave', function (e) {
                 // Timeout to make sure the user can move it's cursor from the button
                 // to the popover without having the popover to hide in between.
                 $timeout(function () {

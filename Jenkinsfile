@@ -7,8 +7,7 @@ def userInput = [
     buildDocker: true,
     launchDockerTests: true,
     buildWindows: isUserDevBranch ? false : true,
-    buildOSX: isUserDevBranch ? false : true,
-    syncS3DicomSamples: false
+    buildOSX: isUserDevBranch ? false : true
 ];
 
 // The built version, defined via `git describe` in scripts/ci/setEnv.sh call
@@ -28,8 +27,7 @@ else {
                     [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildDocker'], description: 'Build Docker (/!\\ false -> disable tests & deployment)', name: 'buildDocker'],
                     [$class: 'BooleanParameterDefinition', defaultValue: userInput['launchDockerTests'], description: 'Launch Docker Tests (including JS Unit Tests & Integration Tests)', name: 'launchDockerTests'],
                     [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildWindows'], description: 'Build Windows', name: 'buildWindows'],
-                    [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildOSX'], description: 'Build OSX', name: 'buildOSX'],
-                    [$class: 'BooleanParameterDefinition', defaultValue: userInput['syncS3DicomSamples'], description: 'Sync S3 DICOM samples', name: 'syncS3DicomSamples']
+                    [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildOSX'], description: 'Build OSX', name: 'buildOSX']
                 ]
             )
         }
@@ -43,7 +41,6 @@ else {
 echo 'Build Docker          : ' + (userInput['buildDocker'] ? 'OK' : 'KO (/!\\ tests disabled)')
 echo 'Build Windows         : ' + (userInput['buildWindows'] ? 'OK' : 'KO')
 echo 'Build OSX             : ' + (userInput['buildOSX'] ? 'OK' : 'KO')
-echo 'Sync S3 DICOM samples : ' + (userInput['syncS3DicomSamples'] ? 'OK' : 'KO')
 
 // Lock overall build to avoid issues related to slow unit test runs or docker ip/name conflicts for instance
 // This allow to benefits the optimization of using a common workspace for every branches (for instance, test
@@ -179,26 +176,18 @@ lock(resource: 'webviewer', inversePrecedence: false) {
                     int demoPort = random.nextInt(maxPort - minPort + 1) + minPort;
 
                     // Build demo
-                    if (userInput['syncS3DicomSamples']) {
-                        sh "demo/scripts/buildDocker.sh \"\" true"
-                    }
-                    else {
-                        sh "demo/scripts/buildDocker.sh \"\" false"
-                    }
+                    sh "demo/scripts/buildDocker.sh"
 
                     // Load docker registry (required by docker-compose)
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkinsosimis') {
-                        // Build proxy (in case config has changed)
-                        sh "SUBNET=${demoSubnet} PORT=${demoPort} docker-compose build proxy"
-
                         // Set docker-compose project name
                         def dockerProject = "wvb_demo_${BRANCH_NAME}"
 
                         // Stop previous demo (if already exists)
                         sh "SUBNET=${demoSubnet} PORT=${demoPort} docker-compose -p ${dockerProject} down || true"
                         
-                        // Start demo (with proxy)
-                        sh "SUBNET=${demoSubnet} PORT=${demoPort} docker-compose -p ${dockerProject} up -d proxy"
+                        // Start demo
+                        sh "SUBNET=${demoSubnet} PORT=${demoPort} docker-compose -p ${dockerProject} up -d orthanc_populated"
                     }
 
                     // Retrieve ticket number

@@ -285,11 +285,13 @@
                 //    optimized order.
                 //
                 // The following function is performed at each $digest cycle.
+                var _firstWatch = true;
                 scope.$watch(function fromWatch() {
                     var oldImageId = _watchedValue.imageId || null;
                     var newImageId = scope.vm.wvImageId || null;
                     var oldCsViewport = oldImageId && _watchedValue.csViewport || null;
                     var newCsViewport = newImageId && scope.vm.csViewport || null;
+                    _firstWatch = _firstWatch && newImageId === oldImageId;
 
                     // Assert values (because if they are not finite, they
                     // will always return false on equality comparison,
@@ -319,7 +321,7 @@
                     //   SET IMAGE
                     //   UPDATE VIEWPORT
                     //   DRAW IMAGE
-                    else if (newImageId !== oldImageId) {
+                    else if (newImageId !== oldImageId || _firstWatch) {
                         // Load image model & set it.
                         wvImageManager
                             .get(newImageId)
@@ -394,6 +396,9 @@
                         model.draw(false);
                     }
 
+                    // Update old values
+                    _firstWatch = false;
+
                     // Update old values if they have changed.
                     if (newImageId !== oldImageId) {
                         _watchedValue.imageId = newImageId;
@@ -424,12 +429,6 @@
                     )) {
                         _watchedValue.csViewport = newImageId && newCsViewport && newCsViewport.clone() || null; // the `.clone` is only here to be able to deep compare new values with old ones (otherwise both old & new variable would reference the same object)
                     }
-                    /*
-                    _watchedValue = {
-                        imageId: newImageId,
-                        csViewport: newCsViewport// scope.vm.wvImageId && scope.vm.csViewport && scope.vm.csViewport.clone() // the `.clone` is only here to be able to deep compare new values with old ones (otherwise both old & new variable would reference the same object)
-                    };
-                    */
 
                     // Always return false, as we do not use the watch function
                     return false;

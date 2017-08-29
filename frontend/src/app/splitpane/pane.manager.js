@@ -38,6 +38,12 @@
         this.onSelectedPaneChanged = new osimis.Listener();
     }
 
+    PaneManager.prototype.getSelectedPaneElement = function() {
+        var selectedPane = this.getSelectedPane();
+        var paneEl = $($('wv-pane-policy')[this.panes.indexOf(selectedPane)]); // @todo check if this safe
+        return paneEl;
+    }
+
     /**
      * @ngdoc method
      * @methodOf osimis.PaneManager

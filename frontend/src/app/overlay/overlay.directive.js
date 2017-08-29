@@ -4,6 +4,13 @@
  * 
  * @restrict Element
  * @requires webviewer.directive:wvViewport
+ *
+ * @param {boolean} [wvKeyImageCaptureEnabled=false]
+ * When activated, this option displays a button on each viewport. When the button is
+ * clicked, a new DICOM series is created with the image of the viewport, including the
+ * annotations. This image is considered as a DICOM Key Image Note (see 
+ * `http://wiki.ihe.net/index.php/Key_Image_Note`).
+ *
  */
 (function() {
     'use strict';
@@ -27,11 +34,12 @@
             },
             templateUrl: 'app/overlay/overlay.directive.html',
             scope: {
-                'wvTags': '=?',
-            	'wvSeries': '=?',
-                'studyId': '=?wvStudyId',
-            	'wvViewport': '=?',
-            	'wvShowTimeline': '=?'
+                wvTags: '=?',
+                wvSeries: '=?',
+                studyId: '=?wvStudyId',
+                wvViewport: '=?',
+                image: '=wvImage',
+                keyImageCaptureEnabled: '=?wvKeyImageCaptureEnabled',
             }
         };
         return directive;
@@ -39,6 +47,10 @@
         function link(scope, element, attrs, ctrls) {
             var _this = this;
             var vm = scope.vm;
+
+            // Set default value.
+            vm.keyImageCaptureEnabled = typeof vm.keyImageCaptureEnabled !== 'undefined' ? vm.keyImageCaptureEnabled : false;
+
 
             vm.showTopLeftArea = function() {
                 return !!vm.wvTags;
@@ -51,18 +63,14 @@
             vm.showBottomRightArea = function() {
                 return !!vm.wvViewport && !!vm.wvTags;
             };
-            vm.wvShowTimeline = typeof vm.wvShowTimeline === 'undefined' ? true : vm.wvShowTimeline;
-            vm.showTimeline = false;
 
             // auto grab series model
-            if (vm.wvShowTimeline && ctrls.series) {
+            if (ctrls.series) {
                 var series = ctrls.series.getSeries();
                 vm.wvSeries = series;
-                vm.showTimeline = series && vm.wvShowTimeline && !!series.imageCount;
 
                 ctrls.series.onSeriesChanged(_this, function(series) {
                     vm.wvSeries = series;
-                    vm.showTimeline = vm.wvShowTimeline && series && series.imageCount > 1;
                 });
                 scope.$on('$destroy', function() {
                     ctrls.series.onSeriesChanged.close(_this);
@@ -86,19 +94,6 @@
                     });
             });
 
-            // function _onViewportData(viewport) {
-            //     scope.$viewport = viewport;
-
-            //     if (!viewport) {
-            //       scope.showBottomRightArea = false;
-            //     }
-            //     else {
-            //       scope.$viewport.scale = parseFloat(viewport.scale).toFixed(2);
-            //       scope.$viewport.voi.windowWidth = parseFloat(viewport.voi.windowWidth).toFixed(0);
-            //       scope.$viewport.voi.windowCenter = parseFloat(viewport.voi.windowCenter).toFixed(0);
-            //       scope.showBottomRightArea = true;
-            //     }
-            // }
         }
     }
 
