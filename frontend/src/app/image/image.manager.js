@@ -14,8 +14,7 @@
 (function(osimis) {
     'use strict';
 
-    function ImageManager(studyManager, instanceManager, imageBinaryManager, annotationManager, config) {
-        this._studyManager = studyManager;
+    function ImageManager(instanceManager, imageBinaryManager, annotationManager, config) {
         this._instanceManager = instanceManager;
         this._imageBinaryManager = imageBinaryManager;
         this._annotationManager = annotationManager;
@@ -166,7 +165,6 @@
      ImageManager.prototype.captureViewportAsKeyImage = function(imageId, width, height, note, serializedCsViewport) {
 
         var instanceManager = this._instanceManager;
-        var studyManager = this._studyManager;
         var config = this._config;
         var studyId = undefined;
 
@@ -202,15 +200,15 @@
                         };
 
                         // Retrieve study Id
-                        return studyManager
-                            .getByInstanceId(instanceId)
-                            .then(function(study) {
+                        return instanceManager
+                            .getParentStudyId(instanceId)
+                            .then(function(studyIdFromResponse) {
+                                studyId = studyIdFromResponse;
                                 // Return POST request body.
-                                studyId = study.id;
                                 return {
                                     Tags: tags,
                                     Content: b64PixelData,
-                                    Parent: study.id
+                                    Parent: studyId
                                 };
                             });
                     });
@@ -235,8 +233,8 @@
         .factory('wvImageManager', wvImageManager);
 
     /* @ngInject */
-    function wvImageManager($rootScope, $q, $compile, $timeout, wvStudyManager, wvInstanceManager, wvImageBinaryManager, wvAnnotationManager, wvConfig) {
-        var imageManager = new ImageManager(wvStudyManager, wvInstanceManager, wvImageBinaryManager, wvAnnotationManager, wvConfig);
+    function wvImageManager($rootScope, $q, $compile, $timeout, wvInstanceManager, wvImageBinaryManager, wvAnnotationManager, wvConfig) {
+        var imageManager = new ImageManager(wvInstanceManager, wvImageBinaryManager, wvAnnotationManager, wvConfig);
 
         // Cache available binary qualities for instance
         $rootScope.$on('SeriesHasBeenLoaded', function(evt, series) {

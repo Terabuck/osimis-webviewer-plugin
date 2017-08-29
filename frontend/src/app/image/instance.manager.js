@@ -72,7 +72,22 @@
              * Required as some part of the cornerstone API doesn't fit well
              * with the getter/setter we use (because they use promises).
              */
-            onTagsSet: new osimis.Listener()
+            onTagsSet: new osimis.Listener(),
+            
+            /**
+             * @ngdoc method
+             * @methodOd webviewer.service:wvInstanceManager
+             * 
+             * @name osimis.InstanceManager#getParentStudyId
+             * 
+             * @param {string} id
+             * The id of the instance (orthanc format)
+             * 
+             * @description
+             * get the study id of the instanceId. Similar to StudyManager.getFromInstanceId but reversed to retrieve the study id.
+             * Written to avoid circular dependency of wvStudyManager.
+             */
+            getParentStudyId: getParentStudyId
         };
 
         /**
@@ -92,6 +107,21 @@
         return service;
 
         ////////////////
+
+        function getParentStudyId(id){
+            var request = new osimis.HttpRequest();
+            request.setHeaders(wvConfig.httpRequestHeaders);
+            return request
+                .get(wvConfig.orthancApiURL + '/instances/' + id + '/study')
+                .then(function(response) {
+                    var studyId = response.data.ID;
+                    return studyId
+                }, function(err) {
+                    // @todo uncache & do something with the error.
+                    
+                    return $q.reject(err);
+                });
+        }
 
         function getTags(id) {
         	// Load image tags if not already in loading.
