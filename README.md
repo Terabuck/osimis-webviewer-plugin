@@ -167,10 +167,6 @@ This plugin provide a few optional options as well.
     // Preload high quality images on the frontend before the user actually
     // needs them
     "HighQualityImagePreloadingEnabled": true
-  },
-  "Dictionary" : {
-    // Tag required when setting `KeyImageCaptureEnabled` to true.
-    "7331,1000" : [ "LT", "OsimisNote", 1, 1 ]
   }
 }
 ```
