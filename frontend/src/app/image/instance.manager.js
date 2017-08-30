@@ -76,7 +76,7 @@
             
             /**
              * @ngdoc method
-             * @methodOd webviewer.service:wvInstanceManager
+             * @methodOf webviewer.service:wvInstanceManager
              * 
              * @name osimis.InstanceManager#getParentStudyId
              * 
