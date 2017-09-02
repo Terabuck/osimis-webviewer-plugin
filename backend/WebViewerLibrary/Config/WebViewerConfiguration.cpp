@@ -12,28 +12,12 @@
 WebViewerConfiguration::WebViewerConfiguration(OrthancPluginContext* context)
   : _context(context)
 {
-  // By default, disable storage attachment cache.
-  persistentCachedImageStorageEnabled = false;
+}
 
-  // By default, use GDCM.
-  gdcmEnabled = true;
-  // By default, use GDCM for everything.
-  restrictTransferSyntaxes = false;
 
-  // By default, show the study download button in the frontend.
-  studyDownloadEnabled = true;
-
-  // By default, display DICOM video in the frontend.
-  videoDisplayEnabled = true;
-
-  // By default, the frontend will download the high quality images before the
-  // user needs them.
-  highQualityImagePreloadingEnabled = true;
-
-  // By default, disable annotation storage.
-  annotationStorageEnabled = false;
-
-  // By default, set these windowing presets.
+void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
+{
+  // By default, set these windowing presets. note, these are the default values sent to the frontend -> they are in mixedCase (in the settings, they are in CamelCase)
   windowingPresets = Json::Value(Json::arrayValue);
   windowingPresets.append(Json::Value(Json::arrayValue));
   windowingPresets[0] = Json::Value(Json::objectValue);
@@ -61,35 +45,15 @@ WebViewerConfiguration::WebViewerConfiguration(OrthancPluginContext* context)
   windowingPresets[5]["windowCenter"] = 300;
   windowingPresets[5]["windowWidth"] = 600;
 
-  // By default, enable the short term storage cached
-  shortTermCacheEnabled = true;
-  shortTermCacheDebugLogsEnabled = false;
-  shortTermCachePrefetchOnInstanceStored = false;
-  shortTermCacheDecoderThreadsCound = std::max(boost::thread::hardware_concurrency() / 2, 1u);
-  shortTermCacheSize = 1000;
-}
 
-
-void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
-{
-  // Enable GCM
-  static const char* CONFIG_GDCM_ENABLED = "GdcmEnabled";
-  if (wvConfig.isMember(CONFIG_GDCM_ENABLED))
-  {
-    if (wvConfig[CONFIG_GDCM_ENABLED].type() != Json::booleanValue)
-    {
-      throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
-    }
-    else
-    {
-      gdcmEnabled = wvConfig[CONFIG_GDCM_ENABLED].asBool();
-    }
-  }
+  gdcmEnabled = OrthancPlugins::GetBoolValue(wvConfig, "GdcmEnabled", true);
+  // By default, use GDCM for everything.
+  restrictTransferSyntaxes = false;
 
   // Restrict GDCM usage to the specified transfer syntaxes
-  static const char* CONFIG_RESTRICT_TRANSFER_SYNTAXES = "RestrictTransferSyntaxes";
   if (gdcmEnabled)
   {
+    static const char* CONFIG_RESTRICT_TRANSFER_SYNTAXES = "RestrictTransferSyntaxes";
     if (wvConfig.isMember(CONFIG_RESTRICT_TRANSFER_SYNTAXES))
     {
       const Json::Value& config = wvConfig[CONFIG_RESTRICT_TRANSFER_SYNTAXES];
@@ -115,57 +79,41 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
       }
     }
   }
-  
-  // Enable cache
-  if (wvConfig.isMember("CacheEnabled") &&
-      wvConfig["CacheEnabled"].type() == Json::booleanValue)
-  {
-    persistentCachedImageStorageEnabled = wvConfig["CacheEnabled"].asBool();
-  }
-
-  // Enable Study Download
-  if (wvConfig.isMember("StudyDownloadEnabled") &&
-      wvConfig["StudyDownloadEnabled"].type() == Json::booleanValue)
-  {
-    studyDownloadEnabled = wvConfig["StudyDownloadEnabled"].asBool();
-  }
-
-  // Enable Video Display
-  if (wvConfig.isMember("VideoDisplayEnabled") &&
-      wvConfig["VideoDisplayEnabled"].type() == Json::booleanValue)
-  {
-    videoDisplayEnabled = wvConfig["VideoDisplayEnabled"].asBool();
-  }
-
-  // Enable Annotation Storage
-  if (wvConfig.isMember("AnnotationStorageEnabled") &&
-      wvConfig["AnnotationStorageEnabled"].type() == Json::booleanValue)
-  {
-    annotationStorageEnabled = wvConfig["AnnotationStorageEnabled"].asBool();
-  }
-
-  // Enable Key Image Capture
-  if (wvConfig.isMember("KeyImageCaptureEnabled") &&
-      wvConfig["KeyImageCaptureEnabled"].type() == Json::booleanValue)
-  {
-    keyImageCaptureEnabled = wvConfig["KeyImageCaptureEnabled"].asBool();
-  }
 
   // Retrieve windowing preset (if set).
   if (wvConfig.isMember("WindowingPresets") &&
       wvConfig["WindowingPresets"].type() == Json::arrayValue)
   {
-    windowingPresets = wvConfig["WindowingPresets"];
-    // @todo validate the content of the input.
+    windowingPresets = windowingPresets = Json::Value(Json::arrayValue);  // remove default values
+
+    for (Json::Value::ArrayIndex i = 0; i < wvConfig["WindowingPresets"].size(); i++)
+    {
+      Json::Value preset = wvConfig["WindowingPresets"][i];
+      if (preset.type() != Json::objectValue)
+        throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
+      else
+      {
+        windowingPresets[i] = Json::Value(Json::objectValue);
+        windowingPresets[i]["name"] = preset["Name"];
+        windowingPresets[i]["windowCenter"] = preset["WindowCenter"];
+        windowingPresets[i]["windowWidth"] = preset["WindowWidth"];
+      }
+    }
   }
 
-  shortTermCachePrefetchOnInstanceStored = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCachePrefetchOnInstanceStored", shortTermCachePrefetchOnInstanceStored);
-  shortTermCacheEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheEnabled", shortTermCacheEnabled);
-  shortTermCacheDebugLogsEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheDebugLogsEnabled", shortTermCacheDebugLogsEnabled);
+  persistentCachedImageStorageEnabled = OrthancPlugins::GetBoolValue(wvConfig, "CacheEnabled", false);
+  studyDownloadEnabled = OrthancPlugins::GetBoolValue(wvConfig, "StudyDownloadEnabled", true);
+  videoDisplayEnabled = OrthancPlugins::GetBoolValue(wvConfig, "VideoDisplayEnabled", true);
+  annotationStorageEnabled = OrthancPlugins::GetBoolValue(wvConfig, "AnnotationStorageEnabled", false);
+  keyImageCaptureEnabled = OrthancPlugins::GetBoolValue(wvConfig, "KeyImageCaptureEnabled", false);
+  showBreadCrumb = OrthancPlugins::GetBoolValue(wvConfig, "ShowBreadCrumb", false);
+  shortTermCachePrefetchOnInstanceStored = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCachePrefetchOnInstanceStored", false);
+  shortTermCacheEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheEnabled", true);
+  shortTermCacheDebugLogsEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheDebugLogsEnabled", false);
   shortTermCachePath = OrthancPlugins::GetStringValue(wvConfig, "ShortTermCachePath", shortTermCachePath.string());
-  shortTermCacheSize = OrthancPlugins::GetIntegerValue(wvConfig, "ShortTermCacheSize", shortTermCacheSize);
-  shortTermCacheDecoderThreadsCound = OrthancPlugins::GetIntegerValue(wvConfig, "Threads", shortTermCacheDecoderThreadsCound);
-  highQualityImagePreloadingEnabled = OrthancPlugins::GetBoolValue(wvConfig, "HighQualityImagePreloadingEnabled", highQualityImagePreloadingEnabled);
+  shortTermCacheSize = OrthancPlugins::GetIntegerValue(wvConfig, "ShortTermCacheSize", 1000);
+  shortTermCacheDecoderThreadsCound = OrthancPlugins::GetIntegerValue(wvConfig, "Threads", std::max(boost::thread::hardware_concurrency() / 2, 1u));
+  highQualityImagePreloadingEnabled = OrthancPlugins::GetBoolValue(wvConfig, "HighQualityImagePreloadingEnabled", true);
 }
 
 void WebViewerConfiguration::parseFile()
@@ -234,21 +182,12 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
     config["version"]["webviewer"] = plugin["Version"].asString();
   }
 
-  // Register "studyDownloadEnabled"
   config["enableStudyDownload"] = studyDownloadEnabled;
-  
-  // Register "videoDisplayEnabled"
   config["enableVideoDisplay"] = videoDisplayEnabled;
-
-  // Register "annotationStorageEnabled"
   config["enableAnnotationStorage"] = annotationStorageEnabled;
-
-  // Register "keyImageCaptureEnabled"
   config["enableKeyImageCapture"] = keyImageCaptureEnabled;
-
-  // Register "windowingPresets"
+  config["showBreadCrumb"] = this->showBreadCrumb;
   config["windowingPresets"] = windowingPresets;
-
   config["enableHighQualityImagePreloading"] = highQualityImagePreloadingEnabled;
 
   return config;
