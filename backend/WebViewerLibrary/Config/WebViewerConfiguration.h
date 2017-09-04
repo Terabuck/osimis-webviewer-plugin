@@ -54,7 +54,7 @@ public:
   std::set<std::string> enabledTransferSyntaxes;
 
   // Frontend Variables
-  bool showBreadCrumb;
+  bool showStudyInformationBreadcrumb;
   bool studyDownloadEnabled;
   bool videoDisplayEnabled;
   bool annotationStorageEnabled;

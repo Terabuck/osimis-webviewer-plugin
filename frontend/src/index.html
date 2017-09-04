@@ -170,7 +170,7 @@
 
         // Configure the user interface depending on the user angent/browser.
         var userInterfacePolicy = new osimis.UserAgentBasedInterfacePolicy();
-        vm.enableLayoutTop = __webViewerConfig.showBreadCrumb && userInterfacePolicy.enableLayoutTop;
+        vm.enableLayoutTop = __webViewerConfig.showStudyInformationBreadcrumb && userInterfacePolicy.enableLayoutTop;
         vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
         vm.enableLayoutTopRight = userInterfacePolicy.enableLayoutTopRight;
         vm.enableToolbar = userInterfacePolicy.enableToolbar;
@@ -183,7 +183,7 @@
         // Listen to changes triggered by the user interface policy.    
         userInterfacePolicy.onUpdate(function() {
             $scope.$apply(function() {
-                vm.enableLayoutTop = __webViewerConfig.showBreadCrumb && userInterfacePolicy.enableLayoutTop;
+                vm.enableLayoutTop = __webViewerConfig.showStudyInformationBreadcrumb && userInterfacePolicy.enableLayoutTop;
                 vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
                 vm.enableLayoutTopRight = userInterfacePolicy.enableLayoutTopRight;
                 vm.enableToolbar = userInterfacePolicy.enableToolbar;

@@ -106,7 +106,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   videoDisplayEnabled = OrthancPlugins::GetBoolValue(wvConfig, "VideoDisplayEnabled", true);
   annotationStorageEnabled = OrthancPlugins::GetBoolValue(wvConfig, "AnnotationStorageEnabled", false);
   keyImageCaptureEnabled = OrthancPlugins::GetBoolValue(wvConfig, "KeyImageCaptureEnabled", false);
-  showBreadCrumb = OrthancPlugins::GetBoolValue(wvConfig, "ShowBreadCrumb", false);
+  showStudyInformationBreadcrumb = OrthancPlugins::GetBoolValue(wvConfig, "ShowStudyInformationBreadcrumb", false);
   shortTermCachePrefetchOnInstanceStored = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCachePrefetchOnInstanceStored", false);
   shortTermCacheEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheEnabled", true);
   shortTermCacheDebugLogsEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheDebugLogsEnabled", false);
@@ -186,7 +186,7 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["enableVideoDisplay"] = videoDisplayEnabled;
   config["enableAnnotationStorage"] = annotationStorageEnabled;
   config["enableKeyImageCapture"] = keyImageCaptureEnabled;
-  config["showBreadCrumb"] = this->showBreadCrumb;
+  config["showStudyInformationBreadcrumb"] = showStudyInformationBreadcrumb;
   config["windowingPresets"] = windowingPresets;
   config["enableHighQualityImagePreloading"] = highQualityImagePreloadingEnabled;
 
