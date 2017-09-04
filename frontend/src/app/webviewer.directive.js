@@ -157,6 +157,8 @@
                 videoDisplayEnabled: '=?wvVideoDisplayEnabled',
                 keyImageCaptureEnabled: '=?wvKeyImageCaptureEnabled',
 
+                displayDisclaimer: '=?wvDisplayDisclaimer',
+
                 // Selection-related
                 seriesItemSelectionEnabled: '=?wvSeriesItemSelectionEnabled',
                 selectedSeriesItems: '=?wvSelectedSeriesItems' // readonly

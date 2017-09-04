@@ -25,6 +25,7 @@ wv-webviewer {
 @import "wv-timeline.scss";
 @import "wv-timeline-controls.scss";
 @import "wv-loadingbar.scss";
+@import "wv-disclaimer";
 
 wv-viewport { // make sure the element is sized when using with drag & drop
   display: inline-block;
