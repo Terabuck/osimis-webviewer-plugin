@@ -31,7 +31,6 @@ private:
   static ImageRepository* imageRepository_;
   static AnnotationRepository* annotationRepository_;
   static CacheContext* cacheContext_;
-  ImageProcessingRouteParser imageProcessingRouteParser_;
 
   bool isAnnotationRequest_;
   bool disableCache_;
@@ -47,9 +46,14 @@ private:
 class ImageControllerUrlParser
 {
   static std::auto_ptr<ImageProcessingRouteParser> imageProcessingRouteParser_;
-
 public:
+  static void init();
   static bool parseUrlPostfix(const std::string urlPostfix, std::string& instanceId, uint32_t& frameIndex, std::auto_ptr<IImageProcessingPolicy>& processingPolicy);
+  static IImageProcessingPolicy* InstantiatePolicyFromRoute(const std::string& route)
+  {
+    assert(imageProcessingRouteParser_.get() != NULL);
+    return imageProcessingRouteParser_->InstantiatePolicyFromRoute(route);
+  }
 };
 
 class ImageControllerCacheFactory: public OrthancPlugins::ICacheFactory
