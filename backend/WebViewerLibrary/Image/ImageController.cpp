@@ -50,7 +50,7 @@ void ImageController::Inject<AnnotationRepository>(AnnotationRepository* obj) {
 ImageController::ImageController(OrthancPluginRestOutput* response, const std::string& url, const OrthancPluginHttpRequest* request)
   : BaseController(response, url, request)
 {
-  ImageControllerUrlParser::init();
+  ImageControllerUrlParser::init();  // create imageProcessingRouteParser_ if not created yet (it's used by 2 classes but we don't know which one will use it first)
 }
 
 int ImageController::_ParseURLPostFix(const std::string& urlPostfix) {
@@ -400,7 +400,7 @@ void ImageControllerUrlParser::init()
 
 bool ImageControllerUrlParser::parseUrlPostfix(const std::string urlPostfix, std::string& instanceId, uint32_t& frameIndex, std::auto_ptr<IImageProcessingPolicy>& processingPolicy)
 {
-  assert(imageProcessingRouteParser_.get() != NULL);
+  init(); // create imageProcessingRouteParser_ if not created yet  (it's used by 2 classes but we don't know which one will use it first)
 
   boost::regex regexp("^(nocache/|cleancache/)?([^/]+)/(\\d+)(?:/(.+))$");
   boost::cmatch matches;
