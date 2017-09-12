@@ -57,6 +57,7 @@
 
         wv-show-no-report-icon-in-series-list="vm.showNoReportIconInSeriesList"
         wv-display-disclaimer="true"
+        wv-reduce-timeline-height-on-single-frame-series="vm.reduceTimelineHeightOnSingleFrameSeries"
     >
     </wv-webviewer>
 
@@ -203,6 +204,7 @@
         vm.enableAnnotationStorage = __webViewerConfig.enableAnnotationStorage;
         vm.enableKeyImageCapture = __webViewerConfig.enableKeyImageCapture;
         vm.showNoReportIconInSeriesList = __webViewerConfig.showNoReportIconInSeriesList;
+        vm.reduceTimelineHeightOnSingleFrameSeries = __webViewerConfig.reduceTimelineHeightOnSingleFrameSeries === undefined ? false : __webViewerConfig.reduceTimelineHeightOnSingleFrameSeries;
     }]);
     </script>
 </body>

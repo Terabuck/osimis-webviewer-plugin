@@ -6,6 +6,7 @@
  *                                 `wvSeriesId` directive.
  * 
  * @param {boolean} [wvReadonly=false] Deactivate the directive's inputs.
+ * @param {boolean} [wvReduceTimelineHeightOnSingleFrameSeries=false] Make the height of the component to have a reduced height if there is only 1 image
  *
  * @scope
  * @restrict Element
@@ -60,7 +61,8 @@
             restrict: 'E',
             scope: {
                 series: '=wvSeries',
-                readonly: '=?wvReadonly'
+                readonly: '=?wvReadonly',
+                reduceTimelineHeightOnSingleFrameSeries: '=?wvReduceTimelineHeightOnSingleFrameSeries'
             },
             templateUrl: 'app/timeline/timeline.directive.html'
         };
