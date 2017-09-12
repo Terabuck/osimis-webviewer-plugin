@@ -114,6 +114,22 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   shortTermCacheSize = OrthancPlugins::GetIntegerValue(wvConfig, "ShortTermCacheSize", 1000);
   shortTermCacheDecoderThreadsCound = OrthancPlugins::GetIntegerValue(wvConfig, "Threads", std::max(boost::thread::hardware_concurrency() / 2, 1u));
   highQualityImagePreloadingEnabled = OrthancPlugins::GetBoolValue(wvConfig, "HighQualityImagePreloadingEnabled", true);
+  reduceTimelineHeightOnSingleFrameSeries = OrthancPlugins::GetBoolValue(wvConfig, "ReduceTimelineHeightOnSingleFrameSeries", false);
+  showNoReportIconInSeriesList = OrthancPlugins::GetBoolValue(wvConfig, "ShowNoReportIconInSeriesList", false);
+  toolbarLayoutMode = OrthancPlugins::GetStringValue(wvConfig, "ToolbarLayoutMode", "flat");
+  toolbarButtonSize = OrthancPlugins::GetStringValue(wvConfig, "ToolbarButtonSize", "small");
+
+  if (toolbarLayoutMode != "flat" || toolbarLayoutMode != "tree")
+  {
+    OrthancPluginLogError(_context, "ToolboxLayoutMode invalid value.  Allowed values are \"flat\" and \"tree\"");
+    throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
+  }
+
+  if (toolbarButtonSize != "small" || toolbarButtonSize != "large")
+  {
+    OrthancPluginLogError(_context, "ToolboxButtonSize invalid value.  Allowed values are \"small\" and \"large\"");
+    throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
+  }
 }
 
 void WebViewerConfiguration::parseFile()
@@ -189,6 +205,10 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["showStudyInformationBreadcrumb"] = showStudyInformationBreadcrumb;
   config["windowingPresets"] = windowingPresets;
   config["enableHighQualityImagePreloading"] = highQualityImagePreloadingEnabled;
+  config["reduceTimelineHeightOnSingleFrameSeries"] = reduceTimelineHeightOnSingleFrameSeries;
+  config["showNoReportIconInSeriesList"] = showNoReportIconInSeriesList;
+  config["toolbarLayoutMode"] = toolbarLayoutMode;
+  config["toolbarButtonSize"] = toolbarButtonSize;
 
   return config;
 }
