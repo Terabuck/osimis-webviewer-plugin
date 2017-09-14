@@ -146,6 +146,7 @@
                 tools: '=?wvTools',
                 toolbarEnabled: '=?wvToolbarEnabled',
                 toolbarPosition: '=?wvToolbarPosition',
+                toolbarLayoutMode: '=?wvToolbarLayoutMode',
                 serieslistEnabled: '=?wvSerieslistEnabled',
                 studyinformationEnabled: '=?wvStudyinformationEnabled',
                 leftHandlesEnabled: '=?wvLefthandlesEnabled',
@@ -160,6 +161,7 @@
                 reduceTimelineHeightOnSingleFrameSeries: '=?wvReduceTimelineHeightOnSingleFrameSeries',
 
                 displayDisclaimer: '=?wvDisplayDisclaimer',
+                toolboxButtonsOrdering: '=?wvToolboxButtonsOrdering',
 
                 // Selection-related
                 seriesItemSelectionEnabled: '=?wvSeriesItemSelectionEnabled',
@@ -215,6 +217,41 @@
             };
             if (vm.keyImageCaptureEnabled) { // activate
                 vm.tools.keyimagenote = false;
+            }
+            if(vm.toolboxButtonsOrdering === undefined){
+                vm.toolboxButtonsOrdering = [
+                    {type: "button", tool: "layout"},
+                    {type: "button", tool: "zoom"},
+                    {type: "button", tool: "pan"},
+                    {
+                        type: "group", 
+                        iconClasses: "glyphicon glyphicon-picture",
+                        title: "manipulation",
+                        buttons: [
+                            {type: "button", tool: "invert"},
+                            {type: "button", tool: "windowing"},
+                            {type: "button", tool: "magnify"},
+                            {type: "button", tool: "rotateleft"},
+                            {type: "button", tool: "rotateright"},
+                            {type: "button", tool: "hflip"},
+                            {type: "button", tool: "vflip"},
+                        ]
+                    },
+                    {
+                        type: "group",
+                        iconClasses: "glyphicon glyphicon-pencil",
+                        title: "anotation",
+                        buttons: [
+                            {type: "button", tool: "lengthmeasure"},
+                            {type: "button", tool: "anglemeasure"},
+                            {type: "button", tool: "pixelprobe"},
+                            {type: "button", tool: "ellipticalroi"},
+                            {type: "button", tool: "rectangleroi"},
+                            {type: "button", tool: "arrowAnnotate"},
+                        ]
+                    },
+                    {type: "button", tool: "keyimagenote"},                    
+                ]
             }
             vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];
             vm.selectedStudyIds = typeof vm.selectedStudyIds !== 'undefined' ? vm.selectedStudyIds : [];

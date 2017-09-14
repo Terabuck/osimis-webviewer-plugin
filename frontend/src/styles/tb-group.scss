@@ -1,0 +1,21 @@
+.tbGroup{
+    position:relative;
+}
+.tbGroup__buttons--base,
+%tbGroup__buttons--base{
+    z-index: 5;
+    background-color: black;
+    position: absolute;
+}
+
+.tbGroup__buttons--bottom{
+    @extend .tbGroup__buttons--base;
+    right:0;  // let the element at it's initial position but align him in right (natural position is below the toggl button element)
+    display:block;
+}
+.tbGroup__buttons--left{
+    @extend .tbGroup__buttons--base;
+    right:100%;
+    top:0;
+    display:block;
+}
