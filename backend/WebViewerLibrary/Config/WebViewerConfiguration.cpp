@@ -119,15 +119,15 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   toolbarLayoutMode = OrthancPlugins::GetStringValue(wvConfig, "ToolbarLayoutMode", "flat");
   toolbarButtonSize = OrthancPlugins::GetStringValue(wvConfig, "ToolbarButtonSize", "small");
 
-  if (toolbarLayoutMode != "flat" || toolbarLayoutMode != "tree")
+  if (toolbarLayoutMode != "flat" && toolbarLayoutMode != "tree")
   {
-    OrthancPluginLogError(_context, "ToolboxLayoutMode invalid value.  Allowed values are \"flat\" and \"tree\"");
+    OrthancPluginLogError(_context, "ToolbarLayoutMode invalid value.  Allowed values are \"flat\" and \"tree\"");
     throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
   }
 
-  if (toolbarButtonSize != "small" || toolbarButtonSize != "large")
+  if (toolbarButtonSize != "small" && toolbarButtonSize != "large")
   {
-    OrthancPluginLogError(_context, "ToolboxButtonSize invalid value.  Allowed values are \"small\" and \"large\"");
+    OrthancPluginLogError(_context, "ToolbarButtonSize invalid value.  Allowed values are \"small\" and \"large\"");
     throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
   }
 }
