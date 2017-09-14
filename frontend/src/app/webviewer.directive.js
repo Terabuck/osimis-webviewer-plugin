@@ -156,6 +156,8 @@
                 studyDownloadEnabled: '=?wvStudyDownloadEnabled',
                 videoDisplayEnabled: '=?wvVideoDisplayEnabled',
                 keyImageCaptureEnabled: '=?wvKeyImageCaptureEnabled',
+                showNoReportIconInSeriesList: '=?wvShowNoReportIconInSeriesList',
+                reduceTimelineHeightOnSingleFrameSeries: '=?wvReduceTimelineHeightOnSingleFrameSeries',
 
                 displayDisclaimer: '=?wvDisplayDisclaimer',
 

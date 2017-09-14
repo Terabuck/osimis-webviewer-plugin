@@ -1,8 +1,9 @@
 <div 
     ng-if="!!vm.series"
     class="wv-timeline"
+    ng-class="{'reduced': vm.reduceTimelineHeightOnSingleFrameSeries && vm.series.imageCount == 1}"
 >
-    <div class="wv-timeline-controls-wrapper">
+    <div class="wv-timeline-controls-wrapper" ng-if="!vm.reduceTimelineHeightOnSingleFrameSeries || vm.series.imageCount > 1">
         <wv-timeline-controls wv-readonly="vm.readonly" wv-series="vm.series"></wv-timeline-controls>
     </div>
     <div class="wv-timeline-loading-bar-wrapper">

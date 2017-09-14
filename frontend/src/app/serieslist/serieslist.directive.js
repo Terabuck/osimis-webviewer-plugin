@@ -64,6 +64,7 @@
                 onStudyLoaded: '&?wvOnStudyLoaded', // For testing convenience
                 displayMode: '=?wvDisplayMode',
                 videoDisplayEnabled: '=?wvVideoDisplayEnabled',
+                showNoReportIcon: '=?wvShowNoReportIcon',
 
                 // Selection-related
                 selectionEnabled: '=?wvSelectionEnabled',

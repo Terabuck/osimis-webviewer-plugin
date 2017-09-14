@@ -41,7 +41,7 @@
             <span class="wvSerieslist__label mn">PDF report</span>
         </div>
     <li
-        ng-show="vm.loaded && !vm.pdfInstanceIds.length"
+        ng-show="vm.loaded && !vm.pdfInstanceIds.length && vm.showNoReportIcon"
         class="wvSerieslist__seriesItem wvSerieslist__noReport"
         ng-class="{
             'wvSerieslist__seriesItem--list': vm.displayMode === 'list',
