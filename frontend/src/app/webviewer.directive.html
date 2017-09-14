@@ -256,6 +256,8 @@
             wv-windowing-presets="vm.windowingPresets"
             wv-on-windowing-preset-selected="vm.onWindowingPresetSelected($windowWidth, $windowCenter);"
             wv-toolbox-buttons-ordering="vm.toolboxButtonsOrdering"
+            wv-toolbox-buttons-size="vm.buttonsSize"
+            wv-layout-mode="vm.toolbarLayoutMode"
         ></wv-toolbox>
 
         <!--
@@ -264,8 +266,10 @@
         <wv-splitpane
             wv-readonly="vm.readonly"
             ng-class="{
-                'wvLayout__splitpane--toolbarAtTop': vm.toolbarEnabled && vm.toolbarPosition === 'top',
-                'wvLayout__splitpane--toolbarAtRight': vm.toolbarEnabled && vm.toolbarPosition === 'right'
+                'wvLayout__splitpane--toolbarAtTop': vm.toolbarEnabled && vm.buttonsSize == 'small' && vm.toolbarPosition === 'top',
+                'wvLayout__splitpane--toolbarAtRight': vm.toolbarEnabled && vm.buttonsSize == 'small' && vm.toolbarPosition === 'right',
+                'wvLayout__splitpane--bigToolbarAtRight': vm.toolbarEnabled && vm.buttonsSize == 'large' && vm.toolbarPosition === 'right',
+                'wvLayout__splitpane--bigToolbarAtTop': vm.toolbarEnabled && vm.buttonsSize == 'large' && vm.toolbarPosition === 'top',
             }"
         >
              <wv-pane-policy

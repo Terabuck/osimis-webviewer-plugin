@@ -1,6 +1,6 @@
 <div class="tbGroup">
     <div ng-if="vm.toolbox.layoutMode === 'tree'" class="tbGroup__toggl">
-        <button class="wvButton--underline" ng-click="vm.isOpen = !vm.isOpen" ng-class="{active: vm.isToolInGroup(vm.toolbox.tool)}">
+        <button class="wvButton--underline" ng-click="vm.isOpen = !vm.isOpen" ng-class="{active: vm.isToolInGroup(vm.toolbox.tool), 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}">
             <span class="{{vm.group.iconClasses}}"></span>
             <span class="ml5 glyphicon" ng-class="{'glyphicon-chevron-down': !vm.isOpen, 'glyphicon-chevron-up': vm.isOpen}"></span>
         </button>

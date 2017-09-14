@@ -2,7 +2,8 @@
     class="wvToolbar"
     ng-class="{
         'wvToolbar--top': vm.position === 'top',
-        'wvToolbar--right': vm.position === 'right'
+        'wvToolbar--right': vm.position === 'right',
+        'wvToolbar--big': vm.buttonsSize === 'large'
     }"
 >
     <div ng-repeat="groupOrButton in vm.buttonsOrdering" ng-switch="groupOrButton.type" ng-class="{'inline-object': vm.position === 'top'}">

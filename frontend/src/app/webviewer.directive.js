@@ -159,6 +159,7 @@
                 keyImageCaptureEnabled: '=?wvKeyImageCaptureEnabled',
                 showNoReportIconInSeriesList: '=?wvShowNoReportIconInSeriesList',
                 reduceTimelineHeightOnSingleFrameSeries: '=?wvReduceTimelineHeightOnSingleFrameSeries',
+                buttonsSize: '=?wvButtonsSize',  // small | large
 
                 displayDisclaimer: '=?wvDisplayDisclaimer',
                 toolboxButtonsOrdering: '=?wvToolboxButtonsOrdering',
@@ -183,6 +184,7 @@
             // Configure attributes default values
             vm.toolbarEnabled = typeof vm.toolbarEnabled !== 'undefined' ? vm.toolbarEnabled : true;
             vm.toolbarPosition = typeof vm.toolbarPosition !== 'undefined' ? vm.toolbarPosition : 'top';
+            vm.buttonsSize = typeof vm.buttonsSize !== 'undefined' ? vm.buttonsSize : 'small';            
             vm.serieslistEnabled = typeof vm.serieslistEnabled !== 'undefined' ? vm.serieslistEnabled : true;
             vm.studyinformationEnabled = typeof vm.studyinformationEnabled !== 'undefined' ? vm.studyinformationEnabled : true;
             vm.leftHandlesEnabled = typeof vm.leftHandlesEnabled !== 'undefined' ? vm.leftHandlesEnabled : true;

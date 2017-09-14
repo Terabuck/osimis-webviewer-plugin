@@ -16,7 +16,6 @@
     // popover will appear behind them (even with higher z-index) due to an
     // overflow property hidden somewhere.
     // overflow-y: auto;
-    overflow-x: visible;
     white-space: nowrap;
     max-width: 100%;
 }
@@ -27,10 +26,10 @@
 
     // Allow user to scroll through the toolbar if screen is too small. 
     // overflow-x: auto;
-    overflow-y: visible;
     height: 100%;
     z-index: 2;
 }
+
 
 .wvToolbar--right .wvButton--rotate, .wvToolbar--right .wvButton--rotate.fa { // make sure we have more precedence than .fa class
     // Align rotated button position when toolbar is positioned at right.
@@ -57,6 +56,7 @@
 .wvToolbar__splitpaneConfigButton {
     @extend .wvButton;
 
+
     // Set black text on white background.
     color: hsl(0, 0%, 9%);
     &:hover, &:focus, &.active {
@@ -76,6 +76,12 @@
     left: -5px;
     top: 1px;
     margin-right: -10px;
+
+    &.wvLargeButton{
+        width: auto;
+        height: auto;
+        top: 2px;
+    }
 }
 input[type="radio"].wvToolbar__splitpaneConfigButtonInput {
     // Hide the radio input, but make it fit the label, so we can rely on its 
