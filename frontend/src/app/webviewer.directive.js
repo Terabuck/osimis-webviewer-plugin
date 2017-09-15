@@ -147,6 +147,7 @@
                 toolbarEnabled: '=?wvToolbarEnabled',
                 toolbarPosition: '=?wvToolbarPosition',
                 toolbarLayoutMode: '=?wvToolbarLayoutMode',
+                toolbarDefaultTool: '=?wvToolbarDefaultTool',
                 serieslistEnabled: '=?wvSerieslistEnabled',
                 studyinformationEnabled: '=?wvStudyinformationEnabled',
                 leftHandlesEnabled: '=?wvLefthandlesEnabled',
@@ -193,7 +194,7 @@
             vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;
             vm.tools = typeof vm.tools !== 'undefined' ? vm.tools : {
                 windowing: false,
-                zoom: true,
+                zoom: false,
                 pan: false,
                 invert: false,
                 magnify: {
@@ -217,6 +218,17 @@
                 rotateright: false,
                 arrowAnnotate: false
             };
+            
+            console.log('defaultTool', vm.toolbarDefaultTool)
+            if(vm.toolbarDefaultTool){
+                vm.tools[vm.toolbarDefaultTool] = true;
+                vm.activeTool = vm.toolbarDefaultTool;
+            }else{
+                vm.tools.zoom = true;
+                vm.activeTool = 'zoom';
+            }
+            console.log('tools', vm.tools);
+
             if (vm.keyImageCaptureEnabled) { // activate
                 vm.tools.keyimagenote = false;
             }
