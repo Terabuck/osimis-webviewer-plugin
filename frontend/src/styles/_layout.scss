@@ -275,7 +275,7 @@ $asideRightPadding: 10px;
     & .wvLayout__splitpane--toolbarAtRight {
         display: block;
         height: 100%;
-        width: calc(100% - 55px);
+        width: calc(100% - #{$toolbarHeight});
     }
 
     & .wvLayout__splitpane--bigToolbarAtTop {
@@ -289,7 +289,7 @@ $asideRightPadding: 10px;
     & .wvLayout__splitpane--bigToolbarAtRight {
         display: block;
         height: 100%;
-        width: calc(100% - 100px);
+        width: calc(100% - 68px);
     }
 
     // Position the main section below the top zone if the latter is shown

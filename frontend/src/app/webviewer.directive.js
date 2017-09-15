@@ -242,7 +242,7 @@
                     {
                         type: "group",
                         iconClasses: "glyphicon glyphicon-pencil",
-                        title: "anotation",
+                        title: "annotation",
                         buttons: [
                             {type: "button", tool: "lengthmeasure"},
                             {type: "button", tool: "anglemeasure"},
