@@ -35,7 +35,8 @@
                 'wvToolboxCtrl': '^^wvToolbox', // Ctrl postfix to avoid conflict w/ scope attribute
             },
             scope: {
-                group: '=wvGroup'
+                group: '=wvGroup',
+                isOpen: '=?wvIsOpen'
             },
             templateUrl: 'app/toolbox/toolbox-group-generator.directive.html'
         };
@@ -48,8 +49,26 @@
     }
 
     /* @ngInject */
-    function toolboxGeneratorController($element, $scope, $popover) {
+    function toolboxGeneratorController($element, $scope, $popover, $rootScope) {
         var _this = this;
+
+        /**
+         * Make only one group open at the same time
+         * 
+         * 1. generate an event that will be sent when the group is open (with the group as param)
+         * 2. listen to this event, if the group of the param is not the same of the group in this scope
+         *    then we close it.
+         */
+        $rootScope.$on('wvToolbarGroupOpen', function($event, group){
+            if(group !== _this.group){
+                _this.isOpen = false;
+            }
+        })
+        $scope.$watch('vm.isOpen', function(newValue, oldValue){
+            if(newValue){
+                $rootScope.$emit('wvToolbarGroupOpen', _this.group);                
+            }
+        })
 
         _this.isToolInGroup = function(tool){
             var isInGroup = false;
