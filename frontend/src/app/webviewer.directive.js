@@ -482,7 +482,7 @@
             };
             scope.$watch('vm.selectedStudyIds', function(newValues, oldValues) {
                 // Log study ids
-                console.log('studies: ', newValues);
+                console.log('selected studies ids: ', newValues);
 
                 // Consider oldValues to be empty if this watch function is 
                 // called at initialization.
