@@ -118,6 +118,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   showNoReportIconInSeriesList = OrthancPlugins::GetBoolValue(wvConfig, "ShowNoReportIconInSeriesList", false);
   toolbarLayoutMode = OrthancPlugins::GetStringValue(wvConfig, "ToolbarLayoutMode", "flat");
   toolbarButtonSize = OrthancPlugins::GetStringValue(wvConfig, "ToolbarButtonSize", "small");
+  defaultSelectedTool = OrthancPlugins::GetStringValue(wvConfig, "DefaultSelectedTool", "zoom");
 
   if (toolbarLayoutMode != "flat" && toolbarLayoutMode != "tree")
   {
@@ -209,6 +210,7 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["showNoReportIconInSeriesList"] = showNoReportIconInSeriesList;
   config["toolbarLayoutMode"] = toolbarLayoutMode;
   config["toolbarButtonSize"] = toolbarButtonSize;
+  config["defaultSelectedTool"] = defaultSelectedTool;
 
   return config;
 }

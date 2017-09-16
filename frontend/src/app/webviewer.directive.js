@@ -146,6 +146,8 @@
                 tools: '=?wvTools',
                 toolbarEnabled: '=?wvToolbarEnabled',
                 toolbarPosition: '=?wvToolbarPosition',
+                toolbarLayoutMode: '=?wvToolbarLayoutMode',
+                toolbarDefaultTool: '=?wvToolbarDefaultTool',
                 serieslistEnabled: '=?wvSerieslistEnabled',
                 studyinformationEnabled: '=?wvStudyinformationEnabled',
                 leftHandlesEnabled: '=?wvLefthandlesEnabled',
@@ -158,8 +160,10 @@
                 keyImageCaptureEnabled: '=?wvKeyImageCaptureEnabled',
                 showNoReportIconInSeriesList: '=?wvShowNoReportIconInSeriesList',
                 reduceTimelineHeightOnSingleFrameSeries: '=?wvReduceTimelineHeightOnSingleFrameSeries',
+                buttonsSize: '=?wvButtonsSize',  // small | large
 
                 displayDisclaimer: '=?wvDisplayDisclaimer',
+                toolboxButtonsOrdering: '=?wvToolboxButtonsOrdering',
 
                 // Selection-related
                 seriesItemSelectionEnabled: '=?wvSeriesItemSelectionEnabled',
@@ -181,6 +185,7 @@
             // Configure attributes default values
             vm.toolbarEnabled = typeof vm.toolbarEnabled !== 'undefined' ? vm.toolbarEnabled : true;
             vm.toolbarPosition = typeof vm.toolbarPosition !== 'undefined' ? vm.toolbarPosition : 'top';
+            vm.buttonsSize = typeof vm.buttonsSize !== 'undefined' ? vm.buttonsSize : 'small';            
             vm.serieslistEnabled = typeof vm.serieslistEnabled !== 'undefined' ? vm.serieslistEnabled : true;
             vm.studyinformationEnabled = typeof vm.studyinformationEnabled !== 'undefined' ? vm.studyinformationEnabled : true;
             vm.leftHandlesEnabled = typeof vm.leftHandlesEnabled !== 'undefined' ? vm.leftHandlesEnabled : true;
@@ -189,18 +194,18 @@
             vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;
             vm.tools = typeof vm.tools !== 'undefined' ? vm.tools : {
                 windowing: false,
-                zoom: true,
+                zoom: false,
                 pan: false,
                 invert: false,
                 magnify: {
                     magnificationLevel: 5,
                     magnifyingGlassSize: 300
                 },
-                lengthmeasure: false,
-                anglemeasure: false,
-                pixelprobe: false,
-                ellipticalroi: false,
-                rectangleroi: false,
+                lengthMeasure: false,
+                angleMeasure: false,
+                pixelProbe: false,
+                ellipticalRoi: false,
+                rectangleRoi: false,
                 layout: {
                     x: 1,
                     y: 1
@@ -209,12 +214,58 @@
                 overlay: true,
                 vflip: false,
                 hflip: false,
-                rotateleft: false,
-                rotateright: false,
+                rotateLeft: false,
+                rotateRight: false,
                 arrowAnnotate: false
             };
+            
+            console.log('defaultTool', vm.toolbarDefaultTool)
+            if(vm.toolbarDefaultTool){
+                vm.tools[vm.toolbarDefaultTool] = true;
+                vm.activeTool = vm.toolbarDefaultTool;
+            }else{
+                vm.tools.zoom = true;
+                vm.activeTool = 'zoom';
+            }
+            console.log('default selected tool: ', vm.tools);
+
             if (vm.keyImageCaptureEnabled) { // activate
-                vm.tools.keyimagenote = false;
+                vm.tools.keyImageCapture = false;
+            }
+            if(vm.toolboxButtonsOrdering === undefined){
+                vm.toolboxButtonsOrdering = [
+                    {type: "button", tool: "layout"},
+                    {type: "button", tool: "zoom"},
+                    {type: "button", tool: "pan"},
+                    {
+                        type: "group", 
+                        iconClasses: "glyphicon glyphicon-picture",
+                        title: "manipulation",
+                        buttons: [
+                            {type: "button", tool: "invert"},
+                            {type: "button", tool: "windowing"},
+                            {type: "button", tool: "magnify"},
+                            {type: "button", tool: "rotateLeft"},
+                            {type: "button", tool: "rotateRight"},
+                            {type: "button", tool: "hflip"},
+                            {type: "button", tool: "vflip"},
+                        ]
+                    },
+                    {
+                        type: "group",
+                        iconClasses: "glyphicon glyphicon-pencil",
+                        title: "annotation",
+                        buttons: [
+                            {type: "button", tool: "lengthMeasure"},
+                            {type: "button", tool: "angleMeasure"},
+                            {type: "button", tool: "pixelProbe"},
+                            {type: "button", tool: "ellipticalRoi"},
+                            {type: "button", tool: "rectangleRoi"},
+                            {type: "button", tool: "arrowAnnotate"},
+                        ]
+                    },
+                    {type: "button", tool: "keyImageCapture"},
+                ]
             }
             vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];
             vm.selectedStudyIds = typeof vm.selectedStudyIds !== 'undefined' ? vm.selectedStudyIds : [];
@@ -369,10 +420,10 @@
                 case 'hflip':
                     selectedPane.csViewport.hflip = !selectedPane.csViewport.hflip;
                     break;
-                case 'rotateleft':
+                case 'rotateLeft':
                     selectedPane.csViewport.rotation = selectedPane.csViewport.rotation - 90;
                     break;
-                case 'rotateright':
+                case 'rotateRight':
                     selectedPane.csViewport.rotation = selectedPane.csViewport.rotation + 90;
                     break;
                 default:

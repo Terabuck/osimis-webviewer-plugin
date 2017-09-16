@@ -255,6 +255,9 @@
             wv-on-action-clicked="vm.onActionClicked($action)"
             wv-windowing-presets="vm.windowingPresets"
             wv-on-windowing-preset-selected="vm.onWindowingPresetSelected($windowWidth, $windowCenter);"
+            wv-toolbox-buttons-ordering="vm.toolboxButtonsOrdering"
+            wv-toolbox-buttons-size="vm.buttonsSize"
+            wv-layout-mode="vm.toolbarLayoutMode"
         ></wv-toolbox>
 
         <!--
@@ -263,8 +266,10 @@
         <wv-splitpane
             wv-readonly="vm.readonly"
             ng-class="{
-                'wvLayout__splitpane--toolbarAtTop': vm.toolbarEnabled && vm.toolbarPosition === 'top',
-                'wvLayout__splitpane--toolbarAtRight': vm.toolbarEnabled && vm.toolbarPosition === 'right'
+                'wvLayout__splitpane--toolbarAtTop': vm.toolbarEnabled && vm.buttonsSize == 'small' && vm.toolbarPosition === 'top',
+                'wvLayout__splitpane--toolbarAtRight': vm.toolbarEnabled && vm.buttonsSize == 'small' && vm.toolbarPosition === 'right',
+                'wvLayout__splitpane--bigToolbarAtRight': vm.toolbarEnabled && vm.buttonsSize == 'large' && vm.toolbarPosition === 'right',
+                'wvLayout__splitpane--bigToolbarAtTop': vm.toolbarEnabled && vm.buttonsSize == 'large' && vm.toolbarPosition === 'top',
             }"
         >
              <wv-pane-policy
@@ -303,13 +308,13 @@
 
                     wv-mobile-viewport-tool="!vm.readonly && vm.mobileInteraction"
                     wv-windowing-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.windowing"
-                    wv-angle-measure-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.anglemeasure"
-                    wv-length-measure-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.lengthmeasure"
-                    wv-elliptical-roi-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.ellipticalroi"
+                    wv-angle-measure-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.angleMeasure"
+                    wv-length-measure-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.lengthMeasure"
+                    wv-elliptical-roi-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.ellipticalRoi"
                     wv-zoom-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.zoom"
                     wv-pan-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.pan"
-                    wv-pixel-probe-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.pixelprobe"
-                    wv-rectangle-roi-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.rectangleroi"
+                    wv-pixel-probe-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.pixelProbe"
+                    wv-rectangle-roi-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.rectangleRoi"
                     wv-magnifying-glass-viewport-tool="!vm.readonly && !vm.mobileInteraction && {
                         enabled: vm.tools.magnify.enabled,
                         magnificationLevel: vm.tools.magnify.magnificationLevel,

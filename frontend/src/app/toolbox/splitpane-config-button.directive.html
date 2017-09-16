@@ -3,7 +3,8 @@
 
     ng-class="{
         'glyphicon-th': vm.splitpaneLayout.x === 1 && vm.splitpaneLayout.y === 1,
-        'glyphicon-stop': vm.splitpaneLayout.x !== 1 || vm.splitpaneLayout.y !== 1
+        'glyphicon-stop': vm.splitpaneLayout.x !== 1 || vm.splitpaneLayout.y !== 1,
+        'wvLargeButton': vm.buttonSize == 'large'    
     }"
 >
     <input

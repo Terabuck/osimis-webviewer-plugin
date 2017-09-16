@@ -25,7 +25,8 @@
             scope: {
                 readonly: '=?wvReadonly',
                 popoverPlacement: '@?wvPopoverPlacement',
-                onKeyimagenoteCreated: '&onKeyimagenoteCreated'
+                onKeyimagenoteCreated: '&onKeyimagenoteCreated',
+                buttonSize: '@?wvButtonSize'
             },
             templateUrl: 'app/toolbox/keyimagenote-button.directive.html'
         };
@@ -36,6 +37,8 @@
 
             var buttonEl = element.children().first();
             
+            vm.buttonSize = vm.buttonSize === undefined ? 'small' : vm.buttonSize;
+
             // Toggle popover on mouse over/out.
             buttonEl.bind('mouseenter', function (e) {
                 if (!vm.readonly && !vm.insidePopover) {

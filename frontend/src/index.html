@@ -40,6 +40,10 @@
         wv-series-id="vm.seriesId"
 
         wv-toolbar-enabled="vm.enableToolbar"
+        wv-toolbar-layout-mode="vm.toolbarLayoutMode"
+        wv-toolbar-default-tool="vm.defaultSelectedTool"
+        wv-buttons-size="vm.toolbarButtonSize"
+
         wv-serieslist-enabled="vm.enableLayoutLeft && vm.mode !== 'series'"
         wv-studyinformation-enabled="vm.enableLayoutTop && vm.mode !== 'series'"
         wv-lefthandles-enabled="vm.enableLayoutLeftHandles"
@@ -205,6 +209,10 @@
         vm.enableKeyImageCapture = __webViewerConfig.enableKeyImageCapture;
         vm.showNoReportIconInSeriesList = __webViewerConfig.showNoReportIconInSeriesList;
         vm.reduceTimelineHeightOnSingleFrameSeries = __webViewerConfig.reduceTimelineHeightOnSingleFrameSeries;
+        vm.toolbarLayoutMode = __webViewerConfig.toolbarLayoutMode || "flat";
+        vm.toolbarButtonSize = __webViewerConfig.toolbarButtonSize || "small";
+        vm.defaultSelectedTool = __webViewerConfig.defaultSelectedTool || "zoom";
+
     }]);
     </script>
 </body>
