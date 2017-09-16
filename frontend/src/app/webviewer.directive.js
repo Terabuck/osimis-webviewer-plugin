@@ -230,7 +230,7 @@
             console.log('tools', vm.tools);
 
             if (vm.keyImageCaptureEnabled) { // activate
-                vm.tools.keyimageNote = false;
+                vm.tools.keyImageCapture = false;
             }
             if(vm.toolboxButtonsOrdering === undefined){
                 vm.toolboxButtonsOrdering = [
@@ -264,7 +264,7 @@
                             {type: "button", tool: "arrowAnnotate"},
                         ]
                     },
-                    {type: "button", tool: "keyimageNote"},                    
+                    {type: "button", tool: "keyImageCapture"},
                 ]
             }
             vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];
