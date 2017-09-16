@@ -63,6 +63,7 @@ public:
   bool showNoReportIconInSeriesList;
   std::string toolbarLayoutMode;
   std::string toolbarButtonSize;
+  std::string defaultSelectedTool;
   Json::Value windowingPresets;
 
   // If activated, this feature displays a button on each viewport. When the button is
