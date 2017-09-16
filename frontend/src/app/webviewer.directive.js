@@ -227,7 +227,7 @@
                 vm.tools.zoom = true;
                 vm.activeTool = 'zoom';
             }
-            console.log('tools', vm.tools);
+            console.log('default selected tool: ', vm.tools);
 
             if (vm.keyImageCaptureEnabled) { // activate
                 vm.tools.keyImageCapture = false;
