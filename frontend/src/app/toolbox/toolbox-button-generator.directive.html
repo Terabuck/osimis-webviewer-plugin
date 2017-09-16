@@ -77,72 +77,72 @@
 
     <!-- Length Measure -->
     <label
-        ng-switch-when="lengthmeasure"
-        ng-if="vm.toolbox.buttons.hasOwnProperty('lengthmeasure')"
+        ng-switch-when="lengthMeasure"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('lengthMeasure')"
         class="wvButton--underline glyphicon glyphicon-resize-horizontal"
-        ng-class="{active: vm.toolbox.tool === 'lengthmeasure', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        ng-class="{active: vm.toolbox.tool === 'lengthMeasure', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         data-title="Length Measurement"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"        
         data-container="body"
         bs-tooltip
         >
-        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="lengthmeasure" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="lengthMeasure" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Angle Measure -->
     <label
-        ng-switch-when="anglemeasure"
-        ng-if="vm.toolbox.buttons.hasOwnProperty('anglemeasure')"
+        ng-switch-when="angleMeasure"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('angleMeasure')"
         class="wvButton--underline glyphicon glyphicon-chevron-left"
-        ng-class="{active: vm.toolbox.tool === 'anglemeasure', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        ng-class="{active: vm.toolbox.tool === 'angleMeasure', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         data-title="Angle Measurement"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         bs-tooltip
         >
-        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="anglemeasure" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="angleMeasure" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Pixel Probe -->
     <label
-        ng-switch-when="pixelprobe"
-        ng-if="vm.toolbox.buttons.hasOwnProperty('pixelprobe')"
+        ng-switch-when="pixelProbe"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('pixelProbe')"
         class="wvButton--underline glyphicon glyphicon-record"
-        ng-class="{active: vm.toolbox.tool === 'pixelprobe', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        ng-class="{active: vm.toolbox.tool === 'pixelProbe', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         data-title="Pixel Probe"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         bs-tooltip
         >
-        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="pixelprobe" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="pixelProbe" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Elliptical Region Of Interest -->
     <label
-        ng-switch-when="ellipticalroi"
-        ng-if="vm.toolbox.buttons.hasOwnProperty('ellipticalroi')"
+        ng-switch-when="ellipticalRoi"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('ellipticalRoi')"
         class="wvButton--underline fa fa-circle-o"
-        ng-class="{active: vm.toolbox.tool === 'ellipticalroi', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        ng-class="{active: vm.toolbox.tool === 'ellipticalRoi', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         data-title="Elliptical ROI"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         bs-tooltip
         >
-        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="ellipticalroi" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="ellipticalRoi" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Rectangle Region Of Interest -->
     <label
-        ng-switch-when="rectangleroi"
-        ng-if="vm.toolbox.buttons.hasOwnProperty('rectangleroi')"
+        ng-switch-when="rectangleRoi"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('rectangleRoi')"
         class="wvButton--underline glyphicon glyphicon glyphicon-unchecked"
-        ng-class="{active: vm.toolbox.tool === 'rectangleroi', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        ng-class="{active: vm.toolbox.tool === 'rectangleRoi', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         data-title="Rectangle ROI"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         bs-tooltip
         >
-        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="rectangleroi" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="rectangleRoi" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Arrow/Text Annotate -->
@@ -161,8 +161,8 @@
 
     <!-- Rotate Left -->
     <label
-        ng-switch-when="rotateleft"
-        ng-if="vm.toolbox.buttons.hasOwnProperty('rotateleft')"
+        ng-switch-when="rotateLeft"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('rotateLeft')"
         class="wvButton--underline fa fa-rotate-left"
         data-title="Rotate to the left"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
@@ -170,13 +170,13 @@
         ng-class="{'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         bs-tooltip
         >
-        <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'rotateleft'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'rotateLeft'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Rotate Right -->
     <label
-        ng-switch-when="rotateright"
-        ng-if="vm.toolbox.buttons.hasOwnProperty('rotateright')"
+        ng-switch-when="rotateRight"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('rotateRight')"
         class="wvButton--underline fa fa-rotate-right"
         data-title="Rotate to the right"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
@@ -184,7 +184,7 @@
         ng-class="{'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         bs-tooltip
         >
-        <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'rotateright'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'rotateRight'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Flip Horizontally -->

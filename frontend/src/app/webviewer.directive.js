@@ -201,11 +201,11 @@
                     magnificationLevel: 5,
                     magnifyingGlassSize: 300
                 },
-                lengthmeasure: false,
-                anglemeasure: false,
-                pixelprobe: false,
-                ellipticalroi: false,
-                rectangleroi: false,
+                lengthMeasure: false,
+                angleMeasure: false,
+                pixelProbe: false,
+                ellipticalRoi: false,
+                rectangleRoi: false,
                 layout: {
                     x: 1,
                     y: 1
@@ -214,8 +214,8 @@
                 overlay: true,
                 vflip: false,
                 hflip: false,
-                rotateleft: false,
-                rotateright: false,
+                rotateLeft: false,
+                rotateRight: false,
                 arrowAnnotate: false
             };
             
@@ -245,8 +245,8 @@
                             {type: "button", tool: "invert"},
                             {type: "button", tool: "windowing"},
                             {type: "button", tool: "magnify"},
-                            {type: "button", tool: "rotateleft"},
-                            {type: "button", tool: "rotateright"},
+                            {type: "button", tool: "rotateLeft"},
+                            {type: "button", tool: "rotateRight"},
                             {type: "button", tool: "hflip"},
                             {type: "button", tool: "vflip"},
                         ]
@@ -256,11 +256,11 @@
                         iconClasses: "glyphicon glyphicon-pencil",
                         title: "annotation",
                         buttons: [
-                            {type: "button", tool: "lengthmeasure"},
-                            {type: "button", tool: "anglemeasure"},
-                            {type: "button", tool: "pixelprobe"},
-                            {type: "button", tool: "ellipticalroi"},
-                            {type: "button", tool: "rectangleroi"},
+                            {type: "button", tool: "lengthMeasure"},
+                            {type: "button", tool: "angleMeasure"},
+                            {type: "button", tool: "pixelProbe"},
+                            {type: "button", tool: "ellipticalRoi"},
+                            {type: "button", tool: "rectangleRoi"},
                             {type: "button", tool: "arrowAnnotate"},
                         ]
                     },
@@ -420,10 +420,10 @@
                 case 'hflip':
                     selectedPane.csViewport.hflip = !selectedPane.csViewport.hflip;
                     break;
-                case 'rotateleft':
+                case 'rotateLeft':
                     selectedPane.csViewport.rotation = selectedPane.csViewport.rotation - 90;
                     break;
-                case 'rotateright':
+                case 'rotateRight':
                     selectedPane.csViewport.rotation = selectedPane.csViewport.rotation + 90;
                     break;
                 default:
