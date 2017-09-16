@@ -219,20 +219,19 @@
                 arrowAnnotate: false
             };
             
-            console.log('defaultTool', vm.toolbarDefaultTool)
-            if(vm.toolbarDefaultTool){
+            console.log('default tool: ', vm.toolbarDefaultTool)
+            if (vm.toolbarDefaultTool) {
                 vm.tools[vm.toolbarDefaultTool] = true;
                 vm.activeTool = vm.toolbarDefaultTool;
-            }else{
+            } else {
                 vm.tools.zoom = true;
                 vm.activeTool = 'zoom';
             }
-            console.log('default selected tool: ', vm.tools);
 
             if (vm.keyImageCaptureEnabled) { // activate
                 vm.tools.keyImageCapture = false;
             }
-            if(vm.toolboxButtonsOrdering === undefined){
+            if (vm.toolboxButtonsOrdering === undefined) {
                 vm.toolboxButtonsOrdering = [
                     {type: "button", tool: "layout"},
                     {type: "button", tool: "zoom"},
