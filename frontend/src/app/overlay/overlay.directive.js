@@ -33,7 +33,7 @@ var ArrayHelpers = {
         .directive('wvOverlay', wvOverlay);
 
     /* @ngInject */
-    function wvOverlay(wvStudyManager) {
+    function wvOverlay(wvStudyManager, wvInstanceManager) {
         var directive = {
             bindToController: true,
             controller: Controller,
@@ -77,7 +77,7 @@ var ArrayHelpers = {
                 return !!vm.bottomLeftLines && vm.bottomLeftLines.length > 0;
             };
 
-            vm.getTopLeftArea = function(seriesTags) {
+            vm.getTopLeftArea = function(seriesTags, instanceTags) {
                 var lines = [];
 
                 ArrayHelpers.pushIfDefined(lines, seriesTags.PatientName);
@@ -86,7 +86,7 @@ var ArrayHelpers = {
 
                 return lines;
             };
-            vm.getTopRightArea = function(seriesTags) {
+            vm.getTopRightArea = function(seriesTags, instanceTags) {
                 var lines = [];
 
                 ArrayHelpers.pushIfDefined(lines, seriesTags.StudyDescription);
@@ -101,38 +101,47 @@ var ArrayHelpers = {
 
                 return lines;
             };
-            vm.getBottomLeftArea = function(seriesTags) { // this has been added for Avignon, it still needs to be checked with nico how it should be done for good
+            vm.getBottomLeftArea = function(seriesTags, instanceTags) { // this has been added for Avignon, it still needs to be checked with nico how it should be done for good
                 var lines = [];
 
-                ArrayHelpers.pushIfDefined(lines, seriesTags.PatientOrientation);
-                ArrayHelpers.pushIfDefined(lines, seriesTags.ImageLaterality);
-                ArrayHelpers.pushIfDefined(lines, seriesTags.ViewPosition);
+                ArrayHelpers.pushIfDefined(lines, instanceTags.PatientOrientation);
+                ArrayHelpers.pushIfDefined(lines, instanceTags.ImageLaterality);
+                ArrayHelpers.pushIfDefined(lines, instanceTags.ViewPosition);
 
                 return lines;
             };
-            vm.getBottomRightArea = function(seriesTags) {
+            vm.getBottomRightArea = function(seriesTags, instanceTags) {
                 return [];
             };
+            vm.updateLayout = function(seriesTags, imageId) {
+                wvInstanceManager
+                    .getTags(imageId.split(":")[0]) // imageId is something like orthancId:frameId
+                    .then(function(instanceTags) {
+                        vm.topLeftLines = vm.getTopLeftArea(seriesTags, instanceTags);
+                        vm.topRightLines = vm.getTopRightArea(seriesTags, instanceTags);
+                        vm.bottomLeftLines = vm.getBottomLeftArea(seriesTags, instanceTags);
+                        vm.bottomRightLines = vm.getBottomRightArea(seriesTags, instanceTags);
+                    });
 
+            };
 
             // auto grab series model
             if (ctrls.series) {
                 var series = ctrls.series.getSeries();
                 vm.wvSeries = series;
-                vm.topLeftLines = vm.getTopLeftArea(vm.wvSeries.tags);
-                vm.topRightLines = vm.getTopRightArea(vm.wvSeries.tags);
-                vm.bottomLeftLines = vm.getBottomLeftArea(vm.wvSeries.tags);
-                vm.bottomRightLines = vm.getBottomRightArea(vm.wvSeries.tags);
+                vm.updateLayout(vm.wvSeries.tags, vm.wvSeries.imageIds[vm.wvSeries.currentShownIndex]);
 
                 ctrls.series.onSeriesChanged(_this, function(series) {
                     vm.wvSeries = series;
-                    vm.topLeftLines = vm.getTopLeftArea(vm.wvSeries.tags);
-                    vm.topRightLines = vm.getTopRightArea(vm.wvSeries.tags);
-                    vm.bottomLeftLines = vm.getBottomLeftArea(vm.wvSeries.tags);
-                    vm.bottomRightLines = vm.getBottomRightArea(vm.wvSeries.tags);
+                    vm.updateLayout(vm.wvSeries.tags, vm.wvSeries.imageIds[vm.wvSeries.currentShownIndex]);
                 });
+                ctrls.series.onCurrentImageIdChanged(_this, function(imageId, notUsed) {
+                    vm.updateLayout(vm.wvSeries.tags, imageId);
+                });
+
                 scope.$on('$destroy', function() {
                     ctrls.series.onSeriesChanged.close(_this);
+                    ctrls.series.onCurrentImageIdChanged.close(_this);
                 });
             }
 
