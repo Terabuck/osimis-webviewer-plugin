@@ -607,9 +607,6 @@
                         continue;
                     }
 
-                    // Log new series id
-                    console.log('series['+i+']: ', newViewports[i] && newViewports[i].seriesId);
-
                     // Set viewport's series
                     if (!oldViewports[i] && newViewports[i]) {
                         if (newViewports[i].seriesId) {

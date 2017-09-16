@@ -79,7 +79,6 @@
                 })
             });
 
-            console.log('KEYBOARD_SHORTCUT', wvKeyboardShortcutEventManager, webviewer);
             wvKeyboardShortcutEventManager.down(this, function(e){
                 var selectedPane = wvPaneManager.getSelectedPane();
                 selectedPane.getStudy().then(function(study){
