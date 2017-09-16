@@ -12,6 +12,19 @@
  * `http://wiki.ihe.net/index.php/Key_Image_Note`).
  *
  */
+var ArrayHelpers = {
+   pushIfDefined: function(array, value) {
+        if (value) {
+            array.push(value);
+        }
+   },
+   pushIfDefinedWithPrefix: function(array, prefix, value) {
+        if (value) {
+            array.push(prefix + value);
+        }
+    }
+ };
+
 (function() {
     'use strict';
 
@@ -51,26 +64,72 @@
             // Set default value.
             vm.keyImageCaptureEnabled = typeof vm.keyImageCaptureEnabled !== 'undefined' ? vm.keyImageCaptureEnabled : false;
 
-
             vm.showTopLeftArea = function() {
-                return !!vm.wvTags;
+                return !!vm.topLeftLines && vm.topLeftLines.length > 0;
             };
             vm.showTopRightArea = function() {
-                return !!vm.wvTags &&
-                    !!vm.wvTags.SeriesDescription &&
-                    !!vm.wvTags.SeriesNumber;
+                return !!vm.bottomRightLines && vm.bottomRightLines.length > 0;
             };
-            vm.showBottomRightArea = function() {
-                return !!vm.wvViewport && !!vm.wvTags;
+            vm.showBottomRightArea = function() { // this is a mix of viewport information (check in the html code + custom layout defined in this code)
+                return !!vm.wvViewport && !!vm.bottomRightLines && vm.bottomRightLines.length > 0;
             };
+            vm.showBottomLeftArea = function() {
+                return !!vm.bottomLeftLines && vm.bottomLeftLines.length > 0;
+            };
+
+            vm.getTopLeftArea = function(seriesTags) {
+                var lines = [];
+
+                ArrayHelpers.pushIfDefined(lines, seriesTags.PatientName);
+                ArrayHelpers.pushIfDefined(lines, seriesTags.PatientID);
+                ArrayHelpers.pushIfDefined(lines, seriesTags.OsimisNote);
+
+                return lines;
+            };
+            vm.getTopRightArea = function(seriesTags) {
+                var lines = [];
+
+                ArrayHelpers.pushIfDefined(lines, seriesTags.StudyDescription);
+                ArrayHelpers.pushIfDefined(lines, seriesTags.StudyDate);
+
+                var lineElements = [];
+                ArrayHelpers.pushIfDefinedWithPrefix(lineElements, "#", seriesTags.SeriesNumber);
+                ArrayHelpers.pushIfDefined(lineElements, seriesTags.SeriesDescription);
+                if (lineElements.length > 0) {
+                    lines.push(lineElements.join(" - "));
+                }
+
+                return lines;
+            };
+            vm.getBottomLeftArea = function(seriesTags) { // this has been added for Avignon, it still needs to be checked with nico how it should be done for good
+                var lines = [];
+
+                ArrayHelpers.pushIfDefined(lines, seriesTags.PatientOrientation);
+                ArrayHelpers.pushIfDefined(lines, seriesTags.ImageLaterality);
+                ArrayHelpers.pushIfDefined(lines, seriesTags.ViewPosition);
+
+                return lines;
+            };
+            vm.getBottomRightArea = function(seriesTags) {
+                return [];
+            };
+
 
             // auto grab series model
             if (ctrls.series) {
                 var series = ctrls.series.getSeries();
                 vm.wvSeries = series;
+                vm.topLeftLines = vm.getTopLeftArea(vm.wvSeries.tags);
+                vm.topRightLines = vm.getTopRightArea(vm.wvSeries.tags);
+                vm.bottomLeftLines = vm.getBottomLeftArea(vm.wvSeries.tags);
+                vm.bottomRightLines = vm.getBottomRightArea(vm.wvSeries.tags);
 
                 ctrls.series.onSeriesChanged(_this, function(series) {
                     vm.wvSeries = series;
+                    vm.topLeftLines = vm.getTopLeftArea(vm.wvSeries.tags);
+                    vm.topRightLines = vm.getTopRightArea(vm.wvSeries.tags);
+                    vm.bottomLeftLines = vm.getBottomLeftArea(vm.wvSeries.tags);
+                    vm.bottomRightLines = vm.getBottomRightArea(vm.wvSeries.tags);
                 });
                 scope.$on('$destroy', function() {
                     ctrls.series.onSeriesChanged.close(_this);
