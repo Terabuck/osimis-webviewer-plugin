@@ -63,10 +63,16 @@
             csViewport = csViewport.serialize(canvasWidth, canvasHeight);
 
             return wvImageManager.get(imageId).then(function(image){
-                console.log(image);
                 var captureWidth = image.tags["Columns"] || 600;
                 var captureHeight = image.tags["Rows"] || 400;
 
+                if (captureWidth < 512) { // if image is too small, the annotation will appear 'pixelized' -> increase the size
+                    var upscaleRatio = 512 / captureWidth;
+                    captureWidth = Math.round(captureWidth * upscaleRatio);
+                    captureHeight = Math.round(captureHeight * upscaleRatio);
+                }
+
+                console.log("creating a new capture image (" + captureWidth + " x " + captureHeight + ")");
 
                 wvImageManager
                     .captureViewportAsKeyImage(imageId, captureWidth, captureHeight, note, csViewport)
