@@ -12,18 +12,6 @@
  * `http://wiki.ihe.net/index.php/Key_Image_Note`).
  *
  */
-var ArrayHelpers = {
-   pushIfDefined: function(array, value) {
-        if (value) {
-            array.push(value);
-        }
-   },
-   pushIfDefinedWithPrefix: function(array, prefix, value) {
-        if (value) {
-            array.push(prefix + value);
-        }
-    }
- };
 
 (function() {
     'use strict';
@@ -31,6 +19,19 @@ var ArrayHelpers = {
     angular
         .module('webviewer')
         .directive('wvOverlay', wvOverlay);
+
+    var ArrayHelpers = {
+       pushIfDefined: function(array, value) {
+            if (value !== undefined) {
+                array.push(value);
+            }
+       },
+       pushIfDefinedWithPrefix: function(array, prefix, value) {
+            if (value !== undefined) {
+                array.push(prefix + value);
+            }
+        }
+     };
 
     /* @ngInject */
     function wvOverlay(wvStudyManager, wvInstanceManager) {
