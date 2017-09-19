@@ -2,24 +2,18 @@
     <span class="wvOverlay__studyBadge--{{vm.study.color}}"></span>
 
     <div class="wv-overlay-topleft" ng-show="vm.showTopLeftArea()">
-        {{vm.wvSeries.tags.PatientName}}<br/>
-        {{vm.wvSeries.tags.PatientID}}<br/>
-        <p style="margin-top: 1rem; white-space: pre;"><!--
-            -->{{vm.wvSeries.tags.OsimisNote}}<!--
-        --></p>
+        <div ng-repeat="line in vm.topLeftLines">{{line}}<br/></div>
     </div>
     <div class="wv-overlay-topright" ng-show="vm.showTopRightArea()">
-        {{vm.wvSeries.tags.StudyDescription}}<br/>
-        {{vm.wvSeries.tags.StudyDate}}<br/>
-        #{{vm.wvSeries.tags.SeriesNumber}} - {{vm.wvSeries.tags.SeriesDescription}}<br/>
-        <!--<wv-export-viewport-button
-            ng-if="vm.keyImageCaptureEnabled"
-            wv-image-id="vm.image.id"
-            wv-viewport="vm.wvViewport"
-        ></wv-export-viewport-button>-->
+        <div ng-repeat="line in vm.topRightLines">{{line}}<br/></div>
     </div>
     
+    <div class="wv-overlay-bottomleft" ng-show="vm.showBottomLeftArea()">
+        <div ng-repeat="line in vm.bottomLeftLines">{{line}}<br/></div>
+    </div>
+
     <div class="wv-overlay-bottomright" ng-show="vm.showBottomRightArea()">
+        <div ng-repeat="line in vm.bottomRightLines">{{line}}<br/></div>
         <span ng-show="vm.wvSeries.currentShownIndex != vm.wvSeries.currentIndex">(image {{vm.wvSeries.currentIndex+1}} in loading, image {{vm.wvSeries.currentShownIndex+1}} displayed)</br></span>
         zoom: {{vm.wvViewport.getScaleForFullResolution()|number:2}}x<br/>
         ww/wc: {{vm.wvViewport.voi.windowWidth|number:0}}/{{vm.wvViewport.voi.windowCenter|number:0}}
