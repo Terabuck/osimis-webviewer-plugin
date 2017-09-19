@@ -68,10 +68,10 @@ var ArrayHelpers = {
                 return !!vm.topLeftLines && vm.topLeftLines.length > 0;
             };
             vm.showTopRightArea = function() {
-                return !!vm.bottomRightLines && vm.bottomRightLines.length > 0;
+                return !!vm.topRightLines && vm.topRightLines.length > 0;
             };
             vm.showBottomRightArea = function() { // this is a mix of viewport information (check in the html code + custom layout defined in this code)
-                return !!vm.wvViewport && !!vm.bottomRightLines && vm.bottomRightLines.length > 0;
+                return !!vm.wvViewport || (!!vm.bottomRightLines && vm.bottomRightLines.length > 0);
             };
             vm.showBottomLeftArea = function() {
                 return !!vm.bottomLeftLines && vm.bottomLeftLines.length > 0;
