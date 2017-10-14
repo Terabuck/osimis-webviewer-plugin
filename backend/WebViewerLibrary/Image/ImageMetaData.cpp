@@ -63,7 +63,7 @@ ImageMetaData::ImageMetaData(RawImageContainer* rawImage, const Json::Value& dic
       int64_t a, b;
 
       // @todo don't process when tag is available
-      ImageProcessing::GetMinMaxValue(a, b, *accessor);
+      ImageProcessing::GetMinMaxIntegerValue(a, b, *accessor);
       minPixelValue = (a < 0 ? static_cast<int32_t>(a) : 0);
       maxPixelValue = (b > 0 ? static_cast<int32_t>(b) : 1);
       break;

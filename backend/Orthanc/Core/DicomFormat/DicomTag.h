@@ -2,6 +2,7 @@
  * Orthanc - A Lightweight, RESTful DICOM Store
  * Copyright (C) 2012-2016 Sebastien Jodogne, Medical Physics
  * Department, University Hospital of Liege, Belgium
+ * Copyright (C) 2017 Osimis, Belgium
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -100,6 +101,7 @@ namespace Orthanc
   static const DicomTag DICOM_TAG_SERIES_INSTANCE_UID(0x0020, 0x000e);
   static const DicomTag DICOM_TAG_STUDY_INSTANCE_UID(0x0020, 0x000d);
   static const DicomTag DICOM_TAG_PIXEL_DATA(0x7fe0, 0x0010);
+  static const DicomTag DICOM_TAG_TRANSFER_SYNTAX_UID(0x0002, 0x0010);
 
   static const DicomTag DICOM_TAG_IMAGE_INDEX(0x0054, 0x1330);
   static const DicomTag DICOM_TAG_INSTANCE_NUMBER(0x0020, 0x0013);
@@ -127,6 +129,7 @@ namespace Orthanc
   static const DicomTag DICOM_TAG_TEMPORAL_POSITION_IDENTIFIER(0x0020, 0x0100);
 
   // Tags for C-FIND and C-MOVE
+  static const DicomTag DICOM_TAG_MESSAGE_ID(0x0000, 0x0110);
   static const DicomTag DICOM_TAG_SPECIFIC_CHARACTER_SET(0x0008, 0x0005);
   static const DicomTag DICOM_TAG_QUERY_RETRIEVE_LEVEL(0x0008, 0x0052);
   static const DicomTag DICOM_TAG_MODALITIES_IN_STUDY(0x0008, 0x0061);
@@ -170,6 +173,17 @@ namespace Orthanc
   static const DicomTag DICOM_TAG_ACQUISITION_DEVICE_PROCESSING_DESCRIPTION(0x0018, 0x1400);
   static const DicomTag DICOM_TAG_CONTRAST_BOLUS_AGENT(0x0018, 0x0010);
 
+  // Tags used within the Stone of Orthanc
+  static const DicomTag DICOM_TAG_FRAME_INCREMENT_POINTER(0x0028, 0x0009);
+  static const DicomTag DICOM_TAG_GRID_FRAME_OFFSET_VECTOR(0x3004, 0x000c);
+  static const DicomTag DICOM_TAG_PIXEL_SPACING(0x0028, 0x0030);
+  static const DicomTag DICOM_TAG_RESCALE_INTERCEPT(0x0028, 0x1052);
+  static const DicomTag DICOM_TAG_RESCALE_SLOPE(0x0028, 0x1053);
+  static const DicomTag DICOM_TAG_SLICE_THICKNESS(0x0018, 0x0050);
+  static const DicomTag DICOM_TAG_WINDOW_CENTER(0x0028, 0x1050);
+  static const DicomTag DICOM_TAG_WINDOW_WIDTH(0x0028, 0x1051);
+  static const DicomTag DICOM_TAG_DOSE_GRID_SCALING(0x3004, 0x000e);
+                                    
   // Counting patients, studies and series
   // https://www.medicalconnections.co.uk/kb/Counting_Studies_Series_and_Instances
   static const DicomTag DICOM_TAG_NUMBER_OF_PATIENT_RELATED_STUDIES(0x0020, 0x1200);  

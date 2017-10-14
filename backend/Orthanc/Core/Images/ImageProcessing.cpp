@@ -2,6 +2,7 @@
  * Orthanc - A Lightweight, RESTful DICOM Store
  * Copyright (C) 2012-2016 Sebastien Jodogne, Medical Physics
  * Department, University Hospital of Liege, Belgium
+ * Copyright (C) 2017 Osimis, Belgium
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -412,6 +413,13 @@ namespace Orthanc
     }
 
     if (target.GetFormat() == PixelFormat_Float32 &&
+        source.GetFormat() == PixelFormat_Grayscale32)
+    {
+      ConvertGrayscaleToFloat<uint32_t>(target, source);
+      return;
+    }
+
+    if (target.GetFormat() == PixelFormat_Float32 &&
         source.GetFormat() == PixelFormat_SignedGrayscale16)
     {
       ConvertGrayscaleToFloat<int16_t>(target, source);
@@ -449,6 +457,26 @@ namespace Orthanc
           q[0] = p[0];
           q[1] = p[1];
           q[2] = p[2];
+          p += 4;
+          q += 3;
+        }
+      }
+
+      return;
+    }
+
+    if (target.GetFormat() == PixelFormat_RGB24 &&
+        source.GetFormat() == PixelFormat_BGRA32)
+    {
+      for (unsigned int y = 0; y < source.GetHeight(); y++)
+      {
+        const uint8_t* p = reinterpret_cast<const uint8_t*>(source.GetConstRow(y));
+        uint8_t* q = reinterpret_cast<uint8_t*>(target.GetRow(y));
+        for (unsigned int x = 0; x < source.GetWidth(); x++)
+        {
+          q[0] = p[2];
+          q[1] = p[1];
+          q[2] = p[0];
           p += 4;
           q += 3;
         }
@@ -540,6 +568,26 @@ namespace Orthanc
       return;
     }
 
+    if (target.GetFormat() == PixelFormat_RGB24 &&
+        source.GetFormat() == PixelFormat_RGB48)
+    {
+      for (unsigned int y = 0; y < source.GetHeight(); y++)
+      {
+        const uint16_t* p = reinterpret_cast<const uint16_t*>(source.GetConstRow(y));
+        uint8_t* q = reinterpret_cast<uint8_t*>(target.GetRow(y));
+        for (unsigned int x = 0; x < source.GetWidth(); x++)
+        {
+          q[0] = p[0] >> 8;
+          q[1] = p[1] >> 8;
+          q[2] = p[2] >> 8;
+          p += 3;
+          q += 3;
+        }
+      }
+
+      return;
+    }
+
     throw OrthancException(ErrorCode_NotImplemented);
   }
 
@@ -556,6 +604,10 @@ namespace Orthanc
 
       case PixelFormat_Grayscale16:
         SetInternal<uint16_t>(image, value);
+        return;
+
+      case PixelFormat_Grayscale32:
+        SetInternal<uint32_t>(image, value);
         return;
 
       case PixelFormat_SignedGrayscale16:
@@ -643,9 +695,9 @@ namespace Orthanc
   }
 
 
-  void ImageProcessing::GetMinMaxValue(int64_t& minValue,
-                                       int64_t& maxValue,
-                                       const ImageAccessor& image)
+  void ImageProcessing::GetMinMaxIntegerValue(int64_t& minValue,
+                                              int64_t& maxValue,
+                                              const ImageAccessor& image)
   {
     switch (image.GetFormat())
     {
@@ -667,10 +719,41 @@ namespace Orthanc
         break;
       }
 
+      case PixelFormat_Grayscale32:
+      {
+        uint32_t a, b;
+        GetMinMaxValueInternal<uint32_t>(a, b, image);
+        minValue = a;
+        maxValue = b;
+        break;
+      }
+
       case PixelFormat_SignedGrayscale16:
       {
         int16_t a, b;
         GetMinMaxValueInternal<int16_t>(a, b, image);
+        minValue = a;
+        maxValue = b;
+        break;
+      }
+
+      default:
+        throw OrthancException(ErrorCode_NotImplemented);
+    }
+  }
+
+
+  void ImageProcessing::GetMinMaxFloatValue(float& minValue,
+                                            float& maxValue,
+                                            const ImageAccessor& image)
+  {
+    switch (image.GetFormat())
+    {
+      case PixelFormat_Float32:
+      {
+        assert(sizeof(float) == 32);
+        float a, b;
+        GetMinMaxValueInternal<float>(a, b, image);
         minValue = a;
         maxValue = b;
         break;
