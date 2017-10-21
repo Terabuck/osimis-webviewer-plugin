@@ -18,6 +18,7 @@ namespace {
   std::string _getTransferSyntax(const Orthanc::DicomMap& headerTags);
   bool _isDicomSr(const Json::Value &tags);
   bool _isDicomPr(const Json::Value &tags);
+  Json::Value simplifyInstanceTags(const Json::Value& instanceTags);
 }
 
 SeriesRepository::SeriesRepository(DicomRepository* dicomRepository)
@@ -55,7 +56,7 @@ std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId, b
         throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
       }
 
-      instancesTags[instanceId] = instanceTags;
+      instancesTags[instanceId] = simplifyInstanceTags(instanceTags);
     }
   }
   else
@@ -65,7 +66,7 @@ std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId, b
     {
       throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
     }
-    instancesTags[middleInstanceId] = instanceTags;
+    instancesTags[middleInstanceId] = simplifyInstanceTags(instanceTags);
   }
 
 
@@ -155,4 +156,13 @@ namespace {
 
     return (modality == "PR");
   }
+
+  Json::Value simplifyInstanceTags(const Json::Value& instanceTags) {
+    // keep only the tags we need in the frontend -> otherwise, the full /series route might return 6MB of Json in case of a PET-CT !!!!
+    Json::Value toReturn = instanceTags;
+
+    return toReturn;
+  }
 }
+
+
