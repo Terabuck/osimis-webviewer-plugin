@@ -2,7 +2,20 @@
 # However, the frontend is embedded within the backend:
 # The CI generates the frontend build, uploads it to aws and then builds this dockerfile.
 
-FROM jodogne/orthanc-plugins:1.2.0
+# we need SDK 1.3.1 -> use mainline !
+FROM osimis/orthanc:mainline-20171021
+
+# install build tools (this is copied from orthanc-builder)
+
+# We keep hitting the 91.189.88.162 mirror from Belgian networks and it
+# seems it (and maybe others) contain corrupt packages (e.g. logrotate,
+# libuuid).
+#
+# https://paste.ubuntu.com/25579603/
+# https://paste.ubuntu.com/25579606/
+RUN sed 's@archive.ubuntu.com@mir1.ovh.net@' -i /etc/apt/sources.list
+
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install wget nano build-essential unzip cmake mercurial uuid-dev libcurl4-openssl-dev liblua5.1-0-dev libgtest-dev libpng-dev libsqlite3-dev libssl-dev libjpeg-dev zlib1g-dev libdcmtk2-dev libboost-all-dev libwrap0-dev libcharls-dev locales libjsoncpp-dev libpugixml-dev && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update; apt-get -y install libgdcm2-dev libjpeg-dev git; rm -rf /var/lib/apt/lists/*
 
