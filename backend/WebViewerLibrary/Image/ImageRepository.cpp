@@ -288,42 +288,42 @@ void ImageRepository::_CacheProcessedImage(const std::string &attachmentNumber, 
 
 namespace
 {
-using namespace OrthancPlugins;
+  using namespace OrthancPlugins;
 
-void _loadDicomTags(Json::Value& jsonOutput, const std::string& instanceId)
-{
-  BENCH(LOAD_JSON);
-  if (!GetJsonFromOrthanc(jsonOutput, OrthancContextManager::Get(), "/instances/" + instanceId + "/simplified-tags")) {
-    throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
-  }
-}
-
-std::string _getAttachmentNumber(int frameIndex, const IImageProcessingPolicy* policy)
-{
-  assert(policy != NULL);
-
-  std::string attachmentNumber;
-  std::string policyString = policy->ToString();
-  int attachmentPrefix = 10000;
-  int maxFrameCount = 1000; // @todo use adaptative maxFrameCount !
-
-  // Except to cache only specified policies
-  assert(policyString == "pixeldata-quality" || policyString == "high-quality" || policyString == "medium-quality" ||
-         policyString == "low-quality");
-
-  if (policyString == "pixeldata-quality") {
-    attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 3 + frameIndex);
-  }
-  else if (policyString == "high-quality") {
-    attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 0 + frameIndex);
-  }
-  else if (policyString == "medium-quality") {
-    attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 1 + frameIndex);
-  }
-  else if (policyString == "low-quality") {
-    attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 2 + frameIndex);
+  void _loadDicomTags(Json::Value& jsonOutput, const std::string& instanceId)
+  {
+    BENCH(LOAD_JSON);
+    if (!GetJsonFromOrthanc(jsonOutput, OrthancContextManager::Get(), "/instances/" + instanceId + "/simplified-tags")) {
+      throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
+    }
   }
 
-  return attachmentNumber;
-}
+  std::string _getAttachmentNumber(int frameIndex, const IImageProcessingPolicy* policy)
+  {
+    assert(policy != NULL);
+
+    std::string attachmentNumber;
+    std::string policyString = policy->ToString();
+    int attachmentPrefix = 10000;
+    int maxFrameCount = 1000; // @todo use adaptative maxFrameCount !
+
+    // Except to cache only specified policies
+    assert(policyString == "pixeldata-quality" || policyString == "high-quality" || policyString == "medium-quality" ||
+           policyString == "low-quality");
+
+    if (policyString == "pixeldata-quality") {
+      attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 3 + frameIndex);
+    }
+    else if (policyString == "high-quality") {
+      attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 0 + frameIndex);
+    }
+    else if (policyString == "medium-quality") {
+      attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 1 + frameIndex);
+    }
+    else if (policyString == "low-quality") {
+      attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 2 + frameIndex);
+    }
+
+    return attachmentNumber;
+  }
 }
