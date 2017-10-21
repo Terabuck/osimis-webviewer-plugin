@@ -73,6 +73,12 @@ ImageMetaData::ImageMetaData(RawImageContainer* rawImage, const Json::Value& dic
       minPixelValue = 0;
       maxPixelValue = 255;
       break;
+    case PixelFormat_RGB48:
+      {
+        minPixelValue = 0;
+        maxPixelValue = 65535;
+        break;
+      }
     }
     default:
     {

@@ -7,6 +7,7 @@
 
 #include <Core/OrthancException.h> // for throws
 #include <Core/DicomFormat/DicomMap.h>
+#include <Core/Enumerations.h>
 #include "../ViewerToolbox.h" // for OrthancPlugins::get*FromOrthanc && OrthancPluginImage
 #include "../BenchmarkHelper.h" // for BENCH(*)
 #include "../OrthancContextManager.h" // for context_ global
@@ -21,8 +22,32 @@
 
 namespace
 {
-void _loadDicomTags(Json::Value& jsonOutput, const std::string& instanceId);
-std::string _getAttachmentNumber(int frameIndex, const IImageProcessingPolicy* policy);
+  void _loadDicomTags(Json::Value& jsonOutput, const std::string& instanceId);
+  std::string _getAttachmentNumber(int frameIndex, const IImageProcessingPolicy* policy);
+  void ConvertRGB48ToRGB24(Orthanc::ImageAccessor& target,
+                           const Orthanc::ImageAccessor& source)
+  {
+    //  if (source.GetWidth() != target.GetWidth() ||
+    //      source.GetHeight() != target.GetHeight())
+    //  {
+    //    throw Orthanc::OrthancException(Orthanc::ErrorCode_IncompatibleImageSize);
+    //  }
+
+    for (unsigned int y = 0; y < source.GetHeight(); y++)
+    {
+      const uint16_t* p = reinterpret_cast<const uint16_t*>(source.GetConstRow(y));
+      uint8_t* q = reinterpret_cast<uint8_t*>(target.GetRow(y));
+
+      for (unsigned int x = 0; x < source.GetWidth(); x++)
+      {
+        q[0] = p[0] >> 8;
+        q[1] = p[1] >> 8;
+        q[2] = p[2] >> 8;
+        p += 3;
+        q += 3;
+      }
+    }
+  }
 }
 
 ImageRepository::ImageRepository(DicomRepository* dicomRepository, CacheContext* cache)
@@ -139,20 +164,55 @@ std::auto_ptr<Image> ImageRepository::_LoadImageFromOrthanc(const std::string& i
 
     // Retrieve frame from dicom file
     OrthancPluginImage* frame = OrthancPluginDecodeDicomImage(OrthancContextManager::Get(),
-                  reinterpret_cast<const void*>(dicom.data), dicom.size, frameIndex);
+                                                              reinterpret_cast<const void*>(dicom.data), dicom.size, frameIndex);
 
-    // Clean DICOM file memory once the frame has been retrieved from the dicom file - @todo call on exception
-    _dicomRepository->decrefDicomFile(instanceId);
+    // Clean dicom file (at scope end)
+    BOOST_SCOPE_EXIT(_dicomRepository, &instanceId) {
+      _dicomRepository->decrefDicomFile(instanceId);
+    } BOOST_SCOPE_EXIT_END;
 
     // Throw exception if frame couldn't be decoded
     if (frame == NULL) {
       throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_IncompatibleImageFormat));
     }
 
-    // Store the frame inside a container
-    std::auto_ptr<RawImageContainer> data(new RawImageContainer(frame));
+    {// Store the frame inside a container
+      OrthancPluginPixelFormat pixelFormat = OrthancPluginGetImagePixelFormat(OrthancContextManager::Get(), frame);
 
-    image.reset(new Image(instanceId, frameIndex, data, dicomTags));
+      // if the image is RGB48, convert it to RGB24 asap
+      if (pixelFormat == OrthancPluginPixelFormat_RGB48) {
+        Orthanc::ImageAccessor sourceRgb48;
+        Orthanc::ImageAccessor destRgb24;
+
+        unsigned int width = OrthancPluginGetImageWidth(OrthancContextManager::Get(), frame);
+        unsigned int height = OrthancPluginGetImageHeight(OrthancContextManager::Get(), frame);
+
+        sourceRgb48.AssignReadOnly(Orthanc::PixelFormat_RGB48,
+                                   width,
+                                   height,
+                                   OrthancPluginGetImagePitch(OrthancContextManager::Get(), frame),
+                                   OrthancPluginGetImageBuffer(OrthancContextManager::Get(), frame)
+                                   );
+
+        Orthanc::ImageBuffer* destBuffer = new Orthanc::ImageBuffer(Orthanc::PixelFormat_RGB24,
+                                                                    width,
+                                                                    height,
+                                                                    false);
+
+        destRgb24 = destBuffer->GetAccessor();
+        ConvertRGB48ToRGB24(destRgb24, sourceRgb48);
+
+        std::auto_ptr<RawImageContainer> data(new RawImageContainer(destBuffer));
+
+        image.reset(new Image(instanceId, frameIndex, data, dicomTags));
+      }
+      else
+      {
+        std::auto_ptr<RawImageContainer> data(new RawImageContainer(frame));
+
+        image.reset(new Image(instanceId, frameIndex, data, dicomTags));
+      }
+    }
   }
 
   if (policy != NULL) {
