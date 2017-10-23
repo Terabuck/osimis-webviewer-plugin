@@ -159,7 +159,50 @@ namespace {
 
   Json::Value simplifyInstanceTags(const Json::Value& instanceTags) {
     // keep only the tags we need in the frontend -> otherwise, the full /series route might return 6MB of Json in case of a PET-CT !!!!
-    Json::Value toReturn = instanceTags;
+    Json::Value toReturn;
+
+    std::vector<std::string> tagsToKeep;
+    tagsToKeep.push_back("PatientName");
+    tagsToKeep.push_back("PatientID");
+    tagsToKeep.push_back("OsimisNote");
+    tagsToKeep.push_back("StudyDescription");
+    tagsToKeep.push_back("StudyDate");
+    tagsToKeep.push_back("SeriesNumber");
+    tagsToKeep.push_back("SeriesDescription");
+
+    // used by the JS code
+    tagsToKeep.push_back("PatientOrientation");
+    tagsToKeep.push_back("ImageLaterality");
+    tagsToKeep.push_back("ViewPosition");
+    tagsToKeep.push_back("MIMETypeOfEncapsulatedDocument");
+    tagsToKeep.push_back("PhotometricInterpretation");
+    tagsToKeep.push_back("PixelSpacing");
+    tagsToKeep.push_back("ImagerPixelSpacing");
+    tagsToKeep.push_back("SequenceOfUltrasoundRegions");
+    tagsToKeep.push_back("PixelRepresentation");
+    tagsToKeep.push_back("BitsStored");
+    tagsToKeep.push_back("WindowCenter");
+    tagsToKeep.push_back("WindowWidth");
+    tagsToKeep.push_back("RescaleSlope");
+    tagsToKeep.push_back("RescaleIntercept");
+    tagsToKeep.push_back("RecommendedDisplayFrameRate");
+    tagsToKeep.push_back("ImageOrientationPatient");
+    tagsToKeep.push_back("ImagePositionPatient");
+    tagsToKeep.push_back("FrameOfReferenceUID");
+
+    // used by the C++ code
+    tagsToKeep.push_back("Modality");
+    tagsToKeep.push_back("Columns");
+    tagsToKeep.push_back("Rows");
+
+
+    for (std::vector<std::string>::const_iterator it = tagsToKeep.begin(); it != tagsToKeep.end(); it++)
+    {
+      if (!instanceTags[*it].empty())
+      {
+        toReturn[*it] = instanceTags[*it];
+      }
+    }
 
     return toReturn;
   }
