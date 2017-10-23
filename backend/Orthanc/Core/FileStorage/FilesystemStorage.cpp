@@ -2,6 +2,7 @@
  * Orthanc - A Lightweight, RESTful DICOM Store
  * Copyright (C) 2012-2016 Sebastien Jodogne, Medical Physics
  * Department, University Hospital of Liege, Belgium
+ * Copyright (C) 2017 Osimis, Belgium
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -39,7 +40,7 @@
 #include "../Logging.h"
 #include "../OrthancException.h"
 #include "../Toolbox.h"
-#include "../Uuid.h"
+#include "../SystemToolbox.h"
 
 #include <boost/filesystem/fstream.hpp>
 
@@ -83,7 +84,7 @@ namespace Orthanc
     //root_ = boost::filesystem::absolute(root).string();
     root_ = root;
 
-    Toolbox::MakeDirectory(root);
+    SystemToolbox::MakeDirectory(root);
   }
 
 
@@ -143,7 +144,7 @@ namespace Orthanc
       }
     }
 
-    Toolbox::WriteFile(content, size, path.string());
+    SystemToolbox::WriteFile(content, size, path.string());
   }
 
 
@@ -155,7 +156,7 @@ namespace Orthanc
               << "\" content type";
 
     content.clear();
-    Toolbox::ReadFile(content, GetPath(uuid).string());
+    SystemToolbox::ReadFile(content, GetPath(uuid).string());
   }
 
 
@@ -177,7 +178,7 @@ namespace Orthanc
     {
       for (fs::recursive_directory_iterator current(root_), end; current != end ; ++current)
       {
-        if (Toolbox::IsRegularFile(current->path().string()))
+        if (SystemToolbox::IsRegularFile(current->path().string()))
         {
           try
           {

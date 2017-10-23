@@ -1,7 +1,8 @@
 <label 
     class="wvButton--underline fa fa-sun-o"
     ng-class="{
-        active: vm.selectedTool === 'windowing'
+        active: vm.selectedTool === 'windowing',
+        'wvLargeButton': vm.buttonSize == 'large'  
     }"
 >
     <input

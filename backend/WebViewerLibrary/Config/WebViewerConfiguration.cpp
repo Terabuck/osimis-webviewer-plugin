@@ -12,84 +12,48 @@
 WebViewerConfiguration::WebViewerConfiguration(OrthancPluginContext* context)
   : _context(context)
 {
-  // By default, disable storage attachment cache.
-  persistentCachedImageStorageEnabled = false;
-
-  // By default, use GDCM.
-  gdcmEnabled = true;
-  // By default, use GDCM for everything.
-  restrictTransferSyntaxes = false;
-
-  // By default, show the study download button in the frontend.
-  studyDownloadEnabled = true;
-
-  // By default, display DICOM video in the frontend.
-  videoDisplayEnabled = true;
-
-  // By default, the frontend will download the high quality images before the
-  // user needs them.
-  highQualityImagePreloadingEnabled = true;
-
-  // By default, disable annotation storage.
-  annotationStorageEnabled = false;
-
-  // By default, set these windowing presets.
-  windowingPresets = Json::Value(Json::arrayValue);
-  windowingPresets.append(Json::Value(Json::arrayValue));
-  windowingPresets[0] = Json::Value(Json::objectValue);
-  windowingPresets[0]["name"] = "Ct Lung";
-  windowingPresets[0]["windowWidth"] = -400;
-  windowingPresets[0]["windowCenter"] = 1600;
-  windowingPresets[1] = Json::Value(Json::objectValue);
-  windowingPresets[1]["name"] = "Ct Abdomen";
-  windowingPresets[1]["windowWidth"] = 300;
-  windowingPresets[1]["windowCenter"] = 1500;
-  windowingPresets[2] = Json::Value(Json::objectValue);
-  windowingPresets[2]["name"] = "Ct Bone";
-  windowingPresets[2]["windowWidth"] = 40;
-  windowingPresets[2]["windowCenter"] = 80;
-  windowingPresets[3] = Json::Value(Json::objectValue);
-  windowingPresets[3]["name"] = "Ct Brain";
-  windowingPresets[3]["windowWidth"] = 40;
-  windowingPresets[3]["windowCenter"] = 400;
-  windowingPresets[4] = Json::Value(Json::objectValue);
-  windowingPresets[4]["name"] = "Ct Chest";
-  windowingPresets[4]["windowWidth"] = -400;
-  windowingPresets[4]["windowCenter"] = 1600;
-  windowingPresets[5] = Json::Value(Json::objectValue);
-  windowingPresets[5]["name"] = "Ct Angio";
-  windowingPresets[5]["windowWidth"] = 300;
-  windowingPresets[5]["windowCenter"] = 600;
-
-  // By default, enable the short term storage cached
-  shortTermCacheEnabled = true;
-  shortTermCacheDebugLogsEnabled = false;
-  shortTermCachePrefetchOnInstanceStored = false;
-  shortTermCacheDecoderThreadsCound = std::max(boost::thread::hardware_concurrency() / 2, 1u);
-  shortTermCacheSize = 1000;
 }
 
 
 void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
 {
-  // Enable GCM
-  static const char* CONFIG_GDCM_ENABLED = "GdcmEnabled";
-  if (wvConfig.isMember(CONFIG_GDCM_ENABLED))
-  {
-    if (wvConfig[CONFIG_GDCM_ENABLED].type() != Json::booleanValue)
-    {
-      throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
-    }
-    else
-    {
-      gdcmEnabled = wvConfig[CONFIG_GDCM_ENABLED].asBool();
-    }
-  }
+  // By default, set these windowing presets. note, these are the default values sent to the frontend -> they are in mixedCase (in the settings, they are in CamelCase)
+  windowingPresets = Json::Value(Json::arrayValue);
+  windowingPresets.append(Json::Value(Json::arrayValue));
+  windowingPresets[0] = Json::Value(Json::objectValue);
+  windowingPresets[0]["name"] = "Ct Lung";
+  windowingPresets[0]["windowCenter"] = -400;
+  windowingPresets[0]["windowWidth"] = 1600;
+  windowingPresets[1] = Json::Value(Json::objectValue);
+  windowingPresets[1]["name"] = "Ct Abdomen";
+  windowingPresets[1]["windowCenter"] = 300;
+  windowingPresets[1]["windowWidth"] = 1500;
+  windowingPresets[2] = Json::Value(Json::objectValue);
+  windowingPresets[2]["name"] = "Ct Bone";
+  windowingPresets[2]["windowCenter"] = 40;
+  windowingPresets[2]["windowWidth"] = 80;
+  windowingPresets[3] = Json::Value(Json::objectValue);
+  windowingPresets[3]["name"] = "Ct Brain";
+  windowingPresets[3]["windowCenter"] = 40;
+  windowingPresets[3]["windowWidth"] = 400;
+  windowingPresets[4] = Json::Value(Json::objectValue);
+  windowingPresets[4]["name"] = "Ct Chest";
+  windowingPresets[4]["windowCenter"] = -400;
+  windowingPresets[4]["windowWidth"] = 1600;
+  windowingPresets[5] = Json::Value(Json::objectValue);
+  windowingPresets[5]["name"] = "Ct Angio";
+  windowingPresets[5]["windowCenter"] = 300;
+  windowingPresets[5]["windowWidth"] = 600;
+
+
+  gdcmEnabled = OrthancPlugins::GetBoolValue(wvConfig, "GdcmEnabled", true);
+  // By default, use GDCM for everything.
+  restrictTransferSyntaxes = false;
 
   // Restrict GDCM usage to the specified transfer syntaxes
-  static const char* CONFIG_RESTRICT_TRANSFER_SYNTAXES = "RestrictTransferSyntaxes";
   if (gdcmEnabled)
   {
+    static const char* CONFIG_RESTRICT_TRANSFER_SYNTAXES = "RestrictTransferSyntaxes";
     if (wvConfig.isMember(CONFIG_RESTRICT_TRANSFER_SYNTAXES))
     {
       const Json::Value& config = wvConfig[CONFIG_RESTRICT_TRANSFER_SYNTAXES];
@@ -115,57 +79,58 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
       }
     }
   }
-  
-  // Enable cache
-  if (wvConfig.isMember("CacheEnabled") &&
-      wvConfig["CacheEnabled"].type() == Json::booleanValue)
-  {
-    persistentCachedImageStorageEnabled = wvConfig["CacheEnabled"].asBool();
-  }
-
-  // Enable Study Download
-  if (wvConfig.isMember("StudyDownloadEnabled") &&
-      wvConfig["StudyDownloadEnabled"].type() == Json::booleanValue)
-  {
-    studyDownloadEnabled = wvConfig["StudyDownloadEnabled"].asBool();
-  }
-
-  // Enable Video Display
-  if (wvConfig.isMember("VideoDisplayEnabled") &&
-      wvConfig["VideoDisplayEnabled"].type() == Json::booleanValue)
-  {
-    videoDisplayEnabled = wvConfig["VideoDisplayEnabled"].asBool();
-  }
-
-  // Enable Annotation Storage
-  if (wvConfig.isMember("AnnotationStorageEnabled") &&
-      wvConfig["AnnotationStorageEnabled"].type() == Json::booleanValue)
-  {
-    annotationStorageEnabled = wvConfig["AnnotationStorageEnabled"].asBool();
-  }
-
-  // Enable Key Image Capture
-  if (wvConfig.isMember("KeyImageCaptureEnabled") &&
-      wvConfig["KeyImageCaptureEnabled"].type() == Json::booleanValue)
-  {
-    keyImageCaptureEnabled = wvConfig["KeyImageCaptureEnabled"].asBool();
-  }
 
   // Retrieve windowing preset (if set).
   if (wvConfig.isMember("WindowingPresets") &&
       wvConfig["WindowingPresets"].type() == Json::arrayValue)
   {
-    windowingPresets = wvConfig["WindowingPresets"];
-    // @todo validate the content of the input.
+    windowingPresets = windowingPresets = Json::Value(Json::arrayValue);  // remove default values
+
+    for (Json::Value::ArrayIndex i = 0; i < wvConfig["WindowingPresets"].size(); i++)
+    {
+      Json::Value preset = wvConfig["WindowingPresets"][i];
+      if (preset.type() != Json::objectValue)
+        throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
+      else
+      {
+        windowingPresets[i] = Json::Value(Json::objectValue);
+        windowingPresets[i]["name"] = preset["Name"];
+        windowingPresets[i]["windowCenter"] = preset["WindowCenter"];
+        windowingPresets[i]["windowWidth"] = preset["WindowWidth"];
+      }
+    }
   }
 
-  shortTermCachePrefetchOnInstanceStored = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCachePrefetchOnInstanceStored", shortTermCachePrefetchOnInstanceStored);
-  shortTermCacheEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheEnabled", shortTermCacheEnabled);
-  shortTermCacheDebugLogsEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheDebugLogsEnabled", shortTermCacheDebugLogsEnabled);
+  persistentCachedImageStorageEnabled = OrthancPlugins::GetBoolValue(wvConfig, "CacheEnabled", false);
+  studyDownloadEnabled = OrthancPlugins::GetBoolValue(wvConfig, "StudyDownloadEnabled", true);
+  videoDisplayEnabled = OrthancPlugins::GetBoolValue(wvConfig, "VideoDisplayEnabled", true);
+  annotationStorageEnabled = OrthancPlugins::GetBoolValue(wvConfig, "AnnotationStorageEnabled", false);
+  keyImageCaptureEnabled = OrthancPlugins::GetBoolValue(wvConfig, "KeyImageCaptureEnabled", false);
+  showStudyInformationBreadcrumb = OrthancPlugins::GetBoolValue(wvConfig, "ShowStudyInformationBreadcrumb", false);
+  shortTermCachePrefetchOnInstanceStored = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCachePrefetchOnInstanceStored", false);
+  shortTermCacheEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheEnabled", true);
+  shortTermCacheDebugLogsEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheDebugLogsEnabled", false);
   shortTermCachePath = OrthancPlugins::GetStringValue(wvConfig, "ShortTermCachePath", shortTermCachePath.string());
-  shortTermCacheSize = OrthancPlugins::GetIntegerValue(wvConfig, "ShortTermCacheSize", shortTermCacheSize);
-  shortTermCacheDecoderThreadsCound = OrthancPlugins::GetIntegerValue(wvConfig, "Threads", shortTermCacheDecoderThreadsCound);
-  highQualityImagePreloadingEnabled = OrthancPlugins::GetBoolValue(wvConfig, "HighQualityImagePreloadingEnabled", highQualityImagePreloadingEnabled);
+  shortTermCacheSize = OrthancPlugins::GetIntegerValue(wvConfig, "ShortTermCacheSize", 1000);
+  shortTermCacheDecoderThreadsCound = OrthancPlugins::GetIntegerValue(wvConfig, "Threads", std::max(boost::thread::hardware_concurrency() / 2, 1u));
+  highQualityImagePreloadingEnabled = OrthancPlugins::GetBoolValue(wvConfig, "HighQualityImagePreloadingEnabled", true);
+  reduceTimelineHeightOnSingleFrameSeries = OrthancPlugins::GetBoolValue(wvConfig, "ReduceTimelineHeightOnSingleFrameSeries", false);
+  showNoReportIconInSeriesList = OrthancPlugins::GetBoolValue(wvConfig, "ShowNoReportIconInSeriesList", false);
+  toolbarLayoutMode = OrthancPlugins::GetStringValue(wvConfig, "ToolbarLayoutMode", "flat");
+  toolbarButtonSize = OrthancPlugins::GetStringValue(wvConfig, "ToolbarButtonSize", "small");
+  defaultSelectedTool = OrthancPlugins::GetStringValue(wvConfig, "DefaultSelectedTool", "zoom");
+
+  if (toolbarLayoutMode != "flat" && toolbarLayoutMode != "tree")
+  {
+    OrthancPluginLogError(_context, "ToolbarLayoutMode invalid value.  Allowed values are \"flat\" and \"tree\"");
+    throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
+  }
+
+  if (toolbarButtonSize != "small" && toolbarButtonSize != "large")
+  {
+    OrthancPluginLogError(_context, "ToolbarButtonSize invalid value.  Allowed values are \"small\" and \"large\"");
+    throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
+  }
 }
 
 void WebViewerConfiguration::parseFile()
@@ -234,22 +199,18 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
     config["version"]["webviewer"] = plugin["Version"].asString();
   }
 
-  // Register "studyDownloadEnabled"
   config["enableStudyDownload"] = studyDownloadEnabled;
-  
-  // Register "videoDisplayEnabled"
   config["enableVideoDisplay"] = videoDisplayEnabled;
-
-  // Register "annotationStorageEnabled"
   config["enableAnnotationStorage"] = annotationStorageEnabled;
-
-  // Register "keyImageCaptureEnabled"
   config["enableKeyImageCapture"] = keyImageCaptureEnabled;
-
-  // Register "windowingPresets"
+  config["showStudyInformationBreadcrumb"] = showStudyInformationBreadcrumb;
   config["windowingPresets"] = windowingPresets;
-
   config["enableHighQualityImagePreloading"] = highQualityImagePreloadingEnabled;
+  config["reduceTimelineHeightOnSingleFrameSeries"] = reduceTimelineHeightOnSingleFrameSeries;
+  config["showNoReportIconInSeriesList"] = showNoReportIconInSeriesList;
+  config["toolbarLayoutMode"] = toolbarLayoutMode;
+  config["toolbarButtonSize"] = toolbarButtonSize;
+  config["defaultSelectedTool"] = defaultSelectedTool;
 
   return config;
 }

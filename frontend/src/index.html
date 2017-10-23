@@ -40,6 +40,10 @@
         wv-series-id="vm.seriesId"
 
         wv-toolbar-enabled="vm.enableToolbar"
+        wv-toolbar-layout-mode="vm.toolbarLayoutMode"
+        wv-toolbar-default-tool="vm.defaultSelectedTool"
+        wv-buttons-size="vm.toolbarButtonSize"
+
         wv-serieslist-enabled="vm.enableLayoutLeft && vm.mode !== 'series'"
         wv-studyinformation-enabled="vm.enableLayoutTop && vm.mode !== 'series'"
         wv-lefthandles-enabled="vm.enableLayoutLeftHandles"
@@ -54,6 +58,10 @@
         wv-selected-series-items="vm.selectedSeriesItems"
         wv-study-download-enabled="vm.enableStudyDownload"
         wv-key-image-capture-enabled="vm.enableKeyImageCapture"
+
+        wv-show-no-report-icon-in-series-list="vm.showNoReportIconInSeriesList"
+        wv-display-disclaimer="true"
+        wv-reduce-timeline-height-on-single-frame-series="vm.reduceTimelineHeightOnSingleFrameSeries"
     >
     </wv-webviewer>
 
@@ -168,7 +176,7 @@
 
         // Configure the user interface depending on the user angent/browser.
         var userInterfacePolicy = new osimis.UserAgentBasedInterfacePolicy();
-        vm.enableLayoutTop = userInterfacePolicy.enableLayoutTop;
+        vm.enableLayoutTop = __webViewerConfig.showStudyInformationBreadcrumb && userInterfacePolicy.enableLayoutTop;
         vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
         vm.enableLayoutTopRight = userInterfacePolicy.enableLayoutTopRight;
         vm.enableToolbar = userInterfacePolicy.enableToolbar;
@@ -181,7 +189,7 @@
         // Listen to changes triggered by the user interface policy.    
         userInterfacePolicy.onUpdate(function() {
             $scope.$apply(function() {
-                vm.enableLayoutTop = userInterfacePolicy.enableLayoutTop;
+                vm.enableLayoutTop = __webViewerConfig.showStudyInformationBreadcrumb && userInterfacePolicy.enableLayoutTop;
                 vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
                 vm.enableLayoutTopRight = userInterfacePolicy.enableLayoutTopRight;
                 vm.enableToolbar = userInterfacePolicy.enableToolbar;
@@ -199,6 +207,12 @@
         vm.enableVideoDisplay = __webViewerConfig.enableVideoDisplay;
         vm.enableAnnotationStorage = __webViewerConfig.enableAnnotationStorage;
         vm.enableKeyImageCapture = __webViewerConfig.enableKeyImageCapture;
+        vm.showNoReportIconInSeriesList = __webViewerConfig.showNoReportIconInSeriesList;
+        vm.reduceTimelineHeightOnSingleFrameSeries = __webViewerConfig.reduceTimelineHeightOnSingleFrameSeries;
+        vm.toolbarLayoutMode = __webViewerConfig.toolbarLayoutMode || "flat";
+        vm.toolbarButtonSize = __webViewerConfig.toolbarButtonSize || "small";
+        vm.defaultSelectedTool = __webViewerConfig.defaultSelectedTool || "zoom";
+
     }]);
     </script>
 </body>

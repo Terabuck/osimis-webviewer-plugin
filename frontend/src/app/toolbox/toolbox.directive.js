@@ -35,11 +35,14 @@
             restrict: 'E',
             scope: {
                 buttons: '=wvToolboxButtons', // input + output
+                buttonsOrdering: '=wvToolboxButtonsOrdering',
+                buttonsSize: '=?wvToolboxButtonsSize',  
                 tool: '=?wvActiveTool', // output (duplicate with buttons as an output
                 onActionClicked: '&?wvOnActionClicked', 
                 windowingPresets: '=wvWindowingPresets',
                 onWindowingPresetSelected: '&?wvOnWindowingPresetSelected',
                 position: '=?wvPosition',
+                layoutMode: '=?wvLayoutMode',  // flat | tree
                 // - avoid lifecycle ordering issue when switching tool though, for instance
                 // deactivated tool always occurs before the activation of another one)
                 readonly: '=?wvReadonly' // default: false
@@ -50,6 +53,8 @@
 
         function link(scope, element, attrs) {
             var vm = scope.vm || {};
+
+            vm.layoutMode = vm.layoutMode === undefined ? 'flat': vm.layoutMode;
 
             vm.position = typeof vm.position !== 'undefined' ? vm.position : 'top';
             vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;

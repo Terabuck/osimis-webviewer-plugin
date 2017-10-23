@@ -2,6 +2,7 @@
  * Orthanc - A Lightweight, RESTful DICOM Store
  * Copyright (C) 2012-2016 Sebastien Jodogne, Medical Physics
  * Department, University Hospital of Liege, Belgium
+ * Copyright (C) 2017 Osimis, Belgium
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -36,57 +37,29 @@
 #include "OrthancException.h"
 #include "Logging.h"
 
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/algorithm/string/replace.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/regex.hpp> 
+#include <boost/uuid/sha1.hpp>
+ 
 #include <string>
 #include <stdint.h>
 #include <string.h>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
-#include <boost/uuid/sha1.hpp>
-#include <boost/lexical_cast.hpp>
 #include <algorithm>
 #include <ctype.h>
 
-#if BOOST_HAS_DATE_TIME == 1
-#include <boost/date_time/posix_time/posix_time.hpp>
+
+#if ORTHANC_ENABLE_MD5 == 1
+#  include "../Resources/ThirdParty/md5/md5.h"
 #endif
 
-#if BOOST_HAS_REGEX == 1
-#include <boost/regex.hpp> 
+#if ORTHANC_ENABLE_BASE64 == 1
+#  include "../Resources/ThirdParty/base64/base64.h"
 #endif
 
-#if defined(_WIN32)
-#include <windows.h>
-#include <process.h>   // For "_spawnvp()" and "_getpid()"
-#else
-#include <unistd.h>    // For "execvp()"
-#include <sys/wait.h>  // For "waitpid()"
-#endif
-
-#if defined(__APPLE__) && defined(__MACH__)
-#include <mach-o/dyld.h> /* _NSGetExecutablePath */
-#include <limits.h>      /* PATH_MAX */
-#endif
-
-#if defined(__linux__) || defined(__FreeBSD_kernel__) || defined(__FreeBSD__)
-#include <limits.h>      /* PATH_MAX */
-#include <signal.h>
-#include <unistd.h>
-#endif
-
-#if BOOST_HAS_LOCALE != 1
-#error Since version 0.7.6, Orthanc entirely relies on boost::locale
-#endif
-
-#include <boost/locale.hpp>
-
-
-#if !defined(ORTHANC_ENABLE_MD5) || ORTHANC_ENABLE_MD5 == 1
-#include "../Resources/ThirdParty/md5/md5.h"
-#endif
-
-
-#if !defined(ORTHANC_ENABLE_BASE64) || ORTHANC_ENABLE_BASE64 == 1
-#include "../Resources/ThirdParty/base64/base64.h"
+#if ORTHANC_ENABLE_LOCALE == 1
+#  include <boost/locale.hpp>
 #endif
 
 
@@ -103,95 +76,19 @@ extern "C"
 #endif
 
 
-#if ORTHANC_PUGIXML_ENABLED == 1
-#include "ChunkedBuffer.h"
-#include <pugixml.hpp>
+#if defined(_WIN32)
+#  include <windows.h>   // For ::Sleep
+#endif
+
+
+#if ORTHANC_ENABLE_PUGIXML == 1
+#  include "ChunkedBuffer.h"
+#  include <pugixml.hpp>
 #endif
 
 
 namespace Orthanc
 {
-  void Toolbox::USleep(uint64_t microSeconds)
-  {
-#if defined(_WIN32)
-    ::Sleep(static_cast<DWORD>(microSeconds / static_cast<uint64_t>(1000)));
-#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD_kernel__) || defined(__FreeBSD__) || defined(__native_client__)
-    usleep(microSeconds);
-#else
-#error Support your platform here
-#endif
-  }
-
-
-#if !defined(ORTHANC_SANDBOXED) || ORTHANC_SANDBOXED != 1
-  static bool finish_;
-  static ServerBarrierEvent barrierEvent_;
-
-#if defined(_WIN32)
-  static BOOL WINAPI ConsoleControlHandler(DWORD dwCtrlType)
-  {
-    // http://msdn.microsoft.com/en-us/library/ms683242(v=vs.85).aspx
-    finish_ = true;
-    return true;
-  }
-#else
-  static void SignalHandler(int signal)
-  {
-    if (signal == SIGHUP)
-    {
-      barrierEvent_ = ServerBarrierEvent_Reload;
-    }
-
-    finish_ = true;
-  }
-#endif
-
-
-  static ServerBarrierEvent ServerBarrierInternal(const bool* stopFlag)
-  {
-#if defined(_WIN32)
-    SetConsoleCtrlHandler(ConsoleControlHandler, true);
-#else
-    signal(SIGINT, SignalHandler);
-    signal(SIGQUIT, SignalHandler);
-    signal(SIGTERM, SignalHandler);
-    signal(SIGHUP, SignalHandler);
-#endif
-  
-    // Active loop that awakens every 100ms
-    finish_ = false;
-    barrierEvent_ = ServerBarrierEvent_Stop;
-    while (!(*stopFlag || finish_))
-    {
-      Toolbox::USleep(100 * 1000);
-    }
-
-#if defined(_WIN32)
-    SetConsoleCtrlHandler(ConsoleControlHandler, false);
-#else
-    signal(SIGINT, NULL);
-    signal(SIGQUIT, NULL);
-    signal(SIGTERM, NULL);
-    signal(SIGHUP, NULL);
-#endif
-
-    return barrierEvent_;
-  }
-
-
-  ServerBarrierEvent Toolbox::ServerBarrier(const bool& stopFlag)
-  {
-    return ServerBarrierInternal(&stopFlag);
-  }
-
-  ServerBarrierEvent Toolbox::ServerBarrier()
-  {
-    const bool stopFlag = false;
-    return ServerBarrierInternal(&stopFlag);
-  }
-#endif  /* ORTHANC_SANDBOXED */
-
-
   void Toolbox::ToUpperCase(std::string& s)
   {
     std::transform(s.begin(), s.end(), s.begin(), toupper);
@@ -217,149 +114,6 @@ namespace Orthanc
     result = source;
     ToLowerCase(result);
   }
-
-
-  static std::streamsize GetStreamSize(std::istream& f)
-  {
-    // http://www.cplusplus.com/reference/iostream/istream/tellg/
-    f.seekg(0, std::ios::end);
-    std::streamsize size = f.tellg();
-    f.seekg(0, std::ios::beg);
-
-    return size;
-  }
-
-
-#if !defined(ORTHANC_SANDBOXED) || ORTHANC_SANDBOXED != 1
-  void Toolbox::ReadFile(std::string& content,
-                         const std::string& path) 
-  {
-    if (!IsRegularFile(path))
-    {
-      LOG(ERROR) << std::string("The path does not point to a regular file: ") << path;
-      throw OrthancException(ErrorCode_RegularFileExpected);
-    }
-
-    boost::filesystem::ifstream f;
-    f.open(path, std::ifstream::in | std::ifstream::binary);
-    if (!f.good())
-    {
-      throw OrthancException(ErrorCode_InexistentFile);
-    }
-
-    std::streamsize size = GetStreamSize(f);
-    content.resize(size);
-    if (size != 0)
-    {
-      f.read(reinterpret_cast<char*>(&content[0]), size);
-    }
-
-    f.close();
-  }
-#endif
-
-
-#if !defined(ORTHANC_SANDBOXED) || ORTHANC_SANDBOXED != 1
-  bool Toolbox::ReadHeader(std::string& header,
-                           const std::string& path,
-                           size_t headerSize)
-  {
-    if (!IsRegularFile(path))
-    {
-      LOG(ERROR) << std::string("The path does not point to a regular file: ") << path;
-      throw OrthancException(ErrorCode_RegularFileExpected);
-    }
-
-    boost::filesystem::ifstream f;
-    f.open(path, std::ifstream::in | std::ifstream::binary);
-    if (!f.good())
-    {
-      throw OrthancException(ErrorCode_InexistentFile);
-    }
-
-    bool full = true;
-
-    {
-      std::streamsize size = GetStreamSize(f);
-      if (size <= 0)
-      {
-        headerSize = 0;
-        full = false;
-      }
-      else if (static_cast<size_t>(size) < headerSize)
-      {
-        headerSize = size;  // Truncate to the size of the file
-        full = false;
-      }
-    }
-
-    header.resize(headerSize);
-    if (headerSize != 0)
-    {
-      f.read(reinterpret_cast<char*>(&header[0]), headerSize);
-    }
-
-    f.close();
-
-    return full;
-  }
-#endif
-
-
-#if !defined(ORTHANC_SANDBOXED) || ORTHANC_SANDBOXED != 1
-  void Toolbox::WriteFile(const void* content,
-                          size_t size,
-                          const std::string& path)
-  {
-    boost::filesystem::ofstream f;
-    f.open(path, std::ofstream::out | std::ofstream::binary);
-    if (!f.good())
-    {
-      throw OrthancException(ErrorCode_CannotWriteFile);
-    }
-
-    if (size != 0)
-    {
-      f.write(reinterpret_cast<const char*>(content), size);
-
-      if (!f.good())
-      {
-        f.close();
-        throw OrthancException(ErrorCode_FileStorageCannotWrite);
-      }
-    }
-
-    f.close();
-  }
-#endif
-
-
-#if !defined(ORTHANC_SANDBOXED) || ORTHANC_SANDBOXED != 1
-  void Toolbox::WriteFile(const std::string& content,
-                          const std::string& path)
-  {
-    WriteFile(content.size() > 0 ? content.c_str() : NULL,
-              content.size(), path);
-  }
-#endif
-
-
-#if !defined(ORTHANC_SANDBOXED) || ORTHANC_SANDBOXED != 1
-  void Toolbox::RemoveFile(const std::string& path)
-  {
-    if (boost::filesystem::exists(path))
-    {
-      if (IsRegularFile(path))
-      {
-        boost::filesystem::remove(path);
-      }
-      else
-      {
-        throw OrthancException(ErrorCode_RegularFileExpected);
-      }
-    }
-  }
-#endif
 
 
   void Toolbox::SplitUriComponents(UriComponents& components,
@@ -529,23 +283,7 @@ namespace Orthanc
   }
 
 
-
-#if !defined(ORTHANC_SANDBOXED) || ORTHANC_SANDBOXED != 1
-  uint64_t Toolbox::GetFileSize(const std::string& path)
-  {
-    try
-    {
-      return static_cast<uint64_t>(boost::filesystem::file_size(path));
-    }
-    catch (boost::filesystem::filesystem_error&)
-    {
-      throw OrthancException(ErrorCode_InexistentFile);
-    }
-  }
-#endif
-
-
-#if !defined(ORTHANC_ENABLE_MD5) || ORTHANC_ENABLE_MD5 == 1
+#if ORTHANC_ENABLE_MD5 == 1
   static char GetHexadecimalCharacter(uint8_t value)
   {
     assert(value < 16);
@@ -602,7 +340,7 @@ namespace Orthanc
 #endif
 
 
-#if !defined(ORTHANC_ENABLE_BASE64) || ORTHANC_ENABLE_BASE64 == 1
+#if ORTHANC_ENABLE_BASE64 == 1
   void Toolbox::EncodeBase64(std::string& result, 
                              const std::string& data)
   {
@@ -628,7 +366,6 @@ namespace Orthanc
   }
 
 
-#  if BOOST_HAS_REGEX == 1
   bool Toolbox::DecodeDataUriScheme(std::string& mime,
                                     std::string& content,
                                     const std::string& source)
@@ -648,7 +385,6 @@ namespace Orthanc
       return false;
     }
   }
-#  endif
 
 
   void Toolbox::EncodeDataUriScheme(std::string& result,
@@ -661,65 +397,7 @@ namespace Orthanc
 #endif
 
 
-
-#if defined(_WIN32)
-  static std::string GetPathToExecutableInternal()
-  {
-    // Yes, this is ugly, but there is no simple way to get the 
-    // required buffer size, so we use a big constant
-    std::vector<char> buffer(32768);
-    /*int bytes =*/ GetModuleFileNameA(NULL, &buffer[0], static_cast<DWORD>(buffer.size() - 1));
-    return std::string(&buffer[0]);
-  }
-
-#elif defined(__linux__) || defined(__FreeBSD_kernel__) || defined(__FreeBSD__)
-  static std::string GetPathToExecutableInternal()
-  {
-    std::vector<char> buffer(PATH_MAX + 1);
-    ssize_t bytes = readlink("/proc/self/exe", &buffer[0], buffer.size() - 1);
-    if (bytes == 0)
-    {
-      throw OrthancException(ErrorCode_PathToExecutable);
-    }
-
-    return std::string(&buffer[0]);
-  }
-
-#elif defined(__APPLE__) && defined(__MACH__)
-  static std::string GetPathToExecutableInternal()
-  {
-    char pathbuf[PATH_MAX + 1];
-    unsigned int  bufsize = static_cast<int>(sizeof(pathbuf));
-
-    _NSGetExecutablePath( pathbuf, &bufsize);
-
-    return std::string(pathbuf);
-  }
-
-#elif defined(ORTHANC_SANDBOXED) && ORTHANC_SANDBOXED == 1
-  // Sandboxed Orthanc, no access to the executable
-
-#else
-#error Support your platform here
-#endif
-
-
-#if !defined(ORTHANC_SANDBOXED) || ORTHANC_SANDBOXED != 1
-  std::string Toolbox::GetPathToExecutable()
-  {
-    boost::filesystem::path p(GetPathToExecutableInternal());
-    return boost::filesystem::absolute(p).string();
-  }
-
-
-  std::string Toolbox::GetDirectoryOfExecutable()
-  {
-    boost::filesystem::path p(GetPathToExecutableInternal());
-    return boost::filesystem::absolute(p.parent_path()).string();
-  }
-#endif
-
-
+#if ORTHANC_ENABLE_LOCALE == 1
   static const char* GetBoostLocaleEncoding(const Encoding sourceEncoding)
   {
     switch (sourceEncoding)
@@ -786,8 +464,10 @@ namespace Orthanc
         throw OrthancException(ErrorCode_NotImplemented);
     }
   }
+#endif
 
 
+#if ORTHANC_ENABLE_LOCALE == 1
   std::string Toolbox::ConvertToUtf8(const std::string& source,
                                      Encoding sourceEncoding)
   {
@@ -814,8 +494,10 @@ namespace Orthanc
       return ConvertToAscii(source);
     }
   }
+#endif
+  
 
-
+#if ORTHANC_ENABLE_LOCALE == 1
   std::string Toolbox::ConvertFromUtf8(const std::string& source,
                                        Encoding targetEncoding)
   {
@@ -842,6 +524,7 @@ namespace Orthanc
       return ConvertToAscii(source);
     }
   }
+#endif
 
 
   bool Toolbox::IsAsciiString(const void* data,
@@ -997,30 +680,6 @@ namespace Orthanc
   }
 
 
-#if BOOST_HAS_DATE_TIME == 1
-  std::string Toolbox::GetNowIsoString()
-  {
-    boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-    return boost::posix_time::to_iso_string(now);
-  }
-
-  void Toolbox::GetNowDicom(std::string& date,
-                            std::string& time)
-  {
-    boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-    tm tm = boost::posix_time::to_tm(now);
-
-    char s[32];
-    sprintf(s, "%04d%02d%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
-    date.assign(s);
-
-    // TODO milliseconds
-    sprintf(s, "%02d%02d%02d.%06d", tm.tm_hour, tm.tm_min, tm.tm_sec, 0);
-    time.assign(s);
-  }
-#endif
-
-
   std::string Toolbox::StripSpaces(const std::string& source)
   {
     size_t first = 0;
@@ -1121,7 +780,6 @@ namespace Orthanc
   }
 
 
-#if BOOST_HAS_REGEX == 1
   std::string Toolbox::WildcardToRegularExpression(const std::string& source)
   {
     // TODO - Speed up this with a regular expression
@@ -1149,8 +807,6 @@ namespace Orthanc
 
     return result;
   }
-#endif
-
 
 
   void Toolbox::TokenizeString(std::vector<std::string>& result,
@@ -1178,36 +834,7 @@ namespace Orthanc
   }
 
 
-#if !defined(ORTHANC_SANDBOXED) || ORTHANC_SANDBOXED != 1
-  void Toolbox::MakeDirectory(const std::string& path)
-  {
-    if (boost::filesystem::exists(path))
-    {
-      if (!boost::filesystem::is_directory(path))
-      {
-        throw OrthancException(ErrorCode_DirectoryOverFile);
-      }
-    }
-    else
-    {
-      if (!boost::filesystem::create_directories(path))
-      {
-        throw OrthancException(ErrorCode_MakeDirectory);
-      }
-    }
-  }
-#endif
-
-
-#if !defined(ORTHANC_SANDBOXED) || ORTHANC_SANDBOXED != 1
-  bool Toolbox::IsExistingFile(const std::string& path)
-  {
-    return boost::filesystem::exists(path);
-  }
-#endif
-
-
-#if ORTHANC_PUGIXML_ENABLED == 1
+#if ORTHANC_ENABLE_PUGIXML == 1
   class ChunkedBufferWriter : public pugi::xml_writer
   {
   private:
@@ -1329,66 +956,6 @@ namespace Orthanc
 #endif
 
 
-#if !defined(ORTHANC_SANDBOXED) || ORTHANC_SANDBOXED != 1
-  void Toolbox::ExecuteSystemCommand(const std::string& command,
-                                     const std::vector<std::string>& arguments)
-  {
-    // Convert the arguments as a C array
-    std::vector<char*>  args(arguments.size() + 2);
-
-    args.front() = const_cast<char*>(command.c_str());
-
-    for (size_t i = 0; i < arguments.size(); i++)
-    {
-      args[i + 1] = const_cast<char*>(arguments[i].c_str());
-    }
-
-    args.back() = NULL;
-
-    int status;
-
-#if defined(_WIN32)
-    // http://msdn.microsoft.com/en-us/library/275khfab.aspx
-    status = static_cast<int>(_spawnvp(_P_OVERLAY, command.c_str(), &args[0]));
-
-#else
-    int pid = fork();
-
-    if (pid == -1)
-    {
-      // Error in fork()
-#if ORTHANC_ENABLE_LOGGING == 1
-      LOG(ERROR) << "Cannot fork a child process";
-#endif
-
-      throw OrthancException(ErrorCode_SystemCommand);
-    }
-    else if (pid == 0)
-    {
-      // Execute the system command in the child process
-      execvp(command.c_str(), &args[0]);
-
-      // We should never get here
-      _exit(1);
-    }
-    else
-    {
-      // Wait for the system command to exit
-      waitpid(pid, &status, 0);
-    }
-#endif
-
-    if (status != 0)
-    {
-#if ORTHANC_ENABLE_LOGGING == 1
-      LOG(ERROR) << "System command failed with status code " << status;
-#endif
-
-      throw OrthancException(ErrorCode_SystemCommand);
-    }
-  }
-#endif
-
   
   bool Toolbox::IsInteger(const std::string& str)
   {
@@ -1496,66 +1063,6 @@ namespace Orthanc
       return str.compare(0, prefix.size(), prefix) == 0;
     }
   }
-
-
-  int Toolbox::GetProcessId()
-  {
-#if defined(_WIN32)
-    return static_cast<int>(_getpid());
-#else
-    return static_cast<int>(getpid());
-#endif
-  }
-
-
-#if !defined(ORTHANC_SANDBOXED) || ORTHANC_SANDBOXED != 1
-  bool Toolbox::IsRegularFile(const std::string& path)
-  {
-    namespace fs = boost::filesystem;
-
-    try
-    {
-      if (fs::exists(path))
-      {
-        fs::file_status status = fs::status(path);
-        return (status.type() == boost::filesystem::regular_file ||
-                status.type() == boost::filesystem::reparse_file);   // Fix BitBucket issue #11
-      }
-    }
-    catch (fs::filesystem_error&)
-    {
-    }
-
-    return false;
-  }
-#endif
-
-
-  FILE* Toolbox::OpenFile(const std::string& path,
-                          FileMode mode)
-  {
-#if defined(_WIN32)
-    // TODO Deal with special characters by converting to the current locale
-#endif
-
-    const char* m;
-    switch (mode)
-    {
-      case FileMode_ReadBinary:
-        m = "rb";
-        break;
-
-      case FileMode_WriteBinary:
-        m = "wb";
-        break;
-
-      default:
-        throw OrthancException(ErrorCode_ParameterOutOfRange);
-    }
-
-    return fopen(path.c_str(), m);
-  }
-
   
 
   static bool IsUnreservedCharacter(char c)
@@ -1696,4 +1203,171 @@ namespace Orthanc
       return static_cast<unsigned int>(v);
     }
   }
+
+
+  bool Toolbox::IsUuid(const std::string& str)
+  {
+    if (str.size() != 36)
+    {
+      return false;
+    }
+
+    for (size_t i = 0; i < str.length(); i++)
+    {
+      if (i == 8 || i == 13 || i == 18 || i == 23)
+      {
+        if (str[i] != '-')
+          return false;
+      }
+      else
+      {
+        if (!isalnum(str[i]))
+          return false;
+      }
+    }
+
+    return true;
+  }
+
+
+  bool Toolbox::StartsWithUuid(const std::string& str)
+  {
+    if (str.size() < 36)
+    {
+      return false;
+    }
+
+    if (str.size() == 36)
+    {
+      return IsUuid(str);
+    }
+
+    assert(str.size() > 36);
+    if (!isspace(str[36]))
+    {
+      return false;
+    }
+
+    return IsUuid(str.substr(0, 36));
+  }
+
+
+#if ORTHANC_ENABLE_LOCALE == 1
+  static std::auto_ptr<std::locale>  globalLocale_;
+
+  static bool SetGlobalLocale(const char* locale)
+  {
+    globalLocale_.reset(NULL);
+
+    try
+    {
+      if (locale == NULL)
+      {
+        LOG(WARNING) << "Falling back to system-wide default locale";
+        globalLocale_.reset(new std::locale());
+      }
+      else
+      {
+        LOG(INFO) << "Using locale: \"" << locale << "\" for case-insensitive comparison of strings";
+        globalLocale_.reset(new std::locale(locale));
+      }
+    }
+    catch (std::runtime_error&)
+    {
+    }
+
+    return (globalLocale_.get() != NULL);
+  }
+  
+  void Toolbox::InitializeGlobalLocale(const char* locale)
+  {
+    // Make Orthanc use English, United States locale
+    // Linux: use "en_US.UTF-8"
+    // Windows: use ""
+    // Wine: use NULL
+    
+#if defined(__MINGW32__)
+    // Visibly, there is no support of locales in MinGW yet
+    // http://mingw.5.n7.nabble.com/How-to-use-std-locale-global-with-MinGW-correct-td33048.html
+    static const char* DEFAULT_LOCALE = NULL;
+#elif defined(_WIN32)
+    // For Windows: use default locale (using "en_US" does not work)
+    static const char* DEFAULT_LOCALE = "";
+#else
+    // For Linux & cie
+    static const char* DEFAULT_LOCALE = "en_US.UTF-8";
+#endif
+
+    bool ok;
+    
+    if (locale == NULL)
+    {
+      ok = SetGlobalLocale(DEFAULT_LOCALE);
+
+#if defined(__MINGW32__)
+      LOG(WARNING) << "This is a MinGW build, case-insensitive comparison of "
+                   << "strings with accents will not work outside of Wine";
+#endif
+    }
+    else
+    {
+      ok = SetGlobalLocale(locale);
+    }
+
+    if (!ok &&
+        !SetGlobalLocale(NULL))
+    {
+      LOG(ERROR) << "Cannot initialize global locale";
+      throw OrthancException(ErrorCode_InternalError);
+    }
+
+  }
+
+
+  void Toolbox::FinalizeGlobalLocale()
+  {
+    globalLocale_.reset();
+  }
+
+  
+  std::string Toolbox::ToUpperCaseWithAccents(const std::string& source)
+  {
+    if (globalLocale_.get() == NULL)
+    {
+      LOG(ERROR) << "No global locale was set, call Toolbox::InitializeGlobalLocale()";
+      throw OrthancException(ErrorCode_BadSequenceOfCalls);
+    }
+
+    /**
+     * A few notes about locales:
+     *
+     * (1) We don't use "case folding":
+     * http://www.boost.org/doc/libs/1_64_0/libs/locale/doc/html/conversions.html
+     *
+     * Characters are made uppercase one by one. This is because, in
+     * static builds, we are using iconv, which is visibly not
+     * supported correctly (TODO: Understand why). Case folding seems
+     * to be working correctly if using the default backend under
+     * Linux (ICU or POSIX?). If one wishes to use case folding, one
+     * would use:
+     *
+     *   boost::locale::generator gen;
+     *   std::locale::global(gen(DEFAULT_LOCALE));
+     *   return boost::locale::to_upper(source);
+     *
+     * (2) The function "boost::algorithm::to_upper_copy" does not
+     * make use of the "std::locale::global()". We therefore create a
+     * global variable "globalLocale_".
+     * 
+     * (3) The variant of "boost::algorithm::to_upper_copy()" that
+     * uses std::string does not work properly. We need to apply it
+     * one wide strings (std::wstring). This explains the two calls to
+     * "utf_to_utf" in order to convert to/from std::wstring.
+     **/
+
+    std::wstring w = boost::locale::conv::utf_to_utf<wchar_t>(source);
+    w = boost::algorithm::to_upper_copy<std::wstring>(w, *globalLocale_);
+    return boost::locale::conv::utf_to_utf<char>(w);
+  }
+#endif
 }

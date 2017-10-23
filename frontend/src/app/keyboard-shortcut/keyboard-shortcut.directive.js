@@ -41,7 +41,7 @@
                     return wvStudyManager.get(nextStudyId)
                 }).then(function(nextStudy){
                     var firstItemTuple = nextStudy.getNextItemId(),
-                        paneOptions = {csViewport: null};
+                        paneOptions = {csViewport: null, isSelected: true};
                     
                     if(firstItemTuple[1] == "series"){
                         paneOptions.seriesId = firstItemTuple[0];
@@ -65,7 +65,7 @@
                     return wvStudyManager.get(previousStudyId)
                 }).then(function(previousStudy){
                     var firstItemTuple = previousStudy.getNextItemId(),
-                        paneOptions = {csViewport: null};
+                        paneOptions = {csViewport: null, isSelected: true};
                     
                     if(firstItemTuple[1] == "series"){
                         paneOptions.seriesId = firstItemTuple[0];
@@ -79,13 +79,12 @@
                 })
             });
 
-            console.log('KEYBOARD_SHORTCUT', wvKeyboardShortcutEventManager, webviewer);
             wvKeyboardShortcutEventManager.down(this, function(e){
                 var selectedPane = wvPaneManager.getSelectedPane();
                 selectedPane.getStudy().then(function(study){
                     var currentItemId = selectedPane.seriesId || selectedPane.videoId || selectedPane.reportId,
                         nextItemTuple = study.getNextItemId(currentItemId),
-                        paneOptions = {csViewport: null};
+                        paneOptions = {csViewport: null, isSelected: true};
 
                     if(nextItemTuple[1] == "series"){
                         paneOptions.seriesId = nextItemTuple[0];
@@ -106,7 +105,7 @@
                 selectedPane.getStudy().then(function(study){
                     var currentItemId = selectedPane.seriesId || selectedPane.videoId || selectedPane.reportId,
                         previousItemTuple = study.getPreviousItemId(currentItemId),
-                        paneOptions = {csViewport: null};
+                        paneOptions = {csViewport: null, isSelected: true};
 
                     if(previousItemTuple[1] == "series"){
                         paneOptions.seriesId = previousItemTuple[0];

@@ -1,0 +1,227 @@
+<div ng-switch="vm.button.tool">
+    <!-- Splitpane Grid configuration buttons. -->
+    <wv-splitpane-config-button
+        ng-switch-when="layout"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('layout')"
+        wv-readonly="vm.toolbox.readonly"
+        wv-button-size="{{ vm.toolbox.buttonsSize }}"
+        wv-splitpane-layout="vm.toolbox.buttons.layout"
+        wv-popover-placement="{{ vm.toolbox.position === 'top' ? 'bottom': 'left' }}"
+    ></wv-splitpane-config-button>
+
+    <!-- Invert Colour State -->
+    <label 
+        ng-switch-when="invert"            
+        ng-if="vm.toolbox.buttons.hasOwnProperty('invert')"
+        class="wvButton--underline glyphicon glyphicon-adjust"
+        data-title="Invert color"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        ng-class="{'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        bs-tooltip
+    >
+        <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'invert'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
+    <!-- Zoom -->
+    <label
+        ng-switch-when="zoom"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('zoom')"
+        class="wvButton--underline glyphicon glyphicon-search"
+        ng-class="{active: vm.toolbox.tool === 'zoom', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        data-title="Zoom"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        bs-tooltip
+        >
+        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="zoom" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
+    <!-- Pan -->
+    <label
+        ng-switch-when="pan"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('pan')"
+        class="wvButton--underline glyphicon glyphicon-move"
+        ng-class="{active: vm.toolbox.tool === 'pan', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        data-title="Panning"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"        
+        data-container="body"
+        bs-tooltip
+        >
+        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="pan" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
+    <!-- Windowing -->
+    <wv-windowing-preset-button
+        ng-switch-when="windowing"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('windowing')"
+        wv-selected-tool="vm.toolbox.tool"
+        wv-readonly="vm.toolbox.readonly"
+        wv-button-size="{{ vm.toolbox.buttonsSize }}"
+        wv-popover-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        wv-windowing-presets="vm.toolbox.windowingPresets"
+        wv-on-windowing-preset-selected="vm.toolbox.applyWindowing($windowWidth, $windowCenter)"
+    ></wv-windowing-preset-button>
+
+    <!-- Magnifying Glass -->
+    <wv-magnifying-glass-config-button
+        ng-switch-when="magnify"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('magnify')"
+        wv-selected-tool="vm.toolbox.tool"
+        wv-magnification-level="vm.toolbox.buttons.magnify.magnificationLevel"
+        wv-magnifying-glass-size="vm.toolbox.buttons.magnify.magnifyingGlassSize"
+        wv-readonly="vm.toolbox.readonly"
+        wv-button-size="{{ vm.toolbox.buttonsSize }}"
+        wv-popover-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+    ></wv-magnifying-glass-config-button>
+
+    <!-- Length Measure -->
+    <label
+        ng-switch-when="lengthMeasure"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('lengthMeasure')"
+        class="wvButton--underline glyphicon glyphicon-resize-horizontal"
+        ng-class="{active: vm.toolbox.tool === 'lengthMeasure', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        data-title="Length Measurement"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"        
+        data-container="body"
+        bs-tooltip
+        >
+        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="lengthMeasure" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
+    <!-- Angle Measure -->
+    <label
+        ng-switch-when="angleMeasure"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('angleMeasure')"
+        class="wvButton--underline glyphicon glyphicon-chevron-left"
+        ng-class="{active: vm.toolbox.tool === 'angleMeasure', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        data-title="Angle Measurement"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        bs-tooltip
+        >
+        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="angleMeasure" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
+    <!-- Pixel Probe -->
+    <label
+        ng-switch-when="pixelProbe"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('pixelProbe')"
+        class="wvButton--underline glyphicon glyphicon-record"
+        ng-class="{active: vm.toolbox.tool === 'pixelProbe', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        data-title="Pixel Probe"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        bs-tooltip
+        >
+        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="pixelProbe" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
+    <!-- Elliptical Region Of Interest -->
+    <label
+        ng-switch-when="ellipticalRoi"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('ellipticalRoi')"
+        class="wvButton--underline fa fa-circle-o"
+        ng-class="{active: vm.toolbox.tool === 'ellipticalRoi', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        data-title="Elliptical ROI"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        bs-tooltip
+        >
+        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="ellipticalRoi" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
+    <!-- Rectangle Region Of Interest -->
+    <label
+        ng-switch-when="rectangleRoi"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('rectangleRoi')"
+        class="wvButton--underline glyphicon glyphicon glyphicon-unchecked"
+        ng-class="{active: vm.toolbox.tool === 'rectangleRoi', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        data-title="Rectangle ROI"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        bs-tooltip
+        >
+        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="rectangleRoi" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
+    <!-- Arrow/Text Annotate -->
+    <label
+        ng-switch-when="arrowAnnotate"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('arrowAnnotate')"
+        class="wvButton--underline fa fa-arrow-right"
+        ng-class="{active: vm.toolbox.tool === 'arrowAnnotate', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        data-title="Annotate the image with text"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        bs-tooltip
+        >
+        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="arrowAnnotate" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
+    <!-- Rotate Left -->
+    <label
+        ng-switch-when="rotateLeft"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('rotateLeft')"
+        class="wvButton--underline fa fa-rotate-left"
+        data-title="Rotate to the left"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        ng-class="{'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        bs-tooltip
+        >
+        <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'rotateLeft'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
+    <!-- Rotate Right -->
+    <label
+        ng-switch-when="rotateRight"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('rotateRight')"
+        class="wvButton--underline fa fa-rotate-right"
+        data-title="Rotate to the right"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        ng-class="{'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        bs-tooltip
+        >
+        <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'rotateRight'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
+    <!-- Flip Horizontally -->
+    <label
+        ng-switch-when="hflip"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('hflip')"
+        class="wvButton--underline fa fa-exchange"
+        data-title="Flip horizontally"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        ng-class="{'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        bs-tooltip
+        >
+        <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'hflip'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
+    <!-- Flip Vertically -->
+    <label
+        ng-switch-when="vflip"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('vflip')"
+        class="wvButton--underline fa fa-exchange wvButton--rotate"
+        data-title="Flip vertically"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        ng-class="{'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        bs-tooltip
+        >
+        <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'vflip'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
+    <!-- Key Image Note -->
+    <wv-keyimagenote-button
+        ng-switch-when="keyImageCapture"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('keyImageCapture')"
+        wv-readonly="vm.toolbox.readonly"
+        wv-button-size="{{ vm.toolbox.buttonsSize }}"
+        wv-popover-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        wv-on-keyimagenote-created="vm.toolbox.createKeyImageNote($note)"
+    ></wv-keyimagenote-button>
+</div>

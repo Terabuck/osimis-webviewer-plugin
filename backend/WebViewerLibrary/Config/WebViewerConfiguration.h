@@ -54,10 +54,16 @@ public:
   std::set<std::string> enabledTransferSyntaxes;
 
   // Frontend Variables
+  bool showStudyInformationBreadcrumb;
   bool studyDownloadEnabled;
   bool videoDisplayEnabled;
   bool annotationStorageEnabled;
   bool highQualityImagePreloadingEnabled;
+  bool reduceTimelineHeightOnSingleFrameSeries;
+  bool showNoReportIconInSeriesList;
+  std::string toolbarLayoutMode;
+  std::string toolbarButtonSize;
+  std::string defaultSelectedTool;
   Json::Value windowingPresets;
 
   // If activated, this feature displays a button on each viewport. When the button is

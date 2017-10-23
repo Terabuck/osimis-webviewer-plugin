@@ -53,7 +53,8 @@
             scope: {
                 splitpaneLayout: '=wvSplitpaneLayout',
                 readonly: '=?wvReadonly',
-                popoverPlacement: '@?wvPopoverPlacement'
+                popoverPlacement: '@?wvPopoverPlacement',
+                buttonSize: '@?wvButtonSize'
             },
             templateUrl: 'app/toolbox/splitpane-config-button.directive.html'
         };
@@ -61,7 +62,7 @@
 
         function link(scope, element, attrs) {
             var vm = scope.vm;
-
+            vm.buttonSize = vm.buttonSize === undefined ? "small" : vm.buttonSize;
             var buttonEl = element.children().first();
             
             // Toggle popover on mouse over/out.

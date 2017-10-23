@@ -59,6 +59,7 @@
                 studyDownloadEnabled: '=?wvStudyDownloadEnabled',
                 videoDisplayEnabled: '=?wvVideoDisplayEnabled',
                 displayMode: '=?wvDisplayMode',
+                showNoReportIcon: '=?wvShowNoReportIcon',
 
                 // Selection-related
                 itemSelectionEnabled: '=?wvItemSelectionEnabled',

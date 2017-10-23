@@ -72,12 +72,21 @@ $asideRightPadding: 10px;
 .wvLayoutLeft__contentTop {
     // We have to set a static height since we use floating to make white space
     // disapear in nested content.
-    height: 4rem;
+    // note: could be deactivate with the clearfix so we can have a dynamic height
+    // max-height: 6rem;
     padding: 0rem 1rem 0rem 1rem;
 
     // Enforce width even if there is a scrollbar on win/IE11 (-1 px for
     // border).
     width: calc(32rem - 1px);
+
+    &:after{
+        content: "";
+        display:block;
+        height:0;
+        width:0;
+        clear:both;
+    }
 }
 
 .wvLayoutLeft__contentMiddle {
@@ -267,6 +276,20 @@ $asideRightPadding: 10px;
         display: block;
         height: 100%;
         width: calc(100% - #{$toolbarHeight});
+    }
+
+    & .wvLayout__splitpane--bigToolbarAtTop {
+        display: block;
+        height: calc(100% - 68px);
+        width: 100%;
+
+        position: relative;
+        top: 68px;
+    }
+    & .wvLayout__splitpane--bigToolbarAtRight {
+        display: block;
+        height: 100%;
+        width: calc(100% - 68px);
     }
 
     // Position the main section below the top zone if the latter is shown

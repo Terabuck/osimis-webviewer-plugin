@@ -18,7 +18,8 @@
                 windowingPresets: '=wvWindowingPresets',
                 selectedTool: '=wvSelectedTool',
                 readonly: '=?wvReadonly',
-                popoverPlacement: '@?wvPopoverPlacement'
+                popoverPlacement: '@?wvPopoverPlacement',
+                buttonSize: '@?wvButtonSize'
             },
             templateUrl: 'app/toolbox/windowing-preset-button.directive.html'
         };
@@ -26,6 +27,7 @@
 
         function link(scope, element, attrs) {
             var vm = scope.vm;
+            vm.buttonSize = vm.buttonSize === undefined ? 'small' : vm.buttonSize;
 
             var buttonEl = element.children().first();
             

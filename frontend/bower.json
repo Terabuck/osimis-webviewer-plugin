@@ -1,7 +1,7 @@
 {
   "name": "webViewer",
-  "description": "Orthanc & component based viewer",
   "version": "1.0.0",
+  "description": "Orthanc & component based viewer",
   "main": [
     "js/app.js",
     "styles/app.css"
@@ -22,7 +22,7 @@
     "url": "https://bitbucket.org/osimis/osimis-webviewer.git"
   },
   "devDependencies": {
-    "sinon": "^1.17.6",
+    "sinon": "^1.17.7",
     "bardjs": "^0.1.8",
     "angular-mocks": "^1.5.8"
   },

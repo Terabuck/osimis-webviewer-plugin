@@ -9,8 +9,8 @@
 
 ResizePolicy::ResizePolicy(unsigned int maxWidthHeight)
 {
-  // Limit resizing between 25x25 & 1000x1000.
-  if (maxWidthHeight < 25 || maxWidthHeight > 1000) {
+  // Limit resizing between 25x25 & 10000x10000.
+  if (maxWidthHeight < 25 || maxWidthHeight > 10000) {
     throw Orthanc::OrthancException(Orthanc::ErrorCode_ParameterOutOfRange);
   }
 

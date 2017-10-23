@@ -48,26 +48,9 @@ void ImageController::Inject<AnnotationRepository>(AnnotationRepository* obj) {
 }
 
 ImageController::ImageController(OrthancPluginRestOutput* response, const std::string& url, const OrthancPluginHttpRequest* request)
-  : BaseController(response, url, request), imageProcessingRouteParser_() //, frameIndex_(0)
+  : BaseController(response, url, request)
 {
-  // Register sub routes related to image optimization (doesn't include
-  // annotation routes). Have a look at the _ParseURLPostFix method for more
-  // info.
-  imageProcessingRouteParser_.RegisterRoute<LowQualityPolicy>("^low-quality$");
-  imageProcessingRouteParser_.RegisterRoute<MediumQualityPolicy>("^medium-quality$");
-  imageProcessingRouteParser_.RegisterRoute<HighQualityPolicy>("^high-quality$");
-  imageProcessingRouteParser_.RegisterRoute<PixelDataQualityPolicy>("^pixeldata-quality$");
-
-  // These image processing routes can be queued in any order. Some of them
-  // also accept parameters. For instance, we can resize to 150px/150px than
-  // convert to png using the `/resize:150/png` route.
-  imageProcessingRouteParser_.RegisterRoute<CompositePolicy>("^(.+/.+)$"); // regex: at least a single "/"
-  imageProcessingRouteParser_.RegisterRoute<ResizePolicy>("^resize:(\\d+)$"); // resize:<maximal height/width: uint>
-  imageProcessingRouteParser_.RegisterRoute<JpegConversionPolicy>("^jpeg:?(\\d{0,3})$"); // regex: jpeg:<quality level: int[0;100]>
-  imageProcessingRouteParser_.RegisterRoute<PngConversionPolicy>("^png$");
-  imageProcessingRouteParser_.RegisterRoute<Uint8ConversionPolicy>("^8bit$");
-  imageProcessingRouteParser_.RegisterRoute<KLVEmbeddingPolicy>("^klv$");
-  imageProcessingRouteParser_.RegisterRoute<Monochrome1InversionPolicy>("^invert-monochrome1$");
+  ImageControllerUrlParser::init();  // create imageProcessingRouteParser_ if not created yet (it's used by 2 classes but we don't know which one will use it first)
 }
 
 int ImageController::_ParseURLPostFix(const std::string& urlPostfix) {
@@ -110,7 +93,7 @@ int ImageController::_ParseURLPostFix(const std::string& urlPostfix) {
       // such.
       else {
         this->isAnnotationRequest_ = false;
-        this->processingPolicy_.reset(matches.size() < 4 ? NULL : imageProcessingRouteParser_.InstantiatePolicyFromRoute(matches[4]));
+        this->processingPolicy_.reset(matches.size() < 4 ? NULL : ImageControllerUrlParser::InstantiatePolicyFromRoute(matches[4]));
         // See the _ProcessRequest method for request processing.
       }
       
@@ -395,7 +378,7 @@ bool ImageControllerCacheFactory::Create(std::string& content,
 
 std::auto_ptr<ImageProcessingRouteParser> ImageControllerUrlParser::imageProcessingRouteParser_;
 
-bool ImageControllerUrlParser::parseUrlPostfix(const std::string urlPostfix, std::string& instanceId, uint32_t& frameIndex, std::auto_ptr<IImageProcessingPolicy>& processingPolicy)
+void ImageControllerUrlParser::init()
 {
   if (imageProcessingRouteParser_.get() == NULL)
   {
@@ -404,7 +387,20 @@ bool ImageControllerUrlParser::parseUrlPostfix(const std::string urlPostfix, std
     imageProcessingRouteParser_->RegisterRoute<MediumQualityPolicy>("^medium-quality$");
     imageProcessingRouteParser_->RegisterRoute<HighQualityPolicy>("^high-quality$");
     imageProcessingRouteParser_->RegisterRoute<PixelDataQualityPolicy>("^pixeldata-quality$");
+
+    imageProcessingRouteParser_->RegisterRoute<CompositePolicy>("^(.+/.+)$"); // regex: at least a single "/"
+    imageProcessingRouteParser_->RegisterRoute<ResizePolicy>("^resize:(\\d+)$"); // resize:<maximal height/width: uint>
+    imageProcessingRouteParser_->RegisterRoute<JpegConversionPolicy>("^jpeg:?(\\d{0,3})$"); // regex: jpeg:<quality level: int[0;100]>
+    imageProcessingRouteParser_->RegisterRoute<PngConversionPolicy>("^png$");
+    imageProcessingRouteParser_->RegisterRoute<Uint8ConversionPolicy>("^8bit$");
+    imageProcessingRouteParser_->RegisterRoute<KLVEmbeddingPolicy>("^klv$");
+    imageProcessingRouteParser_->RegisterRoute<Monochrome1InversionPolicy>("^invert-monochrome1$");
   }
+}
+
+bool ImageControllerUrlParser::parseUrlPostfix(const std::string urlPostfix, std::string& instanceId, uint32_t& frameIndex, std::auto_ptr<IImageProcessingPolicy>& processingPolicy)
+{
+  init(); // create imageProcessingRouteParser_ if not created yet  (it's used by 2 classes but we don't know which one will use it first)
 
   boost::regex regexp("^(nocache/|cleancache/)?([^/]+)/(\\d+)(?:/(.+))$");
   boost::cmatch matches;
