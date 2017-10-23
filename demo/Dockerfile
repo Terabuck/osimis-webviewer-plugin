@@ -4,4 +4,5 @@ FROM osimis/orthanc-pro:mainline-20171022-demo-populated
 
 COPY ./osimis-webviewer.json /etc/orthanc/osimis-webviewer.json
 
-COPY binaries/libOsimisWebViewer.so /usr/share/orthanc/plugins/libOsimisWebViewer.so
+# we must copy the .so file in the 'disabled' folder to overwrite the existing one
+COPY binaries/libOsimisWebViewer.so /usr/share/orthanc/plugins-disabled/libOsimisWebViewer.so
