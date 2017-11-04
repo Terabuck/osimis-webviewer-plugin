@@ -165,7 +165,7 @@ address={San Francisco, {CA}, {USA}}
 
 ## Contact & Bug/Feedback Report
 
-Any question/feedback/bug report are well appreciated. You may send them by mail to osimis' developer Thibault Piront at `tp@osimis.io`.
+Any question/feedback/bug report are well appreciated. You may send them by mail to osimis' support at `support@osimis.io`.
 
 The full bug/feedback report procedure is available in the 
 `procedures/report-bug-or-feedback.md` file.

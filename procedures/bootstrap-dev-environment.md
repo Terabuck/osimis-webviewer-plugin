@@ -135,7 +135,8 @@ gulp serve-dev --nosync --novet
 
 The file `frontend/server.js` serves the frontend. You may want to change 
 the defined port/ip. The reverse proxy may also be used (see the
-`reverse-proxy/` folder.
+`reverse-proxy/` folder.  There's also a sample config file for nginx available
+in `sample-nginx-config-for-development.md` 
 
 You may need to set the "RemoteAccessAllowed" configuration option to true in
 your Orthanc config.json file.
@@ -143,3 +144,4 @@ your Orthanc config.json file.
 Known issues:
 - the serve-dev command erases the _build/_ folder content.
 - the server must be restarted to update index.html file.
+
