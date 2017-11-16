@@ -191,6 +191,8 @@ namespace {
     tagsToKeep.push_back("ImageOrientationPatient");
     tagsToKeep.push_back("ImagePositionPatient");
     tagsToKeep.push_back("FrameOfReferenceUID");
+    tagsToKeep.push_back("HighBit");
+    tagsToKeep.push_back("InstanceNumber");
 
     // used by the C++ code
     tagsToKeep.push_back("Modality");
