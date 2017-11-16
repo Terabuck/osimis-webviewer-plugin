@@ -9,26 +9,26 @@
  * studies as the current patient ones. Be aware this does not compensate
  * server-side security, but provide an easy mechanism to override the studies
  * shown in the study picker without overriding the <orthanc>/studies route.
- * 
- * @param {Array<string>} [wvSelectedStudyIds=EmptyArray] 
- * Configure the studies shown in the serieslist. `wvSerieslistEnabled` must be 
+ *
+ * @param {Array<string>} [wvSelectedStudyIds=EmptyArray]
+ * Configure the studies shown in the serieslist. `wvSerieslistEnabled` must be
  * true.
- * 
+ *
  * @param {boolean} [wvToolbarEnabled=true]
- * Display the toolbar. Note all tools are disabled when the toolbar is 
+ * Display the toolbar. Note all tools are disabled when the toolbar is
  * disabled, including the preselected ones (zooming).
- * 
+ *
  * @param {string} [wvToolbarPosition='top']
  * The toolbar position on the screen.
- * 
+ *
  * Can either be:
- * 
+ *
  * * `top`
  * * `right`
  *
  * @param {boolean} [wvSerieslistEnabled=true]
- * Display the list of series based on the `wvStudyId`. 
- * 
+ * Display the list of series based on the `wvStudyId`.
+ *
  * @param {boolean} [wvStudyinformationEnabled=true]
  * Display the study information (breadcrumb) based on the `wvStudyId`.
  *
@@ -38,14 +38,14 @@
  * @param {boolean} [wvLefthandlesEnabled=true]
  * Display buttons to toggle the left side of the interface. The right handles
  * are configurable via the transcluded directive.
- * 
+ *
  * @param {boolean} [wvNoticeEnabled=false]
  * Display a notice in the bottom side of the application.
- * 
+ *
  * @param {string} [wvNoticeText=undefined]
  * The displayed notice content, for instance instructions over mobile
  * ergonomy, or related series / studies.
- * 
+ *
  * @param {boolean} [wvSeriesItemSelectionEnabled=false]
  * Let the end-user select series in the serieslist using a single click. This
  * selection has no impact on the standalone viewer. However, host applications
@@ -55,44 +55,44 @@
  *
  * @param {Array<object>} [wvSelectedSeriesItems=EmptyArray] (readonly)
  * A list of selected series items. This list can be retrieved to customize the
- * viewer by host applications. See the `wvSeriesItemSelectionEnabled` 
- * parameter. 
+ * viewer by host applications. See the `wvSeriesItemSelectionEnabled`
+ * parameter.
  *
  * Inner objects can contains the following attributes:
- * 
+ *
  * * {string} `seriesId`
  *   The orthanc series id. This parameter is not provided for PDF report &
  *   video. Note this is the original orthanc id, not the webviewer's series
  *   id. This parameter is always provided.
- *   
+ *
  * * {number} `instanceIndex`
- *   The instance index. A multiframe instance appears as a series in the 
+ *   The instance index. A multiframe instance appears as a series in the
  *   Osimis web viewer. Thus, the series id might not be enough in these cases.
  *   This parameter is not provided for video & pdf instances.
- *   
+ *
  * * {string} `studyId`
  *   The orthanc study id. This parameter is always provided.
- *   
+ *
  * * {string} `instanceId`
  *   The orthanc instance id. This parameter is only provided for selected PDF
  *   report or video. Selected multiframe instance do not provide this
  *   parameter, you have to rely on `seriesId` instead.
- * 
+ *
  * @param {string} [wvSeriesId=undefined]
  * Configure the series shown in the main viewport. Viewport's data are reset
  * on change.
- * 
+ *
  * @param {object} [wvTools=...]
  * Configure the displayed tools with their default value. See source code for
  * available configuration options.
  *
  * @param {boolean} [wvReadonly=false]
- * Prevent the user from controling the interface. This is primary useful to 
+ * Prevent the user from controling the interface. This is primary useful to
  * prevent liveshare session's attendees interfer with the chair (though the
  * parameter is configured from within the `wvLiveshare` directive).
- *  
+ *
  * Especially, the following actions are disabled:
- * 
+ *
  * * Drag&dropping series from the `wvSerieslist` into viewports
  * * Using the timeline controls
  * * Using the toolbar & tools
@@ -109,16 +109,16 @@
  * @param {boolean} [wvAnnotationstorageEnabled=true]
  * Retrieve annotations from storage. Store annotations to storage
  * automatically. This should be set to false when `wvReadonly` is true.
- * 
+ *
  * @param {boolean} [wvKeyImageCaptureEnabled=false]
  * When activated, this option displays a button on each viewport. When the button is
  * clicked, a new DICOM series is created with the image of the viewport, including the
- * annotations. This image is considered as a DICOM Key Image Note (see 
+ * annotations. This image is considered as a DICOM Key Image Note (see
  * `http://wiki.ihe.net/index.php/Key_Image_Note`).
  *
  * @scope
  * @restrict E
- * 
+ *
  * @description
  * The `wvWebviewer` directive display a whole web viewer at full scale (100%
  * width, 100% height).
@@ -185,7 +185,7 @@
             // Configure attributes default values
             vm.toolbarEnabled = typeof vm.toolbarEnabled !== 'undefined' ? vm.toolbarEnabled : true;
             vm.toolbarPosition = typeof vm.toolbarPosition !== 'undefined' ? vm.toolbarPosition : 'top';
-            vm.buttonsSize = typeof vm.buttonsSize !== 'undefined' ? vm.buttonsSize : 'small';            
+            vm.buttonsSize = typeof vm.buttonsSize !== 'undefined' ? vm.buttonsSize : 'small';
             vm.serieslistEnabled = typeof vm.serieslistEnabled !== 'undefined' ? vm.serieslistEnabled : true;
             vm.studyinformationEnabled = typeof vm.studyinformationEnabled !== 'undefined' ? vm.studyinformationEnabled : true;
             vm.leftHandlesEnabled = typeof vm.leftHandlesEnabled !== 'undefined' ? vm.leftHandlesEnabled : true;
@@ -193,6 +193,7 @@
             vm.noticeText = typeof vm.noticeText !== 'undefined' ? vm.noticeText : undefined;
             vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;
             vm.tools = typeof vm.tools !== 'undefined' ? vm.tools : {
+                touchGesture: false,
                 windowing: false,
                 zoom: false,
                 pan: false,
@@ -218,14 +219,14 @@
                 rotateRight: false,
                 arrowAnnotate: false
             };
-            
+
             console.log('default tool: ', vm.toolbarDefaultTool)
             if (vm.toolbarDefaultTool) {
                 vm.tools[vm.toolbarDefaultTool] = true;
                 vm.activeTool = vm.toolbarDefaultTool;
             } else {
-                vm.tools.zoom = true;
-                vm.activeTool = 'zoom';
+                vm.tools.touchGesture = true;
+                vm.activeTool = 'touchGesture';
             }
 
             if (vm.keyImageCaptureEnabled) { // activate
@@ -234,10 +235,11 @@
             if (vm.toolboxButtonsOrdering === undefined) {
                 vm.toolboxButtonsOrdering = [
                     {type: "button", tool: "layout"},
+                    {type: "button", tool: "touchGesture"},
                     {type: "button", tool: "zoom"},
                     {type: "button", tool: "pan"},
                     {
-                        type: "group", 
+                        type: "group",
                         iconClasses: "glyphicon glyphicon-picture",
                         title: "manipulation",
                         buttons: [
@@ -381,6 +383,9 @@
             // Activate mobile interaction tools on mobile (not tablet)
             var uaParser = new UAParser();
             vm.mobileInteraction = uaParser.getDevice().type === 'mobile';
+            if(vm.mobileInteraction){
+                vm.tools.touchGesture = true;
+                vm.activeTool = 'touchGesture';            }
 
             // Adapt breadcrumb displayed info based on the selected pane.
             wvPaneManager
@@ -458,7 +463,7 @@
             vm.onItemDroppedToPane = function(x, y, config) {
                 // Set dropped pane as selected
                 config.isSelected = true;
-                
+
                 // Change pane's configuration.
                 wvPaneManager.setPane(x, y, config);
             };
@@ -484,7 +489,7 @@
                 // Log study ids
                 console.log('selected studies ids: ', newValues);
 
-                // Consider oldValues to be empty if this watch function is 
+                // Consider oldValues to be empty if this watch function is
                 // called at initialization.
                 if (_.isEqual(newValues, oldValues)) {
                     oldValues = [];

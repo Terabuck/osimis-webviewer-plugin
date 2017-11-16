@@ -56,7 +56,7 @@
                         e.preventDefault();
 
                         $scope.$apply(function() {  // @todo necessary ?
-                            var deltaX = (!isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX) - lastX; 
+                            var deltaX = (!isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX) - lastX;
                             var deltaY = (!isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY) - lastY;
                             lastX = !isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX;
                             lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
@@ -106,7 +106,7 @@
                 // zooms to a specific zone of a mammography, he wishes to
                 // adjust the windowing more precisely than when he sees the
                 // whole image. A better solution would be to define the
-                // strength based on the currently viewed image zone dynamic, 
+                // strength based on the currently viewed image zone dynamic,
                 // instead of the whole image dynamic, but that's fine for now.
                 // var scale = Math.max(1, Math.min(+viewportData.getScaleForFullResolution(), 3));
                 var scale = 1;
@@ -115,7 +115,7 @@
                 var newWindowWidth = +viewportData.voi.windowWidth + (deltaX / scale * strength);
                 var newWindowCenter = +viewportData.voi.windowCenter + (deltaY / scale * strength);
 
-                // Clamp windowing values to the min/max one availables, so 
+                // Clamp windowing values to the min/max one availables, so
                 // image doesn't become invisible because of out of scope
                 // value.
                 if (newWindowWidth >= minPixelValue && newWindowWidth <= maxPixelValue) {
@@ -124,7 +124,7 @@
                 if (newWindowCenter >= minPixelValue && newWindowCenter <= maxPixelValue) {
                     viewportData.voi.windowCenter = newWindowCenter;
                 }
-                
+
                 // Update viewport values & redraw the viewport.
                 viewport.setViewport(viewportData);
                 viewport.draw(false);
@@ -139,7 +139,7 @@
 
                 viewportData.translation.x = x + (deltaX / scale);
                 viewportData.translation.y = y + (deltaY / scale);
-                
+
                 viewport.setViewport(viewportData);
                 viewport.draw(false);
             };
