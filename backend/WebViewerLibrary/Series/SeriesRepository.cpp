@@ -164,6 +164,8 @@ namespace {
     std::vector<std::string> tagsToKeep;
     tagsToKeep.push_back("PatientName");
     tagsToKeep.push_back("PatientID");
+    tagsToKeep.push_back("PatientBirthDate");
+    tagsToKeep.push_back("PatientIdentityRemoved");
     tagsToKeep.push_back("OsimisNote");
     tagsToKeep.push_back("StudyDescription");
     tagsToKeep.push_back("StudyDate");
