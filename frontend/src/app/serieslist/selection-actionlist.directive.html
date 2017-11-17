@@ -1,4 +1,4 @@
-<div 
+<div
     class="wvSelectionActionlist"
 >
     <!-- State 1: selection disabled -->
@@ -9,17 +9,17 @@
             class="wvButton--border"
             ng-click="vm.selectionEnabled = !vm.selectionEnabled"
         >
-            selection mode
+            {{ "COMPONENTS.SERIES_LIST.SELECTION_MODE" | translate }}
         </button>
     </div>
 
     <!-- State 2: selection enabled -->
-    <div 
+    <div
         ng-show="vm.selectionEnabled"
     >
         <!-- Notice -->
         <p>
-            Select one or multiple series items by clicking on them.
+            {{ "COMPONENTS.SERIES_LIST.NOTICE_PARAGRAPH" | translate }}
         </p>
 
         <!-- Injectable Content Zone -->
@@ -37,13 +37,13 @@
                 ng-show="vm.selectionEnabled"
                 ng-click="vm.selectionEnabled = !vm.selectionEnabled"
             >
-                close
+                {{ "ACTION_TERMS.CLOSE" | translate | wvCapitalize }}
             <button
                 class="wvButton--border"
                 ng-show="vm.selectionEnabled"
                 ng-click="vm.data = []"
             >
-                reset
+                {{ "ACTION_TERMS.RESET" | translate | wvCapitalize }}
             </button>
         </div>
     </div>
