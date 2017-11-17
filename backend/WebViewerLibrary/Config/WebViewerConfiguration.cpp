@@ -119,6 +119,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   toolbarLayoutMode = OrthancPlugins::GetStringValue(wvConfig, "ToolbarLayoutMode", "flat");
   toolbarButtonSize = OrthancPlugins::GetStringValue(wvConfig, "ToolbarButtonSize", "small");
   defaultSelectedTool = OrthancPlugins::GetStringValue(wvConfig, "DefaultSelectedTool", "zoom");
+  defaultLanguage = OrthancPlugins::GetStringValue(wvConfig, "DefaultLanguage", "en");
 
   if (toolbarLayoutMode != "flat" && toolbarLayoutMode != "tree")
   {
@@ -141,7 +142,7 @@ void WebViewerConfiguration::parseFile()
     Json::Value configuration;
     if (!OrthancPlugins::ReadConfiguration(configuration, _context))
     {
-      throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);    
+      throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
     }
 
     shortTermCachePath = OrthancPlugins::GetStringValue(configuration, "StorageDirectory", "."); // By default, the cache of the Web viewer is located inside the "StorageDirectory" of Orthanc
@@ -177,7 +178,7 @@ void WebViewerConfiguration::parseFile()
 Json::Value WebViewerConfiguration::getFrontendConfig() const {
   Json::Value config;
 
-  // Register "version" 
+  // Register "version"
   // @todo move external requests out of model object (cleaner)
   {
     Json::Value system;
@@ -211,6 +212,7 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["toolbarLayoutMode"] = toolbarLayoutMode;
   config["toolbarButtonSize"] = toolbarButtonSize;
   config["defaultSelectedTool"] = defaultSelectedTool;
+  config["defaultLanguage"] = defaultLanguage;
 
   return config;
 }

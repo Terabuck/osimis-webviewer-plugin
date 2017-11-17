@@ -7,12 +7,12 @@
  * @Rationale Backend options can be used to set specific backend behaviors,
  * for instance activating disk-based cache. They should be kept to a minimum
  * to avoid testing overhead.
- * 
+ *
  * Frontend options are necessary to enable/disable/configure frontend features
  * from the backend configuration file. For instance, in the webviewerpro, the
  * liveshare server HOST and PORT used in frontend can be set in the json
  * configuration file instead of having to rebuild the whole javascript.
- * 
+ *
  * Using two class for frontend and backend options instead of a single one
  * would implies additional unnecessary layer of complexity since these classes
  * must be extended or overriden by the webviewerpro.
@@ -61,6 +61,7 @@ public:
   bool highQualityImagePreloadingEnabled;
   bool reduceTimelineHeightOnSingleFrameSeries;
   bool showNoReportIconInSeriesList;
+  std::string defaultLanguage;
   std::string toolbarLayoutMode;
   std::string toolbarButtonSize;
   std::string defaultSelectedTool;
@@ -68,7 +69,7 @@ public:
 
   // If activated, this feature displays a button on each viewport. When the button is
   // clicked, a new series is created with the image of the viewport, including the
-  // annotations. This image is considered as a DICOM Key Image Note (see 
+  // annotations. This image is considered as a DICOM Key Image Note (see
   // `http://wiki.ihe.net/index.php/Key_Image_Note`).
   bool keyImageCaptureEnabled;
 
