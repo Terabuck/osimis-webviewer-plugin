@@ -194,6 +194,7 @@
             vm.noticeText = typeof vm.noticeText !== 'undefined' ? vm.noticeText : undefined;
             vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;
             vm.tools = typeof vm.tools !== 'undefined' ? vm.tools : {
+                touchGesture: false,
                 windowing: false,
                 zoom: false,
                 pan: false,
@@ -225,8 +226,8 @@
                 vm.tools[vm.toolbarDefaultTool] = true;
                 vm.activeTool = vm.toolbarDefaultTool;
             } else {
-                vm.tools.zoom = true;
-                vm.activeTool = 'zoom';
+                vm.tools.touchGesture = true;
+                vm.activeTool = 'touchGesture';
             }
 
             if (vm.keyImageCaptureEnabled) { // activate
@@ -235,6 +236,7 @@
             if (vm.toolboxButtonsOrdering === undefined) {
                 vm.toolboxButtonsOrdering = [
                     {type: "button", tool: "layout"},
+                    // {type: "button", tool: "touchGesture"},
                     {type: "button", tool: "zoom"},
                     {type: "button", tool: "pan"},
                     {
@@ -264,7 +266,7 @@
                             {type: "button", tool: "arrowAnnotate"},
                         ]
                     },
-                    {type: "button", tool: "keyImageCapture"},
+                    {type: "button", tool: "keyImageCapture"}
                 ]
             }
             vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];
@@ -381,6 +383,9 @@
             // Activate mobile interaction tools on mobile (not tablet)
             var uaParser = new UAParser();
             vm.mobileInteraction = uaParser.getDevice().type === 'mobile';
+            if(vm.mobileInteraction){
+                vm.tools.touchGesture = true;
+                vm.activeTool = 'touchGesture';            }
 
             // Adapt breadcrumb displayed info based on the selected pane.
             wvPaneManager

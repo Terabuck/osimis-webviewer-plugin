@@ -1,4 +1,18 @@
 <div ng-switch="vm.button.tool">
+    <!-- Free -->
+    <label
+        ng-switch-when="touchGesture"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('touchGesture')"
+        class="wvButton--underline glyphicon glyphicon-hand-up"
+        ng-class="{active: vm.toolbox.tool === 'touchGesture', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        data-title="Touch gesture"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        bs-tooltip
+        >
+        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="touchGesture" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
     <!-- Splitpane Grid configuration buttons. -->
     <wv-splitpane-config-button
         ng-switch-when="layout"
@@ -10,8 +24,8 @@
     ></wv-splitpane-config-button>
 
     <!-- Invert Colour State -->
-    <label 
-        ng-switch-when="invert"            
+    <label
+        ng-switch-when="invert"
         ng-if="vm.toolbox.buttons.hasOwnProperty('invert')"
         class="wvButton--underline glyphicon glyphicon-adjust"
         data-title="Invert color"
@@ -44,7 +58,7 @@
         class="wvButton--underline glyphicon glyphicon-move"
         ng-class="{active: vm.toolbox.tool === 'pan', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         data-title="Panning"
-        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"        
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         bs-tooltip
         >
@@ -82,7 +96,7 @@
         class="wvButton--underline glyphicon glyphicon-resize-horizontal"
         ng-class="{active: vm.toolbox.tool === 'lengthMeasure', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         data-title="Length Measurement"
-        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"        
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         bs-tooltip
         >

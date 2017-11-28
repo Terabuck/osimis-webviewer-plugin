@@ -1,14 +1,14 @@
 /**
  * @ngdoc directive
  * @name webviewer.directive:wvScrollOnWheelSeriesExt
- * 
+ *
  * @param {boolean} [wvScrollOnWheelSeriesExt=true] Makes the viewport
  *                                                  scrollable.
- * 
+ *
  * @restrict A
  * @requires webviewer.directive:wvViewport
  * @requires webviewer.directive:vpSeriesId
- * 
+ *
  * @description
  * The `wvScrollOnWheelSeriesExt` directive let the end-user scroll through a
  * viewport's series via the mouse wheel (or via fingers on mobile).
@@ -64,7 +64,7 @@
     	this.unregister = function(viewmodel) {
             _.pull(_wvSeriesIdViewModels, viewmodel);
     	};
-        
+
         this.activate = function() {
             _wvSeriesIdViewModels
                 .forEach(registerDesktopEvents);
@@ -85,7 +85,7 @@
         });
 
         /* desktop scrolling */
-        
+
         var hamsterInstance;
         function registerDesktopEvents(viewmodel) {
             // @warning This will only work for one viewport by scrollOnWheel extension
@@ -123,18 +123,18 @@
                 if (hamsterInstance.unwheel) {
                     hamsterInstance.unwheel();
                 }
-                
+
                 hamsterInstance = null;
             }
         }
 
         /* mobile scrolling */
-        
+
         var _hammertimeObjectsByViewport = {};
         var _mobileEvtBySeriesVM = {};
 
         function registerMobileEvents(viewmodel) {
-            // Prevent on non-mobile platform (ie. desktop touchscreen) to 
+            // Prevent on non-mobile platform (ie. desktop touchscreen) to
             // avoid conflicts with other tools such as paning.
             var uaParser = new UAParser();
             vm.isMobile = (uaParser.getDevice().type === 'mobile');
@@ -143,14 +143,13 @@
             }
 
             // Configure the dom element
-            // Use the enabledElement instead of the current element 
+            // Use the enabledElement instead of the current element
             // to avoid hammertime making the overlay unselectable
             var enabledElement = viewmodel.getViewport().getEnabledElement();
             var hammertime = new Hammer(enabledElement, {
                 inputClass: Hammer.TouchInput // disable panning on desktop
             });
-            hammertime.get('pan').set({
-                direction: Hammer.DIRECTION_HORIZONTAL,
+            hammertime.get('tap').set({
                 pointers: 1
             });
 
@@ -159,52 +158,49 @@
 
             // Add the panning event
             _mobileEvtBySeriesVM[viewmodel] = onMobilePanning;
-            hammertime.on('pan', _mobileEvtBySeriesVM[viewmodel]);
+            hammertime.on('tap', _mobileEvtBySeriesVM[viewmodel]);
 
             // React to panning
-            var _lastDistance = 0;
             function onMobilePanning(evt) {
                 var series = viewmodel.getSeries();
                 if (!series) {
                     return;
                 }
-
-                // sum distances of each evt call in a common var
-                // for some reasons distance = 1 seems to equals 20 pixels..
-                _lastDistance += evt.distance / 20;
-
-                // each time the distance attains the required width
-                // switch image & reset the lastDistance
-                var requiredDistance = ($element.width() / series.imageCount);
-                if (_lastDistance >= requiredDistance) {
-                    $scope.$apply(function() {
-                        if (evt.direction === Hammer.DIRECTION_LEFT) {
-                            series.goToPreviousImage();
-                        }
-                        else if (evt.direction === Hammer.DIRECTION_RIGHT) {
-                            series.goToNextImage(false);
-                        }
-                    });
-                    
-                    // set lastDistance to the remaining distance
-                    _lastDistance = _lastDistance % requiredDistance;
+                var location = detectTapLocation(evt.center.x, evt.center.y);
+                if(location === null){
+                    return;
                 }
 
-                // reset the distance when the gesture starts
-                if (evt.isFinal) {
-                    _lastDistance = 0;
+                if (location === Hammer.DIRECTION_LEFT) {
+                    series.goToPreviousImage();
+                }
+                else if (location === Hammer.DIRECTION_RIGHT) {
+                    series.goToNextImage();
+                }
+            }
+
+            function detectTapLocation(x, y){
+                var rect = enabledElement.getBoundingClientRect();
+                var leftSide = {"from": rect.left, "to": rect.left + ((rect.right - rect.left)/3)};
+                var rightSide = {"from": rect.right - ((rect.right - rect.left)/3), "to": rect.right};
+                if(x > leftSide.from && x < leftSide.to){
+                    return Hammer.DIRECTION_LEFT;
+                }else if(x > rightSide.from && x < rightSide.to){
+                    return Hammer.DIRECTION_RIGHT
+                }else {
+                    return null
                 }
             }
         };
         function unregisterMobileEvents(viewmodel) {
-            // Prevent on non-mobile platform (ie. desktop touchscreen) to 
+            // Prevent on non-mobile platform (ie. desktop touchscreen) to
             // avoid conflicts with other tools such as paning.
             var uaParser = new UAParser();
             vm.isMobile = (uaParser.getDevice().type === 'mobile');
             if (!vm.isMobile) {
                 return;
             }
-            
+
             if (_hammertimeObjectsByViewport[viewmodel]) {
                 var hammertime = _hammertimeObjectsByViewport[viewmodel];
                 hammertime.off('pan', _mobileEvtBySeriesVM[viewmodel])
