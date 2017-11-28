@@ -24,7 +24,7 @@
     right: 0;
     width: 42px; // != $toolbarHeight since we're in the reverse order.
 
-    // Allow user to scroll through the toolbar if screen is too small. 
+    // Allow user to scroll through the toolbar if screen is too small.
     // overflow-x: auto;
     height: 100%;
     z-index: 2;
@@ -48,37 +48,8 @@
     color: #333;
 }
 
-.wvToolbar__splitpaneConfigButton {
-    @extend .wvButton;
-
-
-    // Set black text on white background.
-    color: hsl(0, 0%, 9%);
-    &:hover, &:focus, &.active {
-        color: black;
-    }
-}
-.wvToolbar__splitpaneConfigButton--rotate {
-    @extend .wvToolbar__splitpaneConfigButton;
-
-    // Rotate icon.
-    transform: rotate(90deg);
-    width: 42px;
-    height: 32px;
-    line-height: 32px;
-
-    left: -5px;
-    top: 2px;
-    margin-right: -10px;
-
-    &.wvLargeButton{
-        width: auto;
-        height: auto;
-        top: 3px;
-    }
-}
 input[type="radio"].wvToolbar__splitpaneConfigButtonInput {
-    // Hide the radio input, but make it fit the label, so we can rely on its 
+    // Hide the radio input, but make it fit the label, so we can rely on its
     // html caracteristics without having to suffer from its design.
     position: absolute;
     width: 0;
