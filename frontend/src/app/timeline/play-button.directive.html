@@ -3,7 +3,7 @@
 
     <!-- Play/Pause button -->
     <label
-        data-title="Play" 
+        data-title="{{ 'COMPONENTS.TIMELINE.PLAY' | translate | wvCapitalize }}"
         ng-click="!vm.readonly && vm.series.play()"
         ng-show="!vm.series.isPlaying"
         class="wv-timeline-controls-button"
@@ -11,28 +11,28 @@
         <span class="fa fa-play" class="wv-timeline-controls-vertical-sizing"></span>
     </label>
     <label
-        data-title="Paused" 
+        data-title="{{ 'COMPONENTS.TIMELINE.PAUSED' | translate | wvCapitalize }}"
         ng-click="!vm.readonly && vm.series.pause()"
         ng-show="vm.series.isPlaying"
         class="wv-timeline-controls-button"
     >
         <span class="fa fa-pause" class="wv-timeline-controls-vertical-sizing"></span>
     </label>
-    
+
     <!--  Configuration options -->
     <div class="wv-play-button-config-position-handler"> <!-- This is a 0x0 div to set the position -->
         <div class="wv-play-button-config">
             <label>
-                Frame rate
+                {{ "COMPONENTS.TIMELINE.FRAME_RATE" | translate | wvCapitalize }}
                 <span class="wv-play-button-config-framerate-wrapper">
                     <input type="range" min="1" max="60"
                         class="wv-play-button-config-framerate"
-                        
-                        ng-model="vm.series.frameRate" 
+
+                        ng-model="vm.series.frameRate"
                         ng-disabled="vm.readonly"
                     />
                 </span>
-                {{vm.series.frameRate}} fps
+                {{vm.series.frameRate}} {{ "COMPONENTS.TIMELINE.FPS" | translate }}
             </label>
         </div>
     </div>

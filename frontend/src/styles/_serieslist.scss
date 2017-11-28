@@ -29,7 +29,7 @@ $pictureSize: 6.5rem;
 .wvSerieslist__placeholderIcon, .wvSerieslist__placeholderIcon.fa { // Make sure it has precedence over .fa class {
     position: absolute;
 
-    // Fill the li element 
+    // Fill the li element
     width: 100%;
     height: 100%;
 
@@ -52,7 +52,7 @@ $pictureSize: 6.5rem;
         left: 0;
         top: 50%;
         right: 0;
-        
+
         transform: rotate(-45deg) scaleX(0.9);
 
         border-top: 5px solid;
@@ -148,6 +148,9 @@ $pictureSize: 6.5rem;
 }
 .wvSerieslist__seriesItem--grid {
     display: inline-block;
+}
+.wvSerieslist__seriesItem--oneCol{
+    text-align: center;
 }
 
 .wvSerieslist__seriesItem--activated,

@@ -18,7 +18,7 @@
         Parameterizable zone.
         The user of the `wvWebviewer` directive can inject content here. For
         instance, a button to quit the application, or a study list.
-        
+
         @example
         ```html
         <wv-webviewer ...>
@@ -32,7 +32,7 @@
 
         <!--
         Layout: top2
-    
+
         @description
         @todo
         -->
@@ -41,7 +41,7 @@
 
         <!--
         Layout: top3
-    
+
         @description
         Zone containing the study information.
         -->
@@ -54,7 +54,7 @@
 
         <!--
         Layout: top-right
-        
+
         @description
         Parameterizable zone.
         The user of the `wvWebviewer` directive can inject content here. For
@@ -95,17 +95,19 @@
 
     <!--
     Layout: left
-    
+
     @description
     Zone containing the study's information and the list of series.
     -->
     <wv-layout-left
         wv-enabled="vm.serieslistEnabled || vm.studyinformationEnabled"
         wv-handles-enabled="vm.leftHandlesEnabled"
+        wv-is-small="vm.studyIslandsDisplayMode === 'oneCol'"
     >
         <wv-layout-left1>
             <!-- Study Picker -->
-            <wv-studylist 
+            <wv-studylist
+                ng-if="vm.studyIslandsDisplayMode !== 'oneCol'"
                 class="float__left" style="max-width: calc(100% - 4.5rem);"
                 ng-show="vm.serieslistEnabled"
                 wv-readonly="vm.readonly"
@@ -116,29 +118,40 @@
             <!-- Display mode toggle -->
             <div
                 class="float__right wvButton"
-                ng-show="vm.studyIslandsDisplayMode !== 'grid'"
+                ng-show="vm.studyIslandsDisplayMode === 'oneCol'"
                 ng-click="vm.studyIslandsDisplayMode = 'grid'"
 
                 bs-tooltip
-                data-title="Grid Display"
+                data-title="{{ 'COMPONENTS.ASIDE_DISPLAY_MODE.GRID_DISPLAY' | translate | wvCapitalize }}"
                 placement="right"
             >
                 <span class="glyphicon glyphicon-th"></span>
             </div>
             <div
                 class="float__right wvButton"
-                ng-show="vm.studyIslandsDisplayMode !== 'list'"
+                ng-show="vm.studyIslandsDisplayMode === 'grid'"
                 ng-click="vm.studyIslandsDisplayMode = 'list'"
 
                 bs-tooltip
-                data-title="List Display"
+                data-title="{{ 'COMPONENTS.ASIDE_DISPLAY_MODE.LIST_DISPLAY' | translate | wvCapitalize }}"
                 placement="right"
             >
                 <span class="glyphicon glyphicon-th-list"></span>
             </div>
-            <p ng-if="vm.displayDisclaimer" class="clear disclaimer mbn">Not for diagnostic usage</p>            
+            <div
+                class="float__right wvButton"
+                ng-show="vm.studyIslandsDisplayMode === 'list'"
+                ng-click="vm.studyIslandsDisplayMode = 'oneCol'"
+
+                bs-tooltip
+                data-title="{{ 'COMPONENTS.ASIDE_DISPLAY_MODE.ONE_COL_DISPLAY' | translate | wvCapitalize }}"
+                placement="right"
+            >
+                <span class="fa fa-ellipsis-v"></span>
+            </div>
+            <p ng-if="vm.displayDisclaimer && vm.studyIslandsDisplayMode !== 'oneCol'" class="clear disclaimer mbn">{{ "GENERAL_PARAGRAPHS.DISCLAIMER_PARAGRAPH" | translate }}</p>
         </wv-layout-left1>
-        
+
         <wv-layout-left2>
             <!-- Study Islands -->
             <wv-study-island
@@ -160,7 +173,7 @@
         <wv-layout-left3>
             <!--
             Layout: left bottom
-            
+
             @description
             Parameterizablee zone.
             The user of the `wvWebviewer` directive can inject content here and
@@ -178,7 +191,7 @@
             -->
             <ng-transclude
                 ng-transclude-slot="wvLayoutLeftBottom"
-            >   
+            >
                 <!-- Default layout left bottom disabled -->
                 <wv-layout-left-bottom
                     ng-init="falseValue = false"
@@ -191,11 +204,11 @@
 
     <!--
     Layout: right
-    
+
     @description
     Parameterizable zone.
     The user of the `wvWebviewer` directive can inject content here and
-    configure advanced display options. Have a look at the `wvLayoutRight` 
+    configure advanced display options. Have a look at the `wvLayoutRight`
     directive for the advanced configuration.
 
     @todo ng-if to make sure javascript is loaded after layout-main one's
@@ -211,7 +224,7 @@
     -->
     <ng-transclude
         ng-transclude-slot="wvLayoutRight"
-    >   
+    >
         <!-- Default layout right disabled -->
         <wv-layout-right
             ng-init="falseValue = false"
@@ -246,7 +259,7 @@
         <!--
         Toolbar
         -->
-        <wv-toolbox 
+        <wv-toolbox
             ng-show="vm.toolbarEnabled"
             wv-readonly="vm.readonly"
             wv-toolbox-buttons="vm.tools"
@@ -306,7 +319,7 @@
                     wv-viewport="$pane.csViewport"
                     wv-image-index="$pane.imageIndex"
 
-                    wv-mobile-viewport-tool="!vm.readonly && vm.mobileInteraction"
+                    wv-mobile-viewport-tool="!vm.readonly && vm.tools.touchGesture"
                     wv-windowing-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.windowing"
                     wv-angle-measure-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.angleMeasure"
                     wv-length-measure-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.lengthMeasure"
@@ -338,8 +351,8 @@
                     <!--
                     Timeline.
 
-                    Always show the timeline — even if there is only 
-                    one image — until we develop a specific component 
+                    Always show the timeline — even if there is only
+                    one image — until we develop a specific component
                     to display the image quality
                     -->
                     <div class="wv-overlay-timeline-wrapper">

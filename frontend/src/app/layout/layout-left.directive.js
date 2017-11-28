@@ -22,7 +22,8 @@
             scope: {
                 enabled: '=?wvEnabled',
                 closed: '=?wvClosed',
-                handlesEnabled: '=?wvHandlesEnabled'
+                handlesEnabled: '=?wvHandlesEnabled',
+                isSmall: "=?wvIsSmall"
             },
             templateUrl:'app/layout/layout-left.html'
         };
@@ -46,21 +47,23 @@
 
             // Transfer states to the wvLayout controller. We delegate state
             // management to wvLayout since this directive may be set up by
-            // the wvWebviewer 
+            // the wvWebviewer
             wvLayout.isLeftEnabled = vm.enabled;
             wvLayout.isLeftClosed = vm.closed;
             scope.$watchGroup([
                 'vm.enabled',
-                'vm.closed'
+                'vm.closed',
+                'vm.isSmall'
             ], function(newValues) {
                 wvLayout.isLeftEnabled = !!newValues[0];
                 wvLayout.isLeftClosed = !!newValues[1];
+                wvLayout.isLeftSmall = !!newValues[2];
             });
 
             // Sync left section position with other sections
             vm.isTopPaddingEnabled = wvLayout.isTopEnabled;
             vm.isBottomPaddingEnabled = wvLayout.isBottomEnabled;
-            
+
             scope.$watch(function() {
                 return [
                     wvLayout.isTopEnabled,
@@ -75,7 +78,7 @@
 
     /* @ngInject */
     function layoutLeftCtrl() {
-        
+
     }
 
 })();
