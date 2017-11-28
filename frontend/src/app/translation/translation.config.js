@@ -19,10 +19,12 @@
 
         // load json static files instead of writing them directly in the js
         // located on the server at /languages/en.json for exemple.
-        $translateProvider.useStaticFilesLoader({
-            prefix: 'languages/',
-            suffix: '.json'
-        });
+        //$translateProvider.useStaticFilesLoader({
+        //    prefix: 'languages/',
+        //    suffix: '.json'
+        //});
+
+        $translateProvider.translations('en', {});
 
         // storage json into local storage (optimization)
         // $translateProvider.useLocalStorage();
