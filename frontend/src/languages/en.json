@@ -22,7 +22,8 @@
     "COMPONENTS": {
         "ASIDE_DISPLAY_MODE": {
             "GRID_DISPLAY": "grid display",
-            "LIST_DISPLAY": "list display"
+            "LIST_DISPLAY": "list display",
+            "ONE_COL_DISPLAY": "column display"
         },
         "OVERLAY": {
             "IMAGE_LOADING_PARAGRAPH": "image {{ loadingImage }} in loading, image {{ loadedImage }} displayed"
