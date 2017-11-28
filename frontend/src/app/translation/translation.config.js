@@ -5,6 +5,16 @@
 
     /* @ngInject */
     function translateConfig($translateProvider) {
+        /**
+         * Set the translate config, and the async loader
+         * note that the async loader makes test failed if it needs to get the translation during
+         * its execution
+         * To prevent this we cannot set default languages and fallback,
+         * so we set a fake language that has not translations and that is loaded synchronously.
+         *
+         * So in that case fallback language are deactivated and no real languages are set by default.
+         * The app needs to specifically use $translate.use('en' | 'fr') in it's index or entrypoint.
+         */
         var languages = {
             en: 'english',
             fr: 'français'
@@ -41,7 +51,7 @@
         $translateProvider.useSanitizeValueStrategy('escapeParameters');
 
         // use a fallback language
-        $translateProvider.fallbackLanguage('en');
+        // $translateProvider.fallbackLanguage('en'); commented to prevent async call during test. No fallback language provided.
 
         // console.log('language has been set', $translateProvider)
     }
