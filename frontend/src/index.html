@@ -94,8 +94,8 @@
     }])
     // Define a basic controller
     .controller('MainController', [
-        '$scope', '$location', 'wvConfig', 'wvStudyManager', 'wvSeriesManager',
-        function($scope, $location, wvConfig, wvStudyManager, wvSeriesManager)
+        '$scope', '$location', '$translate', 'wvConfig', 'wvStudyManager', 'wvSeriesManager',
+        function($scope, $location, $translate, wvConfig, wvStudyManager, wvSeriesManager,)
     {
         var vm = this;
 
@@ -204,6 +204,7 @@
         });
 
         // Configure settings based on server side options
+        vm.defaultLanguage = __webViewerConfig.defaultLanguage || "en";
         vm.windowingPresets = __webViewerConfig.windowingPresets;
         vm.enableStudyDownload = __webViewerConfig.enableStudyDownload;
         vm.enableVideoDisplay = __webViewerConfig.enableVideoDisplay;
@@ -215,6 +216,8 @@
         vm.toolbarButtonSize = __webViewerConfig.toolbarButtonSize || "small";
         vm.defaultSelectedTool = __webViewerConfig.defaultSelectedTool || "zoom";
         vm.studyIslandsDisplayMode = __webViewerConfig.defaultStudyIslandsDisplayMode || "grid";
+
+        $translate.use(vm.defaultLanguage);
 
     }]);
     </script>

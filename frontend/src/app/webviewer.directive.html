@@ -122,7 +122,7 @@
                 ng-click="vm.studyIslandsDisplayMode = 'grid'"
 
                 bs-tooltip
-                data-title="Grid Display"
+                data-title="{{ 'COMPONENTS.ASIDE_DISPLAY_MODE.GRID_DISPLAY' | translate | wvCapitalize }}"
                 placement="right"
             >
                 <span class="glyphicon glyphicon-th"></span>
@@ -133,7 +133,7 @@
                 ng-click="vm.studyIslandsDisplayMode = 'list'"
 
                 bs-tooltip
-                data-title="List Display"
+                data-title="{{ 'COMPONENTS.ASIDE_DISPLAY_MODE.LIST_DISPLAY' | translate | wvCapitalize }}"
                 placement="right"
             >
                 <span class="glyphicon glyphicon-th-list"></span>
@@ -149,7 +149,7 @@
             >
                 <span class="fa fa-ellipsis-v"></span>
             </div>
-            <p ng-if="vm.displayDisclaimer && vm.studyIslandsDisplayMode !== 'oneCol'" class="clear disclaimer mbn">Not for diagnostic usage</p>
+            <p ng-if="vm.displayDisclaimer && vm.studyIslandsDisplayMode !== 'oneCol'" class="clear disclaimer mbn">{{ "GENERAL_PARAGRAPHS.DISCLAIMER_PARAGRAPH" | translate }}</p>
         </wv-layout-left1>
 
         <wv-layout-left2>

@@ -120,6 +120,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   toolbarButtonSize = OrthancPlugins::GetStringValue(wvConfig, "ToolbarButtonSize", "small");
   defaultSelectedTool = OrthancPlugins::GetStringValue(wvConfig, "DefaultSelectedTool", "zoom");
   defaultStudyIslandsDisplayMode = OrthancPlugins::GetStringValue(wvConfig, "DefaultStudyIslandsDisplayMode", "grid");
+  defaultLanguage = OrthancPlugins::GetStringValue(wvConfig, "DefaultLanguage", "en");
 
   if (toolbarLayoutMode != "flat" && toolbarLayoutMode != "tree")
   {
@@ -220,6 +221,7 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["toolbarButtonSize"] = toolbarButtonSize;
   config["defaultSelectedTool"] = defaultSelectedTool;
   config["defaultStudyIslandsDisplayMode"] = defaultStudyIslandsDisplayMode;
+  config["defaultLanguage"] = defaultLanguage;
 
   return config;
 }

@@ -24,7 +24,7 @@
 
         bs-tooltip
         bs-enabled="vm.displayMode !== 'list'"
-        data-title="PDF report"
+        data-title="{{ 'COMPONENTS.SERIES_LIST.PDF_REPORT' | translate }}"
         placement="right"
     >
         <div class="wvSerieslist__picture">
@@ -38,7 +38,7 @@
             ng-if="vm.displayMode === 'list'"
             class="wvSerieslist__information"
         >
-            <span class="wvSerieslist__label mn">PDF report</span>
+            <span class="wvSerieslist__label mn">{{ 'COMPONENTS.SERIES_LIST.PDF_REPORT' | translate }}</span>
         </div>
     <li
         ng-show="vm.loaded && !vm.pdfInstanceIds.length && vm.showNoReportIcon"
@@ -50,7 +50,7 @@
 
         bs-tooltip
         bs-enabled="vm.displayMode !== 'list'"
-        data-title="No report available"
+        data-title="{{ 'COMPONENTS.SERIES_LIST.NO_REPORT_AVAILABLE_PARAGRAPH' | translate }}"
         placement="right"
     >
         <div class="wvSerieslist__picture">
@@ -60,7 +60,7 @@
             ng-if="vm.displayMode === 'list'"
             class="wvSerieslist__information"
         >
-            <span class="wvSerieslist__label mn">No report available</span>
+            <span class="wvSerieslist__label mn">{{ "COMPONENTS.SERIES_LIST.NO_REPORT_AVAILABLE_PARAGRAPH" | translate }}</span>
         </div>
     <!--
     Videos
@@ -85,7 +85,7 @@
 
         bs-tooltip
         bs-enabled="vm.displayMode !== 'list'"
-        data-title="Video: {{$video.tags.SeriesDescription || 'Untitled video'}}"
+        data-title="{{ 'COMPONENTS.SERIES_LIST.VIDEO_LABEL_PARAGRAPH' | translate:{'videoDescription': $video.tags.SeriesDescription} }}"
         placement="right"
     >
         <div class="wvSerieslist__picture">
@@ -99,7 +99,7 @@
             ng-if="vm.displayMode === 'list'"
             class="wvSerieslist__information"
         >
-            <span class="wvSerieslist__label mn">{{$video.tags.SeriesDescription || 'Untitled video'}}</span>
+            <span class="wvSerieslist__label mn">{{$video.tags.SeriesDescription || ("COMPONENTS.SERIES_LIST.UNTITLED_VIDEO" | translate | wvCapitalize)}}</span>
         </div>
     <li
         class="wvSerieslist__seriesItem"
@@ -124,7 +124,7 @@
 
         bs-tooltip
         bs-enabled="vm.displayMode !== 'list'"
-        data-title="{{$series.tags.SeriesDescription || 'Untitled series'}}"
+        data-title="{{$series.tags.SeriesDescription || ('COMPONENTS.SERIES_LIST.UNTITLED_SERIES' | translate | wvCapitalize)}}"
         placement="right"
     >
         <div
@@ -148,7 +148,7 @@
             ng-if="vm.displayMode === 'list'"
             class="wvSerieslist__information"
         >
-            <p class="wvSerieslist__label mn">{{$series.tags.SeriesDescription || 'Untitled series'}}</p>
+            <p class="wvSerieslist__label mn">{{$series.tags.SeriesDescription || ('COMPONENTS.SERIES_LIST.UNTITLED_SERIES' | translate | wvCapitalize)}}</p>
             <!-- @todo reintegrate hotspots (it triggers recursive $digest atm!)
             <wvp-hotspotlist wvp-serie-id="$series.id"></wvp-hotspotlist> -->
         </div>

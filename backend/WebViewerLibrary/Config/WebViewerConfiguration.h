@@ -61,6 +61,7 @@ public:
   bool highQualityImagePreloadingEnabled;
   bool reduceTimelineHeightOnSingleFrameSeries;
   bool showNoReportIconInSeriesList;
+  std::string defaultLanguage;
   std::string toolbarLayoutMode;
   std::string toolbarButtonSize;
   std::string defaultSelectedTool;
