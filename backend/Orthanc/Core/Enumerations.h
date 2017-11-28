@@ -2,6 +2,7 @@
  * Orthanc - A Lightweight, RESTful DICOM Store
  * Copyright (C) 2012-2016 Sebastien Jodogne, Medical Physics
  * Department, University Hospital of Liege, Belgium
+ * Copyright (C) 2017 Osimis, Belgium
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -52,7 +53,7 @@ namespace Orthanc
     ErrorCode_Plugin = 1    /*!< Error encountered within the plugin engine */,
     ErrorCode_NotImplemented = 2    /*!< Not implemented yet */,
     ErrorCode_ParameterOutOfRange = 3    /*!< Parameter out of range */,
-    ErrorCode_NotEnoughMemory = 4    /*!< Not enough memory */,
+    ErrorCode_NotEnoughMemory = 4    /*!< The server hosting Orthanc is running out of memory */,
     ErrorCode_BadParameterType = 5    /*!< Bad type for a parameter */,
     ErrorCode_BadSequenceOfCalls = 6    /*!< Bad sequence of calls */,
     ErrorCode_InexistentItem = 7    /*!< Accessing an inexistent item */,
@@ -83,6 +84,7 @@ namespace Orthanc
     ErrorCode_StorageAreaPlugin = 32    /*!< Error in the plugin implementing a custom storage area */,
     ErrorCode_EmptyRequest = 33    /*!< The request is empty */,
     ErrorCode_NotAcceptable = 34    /*!< Cannot send a response which is acceptable according to the Accept HTTP header */,
+    ErrorCode_NullPointer = 35    /*!< Cannot handle a NULL pointer */,
     ErrorCode_SQLiteNotOpened = 1000    /*!< SQLite: The database is not opened */,
     ErrorCode_SQLiteAlreadyOpened = 1001    /*!< SQLite: Connection is already open */,
     ErrorCode_SQLiteCannotOpen = 1002    /*!< SQLite: Unable to open the database */,
@@ -197,8 +199,21 @@ namespace Orthanc
      **/
     PixelFormat_Float32 = 6,
 
-    // This is the memory layout for Cairo
-    PixelFormat_BGRA32 = 7
+    // This is the memory layout for Cairo (for internal use in Stone of Orthanc)
+    PixelFormat_BGRA32 = 7,
+
+    /**
+     * {summary}{Graylevel, unsigned 32bpp image.}
+     * {description}{The image is graylevel. Each pixel is unsigned and stored in 4 bytes.}
+     **/
+    PixelFormat_Grayscale32 = 8,
+    
+    /**
+     * {summary}{Color image in RGB48 format.}
+     * {description}{This format describes a color image. The pixels are stored in 6
+     * consecutive bytes. The memory layout is RGB.}
+     **/
+    PixelFormat_RGB48 = 9
   };
 
 
@@ -441,6 +456,81 @@ namespace Orthanc
     ValueRepresentation_NotSupported               // Not supported by Orthanc, or tag not in dictionary
   };
 
+  enum DicomReplaceMode
+  {
+    DicomReplaceMode_InsertIfAbsent,
+    DicomReplaceMode_ThrowIfAbsent,
+    DicomReplaceMode_IgnoreIfAbsent
+  };
+
+  enum DicomToJsonFormat
+  {
+    DicomToJsonFormat_Full,
+    DicomToJsonFormat_Short,
+    DicomToJsonFormat_Human
+  };
+
+  enum DicomToJsonFlags
+  {
+    DicomToJsonFlags_IncludeBinary         = (1 << 0),
+    DicomToJsonFlags_IncludePrivateTags    = (1 << 1),
+    DicomToJsonFlags_IncludeUnknownTags    = (1 << 2),
+    DicomToJsonFlags_IncludePixelData      = (1 << 3),
+    DicomToJsonFlags_ConvertBinaryToAscii  = (1 << 4),
+    DicomToJsonFlags_ConvertBinaryToNull   = (1 << 5),
+
+    // Some predefined combinations
+    DicomToJsonFlags_None     = 0,
+    DicomToJsonFlags_Default  = (DicomToJsonFlags_IncludeBinary |
+                                 DicomToJsonFlags_IncludePixelData | 
+                                 DicomToJsonFlags_IncludePrivateTags | 
+                                 DicomToJsonFlags_IncludeUnknownTags | 
+                                 DicomToJsonFlags_ConvertBinaryToNull)
+  };
+  
+  enum DicomFromJsonFlags
+  {
+    DicomFromJsonFlags_DecodeDataUriScheme = (1 << 0),
+    DicomFromJsonFlags_GenerateIdentifiers = (1 << 1)
+  };
+  
+  enum DicomVersion
+  {
+    DicomVersion_2008,
+    DicomVersion_2017c
+  };
+
+  enum ModalityManufacturer
+  {
+    ModalityManufacturer_Generic,
+    ModalityManufacturer_GenericNoWildcardInDates,
+    ModalityManufacturer_GenericNoUniversalWildcard,
+    ModalityManufacturer_StoreScp,
+    ModalityManufacturer_ClearCanvas,
+    ModalityManufacturer_Dcm4Chee,
+    ModalityManufacturer_Vitrea
+  };
+
+  enum DicomRequestType
+  {
+    DicomRequestType_Echo,
+    DicomRequestType_Find,
+    DicomRequestType_Get,
+    DicomRequestType_Move,
+    DicomRequestType_Store
+  };
+
+  enum TransferSyntax
+  {
+    TransferSyntax_Deflated,
+    TransferSyntax_Jpeg,
+    TransferSyntax_Jpeg2000,
+    TransferSyntax_JpegLossless,
+    TransferSyntax_Jpip,
+    TransferSyntax_Mpeg2,
+    TransferSyntax_Rle
+  };
+
 
   /**
    * WARNING: Do not change the explicit values in the enumerations
@@ -511,6 +601,14 @@ namespace Orthanc
 
   const char* EnumerationToString(PixelFormat format);
 
+  const char* EnumerationToString(ModalityManufacturer manufacturer);
+
+  const char* EnumerationToString(DicomRequestType type);
+
+  const char* EnumerationToString(TransferSyntax syntax);
+
+  const char* EnumerationToString(DicomVersion version);
+
   Encoding StringToEncoding(const char* encoding);
 
   ResourceType StringToResourceType(const char* type);
@@ -522,6 +620,12 @@ namespace Orthanc
   ValueRepresentation StringToValueRepresentation(const std::string& vr,
                                                   bool throwIfUnsupported);
 
+  PhotometricInterpretation StringToPhotometricInterpretation(const char* value);
+
+  ModalityManufacturer StringToModalityManufacturer(const std::string& manufacturer);
+
+  DicomVersion StringToDicomVersion(const std::string& version);
+  
   unsigned int GetBytesPerPixel(PixelFormat format);
 
   bool GetDicomEncoding(Encoding& encoding,
@@ -540,4 +644,8 @@ namespace Orthanc
   bool IsUserContentType(FileContentType type);
 
   bool IsBinaryValueRepresentation(ValueRepresentation vr);
+  
+  Encoding GetDefaultDicomEncoding();
+
+  void SetDefaultDicomEncoding(Encoding encoding);
 }

@@ -2,6 +2,7 @@
  * Orthanc - A Lightweight, RESTful DICOM Store
  * Copyright (C) 2012-2016 Sebastien Jodogne, Medical Physics
  * Department, University Hospital of Liege, Belgium
+ * Copyright (C) 2017 Osimis, Belgium
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -47,7 +48,7 @@ namespace Orthanc
   private:
     friend class DicomArray;
     friend class FromDcmtkBridge;
-    friend class ToDcmtkBridge;
+    friend class ParsedDicomFile;
 
     typedef std::map<DicomTag, DicomValue*>  Map;
 
@@ -180,5 +181,29 @@ namespace Orthanc
     static bool ParseDicomMetaInformation(DicomMap& result,
                                           const char* dicom,
                                           size_t size);
+
+    void LogMissingTagsForStore() const;
+
+    bool CopyToString(std::string& result,
+                      const DicomTag& tag,
+                      bool allowBinary) const;
+    
+    bool ParseInteger32(int32_t& result,
+                        const DicomTag& tag) const;
+
+    bool ParseInteger64(int64_t& result,
+                        const DicomTag& tag) const;                                
+
+    bool ParseUnsignedInteger32(uint32_t& result,
+                                const DicomTag& tag) const;
+
+    bool ParseUnsignedInteger64(uint64_t& result,
+                                const DicomTag& tag) const;                                
+
+    bool ParseFloat(float& result,
+                    const DicomTag& tag) const;                                
+
+    bool ParseDouble(double& result,
+                     const DicomTag& tag) const;                                
   };
 }

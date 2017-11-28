@@ -17,9 +17,9 @@
             scope: {
                 // Those parameters are readonly, they must be configured via
                 // their respective directives. We provide them because the
-                // configuration can be done outside the scope of the 
+                // configuration can be done outside the scope of the
                 // `wvWebviewer` directive. This is the case when the user
-                // redefine a specific section. 
+                // redefine a specific section.
                 isTopEnabled: '=?wvTopEnabled', // readonly
                 isTopLeftEnabled: '=?wvTopleftEnabled', // readonly
                 isTopRightEnabled: '=?wvToprightEnabled', // readonly
@@ -29,6 +29,7 @@
                 isLeftEnabled: '=?wvLeftEnabled', // readonly
                 isLeftBottomEnabled: '=?wvLeftBottomEnabled', // readonly
                 isLeftClosed: '=?wvLeftClosed', // readonly
+                isLeftSmall: '=?wvIsLeftSmall' //readonly
             },
             templateUrl: 'app/layout/layout.html'
         };
@@ -75,8 +76,8 @@
             // We use two setTimeout, because just using $evalAsync provides
             // random results.
             // @warning random ui bug
-            // The only way to fix I know this is to manage the reflow logic at 
-            // an upper level, and thus centralize the UI resizing 
+            // The only way to fix I know this is to manage the reflow logic at
+            // an upper level, and thus centralize the UI resizing
             // responsabilities from layout, splitpane and viewport in a single
             // source code.
             // This can be organically/easily done by stopping relying on

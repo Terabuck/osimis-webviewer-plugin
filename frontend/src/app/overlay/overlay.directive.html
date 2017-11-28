@@ -7,15 +7,15 @@
     <div class="wv-overlay-topright" ng-show="vm.showTopRightArea()">
         <div ng-repeat="line in vm.topRightLines">{{line}}<br/></div>
     </div>
-    
+
     <div class="wv-overlay-bottomleft" ng-show="vm.showBottomLeftArea()">
         <div ng-repeat="line in vm.bottomLeftLines">{{line}}<br/></div>
     </div>
 
     <div class="wv-overlay-bottomright" ng-show="vm.showBottomRightArea()">
         <div ng-repeat="line in vm.bottomRightLines">{{line}}<br/></div>
-        <span ng-show="vm.wvSeries.currentShownIndex != vm.wvSeries.currentIndex">(image {{vm.wvSeries.currentIndex+1}} in loading, image {{vm.wvSeries.currentShownIndex+1}} displayed)</br></span>
-        zoom: {{vm.wvViewport.getScaleForFullResolution()|number:2}}x<br/>
-        ww/wc: {{vm.wvViewport.voi.windowWidth|number:0}}/{{vm.wvViewport.voi.windowCenter|number:0}}
+        <span ng-show="vm.wvSeries.currentShownIndex != vm.wvSeries.currentIndex">({{ "COMPONENTS.OVERLAY.IMAGE_LOADING_PARAGRAPH" | translate:{'loadingImage': vm.wvSeries.currentIndex+1, 'loadedImage': vm.wvSeries.currentShownIndex+1} }})</br></span>
+        {{ "COMPONENTS.SPLIT_PANE_OVERLAY.ZOOM" | translate | wvCapitalize }}: {{vm.wvViewport.getScaleForFullResolution()|number:2}}x<br/>
+        {{ "COMPONENTS.SPLIT_PANE_OVERLAY.WW_WC" | translate }}: {{vm.wvViewport.voi.windowWidth|number:0}}/{{vm.wvViewport.voi.windowCenter|number:0}}
     </div>
 </div>

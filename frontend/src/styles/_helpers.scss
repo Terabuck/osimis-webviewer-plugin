@@ -2,6 +2,17 @@
  *  Source code taken from private Osimis' frontend toolbox 3.2.1.
  */
 
+/**
+    _overlay.scss
+ */
+.overlay__transparent{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index: 1;
+}
 
 /** _transition.scss **/
 .transition,

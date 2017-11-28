@@ -1,11 +1,11 @@
 /**
  * @ngdoc object
  * @memberOf osimis
- * 
+ *
  * @name osimis.ProgressiveImageLoader
  * @param {osimis.Image} image The image model to download quality from
  * @param {Array<osimis.quality>} qualities The array of quality to be downloaded
- * 
+ *
  * @description
  * The `ProgressiveImageLoader` class manage image resolution
  * loading (and loading abortion) for a viewport.
@@ -29,7 +29,7 @@
         this._Promise = Promise;
         this._image = image;
         this._qualities = qualities;
-        
+
         this.onBinaryLoaded = new osimis.Listener(); // quality, cornerstoneImageObject
         this.onLoadingFailed = new osimis.Listener(); // quality, err
 
@@ -45,22 +45,22 @@
         // Memory allocation is hard to grasp in this class.
         // There is 4 ways a binary reference may be decreased by the
         // `ProgressiveImageLoader`:
-        // 1. We decr. loaded LQ binary because we don't need it. It happens 
+        // 1. We decr. loaded LQ binary because we don't need it. It happens
         //    when HQ is loaded before LQ.
-        // 2. We decr. loaded LQ binary because we don't need it. It also 
+        // 2. We decr. loaded LQ binary because we don't need it. It also
         //    happens when HQ is loaded after LQ.
-        // 3. We decr. currently loaded image's binary when the 
-        //    `ProgressiveImageLoader` is destroyed (when the image changes for 
+        // 3. We decr. currently loaded image's binary when the
+        //    `ProgressiveImageLoader` is destroyed (when the image changes for
         //    instance, see `#abortBinariesLoading`).
         // 4. We decr. in-loading image's binaries when the
-        //    `ProgressiveImageLoader` is destroyed (when the image changes for 
+        //    `ProgressiveImageLoader` is destroyed (when the image changes for
         //    instance, see `#abortBinariesLoading`).
         // 5. We decr. binaries which have failed to load.
-        // 
-        // The fifth point may also be triggered by the four previous ones 
+        //
+        // The fifth point may also be triggered by the four previous ones
         // (except when the preloader still hold instances of the binary).
         // Therefore, ref. may be decreased twice!
-        // 
+        //
         // To prevent this from happening, we also keep track of decr. binaries.
         this._destroyedQualities = [];
     }
@@ -68,7 +68,7 @@
     /**
      * @ngdoc method
      * @methodOf osimis.ProgressiveImageLoader
-     * 
+     *
      * @name osimis.ProgressiveImageLoader#loadBinaries
      *
      * @description
@@ -115,7 +115,7 @@
                 _this._lastLoadedImageQuality = quality;
 
                 // @todo Abort lower resolution's loading
-                
+
                 // Remove the binary from the binariesInLoading queue (used to be able to cancel the loading request)
                 _.pull(binariesInLoading, quality);
 
@@ -132,7 +132,7 @@
 
                 // Remove the binary from the binariesInLoading queue (used to be able to cancel the loading request)
                 _.pull(binariesInLoading, quality);
-                
+
                 // Call loading cancelled callback when it's not normal behavior
                 _this.onLoadingFailed.trigger(quality, err);
                 if (err.message !== 'LQ Loaded after HQ') {
@@ -140,7 +140,7 @@
                 }
                 else {
                     // Forward the rejection
-                    return Promise.reject(err);
+                    // return Promise.reject(err);
                 }
             });
 
@@ -152,13 +152,13 @@
      * @methodOf osimis.ProgressiveImageLoader
      *
      * @name osimis.ProgressiveImageLoader#onBinaryLoaded
-     * 
+     *
      * @param {callback} callback
      *    Called when a binary has been loaded.
-     * 
+     *
      *    Parameters:
      *    * {osimis.quality} `quality` The quality of the binary.
-     *    * {object} `cornerstoneImageObject` The cornerstone image object of 
+     *    * {object} `cornerstoneImageObject` The cornerstone image object of
      *                                        the loaded binary.
      */
     ProgressiveImageLoader.prototype.onBinaryLoaded = null;
@@ -168,12 +168,12 @@
      * @methodOf osimis.ProgressiveImageLoader
      *
      * @name osimis.ProgressiveImageLoader#onLoadingFailed
-     * 
+     *
      * @param {callback} callback
-     *    Called when a loading as failed. Ignored loaded images are not 
-     *    considered as failed loadings (a LQ binary is ignored when loaded 
+     *    Called when a loading as failed. Ignored loaded images are not
+     *    considered as failed loadings (a LQ binary is ignored when loaded
      *    after a HQ binary for instance).
-     * 
+     *
      *    Parameters:
      *    * {osimis.quality} `quality` The quality of the binary.
      *    * {Error} `err` The thrown javascript error.
@@ -183,7 +183,7 @@
     /**
      * @ngdoc method
      * @methodOf osimis.ProgressiveImageLoader
-     * 
+     *
      * @name osimis.ProgressiveImageLoader#abortBinariesLoading
      *
      * @description
@@ -193,7 +193,7 @@
     ProgressiveImageLoader.prototype.abortBinariesLoading = function() {
         var image = this._image;
         var destroyedQualities = this._destroyedQualities;
-        
+
         // Cancel binary loading requests
         this._binariesInLoading.forEach(function(quality) {
             // try {
@@ -229,7 +229,7 @@
                         throw e;
                     });
                 }
-                
+
                 destroyedQualities.push(this._lastLoadedImageQuality);
             }
             image = null;
@@ -240,11 +240,11 @@
     /**
      * @ngdoc method
      * @methodOf osimis.ProgressiveImageLoader
-     * 
+     *
      * @name osimis.ProgressiveImageLoader#destroy
      *
      * @description
-     * Abort current binaries' loading and close `onBinaryLoaded` and 
+     * Abort current binaries' loading and close `onBinaryLoaded` and
      * `onLoadingFailed` listeners.
      */
     ProgressiveImageLoader.prototype.destroy = function() {

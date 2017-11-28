@@ -4,19 +4,25 @@ Pending changes in the mainline
 => Minimum Orthanc version: 1.3.1 <=
 
 Features:
-* Added a short term cache to store low/high quality images in the backend.
-* Added prefetching on the backend to pre-compute low/high quality images
-  before the frontend requests them.
 * Added an option to preload high quality images on the frontend before
   the user needs them.
 * Added orientation markers
 * Added arrow+text annotations
 * Added key image capture to store snapshots with annotation
 * Windows presets can be configured in configuration file
-* Added many options to configure the UI
 * Added a "Not for diagnostic usage" disclaimer since this viewer is not CE marked or FDA approved
+* Added options to configure the viewer UI:
+  "StudyDownloadEnabled", "VideoDisplayEnabled", "AnnotationStorageEnabled",
+  "KeyImageCaptureEnabled", "ShowStudyInformationBreadcrumb",
+  "ShowNoReportIconInSeriesList", "ReduceTimelineHeightOnSingleFrameSeries",
+  "ToolbarLayoutMode", "ToolbarButtonSize", "WindowingPresets",
+  "DefaultSelectedTool", "DefaultStudyIslandsDisplayMode",
+  "DefaultLanguage"
+* Added a one-column display mode for the study island
+* Added internationalization support (en-fr)
 
 
+TODO: lot's of feature to re-integrate in release notes
 
 Fixes:
 * Annotation readback
@@ -26,6 +32,24 @@ Fixes:
 * WVB-326: support for RGB48 images
 * WVB-293: support for YBR422 images
 
+Improvements:
+* speed-up initial study/series loading time
+
+Experimental features:
+* Added a short term cache to store low/high quality images in the backend. 
+  To enable it, check the "ShortTermCache..." configurations.
+* Added prefetching on the backend to pre-compute low/high quality images
+  before the frontend requests them.  To enable it, check the 
+  "ShortTermCachePrefetchOnInstanceStored" configuration.
+
+
+Version 1.0.1
+========================
+
+=> Minimum Orthanc version: 1.1.0 <=
+
+Fixes:
+* WVB-312: US and XA measures are invalid
 
 
 Version 1.0.0

@@ -1,5 +1,5 @@
 <button type="button" class="wvButton--border"
-    ng-model="sortedSelectedStudyIds" placeholder="Study.."
+    ng-model="sortedSelectedStudyIds" placeholder="{{ 'MEDICAL_TERMS.STUDY' | translate | wvCapitalize }}..."
     ng-disabled="readonly"
     bs-options="study.value as study.label for study in studies"
     data-multiple="true" bs-select>

@@ -46,10 +46,8 @@
 #include <stdint.h>
 
 #if ORTHANC_BUILD_UNIT_TESTS == 1
-#include <gtest/gtest_prod.h>
+#  include <gtest/gtest_prod.h>
 #endif
-
-struct sqlite3_stmt;
 
 
 namespace Orthanc

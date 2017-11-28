@@ -55,32 +55,32 @@ namespace Orthanc
 
     bool StartsWithUuid(const std::string& str);
 
-    class TemporaryFile
-    {
-    private:
-      std::string path_;
+//    class TemporaryFile
+//    {
+//    private:
+//      std::string path_;
 
-    public:
-      TemporaryFile();
+//    public:
+//      TemporaryFile();
 
-      TemporaryFile(const char* extension);
+//      TemporaryFile(const char* extension);
 
-      ~TemporaryFile();
+//      ~TemporaryFile();
 
-      const std::string& GetPath() const
-      {
-        return path_;
-      }
+//      const std::string& GetPath() const
+//      {
+//        return path_;
+//      }
 
-      void Write(const std::string& content)
-      {
-        Toolbox::WriteFile(content, path_);
-      }
+//      void Write(const std::string& content)
+//      {
+//        Toolbox::WriteFile(content, path_);
+//      }
 
-      void Read(std::string& content) const
-      {
-        Toolbox::ReadFile(content, path_);
-      }
-    };
+//      void Read(std::string& content) const
+//      {
+//        Toolbox::ReadFile(content, path_);
+//      }
+//    };
   }
 }

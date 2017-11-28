@@ -197,7 +197,8 @@ namespace OrthancPlugins
       {
         case gdcm::PixelFormat::UINT8:
           return OrthancPluginPixelFormat_RGB24;
-
+        case gdcm::PixelFormat::UINT16:
+          return OrthancPluginPixelFormat_RGB48;
         default:
           break;
       }      
@@ -238,6 +239,8 @@ namespace OrthancPlugins
 
       case OrthancPluginPixelFormat_RGB24:
         return 3;
+      case OrthancPluginPixelFormat_RGB48:
+        return 6;
 
       default:
         throw std::runtime_error("Unsupport pixel format");
