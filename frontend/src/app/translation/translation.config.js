@@ -17,7 +17,7 @@
             }
         }
 
-        $translateProvider.translations('en', {});
+        $translateProvider.translations('xx', {});
         // load json static files instead of writing them directly in the js
         // located on the server at /languages/en.json for exemple.
         $translateProvider.useStaticFilesLoader({
@@ -29,7 +29,7 @@
         // $translateProvider.useLocalStorage();
 
         // default language
-        $translateProvider.preferredLanguage('en');
+        $translateProvider.preferredLanguage('xx');  // for test
 
         // make correspond different local code to our language code fr_FR to fr for exemple.
         // http://angular-translate.github.io/docs/#/guide/09_language-negotiation
