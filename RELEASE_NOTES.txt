@@ -20,6 +20,12 @@ Features:
 
 TODO: lot's of feature to re-integrate in release notes
 
+Fixes:
+WVB-326: added support for RGB48 images
+
+Improvements:
+* speed-up initial study/series loading time
+
 Experimental features:
 * Added a short term cache to store low/high quality images in the backend. 
   To enable it, check the "ShortTermCache..." configurations.
