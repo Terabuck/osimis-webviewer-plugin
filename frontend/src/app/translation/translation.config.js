@@ -5,6 +5,7 @@
 
     /* @ngInject */
     function translateConfig($translateProvider) {
+        return;
         var languages = {
             en: 'english',
             fr: 'français'
