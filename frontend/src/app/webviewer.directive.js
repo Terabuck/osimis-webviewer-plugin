@@ -235,7 +235,7 @@
             if (vm.toolboxButtonsOrdering === undefined) {
                 vm.toolboxButtonsOrdering = [
                     {type: "button", tool: "layout"},
-                    {type: "button", tool: "touchGesture"},
+                    // {type: "button", tool: "touchGesture"},
                     {type: "button", tool: "zoom"},
                     {type: "button", tool: "pan"},
                     {
@@ -265,7 +265,7 @@
                             {type: "button", tool: "arrowAnnotate"},
                         ]
                     },
-                    {type: "button", tool: "keyImageCapture"},
+                    {type: "button", tool: "keyImageCapture"}
                 ]
             }
             vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];
