@@ -5,7 +5,6 @@
 
     /* @ngInject */
     function translateConfig($translateProvider) {
-        return;
         var languages = {
             en: 'english',
             fr: 'français'
@@ -43,6 +42,6 @@
         // use a fallback language
         $translateProvider.fallbackLanguage('en');
 
-        console.log('language has been set', $translateProvider)
+        // console.log('language has been set', $translateProvider)
     }
 })();
