@@ -12,11 +12,13 @@ Features:
   "KeyImageCaptureEnabled", "ShowStudyInformationBreadcrumb",
   "ShowNoReportIconInSeriesList", "ReduceTimelineHeightOnSingleFrameSeries",
   "ToolbarLayoutMode", "ToolbarButtonSize", "WindowingPresets",
-  "DefaultSelectedTool", "DefaultStudyIslandsDisplayMode"
+  "DefaultSelectedTool", "DefaultStudyIslandsDisplayMode",
+  "DefaultLanguage"
 * Added a one-column display mode for the study island
+* Added internationalization support (en-fr)
 
 
-TODO: lot's of feature to re-integrated
+TODO: lot's of feature to re-integrate in release notes
 
 Experimental features:
 * Added a short term cache to store low/high quality images in the backend. 
