@@ -119,7 +119,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   toolbarLayoutMode = OrthancPlugins::GetStringValue(wvConfig, "ToolbarLayoutMode", "flat");
   toolbarButtonSize = OrthancPlugins::GetStringValue(wvConfig, "ToolbarButtonSize", "small");
   defaultSelectedTool = OrthancPlugins::GetStringValue(wvConfig, "DefaultSelectedTool", "zoom");
-  defaultStudyIslandsDisplayMode = OrthancPlugins::GetStringValue(wvConfig, "defaultStudyIslandsDisplayMode", "grid");
+  defaultStudyIslandsDisplayMode = OrthancPlugins::GetStringValue(wvConfig, "DefaultStudyIslandsDisplayMode", "grid");
 
   if (toolbarLayoutMode != "flat" && toolbarLayoutMode != "tree")
   {
@@ -132,6 +132,13 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
     OrthancPluginLogError(_context, "ToolbarButtonSize invalid value.  Allowed values are \"small\" and \"large\"");
     throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
   }
+
+  if (defaultStudyIslandsDisplayMode != "grid" && defaultStudyIslandsDisplayMode != "list" && defaultStudyIslandsDisplayMode != "oneCol")
+  {
+    OrthancPluginLogError(_context, "DefaultStudyIslandsDisplayMode invalid value.  Allowed values are \"grid\" and \"list\" and \"oneCol\"");
+    throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
+  }
+
 }
 
 void WebViewerConfiguration::parseFile()

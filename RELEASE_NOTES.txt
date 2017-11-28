@@ -9,6 +9,10 @@ Features:
   before the frontend requests them.
 * Added an option to preload high quality images on the frontend before
   the user needs them.
+* Added a one-column display mode for the study islend and an option to configure
+  the default display mode: DefaultStudyIslandsDisplayMode (allowed values: grid/list/oneCol)
+  
+
 
 Version 1.0.0
 ========================
