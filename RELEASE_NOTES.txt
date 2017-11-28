@@ -13,7 +13,10 @@ Features:
   "ShowNoReportIconInSeriesList", "ReduceTimelineHeightOnSingleFrameSeries",
   "ToolbarLayoutMode", "ToolbarButtonSize", "WindowingPresets",
   "DefaultSelectedTool", "DefaultStudyIslandsDisplayMode"
+* Added a one-column display mode for the study island
 
+
+TODO: lot's of feature to re-integrated
 
 Experimental features:
 * Added a short term cache to store low/high quality images in the backend. 
@@ -26,12 +29,16 @@ Experimental features:
 Version 1.0.1
 ========================
 
+=> Minimum Orthanc version: 1.1.0 <=
+
 Fixes:
 * WVB-312: US and XA measures are invalid
 
 
 Version 1.0.0
 ========================
+
+=> Minimum Orthanc version: 1.1.0 <=
 
 Features:
 * Zoom in the viewport using a magnifying glass.

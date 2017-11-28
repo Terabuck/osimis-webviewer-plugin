@@ -1,7 +1,7 @@
 <div class="wvStudyIsland--{{vm.study.color}}" ng-if="vm.studyId">
     <div class="wvStudyIsland__header--{{vm.study.color}}">
         <!-- Actions -->
-        <div class="wvStudyIsland__actions">
+        <div class="wvStudyIsland__actions" ng-class="{'wvStudyIsland__actions--oneCol': vm.displayMode === 'oneCol'}">
             <wv-study-download-button
                 ng-if="vm.studyDownloadEnabled"
                 wv-study-id="vm.studyId"
