@@ -95,7 +95,7 @@
     // Define a basic controller
     .controller('MainController', [
         '$scope', '$location', '$translate', 'wvConfig', 'wvStudyManager', 'wvSeriesManager',
-        function($scope, $location, $translate, wvConfig, wvStudyManager, wvSeriesManager,)
+        function($scope, $location, $translate, wvConfig, wvStudyManager, wvSeriesManager)
     {
         var vm = this;
 
@@ -218,7 +218,6 @@
         vm.studyIslandsDisplayMode = __webViewerConfig.defaultStudyIslandsDisplayMode || "grid";
 
         $translate.use(vm.defaultLanguage);
-
     }]);
     </script>
 </body>
