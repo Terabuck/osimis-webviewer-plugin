@@ -47,27 +47,33 @@ void CacheContext::NewInstancesThread(CacheContext* that)
     {
       const std::string& instanceId = dynamic_cast<DynamicString&>(*obj).GetValue();
 
-      // On the reception of a new instance, indalidate the parent series of the instance
+      // when receiving a new instance, this might actually be a new version of a previous instance
+      // we have seen that with some Vet Fuji app where you can rework the instances (i.e: change the orientation)
+      // and resend them to Orthanc -> cache was not cleared -> always invalidate the cache for a new instance
+      // in case there's already something in the cache and the instance was deleted inbetween.
+      that->logger_->LogCacheDebugInfo("invalidating instance " + instanceId);
+      that->GetScheduler().Invalidate(OrthancPlugins::CacheBundle_DecodedImage, instanceId);
+
+      // when receiving a new instance, we must also invalidate the parent series of the instance
       std::string uri = "/instances/" + std::string(instanceId);
       Json::Value instance;
       if (OrthancPlugins::GetJsonFromOrthanc(instance, that->pluginContext_, uri))
       {
         std::string seriesId = instance["ParentSeries"].asString();
+        that->logger_->LogCacheDebugInfo("invalidating series " + seriesId);
         that->GetScheduler().Invalidate(OrthancPlugins::CacheBundle_SeriesInformation, seriesId);
 
         // also start pre-computing the images for the instance
         if (that->prefetchOnInstanceStored_)
         {
-          std::auto_ptr<Series> series = that->seriesRepository_->GetSeries(seriesId);
+          std::auto_ptr<Series> series = that->seriesRepository_->GetSeries(seriesId);  // TODO: clarify difference between series cache and series repository (there's clearly a lot of redundancy there !)
 
           std::vector<ImageQuality> qualitiesToPrefetch = series->GetOrderedImageQualities();
           BOOST_FOREACH(ImageQuality quality, qualitiesToPrefetch) {
             that->GetScheduler().Prefetch(OrthancPlugins::CacheBundle_DecodedImage, instanceId + "/0/" + quality.toProcessingPolicytString()); // TODO: for multi-frame images, we should prefetch all frames and not onlyt the first one !
           }
         }
-
       }
-
     }
   }
 }

@@ -99,7 +99,7 @@ namespace OrthancPlugins
                 const std::string& item);
 
     void Invalidate(int bundle,
-                    const std::string& item);
+                    const std::string& itemPrefix);
 
     void Store(int bundle,
                const std::string& item,
