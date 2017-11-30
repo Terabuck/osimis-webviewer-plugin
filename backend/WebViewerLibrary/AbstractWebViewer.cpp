@@ -23,6 +23,7 @@
 #include "Series/SeriesController.h"
 #include "Image/ImageRepository.h"
 #include "Image/ImageController.h"
+#include "Language/LanguageController.h"
 #include "Annotation/AnnotationRepository.h"
 #include "Config/ConfigController.h"
 #include "Config/WebViewerConfiguration.h"
@@ -107,6 +108,7 @@ void AbstractWebViewer::_serveBackEnd()
   RegisterRoute<SeriesController>("/osimis-viewer/series/");
   RegisterRoute<ConfigController>("/osimis-viewer/config.js");
   RegisterRoute<StudyController>("/osimis-viewer/studies/");
+  RegisterRoute<LanguageController>("/osimis-viewer/languages/");
 
   // OrthancPluginRegisterRestCallbackNoLock(_context, "/osimis-viewer/is-stable-series/(.*)", IsStableSeries);
 }
