@@ -14,7 +14,7 @@
  * The `Configuration` class handle the general webviewer config,
  * and versioning informations. This is much like a private local POJO-like
  * class.
- * 
+ *
  * It is meant only to be used by the `wvConfig` service. However, that service
  * gives a public access to an unique _instance_ of this class.
  *
@@ -50,7 +50,7 @@
         this.orthancApiURL = urlConvertor.toAbsoluteURL('/'); // @note '/' is converted by urlConvertor
                                                               // to the correct path if reverse proxy is found, so np.
                                                               // @todo use ../../ instead
-                                                              
+
         this.httpRequestHeaders = {};
         this.enableHighQualityImagePreloading = __webViewerConfig.enableHighQualityImagePreloading;
         this.showBreadCrumb = __webViewerConfig.showBreadCrumb;
@@ -59,10 +59,10 @@
     /**
      * @ngdoc method
      * @methodOf webviewer.service:wvConfig
-     * 
+     *
      * @name webviewer.service:wvConfig#setHttpRequestHeaders
      * @param {object} headers A hash containing the HTTP headers we wan't to insert in each request
-     * 
+     *
      * @description
      * WebViewer is not responsible for authentication. However, it is quite often embedded behind a proxy.
      * It's therefore convenient to provide the additional user informations to the proxy. The `wvConfig.setHttpRequestHeaders`
@@ -76,7 +76,7 @@
      *
      * # @note Would be better to propose a policy. However, we can't pass policies to web workers, so this solution is not
      * technically achievable.
-     * 
+     *
      * @example
      * The following example show how to use the `wvConfig` provider to set an user token.
      *
@@ -87,7 +87,7 @@
      *     // each time the token is invalidated (preferably before, but will not be required once we have a "retry request"
      *     // mechanism).
      *     var newUserToken = 'renewed-user-token';
-     *     
+     *
      *     wvConfig.setHttpRequestHeaders({
      *         'my-auth-header': newUserToken
      *     });
@@ -112,30 +112,30 @@
     .module('webviewer')
     .provider('wvConfig', function() {
         // @todo use angular.injector for scoped config?
-        
-        var _config = new Configuration();
+
+        this._config = new Configuration();
 
         // @warning @deprecated No longer required.
-        // 
+        //
         // Make sure the httpRequestHeaders configuration option is available before module initialization so we can use it to
         // verify webviewer frontend/backend version compatibility at start.
         // The option is also available after initialization in case the headers have to be changed for instance because of an
         // expired token.
-        // 
+        //
         // We don't have to set this if the following routes are on public access
         // - /plugins/osimis-web-viewer
         // - /system
-        this.setHttpRequestHeaders = _config.setHttpRequestHeaders.bind(_config);
+        this.setHttpRequestHeaders = this._config.setHttpRequestHeaders.bind(this._config);
 
         this.$get = function($q, uaParser) {
             // This is executed at runtime (after initialization)
-            
+
             // Add browser to config (for log mainly)
-            _config.browser = uaParser.getResult();
+            this._config.browser = uaParser.getResult();
 
-            console.log(_config);
+            console.log(this._config);
 
-            return _config;
+            return this._config;
         };
     });
 

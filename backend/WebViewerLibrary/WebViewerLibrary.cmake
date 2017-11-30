@@ -50,6 +50,7 @@ add_library(WebViewerLibrary
   ${VIEWER_LIBRARY_DIR}/ShortTermCache/ViewerPrefetchPolicy.cpp
   ${VIEWER_LIBRARY_DIR}/Annotation/AnnotationRepository.cpp
   ${VIEWER_LIBRARY_DIR}/Study/StudyController.cpp
+  ${VIEWER_LIBRARY_DIR}/Language/LanguageController.cpp
   ${VIEWER_LIBRARY_DIR}/Instance/DicomRepository.cpp
   ${VIEWER_LIBRARY_DIR}/Series/SeriesFactory.cpp
   ${VIEWER_LIBRARY_DIR}/Series/SeriesRepository.cpp

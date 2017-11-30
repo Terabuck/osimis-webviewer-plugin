@@ -15,7 +15,7 @@
     'use strict';
 
     angular.module('webviewer')
-    .directive('wvStudylist', function ($rootScope, wvStudyManager) {
+    .directive('wvStudylist', function ($rootScope, $timeout, wvStudyManager) {
         return {
             scope: {
                 pickableStudyIds: '=wvPickableStudyIds',
@@ -48,7 +48,7 @@
                 });
 
                 // Case 2:
-                // Sorted array changes (the angularstrap `bs-select` directive 
+                // Sorted array changes (the angularstrap `bs-select` directive
                 // changes the content of the array).
                 // -> Convert the sorted array to a chronological one (required
                 //    to display serieslists in chronological order, especially
@@ -82,7 +82,7 @@
                     // @todo Move this inside a study model
                     scope.studies.forEach(function(v) {
                         var studyId = v.value;
-                        
+
                         wvStudyManager
                             .get(studyId)
                             .then(function(study) {
@@ -93,8 +93,25 @@
                             });
                     });
                 });
+
+                // because bs-select (used in the UI) does not support dynamic value interpolation (it only take the first values met)
+                // We need to set a boolean to make the Ui waiting that the language has been loaded.
+                // Each time the language changed, the select directive if destroyed and rebuild once the
+                // $translateLoadingEnd is triggered
+                function setTranslated() {
+                    var removeListener = $rootScope.$on('$translateLoadingEnd', function () {
+                        scope.translateReady = true;
+                        removeListener();
+                        removeListener = null;
+                    });
+                }
+                $rootScope.$on('$translateLoadingStart', function(){
+                    scope.translateReady = false;
+                    setTranslated()
+                });
+                scope.translateReady = false;
+                setTranslated();
             }
         };
     });
 })();
- 

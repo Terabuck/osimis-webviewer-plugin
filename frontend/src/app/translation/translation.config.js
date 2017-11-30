@@ -1,10 +1,10 @@
 (function(){
     var translation = angular
-        .module('webviewer.translation');
+        .module('webviewer'); // .translation
     translation.config(translateConfig);
 
     /* @ngInject */
-    function translateConfig($translateProvider) {
+    function translateConfig($translateProvider, wvConfigProvider) {
         /**
          * Set the translate config, and the async loader
          * note that the async loader makes test failed if it needs to get the translation during
@@ -15,6 +15,9 @@
          * So in that case fallback language are deactivated and no real languages are set by default.
          * The app needs to specifically use $translate.use('en' | 'fr') in it's index or entrypoint.
          */
+        // because wvConfig is not available for config step, we need to inject it manually see: http://stackoverflow.com/questions/15358029/why-am-i-unable-to-inject-angular-cookies
+        console.log(wvConfigProvider);
+        var wvConfig = wvConfigProvider._config;
         var languages = {
             en: 'english',
             fr: 'français'
@@ -31,8 +34,8 @@
         // load json static files instead of writing them directly in the js
         // located on the server at /languages/en.json for exemple.
         $translateProvider.useStaticFilesLoader({
-            prefix: 'languages/',
-            suffix: '.json'
+            prefix: wvConfig.orthancApiURL + '/osimis-viewer/languages/',
+            suffix: ""
         });
 
         // storage json into local storage (optimization)
