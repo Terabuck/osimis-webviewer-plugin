@@ -15,7 +15,7 @@
     'use strict';
 
     angular.module('webviewer')
-    .directive('wvStudylist', function ($rootScope, $timeout, wvStudyManager) {
+    .directive('wvStudylist', function ($rootScope, $timeout, $translate,  wvStudyManager) {
         return {
             scope: {
                 pickableStudyIds: '=wvPickableStudyIds',
@@ -109,8 +109,16 @@
                     scope.translateReady = false;
                     setTranslated()
                 });
-                scope.translateReady = false;
-                setTranslated();
+                if($translate.isReady()){
+                    scope.translateReady = true;
+                }else{
+                    scope.translateReady = false;
+                    setTranslated();
+                }
+
+                $rootScope.$on('$translateChangeSuccess', function(){
+                    scope.translateReady = true;
+                });
             }
         };
     });
