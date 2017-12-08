@@ -649,6 +649,14 @@
                     vm.panes[0].csViewport = null;
                 }
             });
+
+            // when the studyIslandsDisplayMode the layout may changed and so some directive may need
+            // to recalculate their dimentions, so we need to trigger a "window change" event.
+            scope.$watch('vm.studyIslandsDisplayMode', function(){
+                asap(function() {
+                    $(window).trigger("resize");
+                });
+            });
         }
     }
 
