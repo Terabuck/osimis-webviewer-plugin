@@ -131,7 +131,7 @@
         .directive('wvWebviewer', wvWebviewer);
 
     /* @ngInject */
-    function wvWebviewer($rootScope, wvStudyManager, wvAnnotationManager, wvSeriesManager, wvPaneManager) {
+    function wvWebviewer($rootScope, $timeout, wvStudyManager, wvAnnotationManager, wvSeriesManager, wvPaneManager) {
         var directive = {
             bindToController: true,
             controller: Controller,
@@ -653,7 +653,15 @@
             // when the studyIslandsDisplayMode the layout may changed and so some directive may need
             // to recalculate their dimentions, so we need to trigger a "window change" event.
             scope.$watch('vm.studyIslandsDisplayMode', function(){
-                asap(function() {
+                asap(function(){
+                    $(window).trigger("resize");
+                });
+
+                // For some weird reason when the webviewer is on an iframe,
+                // asap is not working and is possibly triggered not at the good time.
+                // To be sure a window resize events is really trigerred we're calling it also after a $timeout
+                // Note: we do not remove asap to prevent a flash if the webviewer is not on an iframe.
+               $timeout(function() {
                     $(window).trigger("resize");
                 });
             });
