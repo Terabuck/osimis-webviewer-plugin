@@ -20,7 +20,8 @@
         var wvConfig = wvConfigProvider._config;
         var languages = {
             en: 'english',
-            fr: 'français'
+            fr: 'français',
+	    nl: 'nederlands'	
         };
         // languages Key array, automatically populated set with languages object
         var keysArray = [];
