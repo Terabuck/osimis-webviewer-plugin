@@ -47,6 +47,7 @@ void WebViewer::_serveFrontEnd()
   // configure languages
   LanguageController::addLanguageFile("en", "/osimis-viewer/app/languages/en.json");
   LanguageController::addLanguageFile("fr", "/osimis-viewer/app/languages/fr.json");
+  LanguageController::addLanguageFile("nl", "/osimis-viewer/app/languages/nl.json");
 }
 
 const std::string& WebViewer::getName()
