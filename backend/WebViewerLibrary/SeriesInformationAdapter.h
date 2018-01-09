@@ -44,5 +44,7 @@ namespace OrthancPlugins
 
     virtual bool Create(std::string& content,
                         const std::string& seriesId);
+
+    virtual void Invalidate(const std::string& /*item*/) {}
   };
 }

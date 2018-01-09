@@ -265,6 +265,7 @@ namespace OrthancPlugins
       {
         prefetchers_[i]->SignalInvalidated(item);
       }
+      factory_->Invalidate(item);
     }
 
     void Prefetch(const std::string& item)

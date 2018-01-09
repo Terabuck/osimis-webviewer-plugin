@@ -27,6 +27,7 @@ public:
   std::auto_ptr<Image> GetImage(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy, bool enableCache) const;
   void CleanImageCache(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const;
 
+  void invalidateInstance(const std::string& instanceId);
   void enableCachedImageStorage(bool enable) {_cachedImageStorageEnabled = enable;}
   bool isCachedImageStorageEnabled() const {return _cachedImageStorageEnabled;}
 

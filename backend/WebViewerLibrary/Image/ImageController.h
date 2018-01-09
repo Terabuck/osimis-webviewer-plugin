@@ -68,6 +68,9 @@ public:
   // call this method at the same time.
   virtual bool Create(std::string& content,
                       const std::string& uri);
+
+  virtual void Invalidate(const std::string& item);
+
 };
 
 #endif // IMAGE_ROUTE_H
