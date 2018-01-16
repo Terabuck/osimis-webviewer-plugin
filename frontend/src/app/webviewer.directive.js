@@ -685,12 +685,6 @@
     /* @ngInject */
     function Controller($rootScope, $scope) {
         var vm = this;
-        // specific brower check
-        vm.isOpera = false;
-        vm.isOpera = window.navigator.userAgent.indexOf("OPR") > -1 || window.navigator.userAgent.indexOf("Opera") > -1;      
-        vm.onCloseWarning = function(){
-            vm.isOpera = false;
-        }
     }
 
 })();
