@@ -131,7 +131,7 @@
         .directive('wvWebviewer', wvWebviewer);
 
     /* @ngInject */
-    function wvWebviewer($rootScope, $timeout, wvStudyManager, wvAnnotationManager, wvSeriesManager, wvPaneManager) {
+    function wvWebviewer($rootScope, $timeout, wvStudyManager, wvAnnotationManager, wvSeriesManager, wvPaneManager, wvConfig) {
         var directive = {
             bindToController: true,
             controller: Controller,
@@ -182,6 +182,20 @@
 
         function link(scope, element, attrs, ctrls, transcludeFn) {
             var vm = scope.vm;
+
+            vm.browser = wvConfig.browser.browser.name;
+            vm.openModel = false;
+            if((vm.browser === "Chrome") || (vm.browser === "Safari") || (vm.browser === "Firefox") || (vm.browser === "Edge") || (vm.browser === "IE")){
+                console.log(vm.browser + " Supported");
+            }
+            else{
+                vm.openModel = true;
+                console.log(vm.browser + " Unsupported");
+            }
+            
+            vm.onCloseWarning = function(){
+                vm.openModel = false;
+            } 
 
             // Configure attributes default values
             vm.toolbarEnabled = typeof vm.toolbarEnabled !== 'undefined' ? vm.toolbarEnabled : true;
@@ -671,6 +685,12 @@
     /* @ngInject */
     function Controller($rootScope, $scope) {
         var vm = this;
+        // specific brower check
+        vm.isOpera = false;
+        vm.isOpera = window.navigator.userAgent.indexOf("OPR") > -1 || window.navigator.userAgent.indexOf("Opera") > -1;      
+        vm.onCloseWarning = function(){
+            vm.isOpera = false;
+        }
     }
 
 })();

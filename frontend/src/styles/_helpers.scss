@@ -1027,3 +1027,61 @@ $steps: (
 .clear {
   clear: both;
 }
+
+// warning popup
+
+.wvWarning {
+  position: relative;
+  width: 320px;
+  height: 130px;
+  z-index: 999;
+  left: 40%;
+  border: #000 solid 1px;
+  -webkit-border-radius: 7px;
+  -moz-border-radius: 7px;
+  border-radius: 7px;
+  color: #FF5722;
+  box-shadow: 0px 3px 23px #ff980078;
+  -webkit-animation-name: example;  /* Safari 4.0 - 8.0 */
+  -webkit-animation-duration: 3s;  /* Safari 4.0 - 8.0 */    
+  -webkit-animation-fill-mode: both; /* Safari 4.0 - 8.0 */
+  animation-name: example;
+  animation-duration: 2s;    
+  animation-fill-mode: both;
+  animation-timing-function: ease-out;
+}
+
+@-webkit-keyframes example {
+    from {top: 0px;opacity: 0;background: #868686}
+    to {top: 150px;opacity: 1;background: #ffffff}
+}
+
+@keyframes example {
+  from {top: 0px;opacity: 0;background: #868686}
+    to {top: 150px;opacity: 1;background: #ffffff}
+}
+
+.wvWarning-content{
+  position: relative;
+  left: 37px;
+  width: 190px;
+  height: 88px;
+}
+.wvWarning-icon{
+  font-size: 62px;
+  position: relative;
+  top: 25px;
+}
+.wvWarning-text{
+  position: relative;
+  top: -35px;
+  left: 65px;
+}
+.wvWarning-button{
+  background-color: #f1ededcc;
+  color: #607D8B;
+  width: 50px;
+  font-weight: 600;
+  margin-top: 2px;
+  margin-right: 30px;
+}
