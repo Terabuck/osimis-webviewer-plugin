@@ -51,6 +51,14 @@
                                                               // to the correct path if reverse proxy is found, so np.
                                                               // @todo use ../../ instead
 
+        if (__webViewerConfig.overlayIconsProviderUrl) {
+            this.overlayIconsProviderURL = urlConvertor.toAbsoluteURL(__webViewerConfig.overlayIconsProviderUrl) + "/";
+            console.log("Overlay icons provider URL: ", this.overlayIconsProviderURL);
+        } else {
+            this.overlayIconsProviderURL = undefined;
+            console.log("No overlay icons provider defined");
+        }
+
         this.httpRequestHeaders = {};
         this.enableHighQualityImagePreloading = __webViewerConfig.enableHighQualityImagePreloading;
         this.showBreadCrumb = __webViewerConfig.showBreadCrumb;

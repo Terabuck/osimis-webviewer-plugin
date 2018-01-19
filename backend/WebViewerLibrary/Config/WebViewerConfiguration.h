@@ -66,6 +66,7 @@ public:
   std::string toolbarButtonSize;
   std::string defaultSelectedTool;
   std::string defaultStudyIslandsDisplayMode;
+  std::string overlayIconsProviderUrl;
   Json::Value windowingPresets;
 
   // If activated, this feature displays a button on each viewport. When the button is

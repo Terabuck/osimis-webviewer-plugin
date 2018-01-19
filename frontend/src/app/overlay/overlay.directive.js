@@ -114,7 +114,14 @@
             vm.getBottomRightArea = function(seriesTags, instanceTags) {
                 return [];
             };
-            vm.updateLayout = function(seriesTags, imageId) {
+            vm.updateIcon = function(overlayIconsInfo) {
+                console.log(overlayIconsInfo);
+                vm.topLeftIcon = overlayIconsInfo.topLeftIcon;
+                vm.bottomLeftIcon = overlayIconsInfo.bottomLeftIcon;
+                vm.topRightIcon = overlayIconsInfo.topRightIcon;
+                vm.bottomRightIcon = overlayIconsInfo.bottomRightIcon;
+            };
+            vm.updateLayout = function(seriesTags, imageId, overlayIconsInfo) {
                 wvInstanceManager
                     .getTags(imageId.split(":")[0]) // imageId is something like orthancId:frameId
                     .then(function(instanceTags) {
@@ -122,27 +129,30 @@
                         vm.topRightLines = vm.getTopRightArea(seriesTags, instanceTags);
                         vm.bottomLeftLines = vm.getBottomLeftArea(seriesTags, instanceTags);
                         vm.bottomRightLines = vm.getBottomRightArea(seriesTags, instanceTags);
+
+                        vm.updateIcon(overlayIconsInfo);
                     });
 
             };
 
             // auto grab series model
             if (ctrls.series) {
-                var series = ctrls.series.getSeries();
-                vm.wvSeries = series;
-                vm.updateLayout(vm.wvSeries.tags, vm.wvSeries.imageIds[vm.wvSeries.currentShownIndex]);
-
-                ctrls.series.onSeriesChanged(_this, function(series) {
+                var series = ctrls.series.getSeriesPromise().then(function(series) {
                     vm.wvSeries = series;
-                    vm.updateLayout(vm.wvSeries.tags, vm.wvSeries.imageIds[vm.wvSeries.currentShownIndex]);
-                });
-                ctrls.series.onCurrentImageIdChanged(_this, function(imageId, notUsed) {
-                    vm.updateLayout(vm.wvSeries.tags, imageId);
-                });
+                    vm.updateLayout(vm.wvSeries.tags, vm.wvSeries.imageIds[vm.wvSeries.currentShownIndex], vm.wvSeries.overlayIconsInfo);
 
-                scope.$on('$destroy', function() {
-                    ctrls.series.onSeriesChanged.close(_this);
-                    ctrls.series.onCurrentImageIdChanged.close(_this);
+                    ctrls.series.onSeriesChanged(_this, function(series) {
+                        vm.wvSeries = series;
+                        vm.updateLayout(vm.wvSeries.tags, vm.wvSeries.imageIds[vm.wvSeries.currentShownIndex], vm.wvSeries.overlayIconsInfo);
+                    });
+                    ctrls.series.onCurrentImageIdChanged(_this, function(imageId, notUsed) {
+                        vm.updateLayout(vm.wvSeries.tags, imageId, vm.wvSeries.overlayIconsInfo);
+                    });
+
+                    scope.$on('$destroy', function() {
+                        ctrls.series.onSeriesChanged.close(_this);
+                        ctrls.series.onCurrentImageIdChanged.close(_this);
+                    });
                 });
             }
 
