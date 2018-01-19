@@ -115,7 +115,6 @@
                 return [];
             };
             vm.updateIcon = function(overlayIconsInfo) {
-                console.log(overlayIconsInfo);
                 vm.topLeftIcon = overlayIconsInfo.topLeftIcon;
                 vm.bottomLeftIcon = overlayIconsInfo.bottomLeftIcon;
                 vm.topRightIcon = overlayIconsInfo.topRightIcon;
