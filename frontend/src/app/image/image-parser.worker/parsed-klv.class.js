@@ -37,11 +37,11 @@
 
         // Process windowing default values.
         var windowing = _processWindowing(pixels, klvData, tags, pixelValuesBoundaries.min, pixelValuesBoundaries.max);
-
+        console.log(tags);
         // Retrieve pixel spacing if available in dicom tags, so we can 
         // map pixel coordinates with physical ones.
-        var columnPixelSpacing = 1;
-        var rowPixelSpacing = 1;
+        var columnPixelSpacing = 0;  // use really invalid values to make sure the user realizes the measure is invald (note: cornerstone will display pixels dimensions in this case)
+        var rowPixelSpacing = 0;     // TODO: disable the measure tools in this case (note: this can be done later)
         if (tags.PixelSpacing) {
             var pixelSpacing = tags.PixelSpacing.split('\\');
             if (pixelSpacing.length === 2) {
@@ -49,6 +49,25 @@
                 rowPixelSpacing = +pixelSpacing[0];
             }
         }
+        else if (tags.ImagerPixelSpacing) // at least used in XA studies
+        {
+            var pixelSpacing = tags.ImagerPixelSpacing.split('\\');
+            if (pixelSpacing.length === 2) {
+                columnPixelSpacing = +pixelSpacing[1];
+                rowPixelSpacing = +pixelSpacing[0];
+            }
+        }
+        // handle specific US measures
+        else if (tags.SequenceOfUltrasoundRegions && tags.SequenceOfUltrasoundRegions.length == 1) // we are not able to handle multiple regions -> we could do it if they all have the same pixelSpacing
+        {
+            var usRegion = tags.SequenceOfUltrasoundRegions[0];
+            if (usRegion.PhysicalUnitsXDirection == 3 && usRegion.PhysicalUnitsYDirection == 3) // only support 'cm' units (all other units are not length dimension like Hz, ...)
+            {
+                columnPixelSpacing = usRegion.PhysicalDeltaX * 10;     // columnPixelSpacing is in mm -> *10
+                rowPixelSpacing = usRegion.PhysicalDeltaY * 10;     // columnPixelSpacing is in mm -> *10
+            }
+        }
+
 
         // Data required by cornerstone to display the image correctly.
         var cornerstoneMetaData = {

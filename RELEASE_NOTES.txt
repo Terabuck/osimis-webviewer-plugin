@@ -3,6 +3,12 @@ Pending changes in the mainline
 
 => Minimum Orthanc version: 1.1.0 <=
 
+Version 1.0.1
+========================
+
+Fixes:
+* WVB-312: US and XA measures are invalid
+
 Version 1.0.0
 ========================
 
