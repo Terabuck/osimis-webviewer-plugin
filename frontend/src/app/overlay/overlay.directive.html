@@ -3,20 +3,20 @@
 
     <div class="wv-overlay-topleft" ng-show="vm.showTopLeftArea()">
         <div ng-repeat="line in vm.topLeftLines">{{line}}<br/></div>
-        <img ng-src="{{vm.topLeftIcon}}"/>
+        <img ng-src="{{vm.topLeftIcon}}" class="wv-overlay-icon" />
     </div>
     <div class="wv-overlay-topright" ng-show="vm.showTopRightArea()">
         <div ng-repeat="line in vm.topRightLines">{{line}}<br/></div>
-        <img ng-src="{{vm.topRightIcon}}" class="block float__right"/>
+        <img ng-src="{{vm.topRightIcon}}" class="block float__right wv-overlay-icon"/>
     </div>
 
     <div class="wv-overlay-bottomleft" ng-show="vm.showBottomLeftArea()">
-        <img ng-src="{{vm.bottomLeftIcon}}"/>
-        <div ng-repeat="line in vm.bottomLeftLines">{{line}}<br/></div>
+        <img ng-src="{{vm.bottomLeftIcon}}" class="wv-overlay-icon"/>
+        <div ng-repeat="line in vm.bottomLeftLines" >{{line}}<br/></div>
     </div>
 
     <div class="wv-overlay-bottomright" ng-show="vm.showBottomRightArea()">
-        <img ng-src="{{vm.bottomRightIcon}}"  class="block float__right clearfix"/>
+        <img ng-src="{{vm.bottomRightIcon}}" class="block float__right clearfix wv-overlay-icon"/>
         <div class="clear">
             <div ng-repeat="line in vm.bottomRightLines">{{line}}<br/></div>
             <span ng-show="vm.wvSeries.currentShownIndex != vm.wvSeries.currentIndex">({{ "COMPONENTS.OVERLAY.IMAGE_LOADING_PARAGRAPH" | translate:{'loadingImage': vm.wvSeries.currentIndex+1, 'loadedImage': vm.wvSeries.currentShownIndex+1} }})</br></span>
