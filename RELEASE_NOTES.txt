@@ -3,6 +3,13 @@ Pending changes in the mainline
 
 => Minimum Orthanc version: 1.1.0 <=
 
+Version 1.0.2
+========================
+
+Fixes:
+* Annotation readback
+
+
 Version 1.0.1
 ========================
 
