@@ -1033,7 +1033,7 @@ $steps: (
 .wvWarning {
   position: relative;
   width: 320px;
-  height: 130px;
+  min-height: 130px;
   z-index: 999;
   left: 40%;
   border: #000 solid 1px;
@@ -1065,7 +1065,7 @@ $steps: (
   position: relative;
   left: 37px;
   width: 190px;
-  height: 88px;
+  min-height: 88px;
 }
 .wvWarning-icon{
   font-size: 62px;

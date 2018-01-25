@@ -183,19 +183,41 @@
         function link(scope, element, attrs, ctrls, transcludeFn) {
             var vm = scope.vm;
 
-            vm.browser = wvConfig.browser.browser.name;
-            vm.openModel = false;
-            if((vm.browser === "Chrome") || (vm.browser === "Safari") || (vm.browser === "Firefox") || (vm.browser === "Edge") || (vm.browser === "IE")){
-                console.log(vm.browser + " Supported");
+            { // check browser compatibility
+                var browserName = wvConfig.browser.browser.name;
+                var browserMajorVersion = wvConfig.browser.browser.major;
+                var osName = wvConfig.browser.os.name;
+
+                vm.openIncompatibleBrowserModal = false;
+                console.log("Checking browser compatibility:", wvConfig.browser);
+                var minimalChromeVersion =  99; //45;
+                var minimalSafariVersion = 9;
+                var minimalFirefoxVersion = 48;
+                var minimalEdgeVersion = 14;
+                var minimalIEVersion = 11;
+
+                if (osName === "Mac OS") {
+                    minimalChromeVersion = 48;
+                    minimalFirefoxVersion = 28;
+                } 
+
+                if ((browserName === "Chrome" && browserMajorVersion >= minimalChromeVersion) 
+                    || (browserName === "Safari" && browserMajorVersion >= minimalSafariVersion) 
+                    || (browserName === "Firefox" && browserMajorVersion >= minimalFirefoxVersion) 
+                    || (vm.browser === "Edge" && browserMajorVersion >= minimalEdgeVersion) 
+                    || (vm.browser === "IE" && browserMajorVersion >= minimalIEVersion)){
+                    console.log(browserName + " Supported");
+                }
+                else{
+                    vm.openIncompatibleBrowserModal = true;
+                    vm.incompatibleBrowserErrorMessage = browserName + " version " + browserMajorVersion + " is not supported.  You might expect inconsistent behaviours and shall not use the viewer to produce a diagnostic.";
+                    console.log(vm.incompatibleBrowserErrorMessage);
+                }
+                
+                vm.onCloseWarning = function(){
+                    vm.openIncompatibleBrowserModal = false;
+                } 
             }
-            else{
-                vm.openModel = true;
-                console.log(vm.browser + " Unsupported");
-            }
-            
-            vm.onCloseWarning = function(){
-                vm.openModel = false;
-            } 
 
             // Configure attributes default values
             vm.toolbarEnabled = typeof vm.toolbarEnabled !== 'undefined' ? vm.toolbarEnabled : true;
