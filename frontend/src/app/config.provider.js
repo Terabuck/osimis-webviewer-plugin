@@ -52,7 +52,7 @@
                                                               // @todo use ../../ instead
 
         if (__webViewerConfig.customOverlayProviderUrl) {
-            this.customOverlayProviderUrl = urlConvertor.toAbsoluteURL(__webViewerConfig.customOverlayProviderUrl) + "/";
+            this.customOverlayProviderUrl = urlConvertor.toAbsoluteURL(__webViewerConfig.customOverlayProviderUrl);
             console.log("Custom overlay provider URL: ", this.customOverlayProviderUrl);
         } else {
             this.customOverlayProviderUrl = undefined;
