@@ -129,7 +129,7 @@
                         vm.bottomLeftLines = vm.getBottomLeftArea(seriesTags, instanceTags);
                         vm.bottomRightLines = vm.getBottomRightArea(seriesTags, instanceTags);
 
-                        if (customOverlayInfo.icons) {
+                        if (customOverlayInfo !== undefined && customOverlayInfo.icons !== undefined) {
                             vm.updateIcons(customOverlayInfo.icons);
                         }
                     });
