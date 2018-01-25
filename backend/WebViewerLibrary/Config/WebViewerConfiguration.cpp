@@ -121,7 +121,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   defaultSelectedTool = OrthancPlugins::GetStringValue(wvConfig, "DefaultSelectedTool", "zoom");
   defaultStudyIslandsDisplayMode = OrthancPlugins::GetStringValue(wvConfig, "DefaultStudyIslandsDisplayMode", "grid");
   defaultLanguage = OrthancPlugins::GetStringValue(wvConfig, "DefaultLanguage", "en");
-  overlayIconsProviderUrl = OrthancPlugins::GetStringValue(wvConfig, "OverlayIconsProviderUrl", "");  // must be provided as a url relative to orthanc root url (i.e.: "/../overlayIcons/")
+  customOverlayProviderUrl = OrthancPlugins::GetStringValue(wvConfig, "CustomOverlayProviderUrl", "");  // must be provided as a url relative to orthanc root url (i.e.: "/../customOverlays/")
 
   if (toolbarLayoutMode != "flat" && toolbarLayoutMode != "tree")
   {
@@ -223,8 +223,8 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["defaultSelectedTool"] = defaultSelectedTool;
   config["defaultStudyIslandsDisplayMode"] = defaultStudyIslandsDisplayMode;
   config["defaultLanguage"] = defaultLanguage;
-  if (overlayIconsProviderUrl.length() > 0) {
-    config["overlayIconsProviderUrl"] = overlayIconsProviderUrl;
+  if (customOverlayProviderUrl.length() > 0) {
+    config["customOverlayProviderUrl"] = customOverlayProviderUrl;
   }
 
   return config;

@@ -114,13 +114,13 @@
             vm.getBottomRightArea = function(seriesTags, instanceTags) {
                 return [];
             };
-            vm.updateIcon = function(overlayIconsInfo) {
+            vm.updateIcons = function(overlayIconsInfo) {
                 vm.topLeftIcon = overlayIconsInfo.topLeftIcon;
                 vm.bottomLeftIcon = overlayIconsInfo.bottomLeftIcon;
                 vm.topRightIcon = overlayIconsInfo.topRightIcon;
                 vm.bottomRightIcon = overlayIconsInfo.bottomRightIcon;
             };
-            vm.updateLayout = function(seriesTags, imageId, overlayIconsInfo) {
+            vm.updateLayout = function(seriesTags, imageId, customOverlayInfo) {
                 wvInstanceManager
                     .getTags(imageId.split(":")[0]) // imageId is something like orthancId:frameId
                     .then(function(instanceTags) {
@@ -129,7 +129,9 @@
                         vm.bottomLeftLines = vm.getBottomLeftArea(seriesTags, instanceTags);
                         vm.bottomRightLines = vm.getBottomRightArea(seriesTags, instanceTags);
 
-                        vm.updateIcon(overlayIconsInfo);
+                        if (customOverlayInfo.icons) {
+                            vm.updateIcons(customOverlayInfo.icons);
+                        }
                     });
 
             };
@@ -138,14 +140,14 @@
             if (ctrls.series) {
                 var series = ctrls.series.getSeriesPromise().then(function(series) {
                     vm.wvSeries = series;
-                    vm.updateLayout(vm.wvSeries.tags, vm.wvSeries.imageIds[vm.wvSeries.currentShownIndex], vm.wvSeries.overlayIconsInfo);
+                    vm.updateLayout(vm.wvSeries.tags, vm.wvSeries.imageIds[vm.wvSeries.currentShownIndex], vm.wvSeries.customOverlayInfo);
 
                     ctrls.series.onSeriesChanged(_this, function(series) {
                         vm.wvSeries = series;
-                        vm.updateLayout(vm.wvSeries.tags, vm.wvSeries.imageIds[vm.wvSeries.currentShownIndex], vm.wvSeries.overlayIconsInfo);
+                        vm.updateLayout(vm.wvSeries.tags, vm.wvSeries.imageIds[vm.wvSeries.currentShownIndex], vm.wvSeries.customOverlayInfo);
                     });
                     ctrls.series.onCurrentImageIdChanged(_this, function(imageId, notUsed) {
-                        vm.updateLayout(vm.wvSeries.tags, imageId, vm.wvSeries.overlayIconsInfo);
+                        vm.updateLayout(vm.wvSeries.tags, imageId, vm.wvSeries.customOverlayInfo);
                     });
 
                     scope.$on('$destroy', function() {
