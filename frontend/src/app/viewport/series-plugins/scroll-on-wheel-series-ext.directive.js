@@ -54,7 +54,7 @@
     }
 
     /* @ngInject */
-    function Controller($scope, $element, $attrs, hamster) {
+    function Controller($scope, $element, $attrs, hamster, wvPaneManager, wvSeriesManager) {
         var vm = this;
 
         var _wvSeriesIdViewModels = [];
@@ -98,6 +98,7 @@
             hamsterInstance.wheel(function(event, delta, deltaX, deltaY) {
                 $scope.$apply(function() {
                     var series = viewmodel.getSeries();
+                    var panes = wvPaneManager.getAllPanes();
 
                     if (!series) {
                         return;
@@ -108,6 +109,23 @@
                     else if (deltaY > 0) {
                         // @todo calibrate the required speed and accuracy for the enduser
                         series.goToNextImage(true);
+                    }
+
+                    if (true && panes.length > 1) {
+                        series.getCurrentImage().then(function(currentImage) {
+                            var currentPatientPosition = currentImage.tags.ImagePositionPatient.split("\\");
+                            for (var i=0; i < panes.length; ++i) {
+                                if (panes[i].seriesId !== undefined && panes[i].seriesId != series.id && panes[i].series.isSameOrientationAs(series)) {
+                                    console.log("Found a series with same orientation in pane " + i, panes[i].series);
+                                    panes[i].series.getIndexOfClosestImageFrom(currentPatientPosition)
+                                        .then(function(closestIndexResponse) {
+                                            console.log("Closest index is " + closestIndexResponse.closestIndex);
+                                            console.log(closestIndexResponse.series);
+                                            closestIndexResponse.series.goToImage(closestIndexResponse.closestIndex);
+                                    });
+                                }
+                            }
+                        });
                     }
                 });
 

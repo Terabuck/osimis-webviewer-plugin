@@ -218,7 +218,8 @@
                 hflip: false,
                 rotateLeft: false,
                 rotateRight: false,
-                arrowAnnotate: false
+                arrowAnnotate: false,
+                synchro: false
             };
 
             console.log('default tool: ', vm.toolbarDefaultTool)
@@ -266,7 +267,8 @@
                             {type: "button", tool: "arrowAnnotate"},
                         ]
                     },
-                    {type: "button", tool: "keyImageCapture"}
+                    {type: "button", tool: "keyImageCapture"},
+                    {type: "button", tool: "synchro"}
                 ]
             }
             vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];

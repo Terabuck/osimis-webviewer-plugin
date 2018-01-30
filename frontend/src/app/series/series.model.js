@@ -366,6 +366,39 @@
 
             return this._annotationGroup;
         };
+
+        WvSeries.prototype.isSameOrientationAs = function(otherSeries) {
+            return (this.tags.ImageOrientationPatient == otherSeries.tags.ImageOrientationPatient
+                && this.tags.FrameOfReferenceUID == this.tags.FrameOfReferenceUID);
+        };
+
+        WvSeries.prototype.getIndexOfClosestImageFrom = function(otherImagePositionPatientVector) {
+            var _this = this;
+            var imageTagsPromises = this.imageIds.map(function(imageId) {
+                return wvImageManager.get(imageId);
+            });
+
+            return Promise.all(imageTagsPromises).then(function(images) {
+                var closestIndex = -1;
+                var closestDistance = 99999;
+                // console.log("searching slice closest to ", otherImagePositionPatientVector);
+                for (var i=0; i < images.length; ++i) {
+                    var imagePositionVector = images[i].tags.ImagePositionPatient.split("\\");
+                    var distance = Math.abs(parseFloat(otherImagePositionPatientVector[0]) - parseFloat(imagePositionVector[0]))
+                        + Math.abs(parseFloat(otherImagePositionPatientVector[1]) - parseFloat(imagePositionVector[1]))
+                        + Math.abs(parseFloat(otherImagePositionPatientVector[2]) - parseFloat(imagePositionVector[2]));
+
+                    // console.log("distance is " + distance + "for slice " + i, imagePositionVector);
+                    if (distance < closestDistance) {
+                        closestIndex = i;
+                        closestDistance = distance;
+                    }
+                }
+
+                return {'closestIndex':closestIndex, 'series': _this};
+            });
+
+        };
         
         ////////////////
 
