@@ -233,11 +233,13 @@
         };
 
         WvSeries.prototype.goToPreviousImage = function(restartWhenSeriesEnd) {
+            restartWhenSeriesEnd = restartWhenSeriesEnd || false;
+
             if (this.currentIndex > 0) {
                 this.currentIndex--;
                 this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
             }
-            else if (this.currentIndex <= 0) {
+            else if (this.currentIndex <= 0 && restartWhenSeriesEnd) {
                 this.currentIndex = this.imageCount -1;
                 this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
             }

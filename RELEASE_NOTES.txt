@@ -25,6 +25,7 @@ Features:
 TODO: lot's of feature to re-integrate in release notes
 
 Fixes:
+* Scrolling with wheel mouse: when reaching the end of a series, go back to the other end (this worked only in one direction)
 * Annotation readback
 * Magnifying glass not always on top of image
 * WVB-312 + WVB-120: Wrong measurements in US and XA

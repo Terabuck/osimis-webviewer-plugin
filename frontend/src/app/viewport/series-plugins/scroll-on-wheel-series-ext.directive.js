@@ -103,11 +103,11 @@
                         return;
                     }
                     else if (deltaY < 0) {
-                        series.goToPreviousImage();
+                        series.goToPreviousImage(true);
                     }
                     else if (deltaY > 0) {
                         // @todo calibrate the required speed and accuracy for the enduser
-                        series.goToNextImage(false);
+                        series.goToNextImage(true);
                     }
                 });
 
