@@ -1035,7 +1035,7 @@ $steps: (
   width: 320px;
   min-height: 130px;
   z-index: 999;
-  left: 40%;
+  left: calc(50% - 160px);
   border: #000 solid 1px;
   -webkit-border-radius: 7px;
   -moz-border-radius: 7px;
@@ -1063,19 +1063,15 @@ $steps: (
 
 .wvWarning-content{
   position: relative;
-  left: 37px;
   width: 190px;
   min-height: 88px;
+  margin: auto;
 }
 .wvWarning-icon{
-  font-size: 62px;
-  position: relative;
-  top: 25px;
+  font-size: 32px;
 }
 .wvWarning-text{
   position: relative;
-  top: -35px;
-  left: 65px;
 }
 .wvWarning-button{
   background-color: #f1ededcc;

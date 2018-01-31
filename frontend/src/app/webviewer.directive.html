@@ -1,15 +1,14 @@
 <!-- browser specific warning model -->
 <div ng-show="vm.openIncompatibleBrowserModal" class="wvWarning">
     <div class="wvWarning-content clearfix">
-        <i class="fa fa-exclamation-triangle wvWarning-icon"></i>
         <span class="wvWarning-text ">
-            <h2 style="margin: 0px;">Warning!</h2>
-            <p style="margin: 0px; margin-top: 2px; color:#000">
+            <h2 class="mb10"><span class="fa fa-exclamation-triangle wvWarning-icon mr5"></span>Warning!</h2>
+            <p class="mn mb10" style="color:#000">
             {{vm.incompatibleBrowserErrorMessage}}
             </h5>
         </span> 
     </div>
-    <div class="text-right">
+    <div class="text-right mb10 mr10">
         <button class="btn btn-primary" ng-click="vm.onCloseWarning()">OK</button>
     </div>
 </div>

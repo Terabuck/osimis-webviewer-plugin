@@ -190,7 +190,7 @@
 
                 vm.openIncompatibleBrowserModal = false;
                 console.log("Checking browser compatibility:", wvConfig.browser);
-                var minimalChromeVersion =  99; //45;
+                var minimalChromeVersion =  45;
                 var minimalSafariVersion = 9;
                 var minimalFirefoxVersion = 48;
                 var minimalEdgeVersion = 14;
