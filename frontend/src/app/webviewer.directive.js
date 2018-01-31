@@ -225,9 +225,6 @@
             if (vm.toolbarDefaultTool) {
                 vm.tools[vm.toolbarDefaultTool] = true;
                 vm.activeTool = vm.toolbarDefaultTool;
-            } else {
-                vm.tools.touchGesture = true;
-                vm.activeTool = 'touchGesture';
             }
 
             if (vm.keyImageCaptureEnabled) { // activate
