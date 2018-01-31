@@ -106,6 +106,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   videoDisplayEnabled = OrthancPlugins::GetBoolValue(wvConfig, "VideoDisplayEnabled", true);
   annotationStorageEnabled = OrthancPlugins::GetBoolValue(wvConfig, "AnnotationStorageEnabled", false);
   keyImageCaptureEnabled = OrthancPlugins::GetBoolValue(wvConfig, "KeyImageCaptureEnabled", false);
+  touchGestureEnabled = OrthancPlugins::GetBoolValue(wvConfig, "TouchGestureEnabled", false);
   showStudyInformationBreadcrumb = OrthancPlugins::GetBoolValue(wvConfig, "ShowStudyInformationBreadcrumb", false);
   shortTermCachePrefetchOnInstanceStored = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCachePrefetchOnInstanceStored", false);
   shortTermCacheEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheEnabled", true);
@@ -212,6 +213,7 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["enableVideoDisplay"] = videoDisplayEnabled;
   config["enableAnnotationStorage"] = annotationStorageEnabled;
   config["enableKeyImageCapture"] = keyImageCaptureEnabled;
+  config["enableTouchGesture"] = touchGestureEnabled;
   config["showStudyInformationBreadcrumb"] = showStudyInformationBreadcrumb;
   config["windowingPresets"] = windowingPresets;
   config["enableHighQualityImagePreloading"] = highQualityImagePreloadingEnabled;

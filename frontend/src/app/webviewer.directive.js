@@ -158,6 +158,7 @@
                 studyDownloadEnabled: '=?wvStudyDownloadEnabled',
                 videoDisplayEnabled: '=?wvVideoDisplayEnabled',
                 keyImageCaptureEnabled: '=?wvKeyImageCaptureEnabled',
+                touchGestureEnabled: '=?wvTouchGestureEnabled',
                 showNoReportIconInSeriesList: '=?wvShowNoReportIconInSeriesList',
                 reduceTimelineHeightOnSingleFrameSeries: '=?wvReduceTimelineHeightOnSingleFrameSeries',
                 buttonsSize: '=?wvButtonsSize',  // small | large
@@ -194,7 +195,6 @@
             vm.noticeText = typeof vm.noticeText !== 'undefined' ? vm.noticeText : undefined;
             vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;
             vm.tools = typeof vm.tools !== 'undefined' ? vm.tools : {
-                touchGesture: false,
                 windowing: false,
                 zoom: false,
                 pan: false,
@@ -221,19 +221,23 @@
                 arrowAnnotate: false
             };
 
+            if (vm.keyImageCaptureEnabled) { // activate
+                vm.tools.keyImageCapture = false;
+            }
+            if (vm.touchGestureEnabled) { // activate}
+                vm.tools.touchGesture = false;
+            }
+
             console.log('default tool: ', vm.toolbarDefaultTool)
             if (vm.toolbarDefaultTool) {
                 vm.tools[vm.toolbarDefaultTool] = true;
                 vm.activeTool = vm.toolbarDefaultTool;
             }
 
-            if (vm.keyImageCaptureEnabled) { // activate
-                vm.tools.keyImageCapture = false;
-            }
             if (vm.toolboxButtonsOrdering === undefined) {
                 vm.toolboxButtonsOrdering = [
                     {type: "button", tool: "layout"},
-                    // {type: "button", tool: "touchGesture"},
+                    {type: "button", tool: "touchGesture"},
                     {type: "button", tool: "zoom"},
                     {type: "button", tool: "pan"},
                     {
@@ -271,6 +275,7 @@
             vm.studyDownloadEnabled = typeof vm.studyDownloadEnabled !== 'undefined' ? vm.studyDownloadEnabled : false;
             vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
             vm.keyImageCaptureEnabled = typeof vm.keyImageCaptureEnabled !== 'undefined' ? vm.keyImageCaptureEnabled : false;
+            vm.touchGestureEnabled = typeof vm.touchGestureEnabled !== 'undefined' ? vm.touchGestureEnabled : false;
             vm.studyIslandsDisplayMode = typeof vm.studyIslandsDisplayMode !== 'undefined' ? vm.studyIslandsDisplayMode : "grid";
             vm.paneManager = wvPaneManager;
 

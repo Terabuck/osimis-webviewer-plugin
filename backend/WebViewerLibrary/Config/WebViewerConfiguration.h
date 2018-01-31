@@ -73,6 +73,7 @@ public:
   // annotations. This image is considered as a DICOM Key Image Note (see
   // `http://wiki.ihe.net/index.php/Key_Image_Note`).
   bool keyImageCaptureEnabled;
+  bool touchGestureEnabled;
 
   WebViewerConfiguration(OrthancPluginContext* context);
   /**
