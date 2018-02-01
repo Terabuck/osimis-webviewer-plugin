@@ -12,16 +12,13 @@
      */
 
     /* @ngInject */
-    function wvKeyboardShortcutEventManager(){
+    function wvKeyboardShortcutEventManager(wvConfig){
         keyboardJS.setContext('viewerShortcut');
-        var service = {
-            down: createEvent('down'),
-            up: createEvent('up'),
-            left: createEvent('left'),
-            right: createEvent('right'),
-            majUp: createEvent('shift + up'),
-            majDown: createEvent('shift + down'),
-        };
+
+        var service = {};
+        for (var keyboardCode in wvConfig.keyboardShortcuts) {
+            service[wvConfig.keyboardShortcuts[keyboardCode]] = createEvent(keyboardCode);
+        }
         return service
 
         ////////////
@@ -30,7 +27,7 @@
             var listener = new osimis.Listener();
 
             keyboardJS.bind(keyboardCode, function(e){
-                console.log('keyCode', keyboardCode, 'isTrigerred');
+                console.log('keyboard shortcut listener for ', keyboardCode, ' is being triggered');
                 listener.trigger(e);
             });
 

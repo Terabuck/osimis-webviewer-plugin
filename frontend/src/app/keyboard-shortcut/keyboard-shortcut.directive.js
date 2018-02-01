@@ -6,7 +6,7 @@
         .directive('wvKeyboardShortcut', keyboardShortcut);
 
     /* @ngInject */
-    function keyboardShortcut($rootScope, wvAnnotationManager, wvStudyManager, wvSeriesManager, wvPdfInstanceManager, wvVideoManager, wvPaneManager, wvKeyboardShortcutEventManager) {
+    function keyboardShortcut($rootScope, wvAnnotationManager, wvStudyManager, wvSeriesManager, wvPdfInstanceManager, wvVideoManager, wvPaneManager, wvKeyboardShortcutEventManager, wvConfig) {
         
         // Keep track of listener unbind functions (so we can close events).
         var _unbindListenerFns = [];
@@ -31,7 +31,7 @@
             var _this = this;
             var webviewer = ctrls.webviewer;
 
-            wvKeyboardShortcutEventManager.majDown(this, function(e){
+            wvKeyboardShortcutEventManager.nextStudy(this, function(e){
                 var selectedPane = wvPaneManager.getSelectedPane(),
                     selectedStudyIds = webviewer.selectedStudyIds,
                     nextStudyId;
@@ -55,7 +55,7 @@
                 })
             });
 
-            wvKeyboardShortcutEventManager.majUp(this, function(e){
+            wvKeyboardShortcutEventManager.previousStudy(this, function(e){
                 var selectedPane = wvPaneManager.getSelectedPane(),
                     selectedStudyIds = webviewer.selectedStudyIds,
                     previousStudyId;
@@ -79,7 +79,7 @@
                 })
             });
 
-            wvKeyboardShortcutEventManager.down(this, function(e){
+            wvKeyboardShortcutEventManager.nextSeries(this, function(e){
                 var selectedPane = wvPaneManager.getSelectedPane();
                 selectedPane.getStudy().then(function(study){
                     var currentItemId = selectedPane.seriesId || selectedPane.videoId || selectedPane.reportId,
@@ -100,7 +100,7 @@
             });
             
 
-            wvKeyboardShortcutEventManager.up(this, function(e){
+            wvKeyboardShortcutEventManager.previousSeries(this, function(e){
                 var selectedPane = wvPaneManager.getSelectedPane();
                 selectedPane.getStudy().then(function(study){
                     var currentItemId = selectedPane.seriesId || selectedPane.videoId || selectedPane.reportId,
@@ -121,19 +121,19 @@
                 });            
             });
 
-            wvKeyboardShortcutEventManager.left(this, function(e){
+            wvKeyboardShortcutEventManager.previousImage(this, function(e){
                 var selectedPane = wvPaneManager.getSelectedPane();
                 selectedPane.series.goToPreviousImage(true);
             });
 
-            wvKeyboardShortcutEventManager.right(this, function(e){
+            wvKeyboardShortcutEventManager.nextImage(this, function(e){
                 var selectedPane = wvPaneManager.getSelectedPane();
                 selectedPane.series.goToNextImage(true);
             });
             
             scope.$on('$destroy', function() {
-                wvKeyboardShortcutEventManager.down.close(_this);
-                wvKeyboardShortcutEventManager.up.close(_this);
+                wvKeyboardShortcutEventManager.nextSeries.close(_this);
+                wvKeyboardShortcutEventManager.previousSeries.close(_this);
             })
         }
     }

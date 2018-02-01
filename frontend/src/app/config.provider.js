@@ -59,7 +59,16 @@
             "windowingRight": "decrease-ww",
             "windowingUp" : "increase-wc",
             "windowingDown" : "decrease-wc"
-        }
+        };
+        this.keyboardShortcuts = {
+            "left" : "previousImage",
+            "right" : "nextImage",
+            "up" : "previousSeries",
+            "down" : "nextSeries",
+            "shift + up" : "previousStudy",
+            "shift + down" : "nextStudy"
+        };
+
     };
 
     /**
