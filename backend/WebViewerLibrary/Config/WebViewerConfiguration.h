@@ -67,6 +67,8 @@ public:
   std::string defaultSelectedTool;
   std::string defaultStudyIslandsDisplayMode;
   Json::Value windowingPresets;
+  Json::Value mouseBehaviour;
+  Json::Value keyboardShortcuts;
 
   // If activated, this feature displays a button on each viewport. When the button is
   // clicked, a new series is created with the image of the viewport, including the

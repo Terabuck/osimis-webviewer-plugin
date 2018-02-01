@@ -45,6 +45,26 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   windowingPresets[5]["windowCenter"] = 300;
   windowingPresets[5]["windowWidth"] = 600;
 
+  mouseBehaviour = Json::Value(Json::objectValue);
+  mouseBehaviour["windowingLeft"] = "decrease-ww";
+  mouseBehaviour["windowingRight"] = "increase-ww";
+  mouseBehaviour["windowingUp"] = "decrease-wc";
+  mouseBehaviour["windowingDown"] = "increase-wc";
+  mouseBehaviour["leftButton"] = "windowing";
+  mouseBehaviour["middleButton"] = "pan";
+  mouseBehaviour["rightButton"] = "zoom";
+  mouseBehaviour["oneTouchPan"] = "pan";
+  mouseBehaviour["twoTouchPan"] = "pan";
+  mouseBehaviour["twoTouchPinch"] = "zoom";
+  mouseBehaviour["threeTouchPan"] = "windowing";
+
+  keyboardShortcuts = Json::Value(Json::objectValue);
+  keyboardShortcuts["left"] = "previousImage";
+  keyboardShortcuts["right"] = "nextImage";
+  keyboardShortcuts["up"] = "previousSeries";
+  keyboardShortcuts["down"] = "nextSeries";
+  keyboardShortcuts["shift + up"] = "previousStudy";
+  keyboardShortcuts["shift + down"] = "nextStudy";
 
   gdcmEnabled = OrthancPlugins::GetBoolValue(wvConfig, "GdcmEnabled", true);
   // By default, use GDCM for everything.
@@ -84,7 +104,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   if (wvConfig.isMember("WindowingPresets") &&
       wvConfig["WindowingPresets"].type() == Json::arrayValue)
   {
-    windowingPresets = windowingPresets = Json::Value(Json::arrayValue);  // remove default values
+    windowingPresets = Json::Value(Json::arrayValue);  // remove default values
 
     for (Json::Value::ArrayIndex i = 0; i < wvConfig["WindowingPresets"].size(); i++)
     {
@@ -98,6 +118,36 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
         windowingPresets[i]["windowCenter"] = preset["WindowCenter"];
         windowingPresets[i]["windowWidth"] = preset["WindowWidth"];
       }
+    }
+  }
+
+  // Retrieve mouseBehaviour (if set).
+  if (wvConfig.isMember("MouseBehaviour") &&
+      wvConfig["MouseBehaviour"].type() == Json::objectValue)
+  {
+    mouseBehaviour = Json::Value(Json::objectValue);  // remove default values
+
+    Json::Value::Members members = wvConfig["MouseBehaviour"].getMemberNames();
+
+    for (size_t i = 0; i < members.size(); i++)
+    {
+      // TODO: check validity of mouseBehaviour
+      mouseBehaviour[members[i].c_str()] = wvConfig["MouseBehaviour"][members[i]];
+    }
+  }
+
+  // Retrieve keyboardShortcuts (if set).
+  if (wvConfig.isMember("KeyboardShortcuts") &&
+      wvConfig["KeyboardShortcuts"].type() == Json::objectValue)
+  {
+    keyboardShortcuts = Json::Value(Json::objectValue);  // remove default values
+
+    Json::Value::Members members = wvConfig["KeyboardShortcuts"].getMemberNames();
+
+    for (size_t i = 0; i < members.size(); i++)
+    {
+      // TODO: check validity of keyboardShortcuts
+      keyboardShortcuts[members[i].c_str()] = wvConfig["KeyboardShortcuts"][members[i]];
     }
   }
 
@@ -216,6 +266,8 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["enableTouchGesture"] = touchGestureEnabled;
   config["showStudyInformationBreadcrumb"] = showStudyInformationBreadcrumb;
   config["windowingPresets"] = windowingPresets;
+  config["mouseBehaviour"] = mouseBehaviour;
+  config["keyboardShortcuts"] = keyboardShortcuts;
   config["enableHighQualityImagePreloading"] = highQualityImagePreloadingEnabled;
   config["reduceTimelineHeightOnSingleFrameSeries"] = reduceTimelineHeightOnSingleFrameSeries;
   config["showNoReportIconInSeriesList"] = showNoReportIconInSeriesList;
