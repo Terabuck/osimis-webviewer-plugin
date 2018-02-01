@@ -14,7 +14,7 @@
         });
 
     /* @ngInject */
-    function wvWindowingViewportTool($, $parse, WvBaseTool) {
+    function wvWindowingViewportTool($, $parse, WvBaseTool, wvConfig) {
         var directive = {
         	require: 'wvWindowingViewportTool',
             controller: Controller,
@@ -111,9 +111,37 @@
                 // var scale = Math.max(1, Math.min(+viewportData.getScaleForFullResolution(), 3));
                 var scale = 1;
 
+                var deltaWW = 0;
+                var deltaWC = 0;
+
+                if (deltaX < 0) {
+                    if (wvConfig.mouseBehaviour.windowingLeft == "increase-ww") { deltaWW = -deltaX; }
+                    if (wvConfig.mouseBehaviour.windowingLeft == "decrease-ww") { deltaWW = deltaX; }
+                    if (wvConfig.mouseBehaviour.windowingLeft == "increase-wc") { deltaWC = -deltaX; }
+                    if (wvConfig.mouseBehaviour.windowingLeft == "decrease-wc") { deltaWC = deltaX; }
+                }
+                if (deltaX > 0) {
+                    if (wvConfig.mouseBehaviour.windowingRight == "increase-ww") { deltaWW = deltaX; }
+                    if (wvConfig.mouseBehaviour.windowingRight == "decrease-ww") { deltaWW = -deltaX; }
+                    if (wvConfig.mouseBehaviour.windowingRight == "increase-wc") { deltaWC = deltaX; }
+                    if (wvConfig.mouseBehaviour.windowingRight == "decrease-wc") { deltaWC = -deltaX; }
+                }
+                if (deltaY < 0) {
+                    if (wvConfig.mouseBehaviour.windowingUp == "increase-ww") { deltaWW = -deltaY; }
+                    if (wvConfig.mouseBehaviour.windowingUp == "decrease-ww") { deltaWW = deltaY; }
+                    if (wvConfig.mouseBehaviour.windowingUp == "increase-wc") { deltaWC = -deltaY; }
+                    if (wvConfig.mouseBehaviour.windowingUp == "decrease-wc") { deltaWC = deltaY; }
+                }
+                if (deltaY > 0) {
+                    if (wvConfig.mouseBehaviour.windowingDown == "increase-ww") { deltaWW = deltaY; }
+                    if (wvConfig.mouseBehaviour.windowingDown == "decrease-ww") { deltaWW = -deltaY; }
+                    if (wvConfig.mouseBehaviour.windowingDown == "increase-wc") { deltaWC = deltaY; }
+                    if (wvConfig.mouseBehaviour.windowingDown == "decrease-wc") { deltaWC = -deltaY; }
+                }
+
                 // Calculate the new ww/wc.
-                var newWindowWidth = +viewportData.voi.windowWidth + (deltaX / scale * strength);
-                var newWindowCenter = +viewportData.voi.windowCenter + (deltaY / scale * strength);
+                var newWindowWidth = +viewportData.voi.windowWidth + (deltaWW / scale * strength);
+                var newWindowCenter = +viewportData.voi.windowCenter + (deltaWC / scale * strength);
 
                 // Clamp windowing values to the min/max one availables, so
                 // image doesn't become invisible because of out of scope

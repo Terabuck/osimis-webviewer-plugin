@@ -54,6 +54,12 @@
         this.httpRequestHeaders = {};
         this.enableHighQualityImagePreloading = __webViewerConfig.enableHighQualityImagePreloading;
         this.showBreadCrumb = __webViewerConfig.showBreadCrumb;
+        this.mouseBehaviour = { 
+            "windowingLeft": "increase-ww",
+            "windowingRight": "decrease-ww",
+            "windowingUp" : "increase-wc",
+            "windowingDown" : "decrease-wc"
+        }
     };
 
     /**

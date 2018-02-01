@@ -21,7 +21,7 @@
         });
 
     /* @ngInject */
-    function wvMobileViewportTool($parse, WvBaseTool) {
+    function wvMobileViewportTool($parse, WvBaseTool, wvConfig) {
         var directive = {
             require: 'wvMobileViewportTool',
             controller: MobileViewportToolVM,
@@ -51,6 +51,7 @@
             // Cache hammer instances for memory clean up
             var _hammers = {};
             this._activateInputs = function(viewport) {
+                var _this = this;
                 // Call parent method
                 WvBaseTool.prototype._activateInputs.apply(this, arguments);
 
@@ -61,45 +62,26 @@
                 _hammers[viewport]["windowing"] = new Hammer(enabledElement);
                 _hammers[viewport]["windowing"].get('pan').set({
                     direction: Hammer.DIRECTION_ALL,
-                    pointers: 3
+                    pointers: 1
                 });
+
                 // 2. Update window width
                 _hammers[viewport]["windowing"].on("panup", function(ev) {
-                    if(ev.pointerType !== "touch"){
-                        return;
-                    }
-                    var viewportData = viewport.getViewport();
-                    viewportData.voi.windowWidth += 0.04 * viewportData.voi.windowWidth;
-                    viewport.setViewport(viewportData);
-                    viewport.draw(false);
+                    _this._applyWindowing("windowingUp", viewport, ev);
+                    return;
                 });
                 _hammers[viewport]["windowing"].on("pandown", function(ev) {
-                    if(ev.pointerType !== "touch"){
-                        return;
-                    }
-                    var viewportData = viewport.getViewport();
-                    viewportData.voi.windowWidth -= 0.04 * viewportData.voi.windowWidth;
-                    viewport.setViewport(viewportData);
-                    viewport.draw(false);
+                    _this._applyWindowing("windowingDown", viewport, ev);
+                    return;
                 });
                 // 3. Update window center
                 _hammers[viewport]["windowing"].on("panleft", function(ev) {
-                    if(ev.pointerType !== "touch"){
-                        return;
-                    }
-                    var viewportData = viewport.getViewport();
-                    viewportData.voi.windowCenter += 0.04 * viewportData.voi.windowCenter;
-                    viewport.setViewport(viewportData);
-                    viewport.draw(false);
+                    _this._applyWindowing("windowingLeft", viewport, ev);
+                    return;
                 });
                 _hammers[viewport]["windowing"].on("panright", function(ev) {
-                    if(ev.pointerType !== "touch"){
-                        return;
-                    }
-                    var viewportData = viewport.getViewport();
-                    viewportData.voi.windowCenter -= 0.04 * viewportData.voi.windowCenter;
-                    viewport.setViewport(viewportData);
-                    viewport.draw(false);
+                    _this._applyWindowing("windowingRight", viewport, ev);
+                    return;
                 });
 
                 // Add panning via 2 fingers
@@ -107,7 +89,7 @@
                 _hammers[viewport]["panning"] = new Hammer(enabledElement);
                 _hammers[viewport]["panning"].get('pan').set({
                     direction: Hammer.DIRECTION_ALL,
-                    pointers: 1
+                    pointers: 2
                 });
                 var lastPanningCenter = null;
                 _hammers[viewport]["panning"].on("pan", function(ev) {
@@ -147,6 +129,28 @@
                 _hammers[viewport]["panning"].destroy();
                 delete _hammers[viewport];
             };
+
+            this._applyWindowing = function(windowingDirection, viewport, ev) {
+                if(ev.pointerType !== "touch"){
+                    return;
+                }
+                ev.preventDefault();
+                var viewportData = viewport.getViewport();
+
+                var deltaWW = 0;
+                var deltaWC = 0;
+                var maxPixelValue = viewport._displayedCornerstoneImageObject.maxPixelValue || 1000;
+
+                if (wvConfig.mouseBehaviour[windowingDirection] == "increase-ww") { deltaWW = +1; }
+                if (wvConfig.mouseBehaviour[windowingDirection] == "decrease-ww") { deltaWW = -1; }
+                if (wvConfig.mouseBehaviour[windowingDirection] == "increase-wc") { deltaWC = +1; }
+                if (wvConfig.mouseBehaviour[windowingDirection] == "decrease-wc") { deltaWC = -1; }
+
+                viewportData.voi.windowWidth += deltaWW * 0.04 * maxPixelValue;
+                viewportData.voi.windowCenter += deltaWC *0.04 * maxPixelValue;
+                viewport.setViewport(viewportData);
+                viewport.draw(false);
+            }
 
         }
         MobileViewportToolVM.prototype = Object.create(WvBaseTool.prototype);
