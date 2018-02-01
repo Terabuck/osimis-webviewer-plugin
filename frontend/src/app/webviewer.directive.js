@@ -418,19 +418,19 @@
 
                 switch (action) {
                 case 'invert':
-                    selectedPane.csViewport.invert = !selectedPane.csViewport.invert;
+                    selectedPane.invertColor();
                     break;
                 case 'vflip':
-                    selectedPane.csViewport.vflip = !selectedPane.csViewport.vflip;
+                    selectedPane.flipVertical();
                     break;
                 case 'hflip':
-                    selectedPane.csViewport.hflip = !selectedPane.csViewport.hflip;
+                    selectedPane.flipHorizontal();
                     break;
                 case 'rotateLeft':
-                    selectedPane.csViewport.rotation = selectedPane.csViewport.rotation - 90;
+                    selectedPane.rotateLeft();
                     break;
                 case 'rotateRight':
-                    selectedPane.csViewport.rotation = selectedPane.csViewport.rotation + 90;
+                    selectedPane.rotateRight();
                     break;
                 default:
                     throw new Error('Unknown toolbar action.');

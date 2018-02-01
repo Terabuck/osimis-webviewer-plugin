@@ -167,7 +167,27 @@
 
     Pane.prototype.isAtPosition = function(x, y) {
         return this.x === x && this.y === y;
-    }
+    };
+
+    Pane.prototype.rotateLeft = function() {
+        this.csViewport.rotation = this.csViewport.rotation - 90;
+    };
+    
+    Pane.prototype.rotateRight = function() {
+        this.csViewport.rotation = this.csViewport.rotation - 90;
+    };
+    
+    Pane.prototype.flipVertical = function() {
+        this.csViewport.vflip = !this.csViewport.vflip;
+    };
+    
+    Pane.prototype.flipHorizontal = function() {
+        this.csViewport.hflip = !this.csViewport.hflip;
+    };
+    
+    Pane.prototype.invertColor = function() {
+        this.csViewport.invert = !this.csViewport.invert;
+    };
 
     osimis.Pane = Pane;
 

@@ -31,7 +31,7 @@
             var _this = this;
             var webviewer = ctrls.webviewer;
 
-            wvKeyboardShortcutEventManager.nextStudy(this, function(e){
+            wvKeyboardShortcutEventManager.nextStudy && wvKeyboardShortcutEventManager.nextStudy(this, function(e){
                 var selectedPane = wvPaneManager.getSelectedPane(),
                     selectedStudyIds = webviewer.selectedStudyIds,
                     nextStudyId;
@@ -55,7 +55,7 @@
                 })
             });
 
-            wvKeyboardShortcutEventManager.previousStudy(this, function(e){
+            wvKeyboardShortcutEventManager.previousStudy && wvKeyboardShortcutEventManager.previousStudy(this, function(e){
                 var selectedPane = wvPaneManager.getSelectedPane(),
                     selectedStudyIds = webviewer.selectedStudyIds,
                     previousStudyId;
@@ -79,7 +79,7 @@
                 })
             });
 
-            wvKeyboardShortcutEventManager.nextSeries(this, function(e){
+            wvKeyboardShortcutEventManager.nextSeries && wvKeyboardShortcutEventManager.nextSeries(this, function(e){
                 var selectedPane = wvPaneManager.getSelectedPane();
                 selectedPane.getStudy().then(function(study){
                     var currentItemId = selectedPane.seriesId || selectedPane.videoId || selectedPane.reportId,
@@ -100,7 +100,7 @@
             });
             
 
-            wvKeyboardShortcutEventManager.previousSeries(this, function(e){
+            wvKeyboardShortcutEventManager.previousSeries && wvKeyboardShortcutEventManager.previousSeries(this, function(e){
                 var selectedPane = wvPaneManager.getSelectedPane();
                 selectedPane.getStudy().then(function(study){
                     var currentItemId = selectedPane.seriesId || selectedPane.videoId || selectedPane.reportId,
@@ -121,17 +121,38 @@
                 });            
             });
 
-            wvKeyboardShortcutEventManager.previousImage(this, function(e){
+            wvKeyboardShortcutEventManager.previousImage && wvKeyboardShortcutEventManager.previousImage(this, function(e){
                 var selectedPane = wvPaneManager.getSelectedPane();
                 selectedPane.series.goToPreviousImage(true);
             });
 
-            wvKeyboardShortcutEventManager.nextImage(this, function(e){
+            wvKeyboardShortcutEventManager.nextImage && wvKeyboardShortcutEventManager.nextImage(this, function(e){
                 var selectedPane = wvPaneManager.getSelectedPane();
                 selectedPane.series.goToNextImage(true);
             });
+
+            wvKeyboardShortcutEventManager.rotateLeft && wvKeyboardShortcutEventManager.rotateLeft(this, function(e){
+                wvPaneManager.getSelectedPane().rotateLeft();
+            });
+            
+            wvKeyboardShortcutEventManager.rotateRight && wvKeyboardShortcutEventManager.rotateRight(this, function(e){
+                wvPaneManager.getSelectedPane().rotateRight();
+            });
+            
+            wvKeyboardShortcutEventManager.flipVertical && wvKeyboardShortcutEventManager.flipVertical(this, function(e){
+                wvPaneManager.getSelectedPane().flipVertical();
+            });
+
+            wvKeyboardShortcutEventManager.flipHorizontal && wvKeyboardShortcutEventManager.flipHorizontal(this, function(e){
+                wvPaneManager.getSelectedPane().flipHorizontal();
+            });
+            
+            wvKeyboardShortcutEventManager.invertColor && wvKeyboardShortcutEventManager.invertColor(this, function(e){
+                wvPaneManager.getSelectedPane().invertColor();
+            });
             
             scope.$on('$destroy', function() {
+                //TODO: close all listeners
                 wvKeyboardShortcutEventManager.nextSeries.close(_this);
                 wvKeyboardShortcutEventManager.previousSeries.close(_this);
             })

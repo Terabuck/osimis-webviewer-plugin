@@ -132,6 +132,10 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
     for (size_t i = 0; i < members.size(); i++)
     {
       // TODO: check validity of mouseBehaviour
+      // check key is valid
+      // check value is valid
+      // check keys are not duplicated
+      // check values are not duplicated (TBC)
       mouseBehaviour[members[i].c_str()] = wvConfig["MouseBehaviour"][members[i]];
     }
   }
@@ -146,7 +150,10 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
 
     for (size_t i = 0; i < members.size(); i++)
     {
-      // TODO: check validity of keyboardShortcuts
+      // TODO: check validity of keyboardShortcuts:
+      // only one keyboardCode per function
+      // check key (keycode) is valid
+      // check value (function) is valid
       keyboardShortcuts[members[i].c_str()] = wvConfig["KeyboardShortcuts"][members[i]];
     }
   }
