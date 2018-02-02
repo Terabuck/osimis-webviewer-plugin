@@ -44,9 +44,9 @@
         }
 
         /* @ngInject */
-        function MobileViewportToolVM($scope) {
+        function MobileViewportToolVM($scope, wvConfig, wvPanViewportTool, wvWindowingViewportTool, wvZoomViewportTool) {
             // Enable zoom via pinch
-            WvBaseTool.call(this, 'zoomTouchPinch');
+            WvBaseTool.call(this, 'zoomTouchPinch');  // this somehow enables the zoom tool of cornerstone
 
             // Cache hammer instances for memory clean up
             var _hammers = {};
@@ -55,9 +55,10 @@
                 // Call parent method
                 WvBaseTool.prototype._activateInputs.apply(this, arguments);
 
-                // Add windowing via 3 fingers
-                // 1. Detect horiz. & vertical moves with three fingers
+                // Add windowing
+                // 1. Detect pan movements with one finger
                 var enabledElement = viewport.getEnabledElement();
+
                 _hammers[viewport] = {};
                 _hammers[viewport]["windowing"] = new Hammer(enabledElement);
                 _hammers[viewport]["windowing"].get('pan').set({
@@ -65,24 +66,35 @@
                     pointers: 1
                 });
 
-                // 2. Update window width
-                _hammers[viewport]["windowing"].on("panup", function(ev) {
-                    _this._applyWindowing("windowingUp", viewport, ev);
+                var last1TouchPanningCenter = null;
+                _hammers[viewport]["windowing"].on("pan", function(ev) {
+                    if(ev.pointerType !== "touch"){
+                        return;
+                    }
+
+                    if(last1TouchPanningCenter === null){
+                        // at the end of a pinch event, a panning event is fired, which will set the lastPanningCenter. To prevent it we check
+                        // if the ev isFinal is not here to set it. It will prevent the image from bumping out at the next real panning event.
+                        if(!ev.isFinal){
+                            last1TouchPanningCenter = ev.center;
+                        }
+                        return;
+                    }
+                    var viewportData = viewport.getViewport();
+                    var deltaX, deltaY, scale;
+                    scale = +viewportData.scale;
+                    deltaX = ev.center.x -last1TouchPanningCenter.x;
+                    deltaY = ev.center.y -last1TouchPanningCenter.y;
+                    wvWindowingViewportTool.apply(viewport, deltaX, deltaY)
+
+                    last1TouchPanningCenter = ev.center;
+                    if(ev.isFinal){
+                        last1TouchPanningCenter = null;
+                    }
+
                     return;
                 });
-                _hammers[viewport]["windowing"].on("pandown", function(ev) {
-                    _this._applyWindowing("windowingDown", viewport, ev);
-                    return;
-                });
-                // 3. Update window center
-                _hammers[viewport]["windowing"].on("panleft", function(ev) {
-                    _this._applyWindowing("windowingLeft", viewport, ev);
-                    return;
-                });
-                _hammers[viewport]["windowing"].on("panright", function(ev) {
-                    _this._applyWindowing("windowingRight", viewport, ev);
-                    return;
-                });
+
 
                 // Add panning via 2 fingers
                 // 1. Detect horiz. & vertical moves with two fingers
@@ -91,33 +103,70 @@
                     direction: Hammer.DIRECTION_ALL,
                     pointers: 2
                 });
-                var lastPanningCenter = null;
+                var last2TouchPanningCenter = null;
                 _hammers[viewport]["panning"].on("pan", function(ev) {
                     if(ev.pointerType !== "touch"){
                         return;
                     }
-                    if(lastPanningCenter === null){
+                    if(last2TouchPanningCenter === null){
                         // at the end of a pinch event, a panning event is fired, which will set the lastPanningCenter. To prevent it we check
                         // if the ev isFinal is not here to set it. It will prevent the image from bumping out at the next real panning event.
                         if(!ev.isFinal){
-                            lastPanningCenter = ev.center;
+                            last2TouchPanningCenter = ev.center;
                         }
                         return;
                     }
                     var viewportData = viewport.getViewport();
                     var deltaX, deltaY, scale;
                     scale = +viewportData.scale;
-                    deltaX = ev.center.x -lastPanningCenter.x;
-                    deltaY = ev.center.y -lastPanningCenter.y;
-                    viewportData.translation.x += (deltaX / scale);
-                    viewportData.translation.y += (deltaY / scale);
-                    viewport.setViewport(viewportData);
-                    viewport.draw(false);
-                    lastPanningCenter = ev.center;
+                    deltaX = ev.center.x -last2TouchPanningCenter.x;
+                    deltaY = ev.center.y -last2TouchPanningCenter.y;
+
+                    wvPanViewportTool.apply(viewport, deltaX, deltaY)
+
+                    last2TouchPanningCenter = ev.center;
                     if(ev.isFinal){
-                        lastPanningCenter = null;
+                        last2TouchPanningCenter = null;
                     }
                 });
+
+                // install mouse handler
+                var $enabledElement = $(viewport.getEnabledElement());
+
+                $enabledElement.on('mousedown.dvt', function(e) {
+                    var isTouchEvent = !e.pageX && !e.pageY && !!e.originalEvent.touches;
+                    var mouseButton = !isTouchEvent ? e.which : 1;
+                    var lastX = !isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX;
+                    var lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
+
+                    $(document).on('mousemove.dvt', function(e) {
+                        // Prevent issues on touchscreens.
+                        e.preventDefault();
+
+                        $scope.$apply(function() {  // @todo necessary ?
+                            var deltaX = (!isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX) - lastX;
+                            var deltaY = (!isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY) - lastY;
+                            lastX = !isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX;
+                            lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
+
+                            if (mouseButton === 1) { // left-click + move
+                                wvWindowingViewportTool.apply(viewport, deltaX, deltaY);
+                            }
+                            else if (mouseButton === 2) { // middle-click + move
+                                wvPanViewportTool.apply(viewport, deltaX, deltaY);
+                            }
+                            else if (mouseButton === 3) { // right-click + move
+                                wvZoomViewportTool.apply(viewport, deltaY);
+                            }
+                        });
+
+                        $(document).one('mouseup', function(e) {
+                            $(document).unbind('mousemove.dvt');
+                        });
+                    });
+                });
+
+
             };
 
             this._deactivateInputs = function(viewport) {
@@ -128,30 +177,11 @@
                 _hammers[viewport]["windowing"].destroy();
                 _hammers[viewport]["panning"].destroy();
                 delete _hammers[viewport];
+
+                // Remove mouse handlers
+                var $enabledElement = $(viewport.getEnabledElement());
+                $enabledElement.off('mousedown.dvt');
             };
-
-            this._applyWindowing = function(windowingDirection, viewport, ev) {
-                if(ev.pointerType !== "touch"){
-                    return;
-                }
-                ev.preventDefault();
-                var viewportData = viewport.getViewport();
-
-                var deltaWW = 0;
-                var deltaWC = 0;
-                var maxPixelValue = viewport._displayedCornerstoneImageObject.maxPixelValue || 1000;
-
-                if (wvConfig.mouseBehaviour[windowingDirection] == "increase-ww") { deltaWW = +1; }
-                if (wvConfig.mouseBehaviour[windowingDirection] == "decrease-ww") { deltaWW = -1; }
-                if (wvConfig.mouseBehaviour[windowingDirection] == "increase-wc") { deltaWC = +1; }
-                if (wvConfig.mouseBehaviour[windowingDirection] == "decrease-wc") { deltaWC = -1; }
-
-                viewportData.voi.windowWidth += deltaWW * 0.04 * maxPixelValue;
-                viewportData.voi.windowCenter += deltaWC *0.04 * maxPixelValue;
-                viewport.setViewport(viewportData);
-                viewport.draw(false);
-            }
-
         }
         MobileViewportToolVM.prototype = Object.create(WvBaseTool.prototype);
         MobileViewportToolVM.prototype.constructor = MobileViewportToolVM;
