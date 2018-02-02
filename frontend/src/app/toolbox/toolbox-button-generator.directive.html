@@ -10,7 +10,7 @@
         data-container="body"
         bs-tooltip
         >
-        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="touchGesture" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input id="toolbox-touch-gesture-button" type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="touchGesture" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Splitpane Grid configuration buttons. -->
@@ -48,7 +48,7 @@
         data-container="body"
         bs-tooltip
         >
-        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="zoom" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input id="toolbox-zoom-button" type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="zoom" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Pan -->
@@ -62,7 +62,7 @@
         data-container="body"
         bs-tooltip
         >
-        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="pan" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input id="toolbox-pan-button" type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="pan" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Windowing -->
@@ -100,7 +100,7 @@
         data-container="body"
         bs-tooltip
         >
-        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="lengthMeasure" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input id="toolbox-length-measure-button" type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="lengthMeasure" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Angle Measure -->
@@ -114,7 +114,7 @@
         data-container="body"
         bs-tooltip
         >
-        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="angleMeasure" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input id="toolbox-angle-measure-button" type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="angleMeasure" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Pixel Probe -->
@@ -128,7 +128,7 @@
         data-container="body"
         bs-tooltip
         >
-        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="pixelProbe" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input id="toolbox-pixel-probe-button" type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="pixelProbe" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Elliptical Region Of Interest -->
@@ -142,7 +142,7 @@
         data-container="body"
         bs-tooltip
         >
-        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="ellipticalRoi" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input id="toolbox-elliptical-roi-button" type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="ellipticalRoi" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Rectangle Region Of Interest -->
@@ -156,7 +156,7 @@
         data-container="body"
         bs-tooltip
         >
-        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="rectangleRoi" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input id="toolbox-rectangle-roi-button" type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="rectangleRoi" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Arrow/Text Annotate -->
@@ -170,7 +170,7 @@
         data-container="body"
         bs-tooltip
         >
-        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="arrowAnnotate" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input id="toolbox-arrow-annotate-button" type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="arrowAnnotate" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Rotate Left -->

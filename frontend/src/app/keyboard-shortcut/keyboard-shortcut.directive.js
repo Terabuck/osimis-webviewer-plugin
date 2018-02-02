@@ -151,8 +151,52 @@
                 wvPaneManager.getSelectedPane().invertColor();
             });
             
+            wvKeyboardShortcutEventManager.selectTouchGestureTool && wvKeyboardShortcutEventManager.selectTouchGestureTool(this, function(e){
+                angular.element('#toolbox-touch-gesture-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.selectPanTool && wvKeyboardShortcutEventManager.selectPanTool(this, function(e){
+                angular.element('#toolbox-pan-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.selectZoomTool && wvKeyboardShortcutEventManager.selectZoomTool(this, function(e){
+                angular.element('#toolbox-zoom-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.selectWindowingTool && wvKeyboardShortcutEventManager.selectWindowingTool(this, function(e){
+                angular.element('#toolbox-windowing-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.selectMagnifyingGlassTool && wvKeyboardShortcutEventManager.selectMagnifyingGlassTool(this, function(e){
+                angular.element('#toolbox-magnifying-glass-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.selectLengthMeasureTool && wvKeyboardShortcutEventManager.selectLengthMeasureTool(this, function(e){
+                angular.element('#toolbox-length-measure-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.selectPixelProbeTool && wvKeyboardShortcutEventManager.selectPixelProbeTool(this, function(e){
+                angular.element('#toolbox-pixel-probe-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.selectEllipticalRoiTool && wvKeyboardShortcutEventManager.selectEllipticalRoiTool(this, function(e){
+                angular.element('#toolbox-elliptical-roi-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.selectRectangleRoiTool && wvKeyboardShortcutEventManager.selectRectangleRoiTool(this, function(e){
+                angular.element('#toolbox-rectangle-roi-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.selectArrowAnnotateTool && wvKeyboardShortcutEventManager.selectArrowAnnotateTool(this, function(e){
+                angular.element('#toolbox-arrow-annotate-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.selectKeyImageCaptureTool && wvKeyboardShortcutEventManager.selectKeyImageCaptureTool(this, function(e){
+                angular.element('#toolbox-key-image-capture-button').click();
+            });
+
             scope.$on('$destroy', function() {
-                //TODO: close all listeners
+                console.log("TODO: destroy all listeners");
                 wvKeyboardShortcutEventManager.nextSeries.close(_this);
                 wvKeyboardShortcutEventManager.previousSeries.close(_this);
             })
