@@ -137,7 +137,28 @@
             return service.listFromOrthancSeriesId(orthancSeriesId)
                 .then(function(seriesList) {
                     return seriesList[subSeriesIndex];
-                });
+                })
+                .then(function(series) {
+                    if (wvConfig.customOverlayProviderUrl == undefined) {
+                        // console.log("no custom overlay provider defined");
+                        return series;
+                    } else {
+                        var request = new osimis.HttpRequest();
+                        request.setHeaders(wvConfig.httpRequestHeaders);
+                        request.setCache(true);
+                        var seriesCustomOverlayProviderUrl = wvConfig.customOverlayProviderUrl + series.id.split(":")[0]; // series.id looks like 46edef30-c3c9ab46-f68b1625-841e3a63-39f9ec32:0
+                        return request.get(seriesCustomOverlayProviderUrl)
+                            .then(function(customOverlayInfo) {
+                                // console.log("got the custom overlay:", customOverlayInfo);
+                                series.customOverlayInfo = customOverlayInfo.data;
+                                return series;
+                            }, function(error) {
+                                // console.log("failed to retrieve custom overlay:", error);
+                                return series;
+                            })
+                    }
+                })
+                ;
         }
 
         function listFromOrthancSeriesId(seriesId) {

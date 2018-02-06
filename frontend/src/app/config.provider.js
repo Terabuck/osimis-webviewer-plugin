@@ -51,6 +51,14 @@
                                                               // to the correct path if reverse proxy is found, so np.
                                                               // @todo use ../../ instead
 
+        if (__webViewerConfig.customOverlayProviderUrl) {
+            this.customOverlayProviderUrl = urlConvertor.toAbsoluteURL(__webViewerConfig.customOverlayProviderUrl);
+            console.log("Custom overlay provider URL: ", this.customOverlayProviderUrl);
+        } else {
+            this.customOverlayProviderUrl = undefined;
+            console.log("No custom overlay provider defined");
+        }
+
         this.httpRequestHeaders = {};
         this.enableHighQualityImagePreloading = __webViewerConfig.enableHighQualityImagePreloading;
         this.showBreadCrumb = __webViewerConfig.showBreadCrumb;
