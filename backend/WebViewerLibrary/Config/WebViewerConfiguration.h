@@ -66,6 +66,7 @@ public:
   std::string toolbarButtonSize;
   std::string defaultSelectedTool;
   std::string defaultStudyIslandsDisplayMode;
+  std::string customOverlayProviderUrl;
   Json::Value windowingPresets;
   Json::Value windowingBehaviour;
   Json::Value combinedToolBehaviour;
