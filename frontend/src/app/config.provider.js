@@ -52,11 +52,12 @@
                                                               // @todo use ../../ instead
 
         if (__webViewerConfig.customOverlayProviderUrl) {
+            console.log("Custom overlay provider URL from config file: ", __webViewerConfig.customOverlayProviderUrl);
             this.customOverlayProviderUrl = urlConvertor.toAbsoluteURL(__webViewerConfig.customOverlayProviderUrl);
-            console.log("Custom overlay provider URL: ", this.customOverlayProviderUrl);
+            console.log("Custom overlay provider URL (computed): ", this.customOverlayProviderUrl);
         } else {
-            this.customOverlayProviderUrl = undefined;
             console.log("No custom overlay provider defined");
+            this.customOverlayProviderUrl = undefined;
         }
 
         this.httpRequestHeaders = {};
