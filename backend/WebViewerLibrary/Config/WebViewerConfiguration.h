@@ -67,7 +67,8 @@ public:
   std::string defaultSelectedTool;
   std::string defaultStudyIslandsDisplayMode;
   Json::Value windowingPresets;
-  Json::Value mouseBehaviour;
+  Json::Value windowingBehaviour;
+  Json::Value combinedToolBehaviour;
   Json::Value keyboardShortcuts;
 
   // If activated, this feature displays a button on each viewport. When the button is
@@ -75,7 +76,7 @@ public:
   // annotations. This image is considered as a DICOM Key Image Note (see
   // `http://wiki.ihe.net/index.php/Key_Image_Note`).
   bool keyImageCaptureEnabled;
-  bool touchGestureEnabled;
+  bool combinedToolEnabled;
 
   WebViewerConfiguration(OrthancPluginContext* context);
   /**

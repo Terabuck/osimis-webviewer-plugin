@@ -1,16 +1,16 @@
 <div ng-switch="vm.button.tool">
     <!-- Free -->
     <label
-        ng-switch-when="touchGesture"
-        ng-if="vm.toolbox.buttons.hasOwnProperty('touchGesture')"
+        ng-switch-when="combinedTool"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('combinedTool')"
         class="wvButton--underline glyphicon glyphicon-hand-up"
-        ng-class="{active: vm.toolbox.tool === 'touchGesture', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        ng-class="{active: vm.toolbox.tool === 'combinedTool', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         data-title="{{ 'COMPONENTS.TOOLBOX.TOUCH_GESTURE' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         bs-tooltip
         >
-        <input id="toolbox-touch-gesture-button" type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="touchGesture" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+        <input id="toolbox-combined-tool-button" type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="combinedTool" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
     <!-- Splitpane Grid configuration buttons. -->

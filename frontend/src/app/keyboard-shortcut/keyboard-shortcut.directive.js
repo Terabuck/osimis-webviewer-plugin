@@ -151,8 +151,8 @@
                 wvPaneManager.getSelectedPane().invertColor();
             });
             
-            wvKeyboardShortcutEventManager.selectTouchGestureTool && wvKeyboardShortcutEventManager.selectTouchGestureTool(this, function(e){
-                angular.element('#toolbox-touch-gesture-button').click();
+            wvKeyboardShortcutEventManager.selectCombinedTool && wvKeyboardShortcutEventManager.selectCombinedTool(this, function(e){
+                angular.element('#toolbox-combined-tool-button').click();
             });
 
             wvKeyboardShortcutEventManager.selectPanTool && wvKeyboardShortcutEventManager.selectPanTool(this, function(e){

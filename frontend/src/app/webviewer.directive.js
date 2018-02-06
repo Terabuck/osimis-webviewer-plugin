@@ -158,7 +158,7 @@
                 studyDownloadEnabled: '=?wvStudyDownloadEnabled',
                 videoDisplayEnabled: '=?wvVideoDisplayEnabled',
                 keyImageCaptureEnabled: '=?wvKeyImageCaptureEnabled',
-                touchGestureEnabled: '=?wvTouchGestureEnabled',
+                combinedToolEnabled: '=?wvCombinedToolEnabled',
                 showNoReportIconInSeriesList: '=?wvShowNoReportIconInSeriesList',
                 reduceTimelineHeightOnSingleFrameSeries: '=?wvReduceTimelineHeightOnSingleFrameSeries',
                 buttonsSize: '=?wvButtonsSize',  // small | large
@@ -224,8 +224,8 @@
             if (vm.keyImageCaptureEnabled) { // activate
                 vm.tools.keyImageCapture = false;
             }
-            if (vm.touchGestureEnabled) { // activate}
-                vm.tools.touchGesture = false;
+            if (vm.combinedToolEnabled) { // activate}
+                vm.tools.combinedTool = false;
             }
 
             console.log('default tool: ', vm.toolbarDefaultTool)
@@ -237,7 +237,7 @@
             if (vm.toolboxButtonsOrdering === undefined) {
                 vm.toolboxButtonsOrdering = [
                     {type: "button", tool: "layout"},
-                    {type: "button", tool: "touchGesture"},
+                    {type: "button", tool: "combinedTool"},
                     {type: "button", tool: "zoom"},
                     {type: "button", tool: "pan"},
                     {
@@ -275,7 +275,7 @@
             vm.studyDownloadEnabled = typeof vm.studyDownloadEnabled !== 'undefined' ? vm.studyDownloadEnabled : false;
             vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
             vm.keyImageCaptureEnabled = typeof vm.keyImageCaptureEnabled !== 'undefined' ? vm.keyImageCaptureEnabled : false;
-            vm.touchGestureEnabled = typeof vm.touchGestureEnabled !== 'undefined' ? vm.touchGestureEnabled : false;
+            vm.combinedToolEnabled = typeof vm.combinedToolEnabled !== 'undefined' ? vm.combinedToolEnabled : false;
             vm.studyIslandsDisplayMode = typeof vm.studyIslandsDisplayMode !== 'undefined' ? vm.studyIslandsDisplayMode : "grid";
             vm.paneManager = wvPaneManager;
 
@@ -386,8 +386,8 @@
             var uaParser = new UAParser();
             vm.mobileInteraction = uaParser.getDevice().type === 'mobile';
             if(vm.mobileInteraction){
-                vm.tools.touchGesture = true;
-                vm.activeTool = 'touchGesture';            }
+                vm.tools.combinedTool = true;
+                vm.activeTool = 'combinedTool';            }
 
             // Adapt breadcrumb displayed info based on the selected pane.
             wvPaneManager

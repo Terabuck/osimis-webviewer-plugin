@@ -40,28 +40,28 @@
 	        var deltaWC = 0;
 
 	        if (deltaX < 0) {
-	            if (this._wvConfig.mouseBehaviour.windowingLeft == "increase-ww") { deltaWW = -deltaX; }
-	            if (this._wvConfig.mouseBehaviour.windowingLeft == "decrease-ww") { deltaWW = deltaX; }
-	            if (this._wvConfig.mouseBehaviour.windowingLeft == "increase-wc") { deltaWC = -deltaX; }
-	            if (this._wvConfig.mouseBehaviour.windowingLeft == "decrease-wc") { deltaWC = deltaX; }
+	            if (this._wvConfig.windowingBehaviour.left == "increase-ww") { deltaWW = -deltaX; }
+	            if (this._wvConfig.windowingBehaviour.left == "decrease-ww") { deltaWW = deltaX; }
+	            if (this._wvConfig.windowingBehaviour.left == "increase-wc") { deltaWC = -deltaX; }
+	            if (this._wvConfig.windowingBehaviour.left == "decrease-wc") { deltaWC = deltaX; }
 	        }
 	        if (deltaX > 0) {
-	            if (this._wvConfig.mouseBehaviour.windowingRight == "increase-ww") { deltaWW = deltaX; }
-	            if (this._wvConfig.mouseBehaviour.windowingRight == "decrease-ww") { deltaWW = -deltaX; }
-	            if (this._wvConfig.mouseBehaviour.windowingRight == "increase-wc") { deltaWC = deltaX; }
-	            if (this._wvConfig.mouseBehaviour.windowingRight == "decrease-wc") { deltaWC = -deltaX; }
+	            if (this._wvConfig.windowingBehaviour.right == "increase-ww") { deltaWW = deltaX; }
+	            if (this._wvConfig.windowingBehaviour.right == "decrease-ww") { deltaWW = -deltaX; }
+	            if (this._wvConfig.windowingBehaviour.right == "increase-wc") { deltaWC = deltaX; }
+	            if (this._wvConfig.windowingBehaviour.right == "decrease-wc") { deltaWC = -deltaX; }
 	        }
 	        if (deltaY < 0) {
-	            if (this._wvConfig.mouseBehaviour.windowingUp == "increase-ww") { deltaWW = -deltaY; }
-	            if (this._wvConfig.mouseBehaviour.windowingUp == "decrease-ww") { deltaWW = deltaY; }
-	            if (this._wvConfig.mouseBehaviour.windowingUp == "increase-wc") { deltaWC = -deltaY; }
-	            if (this._wvConfig.mouseBehaviour.windowingUp == "decrease-wc") { deltaWC = deltaY; }
+	            if (this._wvConfig.windowingBehaviour.up == "increase-ww") { deltaWW = -deltaY; }
+	            if (this._wvConfig.windowingBehaviour.up == "decrease-ww") { deltaWW = deltaY; }
+	            if (this._wvConfig.windowingBehaviour.up == "increase-wc") { deltaWC = -deltaY; }
+	            if (this._wvConfig.windowingBehaviour.up == "decrease-wc") { deltaWC = deltaY; }
 	        }
 	        if (deltaY > 0) {
-	            if (this._wvConfig.mouseBehaviour.windowingDown == "increase-ww") { deltaWW = deltaY; }
-	            if (this._wvConfig.mouseBehaviour.windowingDown == "decrease-ww") { deltaWW = -deltaY; }
-	            if (this._wvConfig.mouseBehaviour.windowingDown == "increase-wc") { deltaWC = deltaY; }
-	            if (this._wvConfig.mouseBehaviour.windowingDown == "decrease-wc") { deltaWC = -deltaY; }
+	            if (this._wvConfig.windowingBehaviour.down == "increase-ww") { deltaWW = deltaY; }
+	            if (this._wvConfig.windowingBehaviour.down == "decrease-ww") { deltaWW = -deltaY; }
+	            if (this._wvConfig.windowingBehaviour.down == "increase-wc") { deltaWC = deltaY; }
+	            if (this._wvConfig.windowingBehaviour.down == "decrease-wc") { deltaWC = -deltaY; }
 	        }
 
 	        // Calculate the new ww/wc.

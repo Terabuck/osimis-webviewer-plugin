@@ -54,7 +54,8 @@
         this.httpRequestHeaders = {};
         this.enableHighQualityImagePreloading = __webViewerConfig.enableHighQualityImagePreloading;
         this.showBreadCrumb = __webViewerConfig.showBreadCrumb;
-        this.mouseBehaviour = __webViewerConfig.mouseBehaviour;
+        this.combinedToolBehaviour = __webViewerConfig.combinedToolBehaviour;
+        this.windowingBehaviour = __webViewerConfig.windowingBehaviour;
         this.keyboardShortcuts = __webViewerConfig.keyboardShortcuts;
     };
 
