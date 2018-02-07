@@ -1,10 +1,12 @@
 (function(module) {
 
+    var lastTouchPanningCenter = null;  // this is shared betwwen all HammerWrappers because the final event is often received by the oneTouch handler (i.e: when you release your twoTouch, you often release one finger after the other and the final event is issued by the oneTouch handler)
+    var maxTouchCountInThisMove = 0;
+
     function HammerWrapper(enabledElement, touchCount, viewport, toolName, wvWindowingViewportTool, wvPanViewportTool) {
         var _this = this;
         this._touchCount = touchCount;
         this._viewport = viewport;
-        this._lastTouchPanningCenter = null;
         this._toolName = toolName;
 
         this._hammer = new Hammer(enabledElement);
@@ -19,34 +21,38 @@
                 return;
             }
 
-            if (_this._lastTouchPanningCenter === null){
-                // at the end of a pinch event, a panning event is fired, which will set the lastPanningCenter. To prevent it we check
-                // if the ev isFinal is not here to set it. It will prevent the image from bumping out at the next real panning event.
-                if (!ev.isFinal){
-                    _this._lastTouchPanningCenter = ev.center;
-                }
+            if (lastTouchPanningCenter === null){
+                lastTouchPanningCenter = ev.center;
                 return;
             }
+            if (ev.isFinal){
+                maxTouchCountInThisMove = 0;
+                lastTouchPanningCenter = null;
+                return;
+            }
+            
+            if (_this._touchCount < maxTouchCountInThisMove) // we are releasing a twoTouch move one finger before the other -> don't apply the one touch action
+                return;
+            maxTouchCountInThisMove = Math.max(maxTouchCountInThisMove, _this._touchCount);
+
             var viewportData = _this._viewport.getViewport();
             var deltaX, deltaY, scale;
             scale = +viewportData.scale;
-            deltaX = ev.center.x - _this._lastTouchPanningCenter.x;
-            deltaY = ev.center.y - _this._lastTouchPanningCenter.y;
+            deltaX = ev.center.x - lastTouchPanningCenter.x;
+            deltaY = ev.center.y - lastTouchPanningCenter.y;
             if (_this._toolName === "windowing") {
                 wvWindowingViewportTool.apply(_this._viewport, deltaX, deltaY);
             } else if (_this._toolName === "pan") {
                 wvPanViewportTool.apply(_this._viewport, deltaX, deltaY);
             }
 
-            _this._lastTouchPanningCenter = ev.center;
-            if (ev.isFinal){
-                _this._lastTouchPanningCenter = null;
-            }
+            lastTouchPanningCenter = ev.center;
 
             return;
         });
 
         this.destroy = function() {
+            console.log("destroying");
             this._hammer.destroy();
         }
     };
