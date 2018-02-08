@@ -145,7 +145,7 @@
             // Add browser to config (for log mainly)
             this._config.browser = uaParser.getResult();
 
-            console.log(this._config);
+            console.log("Webviewer config: ", this._config);
 
             return this._config;
         };

@@ -16,7 +16,6 @@
          * The app needs to specifically use $translate.use('en' | 'fr') in it's index or entrypoint.
          */
         // because wvConfig is not available for config step, we need to inject it manually see: http://stackoverflow.com/questions/15358029/why-am-i-unable-to-inject-angular-cookies
-        console.log(wvConfigProvider);
         var wvConfig = wvConfigProvider._config;
         var languages = {
             en: 'english',

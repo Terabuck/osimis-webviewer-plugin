@@ -52,7 +52,6 @@
         });
 
         this.destroy = function() {
-            console.log("destroying");
             this._hammer.destroy();
         }
     };
