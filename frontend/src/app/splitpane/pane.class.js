@@ -20,11 +20,12 @@
 (function(osimis) {
     'use strict';
 
-    function Pane(Promise, studyManager, seriesManager, x, y) {
+    function Pane(Promise, studyManager, seriesManager, x, y, wvConfig) {
         // Injections
         this._Promise = Promise;
         this._studyManager = studyManager;
         this._seriesManager = seriesManager;
+        this._wvConfig = wvConfig;
 
         // @warning This parameter is used for other services to access the
         // series model. As the series manager is ill-formed and always create
@@ -147,6 +148,10 @@
         this.getEmbeddedWindowingPresetsPromise().then(function(windowingPresets) {
             _this.applyWindowing(windowingPresets[presetsIndex].windowWidth, windowingPresets[presetsIndex].windowCenter);
         });
+    };
+
+    Pane.prototype.applyConfigWindowingPreset = function(presetsIndex) {
+        this.applyWindowing(this._wvConfig.windowingPresets[presetsIndex].windowWidth, this._wvConfig.windowingPresets[presetsIndex].windowCenter);
     };
 
     Pane.prototype.rotateLeft = function() {

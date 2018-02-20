@@ -212,7 +212,19 @@
             });
 
             wvKeyboardShortcutEventManager.applyConfigWindowingPreset1 && wvKeyboardShortcutEventManager.applyConfigWindowingPreset1(this, function(e) {
-                wvPaneManager.getSelectedPane().applyConfigWindowingPreset1(0);
+                wvPaneManager.getSelectedPane().applyConfigWindowingPreset(0);
+            });
+            wvKeyboardShortcutEventManager.applyConfigWindowingPreset2 && wvKeyboardShortcutEventManager.applyConfigWindowingPreset2(this, function(e) {
+                wvPaneManager.getSelectedPane().applyConfigWindowingPreset(1);
+            });
+            wvKeyboardShortcutEventManager.applyConfigWindowingPreset3 && wvKeyboardShortcutEventManager.applyConfigWindowingPreset3(this, function(e) {
+                wvPaneManager.getSelectedPane().applyConfigWindowingPreset(2);
+            });
+            wvKeyboardShortcutEventManager.applyConfigWindowingPreset4 && wvKeyboardShortcutEventManager.applyConfigWindowingPreset4(this, function(e) {
+                wvPaneManager.getSelectedPane().applyConfigWindowingPreset(3);
+            });
+            wvKeyboardShortcutEventManager.applyConfigWindowingPreset5 && wvKeyboardShortcutEventManager.applyConfigWindowingPreset5(this, function(e) {
+                wvPaneManager.getSelectedPane().applyConfigWindowingPreset(4);
             });
 
             scope.$on('$destroy', function() {

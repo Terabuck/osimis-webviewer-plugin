@@ -66,6 +66,7 @@
         this.combinedToolBehaviour = __webViewerConfig.combinedToolBehaviour;
         this.windowingBehaviour = __webViewerConfig.windowingBehaviour;
         this.keyboardShortcuts = __webViewerConfig.keyboardShortcuts;
+        this.windowingPresets = __webViewerConfig.windowingPresets;
     };
 
     /**

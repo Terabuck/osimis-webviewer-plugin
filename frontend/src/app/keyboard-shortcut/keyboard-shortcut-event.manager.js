@@ -29,6 +29,7 @@
             keyboardJS.bind(keyboardCode, function(e){
                 console.log('keyboard shortcut listener for ', keyboardCode, ' is being triggered');
                 listener.trigger(e);
+                e.preventDefault();
             });
 
             return listener;
