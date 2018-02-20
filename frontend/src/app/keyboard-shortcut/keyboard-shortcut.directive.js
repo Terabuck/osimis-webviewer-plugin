@@ -195,6 +195,26 @@
                 angular.element('#toolbox-key-image-capture-button').click();
             });
 
+            wvKeyboardShortcutEventManager.applyEmbeddedWindowingPreset1 && wvKeyboardShortcutEventManager.applyEmbeddedWindowingPreset1(this, function(e) {
+                wvPaneManager.getSelectedPane().applyEmbeddedWindowingPreset(0);
+            });
+            wvKeyboardShortcutEventManager.applyEmbeddedWindowingPreset2 && wvKeyboardShortcutEventManager.applyEmbeddedWindowingPreset2(this, function(e) {
+                wvPaneManager.getSelectedPane().applyEmbeddedWindowingPreset(1);
+            });
+            wvKeyboardShortcutEventManager.applyEmbeddedWindowingPreset3 && wvKeyboardShortcutEventManager.applyEmbeddedWindowingPreset3(this, function(e) {
+                wvPaneManager.getSelectedPane().applyEmbeddedWindowingPreset(2);
+            });
+            wvKeyboardShortcutEventManager.applyEmbeddedWindowingPreset4 && wvKeyboardShortcutEventManager.applyEmbeddedWindowingPreset4(this, function(e) {
+                wvPaneManager.getSelectedPane().applyEmbeddedWindowingPreset(3);
+            });
+            wvKeyboardShortcutEventManager.applyEmbeddedWindowingPreset5 && wvKeyboardShortcutEventManager.applyEmbeddedWindowingPreset5(this, function(e) {
+                wvPaneManager.getSelectedPane().applyEmbeddedWindowingPreset(4);
+            });
+
+            wvKeyboardShortcutEventManager.applyConfigWindowingPreset1 && wvKeyboardShortcutEventManager.applyConfigWindowingPreset1(this, function(e) {
+                wvPaneManager.getSelectedPane().applyConfigWindowingPreset1(0);
+            });
+
             scope.$on('$destroy', function() {
                 console.log("TODO: destroy all listeners");
                 wvKeyboardShortcutEventManager.nextSeries.close(_this);

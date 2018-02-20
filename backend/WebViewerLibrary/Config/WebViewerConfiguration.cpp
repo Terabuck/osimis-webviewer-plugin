@@ -272,7 +272,12 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
       "selectCombinedTool", "selectPanTool", "selectWindowingTool", "selectZoomTool",
       "selectMagnifyingGlassTool", "selectLengthMeasureTool", "selectPixelProbeTool",
       "selectEllipticalRoiTool", "selectRectangleRoiTool", "selectArrowAnnotateTool",
-      "selectKeyImageCaptureTool"
+      "selectKeyImageCaptureTool",
+      "applyEmbeddedWindowingPreset1", "applyEmbeddedWindowingPreset2", "applyEmbeddedWindowingPreset3",
+      "applyEmbeddedWindowingPreset4", "applyEmbeddedWindowingPreset5",
+      "applyConfigWindowingPreset1", "applyConfigWindowingPreset2", "applyConfigWindowingPreset3",
+      "applyConfigWindowingPreset4", "applyConfigWindowingPreset5",
+      "test"
     };
 
     Json::Value::Members members = keyboardShortcuts.getMemberNames();
