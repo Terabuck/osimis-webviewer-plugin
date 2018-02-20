@@ -20,7 +20,7 @@
 (function(osimis) {
     'use strict';
 
-    function Pane(Promise, studyManager, seriesManager, x, y, config) {
+    function Pane(Promise, studyManager, seriesManager, x, y) {
         // Injections
         this._Promise = Promise;
         this._studyManager = studyManager;
@@ -39,48 +39,13 @@
         this.x = x;
         this.y = y;
 
-        // Assert config
-        if (
-            config &&
-            typeof config.seriesId !== 'undefined' &&
-            typeof config.reportId !== 'undefined' ||
-            config &&
-            typeof config.seriesId !== 'undefined' &&
-            typeof config.videoId  !== 'undefined' ||
-            config &&
-            typeof config.reportId !== 'undefined' &&
-            typeof config.videoId !== 'undefined'
-        ) {
-            throw new Error('A pane can only contain a single reportId/videoId/seriesId at a time.');
-        }
-        else if (config && !config.seriesId &&
-            (config.csViewport || config.imageIndex)
-        ) {
-            throw new Error('`csViewport` and `imageIndex` parameter can only be used with a series.');
-        }
-
-        // Default values: nothing is shown
-        if (!config) {
-            console.log("config is undefined");
-            this.seriesId = undefined;
-            this.csViewport = undefined;
-            this.imageIndex = undefined;
-            this.reportId = undefined;
-            this.videoId = undefined;
-            this.isSelected = false;
-            this.isHovered = false;
-        }
-        // Custom values.
-        else {
-            console.log("config is defined");
-            this.seriesId = config.seriesId || undefined;
-            this.csViewport = config.csViewport || config.seriesId ? null : undefined;
-            this.imageIndex = config.imageIndex || config.seriesId ? 0 : undefined;
-            this.reportId = config.reportId || undefined;
-            this.videoId = config.videoId || undefined;
-            this.isSelected = config.isSelected || false;
-            this.isHovered = config.isHovered || false;
-        }
+        this.seriesId = undefined;
+        this.csViewport = undefined;
+        this.imageIndex = undefined;
+        this.reportId = undefined;
+        this.videoId = undefined;
+        this.isSelected = false;
+        this.isHovered = false;
     }
 
     /**
