@@ -51,9 +51,22 @@
                                                               // to the correct path if reverse proxy is found, so np.
                                                               // @todo use ../../ instead
 
+        if (__webViewerConfig.customOverlayProviderUrl) {
+            console.log("Custom overlay provider URL from config file: ", __webViewerConfig.customOverlayProviderUrl);
+            this.customOverlayProviderUrl = urlConvertor.toAbsoluteURL(__webViewerConfig.customOverlayProviderUrl);
+            console.log("Custom overlay provider URL (computed): ", this.customOverlayProviderUrl);
+        } else {
+            console.log("No custom overlay provider defined");
+            this.customOverlayProviderUrl = undefined;
+        }
+
         this.httpRequestHeaders = {};
         this.enableHighQualityImagePreloading = __webViewerConfig.enableHighQualityImagePreloading;
         this.showBreadCrumb = __webViewerConfig.showBreadCrumb;
+        this.combinedToolBehaviour = __webViewerConfig.combinedToolBehaviour;
+        this.windowingBehaviour = __webViewerConfig.windowingBehaviour;
+        this.keyboardShortcuts = __webViewerConfig.keyboardShortcuts;
+        this.windowingPresets = __webViewerConfig.windowingPresets;
     };
 
     /**
@@ -133,7 +146,7 @@
             // Add browser to config (for log mainly)
             this._config.browser = uaParser.getResult();
 
-            console.log(this._config);
+            console.log("Webviewer config: ", this._config);
 
             return this._config;
         };

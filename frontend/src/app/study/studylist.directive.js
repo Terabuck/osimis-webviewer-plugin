@@ -32,10 +32,6 @@
                 scope.selectedStudyIds = typeof scope.selectedStudyIds !== 'undefined' ? scope.selectedStudyIds : [];
                 scope.readonly = typeof scope.readonly !== 'undefined' ? scope.readonly : false;
 
-                scope.onSelect = function(value, index) {
-                    console.log('ho!', value, index);
-                };
-
                 // sortedSelectedStudyIds <-> [chronological] selectedStudyIds.
                 scope.sortedSelectedStudyIds = [];
                 // Case 1: Chronological array changes (an actor external to
@@ -94,31 +90,33 @@
                     });
                 });
 
-                // because bs-select (used in the UI) does not support dynamic value interpolation (it only take the first values met)
-                // We need to set a boolean to make the Ui waiting that the language has been loaded.
-                // Each time the language changed, the select directive if destroyed and rebuild once the
-                // $translateLoadingEnd is triggered
-                function setTranslated() {
-                    var removeListener = $rootScope.$on('$translateLoadingEnd', function () {
-                        scope.translateReady = true;
-                        removeListener();
-                        removeListener = null;
-                    });
-                }
-                $rootScope.$on('$translateLoadingStart', function(){
-                    scope.translateReady = false;
-                    setTranslated()
-                });
-                if($translate.isReady()){
-                    scope.translateReady = true;
-                }else{
-                    scope.translateReady = false;
-                    setTranslated();
-                }
+                // translation currently disabled -> to be reworked when we want something else than "..." as a placeholder
+                // // because bs-select (used in the UI) does not support dynamic value interpolation (it only take the first values met)
+                // // We need to set a boolean to make the Ui waiting that the language has been loaded.
+                // // Each time the language changed, the select directive if destroyed and rebuild once the
+                // // $translateLoadingEnd is triggered
+                // function setTranslated() {
+                //     var removeListener = $rootScope.$on('$translateLoadingEnd', function () {
+                //         scope.translateReady = true;
+                //         removeListener();
+                //         removeListener = null;
+                //     });
+                // }
+                // $rootScope.$on('$translateLoadingStart', function(){
+                //     scope.translateReady = false;
+                //     setTranslated()
+                // });
 
-                $rootScope.$on('$translateChangeSuccess', function(){
-                    scope.translateReady = true;
-                });
+                // if($translate.isReady()){
+                //     scope.translateReady = true;
+                // }else{
+                //     scope.translateReady = false;
+                //     setTranslated();
+                // }
+
+                // $rootScope.$on('$translateChangeSuccess', function(){
+                //     scope.translateReady = true;
+                // });
             }
         };
     });
