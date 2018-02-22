@@ -194,6 +194,7 @@
             vm.noticeEnabled = typeof vm.noticeEnabled !== 'undefined' ? vm.noticeEnabled : false;
             vm.noticeText = typeof vm.noticeText !== 'undefined' ? vm.noticeText : undefined;
             vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;
+            vm.synchroEnabled = true,
             vm.tools = typeof vm.tools !== 'undefined' ? vm.tools : {
                 windowing: false,
                 zoom: false,
@@ -219,7 +220,7 @@
                 rotateLeft: false,
                 rotateRight: false,
                 arrowAnnotate: false,
-                synchro: false
+                toggleSynchro: false
             };
 
             if (vm.keyImageCaptureEnabled) { // activate
@@ -269,7 +270,7 @@
                         ]
                     },
                     {type: "button", tool: "keyImageCapture"},
-                    {type: "button", tool: "synchro"}
+                    {type: "button", tool: "toggleSynchro"}
                 ]
             }
             vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];
@@ -433,6 +434,15 @@
                     break;
                 case 'rotateRight':
                     selectedPane.rotateRight();
+                    break;
+                case 'toggleSynchro':
+                    vm.synchroEnabled = !vm.synchroEnabled;
+                    if (vm.synchroEnabled) {
+                        console.log("synchro is now enabled");
+                    } else {
+                        console.log("synchro is now disabled");
+                    }
+
                     break;
                 default:
                     throw new Error('Unknown toolbar action.');

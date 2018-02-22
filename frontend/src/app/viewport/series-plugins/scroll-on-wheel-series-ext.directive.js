@@ -42,13 +42,14 @@
         function link(scope, element, attrs, tool) {
             // Switch activate/deactivate based on databound HTML attribute
             var wvScrollOnWheelSeriesExt = $parse(attrs.wvScrollOnWheelSeriesExt);
-            scope.$watch(wvScrollOnWheelSeriesExt, function(isActivated) {
-                if (isActivated) {
+            scope.$watch(wvScrollOnWheelSeriesExt, function(config) {
+                if (config.enabled) {
                     tool.activate();
                 }
                 else {
                     tool.deactivate();
                 }
+                tool.synchroEnabled = config.synchroEnabled;
             });
         }
     }
@@ -111,7 +112,7 @@
                         series.goToNextImage(true);
                     }
 
-                    if (true && panes.length > 1) {
+                    if (vm.synchroEnabled && panes.length > 1) {
                         series.getCurrentImage().then(function(currentImage) {
                             var currentPatientPosition = currentImage.tags.ImagePositionPatient.split("\\");
                             for (var i=0; i < panes.length; ++i) {
