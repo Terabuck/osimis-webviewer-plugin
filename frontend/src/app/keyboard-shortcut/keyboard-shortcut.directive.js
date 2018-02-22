@@ -6,7 +6,7 @@
         .directive('wvKeyboardShortcut', keyboardShortcut);
 
     /* @ngInject */
-    function keyboardShortcut($rootScope, wvAnnotationManager, wvStudyManager, wvSeriesManager, wvPdfInstanceManager, wvVideoManager, wvPaneManager, wvKeyboardShortcutEventManager) {
+    function keyboardShortcut($rootScope, wvAnnotationManager, wvStudyManager, wvSeriesManager, wvPdfInstanceManager, wvVideoManager, wvPaneManager, wvKeyboardShortcutEventManager, wvConfig) {
         
         // Keep track of listener unbind functions (so we can close events).
         var _unbindListenerFns = [];
@@ -31,7 +31,7 @@
             var _this = this;
             var webviewer = ctrls.webviewer;
 
-            wvKeyboardShortcutEventManager.majDown(this, function(e){
+            wvKeyboardShortcutEventManager.nextStudy && wvKeyboardShortcutEventManager.nextStudy(this, function(e){
                 var selectedPane = wvPaneManager.getSelectedPane(),
                     selectedStudyIds = webviewer.selectedStudyIds,
                     nextStudyId;
@@ -55,7 +55,7 @@
                 })
             });
 
-            wvKeyboardShortcutEventManager.majUp(this, function(e){
+            wvKeyboardShortcutEventManager.previousStudy && wvKeyboardShortcutEventManager.previousStudy(this, function(e){
                 var selectedPane = wvPaneManager.getSelectedPane(),
                     selectedStudyIds = webviewer.selectedStudyIds,
                     previousStudyId;
@@ -79,7 +79,7 @@
                 })
             });
 
-            wvKeyboardShortcutEventManager.down(this, function(e){
+            wvKeyboardShortcutEventManager.nextSeries && wvKeyboardShortcutEventManager.nextSeries(this, function(e){
                 var selectedPane = wvPaneManager.getSelectedPane();
                 selectedPane.getStudy().then(function(study){
                     var currentItemId = selectedPane.seriesId || selectedPane.videoId || selectedPane.reportId,
@@ -100,7 +100,7 @@
             });
             
 
-            wvKeyboardShortcutEventManager.up(this, function(e){
+            wvKeyboardShortcutEventManager.previousSeries && wvKeyboardShortcutEventManager.previousSeries(this, function(e){
                 var selectedPane = wvPaneManager.getSelectedPane();
                 selectedPane.getStudy().then(function(study){
                     var currentItemId = selectedPane.seriesId || selectedPane.videoId || selectedPane.reportId,
@@ -121,19 +121,116 @@
                 });            
             });
 
-            wvKeyboardShortcutEventManager.left(this, function(e){
+            wvKeyboardShortcutEventManager.previousImage && wvKeyboardShortcutEventManager.previousImage(this, function(e){
                 var selectedPane = wvPaneManager.getSelectedPane();
                 selectedPane.series.goToPreviousImage(true);
             });
 
-            wvKeyboardShortcutEventManager.right(this, function(e){
+            wvKeyboardShortcutEventManager.nextImage && wvKeyboardShortcutEventManager.nextImage(this, function(e){
                 var selectedPane = wvPaneManager.getSelectedPane();
                 selectedPane.series.goToNextImage(true);
             });
+
+            wvKeyboardShortcutEventManager.rotateLeft && wvKeyboardShortcutEventManager.rotateLeft(this, function(e){
+                wvPaneManager.getSelectedPane().rotateLeft();
+            });
             
+            wvKeyboardShortcutEventManager.rotateRight && wvKeyboardShortcutEventManager.rotateRight(this, function(e){
+                wvPaneManager.getSelectedPane().rotateRight();
+            });
+            
+            wvKeyboardShortcutEventManager.flipVertical && wvKeyboardShortcutEventManager.flipVertical(this, function(e){
+                wvPaneManager.getSelectedPane().flipVertical();
+            });
+
+            wvKeyboardShortcutEventManager.flipHorizontal && wvKeyboardShortcutEventManager.flipHorizontal(this, function(e){
+                wvPaneManager.getSelectedPane().flipHorizontal();
+            });
+            
+            wvKeyboardShortcutEventManager.invertColor && wvKeyboardShortcutEventManager.invertColor(this, function(e){
+                wvPaneManager.getSelectedPane().invertColor();
+            });
+            
+            wvKeyboardShortcutEventManager.selectCombinedTool && wvKeyboardShortcutEventManager.selectCombinedTool(this, function(e){
+                angular.element('#toolbox-combined-tool-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.selectPanTool && wvKeyboardShortcutEventManager.selectPanTool(this, function(e){
+                angular.element('#toolbox-pan-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.selectZoomTool && wvKeyboardShortcutEventManager.selectZoomTool(this, function(e){
+                angular.element('#toolbox-zoom-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.selectWindowingTool && wvKeyboardShortcutEventManager.selectWindowingTool(this, function(e){
+                angular.element('#toolbox-windowing-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.selectMagnifyingGlassTool && wvKeyboardShortcutEventManager.selectMagnifyingGlassTool(this, function(e){
+                angular.element('#toolbox-magnifying-glass-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.selectLengthMeasureTool && wvKeyboardShortcutEventManager.selectLengthMeasureTool(this, function(e){
+                angular.element('#toolbox-length-measure-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.selectPixelProbeTool && wvKeyboardShortcutEventManager.selectPixelProbeTool(this, function(e){
+                angular.element('#toolbox-pixel-probe-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.selectEllipticalRoiTool && wvKeyboardShortcutEventManager.selectEllipticalRoiTool(this, function(e){
+                angular.element('#toolbox-elliptical-roi-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.selectRectangleRoiTool && wvKeyboardShortcutEventManager.selectRectangleRoiTool(this, function(e){
+                angular.element('#toolbox-rectangle-roi-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.selectArrowAnnotateTool && wvKeyboardShortcutEventManager.selectArrowAnnotateTool(this, function(e){
+                angular.element('#toolbox-arrow-annotate-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.selectKeyImageCaptureTool && wvKeyboardShortcutEventManager.selectKeyImageCaptureTool(this, function(e){
+                angular.element('#toolbox-key-image-capture-button').click();
+            });
+
+            wvKeyboardShortcutEventManager.applyEmbeddedWindowingPreset1 && wvKeyboardShortcutEventManager.applyEmbeddedWindowingPreset1(this, function(e) {
+                wvPaneManager.getSelectedPane().applyEmbeddedWindowingPreset(0);
+            });
+            wvKeyboardShortcutEventManager.applyEmbeddedWindowingPreset2 && wvKeyboardShortcutEventManager.applyEmbeddedWindowingPreset2(this, function(e) {
+                wvPaneManager.getSelectedPane().applyEmbeddedWindowingPreset(1);
+            });
+            wvKeyboardShortcutEventManager.applyEmbeddedWindowingPreset3 && wvKeyboardShortcutEventManager.applyEmbeddedWindowingPreset3(this, function(e) {
+                wvPaneManager.getSelectedPane().applyEmbeddedWindowingPreset(2);
+            });
+            wvKeyboardShortcutEventManager.applyEmbeddedWindowingPreset4 && wvKeyboardShortcutEventManager.applyEmbeddedWindowingPreset4(this, function(e) {
+                wvPaneManager.getSelectedPane().applyEmbeddedWindowingPreset(3);
+            });
+            wvKeyboardShortcutEventManager.applyEmbeddedWindowingPreset5 && wvKeyboardShortcutEventManager.applyEmbeddedWindowingPreset5(this, function(e) {
+                wvPaneManager.getSelectedPane().applyEmbeddedWindowingPreset(4);
+            });
+
+            wvKeyboardShortcutEventManager.applyConfigWindowingPreset1 && wvKeyboardShortcutEventManager.applyConfigWindowingPreset1(this, function(e) {
+                wvPaneManager.getSelectedPane().applyConfigWindowingPreset(0);
+            });
+            wvKeyboardShortcutEventManager.applyConfigWindowingPreset2 && wvKeyboardShortcutEventManager.applyConfigWindowingPreset2(this, function(e) {
+                wvPaneManager.getSelectedPane().applyConfigWindowingPreset(1);
+            });
+            wvKeyboardShortcutEventManager.applyConfigWindowingPreset3 && wvKeyboardShortcutEventManager.applyConfigWindowingPreset3(this, function(e) {
+                wvPaneManager.getSelectedPane().applyConfigWindowingPreset(2);
+            });
+            wvKeyboardShortcutEventManager.applyConfigWindowingPreset4 && wvKeyboardShortcutEventManager.applyConfigWindowingPreset4(this, function(e) {
+                wvPaneManager.getSelectedPane().applyConfigWindowingPreset(3);
+            });
+            wvKeyboardShortcutEventManager.applyConfigWindowingPreset5 && wvKeyboardShortcutEventManager.applyConfigWindowingPreset5(this, function(e) {
+                wvPaneManager.getSelectedPane().applyConfigWindowingPreset(4);
+            });
+
             scope.$on('$destroy', function() {
-                wvKeyboardShortcutEventManager.down.close(_this);
-                wvKeyboardShortcutEventManager.up.close(_this);
+                console.log("TODO: destroy all listeners");
+                wvKeyboardShortcutEventManager.nextSeries.close(_this);
+                wvKeyboardShortcutEventManager.previousSeries.close(_this);
             })
         }
     }

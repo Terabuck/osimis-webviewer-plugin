@@ -43,7 +43,7 @@
 
         /* @ngInject */
         function Controller() {
-            WvBaseTool.call(this, 'zoom', 'zoomTouchPinch');
+            WvBaseTool.call(this, 'zoom', 'zoomTouchPinch'); // this somehow enables the zoom tool of cornerstone
         }
         Controller.prototype = Object.create(WvBaseTool.prototype)
         Controller.prototype.constructor = Controller;

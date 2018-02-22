@@ -68,12 +68,16 @@ public:
   std::string defaultStudyIslandsDisplayMode;
   std::string customOverlayProviderUrl;
   Json::Value windowingPresets;
+  Json::Value windowingBehaviour;
+  Json::Value combinedToolBehaviour;
+  Json::Value keyboardShortcuts;
 
   // If activated, this feature displays a button on each viewport. When the button is
   // clicked, a new series is created with the image of the viewport, including the
   // annotations. This image is considered as a DICOM Key Image Note (see
   // `http://wiki.ihe.net/index.php/Key_Image_Note`).
   bool keyImageCaptureEnabled;
+  bool combinedToolEnabled;
 
   WebViewerConfiguration(OrthancPluginContext* context);
   /**

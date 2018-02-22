@@ -158,6 +158,7 @@
                 studyDownloadEnabled: '=?wvStudyDownloadEnabled',
                 videoDisplayEnabled: '=?wvVideoDisplayEnabled',
                 keyImageCaptureEnabled: '=?wvKeyImageCaptureEnabled',
+                combinedToolEnabled: '=?wvCombinedToolEnabled',
                 showNoReportIconInSeriesList: '=?wvShowNoReportIconInSeriesList',
                 reduceTimelineHeightOnSingleFrameSeries: '=?wvReduceTimelineHeightOnSingleFrameSeries',
                 buttonsSize: '=?wvButtonsSize',  // small | large
@@ -194,7 +195,6 @@
             vm.noticeText = typeof vm.noticeText !== 'undefined' ? vm.noticeText : undefined;
             vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;
             vm.tools = typeof vm.tools !== 'undefined' ? vm.tools : {
-                touchGesture: false,
                 windowing: false,
                 zoom: false,
                 pan: false,
@@ -221,22 +221,23 @@
                 arrowAnnotate: false
             };
 
+            if (vm.keyImageCaptureEnabled) { // activate
+                vm.tools.keyImageCapture = false;
+            }
+            if (vm.combinedToolEnabled) { // activate}
+                vm.tools.combinedTool = false;
+            }
+
             console.log('default tool: ', vm.toolbarDefaultTool)
             if (vm.toolbarDefaultTool) {
                 vm.tools[vm.toolbarDefaultTool] = true;
                 vm.activeTool = vm.toolbarDefaultTool;
-            } else {
-                vm.tools.touchGesture = true;
-                vm.activeTool = 'touchGesture';
             }
 
-            if (vm.keyImageCaptureEnabled) { // activate
-                vm.tools.keyImageCapture = false;
-            }
             if (vm.toolboxButtonsOrdering === undefined) {
                 vm.toolboxButtonsOrdering = [
                     {type: "button", tool: "layout"},
-                    // {type: "button", tool: "touchGesture"},
+                    {type: "button", tool: "combinedTool"},
                     {type: "button", tool: "zoom"},
                     {type: "button", tool: "pan"},
                     {
@@ -274,6 +275,7 @@
             vm.studyDownloadEnabled = typeof vm.studyDownloadEnabled !== 'undefined' ? vm.studyDownloadEnabled : false;
             vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
             vm.keyImageCaptureEnabled = typeof vm.keyImageCaptureEnabled !== 'undefined' ? vm.keyImageCaptureEnabled : false;
+            vm.combinedToolEnabled = typeof vm.combinedToolEnabled !== 'undefined' ? vm.combinedToolEnabled : false;
             vm.studyIslandsDisplayMode = typeof vm.studyIslandsDisplayMode !== 'undefined' ? vm.studyIslandsDisplayMode : "grid";
             vm.paneManager = wvPaneManager;
 
@@ -384,8 +386,8 @@
             var uaParser = new UAParser();
             vm.mobileInteraction = uaParser.getDevice().type === 'mobile';
             if(vm.mobileInteraction){
-                vm.tools.touchGesture = true;
-                vm.activeTool = 'touchGesture';            }
+                vm.tools.combinedTool = true;
+                vm.activeTool = 'combinedTool';            }
 
             // Adapt breadcrumb displayed info based on the selected pane.
             wvPaneManager
@@ -416,19 +418,19 @@
 
                 switch (action) {
                 case 'invert':
-                    selectedPane.csViewport.invert = !selectedPane.csViewport.invert;
+                    selectedPane.invertColor();
                     break;
                 case 'vflip':
-                    selectedPane.csViewport.vflip = !selectedPane.csViewport.vflip;
+                    selectedPane.flipVertical();
                     break;
                 case 'hflip':
-                    selectedPane.csViewport.hflip = !selectedPane.csViewport.hflip;
+                    selectedPane.flipHorizontal();
                     break;
                 case 'rotateLeft':
-                    selectedPane.csViewport.rotation = selectedPane.csViewport.rotation - 90;
+                    selectedPane.rotateLeft();
                     break;
                 case 'rotateRight':
-                    selectedPane.csViewport.rotation = selectedPane.csViewport.rotation + 90;
+                    selectedPane.rotateRight();
                     break;
                 default:
                     throw new Error('Unknown toolbar action.');
