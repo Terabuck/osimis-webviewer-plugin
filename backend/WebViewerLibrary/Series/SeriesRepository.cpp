@@ -190,6 +190,8 @@ namespace {
     tagsToKeep.push_back("RecommendedDisplayFrameRate");
     tagsToKeep.push_back("ImageOrientationPatient");
     tagsToKeep.push_back("ImagePositionPatient");
+    tagsToKeep.push_back("SliceLocation");
+    tagsToKeep.push_back("SliceThickness");
     tagsToKeep.push_back("FrameOfReferenceUID");
     tagsToKeep.push_back("HighBit");
     tagsToKeep.push_back("InstanceNumber");

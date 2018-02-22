@@ -17,7 +17,7 @@
 
     <div class="wv-overlay-bottomright" ng-show="vm.showBottomRightArea()">
         <img ng-show="vm.bottomRightIcon" ng-src="{{vm.bottomRightIcon}}" class="block float__right clearfix wv-overlay-icon"/>
-        <div class="clear">
+        <div class="clear" ng-show="vm.showOverlay">
             <div ng-repeat="line in vm.bottomRightLines track by $index">{{line}}<br/></div>
             <span ng-show="vm.wvSeries.currentShownIndex != vm.wvSeries.currentIndex">({{ "COMPONENTS.OVERLAY.IMAGE_LOADING_PARAGRAPH" | translate:{'loadingImage': vm.wvSeries.currentIndex+1, 'loadedImage': vm.wvSeries.currentShownIndex+1} }})</br></span>
             {{ "COMPONENTS.SPLIT_PANE_OVERLAY.ZOOM" | translate | wvCapitalize }}: {{vm.wvViewport.getScaleForFullResolution()|number:2}}x<br/>

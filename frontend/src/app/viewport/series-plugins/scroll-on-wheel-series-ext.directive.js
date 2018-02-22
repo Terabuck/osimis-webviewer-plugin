@@ -43,13 +43,16 @@
             // Switch activate/deactivate based on databound HTML attribute
             var wvScrollOnWheelSeriesExt = $parse(attrs.wvScrollOnWheelSeriesExt);
             scope.$watch(wvScrollOnWheelSeriesExt, function(config) {
-                if (config.enabled) {
+                if (config.enabled && !tool.activated) {
                     tool.activate();
-                }
-                else {
+                } else if (!config.enabled && tool.activated) {
                     tool.deactivate();
                 }
-                tool.synchroEnabled = config.synchroEnabled;
+                if (config.synchroEnabled && !tool.synchroEnabled) {
+                    tool.enableSynchro();
+                } else if (config.synchroEnabled && !tool.synchroEnabled) {
+                    tool.disableSynchro();
+                }
             });
         }
     }
@@ -57,6 +60,8 @@
     /* @ngInject */
     function Controller($scope, $element, $attrs, hamster, wvPaneManager, wvSeriesManager) {
         var vm = this;
+        this.activated = false;
+        this.synchroEnabled = false;
 
         var _wvSeriesIdViewModels = [];
     	this.register = function(viewmodel) {
@@ -71,12 +76,20 @@
                 .forEach(registerDesktopEvents);
             _wvSeriesIdViewModels
                 .forEach(registerMobileEvents);
+            vm.activated = true;
         };
         this.deactivate = function() {
             _wvSeriesIdViewModels
                 .forEach(unregisterDesktopEvents);
             _wvSeriesIdViewModels
                 .forEach(unregisterMobileEvents);
+            vm.activated = false;
+        };
+        this.enableSynchro = function() {
+            vm.synchroEnabled = true;
+        };
+        this.disableSynchro = function() {
+            vm.synchroEnabled = false;
         };
 
         // Free events on destroy
@@ -114,14 +127,14 @@
 
                     if (vm.synchroEnabled && panes.length > 1) {
                         series.getCurrentImage().then(function(currentImage) {
-                            var currentPatientPosition = currentImage.tags.ImagePositionPatient.split("\\");
+                            var currentSliceLocation = currentImage.tags.SliceLocation;
                             for (var i=0; i < panes.length; ++i) {
                                 if (panes[i].seriesId !== undefined && panes[i].seriesId != series.id && panes[i].series.isSameOrientationAs(series)) {
-                                    console.log("Found a series with same orientation in pane " + i, panes[i].series);
-                                    panes[i].series.getIndexOfClosestImageFrom(currentPatientPosition)
+                                    // console.log("Found a series with same orientation in pane " + i, panes[i].series);
+                                    panes[i].series.getIndexOfClosestImageFrom(currentSliceLocation)
                                         .then(function(closestIndexResponse) {
-                                            console.log("Closest index is " + closestIndexResponse.closestIndex);
-                                            console.log(closestIndexResponse.series);
+                                            //console.log("Closest index is " + closestIndexResponse.closestIndex);
+                                            //console.log(closestIndexResponse.series);
                                             closestIndexResponse.series.goToImage(closestIndexResponse.closestIndex);
                                     });
                                 }

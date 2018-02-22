@@ -187,7 +187,11 @@
             this.currentShownIndex = this.getIndexOf(id);
         };
         WvSeries.prototype.getCurrentImageId = function() {
-           return this.imageIds[this.currentIndex];
+            if (this.currentIndex >= 0 && this.currentIndex < this.imageIds.length) {
+                return this.imageIds[this.currentIndex];
+            } else {
+                return null;
+            }
         };
 
         WvSeries.prototype.getCurrentImage = function() {
@@ -256,13 +260,13 @@
 
             // Limit index to available range of image
             if (newIndex < 0) {
-              newIndex = 0;
+              newIndex = -1;
             }
             else if (newIndex + 1 > this.imageCount) {
               return;
             }
 
-            // Do nothing when the image do not change
+            // Do nothing when the image does not change
             if (this.currentIndex == newIndex) {
                 return;
             }
@@ -372,7 +376,7 @@
                 && this.tags.FrameOfReferenceUID == this.tags.FrameOfReferenceUID);
         };
 
-        WvSeries.prototype.getIndexOfClosestImageFrom = function(otherImagePositionPatientVector) {
+        WvSeries.prototype.getIndexOfClosestImageFrom = function(otherSliceLocation) {
             var _this = this;
             var imageTagsPromises = this.imageIds.map(function(imageId) {
                 return wvImageManager.get(imageId);
@@ -381,21 +385,20 @@
             return Promise.all(imageTagsPromises).then(function(images) {
                 var closestIndex = -1;
                 var closestDistance = 99999;
-                // console.log("searching slice closest to ", otherImagePositionPatientVector);
+                var sliceThickness = images[0].tags.SliceThickness;
+                // console.log("searching slice closest to ", otherSliceLocation);
                 for (var i=0; i < images.length; ++i) {
-                    var imagePositionVector = images[i].tags.ImagePositionPatient.split("\\");
-                    var distance = Math.abs(parseFloat(otherImagePositionPatientVector[0]) - parseFloat(imagePositionVector[0]))
-                        + Math.abs(parseFloat(otherImagePositionPatientVector[1]) - parseFloat(imagePositionVector[1]))
-                        + Math.abs(parseFloat(otherImagePositionPatientVector[2]) - parseFloat(imagePositionVector[2]));
+                    var distance = Math.abs(images[i].tags.SliceLocation - otherSliceLocation);
 
-                    // console.log("distance is " + distance + "for slice " + i, imagePositionVector);
-                    if (distance < closestDistance) {
+                    // console.log(images[i].tags.SliceLocation, otherSliceLocation);
+                    // console.log("distance = " + distance + ", sliceThickness = " + sliceThickness);
+                    if (distance < closestDistance && distance <= sliceThickness) {
                         closestIndex = i;
                         closestDistance = distance;
                     }
                 }
 
-                return {'closestIndex':closestIndex, 'series': _this};
+                return {'closestIndex':closestIndex, 'series': _this, 'closestDistance': closestDistance};
             });
 
         };
