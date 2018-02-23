@@ -62,23 +62,49 @@
         var vm = this;
         this.activated = false;
         this.synchroEnabled = false;
+        this.offsets = {};
 
         var _wvSeriesIdViewModels = [];
     	this.register = function(viewmodel) {
+            console.log("register", viewmodel);
             _wvSeriesIdViewModels.push(viewmodel);
     	};
     	this.unregister = function(viewmodel) {
+            console.log("unregister", viewmodel);
             _.pull(_wvSeriesIdViewModels, viewmodel);
     	};
 
         this.activate = function() {
+            console.log("activate");
             _wvSeriesIdViewModels
                 .forEach(registerDesktopEvents);
             _wvSeriesIdViewModels
                 .forEach(registerMobileEvents);
             vm.activated = true;
+
+            // store the current offsets between slices
+            var panes = wvPaneManager.getAllPanes();
+            if (vm.synchroEnabled && panes.length > 1) {
+                for (var i=0; i < panes.length; ++i) {
+                    for (var j=0; j < panes.length; ++j) {
+                        if (i != j && panes[i].seriesId !== undefined && panes[j].seriesId !== undefined
+                            && panes[i].seriesId != panes[j].seriesId && panes[i].series.isSameOrientationAs(panes[j].series)) {
+
+                            // both series are in the same orientation, let's store their current offset
+                            if (!(panes[i].seriesId in this.offsets)) {
+                                this.offsets[panes[i].seriesId] = {};    
+                            }
+                            var paneJSliceLocation = panes[j].series.getCurrentImage().tags.SliceLocation;
+                            this.offsets[panes[i].seriesId][panes[j].seriesId] = panes[i].series.getCurrentOffset(paneJSliceLocation);
+                        }
+                    }
+                }
+            }
+            console.log(this.offsets);
+
         };
         this.deactivate = function() {
+            console.log("deactivate");
             _wvSeriesIdViewModels
                 .forEach(unregisterDesktopEvents);
             _wvSeriesIdViewModels
@@ -86,9 +112,11 @@
             vm.activated = false;
         };
         this.enableSynchro = function() {
+            console.log("enableSynchro");
             vm.synchroEnabled = true;
         };
         this.disableSynchro = function() {
+            console.log("disableSynchro");
             vm.synchroEnabled = false;
         };
 

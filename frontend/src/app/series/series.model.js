@@ -402,6 +402,17 @@
             });
 
         };
+
+        WvSeries.prototype.getCurrentOffset = function(otherSliceLocation) {
+            var currentImage = this.getCurrentImage();
+            var offset = otherSliceLocation - images[i].tags.SliceLocation;
+            if (Math.abs(offset) <= currentImage.tags.SliceThickness) {
+                return 0; // if the offset is smaller than a slice, there is no "intention" to have an offset
+            } else {
+                return offset;
+            }
+        };
+
         
         ////////////////
 
