@@ -1099,13 +1099,13 @@ $steps: (
   text-align: center;
 }
 
-@media screen and (max-width: 320px) {
+@media screen and (max-width: 640px) {
   .wvScreenToSmallWarning {
     display: block;
   }
 }
 
-@media screen and (max-height: 240px) {
+@media screen and (max-height: 320px) {
   .wvScreenToSmallWarning {
     display: block;
   }
