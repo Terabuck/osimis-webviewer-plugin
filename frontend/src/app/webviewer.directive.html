@@ -315,10 +315,7 @@
                     vp-series-id="$pane.seriesId" wv-size="{width: 1.0, height: 1.0}" wv-lossless="true"
                     wv-series="$pane.series" wv-image="$image"
                     wv-droppable-series-ext="!vm.readonly && vm.serieslistEnabled"
-                    wv-scroll-on-wheel-series-ext="{
-                        enabled: !vm.readonly,
-                        synchroEnabled: vm.synchroEnabled
-                    }"
+                    wv-scroll-on-wheel-series-ext="!vm.readonly"
                     wv-viewport="$pane.csViewport"
                     wv-image-index="$pane.imageIndex"
 

@@ -131,7 +131,7 @@
         .directive('wvWebviewer', wvWebviewer);
 
     /* @ngInject */
-    function wvWebviewer($rootScope, $timeout, wvStudyManager, wvAnnotationManager, wvSeriesManager, wvPaneManager) {
+    function wvWebviewer($rootScope, $timeout, wvStudyManager, wvAnnotationManager, wvSeriesManager, wvPaneManager, wvSynchronizer) {
         var directive = {
             bindToController: true,
             controller: Controller,
@@ -194,7 +194,7 @@
             vm.noticeEnabled = typeof vm.noticeEnabled !== 'undefined' ? vm.noticeEnabled : false;
             vm.noticeText = typeof vm.noticeText !== 'undefined' ? vm.noticeText : undefined;
             vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;
-            vm.synchroEnabled = true,
+            vm.synchroEnabled = wvSynchronizer.isEnabled(),
             vm.tools = typeof vm.tools !== 'undefined' ? vm.tools : {
                 windowing: false,
                 zoom: false,
@@ -281,6 +281,7 @@
             vm.combinedToolEnabled = typeof vm.combinedToolEnabled !== 'undefined' ? vm.combinedToolEnabled : false;
             vm.studyIslandsDisplayMode = typeof vm.studyIslandsDisplayMode !== 'undefined' ? vm.studyIslandsDisplayMode : "grid";
             vm.paneManager = wvPaneManager;
+            vm.synchronizer = wvSynchronizer;
 
             // Selection-related
             vm.seriesItemSelectionEnabled = typeof vm.seriesItemSelectionEnabled !== 'undefined' ? vm.seriesItemSelectionEnabled : false;
@@ -436,13 +437,8 @@
                     selectedPane.rotateRight();
                     break;
                 case 'toggleSynchro':
-                    vm.synchroEnabled = !vm.synchroEnabled;
-                    if (vm.synchroEnabled) {
-                        console.log("synchro is now enabled");
-                    } else {
-                        console.log("synchro is now disabled");
-                    }
-
+                    vm.synchronizer.enable(!vm.synchronizer.isEnabled());
+                    vm.synchroEnabled = wvSynchronizer.isEnabled();
                     break;
                 default:
                     throw new Error('Unknown toolbar action.');
