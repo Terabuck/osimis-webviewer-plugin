@@ -12,7 +12,7 @@
      */
 
     /* @ngInject */
-    function wvKeyboardShortcutEventManager(wvConfig, wvStudyManager, wvPaneManager, wvSynchronizer){
+    function wvKeyboardShortcutEventManager($rootScope, wvConfig, wvStudyManager, wvPaneManager, wvSynchronizer){
         this.previousSynchroStatus = undefined;
 
         keyboardJS.setContext('viewerShortcut');
@@ -41,7 +41,8 @@
                 keyDownFunction = function(e) {
                     console.log('keyboard shortcut listener for ', keyboardCode, ' (down) is being triggered');
                     e.preventDefault();
-                    keyDownHandler();
+                    e.preventRepeat();
+                    $rootScope.$apply(function() {keyDownHandler();});
                 }
             }
             var keyUpFunction = undefined;
@@ -49,7 +50,7 @@
                 keyUpFunction = function(e) {
                     console.log('keyboard shortcut listener for ', keyboardCode, ' (up) is being triggered');
                     e.preventDefault();
-                    keyUpHandler();
+                    $rootScope.$apply(function() {keyUpHandler();});
                 }
             }
 
@@ -66,7 +67,7 @@
                 wvSynchronizer.enable(true);
             } 
             handlers.disableSynchro = function() {
-                wvSynchronizer.enable(true);
+                wvSynchronizer.enable(false);
             } 
             handlers.enterTemporaryToggleSynchro = function() {
                 if (this_.previousSynchroStatus === undefined) {
@@ -279,3 +280,4 @@
     }
 
 })(this.osimis || (this.osimis = {}));
+

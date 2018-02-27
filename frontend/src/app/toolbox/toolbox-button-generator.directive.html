@@ -234,7 +234,7 @@
         ng-switch-when="toggleSynchro"
         ng-if="vm.toolbox.buttons.hasOwnProperty('toggleSynchro')"
         class="wvButton--underline fa fa-link"
-        ng-class="{active: vm.synchroEnabled, 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        ng-class="{'active': vm.toolbox.wvSynchronizer.isEnabled(), 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         data-title="{{ 'COMPONENTS.TOOLBOX.SYNCHRONIZED_BROWSING' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
