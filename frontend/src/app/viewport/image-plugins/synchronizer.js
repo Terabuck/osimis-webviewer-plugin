@@ -20,12 +20,19 @@
     }
 
     Synchronizer.prototype.enable = function(enabled) {
-        console.log("Synchronizer.enable() ", enabled);
         this._enabled = enabled;
         if (this._enabled) {
+            console.log("Synchronization is now enabled");
             this.computeOffsets();
+        } else {
+            console.log("Synchronization is now disabled");
         }
     }
+
+    Synchronizer.prototype.toggle = function(enabled) {
+        this.enable(!this._enabled);
+    }
+
 
     Synchronizer.prototype.computeOffsets = function() {
         // store the current offsets between slices
@@ -42,7 +49,6 @@
                 }
             }
         }
-        console.log(this._offsets);
     }
 
     Synchronizer.prototype.updateOffsetBetweenPanes = function(paneA, paneB) {
@@ -88,6 +94,7 @@
         var panes = this._wvPaneManager.getAllPanes();
         var this_ = this;
 
+        // console.log("updating synchro");
         if (this._enabled && panes.length > 1) {
             series.getCurrentImagePromise().then(function(currentImage) {
                 var currentSliceLocation = parseFloat(currentImage.tags.SliceLocation);

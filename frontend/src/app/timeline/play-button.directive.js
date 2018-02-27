@@ -44,8 +44,18 @@
     }
 
     /* @ngInject */
-    function Controller() {
+    function Controller(wvSeriesPlayer) {
         // Set default values
         this.readonly = (typeof this.readonly === 'undefined') ? false : this.readonly;
+        this.wvSeriesPlayer = wvSeriesPlayer;
     }
+
+    Controller.prototype.play = function() {
+        this.wvSeriesPlayer.play();
+    };
+
+    Controller.prototype.pause = function() {
+        this.wvSeriesPlayer.pause();
+    };
+
 })();

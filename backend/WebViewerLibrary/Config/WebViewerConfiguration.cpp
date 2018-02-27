@@ -277,6 +277,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
       "applyEmbeddedWindowingPreset4", "applyEmbeddedWindowingPreset5",
       "applyConfigWindowingPreset1", "applyConfigWindowingPreset2", "applyConfigWindowingPreset3",
       "applyConfigWindowingPreset4", "applyConfigWindowingPreset5",
+      "toggleSynchro", "enableSynchro", "disableSynchro",
       "test"
     };
 

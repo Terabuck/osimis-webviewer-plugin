@@ -61,19 +61,20 @@
     }
 
     /* @ngInject */
-    function Controller($scope, wvImageBinaryManager) {
+    function Controller($scope, wvImageBinaryManager, wvSynchronizer) {
         var _this = this;
 
         // Set default values
         this.readonly = (typeof this.readonly === 'undefined') ? false : this.readonly;
 
+        this.wvSynchronizer = wvSynchronizer;
+        
         // [<image index>: [<image quality: int>, ...], ...] - image-index != image-id
         this.imageQualities = [];
         // [<image index>: <image quality: int> , ...] - image-index != image-id
         this.bestQualityByImage = [];
 
         this.QualityKeys = _.invert(osimis.quality);
-
         // $scope.$watch('vm.series.id', function(seriesId) {
 
         // });
@@ -195,6 +196,11 @@
         });
 
     }
+
+    Controller.prototype.goToImage = function(i) {
+        this.series.goToImage(i);
+        this.wvSynchronizer.update(this.series);
+    };
 
     Controller.prototype._listenSeries = function() {
         // Register events

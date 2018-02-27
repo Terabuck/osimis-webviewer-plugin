@@ -28,7 +28,7 @@
         // Panes.
         // Must keep reference as it's databound in `wvWebviewer` views.
         this.panes = [
-            new osimis.Pane(this._Promise, this._studyManager, this._seriesManager, 0, 0, this._wvConfig)
+            new osimis.Pane($timeout, this._Promise, this._studyManager, this._seriesManager, 0, 0, this._wvConfig)
         ];
         this.panes[0].isSelected = true;
 
@@ -118,7 +118,7 @@
                     var pane = removedPanes.pop();
                     // If none exist, create a new one.
                     if (!pane) {
-                        pane = new osimis.Pane(this._Promise, this._studyManager, this._seriesManager, x, y, this._wvConfig);
+                        pane = new osimis.Pane(this.$timeout, this._Promise, this._studyManager, this._seriesManager, x, y, this._wvConfig);
                     }
                     // Otherwise, move the previously removed pane into its new
                     // position.
