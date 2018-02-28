@@ -29,19 +29,21 @@
             }
         }
 
-        bindKey('shift', handlers.enterTemporaryToggleSynchro, handlers.exitTemporaryToggleSynchro);
+        bindKey('shift', handlers.enterTemporaryToggleSynchro, handlers.exitTemporaryToggleSynchro, true);
         return handlers;
 
         ////////////
 
-        function bindKey(keyboardCode, keyDownHandler, keyUpHandler){
+        function bindKey(keyboardCode, keyDownHandler, keyUpHandler, preventRepeat){
 
             var keyDownFunction = undefined;
             if (keyDownHandler) {
                 keyDownFunction = function(e) {
                     console.log('keyboard shortcut listener for ', keyboardCode, ' (down) is being triggered');
                     e.preventDefault();
-                    e.preventRepeat();
+                    if (preventRepeat) {
+                        e.preventRepeat();
+                    }
                     $rootScope.$apply(function() {keyDownHandler();});
                 }
             }
@@ -172,11 +174,13 @@
             handlers.previousImage = function() {
                 var selectedPane = wvPaneManager.getSelectedPane();
                 selectedPane.series.goToPreviousImage(true);
+                wvSynchronizer.update(selectedPane.series);
             }
 
             handlers.nextImage = function() {
                 var selectedPane = wvPaneManager.getSelectedPane();
                 selectedPane.series.goToNextImage(true);
+                wvSynchronizer.update(selectedPane.series);
             }
 
             handlers.rotateLeft = function() {

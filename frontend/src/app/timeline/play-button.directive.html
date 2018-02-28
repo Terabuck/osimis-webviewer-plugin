@@ -5,7 +5,7 @@
     <label
         data-title="{{ 'COMPONENTS.TIMELINE.PLAY' | translate | wvCapitalize }}"
         ng-click="!vm.readonly && vm.play()"
-        ng-show="!vm.series.isPlaying"
+        ng-show="!vm.isPlaying()"
         class="wv-timeline-controls-button"
     >
         <span class="fa fa-play" class="wv-timeline-controls-vertical-sizing"></span>
@@ -13,7 +13,7 @@
     <label
         data-title="{{ 'COMPONENTS.TIMELINE.PAUSED' | translate | wvCapitalize }}"
         ng-click="!vm.readonly && vm.pause()"
-        ng-show="vm.series.isPlaying"
+        ng-show="vm.isPlaying()"
         class="wv-timeline-controls-button"
     >
         <span class="fa fa-pause" class="wv-timeline-controls-vertical-sizing"></span>

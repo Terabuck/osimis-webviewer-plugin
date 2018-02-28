@@ -277,7 +277,7 @@
 
         var _cancelAnimationId = null;
         var _timeLog;
-        WvSeries.prototype.play = function() {
+        WvSeries.prototype.playPreview = function() { // when playing in the viewport, we use the SeriesPlayer that can synchronize series
             var _this = this;
 
             // Do nothing when there is only one image
@@ -339,7 +339,7 @@
             this.isPlaying = true;
         };
 
-        WvSeries.prototype.pause = function() {
+        WvSeries.prototype.pausePreview = function() {
             if (_cancelAnimationId) {
                 cancelAnimationFrame(_cancelAnimationId);
                 _cancelAnimationId = null;

@@ -51,11 +51,20 @@
     }
 
     Controller.prototype.play = function() {
-        this.wvSeriesPlayer.play();
+        if (this.wvSeriesPlayer.isPlaying(this.series)) {
+            this.wvSeriesPlayer.pause(this.series);    
+        } else {
+            this.wvSeriesPlayer.play(this.series);    
+        }
     };
 
     Controller.prototype.pause = function() {
-        this.wvSeriesPlayer.pause();
+        this.wvSeriesPlayer.pause(this.series);
     };
+
+    Controller.prototype.isPlaying = function() {
+        this.wvSeriesPlayer.isPlaying(this.series);
+    };
+
 
 })();
