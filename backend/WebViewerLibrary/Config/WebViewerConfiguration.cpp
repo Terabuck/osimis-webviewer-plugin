@@ -67,6 +67,42 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   keyboardShortcuts["shift + up"] = "previousStudy";
   keyboardShortcuts["shift + down"] = "nextStudy";
 
+  keyboardShortcuts["l"] = "rotateLeft";
+  keyboardShortcuts["r"] = "rotateRight";
+  keyboardShortcuts["v"] = "flipVertical";
+  keyboardShortcuts["h"] = "flipHorizontal";
+  keyboardShortcuts["i"] = "invertColor";
+  keyboardShortcuts["c"] = "selectCombinedTool";
+  keyboardShortcuts["p"] = "selectPanTool";
+  keyboardShortcuts["z"] = "selectZoomTool";
+  keyboardShortcuts["w"] = "selectWindowingTool";
+  keyboardShortcuts["ctrl + l"] = "selectLengthMeasureTool";
+  keyboardShortcuts["ctrl + p"] = "selectPixelProbeTool";
+  keyboardShortcuts["ctrl + m"] = "selectMagnifyingGlassTool";
+  keyboardShortcuts["ctrl + e"] = "selectEllipticalRoiTool";
+  keyboardShortcuts["ctrl + r"] = "selectRectangleRoiTool";
+  keyboardShortcuts["ctrl + a"] = "selectArrowAnnotateTool";
+  keyboardShortcuts["ctrl + k"] = "selectKeyImageCaptureTool";
+  keyboardShortcuts["1, num1"] = "applyEmbeddedWindowingPreset1";
+  keyboardShortcuts["2, num2"] = "applyEmbeddedWindowingPreset2";
+  keyboardShortcuts["3, num3"] = "applyEmbeddedWindowingPreset3";
+  keyboardShortcuts["4, num4"] = "applyEmbeddedWindowingPreset4";
+  keyboardShortcuts["5, num5"] = "applyEmbeddedWindowingPreset5";
+  keyboardShortcuts["ctrl + 1, ctrl + num1"] = "applyConfigWindowingPreset1";
+  keyboardShortcuts["ctrl + 2, ctrl + num2"] = "applyConfigWindowingPreset2";
+  keyboardShortcuts["ctrl + 3, ctrl + num3"] = "applyConfigWindowingPreset3";
+  keyboardShortcuts["ctrl + 4, ctrl + num4"] = "applyConfigWindowingPreset4";
+  keyboardShortcuts["ctrl + 5, ctrl + num5"] = "applyConfigWindowingPreset5";
+  keyboardShortcuts["s"] = "toggleSynchro";
+  keyboardShortcuts["f1"] = "setLayout1x1";
+  keyboardShortcuts["f2"] = "setLayout1x2";
+  keyboardShortcuts["f3"] = "setLayout2x1";
+  keyboardShortcuts["f4"] = "setLayout2x2";
+  keyboardShortcuts["space"] = "playPause";
+  keyboardShortcuts["tab"] = "selectNextPane";
+  keyboardShortcuts["shift + tab"] = "selectPreviousPane";
+  keyboardShortcuts["enter"] = "loadSeriesInPane";
+
   gdcmEnabled = OrthancPlugins::GetBoolValue(wvConfig, "GdcmEnabled", true);
   // By default, use GDCM for everything.
   restrictTransferSyntaxes = false;
@@ -281,7 +317,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
       "setLayout1x1", "setLayout1x2", "setLayout2x1", "setLayout2x2",
       "play", "pause", "playPause", "selectNextPane", "selectPreviousPane",
       "loadSeriesInPane",
-      "test"
+      "null"
     };
 
     Json::Value::Members members = keyboardShortcuts.getMemberNames();

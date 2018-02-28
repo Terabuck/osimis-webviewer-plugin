@@ -20,12 +20,14 @@
         var handlers = createHandlers(this);
 
         console.log("assigning keyboard shortcuts");
-        for (var keyboardCode in wvConfig.keyboardShortcuts) {
-            var handlerName = wvConfig.keyboardShortcuts[keyboardCode];
+        for (var keyboardCodeString in wvConfig.keyboardShortcuts) {
+            var keyboardCodes = keyboardCodeString.split(",");
+
+            var handlerName = wvConfig.keyboardShortcuts[keyboardCodeString];
             if (handlerName in handlers) {
-                bindKey(keyboardCode, handlers[handlerName]);
+                bindKey(keyboardCodes, handlers[handlerName]);
             } else {
-                console.log("unable to define a keyboard shortcut for ", keyboardCode, " '", handlerName, "'; handler is not available");
+                console.log("unable to define a keyboard shortcut for ", keyboardCodeString, " '", handlerName, "'; handler is not available");
             }
         }
 
@@ -97,6 +99,9 @@
                 } else {
                     wvSeriesPlayer.play(selectedPane.series);
                 }
+            }
+
+            handlers.null = function() {
             }
 
             handlers.nextStudy = function() {
