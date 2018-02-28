@@ -12,7 +12,7 @@
      */
 
     /* @ngInject */
-    function wvKeyboardShortcutEventManager($rootScope, wvConfig, wvStudyManager, wvPaneManager, wvSynchronizer){
+    function wvKeyboardShortcutEventManager($rootScope, wvConfig, wvStudyManager, wvPaneManager, wvSynchronizer, wvSeriesPlayer){
         this.previousSynchroStatus = undefined;
 
         keyboardJS.setContext('viewerShortcut');
@@ -80,6 +80,23 @@
             handlers.exitTemporaryToggleSynchro = function() {
                 wvSynchronizer.enable(this_.previousSynchroStatus);
                 this_.previousSynchroStatus = undefined;
+            }
+
+            handlers.play = function() {
+                var selectedPane = wvPaneManager.getSelectedPane();
+                wvSeriesPlayer.play(selectedPane.series)
+            }
+            handlers.pause = function() {
+                var selectedPane = wvPaneManager.getSelectedPane();
+                wvSeriesPlayer.pause(selectedPane.series)
+            }
+            handlers.playPause = function() {
+                var selectedPane = wvPaneManager.getSelectedPane();
+                if (wvSeriesPlayer.isPlaying(selectedPane.series)) {
+                    wvSeriesPlayer.pause(selectedPane.series);
+                } else {
+                    wvSeriesPlayer.play(selectedPane.series);
+                }
             }
 
             handlers.nextStudy = function() {
@@ -201,6 +218,60 @@
             
             handlers.invertColor = function() {
                 wvPaneManager.getSelectedPane().invertColor();
+            }
+
+            handlers.setLayout1x1 = function() {
+                wvPaneManager.setLayout(1, 1);
+            }
+            handlers.setLayout1x2 = function() {
+                wvPaneManager.setLayout(1, 2);
+            }
+            handlers.setLayout2x1 = function() {
+                wvPaneManager.setLayout(2, 1);
+            }
+            handlers.setLayout2x2 = function() {
+                wvPaneManager.setLayout(2, 2);
+            }
+
+            handlers.selectNextPane = function() {
+                wvPaneManager.selectNextPane();
+            }
+            handlers.selectPreviousPane = function() {
+                wvPaneManager.selectPreviousPane();
+            }
+
+            handlers.loadSeriesInPane = function() {
+                //opens a series in the selected pane if it's empty
+                var selectedPane = wvPaneManager.getSelectedPane();
+                if (!selectedPane.isEmpty()) {
+                    return;
+                }
+                // find the previous pane with content -> we'll get the next series
+                var previousPaneWithContent =  null;
+                var currentPane = selectedPane;
+                while (previousPaneWithContent == null) {
+                    currentPane = wvPaneManager.getPreviousPane(currentPane);
+                    if (!currentPane.isEmpty()) {
+                        previousPaneWithContent = currentPane;
+                    }
+                } 
+
+                previousPaneWithContent.getStudy().then(function(study){
+                    var currentItemId = previousPaneWithContent.seriesId || previousPaneWithContent.videoId || previousPaneWithContent.reportId,
+                        nextItemTuple = study.getNextItemId(currentItemId),
+                        paneOptions = {csViewport: null, isSelected: true};
+
+                    if(nextItemTuple[1] == "series"){
+                        paneOptions.seriesId = nextItemTuple[0];
+                    }else if(nextItemTuple[1] == "video"){
+                        paneOptions.videoId = nextItemTuple[0];
+                    }else {
+                        paneOptions.reportId = nextItemTuple[0];
+                    }
+                    if(nextItemTuple[0] !== currentItemId){
+                        wvPaneManager.setPane(selectedPane.x, selectedPane.y, paneOptions)
+                    }
+                });
             }
             
             handlers.selectCombinedTool = function() {

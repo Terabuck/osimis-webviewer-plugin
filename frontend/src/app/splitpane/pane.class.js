@@ -138,6 +138,10 @@
         return this.x === x && this.y === y;
     };
 
+    Pane.prototype.getPosition = function() {
+        return {'x' : this.x, 'y' : this.y};
+    };
+
     Pane.prototype.applyWindowing = function(windowWidth, windowCenter) {
         // Apply windowing.
         this.csViewport.voi.windowWidth = windowWidth;

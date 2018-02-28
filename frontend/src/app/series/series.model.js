@@ -372,8 +372,8 @@
         };
 
         WvSeries.prototype.isSameOrientationAs = function(otherSeries) {
-            return (this.tags.ImageOrientationPatient == otherSeries.tags.ImageOrientationPatient
-                && this.tags.FrameOfReferenceUID == this.tags.FrameOfReferenceUID);
+            return (this.tags.ImageOrientationPatient == otherSeries.tags.ImageOrientationPatient);
+                // && this.tags.FrameOfReferenceUID == otherSeries.tags.FrameOfReferenceUID);
         };
 
         WvSeries.prototype.getIndexOfClosestImageFrom = function(otherSliceLocation) {

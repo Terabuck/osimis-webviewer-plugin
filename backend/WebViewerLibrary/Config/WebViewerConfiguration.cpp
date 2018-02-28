@@ -278,6 +278,9 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
       "applyConfigWindowingPreset1", "applyConfigWindowingPreset2", "applyConfigWindowingPreset3",
       "applyConfigWindowingPreset4", "applyConfigWindowingPreset5",
       "toggleSynchro", "enableSynchro", "disableSynchro",
+      "setLayout1x1", "setLayout1x2", "setLayout2x1", "setLayout2x2",
+      "play", "pause", "playPause", "selectNextPane", "selectPreviousPane",
+      "loadSeriesInPane",
       "test"
     };
 

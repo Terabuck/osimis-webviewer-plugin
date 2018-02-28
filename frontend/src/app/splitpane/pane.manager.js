@@ -337,11 +337,7 @@
         var previouslySelectedPane = this.getSelectedPane();
         var newlySelectedPane = this.getPane(x, y);
         
-        // Don't do anything if pane is empty.
         var newlySelectedPane = this.getPane(x, y);
-        if (newlySelectedPane.isEmpty()) {
-            return;
-        };
 
         // Unset previously selected pane
         previouslySelectedPane.isSelected = false;
@@ -352,6 +348,58 @@
         // Trigger selected pane changed event.
         this.onSelectedPaneChanged.trigger(newlySelectedPane);
     };
+
+    PaneManager.prototype.selectNextPane = function() {
+        var nextPanePosition = this.getNextPanePosition(this.getSelectedPane());
+        this.selectPane(nextPanePosition.x, nextPanePosition.y);
+    };
+
+    PaneManager.prototype.selectPreviousPane = function() {
+        var nextPanePosition = this.getPreviousPanePosition(this.getSelectedPane());
+        this.selectPane(nextPanePosition.x, nextPanePosition.y);
+    };
+
+    PaneManager.prototype.getNextPanePosition = function(pane) {
+        var currentSelectedPanePosition = pane.getPosition();
+
+        var nextX = currentSelectedPanePosition.x + 1;
+        var nextY = currentSelectedPanePosition.y;
+        if (nextX >= this.layout.x) {
+            nextX = 0;
+            nextY = nextY + 1;
+        }  
+        if (nextY >= this.layout.y) {
+            nextY = 0;
+        }
+
+        return {x : nextX, y : nextY};
+    }
+
+    PaneManager.prototype.getPreviousPanePosition = function(pane) {
+        var currentSelectedPanePosition = pane.getPosition();
+
+        var nextX = currentSelectedPanePosition.x - 1;
+        var nextY = currentSelectedPanePosition.y;
+        if (nextX < 0) {
+            nextX = this.layout.x - 1;
+            nextY = nextY - 1;
+        }  
+        if (nextY < 0  ) {
+            nextY = this.layout.y - 1;
+        }
+
+        return {x : nextX, y : nextY};
+    }
+
+    PaneManager.prototype.getNextPane = function(pane) {
+        var nextPanePosition = this.getNextPanePosition(pane);
+        return this.getPane(nextPanePosition.x, nextPanePosition.y);
+    }
+
+    PaneManager.prototype.getPreviousPane = function(pane) {
+        var nextPanePosition = this.getPreviousPanePosition(pane);
+        return this.getPane(nextPanePosition.x, nextPanePosition.y);
+    }
 
     /**
      * @ngdoc method
