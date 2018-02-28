@@ -71,6 +71,7 @@ public:
   Json::Value windowingBehaviour;
   Json::Value combinedToolBehaviour;
   Json::Value keyboardShortcuts;
+  bool keyboardShortcutsEnabled;
 
   // If activated, this feature displays a button on each viewport. When the button is
   // clicked, a new series is created with the image of the viewport, including the

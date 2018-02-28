@@ -19,19 +19,23 @@
 
         var handlers = createHandlers(this);
 
-        console.log("assigning keyboard shortcuts");
-        for (var keyboardCodeString in wvConfig.keyboardShortcuts) {
-            var keyboardCodes = keyboardCodeString.split(",");
+        if (wvConfig.keyboardShortcutsEnabled) {
+            console.log("assigning keyboard shortcuts");
+            for (var keyboardCodeString in wvConfig.keyboardShortcuts) {
+                var keyboardCodes = keyboardCodeString.split(",");
 
-            var handlerName = wvConfig.keyboardShortcuts[keyboardCodeString];
-            if (handlerName in handlers) {
-                bindKey(keyboardCodes, handlers[handlerName]);
-            } else {
-                console.log("unable to define a keyboard shortcut for ", keyboardCodeString, " '", handlerName, "'; handler is not available");
+                var handlerName = wvConfig.keyboardShortcuts[keyboardCodeString];
+                if (handlerName in handlers) {
+                    bindKey(keyboardCodes, handlers[handlerName]);
+                } else {
+                    console.log("unable to define a keyboard shortcut for ", keyboardCodeString, " '", handlerName, "'; handler is not available");
+                }
             }
-        }
 
-        bindKey('shift', handlers.enterTemporaryToggleSynchro, handlers.exitTemporaryToggleSynchro, true);
+            bindKey('shift', handlers.enterTemporaryToggleSynchro, handlers.exitTemporaryToggleSynchro, true);
+        } else {
+            console.log("keyboard shortcuts are disabled");
+        }
         return handlers;
 
         ////////////

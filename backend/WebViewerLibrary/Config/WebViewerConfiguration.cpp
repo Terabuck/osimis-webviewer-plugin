@@ -212,6 +212,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
 
   persistentCachedImageStorageEnabled = OrthancPlugins::GetBoolValue(wvConfig, "CacheEnabled", false);
   studyDownloadEnabled = OrthancPlugins::GetBoolValue(wvConfig, "StudyDownloadEnabled", true);
+  keyboardShortcutsEnabled = OrthancPlugins::GetBoolValue(wvConfig, "KeyboardShortcutsEnabled", true);
   videoDisplayEnabled = OrthancPlugins::GetBoolValue(wvConfig, "VideoDisplayEnabled", true);
   annotationStorageEnabled = OrthancPlugins::GetBoolValue(wvConfig, "AnnotationStorageEnabled", false);
   keyImageCaptureEnabled = OrthancPlugins::GetBoolValue(wvConfig, "KeyImageCaptureEnabled", false);
@@ -405,6 +406,7 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
     config["version"]["webviewer"] = plugin["Version"].asString();
   }
 
+  config["keyboardShortcutsEnabled"] = keyboardShortcutsEnabled;
   config["enableStudyDownload"] = studyDownloadEnabled;
   config["enableVideoDisplay"] = videoDisplayEnabled;
   config["enableAnnotationStorage"] = annotationStorageEnabled;

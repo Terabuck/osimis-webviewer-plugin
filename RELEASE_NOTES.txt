@@ -5,7 +5,7 @@ Pending changes in the mainline
 
 Features:
 * Added synchronized browsing
-* Added options to configure the keyboard shortcuts ("KeyboardShortcuts")
+* Added options to configure the keyboard shortcuts ("KeyboardShortcuts" + "KeyboardShortcutsEnabled")
 * Added a combined tool that can handle 3 tools on mouse and/or touch gestures ("CombinedToolBehaviour")
 * Added an option to configure the mouse behaviour for the windowing tool ("WindowingBehaviour")
 * Added an option to preload high quality images on the frontend before the user needs them.
