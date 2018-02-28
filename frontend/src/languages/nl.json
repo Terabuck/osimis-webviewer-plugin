@@ -75,7 +75,7 @@
             "ROTATE_LEFT": "linksom draaien",
             "ROTATE_RIGHT": "rechtsom draaien",
             "SPLIT_PANE_CONFIG_LEGEND_PARAGRAPH": "Verander de viewport-layout.",
-            "TOUCH_GESTURE": "Aanraakgebaar",
+            "COMBINED_TOOL": "Aanraakgebaar",
             "WINDOWING_PRESET_LEGEND": "Klik op de knop om de windowing-tool in of uit te schakelen of een voorinstelling toe te passen op de geselecteerde viewport.",
             "ZOOM": "zoom"
         }

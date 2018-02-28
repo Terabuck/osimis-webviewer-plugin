@@ -5,7 +5,7 @@
         ng-if="vm.toolbox.buttons.hasOwnProperty('combinedTool')"
         class="wvButton--underline glyphicon glyphicon-hand-up"
         ng-class="{active: vm.toolbox.tool === 'combinedTool', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
-        data-title="{{ 'COMPONENTS.TOOLBOX.TOUCH_GESTURE' | translate | wvCapitalize }}"
+        data-title="{{ 'COMPONENTS.TOOLBOX.COMBINED_TOOL' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         bs-tooltip
