@@ -128,21 +128,29 @@
                 }
             };
             vm.updateLayout = function(seriesTags, imageId, customOverlayInfo) {
-                wvInstanceManager
-                    .getTags(imageId.split(":")[0]) // imageId is something like orthancId:frameId
-                    .then(function(instanceTags) {
-                        vm.topLeftLines = vm.getTopLeftArea(seriesTags, instanceTags);
-                        vm.topRightLines = vm.getTopRightArea(seriesTags, instanceTags);
-                        vm.bottomLeftLines = vm.getBottomLeftArea(seriesTags, instanceTags);
-                        vm.bottomRightLines = vm.getBottomRightArea(seriesTags, instanceTags);
-
-                        if (customOverlayInfo !== undefined) {
-                            vm.updateIcons(customOverlayInfo.icons);
-                        } else {
-                            vm.updateIcons(undefined);
-                        }
-                    });
-
+                if (imageId) {
+                    wvInstanceManager
+                        .getTags(imageId.split(":")[0]) // imageId is something like orthancId:frameId
+                        .then(function(instanceTags) {
+                            vm.topLeftLines = vm.getTopLeftArea(seriesTags, instanceTags);
+                            vm.topRightLines = vm.getTopRightArea(seriesTags, instanceTags);
+                            vm.bottomLeftLines = vm.getBottomLeftArea(seriesTags, instanceTags);
+                            vm.bottomRightLines = vm.getBottomRightArea(seriesTags, instanceTags);
+                            vm.showOverlay = true;
+                            if (customOverlayInfo !== undefined) {
+                                vm.updateIcons(customOverlayInfo.icons);
+                            } else {
+                                vm.updateIcons(undefined);
+                            }
+                        });
+                } else {
+                    vm.topLeftLines = [];
+                    vm.topRightLines = [];
+                    vm.bottomLeftLines = [];
+                    vm.bottomRightLines = [];
+                    vm.showOverlay = false;
+                    vm.updateIcons(undefined);
+                }
             };
 
             // auto grab series model

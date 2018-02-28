@@ -84,6 +84,10 @@
                     var lastX = !isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX;
                     var lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
 
+                    $(document).one('mouseup', function(e) {
+                        $(document).unbind('mousemove.dvt');
+                    });
+
                     $(document).on('mousemove.dvt', function(e) {
                         // Prevent issues on touchscreens.
                         e.preventDefault();
@@ -103,10 +107,6 @@
                             else if (mouseButton === 3 && wvConfig.combinedToolBehaviour["rightMouseButton"]) { // right-click + move
                                 _this._applyTool(wvConfig.combinedToolBehaviour["rightMouseButton"], viewport, deltaX, deltaY);
                             }
-                        });
-
-                        $(document).one('mouseup', function(e) {
-                            $(document).unbind('mousemove.dvt');
                         });
                     });
                 });

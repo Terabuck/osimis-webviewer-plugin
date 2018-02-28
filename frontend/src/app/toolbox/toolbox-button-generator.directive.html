@@ -229,6 +229,20 @@
         <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'vflip'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
+    <!-- Synchro -->
+    <label
+        ng-switch-when="toggleSynchro"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('toggleSynchro')"
+        class="wvButton--underline fa fa-link"
+        ng-class="{'active': vm.toolbox.wvSynchronizer.isEnabled(), 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        data-title="{{ 'COMPONENTS.TOOLBOX.SYNCHRONIZED_BROWSING' | translate | wvCapitalize }}"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        bs-tooltip
+        >
+        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'toggleSynchro'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
     <!-- Key Image Note -->
     <wv-keyimagenote-button
         ng-switch-when="keyImageCapture"

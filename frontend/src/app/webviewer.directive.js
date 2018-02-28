@@ -131,7 +131,7 @@
         .directive('wvWebviewer', wvWebviewer);
 
     /* @ngInject */
-    function wvWebviewer($rootScope, $timeout, wvStudyManager, wvAnnotationManager, wvSeriesManager, wvPaneManager) {
+    function wvWebviewer($rootScope, $timeout, wvStudyManager, wvAnnotationManager, wvSeriesManager, wvPaneManager, wvSynchronizer) {
         var directive = {
             bindToController: true,
             controller: Controller,
@@ -194,6 +194,7 @@
             vm.noticeEnabled = typeof vm.noticeEnabled !== 'undefined' ? vm.noticeEnabled : false;
             vm.noticeText = typeof vm.noticeText !== 'undefined' ? vm.noticeText : undefined;
             vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;
+            vm.synchroEnabled = wvSynchronizer.isEnabled(),
             vm.tools = typeof vm.tools !== 'undefined' ? vm.tools : {
                 windowing: false,
                 zoom: false,
@@ -218,7 +219,8 @@
                 hflip: false,
                 rotateLeft: false,
                 rotateRight: false,
-                arrowAnnotate: false
+                arrowAnnotate: false,
+                toggleSynchro: false
             };
 
             if (vm.keyImageCaptureEnabled) { // activate
@@ -267,7 +269,8 @@
                             {type: "button", tool: "arrowAnnotate"},
                         ]
                     },
-                    {type: "button", tool: "keyImageCapture"}
+                    {type: "button", tool: "keyImageCapture"},
+                    {type: "button", tool: "toggleSynchro"}
                 ]
             }
             vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];
@@ -278,6 +281,7 @@
             vm.combinedToolEnabled = typeof vm.combinedToolEnabled !== 'undefined' ? vm.combinedToolEnabled : false;
             vm.studyIslandsDisplayMode = typeof vm.studyIslandsDisplayMode !== 'undefined' ? vm.studyIslandsDisplayMode : "grid";
             vm.paneManager = wvPaneManager;
+            vm.synchronizer = wvSynchronizer;
 
             // Selection-related
             vm.seriesItemSelectionEnabled = typeof vm.seriesItemSelectionEnabled !== 'undefined' ? vm.seriesItemSelectionEnabled : false;
@@ -431,6 +435,10 @@
                     break;
                 case 'rotateRight':
                     selectedPane.rotateRight();
+                    break;
+                case 'toggleSynchro':
+                    vm.synchronizer.enable(!vm.synchronizer.isEnabled());
+                    vm.synchroEnabled = wvSynchronizer.isEnabled();
                     break;
                 default:
                     throw new Error('Unknown toolbar action.');

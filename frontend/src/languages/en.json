@@ -75,6 +75,7 @@
             "ROTATE_LEFT": "rotate to the left",
             "ROTATE_RIGHT": "rotate to the right",
             "SPLIT_PANE_CONFIG_LEGEND_PARAGRAPH": "Change the viewport layout.",
+            "SYNCHRONIZED_BROWSING" : "Synchronized browsing",
             "TOUCH_GESTURE": "touch gesture",
             "WINDOWING_PRESET_LEGEND": "Click on the button to toggle the windowing tool or apply a preset to the selected viewport.",
             "ZOOM": "zoom"

@@ -20,12 +20,13 @@
 (function(osimis) {
     'use strict';
 
-    function Pane(Promise, studyManager, seriesManager, x, y, wvConfig) {
+    function Pane($timeout, Promise, studyManager, seriesManager, x, y, wvConfig) {
         // Injections
         this._Promise = Promise;
         this._studyManager = studyManager;
         this._seriesManager = seriesManager;
         this._wvConfig = wvConfig;
+        this.$timeout = $timeout;
 
         // @warning This parameter is used for other services to access the
         // series model. As the series manager is ill-formed and always create
@@ -146,12 +147,24 @@
     Pane.prototype.applyEmbeddedWindowingPreset = function(presetsIndex) {
         var _this = this;
         this.getEmbeddedWindowingPresetsPromise().then(function(windowingPresets) {
-            _this.applyWindowing(windowingPresets[presetsIndex].windowWidth, windowingPresets[presetsIndex].windowCenter);
+            if (!(presetsIndex in windowingPresets)) {
+                console.log("no windowing presets defined in DICOM file for index ", presetsIndex);
+            } else {
+                _this.applyWindowing(windowingPresets[presetsIndex].windowWidth, windowingPresets[presetsIndex].windowCenter);
+            }
         });
     };
 
     Pane.prototype.applyConfigWindowingPreset = function(presetsIndex) {
-        this.applyWindowing(this._wvConfig.windowingPresets[presetsIndex].windowWidth, this._wvConfig.windowingPresets[presetsIndex].windowCenter);
+        if (!(presetsIndex in this._wvConfig.windowingPresets)) {
+            console.log("no windowing presets defined in config file for index ", presetsIndex);
+        } else {
+            var _this = this;
+            this.$timeout(function() { // don't know why but, if applyWindowing is called synchronously, changes are not applied
+                _this.applyWindowing(_this._wvConfig.windowingPresets[presetsIndex].windowWidth, _this._wvConfig.windowingPresets[presetsIndex].windowCenter);
+            }, 1);
+            
+        }
     };
 
     Pane.prototype.rotateLeft = function() {

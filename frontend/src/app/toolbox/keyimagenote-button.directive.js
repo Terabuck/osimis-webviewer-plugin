@@ -71,7 +71,6 @@
         var _this = this;
         var buttonEl = $element.children().first();
 
-        this.splitpaneLayout = typeof this.splitpaneLayout !== 'undefined' ? this.splitpaneLayout : {x: 1, y: 1};
         this.readonly = typeof this.readonly !== 'undefined' ? this.readonly : false;
         this.popoverPlacement = typeof this.popoverPlacement !== 'undefined' ? this.popoverPlacement : 'bottom';
         this.insidePopover = false;

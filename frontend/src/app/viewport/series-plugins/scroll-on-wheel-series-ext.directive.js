@@ -42,11 +42,10 @@
         function link(scope, element, attrs, tool) {
             // Switch activate/deactivate based on databound HTML attribute
             var wvScrollOnWheelSeriesExt = $parse(attrs.wvScrollOnWheelSeriesExt);
-            scope.$watch(wvScrollOnWheelSeriesExt, function(isActivated) {
-                if (isActivated) {
+            scope.$watch(wvScrollOnWheelSeriesExt, function(enabled) {
+                if (enabled) {
                     tool.activate();
-                }
-                else {
+                } else {
                     tool.deactivate();
                 }
             });
@@ -54,7 +53,7 @@
     }
 
     /* @ngInject */
-    function Controller($scope, $element, $attrs, hamster) {
+    function Controller($scope, $element, $attrs, hamster, wvPaneManager, wvSeriesManager, wvSynchronizer) {
         var vm = this;
 
         var _wvSeriesIdViewModels = [];
@@ -98,17 +97,20 @@
             hamsterInstance.wheel(function(event, delta, deltaX, deltaY) {
                 $scope.$apply(function() {
                     var series = viewmodel.getSeries();
+                    var panes = wvPaneManager.getAllPanes();
 
                     if (!series) {
                         return;
                     }
                     else if (deltaY < 0) {
-                        series.goToPreviousImage();
+                        series.goToPreviousImage(true);
                     }
                     else if (deltaY > 0) {
                         // @todo calibrate the required speed and accuracy for the enduser
-                        series.goToNextImage(false);
+                        series.goToNextImage(true);
                     }
+
+                    wvSynchronizer.update(series);          
                 });
 
                 // prevent horizontal & vertical page scrolling
