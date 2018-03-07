@@ -59,6 +59,9 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   combinedToolBehaviour["twoTouchPan"] = "pan";
   combinedToolBehaviour["threeTouchPan"] = Json::nullValue;
 
+  mouseWheelBehaviour["down"] = "previousImage";
+  mouseWheelBehaviour["up"] = "nextImage";
+
   keyboardShortcuts = Json::Value(Json::objectValue);
   keyboardShortcuts["left"] = "previousImage";
   keyboardShortcuts["right"] = "nextImage";
@@ -183,12 +186,21 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
 
     for (size_t i = 0; i < members.size(); i++)
     {
-      // TODO: check validity of WindowingBehaviour
-      // check key is valid
-      // check value is valid
-      // check keys are not duplicated
-      // check values are not duplicated (TBC)
       windowingBehaviour[members[i].c_str()] = wvConfig["WindowingBehaviour"][members[i]];
+    }
+  }
+
+  // Retrieve mouse wheel (if set).
+  if (wvConfig.isMember("MouseWheelBehaviour") &&
+      wvConfig["MouseWheelBehaviour"].type() == Json::objectValue)
+  {
+    mouseWheelBehaviour = Json::Value(Json::objectValue);  // remove default values
+
+    Json::Value::Members members = wvConfig["MouseWheelBehaviour"].getMemberNames();
+
+    for (size_t i = 0; i < members.size(); i++)
+    {
+      mouseWheelBehaviour[members[i].c_str()] = wvConfig["MouseWheelBehaviour"][members[i]];
     }
   }
 
@@ -202,10 +214,6 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
 
     for (size_t i = 0; i < members.size(); i++)
     {
-      // TODO: check validity of keyboardShortcuts:
-      // only one keyboardCode per function
-      // check key (keycode) is valid
-      // check value (function) is valid
       keyboardShortcuts[members[i].c_str()] = wvConfig["KeyboardShortcuts"][members[i]];
     }
   }
@@ -338,6 +346,33 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
     }
   }
 
+  {// validate mouse wheel
+    std::set<std::string> mouseWheelAllowedDirections = { "up", "down" };
+    std::set<std::string> mouseWheelAllowedToolNames = { "nextImage", "previousImage", "zoomIn", "zoomOut"};
+
+    Json::Value::Members members = mouseWheelBehaviour.getMemberNames();
+
+    for (size_t i = 0; i < members.size(); i++)
+    {
+      std::string direction = members[i];
+
+      if (mouseWheelAllowedDirections.find(direction) == mouseWheelAllowedDirections.end()) {
+        OrthancPluginLogError(_context, (std::string("MouseWheelBehaviour invalid direction: ") + direction).c_str());
+        throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
+      }
+
+      if (!mouseWheelBehaviour[direction].isNull()) {
+        std::string toolName = mouseWheelBehaviour[direction].asString();
+        if (mouseWheelAllowedToolNames.find(toolName) == mouseWheelAllowedToolNames.end()) {
+          OrthancPluginLogError(_context, (std::string("MouseWheelBehaviour invalid toolName: ") + toolName).c_str());
+          throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
+        }
+      }
+    }
+
+  }
+
+
 }
 
 void WebViewerConfiguration::parseFile()
@@ -416,6 +451,7 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["windowingPresets"] = windowingPresets;
   config["combinedToolBehaviour"] = combinedToolBehaviour;
   config["windowingBehaviour"] = windowingBehaviour;
+  config["mouseWheelBehaviour"] = mouseWheelBehaviour;
   config["keyboardShortcuts"] = keyboardShortcuts;
   config["enableHighQualityImagePreloading"] = highQualityImagePreloadingEnabled;
   config["reduceTimelineHeightOnSingleFrameSeries"] = reduceTimelineHeightOnSingleFrameSeries;

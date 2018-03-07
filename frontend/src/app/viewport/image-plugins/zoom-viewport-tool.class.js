@@ -17,7 +17,7 @@
         var viewportData = viewport.getViewport();
         var scale = +viewportData.scale;
 
-        viewportData.scale = Math.min(Math.max(Math.abs(scale + (delta / 100)), 0.01), 100.0);
+        viewportData.scale = Math.min(Math.max(scale + (delta / 100), 0.01), 100.0);
 
         viewport.setViewport(viewportData);
         viewport.draw(false);

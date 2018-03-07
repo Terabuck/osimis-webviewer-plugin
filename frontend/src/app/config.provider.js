@@ -62,6 +62,7 @@
 
         this.httpRequestHeaders = {};
         this.keyboardShortcutsEnabled = __webViewerConfig.keyboardShortcutsEnabled;
+        this.mouseWheelBehaviour = __webViewerConfig.mouseWheelBehaviour;
         this.enableHighQualityImagePreloading = __webViewerConfig.enableHighQualityImagePreloading;
         this.showBreadCrumb = __webViewerConfig.showBreadCrumb;
         this.combinedToolBehaviour = __webViewerConfig.combinedToolBehaviour;

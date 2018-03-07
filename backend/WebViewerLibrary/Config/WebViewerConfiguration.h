@@ -70,6 +70,7 @@ public:
   Json::Value windowingPresets;
   Json::Value windowingBehaviour;
   Json::Value combinedToolBehaviour;
+  Json::Value mouseWheelBehaviour;
   Json::Value keyboardShortcuts;
   bool keyboardShortcutsEnabled;
 

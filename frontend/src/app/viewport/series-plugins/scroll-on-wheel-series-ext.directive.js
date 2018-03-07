@@ -53,8 +53,9 @@
     }
 
     /* @ngInject */
-    function Controller($scope, $element, $attrs, hamster, wvPaneManager, wvSeriesManager, wvSynchronizer) {
+    function Controller($scope, $element, $attrs, hamster, wvPaneManager, wvSeriesManager, wvSynchronizer, wvConfig, wvZoomViewportTool) {
         var vm = this;
+        this.wvConfig = wvConfig;
 
         var _wvSeriesIdViewModels = [];
     	this.register = function(viewmodel) {
@@ -76,6 +77,29 @@
             _wvSeriesIdViewModels
                 .forEach(unregisterMobileEvents);
         };
+
+        this. applyTool  = function(series, viewport, toolName, delta) {
+
+            if (toolName === "previousImage") {
+
+                series.goToPreviousImage(true);
+                wvSynchronizer.update(series);          
+
+            } else if (toolName === "nextImage") {
+
+                series.goToNextImage(true);
+                wvSynchronizer.update(series);          
+
+            } else if (toolName === "zoomIn") {
+
+                wvZoomViewportTool.apply(viewport, 10 );
+
+            } else if (toolName === "zoomOut") {
+
+                wvZoomViewportTool.apply(viewport, -10 );
+            }
+        }
+
 
         // Free events on destroy
         $scope.$on('$destroy', function() {
@@ -103,14 +127,11 @@
                         return;
                     }
                     else if (deltaY < 0) {
-                        series.goToPreviousImage(true);
+                        vm.applyTool(series, viewmodel.getViewport(), vm.wvConfig['mouseWheelBehaviour']['down'], -deltaY);
                     }
                     else if (deltaY > 0) {
-                        // @todo calibrate the required speed and accuracy for the enduser
-                        series.goToNextImage(true);
+                        vm.applyTool(series, viewmodel.getViewport(), vm.wvConfig['mouseWheelBehaviour']['up'], deltaY);
                     }
-
-                    wvSynchronizer.update(series);          
                 });
 
                 // prevent horizontal & vertical page scrolling
