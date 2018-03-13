@@ -89,10 +89,10 @@
             
             // Create & return image model based on request results
             modelCache[id] = instanceManager
-                .getTags(instanceId)
-                .then(function(tags) {
+                .getInfos(instanceId)
+                .then(function(infos) {
                     return new osimis.Image(_this._imageBinaryManager, _this._annotationManager,
-                        id, tags, availableQualities, postProcesses);
+                        id, infos.TagsSubset, availableQualities, postProcesses);
                 });
         };
 
@@ -177,11 +177,11 @@
 
                 // Takes original instance's dicom tags, and add the PixelData.
                 return instanceManager
-                    .getTags(instanceId)
-                    .then(function(tags) {
+                    .getInfos(instanceId)
+                    .then(function(infos) {
                         // Clone tags to ensure we don't corrupt them (they may
                         // be passed by reference).
-                        tags = _.cloneDeep(tags);
+                        tags = _.cloneDeep(infos.TagsSubset);
 
                         // Use KO as a modality, as requested by the client.
                         tags.Modality = 'KO';

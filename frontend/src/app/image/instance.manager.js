@@ -24,19 +24,19 @@
              * @ngdoc method
              * @methodOf webviewer.service:wvInstanceManager
              *
-             * @name osimis.InstanceManager#getTags
+             * @name osimis.InstanceManager#getInfos
              * @param {string} id Id of the instance (orthanc format)
              * @return {promise<object>} A hash of the tags (wrapped in promise)
              * 
              * @description
         	 * Retrieve a hash of tags for a specified instance.
         	 */
-            getTags: getTags,
+            getInfos: getInfos,
             /**
              * @ngdoc method
              * @methodOf webviewer.service:wvInstanceManager
              *
-             * @name osimis.InstanceManager#setTags
+             * @name osimis.InstanceManager#setInfos
              * 
              * @param {string} id 
              * The id of the instance (orthanc format).
@@ -50,7 +50,7 @@
              * Used mainly for optimization: retrieving all simplified tags at one single request within the wvSeriesManager
              * instead of many requests for each instances.
              */
-            setTags: setTags,
+            setInfos: setInfos,
             /**
              * @ngdoc method
              * @methodOf webviewer.service:wvInstanceManager
@@ -102,7 +102,7 @@
          *
          * @todo Flush the content
          */
-        var _tagsByInstances = {};
+        var _infosByInstances = {};
 
         return service;
 
@@ -123,9 +123,11 @@
                 });
         }
 
-        function getTags(id) {
-        	// Load image tags if not already in loading.
-        	if (!_tagsByInstances.hasOwnProperty(id)) {
+        function getInfos(id) {
+            // Load image tags if not already in loading.
+            if (!_infosByInstances.hasOwnProperty(id)) {
+                console.log("TODO: we should rebuild the info as done in backend");
+
                 var request = new osimis.HttpRequest();
                 request.setHeaders(wvConfig.httpRequestHeaders);
                 _tagsByInstances[id] = request
@@ -133,7 +135,7 @@
                     .then(function(response) {
                         var tags = response.data;
 
-                        return tags;
+                        return { "TagsSubset" : tags };
                     }, function(err) {
                     	// @todo uncache & do something with the error.
                     	
@@ -141,19 +143,19 @@
                     });
             }
 
-            // Return the tags.
-        	return _tagsByInstances[id];
+            // Return the tags promise.
+            return _infosByInstances[id];
         }
 
-        function setTags(id, tags) {
+        function setInfos(id, instanceInfos) {
         	// Always wrap tags in a promise to stay consistant with the API.
-        	var tagsPromise = $q.when(tags);
+            var infosPromise = $q.when(instanceInfos);
         	
         	// Store the tags.
-            _tagsByInstances[id] = tagsPromise;
+            _infosByInstances[id] = infosPromise;
 
             // Trigger event.
-            service.onTagsSet.trigger(id, tags);
+            service.onTagsSet.trigger(id, instanceInfos.TagsSubset);
         }
     }
 })();

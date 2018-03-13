@@ -124,16 +124,16 @@
             // PixelRepresentation, ...).
             var instanceId = id.split(':')[0];
             var requestPromise = instanceManager
-                .getTags(instanceId)
+                .getInfos(instanceId)
             // Download klv, extract metadata & decompress data to raw image
-                .then(function(tags) {
+                .then(function(infos) {
                     return pool
                         .queueTask({
                             type: 'getBinary',
                             id: id,
                             quality: quality,
                             headers: headers,
-                            tags: tags
+                            infos: infos
                         });
                 })
             // Reconstruct cornerstone object from buffer (we can't transfer pixel view through web worker -

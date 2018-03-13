@@ -16,7 +16,7 @@
         opts.workerPool = opts.workerPool || null;
         opts.imageBinaries = opts.imageBinaries || {};
         opts.instanceManager = opts.instanceManager || {
-            getTags: function() { /* noop */ }
+            getInfos: function() { /* noop */ }
         };
 
         var httpRequestHeaders = null;

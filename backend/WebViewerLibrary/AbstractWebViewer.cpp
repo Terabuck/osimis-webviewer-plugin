@@ -18,6 +18,7 @@
 #include "OrthancContextManager.h"
 #include "BaseController.h"
 #include "Instance/DicomRepository.h"
+#include "Instance/InstanceRepository.h"
 #include "Study/StudyController.h"
 #include "Series/SeriesRepository.h"
 #include "Series/SeriesController.h"
@@ -37,6 +38,7 @@ namespace
   // Needed locally for use by orthanc's callbacks
   OrthancPluginContext* _context;
   CacheContext* _cache = NULL;
+  InstanceRepository* _instanceRepository = NULL;
   const WebViewerConfiguration* _config;
 
   void _configureDicomDecoderPolicy();
@@ -127,7 +129,8 @@ AbstractWebViewer::AbstractWebViewer(OrthancPluginContext* context)
   // Instantiate repositories @warning member declaration order is important
   _dicomRepository.reset(new DicomRepository);
   _imageRepository.reset(new ImageRepository(_dicomRepository.get(), _cache.get()));
-  _seriesRepository.reset(new SeriesRepository(_dicomRepository.get()));
+  _instanceRepository.reset(new InstanceRepository(_context));
+  _seriesRepository.reset(new SeriesRepository(_dicomRepository.get(), _instanceRepository.get()));
   _annotationRepository.reset(new AnnotationRepository);
 
   // Inject repositories within controllers (we can't do it without static method
@@ -136,6 +139,8 @@ AbstractWebViewer::AbstractWebViewer(OrthancPluginContext* context)
   ImageController::Inject(_imageRepository.get());
   ImageController::Inject(_annotationRepository.get());
   SeriesController::Inject(_seriesRepository.get());
+
+  ::_instanceRepository = _instanceRepository.get();
 }
 
 int32_t AbstractWebViewer::start()
@@ -223,6 +228,7 @@ int32_t AbstractWebViewer::start()
 AbstractWebViewer::~AbstractWebViewer()
 {
   OrthancPluginLogWarning(_context, "Finalizing the Web viewer");
+  ::_instanceRepository = NULL;
 }
 
 namespace
@@ -245,6 +251,7 @@ namespace
           resourceType == OrthancPluginResourceType_Instance)
       {
         ::_cache->SignalNewInstance(resourceId);
+        ::_instanceRepository->StoreInstanceInfoInMetadata(resourceId);
       }
 
       return OrthancPluginErrorCode_Success;
