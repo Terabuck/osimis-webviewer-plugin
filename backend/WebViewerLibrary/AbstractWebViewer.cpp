@@ -314,7 +314,7 @@ namespace
       OrthancPluginLogError(::_context, s.c_str());
       return OrthancPluginErrorCode_Plugin;
     }
-    catch (std::runtime_error& e)
+    catch (...)
     {
       OrthancPluginLogError(::_context, "unexpected error in decodeImageCallback");
       return OrthancPluginErrorCode_Plugin;
