@@ -104,6 +104,7 @@ void AbstractWebViewer::_serveBackEnd()
   ConfigController::setConfig(_config.get());
   
   // Register routes & controllers
+  // Note: if you add some routes here, don't forget to add them in the authorization plugin
   RegisterRoute<ImageController>("/osimis-viewer/images/");
   RegisterRoute<SeriesController>("/osimis-viewer/series/");
   RegisterRoute<ConfigController>("/osimis-viewer/config.js");
