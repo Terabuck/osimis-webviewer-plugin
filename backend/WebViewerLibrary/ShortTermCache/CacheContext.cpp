@@ -51,7 +51,7 @@ void CacheContext::NewInstancesThread(CacheContext* that)
       // we have seen that with some Vet Fuji app where you can rework the instances (i.e: change the orientation)
       // and resend them to Orthanc -> cache was not cleared -> always invalidate the cache for a new instance
       // in case there's already something in the cache and the instance was deleted inbetween.
-      that->logger_->LogCacheDebugInfo("invalidating instance " + instanceId);
+      that->logger_->LogCacheDebugInfo("newInstancesThread: invalidating instance " + instanceId);
       that->GetScheduler().Invalidate(OrthancPlugins::CacheBundle_DecodedImage, instanceId);
 
       // when receiving a new instance, we must also invalidate the parent series of the instance
@@ -60,7 +60,7 @@ void CacheContext::NewInstancesThread(CacheContext* that)
       if (OrthancPlugins::GetJsonFromOrthanc(instance, that->pluginContext_, uri))
       {
         std::string seriesId = instance["ParentSeries"].asString();
-        that->logger_->LogCacheDebugInfo("invalidating series " + seriesId);
+        that->logger_->LogCacheDebugInfo("newInstancesThread: invalidating series " + seriesId);
         that->GetScheduler().Invalidate(OrthancPlugins::CacheBundle_SeriesInformation, seriesId);
 
         // also start pre-computing the images for the instance
@@ -74,6 +74,7 @@ void CacheContext::NewInstancesThread(CacheContext* that)
           }
         }
       }
+      that->logger_->LogCacheDebugInfo("newInstancesThread: done handling " + instanceId);
     }
   }
 }

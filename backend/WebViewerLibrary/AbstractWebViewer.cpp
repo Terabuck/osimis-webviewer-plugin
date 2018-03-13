@@ -254,6 +254,11 @@ namespace
       OrthancPluginLogError(::_context, e.what());
       return OrthancPluginErrorCode_Success;  // Ignore error
     }
+    catch (...)
+    {
+      OrthancPluginLogError(::_context, "unexpected error in onChangeCallback");
+      return OrthancPluginErrorCode_Success;  // Ignore error
+    }
   }
 
   void _configureDicomDecoderPolicy()
@@ -307,6 +312,11 @@ namespace
 
       std::string s = "Cannot decode image using GDCM: " + std::string(e.what());
       OrthancPluginLogError(::_context, s.c_str());
+      return OrthancPluginErrorCode_Plugin;
+    }
+    catch (std::runtime_error& e)
+    {
+      OrthancPluginLogError(::_context, "unexpected error in decodeImageCallback");
       return OrthancPluginErrorCode_Plugin;
     }
   }
