@@ -75,11 +75,10 @@
             var vm = scope.vm;
 
             // Default values.
-            vm.studyTags = {};
-            vm.patientTags = {};
             vm.studyDownloadEnabled = typeof vm.studyDownloadEnabled !== 'undefined' ? vm.studyDownloadEnabled : false;
             vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
             vm.displayMode = typeof vm.displayMode !== 'undefined' ? vm.displayMode : 'grid'; // either `grid` or `list`
+            vm.isLoading = true;
 
             // Selection-related.
             vm.itemSelectionEnabled = typeof vm.itemSelectionEnabled !== 'undefined' ? vm.itemSelectionEnabled : false;
@@ -99,6 +98,7 @@
                 wvStudyManager
                     .get(newStudyId)
                     .then(function(study) {
+                        vm.isLoading = false;
                         vm.study = study;
                     });
             });

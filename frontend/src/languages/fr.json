@@ -46,7 +46,8 @@
         },
         "STUDY": {
             "DOWNLOAD_STUDY": "Télécharger l’étude",
-            "UNTITLED_STUDY": "étude sans titre"
+            "UNTITLED_STUDY": "étude sans titre",
+            "LOADING_STUDY": "chargement en cours ..."
         },
         "TIMELINE": {
             "FPS": "ips",
