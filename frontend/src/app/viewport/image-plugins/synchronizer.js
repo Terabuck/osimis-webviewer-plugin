@@ -95,18 +95,21 @@
         var this_ = this;
 
         // console.log("updating synchro");
-        if (this._enabled && panes.length > 1) {
+        if (this._enabled && panes.length > 1 && series.hasSlices()) {
             series.getCurrentImagePromise().then(function(currentImage) {
                 var currentSliceLocation = parseFloat(currentImage.tags.SliceLocation);
                 for (var i=0; i < panes.length; ++i) {
-                    if (panes[i].seriesId !== undefined && panes[i].seriesId != series.id && panes[i].series.isSameOrientationAs(series)) {
-                        // console.log("Found a series with same orientation in pane " + i, panes[i].series);
-                        panes[i].series.getIndexOfClosestImageFrom(currentSliceLocation + this_.getOffsetBetweenPanes(series.id, panes[i].seriesId))
-                            .then(function(closestIndexResponse) {
-                                //console.log("Closest index is " + closestIndexResponse.closestIndex);
-                                //console.log(closestIndexResponse.series);
-                                closestIndexResponse.series.goToImage(closestIndexResponse.closestIndex);
-                        });
+                    if (panes[i].seriesId !== undefined && panes[i].seriesId != series.id && panes[i].series.hasSlices()) {
+
+                        if (panes[i].series.isSameOrientationAs(series)) {
+                            // console.log("Found a series with same orientation in pane " + i, panes[i].series);
+                            panes[i].series.getIndexOfClosestImageFrom(currentSliceLocation + this_.getOffsetBetweenPanes(series.id, panes[i].seriesId))
+                                .then(function(closestIndexResponse) {
+                                    //console.log("Closest index is " + closestIndexResponse.closestIndex);
+                                    //console.log(closestIndexResponse.series);
+                                    closestIndexResponse.series.goToImage(closestIndexResponse.closestIndex);
+                            });
+                        }
                     }
                 }
             });
