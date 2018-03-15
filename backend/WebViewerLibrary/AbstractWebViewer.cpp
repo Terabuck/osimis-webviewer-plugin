@@ -196,6 +196,8 @@ int32_t AbstractWebViewer::start()
     ImageController::Inject(_cache.get());
   }
 
+  _instanceRepository->EnableCachingInMetadata(_config->instanceInfoCacheEnabled);
+
   if (_config->keyImageCaptureEnabled) {
     // register the OsimisNote tag
     OrthancPluginRegisterDictionaryTag(_context,
@@ -250,8 +252,8 @@ namespace
       if (changeType == OrthancPluginChangeType_NewInstance &&
           resourceType == OrthancPluginResourceType_Instance)
       {
+        ::_instanceRepository->SignalNewInstance(resourceId);
         ::_cache->SignalNewInstance(resourceId);
-        ::_instanceRepository->StoreInstanceInfoInMetadata(resourceId);
       }
 
       return OrthancPluginErrorCode_Success;

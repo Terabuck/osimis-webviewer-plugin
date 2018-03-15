@@ -8,14 +8,18 @@
 
 class InstanceRepository : public boost::noncopyable {
   OrthancPluginContext* _context;
+  bool _cachingInMetadataEnabled;
 
 public:
   InstanceRepository(OrthancPluginContext* context);
 
-  Json::Value StoreInstanceInfoInMetadata(const std::string& instanceId);
+  void EnableCachingInMetadata(bool enable);
+  void SignalNewInstance(const std::string& instanceId);
+
   Json::Value GetInstanceInfo(const std::string& instanceId);
 
 protected:
-  Json::Value _GetInstanceInfo(const std::string& instanceId);
+  void StoreInstanceInfoInMetadata(const std::string& instanceId, const Json::Value& instanceInfo);
+  Json::Value GenerateInstanceInfo(const std::string& instanceId);
   static Json::Value SimplifyInstanceTags(const Json::Value& instanceTags);
 };

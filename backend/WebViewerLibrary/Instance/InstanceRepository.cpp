@@ -19,13 +19,25 @@ std::string metadataId = "19999";
 int instanceInfoJsonVersion = 2;
 
 InstanceRepository::InstanceRepository(OrthancPluginContext* context)
-  : _context(context)
+  : _context(context),
+    _cachingInMetadataEnabled(false)
 {
 }
 
-Json::Value InstanceRepository::StoreInstanceInfoInMetadata(const std::string& instanceId) {
+void InstanceRepository::EnableCachingInMetadata(bool enable) {
+  _cachingInMetadataEnabled = enable;
+}
 
-  Json::Value instanceInfo = _GetInstanceInfo(instanceId);
+void InstanceRepository::SignalNewInstance(const std::string& instanceId) {
+  if (_cachingInMetadataEnabled) {
+    Json::Value instanceInfo = GenerateInstanceInfo(instanceId);
+    StoreInstanceInfoInMetadata(instanceId, instanceInfo);
+  }
+}
+
+
+
+void InstanceRepository::StoreInstanceInfoInMetadata(const std::string& instanceId, const Json::Value& instanceInfo) {
 
   std::string url = "/instances/" + instanceId + "/metadata/" + metadataId;
   Json::FastWriter fastWriter;
@@ -34,33 +46,27 @@ Json::Value InstanceRepository::StoreInstanceInfoInMetadata(const std::string& i
 
   // actually, we don't check the success or not, there's nothing to do anyway !
   OrthancPluginRestApiPutAfterPlugins(_context, buffer.getPtr(), url.c_str(), instanceInfoContent.c_str(), instanceInfoContent.size());
-
-  return instanceInfo;
 }
 
 Json::Value InstanceRepository::GetInstanceInfo(const std::string& instanceId) {
 
-  Json::Value instanceInfo;
+  if (_cachingInMetadataEnabled) {
+      Json::Value instanceInfo;
 
-  // if information has not been cached yet (or is obsolete, update it)
-  if (!OrthancPlugins::GetJsonFromOrthanc(instanceInfo, _context, "/instances/" + instanceId + "/metadata/" + metadataId)
-      || instanceInfo["Version"] != instanceInfoJsonVersion)
-  {
-    return StoreInstanceInfoInMetadata(instanceId);
+      // if information has not been cached yet (or is obsolete, update it)
+      if (!OrthancPlugins::GetJsonFromOrthanc(instanceInfo, _context, "/instances/" + instanceId + "/metadata/" + metadataId)
+          || instanceInfo["Version"] != instanceInfoJsonVersion)
+      {
+        instanceInfo = GenerateInstanceInfo(instanceId);
+        StoreInstanceInfoInMetadata(instanceId, instanceInfo);
+      }
+      return instanceInfo;
+  } else {
+      return GenerateInstanceInfo(instanceId);
   }
-
-  return instanceInfo;
-//  OrthancPlugins::GetStringFromOrthanc(instanceInfoContent, _context, "/instances/" + instanceId + "/metadata/19999");
-
-//  Json::Reader reader;
-//  if (!reader.parse(bufferStr, result)) {
-//    throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
-//  }
-
-//  return Json::nullValue;
 }
 
-Json::Value InstanceRepository::_GetInstanceInfo(const std::string& instanceId) {
+Json::Value InstanceRepository::GenerateInstanceInfo(const std::string& instanceId) {
 
   Json::Value instanceTags;
   if (!OrthancPlugins::GetJsonFromOrthanc(instanceTags, _context, "/instances/" + instanceId + "/simplified-tags"))
@@ -83,7 +89,8 @@ Json::Value InstanceRepository::_GetInstanceInfo(const std::string& instanceId) 
 }
 
 Json::Value InstanceRepository::SimplifyInstanceTags(const Json::Value& instanceTags) {
-  // keep only the tags we need in the frontend -> otherwise, the full /series route might return 6MB of Json in case of a PET-CT !!!!
+
+    // keep only the tags we need in the frontend -> otherwise, the full /series route might return 6MB of Json in case of a PET-CT !!!!
   Json::Value toReturn;
 
   std::vector<std::string> tagsToKeep;

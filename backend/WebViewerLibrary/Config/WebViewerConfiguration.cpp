@@ -106,6 +106,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   keyboardShortcuts["shift + tab"] = "selectPreviousPane";
   keyboardShortcuts["enter"] = "loadSeriesInPane";
 
+  instanceInfoCacheEnabled = OrthancPlugins::GetBoolValue(wvConfig, "InstanceInfoCacheEnabled", false);
   gdcmEnabled = OrthancPlugins::GetBoolValue(wvConfig, "GdcmEnabled", true);
   // By default, use GDCM for everything.
   restrictTransferSyntaxes = false;
