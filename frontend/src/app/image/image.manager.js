@@ -92,7 +92,7 @@
                 .getInfos(instanceId)
                 .then(function(infos) {
                     return new osimis.Image(_this._imageBinaryManager, _this._annotationManager,
-                        id, infos.TagsSubset, availableQualities, postProcesses);
+                        id, infos, availableQualities, postProcesses);
                 });
         };
 
@@ -302,7 +302,6 @@
     //                    'wv-invert-contrast-viewport-tool="???"',
                     'wv-orientation-marker-viewport-tool',
                 '>',
-                    // '<wv-overlay wv-tags="$image.tags" wv-viewport="$viewport" wv-show-timeline="false"></wv-overlay>',
                 '</wv-viewport>'
             ].join('\n'))($scope);
 

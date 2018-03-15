@@ -231,8 +231,8 @@
             var defaultWindowing = result[1];
 
             // Process windowing presets inside dicom.
-            var windowCenters = image.tags.WindowCenter && image.tags.WindowCenter.split('\\');
-            var windowWidths = image.tags.WindowWidth && image.tags.WindowWidth.split('\\');
+            var windowCenters = image.instanceInfos.TagsSubset.WindowCenter && image.instanceInfos.TagsSubset.WindowCenter.split('\\');
+            var windowWidths = image.instanceInfos.TagsSubset.WindowWidth && image.instanceInfos.TagsSubset.WindowWidth.split('\\');
 
             // Ignore method if there is no windowing tag.
             if (!windowCenters || !windowWidths) {

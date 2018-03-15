@@ -114,7 +114,7 @@
 
             this._applyTool = function(toolName, viewport, deltaX, deltaY) {
                 if (toolName === "windowing") {
-                    wvWindowingViewportTool.apply(viewport, deltaX, deltaY);
+                    wvWindowingViewportTool.apply(viewport, deltaX, deltaY, true);
                 }
                 else if (toolName === "pan") {
                     wvPanViewportTool.apply(viewport, deltaX, deltaY);

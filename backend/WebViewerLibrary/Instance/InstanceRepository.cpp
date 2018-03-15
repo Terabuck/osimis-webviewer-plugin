@@ -16,7 +16,7 @@
 #include "ViewerToolbox.h"
 
 std::string metadataId = "19999";
-int instanceInfoJsonVersion = 2;
+int instanceInfoJsonVersion = 4;
 
 InstanceRepository::InstanceRepository(OrthancPluginContext* context)
   : _context(context),
@@ -77,6 +77,14 @@ Json::Value InstanceRepository::GenerateInstanceInfo(const std::string& instance
   Json::Value instanceInfo;
   instanceInfo["TagsSubset"] = SimplifyInstanceTags(instanceTags);
   instanceInfo["Version"] = instanceInfoJsonVersion;
+
+  Json::Value instanceOrthancInfo;
+  if (!OrthancPlugins::GetJsonFromOrthanc(instanceOrthancInfo, _context, "/instances/" + instanceId))
+  {
+    throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
+  }
+
+  instanceInfo["SeriesId"] = instanceOrthancInfo["ParentSeries"];
 
   std::string transferSyntax;
   if (!OrthancPlugins::GetStringFromOrthanc(transferSyntax, _context, "/instances/" + instanceId + "/metadata/TransferSyntax")) {
