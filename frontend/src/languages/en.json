@@ -46,7 +46,8 @@
         },
         "STUDY": {
             "DOWNLOAD_STUDY": "download study",
-            "UNTITLED_STUDY": "untitled study"
+            "UNTITLED_STUDY": "untitled study",
+            "LOADING_STUDY": "loading study ..."
         },
         "TIMELINE": {
             "FPS": "fps",
