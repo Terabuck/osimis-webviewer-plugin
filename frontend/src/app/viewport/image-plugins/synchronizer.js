@@ -114,7 +114,7 @@
         // console.log("updating synchro");
         if (this._enabled) {
             series.getCurrentImagePromise().then(function(currentImage) {
-                var currentSliceLocation = parseFloat(currentImage.tags.SliceLocation);
+                var currentSliceLocation = parseFloat(currentImage.instanceInfos.TagsSubset.SliceLocation);
                 var panes = this_.getListOfSynchronizedPanes(series);
                 for (var i = 0; i < panes.length; i++) {
                     var pane = panes[i];
