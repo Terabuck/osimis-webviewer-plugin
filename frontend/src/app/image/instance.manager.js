@@ -126,11 +126,11 @@
         function getInfos(id) {
             // Load image tags if not already in loading.
             if (!_infosByInstances.hasOwnProperty(id)) {
-                console.log("TODO: we should rebuild the info as done in backend");
+                // rebuild the info as done in backend
 
                 var request = new osimis.HttpRequest();
                 request.setHeaders(wvConfig.httpRequestHeaders);
-                _tagsByInstances[id] = request
+                _infosByInstances[id] = request
                     .get(wvConfig.orthancApiURL + '/instances/'+id+'/simplified-tags')
                     .then(function(response) {
                         var tags = response.data;
