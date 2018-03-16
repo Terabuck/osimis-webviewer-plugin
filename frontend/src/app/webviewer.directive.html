@@ -342,7 +342,7 @@
                     <wv-overlay
                         ng-if="vm.tools.overlay"
                         wv-study-id="$pane.series.studyId"
-                        wv-tags="$image.tags"
+                        wv-tags="$image.instanceInfos.TagsSubset"
                         wv-viewport="$pane.csViewport"
                         wv-image="$image"
                         wv-key-image-capture-enabled="vm.keyImageCaptureEnabled"

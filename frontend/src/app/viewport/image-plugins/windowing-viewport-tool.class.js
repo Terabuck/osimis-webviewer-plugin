@@ -11,10 +11,35 @@
     'use strict';
 
     /* @ngInject */
-    function WindowingViewportTool(wvConfig) {
+    function WindowingViewportTool(wvConfig, wvSeriesManager, wvSynchronizer) {
     	this._wvConfig = wvConfig;
+        this._wvSeriesManager = wvSeriesManager;
+        this._wvSynchronizer = wvSynchronizer;
 
-	    this.apply = function(viewport, deltaX, deltaY) {
+        this.applyWindowing = function(pane, windowWidth, windowCenter, applyToSynchronizedViewports) {
+
+            if (!pane.csViewport) {
+                return;
+            }
+
+            // Apply windowing.
+            pane.csViewport.voi.windowWidth = windowWidth;
+            pane.csViewport.voi.windowCenter = windowCenter;
+
+            if (applyToSynchronizedViewports) {
+                this._applyWindowingToSynchronizedViewports(pane.series, windowWidth, windowCenter);
+            }
+        };
+
+        this._applyWindowingToSynchronizedViewports = function(series, windowWidth, windowCenter) {
+            var synchronizedPanes = this._wvSynchronizer.getListOfSynchronizedPanes(series);
+            for (var i = 0; i < synchronizedPanes.length; i++) {
+                var pane = synchronizedPanes[i];
+                pane.applyWindowing(windowWidth, windowCenter);
+            }
+        };
+
+	    this.apply = function(viewport, deltaX, deltaY, applyToSynchronizedViewports) {
 	        var viewportData = viewport.getViewport();
 
 	        // Retrieve image min/max image pixel value and define a
@@ -68,19 +93,24 @@
 	        var newWindowWidth = +viewportData.voi.windowWidth + (deltaWW / scale * strength);
 	        var newWindowCenter = +viewportData.voi.windowCenter + (deltaWC / scale * strength);
 
-	        // Clamp windowing values to the min/max one availables, so
-	        // image doesn't become invisible because of out of scope
-	        // value.
-	        if (newWindowWidth >= minPixelValue && newWindowWidth <= maxPixelValue) {
-	            viewportData.voi.windowWidth = newWindowWidth;
+	        if (newWindowWidth <= 1) {
+	            newWindowWidth = 1;
 	        }
-	        if (newWindowCenter >= minPixelValue && newWindowCenter <= maxPixelValue) {
-	            viewportData.voi.windowCenter = newWindowCenter;
-	        }
+            
+            viewportData.voi.windowWidth = newWindowWidth;
+            viewportData.voi.windowCenter = newWindowCenter;
 
 	        // Update viewport values & redraw the viewport.
 	        viewport.setViewport(viewportData);
 	        viewport.draw(false);
+
+	        if (applyToSynchronizedViewports) {
+	        	var image = viewport.getImage();
+                var this_ = this;
+	        	this._wvSeriesManager.get(image.instanceInfos.SeriesId).then(function(series) {
+                    this_._applyWindowingToSynchronizedViewports(series, newWindowWidth, newWindowCenter);
+                });
+	        }
 	    };
 	}
 
@@ -91,7 +121,7 @@
         .factory('wvWindowingViewportTool', wvWindowingViewportTool);
 
     /* @ngInject */
-    function wvWindowingViewportTool(wvConfig) {
-        return new osimis.WindowingViewportTool(wvConfig);
+    function wvWindowingViewportTool(wvConfig, wvSeriesManager, wvSynchronizer) {
+        return new osimis.WindowingViewportTool(wvConfig, wvSeriesManager, wvSynchronizer);
     }
 })(this.osimis || (this.osimis = {}));

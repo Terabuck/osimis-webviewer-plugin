@@ -63,8 +63,8 @@
             paneB.series.getCurrentImagePromise().then(function(imageB) {
                 paneA.series.getCurrentImagePromise().then(function(imageA) {
 
-                    var offset = imageB.tags.SliceLocation - imageA.tags.SliceLocation;
-                    if (Math.abs(offset) <= imageA.tags.SliceThickness) {
+                    var offset = imageB.instanceInfos.TagsSubset.SliceLocation - imageA.instanceInfos.TagsSubset.SliceLocation;
+                    if (Math.abs(offset) <= imageA.instanceInfos.TagsSubset.SliceThickness) {
                         offset = 0; // if the offset is smaller than a slice, there is no "intention" to have an offset
                     }
 
@@ -90,24 +90,40 @@
         return this._enabled;
     }
 
-    Synchronizer.prototype.update = function(series) {
+    Synchronizer.prototype.getListOfSynchronizedPanes = function(series) {
+        var toReturn = [];
         var panes = this._wvPaneManager.getAllPanes();
+
+        if (this._enabled && panes.length > 1 && series.hasSlices()) {
+            for (var i=0; i < panes.length; ++i) {
+                if (panes[i].seriesId !== undefined && panes[i].seriesId != series.id && panes[i].series.hasSlices()) {
+
+                    if (panes[i].series.isSameOrientationAs(series)) {
+                        toReturn.push(panes[i]);
+                    }
+                }
+            }
+        }
+
+        return toReturn;
+    }
+
+    Synchronizer.prototype.update = function(series) {
         var this_ = this;
 
         // console.log("updating synchro");
-        if (this._enabled && panes.length > 1) {
+        if (this._enabled) {
             series.getCurrentImagePromise().then(function(currentImage) {
-                var currentSliceLocation = parseFloat(currentImage.tags.SliceLocation);
-                for (var i=0; i < panes.length; ++i) {
-                    if (panes[i].seriesId !== undefined && panes[i].seriesId != series.id && panes[i].series.isSameOrientationAs(series)) {
-                        // console.log("Found a series with same orientation in pane " + i, panes[i].series);
-                        panes[i].series.getIndexOfClosestImageFrom(currentSliceLocation + this_.getOffsetBetweenPanes(series.id, panes[i].seriesId))
-                            .then(function(closestIndexResponse) {
-                                //console.log("Closest index is " + closestIndexResponse.closestIndex);
-                                //console.log(closestIndexResponse.series);
-                                closestIndexResponse.series.goToImage(closestIndexResponse.closestIndex);
-                        });
-                    }
+                var currentSliceLocation = parseFloat(currentImage.instanceInfos.TagsSubset.SliceLocation);
+                var panes = this_.getListOfSynchronizedPanes(series);
+                for (var i = 0; i < panes.length; i++) {
+                    var pane = panes[i];
+                    pane.series.getIndexOfClosestImageFrom(currentSliceLocation + this_.getOffsetBetweenPanes(series.id, pane.seriesId))
+                        .then(function(closestIndexResponse) {
+                            //console.log("Closest index is " + closestIndexResponse.closestIndex);
+                            //console.log(closestIndexResponse.series);
+                            closestIndexResponse.series.goToImage(closestIndexResponse.closestIndex);
+                    });
                 }
             });
         }

@@ -218,10 +218,10 @@ describe('backend', function() {
                     instanceIds.forEach(function(instanceId) {
                         // Retrieve tags
                         var promise = wvInstanceManager // wvInstanceManager should have received cache from seriesManager
-                            .getTags(instanceId)
-                            .then(function(instanceTags) {
+                            .getInfos(instanceId)
+                            .then(function(instanceInfos) {
                                 // Validate series contains the tags
-                                assert.deepEqual(instanceTags, seriesInstancesTags[instanceId], 'Uncompatible tags for instance: ' + instanceId);
+                                assert.deepEqual(instanceInfos.TagsSubset, seriesInstancesTags[instanceId], 'Uncompatible tags for instance: ' + instanceId);
                             }, function(error) {
                                 // Fail the test - series not found
                                 assert.fail();

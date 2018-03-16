@@ -131,7 +131,7 @@
         .directive('wvWebviewer', wvWebviewer);
 
     /* @ngInject */
-    function wvWebviewer($rootScope, $timeout, wvStudyManager, wvAnnotationManager, wvSeriesManager, wvPaneManager, wvSynchronizer) {
+    function wvWebviewer($rootScope, $timeout, wvStudyManager, wvAnnotationManager, wvSeriesManager, wvPaneManager, wvWindowingViewportTool, wvSynchronizer) {
         var directive = {
             bindToController: true,
             controller: Controller,
@@ -282,6 +282,7 @@
             vm.studyIslandsDisplayMode = typeof vm.studyIslandsDisplayMode !== 'undefined' ? vm.studyIslandsDisplayMode : "grid";
             vm.paneManager = wvPaneManager;
             vm.synchronizer = wvSynchronizer;
+            vm.wvWindowingViewportTool = wvWindowingViewportTool;
 
             // Selection-related
             vm.seriesItemSelectionEnabled = typeof vm.seriesItemSelectionEnabled !== 'undefined' ? vm.seriesItemSelectionEnabled : false;
@@ -447,19 +448,14 @@
             // Apply viewport change when a windowing preset has been
             // selected (from the toolbar).
             vm.onWindowingPresetSelected = function(windowWidth, windowCenter) {
-                // Retrieve selected pane (or leave the function if none).
-                var selectedPane = wvPaneManager.getSelectedPane();
 
                 if (this.readonly) {
                     return;
                 }
-                if (!selectedPane.csViewport) {
-                    return;
-                }
 
-                // Apply windowing.
-                selectedPane.csViewport.voi.windowWidth = windowWidth;
-                selectedPane.csViewport.voi.windowCenter = windowCenter;
+                // Retrieve selected pane (or leave the function if none).
+                var selectedPane = wvPaneManager.getSelectedPane();
+                vm.wvWindowingViewportTool.applyWindowing(selectedPane, windowWidth, windowCenter, true);
             };
 
             // Store each panes' states.

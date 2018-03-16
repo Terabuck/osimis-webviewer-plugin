@@ -49,6 +49,8 @@ public:
   int shortTermCacheDecoderThreadsCound;
   int shortTermCacheSize;
 
+  bool instanceInfoCacheEnabled;
+
   bool gdcmEnabled;
   bool restrictTransferSyntaxes;
   std::set<std::string> enabledTransferSyntaxes;

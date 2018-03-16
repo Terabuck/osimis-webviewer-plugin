@@ -130,8 +130,9 @@
             vm.updateLayout = function(seriesTags, imageId, customOverlayInfo) {
                 if (imageId) {
                     wvInstanceManager
-                        .getTags(imageId.split(":")[0]) // imageId is something like orthancId:frameId
-                        .then(function(instanceTags) {
+                        .getInfos(imageId.split(":")[0]) // imageId is something like orthancId:frameId
+                        .then(function(instanceInfos) {
+                            var instanceTags = instanceInfos.TagsSubset;
                             vm.topLeftLines = vm.getTopLeftArea(seriesTags, instanceTags);
                             vm.topRightLines = vm.getTopRightArea(seriesTags, instanceTags);
                             vm.bottomLeftLines = vm.getBottomLeftArea(seriesTags, instanceTags);

@@ -52,6 +52,7 @@ add_library(WebViewerLibrary
   ${VIEWER_LIBRARY_DIR}/Study/StudyController.cpp
   ${VIEWER_LIBRARY_DIR}/Language/LanguageController.cpp
   ${VIEWER_LIBRARY_DIR}/Instance/DicomRepository.cpp
+  ${VIEWER_LIBRARY_DIR}/Instance/InstanceRepository.cpp
   ${VIEWER_LIBRARY_DIR}/Series/SeriesFactory.cpp
   ${VIEWER_LIBRARY_DIR}/Series/SeriesRepository.cpp
   ${VIEWER_LIBRARY_DIR}/Series/Series.cpp

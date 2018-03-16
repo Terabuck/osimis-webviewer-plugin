@@ -68,8 +68,8 @@
                 wvImageManager 
                     .get(middleImageId)
                     .then(function(image) {
-                        if (image.tags.RecommendedDisplayFrameRate) {
-                            _this.frameRate = +image.tags.RecommendedDisplayFrameRate; // make sure it's a number so input numbers referencing this var don't throw errors
+                        if (image.instanceInfos.TagsSubset.RecommendedDisplayFrameRate) {
+                            _this.frameRate = +image.instanceInfos.TagsSubset.RecommendedDisplayFrameRate; // make sure it's a number so input numbers referencing this var don't throw errors
                         }
                     });
             });
@@ -373,7 +373,14 @@
 
         WvSeries.prototype.isSameOrientationAs = function(otherSeries) {
             return (this.tags.ImageOrientationPatient == otherSeries.tags.ImageOrientationPatient);
-                // && this.tags.FrameOfReferenceUID == otherSeries.tags.FrameOfReferenceUID);
+        };
+
+        WvSeries.prototype.isSameFrameOfReference = function(otherSeries) {
+            return (this.tags.FrameOfReferenceUID == otherSeries.tags.FrameOfReferenceUID);
+        };
+
+        WvSeries.prototype.hasSlices = function() {
+            return this.tags.SliceLocation !== undefined && this.tags.SliceThickness !== undefined;
         };
 
         WvSeries.prototype.getIndexOfClosestImageFrom = function(otherSliceLocation) {
@@ -385,12 +392,12 @@
             return Promise.all(imageTagsPromises).then(function(images) {
                 var closestIndex = -1;
                 var closestDistance = 99999;
-                var sliceThickness = images[0].tags.SliceThickness;
+                var sliceThickness = images[0].instanceInfos.TagsSubset.SliceThickness;
                 // console.log("searching slice closest to ", otherSliceLocation);
                 for (var i=0; i < images.length; ++i) {
-                    var distance = Math.abs(images[i].tags.SliceLocation - otherSliceLocation);
+                    var distance = Math.abs(images[i].instanceInfos.TagsSubset.SliceLocation - otherSliceLocation);
 
-                    // console.log(images[i].tags.SliceLocation, otherSliceLocation);
+                    // console.log(images[i].instanceInfos.TagsSubset.SliceLocation, otherSliceLocation);
                     // console.log("distance = " + distance + ", sliceThickness = " + sliceThickness);
                     if (distance < closestDistance && distance <= sliceThickness) {
                         closestIndex = i;

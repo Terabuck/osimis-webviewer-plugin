@@ -9,7 +9,8 @@
         </div>
 
         <!-- Title -->
-        <span>{{vm.study.tags.StudyDescription || ('COMPONENTS.STUDY.UNTITLED_STUDY' | translate | wvCapitalize)}}</span> <br/>
+        <span>{{vm.study.tags.StudyDescription || (vm.isLoading && ('COMPONENTS.STUDY.LOADING_STUDY' | translate | wvCapitalize)) || ('COMPONENTS.STUDY.UNTITLED_STUDY' | translate | wvCapitalize)}}</span>
+        <br/>
         <small ng-if="vm.study.tags.StudyDate">{{vm.study.tags.StudyDate}}</small>
     </div>
 
