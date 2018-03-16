@@ -15,8 +15,8 @@
 #include "../Image/Utilities/ScopedBuffers.h" // for ScopedOrthancPluginMemoryBuffer
 #include "ViewerToolbox.h"
 
-std::string metadataId = "19999";
-int instanceInfoJsonVersion = 4;
+std::string metadataId = "9998";
+int instanceInfoJsonVersion = 1;
 
 InstanceRepository::InstanceRepository(OrthancPluginContext* context)
   : _context(context),
