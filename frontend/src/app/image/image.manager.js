@@ -181,7 +181,7 @@
                     .then(function(infos) {
                         // Clone tags to ensure we don't corrupt them (they may
                         // be passed by reference).
-                        tags = _.cloneDeep(infos.TagsSubset);
+                        var tags = _.cloneDeep(infos.TagsSubset);
 
                         // Use KO as a modality, as requested by the client.
                         tags.Modality = 'KO';
