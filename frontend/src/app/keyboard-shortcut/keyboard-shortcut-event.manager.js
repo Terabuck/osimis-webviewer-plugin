@@ -67,7 +67,14 @@
 
         function createHandlers(this_) {
             var handlers = {};
-            
+
+            handlers.enableKeyboardShortucts = function() {
+                keyboardJS.setContext('viewerShortcut');
+            } 
+            handlers.disableKeyboardShortucts = function() {
+                keyboardJS.setContext(null);
+            } 
+
             handlers.toggleSynchro = function() {
                 wvSynchronizer.toggle();
             } 
