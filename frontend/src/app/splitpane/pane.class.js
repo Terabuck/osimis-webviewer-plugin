@@ -1,13 +1,13 @@
 /**
  * @ngdoc object
  * @memberOf osimis
- * 
+ *
  * @name osimis.Pane
  *
  * @description
  * The `Pane` class is used to represent the content of a pane. A pane can
  * either contain:
- * 
+ *
  * - a video.
  * - a (PDF) report.
  * - a series of images.
@@ -53,7 +53,7 @@
     /**
      * @ngdoc method
      * @methodOf osimis.Pane
-     * 
+     *
      * @name osimis.Pane#isEmpty
      *
      * @return {boolean}
@@ -63,7 +63,7 @@
      * * a series
      * * a pdf
      *
-     * @description 
+     * @description
      * Check if the current pane has no content.
      */
     Pane.prototype.isEmpty = function() {
@@ -73,7 +73,7 @@
     /**
      * @ngdoc method
      * @methodOf osimis.Pane
-     * 
+     *
      * @name osimis.Pane#getStudy
      *
      * @return {Promise<osimis.Study>}
@@ -105,7 +105,7 @@
     /**
      * @ngdoc method
      * @methodOf osimis.Pane
-     * 
+     *
      * @name osimis.Pane#getImage
      *
      * @return {Promise<osimis.Image>}
@@ -167,28 +167,65 @@
             this.$timeout(function() { // don't know why but, if applyWindowing is called synchronously, changes are not applied
                 _this.applyWindowing(_this._wvConfig.windowingPresets[presetsIndex].windowWidth, _this._wvConfig.windowingPresets[presetsIndex].windowCenter);
             }, 1);
-            
+
         }
     };
 
     Pane.prototype.rotateLeft = function() {
         this.csViewport.rotation = this.csViewport.rotation - 90;
     };
-    
+
     Pane.prototype.rotateRight = function() {
         this.csViewport.rotation = this.csViewport.rotation - 90;
     };
-    
+
     Pane.prototype.flipVertical = function() {
         this.csViewport.vflip = !this.csViewport.vflip;
     };
-    
+
     Pane.prototype.flipHorizontal = function() {
         this.csViewport.hflip = !this.csViewport.hflip;
     };
-    
+
     Pane.prototype.invertColor = function() {
         this.csViewport.invert = !this.csViewport.invert;
+    };
+
+    Pane.prototype.previousSeries = function(){
+        var selectedPane = this;
+        return selectedPane.getStudy().then(function(study){
+            var currentItemId = selectedPane.seriesId || selectedPane.videoId || selectedPane.reportId,
+                previousItemTuple = study.getPreviousItemId(currentItemId);
+
+            if(previousItemTuple[1] == "series"){
+                selectedPane.seriesId = previousItemTuple[0];
+            }else if(previousItemTuple[1] == "video"){
+                selectedPane.videoId = previousItemTuple[0];
+            }else {
+                selectedPane.reportId = previousItemTuple[0];
+            }
+            selectedPane.csViewport = null;
+
+            return selectedPane;
+        });
+    };
+    Pane.prototype.nextSeries = function(){
+        var selectedPane = this;
+        selectedPane.getStudy().then(function(study){
+            var currentItemId = selectedPane.seriesId || selectedPane.videoId || selectedPane.reportId,
+                nextItemTuple = study.getNextItemId(currentItemId);
+
+            if(nextItemTuple[1] == "series"){
+                selectedPane.seriesId = nextItemTuple[0];
+            }else if(nextItemTuple[1] == "video"){
+                selectedPane.videoId = nextItemTuple[0];
+            }else {
+                selectedPane.reportId = nextItemTuple[0];
+            }
+            selectedPane.csViewport = null;
+
+            return selectedPane;
+        });
     };
 
     Pane.prototype.getEmbeddedWindowingPresetsPromise = function() {
@@ -205,7 +242,7 @@
             // web worker just after the image is downloaded).
             return Promise.all([
                 Promise.when(image), // first element of the returnee is the image
-                image 
+                image
                     .getBestBinaryInCache()
                     .then(function(imageBinary) {
                         // Ignore if no image binary has been loaded yet.
@@ -226,7 +263,7 @@
             if (!result || result.length < 1) {
                 return Promise.when([]);
             }
-            
+
             var image = result[0];
             var defaultWindowing = result[1];
 

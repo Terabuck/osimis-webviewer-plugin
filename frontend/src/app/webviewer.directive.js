@@ -220,7 +220,9 @@
                 rotateLeft: false,
                 rotateRight: false,
                 arrowAnnotate: false,
-                toggleSynchro: false
+                toggleSynchro: false,
+                nextSeries: false,
+                previousSeries: false
             };
 
             if (vm.keyImageCaptureEnabled) { // activate
@@ -270,7 +272,9 @@
                         ]
                     },
                     {type: "button", tool: "keyImageCapture"},
-                    {type: "button", tool: "toggleSynchro"}
+                    {type: "button", tool: "toggleSynchro"},
+                    {type: "button", tool: "previousSeries"},
+                    {type: "button", tool: "nextSeries"}
                 ]
             }
             vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];
@@ -440,6 +444,12 @@
                 case 'toggleSynchro':
                     vm.synchronizer.enable(!vm.synchronizer.isEnabled());
                     vm.synchroEnabled = wvSynchronizer.isEnabled();
+                    break;
+                case 'previousSeries':
+                    selectedPane.previousSeries();
+                    break;
+                case 'nextSeries':
+                    selectedPane.nextSeries();
                     break;
                 default:
                     throw new Error('Unknown toolbar action.');
