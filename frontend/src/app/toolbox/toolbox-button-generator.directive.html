@@ -201,6 +201,34 @@
         <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'rotateRight'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
+    <!-- Previous series -->
+    <label
+        ng-switch-when="previousSeries"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('previousSeries')"
+        class="wvButton--underline fa fa-fast-backward"
+        data-title="{{ 'COMPONENTS.TOOLBOX.PREVIOUS_SERIES' | translate | wvCapitalize }}"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        ng-class="{'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        bs-tooltip
+        >
+        <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'previousSeries'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
+    <!-- Next series -->
+    <label
+        ng-switch-when="nextSeries"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('nextSeries')"
+        class="wvButton--underline fa fa-fast-forward"
+        data-title="{{ 'COMPONENTS.TOOLBOX.NEXT_SERIES' | translate | wvCapitalize }}"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        ng-class="{'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        bs-tooltip
+        >
+        <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'nextSeries'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
     <!-- Flip Horizontally -->
     <label
         ng-switch-when="hflip"
