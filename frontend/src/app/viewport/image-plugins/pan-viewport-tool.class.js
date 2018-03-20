@@ -13,7 +13,7 @@
     function PanViewportTool() {
     };
 
-    PanViewportTool.prototype.apply = function(viewport, deltaX, deltaY) {
+    PanViewportTool.prototype.applyPanToViewport = function(viewport, deltaX, deltaY) {
         var viewportData = viewport.getViewport();
 
         var scale = +viewportData.scale;

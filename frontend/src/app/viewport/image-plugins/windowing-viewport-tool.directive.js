@@ -62,13 +62,13 @@
                             lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
 
                             if (mouseButton === 1) { // left-click + move
-                                wvWindowingViewportTool.apply(viewport, deltaX, deltaY, true);
+                                wvWindowingViewportTool.applyWindowingToViewport(viewport, deltaX, deltaY, true);
                             }
                             else if (mouseButton === 2) { // middle-click + move
-                                wvPanViewportTool.apply(viewport, deltaX, deltaY);
+                                wvPanViewportTool.applyPanToViewport(viewport, deltaX, deltaY);
                             }
                             else if (mouseButton === 3) { // right-click + move
-                                wvZoomViewportTool.apply(viewport, deltaY);
+                                wvZoomViewportTool.applyZoomToViewport(viewport, deltaY);
                             }
                         });
 

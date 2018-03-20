@@ -78,7 +78,7 @@
                 .forEach(unregisterMobileEvents);
         };
 
-        this. applyTool  = function(series, viewport, toolName, delta) {
+        this.applyTool  = function(series, viewport, toolName, delta) {
 
             if (toolName === "previousImage") {
 
@@ -92,11 +92,11 @@
 
             } else if (toolName === "zoomIn") {
 
-                wvZoomViewportTool.apply(viewport, 10 );
+                wvZoomViewportTool.applyZoomToViewport(viewport, 10 );
 
             } else if (toolName === "zoomOut") {
 
-                wvZoomViewportTool.apply(viewport, -10 );
+                wvZoomViewportTool.applyZoomToViewport(viewport, -10 );
             }
         }
 

@@ -13,7 +13,7 @@
     function ZoomViewportTool() {
     };
 
-    ZoomViewportTool.prototype.apply = function(viewport, delta) {
+    ZoomViewportTool.prototype.applyZoomToViewport = function(viewport, delta) {
         var viewportData = viewport.getViewport();
         var scale = +viewportData.scale;
 

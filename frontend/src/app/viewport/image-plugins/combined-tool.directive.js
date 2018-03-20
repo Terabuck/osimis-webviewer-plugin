@@ -114,13 +114,13 @@
 
             this._applyTool = function(toolName, viewport, deltaX, deltaY) {
                 if (toolName === "windowing") {
-                    wvWindowingViewportTool.apply(viewport, deltaX, deltaY, true);
+                    wvWindowingViewportTool.applyWindowingToViewport(viewport, deltaX, deltaY, true);
                 }
                 else if (toolName === "pan") {
-                    wvPanViewportTool.apply(viewport, deltaX, deltaY);
+                    wvPanViewportTool.applyPanToViewport(viewport, deltaX, deltaY);
                 }
                 else if (toolName === "zoom") {
-                    wvZoomViewportTool.apply(viewport, deltaY);
+                    wvZoomViewportTool.applyZoomToViewport(viewport, deltaY);
                 }
             };
 

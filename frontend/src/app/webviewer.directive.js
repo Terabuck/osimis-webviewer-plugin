@@ -455,7 +455,7 @@
 
                 // Retrieve selected pane (or leave the function if none).
                 var selectedPane = wvPaneManager.getSelectedPane();
-                vm.wvWindowingViewportTool.applyWindowing(selectedPane, windowWidth, windowCenter, true);
+                vm.wvWindowingViewportTool.applyWindowingToPane(selectedPane, windowWidth, windowCenter, true);
             };
 
             // Store each panes' states.

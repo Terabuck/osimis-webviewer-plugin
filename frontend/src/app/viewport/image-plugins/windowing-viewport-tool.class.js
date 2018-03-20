@@ -16,15 +16,14 @@
         this._wvSeriesManager = wvSeriesManager;
         this._wvSynchronizer = wvSynchronizer;
 
-        this.applyWindowing = function(pane, windowWidth, windowCenter, applyToSynchronizedViewports) {
+        this.applyWindowingToPane = function(pane, windowWidth, windowCenter, applyToSynchronizedViewports) {
 
             if (!pane.csViewport) {
                 return;
             }
 
             // Apply windowing.
-            pane.csViewport.voi.windowWidth = windowWidth;
-            pane.csViewport.voi.windowCenter = windowCenter;
+            pane.applyWindowing(windowWidth, windowCenter);
 
             if (applyToSynchronizedViewports) {
                 this._applyWindowingToSynchronizedViewports(pane.series, windowWidth, windowCenter);
@@ -39,7 +38,7 @@
             }
         };
 
-	    this.apply = function(viewport, deltaX, deltaY, applyToSynchronizedViewports) {
+	    this.applyWindowingToViewport = function(viewport, deltaX, deltaY, applyToSynchronizedViewports) {
 	        var viewportData = viewport.getViewport();
 
 	        // Retrieve image min/max image pixel value and define a
