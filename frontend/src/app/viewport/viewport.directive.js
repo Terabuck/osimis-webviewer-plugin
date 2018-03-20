@@ -391,6 +391,7 @@
                             )
                         )
                     ) {
+                        console.log("viewport-watch-triggered -> redrawing");
                         // Update csViewport
                         model.setViewport(newCsViewport); // newUnserializedCsViewport
                         model.draw(false);

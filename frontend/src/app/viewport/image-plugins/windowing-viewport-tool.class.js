@@ -22,6 +22,7 @@
                 return;
             }
 
+            console.log("pane =", pane);
             // Apply windowing.
             pane.applyWindowing(windowWidth, windowCenter);
 

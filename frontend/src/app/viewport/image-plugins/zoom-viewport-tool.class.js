@@ -17,6 +17,7 @@
         var viewportData = viewport.getViewport();
         var scale = +viewportData.scale;
 
+        console.log("applying zoom", viewportData);
         viewportData.scale = Math.min(Math.max(scale + (delta / 100), 0.01), 100.0);
 
         viewport.setViewport(viewportData);
