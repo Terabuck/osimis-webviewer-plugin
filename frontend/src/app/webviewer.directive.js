@@ -170,7 +170,9 @@
 
                 // Selection-related
                 seriesItemSelectionEnabled: '=?wvSeriesItemSelectionEnabled',
-                selectedSeriesItems: '=?wvSelectedSeriesItems' // readonly
+                selectedSeriesItems: '=?wvSelectedSeriesItems', // readonly
+
+                isAsideClosed: '=?wvIsAsideClosed'
             },
             transclude: {
                 wvLayoutTopLeft: '?wvLayoutTopLeft',
