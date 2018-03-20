@@ -273,8 +273,9 @@
                     },
                     {type: "button", tool: "keyImageCapture"},
                     {type: "button", tool: "toggleSynchro"},
-                    {type: "button", tool: "previousSeries"},
-                    {type: "button", tool: "nextSeries"}
+                    // Optional buttons to explicitely activate
+                    // {type: "button", tool: "previousSeries"},
+                    // {type: "button", tool: "nextSeries"}
                 ]
             }
             vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];
