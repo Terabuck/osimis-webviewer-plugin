@@ -367,7 +367,9 @@
                     //   UPDATE CS VIEWPORT
                     //   KEEP IMAGE
                     //   DRAW IMAGE
-                    else if (
+                    else { 
+                        console.log(oldCsViewport._cornerstoneViewportData.scale, newCsViewport._cornerstoneViewportData.scale);
+                        if (
                         !oldCsViewport ||
                         oldCsViewport._cornerstoneViewportData.hflip !== newCsViewport._cornerstoneViewportData.hflip || 
                         oldCsViewport._cornerstoneViewportData.invert !== newCsViewport._cornerstoneViewportData.invert ||
@@ -395,6 +397,7 @@
                         // Update csViewport
                         model.setViewport(newCsViewport); // newUnserializedCsViewport
                         model.draw(false);
+                    }
                     }
 
                     // Update old values
