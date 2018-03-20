@@ -201,7 +201,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
                     }
 
                     // Send message on slack with address
-                    slackSend color: '#800080', message: "wvb: ${BRANCH_NAME} deployed.\n- http://qa.wvb.osidev.net:${demoPort}/osimis-viewer/app/index.html\n- https://osimis.myjetbrains.com/youtrack/issue/${ticketNumber}\n- https://bitbucket.org/osimis/osimis-webviewer-plugin/pull-requests/"
+                    slackSend color: '#800080', message: "wvb: ${BRANCH_NAME} deployed.\n- http://qa.wvb.osidev.net:${demoPort}"
                 }
             }}}
         }
