@@ -152,6 +152,10 @@
                 <span class="fa fa-ellipsis-v"></span>
             </div>
             <p ng-if="vm.displayDisclaimer && vm.studyIslandsDisplayMode !== 'oneCol'" class="clear disclaimer mbn">{{ "GENERAL_PARAGRAPHS.DISCLAIMER_PARAGRAPH" | translate }}</p>
+            <ng-transclude
+                ng-transclude-slot="wvLayoutLeftTop"
+            >
+            </ng-transclude>
         </wv-layout-left1>
 
         <wv-layout-left2>

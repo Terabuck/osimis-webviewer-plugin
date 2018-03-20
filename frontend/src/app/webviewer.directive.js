@@ -178,7 +178,8 @@
                 wvLayoutTopLeft: '?wvLayoutTopLeft',
                 wvLayoutTopRight: '?wvLayoutTopRight',
                 wvLayoutRight: '?wvLayoutRight',
-                wvLayoutLeftBottom: '?wvLayoutLeftBottom'
+                wvLayoutLeftBottom: '?wvLayoutLeftBottom',
+                wvLayoutLeftTop: '?wvLayoutLeftTop'
             },
             templateUrl: 'app/webviewer.directive.html'
         };
