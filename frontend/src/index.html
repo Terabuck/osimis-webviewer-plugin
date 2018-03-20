@@ -36,6 +36,7 @@
 >
     <wv-webviewer
         wv-pickable-study-ids="vm.pickableStudyIds"
+        wv-pickable-study-id-labels="vm.pickableStudyIdLabels"
         wv-selected-study-ids="vm.selectedStudyIds"
         wv-series-id="vm.seriesId"
 
@@ -109,6 +110,7 @@
         var orthancSeriesId = $location.search().series;
 
         vm.pickableStudyIds = [];
+        vm.pickableStudyIdLabels = {};
         vm.selectedStudyIds = [];
         vm.seriesId = undefined;
 
