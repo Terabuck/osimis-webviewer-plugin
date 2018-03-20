@@ -240,10 +240,10 @@
                         oldCsViewport._cornerstoneViewportData.voiLUT !== newCsViewport._cornerstoneViewportData.voiLUT ||
                         (
                             // Check first viewport changes are not due to resolution change for the last values
-                            (
+/*                            (
                                 oldCsViewport.currentImageResolution.width === newCsViewport.currentImageResolution.width &&
                                 oldCsViewport.currentImageResolution.height === newCsViewport.currentImageResolution.height
-                            ) &&
+                            ) && */
                             (
                                 oldCsViewport._cornerstoneViewportData.scale !== newCsViewport._cornerstoneViewportData.scale ||
                                 oldCsViewport._cornerstoneViewportData.translation.x !== newCsViewport._cornerstoneViewportData.translation.x ||
@@ -382,10 +382,10 @@
                         oldCsViewport._cornerstoneViewportData.voiLUT !== newCsViewport._cornerstoneViewportData.voiLUT ||
                         (
                             // Check first viewport changes are not due to resolution change for the last values
-                            (
+/*                            (
                                 oldCsViewport.currentImageResolution.width === newCsViewport.currentImageResolution.width &&
                                 oldCsViewport.currentImageResolution.height === newCsViewport.currentImageResolution.height
-                            ) &&
+                            ) && */
                             (
                                 oldCsViewport._cornerstoneViewportData.scale !== newCsViewport._cornerstoneViewportData.scale ||
                                 oldCsViewport._cornerstoneViewportData.translation.x !== newCsViewport._cornerstoneViewportData.translation.x ||
@@ -420,10 +420,10 @@
                         oldCsViewport._cornerstoneViewportData.voiLUT !== newCsViewport._cornerstoneViewportData.voiLUT ||
                         (
                             // Check first viewport changes are not due to resolution change for the last values
-                            (
+/*                            (
                                 oldCsViewport.currentImageResolution.width === newCsViewport.currentImageResolution.width &&
                                 oldCsViewport.currentImageResolution.height === newCsViewport.currentImageResolution.height
-                            ) &&
+                            ) && */
                             (
                                 oldCsViewport._cornerstoneViewportData.scale !== newCsViewport._cornerstoneViewportData.scale ||
                                 oldCsViewport._cornerstoneViewportData.translation.x !== newCsViewport._cornerstoneViewportData.translation.x ||
