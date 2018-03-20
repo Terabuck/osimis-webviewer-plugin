@@ -139,18 +139,9 @@
                 oldCsViewport._cornerstoneViewportData.voi.windowCenter === newCsViewport._cornerstoneViewportData.voi.windowCenter &&
                 oldCsViewport._cornerstoneViewportData.voi.windowWidth === newCsViewport._cornerstoneViewportData.voi.windowWidth &&
                 oldCsViewport._cornerstoneViewportData.voiLUT === newCsViewport._cornerstoneViewportData.voiLUT &&
-                (
-                    // Check first viewport changes are not due to resolution change for the last values
-/*                            (
-                        oldCsViewport.currentImageResolution.width === newCsViewport.currentImageResolution.width &&
-                        oldCsViewport.currentImageResolution.height === newCsViewport.currentImageResolution.height
-                    ) && */
-                    (
-                        oldCsViewport._cornerstoneViewportData.scale === newCsViewport._cornerstoneViewportData.scale &&
-                        oldCsViewport._cornerstoneViewportData.translation.x === newCsViewport._cornerstoneViewportData.translation.x &&
-                        oldCsViewport._cornerstoneViewportData.translation.y === newCsViewport._cornerstoneViewportData.translation.y
-                    )
-                );
+                oldCsViewport._cornerstoneViewportData.scale === newCsViewport._cornerstoneViewportData.scale &&
+                oldCsViewport._cornerstoneViewportData.translation.x === newCsViewport._cornerstoneViewportData.translation.x &&
+                oldCsViewport._cornerstoneViewportData.translation.y === newCsViewport._cornerstoneViewportData.translation.y;
         };
         /**
          * @responsibility manage directive's information flow
@@ -392,37 +383,10 @@
                     //   UPDATE CS VIEWPORT
                     //   KEEP IMAGE
                     //   DRAW IMAGE
-                    else { 
-                        console.log(oldCsViewport._cornerstoneViewportData.scale, newCsViewport._cornerstoneViewportData.scale);
-                        if (!oldCsViewport || !areViewportEqual(oldCsViewport, newCsViewport))
-//                         oldCsViewport._cornerstoneViewportData.hflip !== newCsViewport._cornerstoneViewportData.hflip || 
-//                         oldCsViewport._cornerstoneViewportData.invert !== newCsViewport._cornerstoneViewportData.invert ||
-//                         oldCsViewport._cornerstoneViewportData.modalityLUT !== newCsViewport._cornerstoneViewportData.modalityLUT ||
-//                         oldCsViewport._cornerstoneViewportData.pixelReplication !== newCsViewport._cornerstoneViewportData.pixelReplication ||
-//                         oldCsViewport._cornerstoneViewportData.rotation !== newCsViewport._cornerstoneViewportData.rotation ||
-//                         oldCsViewport._cornerstoneViewportData.vflip !== newCsViewport._cornerstoneViewportData.vflip ||
-//                         oldCsViewport._cornerstoneViewportData.voi.windowCenter !== newCsViewport._cornerstoneViewportData.voi.windowCenter ||
-//                         oldCsViewport._cornerstoneViewportData.voi.windowWidth !== newCsViewport._cornerstoneViewportData.voi.windowWidth ||
-//                         oldCsViewport._cornerstoneViewportData.voiLUT !== newCsViewport._cornerstoneViewportData.voiLUT ||
-//                         (
-//                             // Check first viewport changes are not due to resolution change for the last values
-// /*                            (
-//                                 oldCsViewport.currentImageResolution.width === newCsViewport.currentImageResolution.width &&
-//                                 oldCsViewport.currentImageResolution.height === newCsViewport.currentImageResolution.height
-//                             ) && */
-//                             (
-//                                 oldCsViewport._cornerstoneViewportData.scale !== newCsViewport._cornerstoneViewportData.scale ||
-//                                 oldCsViewport._cornerstoneViewportData.translation.x !== newCsViewport._cornerstoneViewportData.translation.x ||
-//                                 oldCsViewport._cornerstoneViewportData.translation.y !== newCsViewport._cornerstoneViewportData.translation.y
-//                             )
-//                         )
-                    // ) 
-                    {
-                        console.log("viewport-watch-triggered -> redrawing");
+                   else if (!oldCsViewport || !areViewportEqual(oldCsViewport, newCsViewport)) {
                         // Update csViewport
                         model.setViewport(newCsViewport); // newUnserializedCsViewport
                         model.draw(false);
-                    }
                     }
 
                     // Update old values
@@ -432,31 +396,8 @@
                     if (newImageId !== oldImageId) {
                         _watchedValue.imageId = newImageId;
                     }
-                    // May requires deep comparison.
-                    if (newCsViewport !== oldCsViewport && (!newCsViewport || !oldCsViewport || !areViewportEqual(oldCsViewport, newCsViewport)))
-//                         oldCsViewport._cornerstoneViewportData.hflip !== newCsViewport._cornerstoneViewportData.hflip || 
-//                         oldCsViewport._cornerstoneViewportData.invert !== newCsViewport._cornerstoneViewportData.invert ||
-//                         oldCsViewport._cornerstoneViewportData.modalityLUT !== newCsViewport._cornerstoneViewportData.modalityLUT ||
-//                         oldCsViewport._cornerstoneViewportData.pixelReplication !== newCsViewport._cornerstoneViewportData.pixelReplication ||
-//                         oldCsViewport._cornerstoneViewportData.rotation !== newCsViewport._cornerstoneViewportData.rotation ||
-//                         oldCsViewport._cornerstoneViewportData.vflip !== newCsViewport._cornerstoneViewportData.vflip ||
-//                         oldCsViewport._cornerstoneViewportData.voi.windowCenter !== newCsViewport._cornerstoneViewportData.voi.windowCenter ||
-//                         oldCsViewport._cornerstoneViewportData.voi.windowWidth !== newCsViewport._cornerstoneViewportData.voi.windowWidth ||
-//                         oldCsViewport._cornerstoneViewportData.voiLUT !== newCsViewport._cornerstoneViewportData.voiLUT ||
-//                         (
-//                             // Check first viewport changes are not due to resolution change for the last values
-// /*                            (
-//                                 oldCsViewport.currentImageResolution.width === newCsViewport.currentImageResolution.width &&
-//                                 oldCsViewport.currentImageResolution.height === newCsViewport.currentImageResolution.height
-//                             ) && */
-//                             (
-//                                 oldCsViewport._cornerstoneViewportData.scale !== newCsViewport._cornerstoneViewportData.scale ||
-//                                 oldCsViewport._cornerstoneViewportData.translation.x !== newCsViewport._cornerstoneViewportData.translation.x ||
-//                                 oldCsViewport._cornerstoneViewportData.translation.y !== newCsViewport._cornerstoneViewportData.translation.y
-//                             )
-//                         )
-                    // )) 
-                    {
+
+                    if (newCsViewport !== oldCsViewport && (!newCsViewport || !oldCsViewport || !areViewportEqual(oldCsViewport, newCsViewport))) {
                         _watchedValue.csViewport = newImageId && newCsViewport && newCsViewport.clone() || null; // the `.clone` is only here to be able to deep compare new values with old ones (otherwise both old & new variable would reference the same object)
                     }
 
@@ -536,33 +477,10 @@
                             throw new Error('!isFinite(translation.?)');
                         }
 
-                        if (
-                            (!oldCsViewport && newCsViewport) ||
+                        if ((!oldCsViewport && newCsViewport) ||
                             (oldCsViewport && !newCsViewport) ||
                             (oldCsViewport && newCsViewport) &&
-                            (!areViewportEqual(oldCsViewport, newCsViewport)
-                            // oldCsViewport._cornerstoneViewportData.hflip !== newCsViewport._cornerstoneViewportData.hflip || 
-                            // oldCsViewport._cornerstoneViewportData.invert !== newCsViewport._cornerstoneViewportData.invert ||
-                            // oldCsViewport._cornerstoneViewportData.modalityLUT !== newCsViewport._cornerstoneViewportData.modalityLUT ||
-                            // oldCsViewport._cornerstoneViewportData.pixelReplication !== newCsViewport._cornerstoneViewportData.pixelReplication ||
-                            // oldCsViewport._cornerstoneViewportData.rotation !== newCsViewport._cornerstoneViewportData.rotation ||
-                            // oldCsViewport._cornerstoneViewportData.vflip !== newCsViewport._cornerstoneViewportData.vflip ||
-                            // oldCsViewport._cornerstoneViewportData.voi.windowCenter !== newCsViewport._cornerstoneViewportData.voi.windowCenter ||
-                            // oldCsViewport._cornerstoneViewportData.voi.windowWidth !== newCsViewport._cornerstoneViewportData.voi.windowWidth ||
-                            // oldCsViewport._cornerstoneViewportData.voiLUT !== newCsViewport._cornerstoneViewportData.voiLUT ||
-                            // (
-                            //     // Check first viewport changes are not due to resolution change for the last values
-                            //     (
-                            //         oldCsViewport.currentImageResolution.width === newCsViewport.currentImageResolution.width &&
-                            //         oldCsViewport.currentImageResolution.height === newCsViewport.currentImageResolution.height
-                            //     ) &&
-                            //     (
-                            //         oldCsViewport._cornerstoneViewportData.scale !== newCsViewport._cornerstoneViewportData.scale ||
-                            //         oldCsViewport._cornerstoneViewportData.translation.x !== newCsViewport._cornerstoneViewportData.translation.x ||
-                            //         oldCsViewport._cornerstoneViewportData.translation.y !== newCsViewport._cornerstoneViewportData.translation.y
-                            //     )
-                            // )
-                         )
+                            (!areViewportEqual(oldCsViewport, newCsViewport))
                         ) {
                             _watchedValue.csViewport = scope.vm.wvImageId && scope.vm.csViewport && scope.vm.csViewport.clone() || null; // the `.clone` is only here to be able to deep compare new values with old ones (otherwise both old & new variable would reference the same object)
                         }
