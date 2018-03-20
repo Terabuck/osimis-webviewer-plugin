@@ -140,6 +140,7 @@
             restrict: 'E',
             scope: {
                 readonly: '=?wvReadonly',
+                pickableStudyIdLabels: '=?wvPickableStudyIdLabels',  // {studyOrthancUuid: "text to display"}
                 pickableStudyIds: '=wvPickableStudyIds',
                 selectedStudyIds: '=?wvSelectedStudyIds',
                 seriesId: '=?wvSeriesId',
@@ -169,13 +170,16 @@
 
                 // Selection-related
                 seriesItemSelectionEnabled: '=?wvSeriesItemSelectionEnabled',
-                selectedSeriesItems: '=?wvSelectedSeriesItems' // readonly
+                selectedSeriesItems: '=?wvSelectedSeriesItems', // readonly
+
+                isAsideClosed: '=?wvIsAsideClosed'
             },
             transclude: {
                 wvLayoutTopLeft: '?wvLayoutTopLeft',
                 wvLayoutTopRight: '?wvLayoutTopRight',
                 wvLayoutRight: '?wvLayoutRight',
-                wvLayoutLeftBottom: '?wvLayoutLeftBottom'
+                wvLayoutLeftBottom: '?wvLayoutLeftBottom',
+                wvLayoutLeftTop: '?wvLayoutLeftTop'
             },
             templateUrl: 'app/webviewer.directive.html'
         };
@@ -220,7 +224,9 @@
                 rotateLeft: false,
                 rotateRight: false,
                 arrowAnnotate: false,
-                toggleSynchro: false
+                toggleSynchro: false,
+                nextSeries: false,
+                previousSeries: false
             };
 
             if (vm.keyImageCaptureEnabled) { // activate
@@ -270,7 +276,10 @@
                         ]
                     },
                     {type: "button", tool: "keyImageCapture"},
-                    {type: "button", tool: "toggleSynchro"}
+                    {type: "button", tool: "toggleSynchro"},
+                    // Optional buttons to explicitely activate
+                    // {type: "button", tool: "previousSeries"},
+                    // {type: "button", tool: "nextSeries"}
                 ]
             }
             vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];
@@ -440,6 +449,12 @@
                 case 'toggleSynchro':
                     vm.synchronizer.enable(!vm.synchronizer.isEnabled());
                     vm.synchroEnabled = wvSynchronizer.isEnabled();
+                    break;
+                case 'previousSeries':
+                    selectedPane.previousSeries();
+                    break;
+                case 'nextSeries':
+                    selectedPane.nextSeries();
                     break;
                 default:
                     throw new Error('Unknown toolbar action.');

@@ -21,7 +21,7 @@
  *
  * @param {callback} [wvOnImageChange]
  *   triggered when image has effectively changed
- *   
+ *
  *   Available Callback Arguments:
  *   * `$image` - image_model
  *
@@ -29,7 +29,7 @@
  *   Share the cornerstone viewport data. It is different from the viewport
  *   model which is only accessible via viewport plugins. When set to null,
  *   the viewport data is reset to the default value.
- *   
+ *
  *   The cornerstone viewport object contains the following attributes (source: https://github.com/chafey/cornerstone/wiki/viewport):
  *   * `scale` - The scale applied to the image. A scale of 1.0 will display no zoom (one image pixel takes up one screen pixel). A scale of 2.0 will be double zoom and a scale of .5 will be zoomed out by 2x
  *   * `translation` - an object with properties x and y which describe the translation to apply in the pixel coordinate system. Note that the image is initially displayed centered in the enabled element with a x and y translation of 0 and 0 respectively.
@@ -48,7 +48,7 @@
  * @scope
  * @restrict Element
  * @requires webviewer.directive:wvSize
- * 
+ *
  * @description
  * The `wvViewport` directive display medical images inside a canvas.
  *
@@ -68,10 +68,10 @@
  * overlay will be overloaded with white space.
  * By setting the overlay's css _position_ attribute to _absolute_, the ovgetViewporterlay can position information to the top, right, bottom and left sides
  * of the viewport.
- * 
+ *
  * @example
  * Display a specific image with some informations
- * 
+ *
  * ```html
  * <wv-viewport wv-image-id="'your-image-id" wv-image="$image" wv-size="{width: '100px', height: '100px'}"
  $              wv-viewport="$viewport" wv-lossless="true"
@@ -82,7 +82,7 @@
  *
  * @example
  * Display a specific image with custom overlay
- * 
+ *
  * ```html
  * <wv-viewport wv-image-id="'your-image-id'" wv-image="$image" wv-size="{width: '100px', height: '100px'}"
  *              wv-viewport="$viewport" wv-lossless="true">
@@ -145,8 +145,8 @@
         };
         /**
          * @responsibility manage directive's information flow
-         * 
-         * dataflows: 
+         *
+         * dataflows:
          *   directive's controller
          *     [command] -> controller -> attributes/$scope -> viewmodel -> cornerstone API -> [dom]
          *     [request] <- controller <- attributes/$scope <- viewmodel <- [out]
@@ -160,9 +160,15 @@
             var enabledElement = element.children('div').children('.wv-cornerstone-enabled-image')[0];
             var model = new osimis.Viewport($q, cornerstone, enabledElement, !!scope.vm.wvLossless);
 
+            scope.vm.setFocus = function(){
+                // because of unselectable, we set the focus on the click in case the viewer is embedded in an iframe.
+                // this should allow the iframe to get the focus
+                enabledElement.focus();
+            };
+
             scope.vm.wvEnableOverlay = !!scope.vm.wvEnableOverlay;
             var wvImageIdParser = $parse(attrs.wvImageId);
-            
+
             var _watchedValue = {
                 imageId: scope.vm.wvImageId || null,
                 csViewport: scope.vm.csViewport && scope.vm.csViewport.clone() || null // the `.clone` is only here to be able to deep compare new values with old ones (otherwise both old & new variable would reference the same object)
@@ -198,7 +204,7 @@
                     if (newCsViewport && newCsViewport._cornerstoneViewportData.translation && (!isFinite(newCsViewport._cornerstoneViewportData.translation.x) || !isFinite(newCsViewport._cornerstoneViewportData.translation.y))) {
                         throw new Error('!isFinite(translation.?)');
                     }
-                    
+
                     // Case 1:
                     // Do nothing if no change
                     if (!newImageId && !oldImageId) {
@@ -242,31 +248,7 @@
                         _watchedValue.imageId = newImageId;
                     }
                     // May requires deep comparison.
-                    if (newCsViewport !== oldCsViewport && (!newCsViewport || !oldCsViewport || !areViewportEqual(oldCsViewport, newCsViewport)))
-
-//                         oldCsViewport._cornerstoneViewportData.hflip !== newCsViewport._cornerstoneViewportData.hflip || 
-//                         oldCsViewport._cornerstoneViewportData.invert !== newCsViewport._cornerstoneViewportData.invert ||
-//                         oldCsViewport._cornerstoneViewportData.modalityLUT !== newCsViewport._cornerstoneViewportData.modalityLUT ||
-//                         oldCsViewport._cornerstoneViewportData.pixelReplication !== newCsViewport._cornerstoneViewportData.pixelReplication ||
-//                         oldCsViewport._cornerstoneViewportData.rotation !== newCsViewport._cornerstoneViewportData.rotation ||
-//                         oldCsViewport._cornerstoneViewportData.vflip !== newCsViewport._cornerstoneViewportData.vflip ||
-//                         oldCsViewport._cornerstoneViewportData.voi.windowCenter !== newCsViewport._cornerstoneViewportData.voi.windowCenter ||
-//                         oldCsViewport._cornerstoneViewportData.voi.windowWidth !== newCsViewport._cornerstoneViewportData.voi.windowWidth ||
-//                         oldCsViewport._cornerstoneViewportData.voiLUT !== newCsViewport._cornerstoneViewportData.voiLUT ||
-//                         (
-//                             // Check first viewport changes are not due to resolution change for the last values
-// /*                            (
-//                                 oldCsViewport.currentImageResolution.width === newCsViewport.currentImageResolution.width &&
-//                                 oldCsViewport.currentImageResolution.height === newCsViewport.currentImageResolution.height
-//                             ) && */
-//                             (
-//                                 oldCsViewport._cornerstoneViewportData.scale !== newCsViewport._cornerstoneViewportData.scale ||
-//                                 oldCsViewport._cornerstoneViewportData.translation.x !== newCsViewport._cornerstoneViewportData.translation.x ||
-//                                 oldCsViewport._cornerstoneViewportData.translation.y !== newCsViewport._cornerstoneViewportData.translation.y
-//                             )
-//                         )
-                    // )) 
-                    {
+                    if (newCsViewport !== oldCsViewport && (!newCsViewport || !oldCsViewport || !areViewportEqual(oldCsViewport, newCsViewport))) {
                         _watchedValue.csViewport = newImageId && newCsViewport && newCsViewport.clone() || null; // the `.clone` is only here to be able to deep compare new values with old ones (otherwise both old & new variable would reference the same object)
                     }
                     /*
@@ -283,13 +265,13 @@
 
             // bind directive's imageId & viewport attributes to cornerstone
             // image & viewports
-            {   
+            {
                 // To ensure viewport is not reset before the image changes (
                 // instead of after), we need to treat both imageId & viewport
                 // variable at the same times.
 
                 // @warning This part is highly performance critical!
-                // We can't rely on traditional AngularJS $watch tools as 
+                // We can't rely on traditional AngularJS $watch tools as
                 // 1. They may triggers recursive $digest loop (this is why we
                 //    rely on a _watchedValue global variables to cache the
                 //    state prior to the digest and be able to update it
@@ -364,7 +346,7 @@
                     }
                     // Case 5:
                     // @todo compare oldCsViewport & newCsViewport by ref once
-                    // we change their references only when they are different 
+                    // we change their references only when they are different
                     // Do nothing if they are the same, so we slow down write
                     // a lot but enhance global $digest speed.
                     else if (false) {
@@ -433,8 +415,8 @@
             // value in real time.
             var _oldCsViewport = _.cloneDeep(scope.vm.csViewport && scope.vm.csViewport._cornerstoneViewportData) || null;
             $(model._enabledElement).on('CornerstoneImageRendered', function(evt, args) { // element.off not needed
-                
-                // We do want this to update the csViewport, but only 
+
+                // We do want this to update the csViewport, but only
 
                 // var oldCsViewport = _oldCsViewport;
                 // var newCsViewport = model._viewportData && model._viewportData._cornerstoneViewportData || null;
@@ -510,7 +492,7 @@
                     // Resize canvas & redraw only if value as changed. This
                     // condition prevent bugs from occuring! Consider there is
                     // two types of viewports, thumbnails & diagnosis one. They
-                    // have different quality policy. The tend to display low 
+                    // have different quality policy. The tend to display low
                     // quality whereas the second one switch from low to high
                     // once downloaded. As such, it is important to invalidate
                     // cache (using `model.draw(true)` instead of
@@ -544,7 +526,7 @@
                     // Resize canvas & redraw only if value as changed. This
                     // condition prevent bugs from occuring! Consider there is
                     // two types of viewports, thumbnails & diagnosis one. They
-                    // have different quality policy. The tend to display low 
+                    // have different quality policy. The tend to display low
                     // quality whereas the second one switch from low to high
                     // once downloaded. As such, it is important to invalidate
                     // cache (using `model.draw(true)` instead of
@@ -570,12 +552,12 @@
                     unlistenWvSizeFn();
                 }
             }
-            
+
             /** register tools
              *
              * Tool directive spec:
              * - name ends with ViewportTool
-             * 
+             *
              * Tool controller interface:
              * - void register(ctrl)
              * - void unregister(ctrl)
@@ -600,7 +582,7 @@
                     }
                 });
             }
-        }        
+        }
 
 
         return directive;
@@ -683,7 +665,7 @@
                 // If src is an array, set the right length first (seems like
                 // the length property is somehow not being taken in account
                 // by the for loops). This is required because cornerstone will
-                // ignore (don't draw) random tools' annotations if an array 
+                // ignore (don't draw) random tools' annotations if an array
                 // has not a proper length (cf. equals to its item count).
                 if (_.isArray(src)) {
                     // Assert
@@ -727,7 +709,7 @@
                 }
             }
 
-            // Remove the data from cornerstone (if all the related annotations 
+            // Remove the data from cornerstone (if all the related annotations
             // are removed).
             if (!state && this.toolState[imageId] && this.toolState[imageId][toolName]) {
                 delete this.toolState[imageId][toolName];
