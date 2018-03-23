@@ -18,7 +18,8 @@ std::auto_ptr<Series> SeriesFactory::CreateSeries(const std::string& seriesId,
                                                   const Json::Value& slicesShort,
                                                   const Json::Value& middleInstanceMetaInfoTags,
                                                   const Json::Value& middleInstancesInfos,
-                                                  const Json::Value& instancesInfos)
+                                                  const Json::Value& instancesInfos,
+                                                  const Json::Value& studyInfo)
 {
   std::string contentType;
   std::set<ImageQuality> imageQualities;
@@ -65,5 +66,5 @@ std::auto_ptr<Series> SeriesFactory::CreateSeries(const std::string& seriesId,
   }
   
   // Create the series
-  return std::auto_ptr<Series>(new Series(seriesId, contentType, middleInstancesInfos, instancesInfos, slicesShort, imageQualities));
+  return std::auto_ptr<Series>(new Series(seriesId, contentType, middleInstancesInfos, instancesInfos, slicesShort, imageQualities, studyInfo));
 }

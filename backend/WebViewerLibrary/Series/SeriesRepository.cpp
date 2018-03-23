@@ -97,9 +97,15 @@ std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId, b
   if (::_isDicomSr(middleInstanceInfos["TagsSubset"]) || ::_isDicomPr(middleInstanceInfos["TagsSubset"])) {
     throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_IncompatibleImageFormat));
   }
-  
+
+  Json::Value studyInfo;
+  if (!OrthancPlugins::GetJsonFromOrthanc(studyInfo, context, "/series/" + seriesId + "/study"))
+  {
+    throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
+  }
+
   // Create a series based on tags and ordered instances
-  return std::auto_ptr<Series>(_seriesFactory.CreateSeries(seriesId, slicesShort, tags1, middleInstanceInfos, instancesInfos));
+  return std::auto_ptr<Series>(_seriesFactory.CreateSeries(seriesId, slicesShort, tags1, middleInstanceInfos, instancesInfos, studyInfo));
 }
 
 namespace {

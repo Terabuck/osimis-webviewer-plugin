@@ -26,8 +26,8 @@
 #include <boost/foreach.hpp>
 
 Series::Series(const std::string& seriesId, const std::string& contentType, const Json::Value& seriesTags, const Json::Value& instancesInfos,
-    const Json::Value& orderedInstances, const std::set<ImageQuality>& imageQualities)
-    : _seriesId(seriesId), _contentType(contentType), _seriesTags(seriesTags), _instancesInfos(instancesInfos), _orderedInstances(orderedInstances), _imageQualities(imageQualities)
+    const Json::Value& orderedInstances, const std::set<ImageQuality>& imageQualities, const Json::Value& studyInfo)
+    : _seriesId(seriesId), _contentType(contentType), _seriesTags(seriesTags), _instancesInfos(instancesInfos), _orderedInstances(orderedInstances), _imageQualities(imageQualities), _studyInfo(studyInfo)
 {
 
 }
@@ -39,6 +39,7 @@ std::string Series::ToJson() const {
   result["middleInstanceInfos"] = _seriesTags;
   result["instancesInfos"] = _instancesInfos;
   result["instances"] = _orderedInstances;
+  result["study"] = _studyInfo;
   // result["tags"] = OrthancPlugins::ConvertDicomMapToJson(*_seriesTags.get());
 
   BOOST_FOREACH(ImageQuality quality, _imageQualities) {

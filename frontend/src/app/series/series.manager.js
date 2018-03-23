@@ -170,33 +170,12 @@
 
             return seriesPromise
                 .then(function(response) {
-                    // Cache instance tags in wvInstanceManager
                     var instancesInfos = response.data.instancesInfos;
-                    _cacheInstancesInfos(instancesInfos);
-                    
-                    // Look up the study id to be able to retrieve all the
-                    // annotations (only loadable at the study level) in case
-                    // the series contains images. We also use the study id to
-                    // bind the DICOM pdf instances to a specific study.
-                    var request = new osimis.HttpRequest();
-                    request.setHeaders(wvConfig.httpRequestHeaders);
-                    request.setCache(true);
-                    return $q.all({
-                        instancesInfos: $q.when(instancesInfos),
-                        data: $q.when(response.data),
-                        studyId: request
-                            .get(wvConfig.orthancApiURL + '/series/'+seriesId+'/study')
-                            .then(function(studyInfo) {
-                                var studyId = studyInfo.data.ID;
-                                return studyId;
-                            })
-                    });
-                })
-                .then(function (response) {
-                    var instancesInfos = response.instancesInfos;
-                    var studyId = response.studyId;
-
+                    var studyId = response.data.study.ID;
                     var contentType = response.data.contentType;
+
+                    // Cache instance tags in wvInstanceManager
+                    _cacheInstancesInfos(instancesInfos);
 
                     // Return list of image series when series' content is
                     // images.
