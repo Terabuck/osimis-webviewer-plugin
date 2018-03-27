@@ -205,7 +205,7 @@
     <label
         ng-switch-when="previousSeries"
         ng-if="vm.toolbox.buttons.hasOwnProperty('previousSeries')"
-        class="wvButton--underline fa fa-fast-backward"
+        class="wvButton--underline fa fa-play fa-vflip wvButton--vflip"
         data-title="{{ 'COMPONENTS.TOOLBOX.PREVIOUS_SERIES' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
@@ -219,7 +219,7 @@
     <label
         ng-switch-when="nextSeries"
         ng-if="vm.toolbox.buttons.hasOwnProperty('nextSeries')"
-        class="wvButton--underline fa fa-fast-forward"
+        class="wvButton--underline fa fa-play"
         data-title="{{ 'COMPONENTS.TOOLBOX.NEXT_SERIES' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
