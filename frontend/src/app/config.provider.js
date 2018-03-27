@@ -51,24 +51,16 @@
                                                               // to the correct path if reverse proxy is found, so np.
                                                               // @todo use ../../ instead
 
+        this.httpRequestHeaders = {};
+        this.config = __webViewerConfig;
+
         if (__webViewerConfig.customOverlayProviderUrl) {
             console.log("Custom overlay provider URL from config file: ", __webViewerConfig.customOverlayProviderUrl);
-            this.customOverlayProviderUrl = urlConvertor.toAbsoluteURL(__webViewerConfig.customOverlayProviderUrl);
-            console.log("Custom overlay provider URL (computed): ", this.customOverlayProviderUrl);
+            this.config.customOverlayProviderUrl = urlConvertor.toAbsoluteURL(__webViewerConfig.customOverlayProviderUrl);
+            console.log("Custom overlay provider URL (computed): ", this.config.customOverlayProviderUrl);
         } else {
             console.log("No custom overlay provider defined");
-            this.customOverlayProviderUrl = undefined;
         }
-
-        this.httpRequestHeaders = {};
-        this.keyboardShortcutsEnabled = __webViewerConfig.keyboardShortcutsEnabled;
-        this.mouseWheelBehaviour = __webViewerConfig.mouseWheelBehaviour;
-        this.enableHighQualityImagePreloading = __webViewerConfig.enableHighQualityImagePreloading;
-        this.showBreadCrumb = __webViewerConfig.showBreadCrumb;
-        this.combinedToolBehaviour = __webViewerConfig.combinedToolBehaviour;
-        this.windowingBehaviour = __webViewerConfig.windowingBehaviour;
-        this.keyboardShortcuts = __webViewerConfig.keyboardShortcuts;
-        this.windowingPresets = __webViewerConfig.windowingPresets;
     };
 
     /**

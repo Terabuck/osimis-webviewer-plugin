@@ -160,6 +160,8 @@
                 videoDisplayEnabled: '=?wvVideoDisplayEnabled',
                 keyImageCaptureEnabled: '=?wvKeyImageCaptureEnabled',
                 combinedToolEnabled: '=?wvCombinedToolEnabled',
+                toggleLayoutTextButtonEnabled: '=?wvToggleLayoutTextButtonEnabled',
+                toggleLayoutIconsButtonEnabled: '=?wvToggleLayoutIconsButtonEnabled',
                 showNoReportIconInSeriesList: '=?wvShowNoReportIconInSeriesList',
                 reduceTimelineHeightOnSingleFrameSeries: '=?wvReduceTimelineHeightOnSingleFrameSeries',
                 buttonsSize: '=?wvButtonsSize',  // small | large
@@ -235,6 +237,14 @@
             if (vm.combinedToolEnabled) { // activate}
                 vm.tools.combinedTool = false;
             }
+            if (vm.toggleLayoutTextButtonEnabled) { // activate}
+                console.log("TODO: activate toggleLayoutTextButtonEnabled");
+                //TODO vm.tools.combinedTool = false;
+            }
+            if (vm.toggleLayoutIconsButtonEnabled) { // activate}
+                console.log("TODO: activate toggleLayoutIconsButtonEnabled");
+                //TODOvm.tools.combinedTool = false;
+            }
 
             console.log('default tool: ', vm.toolbarDefaultTool)
             if (vm.toolbarDefaultTool) {
@@ -288,6 +298,8 @@
             vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
             vm.keyImageCaptureEnabled = typeof vm.keyImageCaptureEnabled !== 'undefined' ? vm.keyImageCaptureEnabled : false;
             vm.combinedToolEnabled = typeof vm.combinedToolEnabled !== 'undefined' ? vm.combinedToolEnabled : false;
+            vm.toggleLayoutTextButtonEnabled = typeof vm.toggleLayoutTextButtonEnabled !== 'undefined' ? vm.toggleLayoutTextButtonEnabled : false;
+            vm.toggleLayoutIconsButtonEnabled = typeof vm.toggleLayoutIconsButtonEnabled !== 'undefined' ? vm.toggleLayoutIconsButtonEnabled : false;
             vm.studyIslandsDisplayMode = typeof vm.studyIslandsDisplayMode !== 'undefined' ? vm.studyIslandsDisplayMode : "grid";
             vm.paneManager = wvPaneManager;
             vm.synchronizer = wvSynchronizer;

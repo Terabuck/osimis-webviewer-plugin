@@ -160,12 +160,12 @@
     };
 
     Pane.prototype.applyConfigWindowingPreset = function(presetsIndex) {
-        if (!(presetsIndex in this._wvConfig.windowingPresets)) {
+        if (!(presetsIndex in this._wvConfig.config.windowingPresets)) {
             console.log("no windowing presets defined in config file for index ", presetsIndex);
         } else {
             var _this = this;
             this.$timeout(function() { // don't know why but, if applyWindowing is called synchronously, changes are not applied
-                _this.applyWindowing(_this._wvConfig.windowingPresets[presetsIndex].windowWidth, _this._wvConfig.windowingPresets[presetsIndex].windowCenter);
+                _this.applyWindowing(_this._wvConfig.config.windowingPresets[presetsIndex].windowWidth, _this._wvConfig.config.windowingPresets[presetsIndex].windowCenter);
             }, 1);
 
         }

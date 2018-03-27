@@ -242,6 +242,8 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   defaultStudyIslandsDisplayMode = OrthancPlugins::GetStringValue(wvConfig, "DefaultStudyIslandsDisplayMode", "grid");
   defaultLanguage = OrthancPlugins::GetStringValue(wvConfig, "DefaultLanguage", "en");
   customOverlayProviderUrl = OrthancPlugins::GetStringValue(wvConfig, "CustomOverlayProviderUrl", "");  // must be provided as a url relative to orthanc root url (i.e.: "/../customOverlays/")
+  toggleLayoutTextButtonEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ToggleLayoutTextButtonEnabled", false);
+  toggleLayoutIconsButtonEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ToggleLayoutIconsButtonEnabled", false);
 
   if (toolbarLayoutMode != "flat" && toolbarLayoutMode != "tree")
   {
@@ -443,10 +445,10 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   }
 
   config["keyboardShortcutsEnabled"] = keyboardShortcutsEnabled;
-  config["enableStudyDownload"] = studyDownloadEnabled;
-  config["enableVideoDisplay"] = videoDisplayEnabled;
-  config["enableAnnotationStorage"] = annotationStorageEnabled;
-  config["enableKeyImageCapture"] = keyImageCaptureEnabled;
+  config["studyDownloadEnabled"] = studyDownloadEnabled;
+  config["videoDisplayEnabled"] = videoDisplayEnabled;
+  config["annotationStorageEnabled"] = annotationStorageEnabled;
+  config["keyImageCaptureEnabled"] = keyImageCaptureEnabled;
   config["combinedToolEnabled"] = combinedToolEnabled;
   config["showStudyInformationBreadcrumb"] = showStudyInformationBreadcrumb;
   config["windowingPresets"] = windowingPresets;
@@ -454,7 +456,7 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["windowingBehaviour"] = windowingBehaviour;
   config["mouseWheelBehaviour"] = mouseWheelBehaviour;
   config["keyboardShortcuts"] = keyboardShortcuts;
-  config["enableHighQualityImagePreloading"] = highQualityImagePreloadingEnabled;
+  config["highQualityImagePreloadingEnabled"] = highQualityImagePreloadingEnabled;
   config["reduceTimelineHeightOnSingleFrameSeries"] = reduceTimelineHeightOnSingleFrameSeries;
   config["showNoReportIconInSeriesList"] = showNoReportIconInSeriesList;
   config["toolbarLayoutMode"] = toolbarLayoutMode;
@@ -462,6 +464,9 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["defaultSelectedTool"] = defaultSelectedTool;
   config["defaultStudyIslandsDisplayMode"] = defaultStudyIslandsDisplayMode;
   config["defaultLanguage"] = defaultLanguage;
+  config["toggleLayoutTextButtonEnabled"] = toggleLayoutTextButtonEnabled;
+  config["toggleLayoutIconsButtonEnabled"] = toggleLayoutIconsButtonEnabled;
+
   if (customOverlayProviderUrl.length() > 0) {
     config["customOverlayProviderUrl"] = customOverlayProviderUrl;
   }

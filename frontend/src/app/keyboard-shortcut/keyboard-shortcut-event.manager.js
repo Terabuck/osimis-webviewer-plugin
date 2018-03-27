@@ -19,12 +19,12 @@
 
         var handlers = createHandlers(this);
 
-        if (wvConfig.keyboardShortcutsEnabled) {
+        if (wvConfig.config.keyboardShortcutsEnabled) {
             console.log("assigning keyboard shortcuts");
-            for (var keyboardCodeString in wvConfig.keyboardShortcuts) {
+            for (var keyboardCodeString in wvConfig.config.keyboardShortcuts) {
                 var keyboardCodes = keyboardCodeString.split(",");
 
-                var handlerName = wvConfig.keyboardShortcuts[keyboardCodeString];
+                var handlerName = wvConfig.config.keyboardShortcuts[keyboardCodeString];
                 if (handlerName in handlers) {
                     bindKey(keyboardCodes, handlers[handlerName]);
                 } else {
