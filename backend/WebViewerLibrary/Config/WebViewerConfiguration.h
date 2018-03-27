@@ -78,8 +78,8 @@ public:
   bool keyImageCaptureEnabled;
   bool combinedToolEnabled;
 
-  bool toggleLayoutTextButtonEnabled;
-  bool toggleLayoutIconsButtonEnabled;
+  bool toggleOverlayTextButtonEnabled;
+  bool toggleOverlayIconsButtonEnabled;
 
   WebViewerConfiguration(OrthancPluginContext* context);
   /**

@@ -12,7 +12,7 @@
      */
 
     /* @ngInject */
-    function wvKeyboardShortcutEventManager($rootScope, wvConfig, wvStudyManager, wvPaneManager, wvSynchronizer, wvSeriesPlayer){
+    function wvKeyboardShortcutEventManager($rootScope, wvConfig, wvStudyManager, wvPaneManager, wvSynchronizer, wvSeriesPlayer, wvViewerController){
         this.previousSynchroStatus = undefined;
 
         keyboardJS.setContext('viewerShortcut');
@@ -93,6 +93,13 @@
             handlers.exitTemporaryToggleSynchro = function() {
                 wvSynchronizer.enable(this_.previousSynchroStatus);
                 this_.previousSynchroStatus = undefined;
+            };
+
+            handlers.toggleOverlayText = function() {
+                wvViewerController.toggleOverlayText();
+            };
+            handlers.toggleOverlayIcons = function() {
+                wvViewerController.toggleOverlayIcons();
             };
 
             handlers.play = function() {

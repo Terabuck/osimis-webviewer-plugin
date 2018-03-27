@@ -5,11 +5,6 @@
  * @restrict Element
  * @requires webviewer.directive:wvViewport
  *
- * @param {boolean} [wvKeyImageCaptureEnabled=false]
- * When activated, this option displays a button on each viewport. When the button is
- * clicked, a new DICOM series is created with the image of the viewport, including the
- * annotations. This image is considered as a DICOM Key Image Note (see 
- * `http://wiki.ihe.net/index.php/Key_Image_Note`).
  *
  */
 
@@ -34,7 +29,7 @@
      };
 
     /* @ngInject */
-    function wvOverlay(wvStudyManager, wvInstanceManager) {
+    function wvOverlay(wvStudyManager, wvInstanceManager, wvViewerController) {
         var directive = {
             bindToController: true,
             controller: Controller,
@@ -53,7 +48,6 @@
                 studyId: '=?wvStudyId',
                 wvViewport: '=?',
                 image: '=wvImage',
-                keyImageCaptureEnabled: '=?wvKeyImageCaptureEnabled',
             }
         };
         return directive;
@@ -62,21 +56,31 @@
             var _this = this;
             var vm = scope.vm;
 
-            // Set default value.
-            vm.keyImageCaptureEnabled = typeof vm.keyImageCaptureEnabled !== 'undefined' ? vm.keyImageCaptureEnabled : false;
+            vm.showTopLeftText = function() {
+                return wvViewerController.isOverlayTextVisible() && (!!vm.topLeftLines && vm.topLeftLines.length > 0) || vm.topLeftIcon;
+            };
+            vm.showTopRightText = function() {
+                return wvViewerController.isOverlayTextVisible() && (!!vm.topRightLines && vm.topRightLines.length > 0) || vm.topRightIcon;
+            };
+            vm.showBottomRightText = function() { // this is a mix of viewport information (check in the html code + custom layout defined in this code)
+                return wvViewerController.isOverlayTextVisible() && (!!vm.wvViewport || (!!vm.bottomRightLines && vm.bottomRightLines.length > 0)) || vm.bottomRightIcon;
+            };
+            vm.showBottomLeftText = function() {
+                return wvViewerController.isOverlayTextVisible() && (!!vm.bottomLeftLines && vm.bottomLeftLines.length > 0) || vm.bottomLeftIcon;
+            };
+            vm.showTopLeftIcon = function() {
+                return wvViewerController.isOverlayIconsVisible() && !!vm.topLeftIcon;
+            }
+            vm.showTopRightIcon = function() {
+                return wvViewerController.isOverlayIconsVisible() && !!vm.topRightIcon;
+            }
+            vm.showBottomRightIcon = function() {
+                return wvViewerController.isOverlayIconsVisible() && !!vm.bottomRightIcon;
+            }
+            vm.showBottomLeftIcon = function() {
+                return wvViewerController.isOverlayIconsVisible() && !!vm.bottomLeftIcon;
+            }
 
-            vm.showTopLeftArea = function() {
-                return (!!vm.topLeftLines && vm.topLeftLines.length > 0) || vm.topLeftIcon;
-            };
-            vm.showTopRightArea = function() {
-                return (!!vm.topRightLines && vm.topRightLines.length > 0) || vm.topRightIcon;
-            };
-            vm.showBottomRightArea = function() { // this is a mix of viewport information (check in the html code + custom layout defined in this code)
-                return (!!vm.wvViewport || (!!vm.bottomRightLines && vm.bottomRightLines.length > 0)) || vm.bottomRightIcon;
-            };
-            vm.showBottomLeftArea = function() {
-                return (!!vm.bottomLeftLines && vm.bottomLeftLines.length > 0) || vm.bottomLeftIcon;
-            };
 
             vm.getTopLeftArea = function(seriesTags, instanceTags) {
                 var lines = [];
