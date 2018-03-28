@@ -1,7 +1,7 @@
 /**
  * @ngdoc directive
  * @name webviewer.directive:wvOverlay
- * 
+ *
  * @restrict Element
  * @requires webviewer.directive:wvViewport
  *
@@ -57,16 +57,16 @@
             var vm = scope.vm;
 
             vm.showTopLeftText = function() {
-                return wvViewerController.isOverlayTextVisible() && (!!vm.topLeftLines && vm.topLeftLines.length > 0) || vm.topLeftIcon;
+                return wvViewerController.isOverlayTextVisible() && (!!vm.topLeftLines && vm.topLeftLines.length > 0);
             };
             vm.showTopRightText = function() {
-                return wvViewerController.isOverlayTextVisible() && (!!vm.topRightLines && vm.topRightLines.length > 0) || vm.topRightIcon;
+                return wvViewerController.isOverlayTextVisible() && (!!vm.topRightLines && vm.topRightLines.length > 0);
             };
             vm.showBottomRightText = function() { // this is a mix of viewport information (check in the html code + custom layout defined in this code)
-                return wvViewerController.isOverlayTextVisible() && (!!vm.wvViewport || (!!vm.bottomRightLines && vm.bottomRightLines.length > 0)) || vm.bottomRightIcon;
+                return wvViewerController.isOverlayTextVisible() && (!!vm.wvViewport || (!!vm.bottomRightLines && vm.bottomRightLines.length > 0));
             };
             vm.showBottomLeftText = function() {
-                return wvViewerController.isOverlayTextVisible() && (!!vm.bottomLeftLines && vm.bottomLeftLines.length > 0) || vm.bottomLeftIcon;
+                return wvViewerController.isOverlayTextVisible() && (!!vm.bottomLeftLines && vm.bottomLeftLines.length > 0);
             };
             vm.showTopLeftIcon = function() {
                 return wvViewerController.isOverlayIconsVisible() && !!vm.topLeftIcon;
