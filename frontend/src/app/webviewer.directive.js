@@ -131,7 +131,7 @@
         .directive('wvWebviewer', wvWebviewer);
 
     /* @ngInject */
-    function wvWebviewer($rootScope, $timeout, wvStudyManager, wvAnnotationManager, wvSeriesManager, wvPaneManager, wvWindowingViewportTool, wvSynchronizer) {
+    function wvWebviewer($rootScope, $timeout, wvStudyManager, wvAnnotationManager, wvSeriesManager, wvPaneManager, wvWindowingViewportTool, wvSynchronizer, wvViewerController) {
         var directive = {
             bindToController: true,
             controller: Controller,
@@ -160,6 +160,8 @@
                 videoDisplayEnabled: '=?wvVideoDisplayEnabled',
                 keyImageCaptureEnabled: '=?wvKeyImageCaptureEnabled',
                 combinedToolEnabled: '=?wvCombinedToolEnabled',
+                toggleOverlayTextButtonEnabled: '=?wvToggleOverlayTextButtonEnabled',
+                toggleOverlayIconsButtonEnabled: '=?wvToggleOverlayIconsButtonEnabled',
                 showNoReportIconInSeriesList: '=?wvShowNoReportIconInSeriesList',
                 reduceTimelineHeightOnSingleFrameSeries: '=?wvReduceTimelineHeightOnSingleFrameSeries',
                 buttonsSize: '=?wvButtonsSize',  // small | large
@@ -198,7 +200,8 @@
             vm.noticeEnabled = typeof vm.noticeEnabled !== 'undefined' ? vm.noticeEnabled : false;
             vm.noticeText = typeof vm.noticeText !== 'undefined' ? vm.noticeText : undefined;
             vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;
-            vm.synchroEnabled = wvSynchronizer.isEnabled(),
+            vm.isOverlayTextVisible = true;
+            vm.isOverlayIconsVisible = true;
             vm.tools = typeof vm.tools !== 'undefined' ? vm.tools : {
                 windowing: false,
                 zoom: false,
@@ -234,6 +237,12 @@
             }
             if (vm.combinedToolEnabled) { // activate}
                 vm.tools.combinedTool = false;
+            }
+            if (vm.toggleOverlayTextButtonEnabled) { // activate}
+                vm.tools.toggleOverlayText = false;
+            }
+            if (vm.toggleOverlayIconsButtonEnabled) { // activate}
+                vm.tools.toggleOverlayIcons = false;
             }
 
             console.log('default tool: ', vm.toolbarDefaultTool)
@@ -279,7 +288,9 @@
                     {type: "button", tool: "toggleSynchro"},
                     // Optional buttons to explicitely activate
                     // {type: "button", tool: "previousSeries"},
-                    // {type: "button", tool: "nextSeries"}
+                    // {type: "button", tool: "nextSeries"},
+                    {type: "button", tool: "toggleOverlayText"},
+                    {type: "button", tool: "toggleOverlayIcons"},
                 ]
             }
             vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];
@@ -288,9 +299,12 @@
             vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
             vm.keyImageCaptureEnabled = typeof vm.keyImageCaptureEnabled !== 'undefined' ? vm.keyImageCaptureEnabled : false;
             vm.combinedToolEnabled = typeof vm.combinedToolEnabled !== 'undefined' ? vm.combinedToolEnabled : false;
+            vm.toggleOverlayTextButtonEnabled = typeof vm.toggleOverlayTextButtonEnabled !== 'undefined' ? vm.toggleOverlayTextButtonEnabled : false;
+            vm.toggleOverlayIconsButtonEnabled = typeof vm.toggleOverlayIconsButtonEnabled !== 'undefined' ? vm.toggleOverlayIconsButtonEnabled : false;
             vm.studyIslandsDisplayMode = typeof vm.studyIslandsDisplayMode !== 'undefined' ? vm.studyIslandsDisplayMode : "grid";
             vm.paneManager = wvPaneManager;
             vm.synchronizer = wvSynchronizer;
+            vm.wvViewerController = wvViewerController;
             vm.wvWindowingViewportTool = wvWindowingViewportTool;
 
             // Selection-related
@@ -448,7 +462,12 @@
                     break;
                 case 'toggleSynchro':
                     vm.synchronizer.enable(!vm.synchronizer.isEnabled());
-                    vm.synchroEnabled = wvSynchronizer.isEnabled();
+                    break;
+                case 'toggleOverlayText':
+                    vm.wvViewerController.toggleOverlayText();
+                    break;
+                case 'toggleOverlayIcons':
+                    vm.wvViewerController.toggleOverlayIcons();
                     break;
                 case 'previousSeries':
                     selectedPane.previousSeries();

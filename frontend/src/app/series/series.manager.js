@@ -139,14 +139,14 @@
                     return seriesList[subSeriesIndex];
                 })
                 .then(function(series) {
-                    if (wvConfig.customOverlayProviderUrl == undefined) {
+                    if (wvConfig.config.customOverlayProviderUrl == undefined) {
                         // console.log("no custom overlay provider defined");
                         return series;
                     } else {
                         var request = new osimis.HttpRequest();
                         request.setHeaders(wvConfig.httpRequestHeaders);
                         request.setCache(true);
-                        var seriesCustomOverlayProviderUrl = wvConfig.customOverlayProviderUrl + series.id.split(":")[0]; // series.id looks like 46edef30-c3c9ab46-f68b1625-841e3a63-39f9ec32:0
+                        var seriesCustomOverlayProviderUrl = wvConfig.config.customOverlayProviderUrl + series.id.split(":")[0]; // series.id looks like 46edef30-c3c9ab46-f68b1625-841e3a63-39f9ec32:0
                         return request.get(seriesCustomOverlayProviderUrl)
                             .then(function(customOverlayInfo) {
                                 // console.log("got the custom overlay:", customOverlayInfo);

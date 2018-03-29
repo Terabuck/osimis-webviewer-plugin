@@ -12,19 +12,19 @@
      */
 
     /* @ngInject */
-    function wvKeyboardShortcutEventManager($rootScope, wvConfig, wvStudyManager, wvPaneManager, wvSynchronizer, wvSeriesPlayer){
+    function wvKeyboardShortcutEventManager($rootScope, wvConfig, wvStudyManager, wvPaneManager, wvSynchronizer, wvSeriesPlayer, wvViewerController){
         this.previousSynchroStatus = undefined;
 
         keyboardJS.setContext('viewerShortcut');
 
         var handlers = createHandlers(this);
 
-        if (wvConfig.keyboardShortcutsEnabled) {
+        if (wvConfig.config.keyboardShortcutsEnabled) {
             console.log("assigning keyboard shortcuts");
-            for (var keyboardCodeString in wvConfig.keyboardShortcuts) {
+            for (var keyboardCodeString in wvConfig.config.keyboardShortcuts) {
                 var keyboardCodes = keyboardCodeString.split(",");
 
-                var handlerName = wvConfig.keyboardShortcuts[keyboardCodeString];
+                var handlerName = wvConfig.config.keyboardShortcuts[keyboardCodeString];
                 if (handlerName in handlers) {
                     bindKey(keyboardCodes, handlers[handlerName]);
                 } else {
@@ -93,6 +93,13 @@
             handlers.exitTemporaryToggleSynchro = function() {
                 wvSynchronizer.enable(this_.previousSynchroStatus);
                 this_.previousSynchroStatus = undefined;
+            };
+
+            handlers.toggleOverlayText = function() {
+                wvViewerController.toggleOverlayText();
+            };
+            handlers.toggleOverlayIcons = function() {
+                wvViewerController.toggleOverlayIcons();
             };
 
             handlers.play = function() {

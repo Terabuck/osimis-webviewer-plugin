@@ -242,6 +242,8 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   defaultStudyIslandsDisplayMode = OrthancPlugins::GetStringValue(wvConfig, "DefaultStudyIslandsDisplayMode", "grid");
   defaultLanguage = OrthancPlugins::GetStringValue(wvConfig, "DefaultLanguage", "en");
   customOverlayProviderUrl = OrthancPlugins::GetStringValue(wvConfig, "CustomOverlayProviderUrl", "");  // must be provided as a url relative to orthanc root url (i.e.: "/../customOverlays/")
+  toggleOverlayTextButtonEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ToggleOverlayTextButtonEnabled", false);
+  toggleOverlayIconsButtonEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ToggleOverlayIconsButtonEnabled", false);
 
   if (toolbarLayoutMode != "flat" && toolbarLayoutMode != "tree")
   {
@@ -326,7 +328,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
       "toggleSynchro", "enableSynchro", "disableSynchro",
       "setLayout1x1", "setLayout1x2", "setLayout2x1", "setLayout2x2",
       "play", "pause", "playPause", "selectNextPane", "selectPreviousPane",
-      "loadSeriesInPane",
+      "loadSeriesInPane", "toggleOverlayText", "toggleOverlayIcons",
       "null"
     };
 
@@ -443,10 +445,10 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   }
 
   config["keyboardShortcutsEnabled"] = keyboardShortcutsEnabled;
-  config["enableStudyDownload"] = studyDownloadEnabled;
-  config["enableVideoDisplay"] = videoDisplayEnabled;
-  config["enableAnnotationStorage"] = annotationStorageEnabled;
-  config["enableKeyImageCapture"] = keyImageCaptureEnabled;
+  config["studyDownloadEnabled"] = studyDownloadEnabled;
+  config["videoDisplayEnabled"] = videoDisplayEnabled;
+  config["annotationStorageEnabled"] = annotationStorageEnabled;
+  config["keyImageCaptureEnabled"] = keyImageCaptureEnabled;
   config["combinedToolEnabled"] = combinedToolEnabled;
   config["showStudyInformationBreadcrumb"] = showStudyInformationBreadcrumb;
   config["windowingPresets"] = windowingPresets;
@@ -454,7 +456,7 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["windowingBehaviour"] = windowingBehaviour;
   config["mouseWheelBehaviour"] = mouseWheelBehaviour;
   config["keyboardShortcuts"] = keyboardShortcuts;
-  config["enableHighQualityImagePreloading"] = highQualityImagePreloadingEnabled;
+  config["highQualityImagePreloadingEnabled"] = highQualityImagePreloadingEnabled;
   config["reduceTimelineHeightOnSingleFrameSeries"] = reduceTimelineHeightOnSingleFrameSeries;
   config["showNoReportIconInSeriesList"] = showNoReportIconInSeriesList;
   config["toolbarLayoutMode"] = toolbarLayoutMode;
@@ -462,6 +464,9 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["defaultSelectedTool"] = defaultSelectedTool;
   config["defaultStudyIslandsDisplayMode"] = defaultStudyIslandsDisplayMode;
   config["defaultLanguage"] = defaultLanguage;
+  config["toggleOverlayTextButtonEnabled"] = toggleOverlayTextButtonEnabled;
+  config["toggleOverlayIconsButtonEnabled"] = toggleOverlayIconsButtonEnabled;
+
   if (customOverlayProviderUrl.length() > 0) {
     config["customOverlayProviderUrl"] = customOverlayProviderUrl;
   }

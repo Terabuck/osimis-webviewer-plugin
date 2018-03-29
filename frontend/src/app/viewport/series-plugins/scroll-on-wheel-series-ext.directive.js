@@ -127,10 +127,10 @@
                         return;
                     }
                     else if (deltaY < 0) {
-                        vm.applyTool(series, viewmodel.getViewport(), vm.wvConfig['mouseWheelBehaviour']['down'], -deltaY);
+                        vm.applyTool(series, viewmodel.getViewport(), vm.wvConfig.config['mouseWheelBehaviour']['down'], -deltaY);
                     }
                     else if (deltaY > 0) {
-                        vm.applyTool(series, viewmodel.getViewport(), vm.wvConfig['mouseWheelBehaviour']['up'], deltaY);
+                        vm.applyTool(series, viewmodel.getViewport(), vm.wvConfig.config['mouseWheelBehaviour']['up'], deltaY);
                     }
                 });
 

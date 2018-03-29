@@ -64,14 +64,14 @@
                 var enabledElement = viewport.getEnabledElement();
                 _hammers[viewport] = {};
 
-                for (var action in wvConfig.combinedToolBehaviour) {
+                for (var action in wvConfig.config.combinedToolBehaviour) {
 
                      if (action === "oneTouchPan") {
-                        _hammers[viewport]["oneTouchPan"] = new osi.HammerWrapper(enabledElement, 1, viewport, wvConfig.combinedToolBehaviour[action], wvWindowingViewportTool, wvPanViewportTool);
+                        _hammers[viewport]["oneTouchPan"] = new osi.HammerWrapper(enabledElement, 1, viewport, wvConfig.config.combinedToolBehaviour[action], wvWindowingViewportTool, wvPanViewportTool);
                      } else if (action === "twoTouchPan") {
-                        _hammers[viewport]["twoTouchPan"] = new osi.HammerWrapper(enabledElement, 2, viewport, wvConfig.combinedToolBehaviour[action], wvWindowingViewportTool, wvPanViewportTool);
+                        _hammers[viewport]["twoTouchPan"] = new osi.HammerWrapper(enabledElement, 2, viewport, wvConfig.config.combinedToolBehaviour[action], wvWindowingViewportTool, wvPanViewportTool);
                      } else if (action === "threeTouchPan") {
-                        _hammers[viewport]["threeTouchPan"] = new osi.HammerWrapper(enabledElement, 3, viewport, wvConfig.combinedToolBehaviour[action], wvWindowingViewportTool, wvPanViewportTool);
+                        _hammers[viewport]["threeTouchPan"] = new osi.HammerWrapper(enabledElement, 3, viewport, wvConfig.config.combinedToolBehaviour[action], wvWindowingViewportTool, wvPanViewportTool);
                      }
                  };
 
@@ -98,14 +98,14 @@
                             lastX = !isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX;
                             lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
 
-                            if (mouseButton === 1 && wvConfig.combinedToolBehaviour["leftMouseButton"]) { // left-click + move
-                                _this._applyTool(wvConfig.combinedToolBehaviour["leftMouseButton"], viewport, deltaX, deltaY);
+                            if (mouseButton === 1 && wvConfig.config.combinedToolBehaviour["leftMouseButton"]) { // left-click + move
+                                _this._applyTool(wvConfig.config.combinedToolBehaviour["leftMouseButton"], viewport, deltaX, deltaY);
                             }
-                            else if (mouseButton === 2 && wvConfig.combinedToolBehaviour["middleMouseButton"]) { // middle-click + move
-                                _this._applyTool(wvConfig.combinedToolBehaviour["middleMouseButton"], viewport, deltaX, deltaY);
+                            else if (mouseButton === 2 && wvConfig.config.combinedToolBehaviour["middleMouseButton"]) { // middle-click + move
+                                _this._applyTool(wvConfig.config.combinedToolBehaviour["middleMouseButton"], viewport, deltaX, deltaY);
                             }
-                            else if (mouseButton === 3 && wvConfig.combinedToolBehaviour["rightMouseButton"]) { // right-click + move
-                                _this._applyTool(wvConfig.combinedToolBehaviour["rightMouseButton"], viewport, deltaX, deltaY);
+                            else if (mouseButton === 3 && wvConfig.config.combinedToolBehaviour["rightMouseButton"]) { // right-click + move
+                                _this._applyTool(wvConfig.config.combinedToolBehaviour["rightMouseButton"], viewport, deltaX, deltaY);
                             }
                         });
                     });
