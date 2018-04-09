@@ -37,6 +37,7 @@ Fixes:
 * WVB-293: support for YBR422 images
 * WVB-341: WindowingPresets are not visible
 * VS-192: ShortTermCache: invalidate instances when instance is received in case it is a 'resend' of an instance with modification (i.e. same image is uploaded again with rotation/flip)
+* WVP-142: Windowing: Ignore slope/intercept if PhotometricInterpretation is RGB
 
 Improvements:
 * speed-up initial study/series loading time
