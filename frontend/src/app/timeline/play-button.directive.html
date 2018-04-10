@@ -3,20 +3,28 @@
 
     <!-- Play/Pause button -->
     <label
-        data-title="{{ 'COMPONENTS.TIMELINE.PLAY' | translate | wvCapitalize }}"
-        ng-click="!vm.readonly && vm.play()"
-        ng-show="!vm.isPlaying()"
+        data-title="{{ 'COMPONENTS.TIMELINE.PLAY_REVERSE' | translate | wvCapitalize }}"
+        ng-click="!vm.readonly && vm.playReverse()"
+        ng-show="true || !vm.isPlayingReverse()"
         class="wv-timeline-controls-button"
     >
-        <span class="fa fa-play" class="wv-timeline-controls-vertical-sizing"></span>
+        <span class="fa fa-play wv-timeline-controls-vflip" class="wv-timeline-controls-vertical-sizing "></span>
     </label>
     <label
         data-title="{{ 'COMPONENTS.TIMELINE.PAUSED' | translate | wvCapitalize }}"
         ng-click="!vm.readonly && vm.pause()"
-        ng-show="vm.isPlaying()"
+        ng-show="true || vm.isPlaying() || vm.isPlayingReverse()"
         class="wv-timeline-controls-button"
     >
         <span class="fa fa-pause" class="wv-timeline-controls-vertical-sizing"></span>
+    </label>
+    <label
+        data-title="{{ 'COMPONENTS.TIMELINE.PLAY' | translate | wvCapitalize }}"
+        ng-click="!vm.readonly && vm.play()"
+        ng-show="true || !vm.isPlaying()"
+        class="wv-timeline-controls-button"
+    >
+        <span class="fa fa-play" class="wv-timeline-controls-vertical-sizing"></span>
     </label>
 
     <!--  Configuration options -->

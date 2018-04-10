@@ -14,7 +14,7 @@
     position: absolute;
     left: 0;
     bottom: 0;
-    width: 12em;
+    width: 16em;
     height: 100%; 
     color: white;
 }
@@ -23,7 +23,7 @@
     position: absolute;
     right: 0;
     bottom: 0;
-    width: calc(100% - 12em);
+    width: calc(100% - 16em);
     height: calc(100% + 2px); 
     
     svg{

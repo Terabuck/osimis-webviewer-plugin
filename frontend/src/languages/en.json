@@ -56,7 +56,8 @@
             "OF": "of",
             "PAUSED": "paused",
             "PREVIOUS": "previous",
-            "PLAY": "play"
+            "PLAY": "play",
+            "PLAY_REVERSE": "play reverse"
         },
         "TOOLBOX": {
             "ANGLE_MEASUREMENT": "angle measurement",
