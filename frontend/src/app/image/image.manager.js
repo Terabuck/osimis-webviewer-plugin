@@ -292,6 +292,7 @@
                     'wv-lossless="true"',
 
                     'wv-angle-measure-viewport-tool="true"',
+                    'wv-simple-angle-measure-viewport-tool="true"',
                     'wv-length-measure-viewport-tool="true"',
                     'wv-elliptical-roi-viewport-tool="true"',
                     'wv-zoom-viewport-tool="true"',

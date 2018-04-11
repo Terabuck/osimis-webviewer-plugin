@@ -62,6 +62,14 @@
             'handles.end2.x',
             'handles.end2.y',
         ],
+        simpleAngle: [
+            'handles.start.x',
+            'handles.start.y',
+            'handles.middle.x',
+            'handles.middle.y',
+            'handles.end.x',
+            'handles.end.y',
+        ],
         probe: [
             'handles.end.x',
             'handles.end.y',

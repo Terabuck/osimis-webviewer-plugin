@@ -59,6 +59,7 @@
             "PLAY": "lancer"
         },
         "TOOLBOX": {
+            "SIMPLE_ANGLE_MEASUREMENT": "mesure d’angle entre lignes",
             "ANGLE_MEASUREMENT": "mesure d’angle",
             "ARROW_ANNOTATE_TEXT": "annoter l’image avec du texte",
             "ELLIPTICAL_ROI": "roi élliptique",

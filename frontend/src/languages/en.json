@@ -60,7 +60,8 @@
             "PLAY_REVERSE": "play reverse"
         },
         "TOOLBOX": {
-            "ANGLE_MEASUREMENT": "angle measurement",
+            "ANGLE_MEASUREMENT": "lines angle measurement",
+            "SIMPLE_ANGLE_MEASUREMENT": "angle measurement",
             "ARROW_ANNOTATE_TEXT": "annotate the image with text",
             "ELLIPTICAL_ROI": "elliptical roi",
             "FLIP_HORIZONTALLY": "flip horizontally",

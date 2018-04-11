@@ -103,11 +103,25 @@
         <input id="toolbox-length-measure-button" type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="lengthMeasure" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
+    <!-- Simple Angle Measure -->
+    <label
+        ng-switch-when="simpleAngleMeasure"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('simpleAngleMeasure')"
+        class="wvButton--underline glyphicon glyphicon-chevron-left"
+        ng-class="{active: vm.toolbox.tool === 'simpleAngleMeasure', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        data-title="{{ 'COMPONENTS.TOOLBOX.SIMPLE_ANGLE_MEASUREMENT' | translate | wvCapitalize }}"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        bs-tooltip
+        >
+        <input id="toolbox-simple-angle-measure-button" type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="simpleAngleMeasure" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
     <!-- Angle Measure -->
     <label
         ng-switch-when="angleMeasure"
         ng-if="vm.toolbox.buttons.hasOwnProperty('angleMeasure')"
-        class="wvButton--underline glyphicon glyphicon-chevron-left"
+        class="wvButton--underline fa fa-angle-double-left"
         ng-class="{active: vm.toolbox.tool === 'angleMeasure', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         data-title="{{ 'COMPONENTS.TOOLBOX.ANGLE_MEASUREMENT' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"

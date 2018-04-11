@@ -213,6 +213,7 @@
                 },
                 lengthMeasure: false,
                 angleMeasure: false,
+                simpleAngleMeasure: false,
                 pixelProbe: false,
                 ellipticalRoi: false,
                 rectangleRoi: false,
@@ -277,6 +278,7 @@
                         title: "annotation",
                         buttons: [
                             {type: "button", tool: "lengthMeasure"},
+                            {type: "button", tool: "simpleAngleMeasure"},
                             {type: "button", tool: "angleMeasure"},
                             {type: "button", tool: "pixelProbe"},
                             {type: "button", tool: "ellipticalRoi"},
