@@ -3,24 +3,24 @@
 
     angular
         .module('webviewer')
-        .directive('wvPixelProbeViewportTool', wvPixelProbeViewportTool)
+        .directive('wvSimpleAngleMeasureViewportTool', wvSimpleAngleMeasureViewportTool)
         .config(function($provide) {
             $provide.decorator('wvViewportDirective', function($delegate) {
                 var directive = $delegate[0];
-                directive.require['wvPixelProbeViewportTool'] = '?^wvPixelProbeViewportTool';
+                directive.require['wvSimpleAngleMeasureViewportTool'] = '?^wvSimpleAngleMeasureViewportTool';
 
                 return $delegate;
             });
         });
 
     /* @ngInject */
-    function wvPixelProbeViewportTool($parse, WvBaseTool) {
+    function wvSimpleAngleMeasureViewportTool($parse, WvBaseTool) {
         // Usage:
         //
         // Creates:
         //
         var directive = {
-            require: 'wvPixelProbeViewportTool',
+            require: 'wvSimpleAngleMeasureViewportTool',
             controller: Controller,
             link: link,
             restrict: 'A',
@@ -28,10 +28,10 @@
         };
 
         function link(scope, element, attrs, tool) {
-            var wvPixelProbeViewportToolParser = $parse(attrs.wvPixelProbeViewportTool);
+            var wvSimpleAngleMeasureViewportToolParser = $parse(attrs.wvSimpleAngleMeasureViewportTool);
             
             // bind attributes -> tool
-            scope.$watch(wvPixelProbeViewportToolParser, function(isActivated) {
+            scope.$watch(wvSimpleAngleMeasureViewportToolParser, function(isActivated) {
                 if (isActivated) {
                     tool.activate();
                 }
@@ -43,11 +43,11 @@
 
         /* @ngInject */
         function Controller() {
-            WvBaseTool.call(this, 'probe', 'probeTouch', true);
+            WvBaseTool.call(this, 'simpleAngle', 'simpleAngleTouch', true);
         }
         Controller.prototype = Object.create(WvBaseTool.prototype)
         Controller.prototype.constructor = Controller;
-        
+    
         return directive;
     }
 

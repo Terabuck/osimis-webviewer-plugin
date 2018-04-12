@@ -45,7 +45,68 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   windowingPresets[5]["windowCenter"] = 300;
   windowingPresets[5]["windowWidth"] = 600;
 
+  windowingBehaviour = Json::Value(Json::objectValue);
+  windowingBehaviour["left"] = "decrease-ww";
+  windowingBehaviour["right"] = "increase-ww";
+  windowingBehaviour["up"] = "decrease-wc";
+  windowingBehaviour["down"] = "increase-wc";
 
+  combinedToolBehaviour = Json::Value(Json::objectValue);
+  combinedToolBehaviour["leftMouseButton"] = "windowing";
+  combinedToolBehaviour["middleMouseButton"] = "pan";
+  combinedToolBehaviour["rightMouseButton"] = "zoom";
+  combinedToolBehaviour["oneTouchPan"] = "windowing";
+  combinedToolBehaviour["twoTouchPan"] = "pan";
+  combinedToolBehaviour["threeTouchPan"] = Json::nullValue;
+
+  mouseWheelBehaviour["down"] = "previousImage";
+  mouseWheelBehaviour["up"] = "nextImage";
+
+  keyboardShortcuts = Json::Value(Json::objectValue);
+  keyboardShortcuts["left"] = "previousImage";
+  keyboardShortcuts["right"] = "nextImage";
+  keyboardShortcuts["up"] = "previousSeries";
+  keyboardShortcuts["down"] = "nextSeries";
+  keyboardShortcuts["shift + up"] = "previousStudy";
+  keyboardShortcuts["shift + down"] = "nextStudy";
+
+  keyboardShortcuts["l"] = "rotateLeft";
+  keyboardShortcuts["r"] = "rotateRight";
+  keyboardShortcuts["v"] = "flipVertical";
+  keyboardShortcuts["h"] = "flipHorizontal";
+  keyboardShortcuts["i"] = "invertColor";
+  keyboardShortcuts["c"] = "selectCombinedTool";
+  keyboardShortcuts["p"] = "selectPanTool";
+  keyboardShortcuts["z"] = "selectZoomTool";
+  keyboardShortcuts["w"] = "selectWindowingTool";
+  keyboardShortcuts["ctrl + l"] = "selectLengthMeasureTool";
+  keyboardShortcuts["ctrl + p"] = "selectPixelProbeTool";
+  keyboardShortcuts["ctrl + m"] = "selectMagnifyingGlassTool";
+  keyboardShortcuts["ctrl + e"] = "selectEllipticalRoiTool";
+  keyboardShortcuts["ctrl + r"] = "selectRectangleRoiTool";
+  keyboardShortcuts["ctrl + a"] = "selectArrowAnnotateTool";
+  keyboardShortcuts["ctrl + k"] = "selectKeyImageCaptureTool";
+  keyboardShortcuts["1, num1"] = "applyEmbeddedWindowingPreset1";
+  keyboardShortcuts["2, num2"] = "applyEmbeddedWindowingPreset2";
+  keyboardShortcuts["3, num3"] = "applyEmbeddedWindowingPreset3";
+  keyboardShortcuts["4, num4"] = "applyEmbeddedWindowingPreset4";
+  keyboardShortcuts["5, num5"] = "applyEmbeddedWindowingPreset5";
+  keyboardShortcuts["ctrl + 1, ctrl + num1"] = "applyConfigWindowingPreset1";
+  keyboardShortcuts["ctrl + 2, ctrl + num2"] = "applyConfigWindowingPreset2";
+  keyboardShortcuts["ctrl + 3, ctrl + num3"] = "applyConfigWindowingPreset3";
+  keyboardShortcuts["ctrl + 4, ctrl + num4"] = "applyConfigWindowingPreset4";
+  keyboardShortcuts["ctrl + 5, ctrl + num5"] = "applyConfigWindowingPreset5";
+  keyboardShortcuts["s"] = "toggleSynchro";
+  keyboardShortcuts["f1"] = "setLayout1x1";
+  keyboardShortcuts["f2"] = "setLayout1x2";
+  keyboardShortcuts["f3"] = "setLayout2x1";
+  keyboardShortcuts["f4"] = "setLayout2x2";
+  keyboardShortcuts["space"] = "playPause";
+  keyboardShortcuts["tab"] = "selectNextPane";
+  keyboardShortcuts["shift + tab"] = "selectPreviousPane";
+  keyboardShortcuts["enter"] = "loadSeriesInPane";
+
+  instanceInfoCacheEnabled = OrthancPlugins::GetBoolValue(wvConfig, "InstanceInfoCacheEnabled", false);
   gdcmEnabled = OrthancPlugins::GetBoolValue(wvConfig, "GdcmEnabled", true);
   // By default, use GDCM for everything.
   restrictTransferSyntaxes = false;
@@ -84,13 +145,15 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   if (wvConfig.isMember("WindowingPresets") &&
       wvConfig["WindowingPresets"].type() == Json::arrayValue)
   {
-    windowingPresets = windowingPresets = Json::Value(Json::arrayValue);  // remove default values
+    windowingPresets = Json::Value(Json::arrayValue);  // remove default values
 
     for (Json::Value::ArrayIndex i = 0; i < wvConfig["WindowingPresets"].size(); i++)
     {
       Json::Value preset = wvConfig["WindowingPresets"][i];
-      if (preset.type() != Json::objectValue)
+      if (preset.type() != Json::objectValue) {
+        OrthancPluginLogError(_context, "WindowingPresets invalid value.  It shall be an object.");
         throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
+      }
       else
       {
         windowingPresets[i] = Json::Value(Json::objectValue);
@@ -101,11 +164,68 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
     }
   }
 
+  // Retrieve combinedTool preset (if set).
+  if (wvConfig.isMember("CombinedToolBehaviour") &&
+      wvConfig["CombinedToolBehaviour"].type() == Json::objectValue)
+  {
+    combinedToolBehaviour = Json::Value(Json::objectValue);  // remove default values
+
+    Json::Value::Members members = wvConfig["CombinedToolBehaviour"].getMemberNames();
+
+    for (size_t i = 0; i < members.size(); i++) {
+      combinedToolBehaviour[members[i].c_str()] = wvConfig["CombinedToolBehaviour"][members[i]];
+    }
+  }
+
+  // Retrieve windowing (if set).
+  if (wvConfig.isMember("WindowingBehaviour") &&
+      wvConfig["WindowingBehaviour"].type() == Json::objectValue)
+  {
+    windowingBehaviour = Json::Value(Json::objectValue);  // remove default values
+
+    Json::Value::Members members = wvConfig["WindowingBehaviour"].getMemberNames();
+
+    for (size_t i = 0; i < members.size(); i++)
+    {
+      windowingBehaviour[members[i].c_str()] = wvConfig["WindowingBehaviour"][members[i]];
+    }
+  }
+
+  // Retrieve mouse wheel (if set).
+  if (wvConfig.isMember("MouseWheelBehaviour") &&
+      wvConfig["MouseWheelBehaviour"].type() == Json::objectValue)
+  {
+    mouseWheelBehaviour = Json::Value(Json::objectValue);  // remove default values
+
+    Json::Value::Members members = wvConfig["MouseWheelBehaviour"].getMemberNames();
+
+    for (size_t i = 0; i < members.size(); i++)
+    {
+      mouseWheelBehaviour[members[i].c_str()] = wvConfig["MouseWheelBehaviour"][members[i]];
+    }
+  }
+
+  // Retrieve keyboardShortcuts (if set).
+  if (wvConfig.isMember("KeyboardShortcuts") &&
+      wvConfig["KeyboardShortcuts"].type() == Json::objectValue)
+  {
+    keyboardShortcuts = Json::Value(Json::objectValue);  // remove default values
+
+    Json::Value::Members members = wvConfig["KeyboardShortcuts"].getMemberNames();
+
+    for (size_t i = 0; i < members.size(); i++)
+    {
+      keyboardShortcuts[members[i].c_str()] = wvConfig["KeyboardShortcuts"][members[i]];
+    }
+  }
+
   persistentCachedImageStorageEnabled = OrthancPlugins::GetBoolValue(wvConfig, "CacheEnabled", false);
   studyDownloadEnabled = OrthancPlugins::GetBoolValue(wvConfig, "StudyDownloadEnabled", true);
+  keyboardShortcutsEnabled = OrthancPlugins::GetBoolValue(wvConfig, "KeyboardShortcutsEnabled", true);
   videoDisplayEnabled = OrthancPlugins::GetBoolValue(wvConfig, "VideoDisplayEnabled", true);
   annotationStorageEnabled = OrthancPlugins::GetBoolValue(wvConfig, "AnnotationStorageEnabled", false);
   keyImageCaptureEnabled = OrthancPlugins::GetBoolValue(wvConfig, "KeyImageCaptureEnabled", false);
+  combinedToolEnabled = OrthancPlugins::GetBoolValue(wvConfig, "CombinedToolEnabled", false);
   showStudyInformationBreadcrumb = OrthancPlugins::GetBoolValue(wvConfig, "ShowStudyInformationBreadcrumb", false);
   shortTermCachePrefetchOnInstanceStored = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCachePrefetchOnInstanceStored", false);
   shortTermCacheEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheEnabled", true);
@@ -121,6 +241,9 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   defaultSelectedTool = OrthancPlugins::GetStringValue(wvConfig, "DefaultSelectedTool", "zoom");
   defaultStudyIslandsDisplayMode = OrthancPlugins::GetStringValue(wvConfig, "DefaultStudyIslandsDisplayMode", "grid");
   defaultLanguage = OrthancPlugins::GetStringValue(wvConfig, "DefaultLanguage", "en");
+  customOverlayProviderUrl = OrthancPlugins::GetStringValue(wvConfig, "CustomOverlayProviderUrl", "");  // must be provided as a url relative to orthanc root url (i.e.: "/../customOverlays/")
+  toggleOverlayTextButtonEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ToggleOverlayTextButtonEnabled", false);
+  toggleOverlayIconsButtonEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ToggleOverlayIconsButtonEnabled", false);
 
   if (toolbarLayoutMode != "flat" && toolbarLayoutMode != "tree")
   {
@@ -139,6 +262,119 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
     OrthancPluginLogError(_context, "DefaultStudyIslandsDisplayMode invalid value.  Allowed values are \"grid\" and \"list\" and \"oneCol\"");
     throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
   }
+
+  {// validate combinedToolBehaviour
+    std::set<std::string> combinedToolAllowedToolNames = { "windowing", "pan", "zoom" };
+    std::set<std::string> combinedToolAllowedActions = { "leftMouseButton", "middleMouseButton", "rightMouseButton", "oneTouchPan", "twoTouchPan", "threeTouchPan"};
+
+    Json::Value::Members members = combinedToolBehaviour.getMemberNames();
+
+    for (size_t i = 0; i < members.size(); i++)
+    {
+      std::string action = members[i];
+
+      if (combinedToolAllowedActions.find(action) == combinedToolAllowedActions.end()) {
+        OrthancPluginLogError(_context, (std::string("CombinedToolBehaviour invalid action: ") + action).c_str());
+        throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
+      }
+
+      if (!combinedToolBehaviour[action].isNull()) {
+        std::string toolName = combinedToolBehaviour[action].asString();
+        if (combinedToolAllowedToolNames.find(toolName) == combinedToolAllowedToolNames.end()) {
+          OrthancPluginLogError(_context, (std::string("CombinedToolBehaviour invalid toolName: ") + toolName).c_str());
+          throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
+        }
+      }
+    }
+  }
+
+  {// validate windowingBehaviour
+    std::set<std::string> windowingAllowedDirections = { "left", "right", "up", "down" };
+    std::set<std::string> windowingAllowedToolNames = { "decrease-ww", "increase-ww", "decrease-wc", "increase-wc"};
+
+    Json::Value::Members members = windowingBehaviour.getMemberNames();
+
+    for (size_t i = 0; i < members.size(); i++)
+    {
+      std::string direction = members[i];
+
+      if (windowingAllowedDirections.find(direction) == windowingAllowedDirections.end()) {
+        OrthancPluginLogError(_context, (std::string("WindowingBehaviour invalid direction: ") + direction).c_str());
+        throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
+      }
+
+      if (!windowingBehaviour[direction].isNull()) {
+        std::string toolName = windowingBehaviour[direction].asString();
+        if (windowingAllowedToolNames.find(toolName) == windowingAllowedToolNames.end()) {
+          OrthancPluginLogError(_context, (std::string("WindowingBehaviour invalid toolName: ") + toolName).c_str());
+          throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
+        }
+      }
+    }
+  }
+
+  {// validate keyboard shortcuts
+    std::set<std::string> keyboardShortcutsAllowedToolNames = {
+      "nextStudy", "previousStudy", "nextSeries", "previousSeries", "nextImage", "previousImage",
+      "rotateLeft", "rotateRight", "flipVertical", "flipHorizontal", "invertColor",
+      "selectCombinedTool", "selectPanTool", "selectWindowingTool", "selectZoomTool",
+      "selectMagnifyingGlassTool", "selectLengthMeasureTool", "selectPixelProbeTool",
+      "selectEllipticalRoiTool", "selectRectangleRoiTool", "selectArrowAnnotateTool",
+      "selectKeyImageCaptureTool",
+      "applyEmbeddedWindowingPreset1", "applyEmbeddedWindowingPreset2", "applyEmbeddedWindowingPreset3",
+      "applyEmbeddedWindowingPreset4", "applyEmbeddedWindowingPreset5",
+      "applyConfigWindowingPreset1", "applyConfigWindowingPreset2", "applyConfigWindowingPreset3",
+      "applyConfigWindowingPreset4", "applyConfigWindowingPreset5",
+      "toggleSynchro", "enableSynchro", "disableSynchro",
+      "setLayout1x1", "setLayout1x2", "setLayout2x1", "setLayout2x2",
+      "play", "pause", "playPause", "selectNextPane", "selectPreviousPane",
+      "loadSeriesInPane", "toggleOverlayText", "toggleOverlayIcons",
+      "null"
+    };
+
+    Json::Value::Members members = keyboardShortcuts.getMemberNames();
+
+    for (size_t i = 0; i < members.size(); i++)
+    {
+      std::string shortcut = members[i];
+
+      if (!keyboardShortcuts[shortcut].isNull()) {
+        std::string toolName = keyboardShortcuts[shortcut].asString();
+
+        if (keyboardShortcutsAllowedToolNames.find(toolName) == keyboardShortcutsAllowedToolNames.end()) {
+          OrthancPluginLogError(_context, (std::string("KeyboardShortcut invalid toolName: ") + toolName).c_str());
+          throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
+        }
+      }
+    }
+  }
+
+  {// validate mouse wheel
+    std::set<std::string> mouseWheelAllowedDirections = { "up", "down" };
+    std::set<std::string> mouseWheelAllowedToolNames = { "nextImage", "previousImage", "zoomIn", "zoomOut"};
+
+    Json::Value::Members members = mouseWheelBehaviour.getMemberNames();
+
+    for (size_t i = 0; i < members.size(); i++)
+    {
+      std::string direction = members[i];
+
+      if (mouseWheelAllowedDirections.find(direction) == mouseWheelAllowedDirections.end()) {
+        OrthancPluginLogError(_context, (std::string("MouseWheelBehaviour invalid direction: ") + direction).c_str());
+        throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
+      }
+
+      if (!mouseWheelBehaviour[direction].isNull()) {
+        std::string toolName = mouseWheelBehaviour[direction].asString();
+        if (mouseWheelAllowedToolNames.find(toolName) == mouseWheelAllowedToolNames.end()) {
+          OrthancPluginLogError(_context, (std::string("MouseWheelBehaviour invalid toolName: ") + toolName).c_str());
+          throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
+        }
+      }
+    }
+
+  }
+
 
 }
 
@@ -208,13 +444,19 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
     config["version"]["webviewer"] = plugin["Version"].asString();
   }
 
-  config["enableStudyDownload"] = studyDownloadEnabled;
-  config["enableVideoDisplay"] = videoDisplayEnabled;
-  config["enableAnnotationStorage"] = annotationStorageEnabled;
-  config["enableKeyImageCapture"] = keyImageCaptureEnabled;
+  config["keyboardShortcutsEnabled"] = keyboardShortcutsEnabled;
+  config["studyDownloadEnabled"] = studyDownloadEnabled;
+  config["videoDisplayEnabled"] = videoDisplayEnabled;
+  config["annotationStorageEnabled"] = annotationStorageEnabled;
+  config["keyImageCaptureEnabled"] = keyImageCaptureEnabled;
+  config["combinedToolEnabled"] = combinedToolEnabled;
   config["showStudyInformationBreadcrumb"] = showStudyInformationBreadcrumb;
   config["windowingPresets"] = windowingPresets;
-  config["enableHighQualityImagePreloading"] = highQualityImagePreloadingEnabled;
+  config["combinedToolBehaviour"] = combinedToolBehaviour;
+  config["windowingBehaviour"] = windowingBehaviour;
+  config["mouseWheelBehaviour"] = mouseWheelBehaviour;
+  config["keyboardShortcuts"] = keyboardShortcuts;
+  config["highQualityImagePreloadingEnabled"] = highQualityImagePreloadingEnabled;
   config["reduceTimelineHeightOnSingleFrameSeries"] = reduceTimelineHeightOnSingleFrameSeries;
   config["showNoReportIconInSeriesList"] = showNoReportIconInSeriesList;
   config["toolbarLayoutMode"] = toolbarLayoutMode;
@@ -222,6 +464,12 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["defaultSelectedTool"] = defaultSelectedTool;
   config["defaultStudyIslandsDisplayMode"] = defaultStudyIslandsDisplayMode;
   config["defaultLanguage"] = defaultLanguage;
+  config["toggleOverlayTextButtonEnabled"] = toggleOverlayTextButtonEnabled;
+  config["toggleOverlayIconsButtonEnabled"] = toggleOverlayIconsButtonEnabled;
+
+  if (customOverlayProviderUrl.length() > 0) {
+    config["customOverlayProviderUrl"] = customOverlayProviderUrl;
+  }
 
   return config;
 }

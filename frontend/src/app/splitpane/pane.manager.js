@@ -11,12 +11,13 @@
 (function(osimis) {
     'use strict';
 
-    function PaneManager(Promise, studyManager, seriesManager, $timeout) {
+    function PaneManager(Promise, studyManager, seriesManager, $timeout, wvConfig) {
         // Injections.
         this._Promise = Promise;
         this._studyManager = studyManager;
         this._seriesManager = seriesManager;
         this.$timeout = $timeout;
+        this._wvConfig = wvConfig;
 
         // Default config.
         this.layout = {
@@ -27,7 +28,7 @@
         // Panes.
         // Must keep reference as it's databound in `wvWebviewer` views.
         this.panes = [
-            new osimis.Pane(this._Promise, this._studyManager, this._seriesManager, 0, 0)
+            new osimis.Pane($timeout, this._Promise, this._studyManager, this._seriesManager, 0, 0, this._wvConfig)
         ];
         this.panes[0].isSelected = true;
 
@@ -117,7 +118,7 @@
                     var pane = removedPanes.pop();
                     // If none exist, create a new one.
                     if (!pane) {
-                        pane = new osimis.Pane(this._Promise, this._studyManager, this._seriesManager, x, y);
+                        pane = new osimis.Pane(this.$timeout, this._Promise, this._studyManager, this._seriesManager, x, y, this._wvConfig);
                     }
                     // Otherwise, move the previously removed pane into its new
                     // position.
@@ -336,11 +337,7 @@
         var previouslySelectedPane = this.getSelectedPane();
         var newlySelectedPane = this.getPane(x, y);
         
-        // Don't do anything if pane is empty.
         var newlySelectedPane = this.getPane(x, y);
-        if (newlySelectedPane.isEmpty()) {
-            return;
-        };
 
         // Unset previously selected pane
         previouslySelectedPane.isSelected = false;
@@ -351,6 +348,58 @@
         // Trigger selected pane changed event.
         this.onSelectedPaneChanged.trigger(newlySelectedPane);
     };
+
+    PaneManager.prototype.selectNextPane = function() {
+        var nextPanePosition = this.getNextPanePosition(this.getSelectedPane());
+        this.selectPane(nextPanePosition.x, nextPanePosition.y);
+    };
+
+    PaneManager.prototype.selectPreviousPane = function() {
+        var nextPanePosition = this.getPreviousPanePosition(this.getSelectedPane());
+        this.selectPane(nextPanePosition.x, nextPanePosition.y);
+    };
+
+    PaneManager.prototype.getNextPanePosition = function(pane) {
+        var currentSelectedPanePosition = pane.getPosition();
+
+        var nextX = currentSelectedPanePosition.x + 1;
+        var nextY = currentSelectedPanePosition.y;
+        if (nextX >= this.layout.x) {
+            nextX = 0;
+            nextY = nextY + 1;
+        }  
+        if (nextY >= this.layout.y) {
+            nextY = 0;
+        }
+
+        return {x : nextX, y : nextY};
+    }
+
+    PaneManager.prototype.getPreviousPanePosition = function(pane) {
+        var currentSelectedPanePosition = pane.getPosition();
+
+        var nextX = currentSelectedPanePosition.x - 1;
+        var nextY = currentSelectedPanePosition.y;
+        if (nextX < 0) {
+            nextX = this.layout.x - 1;
+            nextY = nextY - 1;
+        }  
+        if (nextY < 0  ) {
+            nextY = this.layout.y - 1;
+        }
+
+        return {x : nextX, y : nextY};
+    }
+
+    PaneManager.prototype.getNextPane = function(pane) {
+        var nextPanePosition = this.getNextPanePosition(pane);
+        return this.getPane(nextPanePosition.x, nextPanePosition.y);
+    }
+
+    PaneManager.prototype.getPreviousPane = function(pane) {
+        var nextPanePosition = this.getPreviousPanePosition(pane);
+        return this.getPane(nextPanePosition.x, nextPanePosition.y);
+    }
 
     /**
      * @ngdoc method
@@ -468,7 +517,7 @@
         .factory('wvPaneManager', wvPaneManager);
 
     /* @ngInject */
-    function wvPaneManager($q, wvStudyManager, wvSeriesManager, $timeout) {
-        return new PaneManager($q, wvStudyManager, wvSeriesManager, $timeout);
+    function wvPaneManager($q, wvStudyManager, wvSeriesManager, $timeout, wvConfig) {
+        return new PaneManager($q, wvStudyManager, wvSeriesManager, $timeout, wvConfig);
     }
 })(osimis || (this.osimis = {}));

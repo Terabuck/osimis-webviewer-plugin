@@ -42,11 +42,10 @@
         function link(scope, element, attrs, tool) {
             // Switch activate/deactivate based on databound HTML attribute
             var wvScrollOnWheelSeriesExt = $parse(attrs.wvScrollOnWheelSeriesExt);
-            scope.$watch(wvScrollOnWheelSeriesExt, function(isActivated) {
-                if (isActivated) {
+            scope.$watch(wvScrollOnWheelSeriesExt, function(enabled) {
+                if (enabled) {
                     tool.activate();
-                }
-                else {
+                } else {
                     tool.deactivate();
                 }
             });
@@ -54,8 +53,9 @@
     }
 
     /* @ngInject */
-    function Controller($scope, $element, $attrs, hamster) {
+    function Controller($scope, $element, $attrs, hamster, wvPaneManager, wvSeriesManager, wvSynchronizer, wvConfig, wvZoomViewportTool) {
         var vm = this;
+        this.wvConfig = wvConfig;
 
         var _wvSeriesIdViewModels = [];
     	this.register = function(viewmodel) {
@@ -78,6 +78,29 @@
                 .forEach(unregisterMobileEvents);
         };
 
+        this.applyTool  = function(series, viewport, toolName, delta) {
+
+            if (toolName === "previousImage") {
+
+                series.goToPreviousImage(true);
+                wvSynchronizer.update(series);          
+
+            } else if (toolName === "nextImage") {
+
+                series.goToNextImage(true);
+                wvSynchronizer.update(series);          
+
+            } else if (toolName === "zoomIn") {
+
+                wvZoomViewportTool.applyZoomToViewport(viewport, 10 );
+
+            } else if (toolName === "zoomOut") {
+
+                wvZoomViewportTool.applyZoomToViewport(viewport, -10 );
+            }
+        }
+
+
         // Free events on destroy
         $scope.$on('$destroy', function() {
             unregisterDesktopEvents();
@@ -98,16 +121,16 @@
             hamsterInstance.wheel(function(event, delta, deltaX, deltaY) {
                 $scope.$apply(function() {
                     var series = viewmodel.getSeries();
+                    var panes = wvPaneManager.getAllPanes();
 
                     if (!series) {
                         return;
                     }
                     else if (deltaY < 0) {
-                        series.goToPreviousImage();
+                        vm.applyTool(series, viewmodel.getViewport(), vm.wvConfig.config['mouseWheelBehaviour']['down'], -deltaY);
                     }
                     else if (deltaY > 0) {
-                        // @todo calibrate the required speed and accuracy for the enduser
-                        series.goToNextImage(false);
+                        vm.applyTool(series, viewmodel.getViewport(), vm.wvConfig.config['mouseWheelBehaviour']['up'], deltaY);
                     }
                 });
 

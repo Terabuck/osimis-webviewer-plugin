@@ -99,88 +99,10 @@
 
                 // Set windowings specific to the selected viewport (either preset set in the dicom file
                 // or which has been processed by the viewer in the web workers).
-                var selectedPane = wvPaneManager.getSelectedPane();
-                selectedPane
-                    .getImage()
-                    .then(function(image) {
-                        // Ignore if the selected viewport doesn't contain an image.
-                        if (!image) {
-                            // @todo
-                            // _this.hidePresets = true;
-                            return;
-                        }
-                        else {
-                            // @todo
-                            // _this.hidePresets = false;
-                        }
 
-                        // Get default windowing (either set via a dicom tag or processed in a
-                        // web worker just after the image is downloaded).
-                        return $q.all([
-                            $q.when(image),
-                            image
-                                .getBestBinaryInCache()
-                                .then(function(imageBinary) {
-                                    // Ignore if no image binary has been loaded yet.
-                                    if (!imageBinary) {
-                                        return;
-                                    }
-
-                                    // Return default windowing.
-                                    return {
-                                        windowCenter: +imageBinary.windowCenter,
-                                        windowWidth: +imageBinary.windowWidth
-                                    };
-                                })
-                        ]);
-                    })
-                    .then(function(result) {
-                        // Ignore selected pane without images.
-                        if (!result || result.length < 1) {
-                            return;
-                        }
-                        
-                        var image = result[0];
-                        var defaultWindowing = result[1];
-
-                        // Process windowing presets inside dicom.
-                        var windowCenters = image.tags.WindowCenter && image.tags.WindowCenter.split('\\');
-                        var windowWidths = image.tags.WindowWidth && image.tags.WindowWidth.split('\\');
-
-                        // Ignore method if there is no windowing tag.
-                        if (!windowCenters || !windowWidths) {
-                            return;
-                        }
-
-                        // Assert there are as many window width preset than window center ones.
-                        if (windowCenters.length !== windowWidths.length) {
-                            throw new Error('WindowWidth DICOM tags doesn\'t fit WindowCenter one.');
-                        }
-
-                        // Merge windowCenters and windowWidths arrays in a single one.
-                        popoverScope.embeddedWindowings = windowCenters
-                            .map(function(windowCenter, index) {
-                                return {
-                                    windowCenter: +windowCenter,
-                                    windowWidth: +windowWidths[index]
-                                }
-                            });
-
-                        // Push default windowing in front.
-                        if (defaultWindowing) {
-                            popoverScope.embeddedWindowings = [
-                                defaultWindowing
-                            ].concat(popoverScope.embeddedWindowings);
-                        }
-                        else {
-                            // This happens only when no binary has been loaded yet. In this case,
-                            // we only show windowing as set in the dicom file.
-                        }
-
-                        // Remove duplicates (this happens for instance when the default windowing has been
-                        // retrieved from the dicom tags).
-                        popoverScope.embeddedWindowings = _.uniqWith(popoverScope.embeddedWindowings, _.isEqual);
-                    });
+                wvPaneManager.getSelectedPane().getEmbeddedWindowingPresetsPromise().then(function(windowingPresets) {
+                    popoverScope.embeddedWindowings = windowingPresets;
+                });
             },
 
             // Option documented in `ngTooltip`, not `ngPopover`, see

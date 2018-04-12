@@ -36,6 +36,7 @@
 >
     <wv-webviewer
         wv-pickable-study-ids="vm.pickableStudyIds"
+        wv-pickable-study-id-labels="vm.pickableStudyIdLabels"
         wv-selected-study-ids="vm.selectedStudyIds"
         wv-series-id="vm.seriesId"
 
@@ -52,12 +53,15 @@
         wv-notice-text="vm.noticeText"
 
         wv-windowing-presets="vm.windowingPresets"
-        wv-video-display-enabled="vm.enableVideoDisplay"
-        wv-annotationstorage-enabled="vm.enableAnnotationStorage"
+        wv-video-display-enabled="vm.videoDisplayEnabled"
+        wv-annotationstorage-enabled="vm.annotationStorageEnabled"
         wv-series-item-selection-enabled="vm.seriesItemSelectionEnabled"
         wv-selected-series-items="vm.selectedSeriesItems"
-        wv-study-download-enabled="vm.enableStudyDownload"
-        wv-key-image-capture-enabled="vm.enableKeyImageCapture"
+        wv-study-download-enabled="vm.studyDownloadEnabled"
+        wv-key-image-capture-enabled="vm.keyImageCaptureEnabled"
+        wv-combined-tool-enabled="vm.combinedToolEnabled"
+        wv-toggle-overlay-text-button-enabled="vm.toggleOverlayTextButtonEnabled"
+        wv-toggle-overlay-icons-button-enabled="vm.toggleOverlayIconsButtonEnabled"
 
         wv-study-islands-display-mode="vm.studyIslandsDisplayMode"
 
@@ -108,6 +112,7 @@
         var orthancSeriesId = $location.search().series;
 
         vm.pickableStudyIds = [];
+        vm.pickableStudyIdLabels = {};
         vm.selectedStudyIds = [];
         vm.seriesId = undefined;
 
@@ -206,10 +211,13 @@
         // Configure settings based on server side options
         vm.defaultLanguage = __webViewerConfig.defaultLanguage || "en";
         vm.windowingPresets = __webViewerConfig.windowingPresets;
-        vm.enableStudyDownload = __webViewerConfig.enableStudyDownload;
-        vm.enableVideoDisplay = __webViewerConfig.enableVideoDisplay;
-        vm.enableAnnotationStorage = __webViewerConfig.enableAnnotationStorage;
-        vm.enableKeyImageCapture = __webViewerConfig.enableKeyImageCapture;
+        vm.studyDownloadEnabled = __webViewerConfig.studyDownloadEnabled;
+        vm.videoDisplayEnabled = __webViewerConfig.videoDisplayEnabled;
+        vm.annotationStorageEnabled = __webViewerConfig.annotationStorageEnabled;
+        vm.keyImageCaptureEnabled = __webViewerConfig.keyImageCaptureEnabled;
+        vm.combinedToolEnabled = __webViewerConfig.combinedToolEnabled;
+        vm.toggleOverlayTextButtonEnabled = __webViewerConfig.toggleOverlayTextButtonEnabled;
+        vm.toggleOverlayIconsButtonEnabled = __webViewerConfig.toggleOverlayIconsButtonEnabled;
         vm.showNoReportIconInSeriesList = __webViewerConfig.showNoReportIconInSeriesList;
         vm.reduceTimelineHeightOnSingleFrameSeries = __webViewerConfig.reduceTimelineHeightOnSingleFrameSeries;
         vm.toolbarLayoutMode = __webViewerConfig.toolbarLayoutMode || "flat";

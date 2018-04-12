@@ -12,6 +12,7 @@
 #include "../OrthancContextManager.h"
 #include "../BenchmarkHelper.h"
 #include "../Image/AvailableQuality/OnTheFlyDownloadAvailableQualityPolicy.h"
+#include "../Instance/InstanceRepository.h"
 #include "ViewerToolbox.h"
 
 namespace {
@@ -21,8 +22,9 @@ namespace {
   Json::Value simplifyInstanceTags(const Json::Value& instanceTags);
 }
 
-SeriesRepository::SeriesRepository(DicomRepository* dicomRepository)
-  : _dicomRepository(dicomRepository), _seriesFactory(std::auto_ptr<IAvailableQualityPolicy>(new OnTheFlyDownloadAvailableQualityPolicy))
+SeriesRepository::SeriesRepository(DicomRepository* dicomRepository, InstanceRepository* instanceRepository)
+  : _dicomRepository(dicomRepository), _seriesFactory(std::auto_ptr<IAvailableQualityPolicy>(new OnTheFlyDownloadAvailableQualityPolicy)),
+    _instanceRepository(instanceRepository)
 {
 }
 
@@ -38,7 +40,7 @@ std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId, b
 
   // Get each instance's tags (to avoid an additional request at each series' images)
   const Json::Value &slicesShort = orderedSlices["SlicesShort"];
-  Json::Value instancesTags;
+  Json::Value instancesInfos;
 
   // Retrieve middle instance id
   int instanceCount = slicesShort.size();
@@ -50,23 +52,12 @@ std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId, b
     for(Json::ValueIterator itr = slicesShort.begin(); itr != slicesShort.end(); itr++) {
       std::string instanceId = (*itr)[0].asString();
 
-      Json::Value instanceTags;
-      if (!OrthancPlugins::GetJsonFromOrthanc(instanceTags, context, "/instances/" + instanceId + "/simplified-tags"))
-      {
-        throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
-      }
-
-      instancesTags[instanceId] = simplifyInstanceTags(instanceTags);
+      instancesInfos[instanceId] = _instanceRepository->GetInstanceInfo(instanceId);
     }
   }
   else
   {// only get the middle instance tags
-    Json::Value instanceTags;
-    if (!OrthancPlugins::GetJsonFromOrthanc(instanceTags, context, "/instances/" + middleInstanceId + "/simplified-tags"))
-    {
-      throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
-    }
-    instancesTags[middleInstanceId] = simplifyInstanceTags(instanceTags);
+    instancesInfos[middleInstanceId] = _instanceRepository->GetInstanceInfo(middleInstanceId);
   }
 
 
@@ -95,7 +86,7 @@ std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId, b
   }
 
   // Get middle instance's tags (the other tags)
-  const Json::Value& tags2 = instancesTags[middleInstanceId];
+  const Json::Value& middleInstanceInfos = instancesInfos[middleInstanceId];
 
   // Ignore DICOM SR (DICOM report) and PR (DICOM Presentation State, which are
   // `views` referencing other instances) files (they can't be processed by our
@@ -103,12 +94,18 @@ std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId, b
   // message, also
   // @warning We make the assumption DICOM SR & PR are always a single alone
   //          instance contained within a separate series.
-  if (::_isDicomSr(tags2) || ::_isDicomPr(tags2)) {
+  if (::_isDicomSr(middleInstanceInfos["TagsSubset"]) || ::_isDicomPr(middleInstanceInfos["TagsSubset"])) {
     throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_IncompatibleImageFormat));
   }
-  
+
+  Json::Value studyInfo;
+  if (!OrthancPlugins::GetJsonFromOrthanc(studyInfo, context, "/series/" + seriesId + "/study"))
+  {
+    throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
+  }
+
   // Create a series based on tags and ordered instances
-  return std::auto_ptr<Series>(_seriesFactory.CreateSeries(seriesId, slicesShort, tags1, tags2, instancesTags));
+  return std::auto_ptr<Series>(_seriesFactory.CreateSeries(seriesId, slicesShort, tags1, middleInstanceInfos, instancesInfos, studyInfo));
 }
 
 namespace {
@@ -190,6 +187,8 @@ namespace {
     tagsToKeep.push_back("RecommendedDisplayFrameRate");
     tagsToKeep.push_back("ImageOrientationPatient");
     tagsToKeep.push_back("ImagePositionPatient");
+    tagsToKeep.push_back("SliceLocation");
+    tagsToKeep.push_back("SliceThickness");
     tagsToKeep.push_back("FrameOfReferenceUID");
     tagsToKeep.push_back("HighBit");
     tagsToKeep.push_back("InstanceNumber");

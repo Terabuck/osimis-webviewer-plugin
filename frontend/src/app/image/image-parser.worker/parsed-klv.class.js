@@ -522,6 +522,16 @@
         
         var windowCenter = 0;
         var windowWidth = 0;
+
+        // Adapt window width/center with the slope & intercept values.
+        // Those calculation will be made internally by cornerstone,
+        // with the following formulas:
+        // `windowCenter = windowCenter * slope + intercept`
+        // `windowWidth = windowWidth * slope`
+        var slope = +tags.RescaleSlope || 1;
+        var intercept = +tags.RescaleIntercept || 0;
+
+
         // If windowing dicom tags are available, use them
         if (tags.WindowCenter && tags.WindowWidth) {
             var windowCenters = tags.WindowCenter.split('\\');
@@ -540,6 +550,8 @@
             // in having something specific)
             windowCenter = 127.5;
             windowWidth = 256;
+            slope = 1;
+            intercept = 0;
         }
         else {
             // Process the threshold delta. When we process the windowing, we
@@ -586,14 +598,6 @@
             windowCenter = minPixelValueForWWWC + (maxPixelValueForWWWC - minPixelValueForWWWC) / 2 || 127.5;
             windowWidth = (maxPixelValueForWWWC - minPixelValueForWWWC) || 256;
         }
-
-        // Adapt window width/center with the slope & intercept values.
-        // Those calculation will be made internally by cornerstone,
-        // with the following formulas:
-        // `windowCenter = windowCenter * slope + intercept`
-        // `windowWidth = windowWidth * slope`
-        var slope = +tags.RescaleSlope || 1;
-        var intercept = +tags.RescaleIntercept || 0;
 
         // Return result.
         return {

@@ -123,6 +123,7 @@
         wv-enabled="vm.serieslistEnabled || vm.studyinformationEnabled"
         wv-handles-enabled="vm.leftHandlesEnabled"
         wv-is-small="vm.studyIslandsDisplayMode === 'oneCol'"
+        wv-closed="vm.isAsideClosed"
     >
         <wv-layout-left1>
             <!-- Study Picker -->
@@ -131,6 +132,7 @@
                 class="float__left" style="max-width: calc(100% - 4.5rem);"
                 ng-show="vm.serieslistEnabled"
                 wv-readonly="vm.readonly"
+                wv-pickable-study-id-labels="vm.pickableStudyIdLabels"
                 wv-pickable-study-ids="vm.pickableStudyIds"
                 wv-selected-study-ids="vm.selectedStudyIds"
             ></wv-studylist>
@@ -170,6 +172,10 @@
                 <span class="fa fa-ellipsis-v"></span>
             </div>
             <p ng-if="vm.displayDisclaimer && vm.studyIslandsDisplayMode !== 'oneCol'" class="clear disclaimer mbn">{{ "GENERAL_PARAGRAPHS.DISCLAIMER_PARAGRAPH" | translate }}</p>
+            <ng-transclude
+                ng-transclude-slot="wvLayoutLeftTop"
+            >
+            </ng-transclude>
         </wv-layout-left1>
 
         <wv-layout-left2>
@@ -339,9 +345,10 @@
                     wv-viewport="$pane.csViewport"
                     wv-image-index="$pane.imageIndex"
 
-                    wv-mobile-viewport-tool="!vm.readonly && vm.tools.touchGesture"
+                    wv-mobile-viewport-tool="!vm.readonly && vm.tools.combinedTool"
                     wv-windowing-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.windowing"
                     wv-angle-measure-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.angleMeasure"
+                    wv-simple-angle-measure-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.simpleAngleMeasure"
                     wv-length-measure-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.lengthMeasure"
                     wv-elliptical-roi-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.ellipticalRoi"
                     wv-zoom-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.zoom"
@@ -362,7 +369,7 @@
                     <wv-overlay
                         ng-if="vm.tools.overlay"
                         wv-study-id="$pane.series.studyId"
-                        wv-tags="$image.tags"
+                        wv-tags="$image.instanceInfos.TagsSubset"
                         wv-viewport="$pane.csViewport"
                         wv-image="$image"
                         wv-key-image-capture-enabled="vm.keyImageCaptureEnabled"

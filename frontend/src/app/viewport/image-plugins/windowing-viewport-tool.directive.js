@@ -14,7 +14,7 @@
         });
 
     /* @ngInject */
-    function wvWindowingViewportTool($, $parse, WvBaseTool) {
+    function wvWindowingViewportTool($, $parse, WvBaseTool, wvConfig) {
         var directive = {
         	require: 'wvWindowingViewportTool',
             controller: Controller,
@@ -38,7 +38,7 @@
         }
 
         /* @ngInject */
-        function Controller($scope) {
+        function Controller($scope, wvPanViewportTool, wvZoomViewportTool, wvWindowingViewportTool) {
             WvBaseTool.call(this, 'default');
 
             this._activateInputs = function(viewport) {
@@ -62,13 +62,13 @@
                             lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
 
                             if (mouseButton === 1) { // left-click + move
-                                _this.setWindowing(viewport, deltaX, deltaY);
+                                wvWindowingViewportTool.applyWindowingToViewport(viewport, deltaX, deltaY, true);
                             }
                             else if (mouseButton === 2) { // middle-click + move
-                                _this.pan(viewport, deltaX, deltaY);
+                                wvPanViewportTool.applyPanToViewport(viewport, deltaX, deltaY);
                             }
                             else if (mouseButton === 3) { // right-click + move
-                                _this.zoom(viewport, deltaY);
+                                wvZoomViewportTool.applyZoomToViewport(viewport, deltaY);
                             }
                         });
 
@@ -88,71 +88,6 @@
             this._unlistenModelChange = angular.noop;
             this._listenViewChange = angular.noop;
             this._unlistenViewChange = angular.noop;
-
-            this.setWindowing = function(viewport, deltaX, deltaY) {
-                var viewportData = viewport.getViewport();
-
-                // Retrieve image min/max image pixel value and define a
-                // strength parameter proportional to the dynamic range of the
-                // image, so high dynamic images have larger windowing changes
-                // than low dynamic ones.
-                var minPixelValue = viewport.getCurrentImageMinPixelValue();
-                var maxPixelValue = viewport.getCurrentImageMaxPixelValue();
-                var pixelValueDelta = maxPixelValue - minPixelValue;
-                var strength = Math.max(1, Math.log2(pixelValueDelta) - 7);
-
-                // Retrieve the current scale of the image, so user has more
-                // refined control over zoomed images. For instance, when user
-                // zooms to a specific zone of a mammography, he wishes to
-                // adjust the windowing more precisely than when he sees the
-                // whole image. A better solution would be to define the
-                // strength based on the currently viewed image zone dynamic,
-                // instead of the whole image dynamic, but that's fine for now.
-                // var scale = Math.max(1, Math.min(+viewportData.getScaleForFullResolution(), 3));
-                var scale = 1;
-
-                // Calculate the new ww/wc.
-                var newWindowWidth = +viewportData.voi.windowWidth + (deltaX / scale * strength);
-                var newWindowCenter = +viewportData.voi.windowCenter + (deltaY / scale * strength);
-
-                // Clamp windowing values to the min/max one availables, so
-                // image doesn't become invisible because of out of scope
-                // value.
-                if (newWindowWidth >= minPixelValue && newWindowWidth <= maxPixelValue) {
-                    viewportData.voi.windowWidth = newWindowWidth;
-                }
-                if (newWindowCenter >= minPixelValue && newWindowCenter <= maxPixelValue) {
-                    viewportData.voi.windowCenter = newWindowCenter;
-                }
-
-                // Update viewport values & redraw the viewport.
-                viewport.setViewport(viewportData);
-                viewport.draw(false);
-            };
-
-            this.pan = function(viewport, deltaX, deltaY) {
-                var viewportData = viewport.getViewport();
-
-                var scale = +viewportData.scale;
-                var x = +viewportData.translation.x;
-                var y = +viewportData.translation.y;
-
-                viewportData.translation.x = x + (deltaX / scale);
-                viewportData.translation.y = y + (deltaY / scale);
-
-                viewport.setViewport(viewportData);
-                viewport.draw(false);
-            };
-
-            this.zoom = function(viewport, deltaY) {
-                var viewportData = viewport.getViewport();
-                var scale = +viewportData.scale;
-
-                viewportData.scale = scale + (deltaY / 100);
-
-                viewport.setViewport(viewportData);
-                viewport.draw(false);
-            };
         }
         Controller.prototype = Object.create(WvBaseTool.prototype)
         Controller.prototype.constructor = Controller;

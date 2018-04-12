@@ -84,9 +84,9 @@
              * @ngdoc method
              * @methodOf webviewer.service:wvSeriesManager
              * 
-             * @name osimis.SeriesManager#_cacheInstancesTags
+             * @name osimis.SeriesManager#_cacheInstancesInfos
              * 
-             * @param {object} instancesTags
+             * @param {object} instancesInfos
              * Hash of tags for each instances
              *
              * @description
@@ -97,7 +97,7 @@
              * HTTP request at the series level instead of multiple ones. 
              * Requested by a client to relieve his authentification proxy.
              */
-            _cacheInstancesTags: _cacheInstancesTags,
+            _cacheInstancesInfos: _cacheInstancesInfos,
             /**
              * @ngdoc method
              * @methodOf webviewer.service:wvSeriesManager
@@ -113,7 +113,7 @@
              * @param {string} instanceId
              * Id of the instance (in orthanc format) containing the PDF.
              * 
-             * @param {object} instancesTags
+             * @param {object} instancesInfos
              * Hash of the instance's tags
              *
              * @description
@@ -137,7 +137,28 @@
             return service.listFromOrthancSeriesId(orthancSeriesId)
                 .then(function(seriesList) {
                     return seriesList[subSeriesIndex];
-                });
+                })
+                .then(function(series) {
+                    if (wvConfig.config.customOverlayProviderUrl == undefined) {
+                        // console.log("no custom overlay provider defined");
+                        return series;
+                    } else {
+                        var request = new osimis.HttpRequest();
+                        request.setHeaders(wvConfig.httpRequestHeaders);
+                        request.setCache(true);
+                        var seriesCustomOverlayProviderUrl = wvConfig.config.customOverlayProviderUrl + series.id.split(":")[0]; // series.id looks like 46edef30-c3c9ab46-f68b1625-841e3a63-39f9ec32:0
+                        return request.get(seriesCustomOverlayProviderUrl)
+                            .then(function(customOverlayInfo) {
+                                // console.log("got the custom overlay:", customOverlayInfo);
+                                series.customOverlayInfo = customOverlayInfo.data;
+                                return series;
+                            }, function(error) {
+                                // console.log("failed to retrieve custom overlay:", error);
+                                return series;
+                            })
+                    }
+                })
+                ;
         }
 
         function listFromOrthancSeriesId(seriesId) {
@@ -149,33 +170,12 @@
 
             return seriesPromise
                 .then(function(response) {
-                    // Cache instance tags in wvInstanceManager
-                    var instancesTags = response.data.instancesTags;
-                    _cacheInstancesTags(instancesTags);
-                    
-                    // Look up the study id to be able to retrieve all the
-                    // annotations (only loadable at the study level) in case
-                    // the series contains images. We also use the study id to
-                    // bind the DICOM pdf instances to a specific study.
-                    var request = new osimis.HttpRequest();
-                    request.setHeaders(wvConfig.httpRequestHeaders);
-                    request.setCache(true);
-                    return $q.all({
-                        instancesTags: $q.when(instancesTags),
-                        data: $q.when(response.data),
-                        studyId: request
-                            .get(wvConfig.orthancApiURL + '/series/'+seriesId+'/study')
-                            .then(function(studyInfo) {
-                                var studyId = studyInfo.data.ID;
-                                return studyId;
-                            })
-                    });
-                })
-                .then(function (response) {
-                    var instancesTags = response.instancesTags;
-                    var studyId = response.studyId;
-
+                    var instancesInfos = response.data.instancesInfos;
+                    var studyId = response.data.study.ID;
                     var contentType = response.data.contentType;
+
+                    // Cache instance tags in wvInstanceManager
+                    _cacheInstancesInfos(instancesInfos);
 
                     // Return list of image series when series' content is
                     // images.
@@ -210,28 +210,28 @@
                     // content & return empty list of image series.
                     else if (contentType.indexOf('pdf') === 0) {
                         // Cache pdf instances in the pdf instance manager
-                        var pdfIds = _(instancesTags)
+                        var pdfIds = _(instancesInfos)
                             // Retrieve pdf-related instances
-                            .pickBy(function(instanceTags) {
+                            .pickBy(function(instanceInfo) {
                                 // Assert
-                                if (instanceTags.MIMETypeOfEncapsulatedDocument !== 'application/pdf') {
+                                if (instanceInfo.TagsSubset.MIMETypeOfEncapsulatedDocument !== 'application/pdf') {
                                     throw new Error('Series of pdf content type contains instances with non-pdf MimeType');
                                 }
 
-                                return instanceTags.MIMETypeOfEncapsulatedDocument === 'application/pdf';
+                                return instanceInfo.TagsSubset.MIMETypeOfEncapsulatedDocument === 'application/pdf';
                             })
                             // Cache the pdfs
-                            .forEach(function(instanceTags, instanceId) {
-                                _cachePdfInstance(studyId, seriesId, instanceId, instanceTags);
+                            .forEach(function(instanceInfos, instanceId) {
+                                _cachePdfInstance(studyId, seriesId, instanceId, instanceInfos);
                             });
                     }
                     // Cache video instances from series' route HTTP request
                     // content & return empty list of image series.
                     else if (contentType.indexOf('video') === 0) {
                         // Cache pdf instances in the pdf instance manager
-                        var videoIds = _(instancesTags)
-                            .forEach(function(instanceTags, instanceId) {
-                                _cacheVideoInstance(studyId, instanceId, instanceTags, contentType);
+                        var videoIds = _(instancesInfos)
+                            .forEach(function(instanceInfos, instanceId) {
+                                _cacheVideoInstance(studyId, instanceId, instanceInfos, contentType);
                             });
                     }
                     // Assert series' content type.
@@ -323,20 +323,20 @@
                 });
         }
 
-        function _cacheInstancesTags(instancesTags) {
-            for (var instanceId in instancesTags) {
-                if (instancesTags.hasOwnProperty(instanceId)) {
-                    wvInstanceManager.setTags(instanceId, instancesTags[instanceId]);
+        function _cacheInstancesInfos(instancesInfos) {
+            for (var instanceId in instancesInfos) {
+                if (instancesInfos.hasOwnProperty(instanceId)) {
+                    wvInstanceManager.setInfos(instanceId, instancesInfos[instanceId]);
                 }
             }
         }
 
-        function _cachePdfInstance(studyId, seriesId, instanceId, instanceTags) {
-            wvPdfInstanceManager.setPdfInstance(instanceId, instanceTags, seriesId, studyId);
+        function _cachePdfInstance(studyId, seriesId, instanceId, instanceInfos) {
+            wvPdfInstanceManager.setPdfInstance(instanceId, instanceInfos, seriesId, studyId);
         }
 
-        function _cacheVideoInstance(studyId, instanceId, instanceTags, contentType) {
-            wvVideoManager.setVideoInstanceIdsForStudyId(studyId, instanceId, instanceTags, contentType);
+        function _cacheVideoInstance(studyId, instanceId, instanceInfos, contentType) {
+            wvVideoManager.setVideoInstanceIdsForStudyId(studyId, instanceId, instanceInfos, contentType);
         }
 
         return service;

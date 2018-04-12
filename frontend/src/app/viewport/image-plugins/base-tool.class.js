@@ -19,12 +19,14 @@
 (function(osimis) {
     'use strict';
 
-    function BaseTool(toolName, toolName2) {
+    function BaseTool(toolName, toolName2, isAnnotationTool) {
         this.viewports = [];
 
         this.toolName = toolName;
         this.toolName2 = toolName2; // in case of additional mobile tool.
         this.isActivated = false;
+        this.isAnnotationTool = (isAnnotationTool !== undefined && isAnnotationTool) || false;
+        this.annotationTools = ["angle", "angleTouch", "simpleAngle", "simpleAngleTouch", "length", "lengthTouch", "probe", "probeTouch", "ellipticalRoi", "ellipticalRoiTouch", "rectangleRoi", "rectangleRoiTouch", "arrowAnnotate", "arrowAnnotateTouch"];
     }
 
     /**
@@ -124,6 +126,11 @@
         cornerstoneTools.mouseInput.enable(enabledElement);
         cornerstoneTools.touchInput.enable(enabledElement);
 
+        if (this.isAnnotationTool) {
+            console.log("deactivating all annotation tools (make the annotation editable but not active)", this.annotationTools);
+            this.annotationTools.forEach(function(value){cornerstoneTools[value].deactivate(enabledElement, 1)});
+        }
+
         // Set tool in activate mode (it's a 1D state machine with 4
         // states) - display annotations and listen to inputs.
         cornerstoneTools[this.toolName].activate(enabledElement, 1);
@@ -151,6 +158,11 @@
         var enabledElement = viewport.getEnabledElement();
         cornerstoneTools.mouseInput.disable(enabledElement);
         cornerstoneTools.touchInput.disable(enabledElement);
+
+        if (this.isAnnotationTool) {
+            console.log("enabling all annotation tools (display the annotations but make them readonly)", this.annotationTools);
+            this.annotationTools.forEach(function(value){cornerstoneTools[value].enable(enabledElement, 1)});
+        }
 
         // Set tool in enable mode (it's a 1D state machine with 4
         // states) - display annotations but ignore inputs.
@@ -265,7 +277,11 @@
     BaseTool.prototype._unlistenViewChange = function(viewport) {
         var enabledElement = viewport.getEnabledElement();
 
-        $(enabledElement).off('CornerstoneImageRendered.'+this.toolName);
+        if (this.isAnnotationTool) {
+            this.annotationTools.forEach(function(toolName) {$(enabledElement).off('CornerstoneImageRendered.' + toolName);}); 
+        } else {
+            $(enabledElement).off('CornerstoneImageRendered.' + this.toolName); 
+        }
     };
 
     BaseTool.prototype._process = function(viewport) {};
@@ -359,52 +375,62 @@
 
             // For the specified cornerstone viewport, listen to rendered
             // events..
-            $(enabledElement).on('CornerstoneImageRendered.'+this.toolName, _.throttle(function() {
-                var image = viewport.getImage();
+            function installCornerstoneImageRenderedHandler(toolName) {
+                $(enabledElement).on('CornerstoneImageRendered.'+ toolName, _.throttle(function() {
+                    var image = viewport.getImage();
 
-                if (!image) {
-                    return;
-                }
-                
-                var newAnnotationsData = toolStateManager.getStateByToolAndImageId(_this.toolName, image.id);
-                var oldAnnotations = image.getAnnotations(_this.toolName);
-                
-                // As update checks are made on each CornerstoneImageRendered
-                // don't trigger update if the newAnnotations hasn't changed
-                // this would be way too slow otherwise The handles visibility
-                // is compared as well (highlight & active properties) - for
-                // livesharing purpose.
-                if (oldAnnotations && _.isEqual(newAnnotationsData, oldAnnotations.data)) return;
-                
-                // Avoid having to use angular deep $watch using a fast
-                // shallow object clone.
-                var data = _.clone(newAnnotationsData);
-
-                // Ignore the BaseTool onAnnotationChanged listening to
-                // avoid dual annotation draw (the annotations are already
-                // drawn). The onAnnotationChanged will still be listened
-                // by other observers.
-                image.onAnnotationChanged.ignore([_this, viewport], function() {
-                    if (data && data.data.length) {
-                        // Store current image resolution in annotations
-                        data.data.forEach(function(data) {
-                            if (data) {
-                                data.imageResolution = {
-                                    width: viewport._displayedCornerstoneImageObject.width,
-                                    height: viewport._displayedCornerstoneImageObject.height
-                                };
-                            }
-                        });
-
-                        // Store annotations
-                        image.setAnnotations(_this.toolName, data, true);
+                    if (!image) {
+                        return;
                     }
-                    else if (data && !data.data.length) {
-                        // remove empty annotation
-                        image.setAnnotations(_this.toolName, null, true);
-                    }
-                });
-            }, 20));
+                    
+                    var newAnnotationsData = toolStateManager.getStateByToolAndImageId(toolName, image.id);
+                    var oldAnnotations = image.getAnnotations(toolName);
+                    
+                    // As update checks are made on each CornerstoneImageRendered
+                    // don't trigger update if the newAnnotations hasn't changed
+                    // this would be way too slow otherwise The handles visibility
+                    // is compared as well (highlight & active properties) - for
+                    // livesharing purpose.
+                    if (oldAnnotations && _.isEqual(newAnnotationsData, oldAnnotations.data)) return;
+                    
+                    // Avoid having to use angular deep $watch using a fast
+                    // shallow object clone.
+                    var data = _.clone(newAnnotationsData);
+
+                    // Ignore the BaseTool onAnnotationChanged listening to
+                    // avoid dual annotation draw (the annotations are already
+                    // drawn). The onAnnotationChanged will still be listened
+                    // by other observers.
+                    image.onAnnotationChanged.ignore([_this, viewport], function() {
+                        if (data && data.data.length) {
+                            // Store current image resolution in annotations
+                            data.data.forEach(function(data) {
+                                if (data) {
+                                    data.imageResolution = {
+                                        width: viewport._displayedCornerstoneImageObject.width,
+                                        height: viewport._displayedCornerstoneImageObject.height
+                                    };
+                                }
+                            });
+
+                            // Store annotations
+                            image.setAnnotations(toolName, data, true);
+                        }
+                        else if (data && !data.data.length) {
+                            // remove empty annotation
+                            image.setAnnotations(toolName, null, true);
+                        }
+                    });
+                }, 20));
+            }
+
+            if (this.isAnnotationTool) {
+                this.annotationTools.forEach(function(toolName) {installCornerstoneImageRenderedHandler(toolName);}); 
+            } else {
+                installCornerstoneImageRenderedHandler(this.toolName);
+            }
+    
+            
         };
 
         return osimis.BaseTool;

@@ -45,6 +45,12 @@
         function link(scope, element, attrs, ctrls) {
             var vm = scope.vm;
             vm.toolbox = ctrls.wvToolboxCtrl;
+            scope.$watch('vm.toolbox.tool', function(newValue, oldValue){
+                if(newValue === oldValue){return;}
+                if(!vm.isToolInGroup(newValue)){
+                    vm.isOpen = false;
+                }
+            });
         }
     }
 
@@ -63,12 +69,12 @@
             if(group !== _this.group){
                 _this.isOpen = false;
             }
-        })
+        });
         $scope.$watch('vm.isOpen', function(newValue, oldValue){
             if(newValue){
-                $rootScope.$emit('wvToolbarGroupOpen', _this.group);                
+                $rootScope.$emit('wvToolbarGroupOpen', _this.group);
             }
-        })
+        });
 
         _this.isToolInGroup = function(tool){
             var isInGroup = false;

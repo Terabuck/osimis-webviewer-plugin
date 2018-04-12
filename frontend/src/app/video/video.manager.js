@@ -144,7 +144,7 @@
             return _videoInstancesByStudyId[studyId] || [];
         }
 
-        function setVideoInstanceIdsForStudyId(studyId, instanceId, instanceTags, contentType) {
+        function setVideoInstanceIdsForStudyId(studyId, instanceId, instanceInfos, contentType) {
             // Don't double cache instance.
             if (_videoInstancesByInstanceId[instanceId]) {
                 return;
@@ -154,7 +154,7 @@
             var video = new osimis.Video(
                 wvConfig,
                 instanceId,
-                instanceTags,
+                instanceInfos.TagsSubset,
                 contentType
             );
 

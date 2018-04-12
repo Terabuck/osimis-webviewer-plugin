@@ -67,11 +67,10 @@
     }
 
     /* @ngInject */
-    function KeyImageNoteButtonVM($element, $scope, $popover, wvPaneManager) {
+    function KeyImageNoteButtonVM($element, $scope, $popover, wvPaneManager, wvKeyboardShortcutEventManager) {
         var _this = this;
         var buttonEl = $element.children().first();
 
-        this.splitpaneLayout = typeof this.splitpaneLayout !== 'undefined' ? this.splitpaneLayout : {x: 1, y: 1};
         this.readonly = typeof this.readonly !== 'undefined' ? this.readonly : false;
         this.popoverPlacement = typeof this.popoverPlacement !== 'undefined' ? this.popoverPlacement : 'bottom';
         this.insidePopover = false;
@@ -106,7 +105,12 @@
             // Option documented in `ngTooltip`, not `ngPopover`, see
             // `https://stackoverflow.com/questions/28021917/angular-strap-popover-programmatic-use`.
             scope: popoverScope,
-
+            onShow : function() {
+                wvKeyboardShortcutEventManager.disableKeyboardShortucts();
+            },
+            onHide : function() {
+                wvKeyboardShortcutEventManager.enableKeyboardShortucts();
+            },
             onBeforeShow: function() {
                 // @warning The following source code is not databound in real time. If one of the used 
                 //    model changes, the windowing presets will only be adapted next time  the popover is
