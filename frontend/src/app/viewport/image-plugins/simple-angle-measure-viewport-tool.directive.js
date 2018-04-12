@@ -43,7 +43,7 @@
 
         /* @ngInject */
         function Controller() {
-            WvBaseTool.call(this, 'simpleAngle', 'simpleAngleTouch');
+            WvBaseTool.call(this, 'simpleAngle', 'simpleAngleTouch', true);
         }
         Controller.prototype = Object.create(WvBaseTool.prototype)
         Controller.prototype.constructor = Controller;
