@@ -4,7 +4,7 @@
         <span class="wvWarning-text ">
             <h2 class="mb10"><span class="fa fa-exclamation-triangle wvWarning-icon mr5"></span>Warning!</h2>
             <p class="mn mb10" style="color:#000">
-            {{vm.incompatibleBrowserErrorMessage}}
+            {{ 'GENERAL_PARAGRAPHS.INCOMPATIBLE_BROWSER' | translate }}
             </h5>
         </span> 
     </div>
@@ -15,7 +15,7 @@
 
 <div class="wvScreenToSmallWarning">
 <div class="wvScreenToSmallWarning-content">
-<p>marche pas !</p>
+<p>{{ 'GENERAL_PARAGRAPHS.SCREEN_TOO_SMALL' | translate | wvCapitalize }}</p>
 </div>
 </div>
 <wv-layout
