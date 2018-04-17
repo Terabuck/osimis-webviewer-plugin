@@ -23,7 +23,7 @@
                             _preload(series, minQuality, 2);
                         });
                         // Prefetch high quality images
-                        if (wvConfig.config.enableHighQualityImagePreloading)
+                        if (wvConfig.config.highQualityImagePreloadingEnabled)
                         {
                             seriesList.forEach(function(series) {
                                 var maxQuality = Math.max.apply(Math, _.toArray(series.availableQualities));
@@ -46,7 +46,7 @@
                         });
 
                         // Prefetch high quality images
-                        if (wvConfig.config.enableHighQualityImagePreloading)
+                        if (wvConfig.config.highQualityImagePreloadingEnabled)
                         {
                             seriesList.forEach(function(series) {
                                 var maxQuality = Math.max.apply(Math, _.toArray(series.availableQualities));
