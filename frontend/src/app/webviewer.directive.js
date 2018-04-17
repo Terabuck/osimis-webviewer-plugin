@@ -307,6 +307,8 @@
             vm.paneManager = wvPaneManager;
             vm.synchronizer = wvSynchronizer;
             vm.wvViewerController = wvViewerController;
+            vm.wvViewerController.setOverlayTextVisible(__webViewerConfig.displayOverlayText);
+            vm.wvViewerController.setOverlayIconsVisible(__webViewerConfig.displayOverlayIcons);
             vm.wvWindowingViewportTool = wvWindowingViewportTool;
 
             // Selection-related

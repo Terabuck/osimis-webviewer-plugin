@@ -80,6 +80,8 @@ public:
 
   bool toggleOverlayTextButtonEnabled;
   bool toggleOverlayIconsButtonEnabled;
+  bool displayOverlayText;
+  bool displayOverlayIcons;
 
   WebViewerConfiguration(OrthancPluginContext* context);
   /**

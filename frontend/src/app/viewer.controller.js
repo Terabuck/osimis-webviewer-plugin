@@ -13,12 +13,19 @@
     ViewerController.prototype.isOverlayTextVisible = function() {
     	return this._isOverlayTextVisible;
     }
+    ViewerController.prototype.setOverlayTextVisible = function(enabled) {
+        this._isOverlayTextVisible = enabled;
+    }
+
 
     ViewerController.prototype.toggleOverlayIcons = function() {
         this._isOverlayIconsVisible = !this._isOverlayIconsVisible;
     }
     ViewerController.prototype.isOverlayIconsVisible = function() {
     	return this._isOverlayIconsVisible;
+    }
+    ViewerController.prototype.setOverlayIconsVisible = function(enabled) {
+        this._isOverlayIconsVisible = enabled;
     }
 
     angular

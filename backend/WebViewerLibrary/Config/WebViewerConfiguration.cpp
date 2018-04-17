@@ -244,6 +244,9 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   customOverlayProviderUrl = OrthancPlugins::GetStringValue(wvConfig, "CustomOverlayProviderUrl", "");  // must be provided as a url relative to orthanc root url (i.e.: "/../customOverlays/")
   toggleOverlayTextButtonEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ToggleOverlayTextButtonEnabled", false);
   toggleOverlayIconsButtonEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ToggleOverlayIconsButtonEnabled", false);
+  displayOverlayText = OrthancPlugins::GetBoolValue(wvConfig, "DisplayOverlayText", true);
+  displayOverlayIcons = OrthancPlugins::GetBoolValue(wvConfig, "DisplayOverlayIcons", true);
+
 
   if (toolbarLayoutMode != "flat" && toolbarLayoutMode != "tree")
   {
@@ -466,6 +469,8 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["defaultLanguage"] = defaultLanguage;
   config["toggleOverlayTextButtonEnabled"] = toggleOverlayTextButtonEnabled;
   config["toggleOverlayIconsButtonEnabled"] = toggleOverlayIconsButtonEnabled;
+  config["displayOverlayText"] = displayOverlayText;
+  config["displayOverlayIcons"] = displayOverlayIcons;
 
   if (customOverlayProviderUrl.length() > 0) {
     config["customOverlayProviderUrl"] = customOverlayProviderUrl;
