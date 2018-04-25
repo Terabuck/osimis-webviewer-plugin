@@ -25,6 +25,7 @@ Features:
   "DefaultLanguage"
 * Added a one-column display mode for the study island
 * Added internationalization support (en-fr)
+* Added a tool to show/hide overlay text/icons
 
 
 TODO: lot's of feature to re-integrate in release notes
@@ -51,6 +52,7 @@ Experimental features:
 * Added prefetching on the backend to pre-compute low/high quality images
   before the frontend requests them.  To enable it, check the 
   "ShortTermCachePrefetchOnInstanceStored" configuration.
+* Added the ability to display custom icons in overlay
 
 
 Version 1.0.1
