@@ -65,6 +65,15 @@
             keyboardJS.bind(keyboardCode, keyDownFunction, keyUpFunction);
         }
 
+        function applyConfigWindowingPreset(index) {
+            wvPaneManager.getSelectedPane().applyConfigWindowingPreset(index);
+            wvSynchronizer.getListOfSynchronizedPanes(wvPaneManager.getSelectedPane().series).forEach(function(pane) {pane.applyConfigWindowingPreset(index)});
+        }
+        function applyEmbeddedWindowingPreset(index) {
+            wvPaneManager.getSelectedPane().applyEmbeddedWindowingPreset(index);
+            wvSynchronizer.getListOfSynchronizedPanes(wvPaneManager.getSelectedPane().series).forEach(function(pane) {pane.applyEmbeddedWindowingPreset(index)});
+        }
+
         function createHandlers(this_) {
             var handlers = {};
 
@@ -311,35 +320,35 @@
             };
 
             handlers.applyEmbeddedWindowingPreset1 = function() {
-                wvPaneManager.getSelectedPane().applyEmbeddedWindowingPreset(0);
+                applyEmbeddedWindowingPreset(0);
             };
             handlers.applyEmbeddedWindowingPreset2 = function() {
-                wvPaneManager.getSelectedPane().applyEmbeddedWindowingPreset(1);
+                applyEmbeddedWindowingPreset(1);
             };
             handlers.applyEmbeddedWindowingPreset3 = function() {
-                wvPaneManager.getSelectedPane().applyEmbeddedWindowingPreset(2);
+                applyEmbeddedWindowingPreset(2);
             };
             handlers.applyEmbeddedWindowingPreset4 = function() {
-                wvPaneManager.getSelectedPane().applyEmbeddedWindowingPreset(3);
+                applyEmbeddedWindowingPreset(3);
             };
             handlers.applyEmbeddedWindowingPreset5 = function() {
-                wvPaneManager.getSelectedPane().applyEmbeddedWindowingPreset(4);
+                applyEmbeddedWindowingPreset(4);
             };
 
             handlers.applyConfigWindowingPreset1 = function() {
-                wvPaneManager.getSelectedPane().applyConfigWindowingPreset(0);
+                applyConfigWindowingPreset(0);
             };
             handlers.applyConfigWindowingPreset2 = function() {
-                wvPaneManager.getSelectedPane().applyConfigWindowingPreset(1);
+                applyConfigWindowingPreset(1);
             };
             handlers.applyConfigWindowingPreset3 = function() {
-                wvPaneManager.getSelectedPane().applyConfigWindowingPreset(2);
+                applyConfigWindowingPreset(2);
             };
             handlers.applyConfigWindowingPreset4 = function() {
-                wvPaneManager.getSelectedPane().applyConfigWindowingPreset(3);
+                applyConfigWindowingPreset(3);
             };
             handlers.applyConfigWindowingPreset5 = function() {
-                wvPaneManager.getSelectedPane().applyConfigWindowingPreset(4);
+                applyConfigWindowingPreset(4);
             };
 
             return handlers;
