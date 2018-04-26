@@ -78,17 +78,17 @@
                 // install mouse handler
                 var $enabledElement = $(viewport.getEnabledElement());
 
-                $enabledElement.on('mousedown.dvt', function(e) {
+                $enabledElement.on('mousedown.combinedTool', function(e) {
                     var isTouchEvent = !e.pageX && !e.pageY && !!e.originalEvent.touches;
                     var mouseButton = !isTouchEvent ? e.which : 1;
                     var lastX = !isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX;
                     var lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
 
                     $(document).one('mouseup', function(e) {
-                        $(document).unbind('mousemove.dvt');
+                        $(document).unbind('mousemove.combinedTool');
                     });
 
-                    $(document).on('mousemove.dvt', function(e) {
+                    $(document).on('mousemove.combinedTool', function(e) {
                         // Prevent issues on touchscreens.
                         e.preventDefault();
 
@@ -136,7 +136,7 @@
 
                 // Remove mouse handlers
                 var $enabledElement = $(viewport.getEnabledElement());
-                $enabledElement.off('mousedown.dvt');
+                $enabledElement.off('mousedown.combinedTool');
             };
         }
         MobileViewportToolVM.prototype = Object.create(WvBaseTool.prototype);

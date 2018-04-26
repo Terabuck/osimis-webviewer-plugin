@@ -45,13 +45,17 @@
                 var _this = this;
                 var $enabledElement = $(viewport.getEnabledElement());
 
-                $enabledElement.on('touchstart.dvt mousedown.dvt', function(e) {
+                $enabledElement.on('touchstart.windowingTool mousedown.windowingTool', function(e) {
                     var isTouchEvent = !e.pageX && !e.pageY && !!e.originalEvent.touches;
                     var mouseButton = !isTouchEvent ? e.which : 1;
                     var lastX = !isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX;
                     var lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
 
-                    $(document).on('touchmove.dvt mousemove.dvt', function(e) {
+                    $(document).one('touchstart mouseup', function(e) {
+                        $(document).unbind('touchmove.windowingTool mousemove.windowingTool');
+                    });
+
+                    $(document).on('touchmove.windowingTool mousemove.windowingTool', function(e) {
                         // Prevent issues on touchscreens.
                         e.preventDefault();
 
@@ -72,16 +76,13 @@
                             }
                         });
 
-                        $(document).one('touchstart mouseup', function(e) {
-                            $(document).unbind('touchmove.dvt mousemove.dvt');
-                        });
                     });
                 });
             };
 
             this._deactivateInputs = function(viewport) {
                 var $enabledElement = $(viewport.getEnabledElement());
-                $enabledElement.off('touchstart.dvt mousedown.dvt');
+                $enabledElement.off('touchstart.windowingTool mousedown.windowingTool');
             };
 
             this._listenModelChange = angular.noop;
