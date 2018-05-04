@@ -40,6 +40,9 @@
         var selectedPane = this.wvPaneManager.getSelectedPane();
         var this_ = this;
         selectedPane.getNextSeriesPaneConfigPromise().then(function(config) {
+            config.csViewport = null;
+            config.imageIndex = 0;
+            config.isSelected = true;
             this_.wvPaneManager.setPane(selectedPane.x, selectedPane.y, config);
         });
     }
@@ -48,6 +51,9 @@
         var selectedPane = this.wvPaneManager.getSelectedPane();
         var this_ = this;
         selectedPane.getPreviousSeriesPaneConfigPromise().then(function(config) {
+            config.csViewport = null;
+            config.imageIndex = 0;
+            config.isSelected = true;
             this_.wvPaneManager.setPane(selectedPane.x, selectedPane.y, config);
         });
     }
