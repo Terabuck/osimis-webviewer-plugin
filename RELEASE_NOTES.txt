@@ -54,6 +54,9 @@ Experimental features:
   "ShortTermCachePrefetchOnInstanceStored" configuration.
 * Added the ability to display custom icons in overlay
 
+Known issues:
+* The WebViewer currently does not work on iPhone (Safari and Chrome).
+
 
 Version 1.0.1
 ========================
