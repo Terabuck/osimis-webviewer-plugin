@@ -1,12 +1,13 @@
 (function(osimis) {
     'use strict';
 
-    function ViewerController(wvPaneManager, wvStudyManager) {
+    function ViewerController($q, wvPaneManager, wvStudyManager) {
         this._isOverlayTextVisible = true;
         this._isOverlayIconsVisible = true;
         this._selectedStudyIds = [];
         this.wvPaneManager = wvPaneManager;
         this.wvStudyManager = wvStudyManager;
+        this.$q = $q;
     }
 
     ViewerController.prototype.setSelectedStudyIds = function(selectedStudyIds) {
@@ -57,9 +58,13 @@
         
         selectedPane.getStudy().then(function(study){
             var selectedStudyIds = this_._selectedStudyIds;
-            var _index = selectedStudyIds.indexOf(study.id);
-            var nextStudyId = _index + 1 < selectedStudyIds.length ? selectedStudyIds[_index + 1] : selectedStudyIds[0];  // select the next study or the first
-            return this_.wvStudyManager.get(nextStudyId)
+            var currentIndex = selectedStudyIds.indexOf(study.id);
+            var nextIndex = (currentIndex + 1) % selectedStudyIds.length; // select the next study or the first
+            if (currentIndex != nextIndex) {
+                return this_.wvStudyManager.get(selectedStudyIds[nextIndex]);
+            } else {
+                return this_.$q.reject();
+            }
         }).then(function(nextStudy){
             var firstItemTuple = nextStudy.getNextItemId(),
                 paneOptions = {csViewport: null, isSelected: true};
@@ -82,9 +87,13 @@
         
         selectedPane.getStudy().then(function(study){
             var selectedStudyIds = this_._selectedStudyIds;
-            var _index = selectedStudyIds.indexOf(study.id);
-            var previousStudyId = _index - 1 >= 0 ? selectedStudyIds[_index - 1] : selectedStudyIds[selectedStudyIds.length - 1];  // select the previous study or the last
-            return this_.wvStudyManager.get(previousStudyId)
+            var currentIndex = selectedStudyIds.indexOf(study.id);
+            var previousIndex = (currentIndex - 1 + selectedStudyIds.length) % selectedStudyIds.length; // select the previous study or the last
+            if (currentIndex != previousIndex) {
+                return this_.wvStudyManager.get(selectedStudyIds[previousIndex]);
+            } else {
+                return this_.$q.reject();
+            }
         }).then(function(previousStudy){
             var firstItemTuple = previousStudy.getNextItemId(),
                 paneOptions = {csViewport: null, isSelected: true};
@@ -106,7 +115,7 @@
         .factory('wvViewerController', wvViewerController);
 
     /* @ngInject */
-    function wvViewerController(wvPaneManager, wvStudyManager) {
-        return new ViewerController(wvPaneManager, wvStudyManager);
+    function wvViewerController($q, wvPaneManager, wvStudyManager) {
+        return new ViewerController($q, wvPaneManager, wvStudyManager);
     }
 })(osimis || (this.osimis = {}));
