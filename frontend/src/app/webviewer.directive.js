@@ -510,10 +510,10 @@
                     vm.wvViewerController.toggleOverlayIcons();
                     break;
                 case 'previousSeries':
-                    selectedPane.previousSeries();
+                    vm.wvViewerController.previousSeries();
                     break;
                 case 'nextSeries':
-                    selectedPane.nextSeries();
+                    vm.wvViewerController.nextSeries();
                     break;
                 default:
                     throw new Error('Unknown toolbar action.');

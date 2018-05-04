@@ -180,13 +180,11 @@
             };
 
             handlers.nextSeries = function() {
-                var selectedPane = wvPaneManager.getSelectedPane();
-                selectedPane.nextSeries();
+                wvViewerController.nextSeries();
             };
 
             handlers.previousSeries = function() {
-                var selectedPane = wvPaneManager.getSelectedPane();
-                selectedPane.previousSeries();
+                wvViewerController.previousSeries();
             };
 
             handlers.previousImage = function() {

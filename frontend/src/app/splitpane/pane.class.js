@@ -191,40 +191,45 @@
         this.csViewport.invert = !this.csViewport.invert;
     };
 
-    Pane.prototype.previousSeries = function(){
+    Pane.prototype.getNextSeriesPaneConfigPromise = function(){
         var selectedPane = this;
+        var Promise = this._Promise;
+
         return selectedPane.getStudy().then(function(study){
-            var currentItemId = selectedPane.seriesId || selectedPane.videoId || selectedPane.reportId,
-                previousItemTuple = study.getPreviousItemId(currentItemId);
-
-            if(previousItemTuple[1] == "series"){
-                selectedPane.seriesId = previousItemTuple[0];
-            }else if(previousItemTuple[1] == "video"){
-                selectedPane.videoId = previousItemTuple[0];
-            }else {
-                selectedPane.reportId = previousItemTuple[0];
-            }
-            selectedPane.csViewport = null;
-
-            return selectedPane;
-        });
-    };
-    Pane.prototype.nextSeries = function(){
-        var selectedPane = this;
-        selectedPane.getStudy().then(function(study){
             var currentItemId = selectedPane.seriesId || selectedPane.videoId || selectedPane.reportId,
                 nextItemTuple = study.getNextItemId(currentItemId);
 
+            var config = {};
             if(nextItemTuple[1] == "series"){
-                selectedPane.seriesId = nextItemTuple[0];
+                config.seriesId = nextItemTuple[0];
             }else if(nextItemTuple[1] == "video"){
-                selectedPane.videoId = nextItemTuple[0];
+                config.videoId = nextItemTuple[0];
             }else {
-                selectedPane.reportId = nextItemTuple[0];
+                config.reportId = nextItemTuple[0];
             }
-            selectedPane.csViewport = null;
 
-            return selectedPane;
+            return Promise.when(config);
+        });
+    };
+
+    Pane.prototype.getPreviousSeriesPaneConfigPromise = function(){
+        var selectedPane = this;
+        var Promise = this._Promise;
+
+        return selectedPane.getStudy().then(function(study){
+            var currentItemId = selectedPane.seriesId || selectedPane.videoId || selectedPane.reportId,
+                nextItemTuple = study.getPreviousItemId(currentItemId);
+
+            var config = {};
+            if(nextItemTuple[1] == "series"){
+                config.seriesId = nextItemTuple[0];
+            }else if(nextItemTuple[1] == "video"){
+                config.videoId = nextItemTuple[0];
+            }else {
+                config.reportId = nextItemTuple[0];
+            }
+
+            return Promise.when(config);
         });
     };
 
