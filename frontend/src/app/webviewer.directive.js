@@ -342,10 +342,12 @@
             vm.studyIslandsDisplayMode = typeof vm.studyIslandsDisplayMode !== 'undefined' ? vm.studyIslandsDisplayMode : "grid";
             vm.paneManager = wvPaneManager;
             vm.synchronizer = wvSynchronizer;
+            vm.wvWindowingViewportTool = wvWindowingViewportTool;
+
             vm.wvViewerController = wvViewerController;
             vm.wvViewerController.setOverlayTextVisible(__webViewerConfig.displayOverlayText);
             vm.wvViewerController.setOverlayIconsVisible(__webViewerConfig.displayOverlayIcons);
-            vm.wvWindowingViewportTool = wvWindowingViewportTool;
+            vm.wvViewerController.setSelectedStudyIds(vm.selectedStudyIds);
 
             // Selection-related
             vm.seriesItemSelectionEnabled = typeof vm.seriesItemSelectionEnabled !== 'undefined' ? vm.seriesItemSelectionEnabled : false;
@@ -568,6 +570,7 @@
             scope.$watch('vm.selectedStudyIds', function(newValues, oldValues) {
                 // Log study ids
                 console.log('selected studies ids: ', newValues);
+                wvViewerController.setSelectedStudyIds(newValues);
 
                 // Consider oldValues to be empty if this watch function is
                 // called at initialization.
