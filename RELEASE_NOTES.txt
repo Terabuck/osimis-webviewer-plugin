@@ -26,6 +26,7 @@ Features:
 * Added a one-column display mode for the study island
 * Added internationalization support (en-fr)
 * Added a tool to show/hide overlay text/icons
+* Added a loading spinner
 
 
 TODO: lot's of feature to re-integrate in release notes
