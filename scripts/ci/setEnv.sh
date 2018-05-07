@@ -25,7 +25,7 @@ function _setEnvMain {
 	releaseCommitId=$(git rev-parse --short HEAD)
 
 	viewerVersion=$(git describe --tags --long --dirty=-dirty) # version as used in cmake for backend build
-
+	echo "ViewerVersion=$viewerVersion"
 	if [[ ! $branchName ]]; then
 		# Exit if detached head
 		branchName=$(git rev-parse --abbrev-ref HEAD)
