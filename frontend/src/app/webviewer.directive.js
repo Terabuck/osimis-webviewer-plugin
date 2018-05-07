@@ -207,12 +207,17 @@
                     minimalChromeVersion = 48;
                     minimalFirefoxVersion = 28;
                 } 
+                if (osName === "iOS" && wvConfig.browser.device.model === "iPhone") { // not supported at all on iPhone right now (too many bugs)
+                    minimalChromeVersion = 999;
+                    minimalFirefoxVersion = 999;
+                    minimalSafariVersion = 999;
+                }
 
                 if ((browserName === "Chrome" && browserMajorVersion >= minimalChromeVersion) 
                     || (browserName === "Safari" && browserMajorVersion >= minimalSafariVersion) 
                     || (browserName === "Firefox" && browserMajorVersion >= minimalFirefoxVersion) 
-                    || (vm.browser === "Edge" && browserMajorVersion >= minimalEdgeVersion) 
-                    || (vm.browser === "IE" && browserMajorVersion >= minimalIEVersion)){
+                    || (browserName === "Edge" && browserMajorVersion >= minimalEdgeVersion) 
+                    || (browserName === "IE" && browserMajorVersion >= minimalIEVersion)){
                     console.log(browserName + " Supported");
                 }
                 else{

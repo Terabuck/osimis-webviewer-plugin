@@ -1101,14 +1101,14 @@ $steps: (
 }
 
 /* on some mobile devices, the size returned for the "screen" is actually the viewport size so 360x640 is actually equal to 280x560 */
-@media only screen and (min-width: 560px) and (min-height: 280px) { 
+@media only screen and (min-width: 550px) and (min-height: 280px) { 
   .wvScreenToSmallWarning {
     display: none;
   }
 }
 
 /* on some mobile devices, the size returned for the "screen" is actually the viewport size so 360x640 is actually equal to 280x560 */
-@media only screen and (min-width: 280px) and (min-height: 560px)  {
+@media only screen and (min-width: 280px) and (min-height: 550px)  {
   .wvScreenToSmallWarning {
     display: none;
   }
