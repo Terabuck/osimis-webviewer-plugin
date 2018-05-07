@@ -12,6 +12,21 @@ namespace
 void _loadDICOM(OrthancPluginMemoryBuffer& dicomOutput, const std::string& instanceId);
 }
 
+void DicomRepository::invalidateDicomFile(const std::string instanceId)
+{
+  boost::lock_guard<boost::mutex> guard(_dicomFilesMutex);
+
+  for (std::deque<DicomFile>::iterator it = _dicomFiles.begin(); it != _dicomFiles.end(); it++)
+  {
+    if (it->instanceId == instanceId)
+    {
+      OrthancPluginFreeMemoryBuffer(OrthancContextManager::Get(), &(it->dicomFileBuffer));
+      _dicomFiles.erase(it);
+      return;
+    }
+  }
+}
+
 void DicomRepository::getDicomFile(const std::string instanceId, OrthancPluginMemoryBuffer& dicomFileBuffer) const
 {
   boost::lock_guard<boost::mutex> guard(_dicomFilesMutex);

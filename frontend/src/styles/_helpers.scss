@@ -2,6 +2,17 @@
  *  Source code taken from private Osimis' frontend toolbox 3.2.1.
  */
 
+/**
+    _overlay.scss
+ */
+.overlay__transparent{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index: 1;
+}
 
 /** _transition.scss **/
 .transition,
@@ -1011,4 +1022,94 @@ $steps: (
 .ib,
 .inline-object {
   display: inline-block !important;
+}
+
+.clear {
+  clear: both;
+}
+
+// warning popup
+
+.wvWarning {
+  position: relative;
+  width: 320px;
+  min-height: 130px;
+  z-index: 999;
+  left: calc(50% - 160px);
+  border: #000 solid 1px;
+  -webkit-border-radius: 7px;
+  -moz-border-radius: 7px;
+  border-radius: 7px;
+  color: #FF5722;
+  box-shadow: 0px 3px 23px #ff980078;
+  -webkit-animation-name: example;  /* Safari 4.0 - 8.0 */
+  -webkit-animation-duration: 3s;  /* Safari 4.0 - 8.0 */    
+  -webkit-animation-fill-mode: both; /* Safari 4.0 - 8.0 */
+  animation-name: example;
+  animation-duration: 2s;    
+  animation-fill-mode: both;
+  animation-timing-function: ease-out;
+}
+
+@-webkit-keyframes example {
+    from {top: 0vh;opacity: 0;background: #868686}
+    to {top: 10vh;opacity: 1;background: #ffffff}
+}
+
+@keyframes example {
+  from {top: 0vh;opacity: 0;background: #868686}
+    to {top: 10vh;opacity: 1;background: #ffffff}
+}
+
+.wvWarning-content{
+  position: relative;
+  width: 190px;
+  min-height: 88px;
+  max-height: 80vh;
+  margin: auto;
+}
+.wvWarning-icon{
+  font-size: 32px;
+}
+.wvWarning-text{
+  position: relative;
+}
+.wvWarning-button{
+  background-color: #f1ededcc;
+  color: #607D8B;
+  width: 50px;
+  font-weight: 600;
+  margin-top: 2px;
+  margin-right: 30px;
+}
+
+.wvScreenToSmallWarning {
+  position: fixed;
+  display: block;
+  top: 0;
+  left: 0;
+  background-color: white;
+  color: #333;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+}
+
+.wvScreenToSmallWarning-content {
+  padding: 10px;
+  text-align: center;
+}
+
+/* on some mobile devices, the size returned for the "screen" is actually the viewport size so 360x640 is actually equal to 280x560 */
+@media only screen and (min-width: 550px) and (min-height: 280px) { 
+  .wvScreenToSmallWarning {
+    display: none;
+  }
+}
+
+/* on some mobile devices, the size returned for the "screen" is actually the viewport size so 360x640 is actually equal to 280x560 */
+@media only screen and (min-width: 280px) and (min-height: 550px)  {
+  .wvScreenToSmallWarning {
+    display: none;
+  }
 }

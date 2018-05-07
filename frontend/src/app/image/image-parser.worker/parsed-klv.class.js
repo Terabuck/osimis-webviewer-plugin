@@ -41,7 +41,11 @@
         // Retrieve pixel spacing if available in dicom tags, so we can 
         // map pixel coordinates with physical ones.
         var columnPixelSpacing = 0;  // use really invalid values to make sure the user realizes the measure is invald (note: cornerstone will display pixels dimensions in this case)
+<<<<<<< HEAD
         var rowPixelSpacing = 0;     // TODO: disable the measure tools in this case (note: this can be done later)
+=======
+        var rowPixelSpacing = 0;     // @todo Disable the measure tools in this case (note: this can be done later).
+>>>>>>> release-1.1.0
         if (tags.PixelSpacing) {
             var pixelSpacing = tags.PixelSpacing.split('\\');
             if (pixelSpacing.length === 2) {
@@ -67,7 +71,10 @@
                 rowPixelSpacing = usRegion.PhysicalDeltaY * 10;     // columnPixelSpacing is in mm -> *10
             }
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> release-1.1.0
 
         // Data required by cornerstone to display the image correctly.
         var cornerstoneMetaData = {
@@ -523,6 +530,16 @@
         
         var windowCenter = 0;
         var windowWidth = 0;
+
+        // Adapt window width/center with the slope & intercept values.
+        // Those calculation will be made internally by cornerstone,
+        // with the following formulas:
+        // `windowCenter = windowCenter * slope + intercept`
+        // `windowWidth = windowWidth * slope`
+        var slope = +tags.RescaleSlope || 1;
+        var intercept = +tags.RescaleIntercept || 0;
+
+
         // If windowing dicom tags are available, use them
         if (tags.WindowCenter && tags.WindowWidth) {
             var windowCenters = tags.WindowCenter.split('\\');
@@ -541,6 +558,8 @@
             // in having something specific)
             windowCenter = 127.5;
             windowWidth = 256;
+            slope = 1;
+            intercept = 0;
         }
         else {
             // Process the threshold delta. When we process the windowing, we
@@ -587,14 +606,6 @@
             windowCenter = minPixelValueForWWWC + (maxPixelValueForWWWC - minPixelValueForWWWC) / 2 || 127.5;
             windowWidth = (maxPixelValueForWWWC - minPixelValueForWWWC) || 256;
         }
-
-        // Adapt window width/center with the slope & intercept values.
-        // Those calculation will be made internally by cornerstone,
-        // with the following formulas:
-        // `windowCenter = windowCenter * slope + intercept`
-        // `windowWidth = windowWidth * slope`
-        var slope = +tags.RescaleSlope || 1;
-        var intercept = +tags.RescaleIntercept || 0;
 
         // Return result.
         return {

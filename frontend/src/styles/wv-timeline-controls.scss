@@ -20,6 +20,14 @@
     font-size: 1em;
 }
 
+.wv-timeline-controls-vflip {
+    // flip only the icon
+    &:before, &:after{
+        transform: scaleX(-1);
+        display: inline-block;
+    }
+}
+
 .wv-timeline-controls-button {
     display: inline-block;
     height: 1em;
@@ -59,7 +67,7 @@
 
     // This is for the boxing box
     height: 3em;
-    width: 2em;
+    width: 6em;
     padding-bottom: 1em;
     padding-left: 0.25em;
     padding-right: 0.25em;

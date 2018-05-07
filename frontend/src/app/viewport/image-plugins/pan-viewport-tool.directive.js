@@ -14,7 +14,7 @@
         });
 
     /* @ngInject */
-    function wvPanViewportTool($parse, WvBaseTool) {
+    function wvPanViewportTool($parse, WvBaseTool, wvPanViewportTool) {
         // Usage:
         //
         // Creates:
@@ -66,7 +66,7 @@
                             lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
 
                             if (mouseButton === 1) { // left-click + move
-                                _this.pan(viewport, deltaX, deltaY);
+                                wvPanViewportTool.applyPanToViewport(viewport, deltaX, deltaY);
                             };
                         });
 
@@ -86,20 +86,6 @@
             this._unlistenModelChange = angular.noop;
             this._listenViewChange = angular.noop;
             this._unlistenViewChange = angular.noop;
-            
-            this.pan = function(viewport, deltaX, deltaY) {
-                var viewportData = viewport.getViewport();
-
-                var scale = +viewportData.scale;
-                var x = +viewportData.translation.x;
-                var y = +viewportData.translation.y;
-
-                viewportData.translation.x = x + (deltaX / scale);
-                viewportData.translation.y = y + (deltaY / scale);
-                
-                viewport.setViewport(viewportData);
-                viewport.draw(false);
-            };
         }
         Controller.prototype = Object.create(WvBaseTool.prototype)
         Controller.prototype.constructor = Controller;

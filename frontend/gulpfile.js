@@ -7,6 +7,8 @@ var del = require('del');
 var glob = require('glob');
 var gulp = require('gulp');
 var path = require('path');
+var gutil = require('gulp-util');
+var plumber = require('gulp-plumber');
 var _ = require('lodash');
 var $ = require('gulp-load-plugins')({lazy: true});
 var osisync = require('osisync');
@@ -28,6 +30,19 @@ var browserSyncPort = osisync.getPort() || 3000;
 var browserSyncUiPort = osisync.getPort() || 3001;
 var weinrePort = osisync.getPort() || 9090;
 var nodeDebugPort = osisync.getPort() || 5858;
+
+var gulp_src = gulp.src;
+gulp.src = function() {
+  return gulp_src.apply(gulp, arguments)
+    .pipe(plumber(function(error) {
+      // Output an error message
+      //gutil.log(gutil.colors.red('Error (' + error.plugin + '): ' + error.message));
+      gutil.log(error);
+      // emit the end event, to properly end the task
+      process.exit(1);
+    })
+  );
+};
 
 /**
  * yargs variables can be passed in to alter the behavior, when present.
@@ -265,12 +280,18 @@ gulp.task('build-specs', ['templatecache'], function(done) {
         .pipe(gulp.dest(config.client));
 });
 
+gulp.task('copy-languages', function() {
+   return gulp
+       .src(config.client + 'languages/**/*')
+       .pipe(gulp.dest(config.build + 'languages'));
+});
+
 /**
  * Build everything
  * This is separate so we can run tests on
  * optimize before handling image or fonts
  */
-gulp.task('build', ['docs', 'optimize', 'images', 'fonts'], function() {
+gulp.task('build', ['docs', 'optimize', 'images', 'fonts', 'copy-languages'], function() {
     log('Building everything');
 
     var msg = {
@@ -330,12 +351,12 @@ gulp.task('optimize', ['inject'], function() {
             }
         }))
         .pipe($.ngAnnotate({add: true}))
-        .pipe($.uglify())
+        //.pipe($.uglify())
         .pipe(getHeader())
         .pipe(jsAppFilter.restore())
         // Get the vendor javascript
         .pipe(jslibFilter)
-        .pipe($.uglify()) // another option is to override wiredep to use min files
+        //.pipe($.uglify()) // another option is to override wiredep to use min files
         .pipe(jslibFilter.restore())
         // Take inventory of the file names for future rev numbers
         // .pipe($.rev())
@@ -592,26 +613,34 @@ function serve(isDev, specRunner) {
 
     var onRestartGulpTasks = [];
     if (!args.novet) onRestartGulpTasks.push('vet');
-    
-    return $.nodemon(nodeOptions)
-        .on('restart', onRestartGulpTasks, function(ev) {
-            log('*** nodemon restarted');
-            log('files changed:\n' + ev);
-            setTimeout(function() {
-                browserSync.notify('reloading now ...');
-                browserSync.reload({stream: false});
-            }, config.browserReloadDelay);
-        })
-        .on('start', function () {
-            log('*** nodemon started');
-            startBrowserSync(isDev, specRunner);
-        })
-        .on('crash', function () {
-            log('*** nodemon crashed: script crashed for some reason');
-        })
-        .on('exit', function () {
-            log('*** nodemon exited cleanly');
-        });
+
+    // @note by Thibault at 26.07.2017 - gulp-nodemon crashes from no reason
+    // since last update. We don't bother for our needs. Let's just use an
+    // hacky `require` to launch the frontend development server instead.
+    //
+    // return $.nodemon(nodeOptions)
+    //     .on('restart', onRestartGulpTasks, function(ev) {
+    //         log('*** nodemon restarted');
+    //         log('files changed:\n' + ev);
+    //         setTimeout(function() {
+    //             browserSync.notify('reloading now ...');
+    //             browserSync.reload({stream: false});
+    //         }, config.browserReloadDelay);
+    //     })
+    //     .on('start', function () {
+    //         log('*** nodemon started');
+    //         startBrowserSync(isDev, specRunner);
+    //     })
+    //     .on('crash', function () {
+    //         log('*** nodemon crashed: script crashed for some reason');
+    //     })
+    //     .on('exit', function () {
+    //         log('*** nodemon exited cleanly');
+    //     });
+
+    process.env.PORT = serverPort;
+    process.env.NODE_ENV = isDev ? 'dev' : 'build';
+    require('./server.js')
 }
 
 function getNodeOptions(isDev) {

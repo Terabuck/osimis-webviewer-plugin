@@ -41,7 +41,7 @@
             },
             scope: {
                 pane: '=?wvPane',
-                panePosition: '=?wvPanePosition'
+                panePosition: '=?wvPanePosition',
             },
             transclude: true,
             templateUrl: 'app/splitpane/pane-policy.directive.html'

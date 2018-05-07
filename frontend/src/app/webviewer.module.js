@@ -1,7 +1,7 @@
 (function(osimis) {
     'use strict';
 
-    /** 
+    /**
      * @ngdoc object
      *
      * @name osimis
@@ -9,8 +9,8 @@
      * @description
      * The POJO Web Viewer's module/package.
      */
-    // this.osimis = this.osimis || {}; // as `this` is undefined it equals to 
-                                        // `window` or `self` depending on the 
+    // this.osimis = this.osimis || {}; // as `this` is undefined it equals to
+                                        // `window` or `self` depending on the
                                         // context
 
     /**
@@ -22,7 +22,7 @@
      * The AngularJS Web Viewer's module/package.
      */
     angular
-    .module('webviewer', ['webviewer.layout', 'webviewer.toolbox', 'ngCookies', 'ngResource', 'ngSanitize', 'mgcrea.ngStrap', 'ngRangeFilter', 'debounce'])
+    .module('webviewer', ['webviewer.layout', 'webviewer.toolbox', 'webviewer.translation', 'ngCookies', 'ngResource', 'ngSanitize', 'mgcrea.ngStrap', 'ngRangeFilter', 'debounce'])
     .config(function($locationProvider, $compileProvider) {
         // Warning: Web Viewer is uncompatible with <base> HTML element (due to SVG/XLink issue)! Don't use it!
         $locationProvider.html5Mode({

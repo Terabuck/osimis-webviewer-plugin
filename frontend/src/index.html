@@ -30,16 +30,28 @@
     <!-- endbuild -->
 </head>
 <body
-    ng-controller="MainController as vm" 
+    ng-controller="MainController as vm"
     class="wv-body"
     ng-cloak
 >
+    <div class="wvLoadingScreen">
+        <div class="wvLoadingSpinner">
+            <div class="bounce1"></div>
+            <div class="bounce2"></div>
+            <div class="bounce3"></div>
+          </div>
+    </div>
     <wv-webviewer
         wv-pickable-study-ids="vm.pickableStudyIds"
+        wv-pickable-study-id-labels="vm.pickableStudyIdLabels"
         wv-selected-study-ids="vm.selectedStudyIds"
         wv-series-id="vm.seriesId"
 
         wv-toolbar-enabled="vm.enableToolbar"
+        wv-toolbar-layout-mode="vm.toolbarLayoutMode"
+        wv-toolbar-default-tool="vm.defaultSelectedTool"
+        wv-buttons-size="vm.toolbarButtonSize"
+
         wv-serieslist-enabled="vm.enableLayoutLeft && vm.mode !== 'series'"
         wv-studyinformation-enabled="vm.enableLayoutTop && vm.mode !== 'series'"
         wv-lefthandles-enabled="vm.enableLayoutLeftHandles"
@@ -47,11 +59,22 @@
         wv-notice-enabled="vm.enableNotice"
         wv-notice-text="vm.noticeText"
 
-        wv-video-display-enabled="vm.enableVideoDisplay"
-        wv-annotationstorage-enabled="vm.enableAnnotationStorage"
+        wv-windowing-presets="vm.windowingPresets"
+        wv-video-display-enabled="vm.videoDisplayEnabled"
+        wv-annotationstorage-enabled="vm.annotationStorageEnabled"
         wv-series-item-selection-enabled="vm.seriesItemSelectionEnabled"
         wv-selected-series-items="vm.selectedSeriesItems"
-        wv-study-download-enabled="vm.enableStudyDownload"
+        wv-study-download-enabled="vm.studyDownloadEnabled"
+        wv-key-image-capture-enabled="vm.keyImageCaptureEnabled"
+        wv-combined-tool-enabled="vm.combinedToolEnabled"
+        wv-toggle-overlay-text-button-enabled="vm.toggleOverlayTextButtonEnabled"
+        wv-toggle-overlay-icons-button-enabled="vm.toggleOverlayIconsButtonEnabled"
+
+        wv-study-islands-display-mode="vm.studyIslandsDisplayMode"
+
+        wv-show-no-report-icon-in-series-list="vm.showNoReportIconInSeriesList"
+        wv-display-disclaimer="true"
+        wv-reduce-timeline-height-on-single-frame-series="vm.reduceTimelineHeightOnSingleFrameSeries"
     >
     </wv-webviewer>
 
@@ -67,7 +90,7 @@
     <!-- inject:templates:js -->
     <!-- endinject -->
     <!-- endbuild -->
-    
+
     <!-- Path served by orthanc backend -->
     <script src="../config.js" type="text/javascript"></script>
 
@@ -82,8 +105,8 @@
     }])
     // Define a basic controller
     .controller('MainController', [
-        '$scope', '$location', 'wvConfig', 'wvStudyManager', 'wvSeriesManager',
-        function($scope, $location, wvConfig, wvStudyManager, wvSeriesManager)
+        '$scope', '$location', '$translate', 'wvConfig', 'wvStudyManager', 'wvSeriesManager',
+        function($scope, $location, $translate, wvConfig, wvStudyManager, wvSeriesManager)
     {
         var vm = this;
 
@@ -96,6 +119,7 @@
         var orthancSeriesId = $location.search().series;
 
         vm.pickableStudyIds = [];
+        vm.pickableStudyIdLabels = {};
         vm.selectedStudyIds = [];
         vm.seriesId = undefined;
 
@@ -166,7 +190,7 @@
 
         // Configure the user interface depending on the user angent/browser.
         var userInterfacePolicy = new osimis.UserAgentBasedInterfacePolicy();
-        vm.enableLayoutTop = userInterfacePolicy.enableLayoutTop;
+        vm.enableLayoutTop = __webViewerConfig.showStudyInformationBreadcrumb && userInterfacePolicy.enableLayoutTop;
         vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
         vm.enableLayoutTopRight = userInterfacePolicy.enableLayoutTopRight;
         vm.enableToolbar = userInterfacePolicy.enableToolbar;
@@ -176,10 +200,10 @@
         vm.enableNotice = userInterfacePolicy.enableNotice;
         vm.noticeText = userInterfacePolicy.noticeText;
 
-        // Listen to changes triggered by the user interface policy.    
+        // Listen to changes triggered by the user interface policy.
         userInterfacePolicy.onUpdate(function() {
             $scope.$apply(function() {
-                vm.enableLayoutTop = userInterfacePolicy.enableLayoutTop;
+                vm.enableLayoutTop = __webViewerConfig.showStudyInformationBreadcrumb && userInterfacePolicy.enableLayoutTop;
                 vm.enableLayoutTopLeft = userInterfacePolicy.enableLayoutTopLeft;
                 vm.enableLayoutTopRight = userInterfacePolicy.enableLayoutTopRight;
                 vm.enableToolbar = userInterfacePolicy.enableToolbar;
@@ -192,9 +216,23 @@
         });
 
         // Configure settings based on server side options
-        vm.enableStudyDownload = __webViewerConfig.enableStudyDownload;
-        vm.enableVideoDisplay = __webViewerConfig.enableVideoDisplay;
-        vm.enableAnnotationStorage = __webViewerConfig.enableAnnotationStorage;
+        vm.defaultLanguage = __webViewerConfig.defaultLanguage || "en";
+        vm.windowingPresets = __webViewerConfig.windowingPresets;
+        vm.studyDownloadEnabled = __webViewerConfig.studyDownloadEnabled;
+        vm.videoDisplayEnabled = __webViewerConfig.videoDisplayEnabled;
+        vm.annotationStorageEnabled = __webViewerConfig.annotationStorageEnabled;
+        vm.keyImageCaptureEnabled = __webViewerConfig.keyImageCaptureEnabled;
+        vm.combinedToolEnabled = __webViewerConfig.combinedToolEnabled;
+        vm.toggleOverlayTextButtonEnabled = __webViewerConfig.toggleOverlayTextButtonEnabled;
+        vm.toggleOverlayIconsButtonEnabled = __webViewerConfig.toggleOverlayIconsButtonEnabled;
+        vm.showNoReportIconInSeriesList = __webViewerConfig.showNoReportIconInSeriesList;
+        vm.reduceTimelineHeightOnSingleFrameSeries = __webViewerConfig.reduceTimelineHeightOnSingleFrameSeries;
+        vm.toolbarLayoutMode = __webViewerConfig.toolbarLayoutMode || "flat";
+        vm.toolbarButtonSize = __webViewerConfig.toolbarButtonSize || "small";
+        vm.defaultSelectedTool = __webViewerConfig.defaultSelectedTool || "zoom";
+        vm.studyIslandsDisplayMode = __webViewerConfig.defaultStudyIslandsDisplayMode || "grid";
+
+        $translate.use(vm.defaultLanguage);
     }]);
     </script>
 </body>

@@ -1,14 +1,97 @@
-<label 
-    class="wvButton glyphicon"
+<div class="tbGroup">
+    <div class="tbGroup__toggl">
+        <button
+            ng-disabled="vm.readonly"
+            class="wvButton--underline glyphicon"
+            ng-click="vm.isOpen = !vm.isOpen"
+            ng-class="{
+                'wvLargeButton': vm.buttonSize == 'large',
+            }"
+        >
+            <span class="glyphicon" ng-class="{'glyphicon-th': vm.splitpaneLayout.x === 1 && vm.splitpaneLayout.y === 1, 'glyphicon-stop': vm.splitpaneLayout.x !== 1 || vm.splitpaneLayout.y !== 1}"></span>
+            <span class="wvButton__bottomTriangle" ng-class="{'toggled': vm.isOpen}"></span>
+        </button>
+    </div>
+    <div ng-show="vm.isOpen" ng-class="{'tbGroup__buttons--bottom': vm.popoverPlacement === 'bottom', 'tbGroup__buttons--left': vm.popoverPlacement === 'left'}">
+        <!--
+        1x1 icon.
+        -->
+        <div ng-class="{'inline-object': vm.popoverPlacement === 'bottom'}">
+            <label
+                class="wvButton glyphicon glyphicon-stop"
+                ng-class="{wvLargeButton: vm.buttonSize === 'large'}"
+                ng-click="vm.isOpen = false"
+            >
+                <input
+                    class="wvToolbar__splitpaneConfigButtonInput"
+                    type="radio"
 
-    ng-class="{
-        'glyphicon-th': vm.splitpaneLayout.x === 1 && vm.splitpaneLayout.y === 1,
-        'glyphicon-stop': vm.splitpaneLayout.x !== 1 || vm.splitpaneLayout.y !== 1
-    }"
->
-    <input
-        type="button"
-        style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"
-        ng-disabled="vm.readonly"
-    />
-</label>
+                    ng-disabled="vm.readonly"
+                    ng-model="vm.splitpaneLayout"
+                    ng-value="{x: 1, y: 1}"
+                />
+            </label>
+        </div>
+
+        <!--
+        2x1 icon.
+        -->
+        <div ng-class="{'inline-object': vm.popoverPlacement === 'bottom'}">
+            <label
+                class="wvButton glyphicon glyphicon-pause"
+                ng-class="{wvLargeButton: vm.buttonSize === 'large'}"
+                ng-click="vm.isOpen = false"
+            >
+                <input
+                    class="wvToolbar__splitpaneConfigButtonInput"
+                    type="radio"
+
+                    ng-disabled="vm.readonly"
+                    ng-model="vm.splitpaneLayout"
+                    ng-value="{x: 2, y: 1}"
+                />
+            </label>
+        </div>
+
+        <!--
+        1x2 icon.
+        -->
+        <div ng-class="{'inline-object': vm.popoverPlacement === 'bottom'}">
+            <label
+                class="wvButton--rotate glyphicon glyphicon-pause"
+                ng-class="{wvLargeButton: vm.buttonSize === 'large'}"
+                ng-click="vm.isOpen = false"
+            >
+                <input
+                    class="wvToolbar__splitpaneConfigButtonInput"
+                    type="radio"
+
+                    ng-disabled="vm.readonly"
+                    ng-model="vm.splitpaneLayout"
+                    ng-value="{x: 1, y: 2}"
+                />
+            </label>
+        </div>
+
+        <!--
+        2x2 icon.
+        -->
+        <div ng-class="{'inline-object': vm.popoverPlacement === 'bottom'}">
+            <label
+                class="wvButton  glyphicon glyphicon-th-large"
+                ng-class="{wvLargeButton: vm.buttonSize === 'large'}"
+                ng-click="vm.isOpen = false"
+            >
+                <input
+                    class="wvToolbar__splitpaneConfigButtonInput"
+                    type="radio"
+
+                    ng-disabled="vm.readonly"
+                    ng-model="vm.splitpaneLayout"
+                    ng-value="{x: 2, y: 2}"
+                />
+            </label>
+        </div>
+    </div>
+    <div class="overlay__transparent" ng-if="vm.isOpen" ng-click="vm.isOpen = false"></div>
+</div>

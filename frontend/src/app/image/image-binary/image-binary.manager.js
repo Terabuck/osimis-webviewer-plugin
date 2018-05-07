@@ -124,16 +124,16 @@
             // PixelRepresentation, ...).
             var instanceId = id.split(':')[0];
             var requestPromise = instanceManager
-                .getTags(instanceId)
+                .getInfos(instanceId)
             // Download klv, extract metadata & decompress data to raw image
-                .then(function(tags) {
+                .then(function(infos) {
                     return pool
                         .queueTask({
                             type: 'getBinary',
                             id: id,
                             quality: quality,
                             headers: headers,
-                            tags: tags
+                            infos: infos
                         });
                 })
             // Reconstruct cornerstone object from buffer (we can't transfer pixel view through web worker -
@@ -445,7 +445,7 @@
         // Init worker pool
         var workerPool = new window.osimis.WorkerPool({
             path: /* @inline-worker: */ '/app/image/image-parser.worker/main.js',
-            workerCount: 5,
+            workerCount: 7, // with 5 workers, there are 4 concurrent downloads, with 10 workers: 6
             createPromiseFn: $q,
             taskPriorityPolicy: new osimis.TaskPriorityPolicy(cache) // @todo break dependency w/ cache
         });

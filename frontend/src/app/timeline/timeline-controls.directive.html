@@ -2,11 +2,11 @@
     <!--  @todo add tooltips -->
 
     <!-- Previous Button -->
-    <span 
+    <span
         ng-show="vm.series.imageCount > 1"
         ng-click="!vm.readonly && vm.series.goToPreviousImage()"
 
-        data-title="Previous" 
+        data-title="{{ 'COMPONENTS.TIMELINE.PREVIOUS' | translate | wvCapitalize }}"
         bs-tooltip data-placement="top"
         class="wv-timeline-controls-button"
     ><span class="fa fa-step-backward" class="wv-timeline-controls-vertical-sizing"></span></span>
@@ -19,15 +19,16 @@
 
             class="wv-timeline-controls-input"
             type="number" min="1" step="1" max="{{ vm.series.imageCount }}"
-        > of {{ vm.series.imageCount }}
+        > {{ "COMPONENTS.TIMELINE.OF" | translate }} {{ vm.series.imageCount }}
     </span>
 
     <!-- Next Button -->
-    <label 
+    <label
         ng-show="vm.series.imageCount > 1"
         ng-click="!vm.readonly && vm.series.goToNextImage()"
 
         bs-tooltip data-placement="top"
+        data-title="{{ 'COMPONENTS.TIMELINE.NEXT' | translate | wvCapitalize }}"
         class="wv-timeline-controls-button"
     >
         <span class="fa fa-step-forward" class="wv-timeline-controls-vertical-sizing"></span>

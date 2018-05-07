@@ -1,10 +1,12 @@
 <label 
     class="wvButton--underline fa fa-sun-o"
     ng-class="{
-        active: vm.selectedTool === 'windowing'
+        active: vm.selectedTool === 'windowing',
+        'wvLargeButton': vm.buttonSize == 'large'  
     }"
 >
     <input
+        id="toolbox-windowing-button"
         type="radio"
         style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"
         ng-disabled="vm.readonly"

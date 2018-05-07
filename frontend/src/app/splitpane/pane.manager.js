@@ -11,11 +11,13 @@
 (function(osimis) {
     'use strict';
 
-    function PaneManager(Promise, studyManager, seriesManager) {
+    function PaneManager(Promise, studyManager, seriesManager, $timeout, wvConfig) {
         // Injections.
         this._Promise = Promise;
         this._studyManager = studyManager;
         this._seriesManager = seriesManager;
+        this.$timeout = $timeout;
+        this._wvConfig = wvConfig;
 
         // Default config.
         this.layout = {
@@ -26,7 +28,7 @@
         // Panes.
         // Must keep reference as it's databound in `wvWebviewer` views.
         this.panes = [
-            new osimis.Pane(this._Promise, this._studyManager, this._seriesManager, 0, 0)
+            new osimis.Pane($timeout, this._Promise, this._studyManager, this._seriesManager, 0, 0, this._wvConfig)
         ];
         this.panes[0].isSelected = true;
 
@@ -36,6 +38,12 @@
         // @todo clean up viewed*Ids when selectable studies change?
 
         this.onSelectedPaneChanged = new osimis.Listener();
+    }
+
+    PaneManager.prototype.getSelectedPaneElement = function() {
+        var selectedPane = this.getSelectedPane();
+        var paneEl = $($('wv-pane-policy')[this.panes.indexOf(selectedPane)]); // @todo check if this safe
+        return paneEl;
     }
 
     /**
@@ -110,7 +118,7 @@
                     var pane = removedPanes.pop();
                     // If none exist, create a new one.
                     if (!pane) {
-                        pane = new osimis.Pane(this._Promise, this._studyManager, this._seriesManager, x, y);
+                        pane = new osimis.Pane(this.$timeout, this._Promise, this._studyManager, this._seriesManager, x, y, this._wvConfig);
                     }
                     // Otherwise, move the previously removed pane into its new
                     // position.
@@ -185,21 +193,28 @@
         ) {
             throw new Error('`csViewport` and `imageIndex` parameter can only be used with a series.');
         }
+        var _this = this;
+        var seriesId = config.seriesId;
+        this.$timeout(function(){
+            pane = _this.getPane(x, y)
+            if(pane.seriesId === seriesId){
+                // Set series as viewed.
+                if (config && config.seriesId) {
+                    _this.viewedSeriesIds = _.union([config.seriesId], _this.viewedSeriesIds);
+                }
 
-        // Set series as viewed.
-        if (config && config.seriesId) {
-            this.viewedSeriesIds = _.union([config.seriesId], this.viewedSeriesIds);
-        }
+                // Set video as viewed.
+                if (config && config.reportId) {
+                    _this.viewedReportIds = _.union([config.reportId], _this.viewedReportIds);
+                }
 
-        // Set video as viewed.
-        if (config && config.reportId) {
-            this.viewedReportIds = _.union([config.reportId], this.viewedReportIds);
-        }
-
-        // Set pdf/report as viewed.
-        if (config && config.videoId) {
-            this.viewedVideoIds = _.union([config.videoId], this.viewedVideoIds);
-        }
+                // Set pdf/report as viewed.
+                if (config && config.videoId) {
+                    _this.viewedVideoIds = _.union([config.videoId], _this.viewedVideoIds);
+                }
+            }
+        }, 1000);
+        
 
         // Update pane's config accordingly.
         var pane = this.getPane(x, y);
@@ -220,6 +235,18 @@
             this.onSelectedPaneChanged.trigger(newlySelectedPane);
         }
     };
+
+    PaneManager.prototype.getAllPanes = function(){
+        return this.panes;
+    }
+
+    PaneManager.prototype.isViewportItemDisplayed = function(itemId){
+        var isDisplayed = false;
+        this.panes.forEach(function(pane){
+            isDisplayed |= pane.seriesId === itemId || pane.videoId === itemId || pane.reportId === itemId;
+        })
+        return isDisplayed
+    }
 
     /**
      * @ngdoc method
@@ -279,6 +306,18 @@
         throw new Error('Assert: No selected pane.');
     }
 
+    PaneManager.prototype.getHoveredPane = function() {
+        // Return the selected pane.
+        for (var i=0; i<this.panes.length; ++i) {
+            var pane = this.panes[i];
+            if (pane.isHovered) {
+                return pane;
+            }
+        }
+
+        return undefined;
+    }
+
     /**
      * @ngdoc method
      * @methodOf osimis.PaneManager
@@ -298,11 +337,7 @@
         var previouslySelectedPane = this.getSelectedPane();
         var newlySelectedPane = this.getPane(x, y);
         
-        // Don't do anything if pane is empty.
         var newlySelectedPane = this.getPane(x, y);
-        if (newlySelectedPane.isEmpty()) {
-            return;
-        };
 
         // Unset previously selected pane
         previouslySelectedPane.isSelected = false;
@@ -313,6 +348,58 @@
         // Trigger selected pane changed event.
         this.onSelectedPaneChanged.trigger(newlySelectedPane);
     };
+
+    PaneManager.prototype.selectNextPane = function() {
+        var nextPanePosition = this.getNextPanePosition(this.getSelectedPane());
+        this.selectPane(nextPanePosition.x, nextPanePosition.y);
+    };
+
+    PaneManager.prototype.selectPreviousPane = function() {
+        var nextPanePosition = this.getPreviousPanePosition(this.getSelectedPane());
+        this.selectPane(nextPanePosition.x, nextPanePosition.y);
+    };
+
+    PaneManager.prototype.getNextPanePosition = function(pane) {
+        var currentSelectedPanePosition = pane.getPosition();
+
+        var nextX = currentSelectedPanePosition.x + 1;
+        var nextY = currentSelectedPanePosition.y;
+        if (nextX >= this.layout.x) {
+            nextX = 0;
+            nextY = nextY + 1;
+        }  
+        if (nextY >= this.layout.y) {
+            nextY = 0;
+        }
+
+        return {x : nextX, y : nextY};
+    }
+
+    PaneManager.prototype.getPreviousPanePosition = function(pane) {
+        var currentSelectedPanePosition = pane.getPosition();
+
+        var nextX = currentSelectedPanePosition.x - 1;
+        var nextY = currentSelectedPanePosition.y;
+        if (nextX < 0) {
+            nextX = this.layout.x - 1;
+            nextY = nextY - 1;
+        }  
+        if (nextY < 0  ) {
+            nextY = this.layout.y - 1;
+        }
+
+        return {x : nextX, y : nextY};
+    }
+
+    PaneManager.prototype.getNextPane = function(pane) {
+        var nextPanePosition = this.getNextPanePosition(pane);
+        return this.getPane(nextPanePosition.x, nextPanePosition.y);
+    }
+
+    PaneManager.prototype.getPreviousPane = function(pane) {
+        var nextPanePosition = this.getPreviousPanePosition(pane);
+        return this.getPane(nextPanePosition.x, nextPanePosition.y);
+    }
 
     /**
      * @ngdoc method
@@ -430,7 +517,7 @@
         .factory('wvPaneManager', wvPaneManager);
 
     /* @ngInject */
-    function wvPaneManager($q, wvStudyManager, wvSeriesManager) {
-        return new PaneManager($q, wvStudyManager, wvSeriesManager);
+    function wvPaneManager($q, wvStudyManager, wvSeriesManager, $timeout, wvConfig) {
+        return new PaneManager($q, wvStudyManager, wvSeriesManager, $timeout, wvConfig);
     }
 })(osimis || (this.osimis = {}));

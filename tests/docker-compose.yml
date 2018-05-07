@@ -12,7 +12,7 @@ services:
         build:
             context: ..
             dockerfile: DockerfileTestRunner
-        image: ${TEST_RUNNER_IMAGE} # no $TAG for caching reasons - fine unless we use parallel builds
+        image: ${TEST_RUNNER_IMAGE}:${TAG}
         environment:
             - ORTHANC_URL=http://orthanc:8042
         expose:

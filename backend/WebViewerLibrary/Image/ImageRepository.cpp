@@ -7,6 +7,7 @@
 
 #include <Core/OrthancException.h> // for throws
 #include <Core/DicomFormat/DicomMap.h>
+#include <Core/Enumerations.h>
 #include "../ViewerToolbox.h" // for OrthancPlugins::get*FromOrthanc && OrthancPluginImage
 #include "../BenchmarkHelper.h" // for BENCH(*)
 #include "../OrthancContextManager.h" // for context_ global
@@ -17,15 +18,40 @@
 #include "ImageContainer/CompressedImageContainer.h" // For orthanc pixeldata retrieval
 #include "ImageProcessingPolicy/PixelDataQualityPolicy.h" // For orthanc pixeldata retrieval
 #include "Utilities/ScopedBuffers.h"
+#include "ShortTermCache/CacheContext.h"
 
 namespace
 {
-void _loadDicomTags(Json::Value& jsonOutput, const std::string& instanceId);
-std::string _getAttachmentNumber(int frameIndex, const IImageProcessingPolicy* policy);
+  void _loadDicomTags(Json::Value& jsonOutput, const std::string& instanceId);
+  std::string _getAttachmentNumber(int frameIndex, const IImageProcessingPolicy* policy);
+  void ConvertRGB48ToRGB24(Orthanc::ImageAccessor& target,
+                           const Orthanc::ImageAccessor& source)
+  {
+    //  if (source.GetWidth() != target.GetWidth() ||
+    //      source.GetHeight() != target.GetHeight())
+    //  {
+    //    throw Orthanc::OrthancException(Orthanc::ErrorCode_IncompatibleImageSize);
+    //  }
+
+    for (unsigned int y = 0; y < source.GetHeight(); y++)
+    {
+      const uint16_t* p = reinterpret_cast<const uint16_t*>(source.GetConstRow(y));
+      uint8_t* q = reinterpret_cast<uint8_t*>(target.GetRow(y));
+
+      for (unsigned int x = 0; x < source.GetWidth(); x++)
+      {
+        q[0] = p[0] >> 8;
+        q[1] = p[1] >> 8;
+        q[2] = p[2] >> 8;
+        p += 3;
+        q += 3;
+      }
+    }
+  }
 }
 
-ImageRepository::ImageRepository(DicomRepository* dicomRepository)
-  : _dicomRepository(dicomRepository), _cachedImageStorageEnabled(true)
+ImageRepository::ImageRepository(DicomRepository* dicomRepository, CacheContext* cache)
+  : _dicomRepository(dicomRepository), _cachedImageStorageEnabled(true), _shortTermCacheContext(cache)
 {
 }
 
@@ -72,6 +98,12 @@ void ImageRepository::CleanImageCache(const std::string& instanceId, uint32_t fr
     error = OrthancPluginRestApiDeleteAfterPlugins(OrthancContextManager::Get(), url.c_str());
     // @todo manage error
   }
+}
+
+
+void ImageRepository::invalidateInstance(const std::string& instanceId)
+{
+  _dicomRepository->invalidateDicomFile(instanceId);
 }
 
 std::auto_ptr<Image> ImageRepository::_LoadImageFromOrthanc(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const {
@@ -138,20 +170,55 @@ std::auto_ptr<Image> ImageRepository::_LoadImageFromOrthanc(const std::string& i
 
     // Retrieve frame from dicom file
     OrthancPluginImage* frame = OrthancPluginDecodeDicomImage(OrthancContextManager::Get(),
-                  reinterpret_cast<const void*>(dicom.data), dicom.size, frameIndex);
+                                                              reinterpret_cast<const void*>(dicom.data), dicom.size, frameIndex);
 
-    // Clean DICOM file memory once the frame has been retrieved from the dicom file - @todo call on exception
-    _dicomRepository->decrefDicomFile(instanceId);
+    // Clean dicom file (at scope end)
+    BOOST_SCOPE_EXIT(_dicomRepository, &instanceId) {
+      _dicomRepository->decrefDicomFile(instanceId);
+    } BOOST_SCOPE_EXIT_END;
 
     // Throw exception if frame couldn't be decoded
     if (frame == NULL) {
       throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_IncompatibleImageFormat));
     }
 
-    // Store the frame inside a container
-    std::auto_ptr<RawImageContainer> data(new RawImageContainer(frame));
+    {// Store the frame inside a container
+      OrthancPluginPixelFormat pixelFormat = OrthancPluginGetImagePixelFormat(OrthancContextManager::Get(), frame);
 
-    image.reset(new Image(instanceId, frameIndex, data, dicomTags));
+      // if the image is RGB48, convert it to RGB24 asap
+      if (pixelFormat == OrthancPluginPixelFormat_RGB48) {
+        Orthanc::ImageAccessor sourceRgb48;
+        Orthanc::ImageAccessor destRgb24;
+
+        unsigned int width = OrthancPluginGetImageWidth(OrthancContextManager::Get(), frame);
+        unsigned int height = OrthancPluginGetImageHeight(OrthancContextManager::Get(), frame);
+
+        sourceRgb48.AssignReadOnly(Orthanc::PixelFormat_RGB48,
+                                   width,
+                                   height,
+                                   OrthancPluginGetImagePitch(OrthancContextManager::Get(), frame),
+                                   OrthancPluginGetImageBuffer(OrthancContextManager::Get(), frame)
+                                   );
+
+        Orthanc::ImageBuffer* destBuffer = new Orthanc::ImageBuffer(Orthanc::PixelFormat_RGB24,
+                                                                    width,
+                                                                    height,
+                                                                    false);
+
+        destRgb24 = destBuffer->GetAccessor();
+        ConvertRGB48ToRGB24(destRgb24, sourceRgb48);
+
+        std::auto_ptr<RawImageContainer> data(new RawImageContainer(destBuffer));
+
+        image.reset(new Image(instanceId, frameIndex, data, dicomTags));
+      }
+      else
+      {
+        std::auto_ptr<RawImageContainer> data(new RawImageContainer(frame));
+
+        image.reset(new Image(instanceId, frameIndex, data, dicomTags));
+      }
+    }
   }
 
   if (policy != NULL) {
@@ -227,42 +294,42 @@ void ImageRepository::_CacheProcessedImage(const std::string &attachmentNumber, 
 
 namespace
 {
-using namespace OrthancPlugins;
+  using namespace OrthancPlugins;
 
-void _loadDicomTags(Json::Value& jsonOutput, const std::string& instanceId)
-{
-  BENCH(LOAD_JSON);
-  if (!GetJsonFromOrthanc(jsonOutput, OrthancContextManager::Get(), "/instances/" + instanceId + "/simplified-tags")) {
-    throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
-  }
-}
-
-std::string _getAttachmentNumber(int frameIndex, const IImageProcessingPolicy* policy)
-{
-  assert(policy != NULL);
-
-  std::string attachmentNumber;
-  std::string policyString = policy->ToString();
-  int attachmentPrefix = 10000;
-  int maxFrameCount = 1000; // @todo use adaptative maxFrameCount !
-
-  // Except to cache only specified policies
-  assert(policyString == "pixeldata-quality" || policyString == "high-quality" || policyString == "medium-quality" ||
-         policyString == "low-quality");
-
-  if (policyString == "pixeldata-quality") {
-    attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 3 + frameIndex);
-  }
-  else if (policyString == "high-quality") {
-    attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 0 + frameIndex);
-  }
-  else if (policyString == "medium-quality") {
-    attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 1 + frameIndex);
-  }
-  else if (policyString == "low-quality") {
-    attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 2 + frameIndex);
+  void _loadDicomTags(Json::Value& jsonOutput, const std::string& instanceId)
+  {
+    BENCH(LOAD_JSON);
+    if (!GetJsonFromOrthanc(jsonOutput, OrthancContextManager::Get(), "/instances/" + instanceId + "/simplified-tags")) {
+      throw Orthanc::OrthancException(Orthanc::ErrorCode_UnknownResource);
+    }
   }
 
-  return attachmentNumber;
-}
+  std::string _getAttachmentNumber(int frameIndex, const IImageProcessingPolicy* policy)
+  {
+    assert(policy != NULL);
+
+    std::string attachmentNumber;
+    std::string policyString = policy->ToString();
+    int attachmentPrefix = 10000;
+    int maxFrameCount = 1000; // @todo use adaptative maxFrameCount !
+
+    // Except to cache only specified policies
+    assert(policyString == "pixeldata-quality" || policyString == "high-quality" || policyString == "medium-quality" ||
+           policyString == "low-quality");
+
+    if (policyString == "pixeldata-quality") {
+      attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 3 + frameIndex);
+    }
+    else if (policyString == "high-quality") {
+      attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 0 + frameIndex);
+    }
+    else if (policyString == "medium-quality") {
+      attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 1 + frameIndex);
+    }
+    else if (policyString == "low-quality") {
+      attachmentNumber = boost::lexical_cast<std::string>(attachmentPrefix + maxFrameCount * 2 + frameIndex);
+    }
+
+    return attachmentNumber;
+  }
 }

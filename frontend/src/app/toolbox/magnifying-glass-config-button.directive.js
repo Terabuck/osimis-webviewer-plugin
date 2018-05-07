@@ -18,7 +18,8 @@
                 magnificationLevel: '=wvMagnificationLevel',
                 magnifyingGlassSize: '=wvMagnifyingGlassSize',
                 readonly: '=?wvReadonly',
-                popoverPlacement: '@?wvPopoverPlacement'
+                popoverPlacement: '@?wvPopoverPlacement',
+                buttonSize: '@?wvButtonSize'
             },
             templateUrl: 'app/toolbox/magnifying-glass-config-button.directive.html'
         };
@@ -26,6 +27,7 @@
 
         function link(scope, element, attrs) {
             var vm = scope.vm;
+            vm.buttonSize = vm.buttonSize === undefined ? 'small' : vm.buttonSize;
 
             var buttonEl = element.children().first();
             
@@ -44,7 +46,7 @@
                 }
             });
 
-            buttonEl.bind('mouseout', function (e) {
+            buttonEl.bind('mouseleave', function (e) {
                 // Timeout to make sure the user can move it's cursor from the button
                 // to the popover without having the popover to hide in between.
                 $timeout(function () {
@@ -104,15 +106,6 @@
         //     enabled: false,
         //     magnificationLevel: 5
         //     magnifyingGlassSize: 400
-        // };
-
-
-        // Apply windowing preset to the selected pane.
-        // popoverScope.applyWindowing = function(windowWidth, windowCenter) {
-        //     _this.onWindowingPresetSelected({
-        //         $windowWidth: windowWidth,
-        //         $windowCenter: windowCenter
-        //     });
         // };
     }
 })();

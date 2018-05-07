@@ -1,13 +1,35 @@
+<!-- browser specific warning model -->
+<div ng-show="vm.openIncompatibleBrowserModal" class="wvWarning">
+    <div class="wvWarning-content clearfix">
+        <span class="wvWarning-text ">
+            <h2 class="mb10"><span class="fa fa-exclamation-triangle wvWarning-icon mr5"></span>Warning!</h2>
+            <p class="mn mb10" style="color:#000">
+            {{ 'GENERAL_PARAGRAPHS.INCOMPATIBLE_BROWSER' | translate }}
+            </h5>
+        </span> 
+    </div>
+    <div class="text-right mb10 mr10">
+        <button class="btn btn-primary" ng-click="vm.onCloseWarning()">OK</button>
+    </div>
+</div>
+
+<div class="wvScreenToSmallWarning">
+<div class="wvScreenToSmallWarning-content">
+<p>{{ 'GENERAL_PARAGRAPHS.SCREEN_TOO_SMALL' | translate | wvCapitalize }}</p>
+</div>
+</div>
 <wv-layout
     wv-topleft-enabled="$isTopLeftEnabled"
     wv-topright-enabled="$isTopRightEnabled"
     wv-right-enabled="$isRightEnabled"
+
+    wv-keyboard-shortcut
 >
     <!--
     Layout: top zones (1, 2, 3 and 4)
     -->
     <wv-layout-top
-        wv-enabled="vm.studyinformationEnabled || vm.toolbarEnabled || $isTopLeftEnabled || $isTopRightEnabled"
+        wv-enabled="vm.studyinformationEnabled || $isTopLeftEnabled || $isTopRightEnabled"
     >
         <!--
         Layout: top-left
@@ -16,7 +38,7 @@
         Parameterizable zone.
         The user of the `wvWebviewer` directive can inject content here. For
         instance, a button to quit the application, or a study list.
-        
+
         @example
         ```html
         <wv-webviewer ...>
@@ -30,7 +52,7 @@
 
         <!--
         Layout: top2
-    
+
         @description
         @todo
         -->
@@ -39,7 +61,7 @@
 
         <!--
         Layout: top3
-    
+
         @description
         Zone containing the study information.
         -->
@@ -52,7 +74,7 @@
 
         <!--
         Layout: top-right
-        
+
         @description
         Parameterizable zone.
         The user of the `wvWebviewer` directive can inject content here. For
@@ -93,20 +115,24 @@
 
     <!--
     Layout: left
-    
+
     @description
     Zone containing the study's information and the list of series.
     -->
     <wv-layout-left
         wv-enabled="vm.serieslistEnabled || vm.studyinformationEnabled"
         wv-handles-enabled="vm.leftHandlesEnabled"
+        wv-is-small="vm.studyIslandsDisplayMode === 'oneCol'"
+        wv-closed="vm.isAsideClosed"
     >
         <wv-layout-left1>
             <!-- Study Picker -->
-            <wv-studylist 
+            <wv-studylist
+                ng-if="vm.studyIslandsDisplayMode !== 'oneCol'"
                 class="float__left" style="max-width: calc(100% - 4.5rem);"
                 ng-show="vm.serieslistEnabled"
                 wv-readonly="vm.readonly"
+                wv-pickable-study-id-labels="vm.pickableStudyIdLabels"
                 wv-pickable-study-ids="vm.pickableStudyIds"
                 wv-selected-study-ids="vm.selectedStudyIds"
             ></wv-studylist>
@@ -114,28 +140,44 @@
             <!-- Display mode toggle -->
             <div
                 class="float__right wvButton"
-                ng-show="vm.studyIslandsDisplayMode !== 'grid'"
+                ng-show="vm.studyIslandsDisplayMode === 'oneCol'"
                 ng-click="vm.studyIslandsDisplayMode = 'grid'"
 
                 bs-tooltip
-                data-title="Grid Display"
+                data-title="{{ 'COMPONENTS.ASIDE_DISPLAY_MODE.GRID_DISPLAY' | translate | wvCapitalize }}"
                 placement="right"
             >
                 <span class="glyphicon glyphicon-th"></span>
             </div>
             <div
                 class="float__right wvButton"
-                ng-show="vm.studyIslandsDisplayMode !== 'list'"
+                ng-show="vm.studyIslandsDisplayMode === 'grid'"
                 ng-click="vm.studyIslandsDisplayMode = 'list'"
 
                 bs-tooltip
-                data-title="List Display"
+                data-title="{{ 'COMPONENTS.ASIDE_DISPLAY_MODE.LIST_DISPLAY' | translate | wvCapitalize }}"
                 placement="right"
             >
                 <span class="glyphicon glyphicon-th-list"></span>
             </div>
+            <div
+                class="float__right wvButton"
+                ng-show="vm.studyIslandsDisplayMode === 'list'"
+                ng-click="vm.studyIslandsDisplayMode = 'oneCol'"
+
+                bs-tooltip
+                data-title="{{ 'COMPONENTS.ASIDE_DISPLAY_MODE.ONE_COL_DISPLAY' | translate | wvCapitalize }}"
+                placement="right"
+            >
+                <span class="fa fa-ellipsis-v"></span>
+            </div>
+            <p ng-if="vm.displayDisclaimer && vm.studyIslandsDisplayMode !== 'oneCol'" class="clear disclaimer mbn">{{ "GENERAL_PARAGRAPHS.DISCLAIMER_PARAGRAPH" | translate }}</p>
+            <ng-transclude
+                ng-transclude-slot="wvLayoutLeftTop"
+            >
+            </ng-transclude>
         </wv-layout-left1>
-        
+
         <wv-layout-left2>
             <!-- Study Islands -->
             <wv-study-island
@@ -150,13 +192,14 @@
                 wv-selected-series-ids="vm.selectedSeriesIds[$studyId]"
                 wv-selected-report-ids="vm.selectedReportIds[$studyId]"
                 wv-selected-video-ids="vm.selectedVideoIds[$studyId]"
+                wv-show-no-report-icon="vm.showNoReportIconInSeriesList"
             ></wv-study-island>
         </wv-layout-left2>
 
         <wv-layout-left3>
             <!--
             Layout: left bottom
-            
+
             @description
             Parameterizablee zone.
             The user of the `wvWebviewer` directive can inject content here and
@@ -174,7 +217,7 @@
             -->
             <ng-transclude
                 ng-transclude-slot="wvLayoutLeftBottom"
-            >   
+            >
                 <!-- Default layout left bottom disabled -->
                 <wv-layout-left-bottom
                     ng-init="falseValue = false"
@@ -187,11 +230,11 @@
 
     <!--
     Layout: right
-    
+
     @description
     Parameterizable zone.
     The user of the `wvWebviewer` directive can inject content here and
-    configure advanced display options. Have a look at the `wvLayoutRight` 
+    configure advanced display options. Have a look at the `wvLayoutRight`
     directive for the advanced configuration.
 
     @todo ng-if to make sure javascript is loaded after layout-main one's
@@ -207,7 +250,7 @@
     -->
     <ng-transclude
         ng-transclude-slot="wvLayoutRight"
-    >   
+    >
         <!-- Default layout right disabled -->
         <wv-layout-right
             ng-init="falseValue = false"
@@ -242,14 +285,18 @@
         <!--
         Toolbar
         -->
-        <wv-toolbox 
+        <wv-toolbox
             ng-show="vm.toolbarEnabled"
             wv-readonly="vm.readonly"
             wv-toolbox-buttons="vm.tools"
             wv-active-tool="vm.activeTool"
             wv-position="vm.toolbarPosition"
             wv-on-action-clicked="vm.onActionClicked($action)"
+            wv-windowing-presets="vm.windowingPresets"
             wv-on-windowing-preset-selected="vm.onWindowingPresetSelected($windowWidth, $windowCenter);"
+            wv-toolbox-buttons-ordering="vm.toolboxButtonsOrdering"
+            wv-toolbox-buttons-size="vm.buttonsSize"
+            wv-layout-mode="vm.toolbarLayoutMode"
         ></wv-toolbox>
 
         <!--
@@ -258,8 +305,10 @@
         <wv-splitpane
             wv-readonly="vm.readonly"
             ng-class="{
-                'wvLayout__splitpane--toolbarAtTop': vm.toolbarEnabled && vm.toolbarPosition === 'top',
-                'wvLayout__splitpane--toolbarAtRight': vm.toolbarEnabled && vm.toolbarPosition === 'right'
+                'wvLayout__splitpane--toolbarAtTop': vm.toolbarEnabled && vm.buttonsSize == 'small' && vm.toolbarPosition === 'top',
+                'wvLayout__splitpane--toolbarAtRight': vm.toolbarEnabled && vm.buttonsSize == 'small' && vm.toolbarPosition === 'right',
+                'wvLayout__splitpane--bigToolbarAtRight': vm.toolbarEnabled && vm.buttonsSize == 'large' && vm.toolbarPosition === 'right',
+                'wvLayout__splitpane--bigToolbarAtTop': vm.toolbarEnabled && vm.buttonsSize == 'large' && vm.toolbarPosition === 'top',
             }"
         >
              <wv-pane-policy
@@ -289,42 +338,52 @@
                 -->
                 <wv-viewport
                     ng-if="!!$pane.seriesId"
-                    vp:series-id="$pane.seriesId" wv-size="{width: 1.0, height: 1.0}" wv-lossless="true"
-                    wv-series="$series" wv-image="$image"
+                    vp-series-id="$pane.seriesId" wv-size="{width: 1.0, height: 1.0}" wv-lossless="true"
+                    wv-series="$pane.series" wv-image="$image"
                     wv-droppable-series-ext="!vm.readonly && vm.serieslistEnabled"
                     wv-scroll-on-wheel-series-ext="!vm.readonly"
                     wv-viewport="$pane.csViewport"
                     wv-image-index="$pane.imageIndex"
 
-                    wv-mobile-viewport-tool="!vm.readonly && vm.mobileInteraction"
+                    wv-mobile-viewport-tool="!vm.readonly && vm.tools.combinedTool"
                     wv-windowing-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.windowing"
-                    wv-angle-measure-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.anglemeasure"
-                    wv-length-measure-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.lengthmeasure"
-                    wv-elliptical-roi-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.ellipticalroi"
+                    wv-angle-measure-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.angleMeasure"
+                    wv-simple-angle-measure-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.simpleAngleMeasure"
+                    wv-length-measure-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.lengthMeasure"
+                    wv-elliptical-roi-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.ellipticalRoi"
                     wv-zoom-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.zoom"
                     wv-pan-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.pan"
-                    wv-pixel-probe-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.pixelprobe"
-                    wv-rectangle-roi-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.rectangleroi"
+                    wv-pixel-probe-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.pixelProbe"
+                    wv-rectangle-roi-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.rectangleRoi"
                     wv-magnifying-glass-viewport-tool="!vm.readonly && !vm.mobileInteraction && {
-                        enabled: vm.activeTool === 'magnify',
+                        enabled: vm.tools.magnify.enabled,
                         magnificationLevel: vm.tools.magnify.magnificationLevel,
                         magnifyingGlassSize: vm.tools.magnify.magnifyingGlassSize
                     }"
+                    wv-arrow-annotate-viewport-tool="!vm.readonly && !vm.mobileInteraction && vm.tools.arrowAnnotate"
+                    wv-orientation-marker-viewport-tool
                 >
                     <!--
                     Overlay
                     -->
-                    <wv-overlay ng-if="vm.tools.overlay" wv-study-id="$series.studyId" wv-tags="$image.tags" wv-viewport="$pane.csViewport"></wv-overlay>
+                    <wv-overlay
+                        ng-if="vm.tools.overlay"
+                        wv-study-id="$pane.series.studyId"
+                        wv-tags="$image.instanceInfos.TagsSubset"
+                        wv-viewport="$pane.csViewport"
+                        wv-image="$image"
+                        wv-key-image-capture-enabled="vm.keyImageCaptureEnabled"
+                    ></wv-overlay>
 
                     <!--
                     Timeline.
 
-                    Always show the timeline — even if there is only 
-                    one image — until we develop a specific component 
+                    Always show the timeline — even if there is only
+                    one image — until we develop a specific component
                     to display the image quality
                     -->
                     <div class="wv-overlay-timeline-wrapper">
-                        <wv-timeline wv-series="$series" wv-readonly="vm.readonly"></wv-timeline>
+                        <wv-timeline wv-series="$pane.series" wv-readonly="vm.readonly" wv-reduce-timeline-height-on-single-frame-series="vm.reduceTimelineHeightOnSingleFrameSeries"></wv-timeline>
                     </div>
                 </wv-viewport>
 

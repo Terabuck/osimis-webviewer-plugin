@@ -43,7 +43,8 @@ std::auto_ptr<IImageContainer> Uint8ConversionPolicy::Apply(std::auto_ptr<IImage
 
   // Except 16bit image
   if (pixelFormat != Orthanc::PixelFormat_Grayscale16 &&
-      pixelFormat != Orthanc::PixelFormat_SignedGrayscale16)
+      pixelFormat != Orthanc::PixelFormat_SignedGrayscale16 &&
+      pixelFormat != Orthanc::PixelFormat_RGB48)
   {
     throw std::invalid_argument("Input is not 16bit");
     return std::auto_ptr<IImageContainer>(0);

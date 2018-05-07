@@ -6,16 +6,16 @@
             Notice
             -->
             <p class="wvToolbar__splitpaneConfigNotice">
-                Change the viewport layout.
+                {{ "COMPONENTS.TOOLBOX.SPLIT_PANE_CONFIG_LEGEND_PARAGRAPH" | translate }}
             </p>
 
             <div style="text-align: center;">
-                <!-- 
+                <!--
                 1x1 icon.
                 -->
                 <label
-                    class="wvToolbar__splitpaneConfigButton glyphicon glyphicon-stop""
-                    ng-class="{active: vm.tool === 'zoom'}"
+                    class="wvToolbar__splitpaneConfigButton glyphicon glyphicon-stop"
+                    ng-class="{wvLargeButton: vm.buttonSize === 'large'}"
                 >
                     <input
                         class="wvToolbar__splitpaneConfigButtonInput"
@@ -23,16 +23,16 @@
 
                         ng-disabled="vm.readonly"
                         ng-model="vm.splitpaneLayout"
-                        ng-value="{x: 1, y: 1}" 
+                        ng-value="{x: 1, y: 1}"
                     />
                 </label>
 
-                <!-- 
+                <!--
                 2x1 icon.
                 -->
                 <label
-                    class="wvToolbar__splitpaneConfigButton glyphicon glyphicon-pause""
-                    ng-class="{active: vm.tool === 'zoom'}"
+                    class="wvToolbar__splitpaneConfigButton glyphicon glyphicon-pause"
+                    ng-class="{wvLargeButton: vm.buttonSize === 'large'}"
                 >
                     <input
                         class="wvToolbar__splitpaneConfigButtonInput"
@@ -40,16 +40,16 @@
 
                         ng-disabled="vm.readonly"
                         ng-model="vm.splitpaneLayout"
-                        ng-value="{x: 2, y: 1}" 
+                        ng-value="{x: 2, y: 1}"
                     />
                 </label>
 
-                <!-- 
+                <!--
                 1x2 icon.
                 -->
                 <label
                     class="wvToolbar__splitpaneConfigButton--rotate glyphicon glyphicon-pause"
-                    ng-class="{active: vm.tool === 'zoom'}"
+                    ng-class="{wvLargeButton: vm.buttonSize === 'large'}"
                 >
                     <input
                         class="wvToolbar__splitpaneConfigButtonInput"
@@ -57,16 +57,16 @@
 
                         ng-disabled="vm.readonly"
                         ng-model="vm.splitpaneLayout"
-                        ng-value="{x: 1, y: 2}" 
+                        ng-value="{x: 1, y: 2}"
                     />
                 </label>
 
-                <!-- 
+                <!--
                 2x2 icon.
                 -->
                 <label
                     class="wvToolbar__splitpaneConfigButton glyphicon glyphicon-th-large"
-                    ng-class="{active: vm.tool === 'zoom'}"
+                    ng-class="{wvLargeButton: vm.buttonSize === 'large'}"
                 >
                     <input
                         class="wvToolbar__splitpaneConfigButtonInput"
@@ -74,7 +74,7 @@
 
                         ng-disabled="vm.readonly"
                         ng-model="vm.splitpaneLayout"
-                        ng-value="{x: 2, y: 2}" 
+                        ng-value="{x: 2, y: 2}"
                     />
                 </label>
               </div>

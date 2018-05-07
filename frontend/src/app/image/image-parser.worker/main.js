@@ -98,9 +98,9 @@ self.addEventListener('message', function(evt) {
         var id = evt.data.id;
         var quality = evt.data.quality;
         var headers = evt.data.headers;
-        var tags = evt.data.tags;
+        var infos = evt.data.infos;
 
-        getCommand(id, quality, headers, tags);
+        getCommand(id, quality, headers, infos);
         break;
     case 'abort':
         // Abort a getCommand.
@@ -127,21 +127,21 @@ function abortCommand() {
 }
 
 /** Get & Decompress Image from Orthanc **/
-function getCommand(id, quality, headers, tags) {
+function getCommand(id, quality, headers, infos) {
     if (_processingRequest) {
         throw new Error('Another request is already in process within worker thread.');
     }
 
     // Retrieve & process image data.
-    _processingRequest = new BinaryRequest(id, quality, headers, tags);
+    _processingRequest = new BinaryRequest(id, quality, headers, infos);
     _processingRequest.execute();
 }
 
-function BinaryRequest(id, quality, headers, tags) {
+function BinaryRequest(id, quality, headers, infos) {
     this.id = id;
     this.quality = quality;
-    this.tags = tags;
-    this.compressionFormatPromise = null;
+    this.infos = infos;
+    this.compressionFormat = null;
     this.headers = headers;
 
     // Parse url
@@ -155,64 +155,32 @@ function BinaryRequest(id, quality, headers, tags) {
     case Qualities.PIXELDATA:
         url = ImageApiURL + instanceId + '/' + frameIndex + '/pixeldata-quality';
 
-        // Compression format depends on transfer synthax - either jpeg or
-        // jpeg-lossless.
-        var transferSyntaxRequest = new osimis.HttpRequest();
-        transferSyntaxRequest.setResponseType('text');
-        transferSyntaxRequest.setHeaders(headers);
-        this.compressionFormatPromise = transferSyntaxRequest
-            .get(OrthancApiURL + '/instances/' + instanceId + '/metadata/TransferSyntax')
-            .then(function(response) {
-                var transferSyntax = response.data;
-                return transferSyntax;
-            }, function(error) {
-                // Request has failed. This is most likely because the
-                // TransferSyntax metadata isn't available (instance must
-                // either have been uploaded when Orthanc was at least 1.2.0 or
-                // have been processed with the `/reconstruct` route
-                // afterward).
-
-                // We thus send an Orthanc 1.1.0 compatible request, although
-                // much slower.
-                var transferSyntaxRequest2 = new osimis.HttpRequest();
-                transferSyntaxRequest2.setResponseType('json');
-                transferSyntaxRequest2.setHeaders(headers);
-
-                return transferSyntaxRequest2
-                    .get(OrthancApiURL + '/instances/' + instanceId + '/header?simplify')
-                    .then(function(response) {
-                        var transferSyntax = response.data.TransferSyntaxUID;
-                        return transferSyntax;
-                    });
-            })
-            .then(function(transferSyntax) {
-                switch(transferSyntax) {
-                // Lossy JPEG 8-bit Image Compression.
-                case '1.2.840.10008.1.2.4.50':
-                    return 'jpeg';
-                // JPEG Lossless, Nonhierarchical, First-Order Prediction
-                // (Default Transfer Syntax for Lossless JPEG Image
-                // Compression). -- jpeg FFC3
-                case '1.2.840.10008.1.2.4.70':
-                    return 'jpeg-lossless';
-                default:
-                    throw new Error('Unsupported transfer syntax ' + transferSyntax);
-                }
-
-            });
-
+        switch (infos.TransferSyntax) {
+            // Lossy JPEG 8-bit Image Compression.
+            case '1.2.840.10008.1.2.4.50':
+                this.compressionFormat = 'jpeg';
+                break;
+            // JPEG Lossless, Nonhierarchical, First-Order Prediction
+            // (Default Transfer Syntax for Lossless JPEG Image
+            // Compression). -- jpeg FFC3
+            case '1.2.840.10008.1.2.4.70':
+                this.compressionFormat = 'jpeg-lossless';
+                break;
+            default:
+                throw new Error('Unsupported transfer syntax ' + infos.TransferSyntax);
+        }
         break;
     case Qualities.LOSSLESS:
         url = ImageApiURL + instanceId + '/' + frameIndex + '/high-quality';
-        this.compressionFormatPromise = Promise.resolve('png');
+        this.compressionFormat = 'png';
         break;
     case Qualities.MEDIUM:
         url = ImageApiURL + instanceId + '/' + frameIndex + '/medium-quality';
-        this.compressionFormatPromise = Promise.resolve('jpeg');
+        this.compressionFormat = 'jpeg';
         break;
     case Qualities.LOW:
         url = ImageApiURL + instanceId + '/' + frameIndex + '/low-quality';
-        this.compressionFormatPromise = Promise.resolve('jpeg');
+        this.compressionFormat = 'jpeg';
         break;
     default:
         _processingRequest = null; // cleaning request
@@ -229,18 +197,17 @@ BinaryRequest.prototype.execute = function() {
     var request = this.request;
     var url = this.url;
     var quality = this.quality;
-    var compressionFormatPromise = this.compressionFormatPromise;
-    var tags = this.tags;
+    var compressionFormat = this.compressionFormat;
+    var infos = this.infos;
 
     // Trigger request
     Promise
         .all([
-            request.get(url),
-            compressionFormatPromise
+            request.get(url)
         ])
         .then(function(resp) {
             var imageResponse = resp[0];
-            var compressionFormat = resp[1];
+            // var compressionFormat = resp[1];
 
             // Variable sent as a response to the main thread.
             var cornerstoneMetaData = null;
@@ -250,7 +217,7 @@ BinaryRequest.prototype.execute = function() {
             // Process data.
             try {
                 // Process all the data out of the klv.
-                var parsedKlv = new osimis.ParsedKlv(compressionFormat, imageResponse.data, tags);
+                var parsedKlv = new osimis.ParsedKlv(compressionFormat, imageResponse.data, infos.TagsSubset);
 
                 // Get decompressed image.
                 pixelArray = parsedKlv.getPixels();

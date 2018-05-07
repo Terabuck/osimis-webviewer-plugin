@@ -80,7 +80,7 @@
                     }
                     
                     series.goToImage(0); // start from first image
-                    series.play();
+                    series.playPreview();
                 });
             });
         }
@@ -92,7 +92,7 @@
                         return;
                     }
 
-                    series.pause();
+                    series.pausePreview();
                     series.goToImage(series.imageCount/2); // go back to middle image
                 });
             });

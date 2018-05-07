@@ -13,10 +13,12 @@
  */
 struct ImageQuality {
   enum EImageQuality {
-    LOW,
-    MEDIUM,
-    LOSSLESS, // lossless PNG compressed
-    PIXELDATA // Without transcoding (pixeldata from dicomfile)
+    NONE = 0,
+
+    LOW = 1,
+    MEDIUM = 2,
+    LOSSLESS = 3, // lossless PNG compressed
+    PIXELDATA = 4 // Without transcoding (pixeldata from dicomfile)
   };
 
   ImageQuality(EImageQuality quality) : _quality(quality) {}
@@ -43,6 +45,33 @@ struct ImageQuality {
       return "pixeldata";
     }
   }
+
+  inline std::string toProcessingPolicytString() const {
+    switch(_quality) {
+    case LOW:
+      return "low-quality";
+    case MEDIUM:
+      return "medium-quality";
+    case LOSSLESS:
+      return "high-quality";
+    case PIXELDATA:
+      return "pixeldata-quality";
+    }
+  }
+
+  static inline EImageQuality fromProcessingPolicytString(const std::string& processingPolicyString) {
+    if (processingPolicyString == "low-quality")
+        return LOW;
+    if (processingPolicyString == "medium-quality")
+        return MEDIUM;
+    if (processingPolicyString == "high-quality")
+        return LOSSLESS;
+    if (processingPolicyString == "pixeldata-quality")
+        return PIXELDATA;
+
+    return NONE;
+  }
+
 
 private:
   const EImageQuality _quality;

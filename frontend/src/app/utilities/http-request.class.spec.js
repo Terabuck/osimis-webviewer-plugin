@@ -106,8 +106,7 @@ describe('http', function() {
                         error: 12,
                         comment: 'Hey there'
                     });
-                })
-                ;
+                });
 
             // Send all the requests from the fake backend
             _server.respond();

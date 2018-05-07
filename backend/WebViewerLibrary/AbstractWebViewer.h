@@ -9,7 +9,8 @@ class ImageRepository;
 class SeriesRepository;
 class AnnotationRepository;
 class WebViewerConfiguration;
-
+class CacheContext;
+class InstanceRepository;
 /**
  * The `AbstractWebViewer` class parses the config and serves both frontend and backend of the webviewer.
  * 
@@ -29,8 +30,10 @@ protected:
   std::auto_ptr<DicomRepository> _dicomRepository;
   std::auto_ptr<ImageRepository> _imageRepository;
   std::auto_ptr<SeriesRepository> _seriesRepository;
+  std::auto_ptr<InstanceRepository> _instanceRepository;
   std::auto_ptr<AnnotationRepository> _annotationRepository;
   std::auto_ptr<WebViewerConfiguration> _config;
+  std::auto_ptr<CacheContext> _cache;
 
   /**
    * Set the configuration, used to fill the `_config` instance variable.

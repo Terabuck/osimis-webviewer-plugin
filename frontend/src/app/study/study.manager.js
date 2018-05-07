@@ -14,7 +14,7 @@
         .factory('wvStudyManager', wvStudyManager);
 
     /* @ngInject */
-    function wvStudyManager($q, $rootScope, wvConfig) {
+    function wvStudyManager($q, $rootScope, wvConfig, wvSeriesManager, wvVideoManager, wvPdfInstanceManager) {
         var service = {
             /**
              * @ngdoc method
@@ -169,14 +169,48 @@
                             data.PatientMainDicomTags
                         );
 
-                        var newStudy = new osimis.Study(
-                            $q,
-                            _this, 
-                            id,
-                            tags
-                        );
+                        // load series via the wvSeriesManager to get the right postfix in the seriesId
+                        // in order to get consistent with the multiFrame instances
+                        // (for example: used to get the eye symbol for the viewedSeriesId array in the paneManager)
+                        
+                        // Series
+                        // Pdf
+                        // Video
 
-                        return newStudy;
+                        // Update video & pdf instance ids (once the series 
+                        // have been loaded since the series manager request 
+                        // will load the pdf instances too in one single HTTP
+                        // request).
+                        return $q.all({
+                            videoIds: /* @todo vm.videoDisplayEnabled && */ $q.all(wvVideoManager.listInstanceIdsFromOrthancStudyId(id)),
+                            pdfInstances: $q.all(wvPdfInstanceManager.listFromOrthancStudyId(id)),
+                            series: wvSeriesManager.listFromOrthancStudyId(id)
+                        })
+                        .then(function(data) {
+                            var seriesIds = data.series.map(function(series){
+                                return series.id;
+                            });
+                            var videoIds = data.videoIds;
+                            var pdfInstanceIds = _.keys(data.pdfInstances).length && data.pdfInstances.map(function(pdfInstance) {
+                                return pdfInstance.id;
+                            });
+                            if(pdfInstanceIds === 0){
+                                pdfInstanceIds = [];
+                            }
+
+                            var newStudy = new osimis.Study(
+                                $q,
+                                _this,
+                                wvSeriesManager,
+                                id,
+                                tags,
+                                seriesIds,
+                                pdfInstanceIds,
+                                videoIds
+                            );
+
+                            return newStudy;
+                        });
                     });
             }
 

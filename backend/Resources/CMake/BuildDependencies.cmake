@@ -23,12 +23,17 @@ include(${ORTHANC_DIR}/Resources/CMake/GoogleTestConfiguration.cmake)
 # Set orthanc config
 add_definitions(
   -DORTHANC_SQLITE_STANDALONE=1
+  -DORTHANC_SANDBOXED=0
   )
 
 add_definitions(
   -DORTHANC_ENABLE_MD5=0
   -DORTHANC_ENABLE_BASE64=0
   -DORTHANC_ENABLE_LOGGING=0
+  -DORTHANC_ENABLE_LOCALE=0
+  -DORTHANC_ENABLE_PUGIXML=0
+  -DORTHANC_ENABLE_SQLITE=1
+  -DORTHANC_SQLITE_VERSION=3007013
   )
 
 # Include orthanc
@@ -40,7 +45,7 @@ include_directories(SYSTEM ${LOCAL_DEPENDENCIES_DIR}/gil-2_1_1/)
 
 # Check that the Orthanc SDK headers are available or download them
 if (STATIC_BUILD OR NOT USE_SYSTEM_ORTHANC_SDK)
-  include_directories(${ORTHANC_DIR}/Sdk-1.1.0)
+  include_directories(${ORTHANC_DIR}/Sdk-1.3.1)
 else ()
   CHECK_INCLUDE_FILE_CXX(orthanc/OrthancCPlugin.h HAVE_ORTHANC_H)
   if (NOT HAVE_ORTHANC_H)
@@ -71,6 +76,7 @@ add_library(WebViewerDependencies
   ${ORTHANC_DIR}/Core/SQLite/StatementReference.cpp
   ${ORTHANC_DIR}/Core/SQLite/Transaction.cpp
   ${ORTHANC_DIR}/Core/Toolbox.cpp
+  ${ORTHANC_DIR}/Core/SystemToolbox.cpp
   ${ORTHANC_DIR}/Core/Uuid.cpp
   ${ORTHANC_DIR}/Core/DicomFormat/DicomMap.cpp
   ${ORTHANC_DIR}/Core/DicomFormat/DicomTag.cpp

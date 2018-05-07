@@ -69,8 +69,8 @@
              * @param {string} instanceId
              * Id of the instance (in orthanc format) containing the PDF.
              * 
-             * @param {object} instancesTags
-             * Hash of the instance's tags
+             * @param {object} instancesInfos
+             * Hash of the instance's infos
              * 
              * @param {string} seriesId
              * Id of the series (in vw format) containing the PDF instance.
@@ -148,7 +148,7 @@
                 });
         }
 
-        function setPdfInstance(instanceId, instanceTags, seriesId, studyId) {
+        function setPdfInstance(instanceId, instanceInfos, seriesId, studyId) {
             // Don't double cache instance.
             if (_pdfInstancesByInstanceId[instanceId]) {
                 return;
@@ -158,7 +158,7 @@
             var pdfInstance = new osimis.PdfInstance(
                 this,
                 instanceId,
-                instanceTags
+                instanceInfos.TagsSubset
             );
 
             // Always wrap models in a promise to stay consistant with the API.

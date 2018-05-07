@@ -6,7 +6,7 @@
             Notice
             -->
             <p class="wvToolbar__windowingPresetConfigNotice">
-                Click on the button to toggle the windowing tool or apply a preset to the selected viewport.
+                {{ "COMPONENTS.TOOLBOX.WINDOWING_PRESET_LEGEND" | translate }}
             </p>
 
             <ul class="wvToolbar__windowingPresetList">
@@ -22,50 +22,15 @@
                 </li>
 
                 <!--
-                CT Lung
+                Windowing presets as set in the orthanc config file (or the
+                default ones).
                 -->
                 <li class="wvToolbar__windowingPresetListItem"
-                    ng-click="applyWindowing(1600, -400)"
+                    ng-repeat="voi in windowingPresets "
+                    ng-click="applyWindowing(voi.windowWidth, voi.windowCenter)"
                 >
-                    CT Lung <small>(L -400, W 1600)</small>
+                    {{voi.name}} <small>(L {{voi.windowCenter | number:0}}, W {{voi.windowWidth | number:0}})</small>
                 </li>
-
-                <!--
-                CT Abdomen
-                -->
-                <li class="wvToolbar__windowingPresetListItem"
-                    ng-click="applyWindowing(400, 60)"
-                >
-                    CT Abdomen <small>(L 60, W 400)</small>
-                </li>
-
-                <!--
-                CT Bone
-                -->
-                <li class="wvToolbar__windowingPresetListItem"
-                    ng-click="applyWindowing(1500, 300)"
-                >
-                    CT Bone <small>(L 300, W 1500)</small>
-                </li>
-
-                <!--
-                CT Brain
-                -->
-                <li class="wvToolbar__windowingPresetListItem"
-                    ng-click="applyWindowing(80, 40)"
-                >
-                    CT Brain <small>(L 40, W 80)</small>
-                </li>
-
-                <!--
-                CT Chest
-                -->
-                <li class="wvToolbar__windowingPresetListItem"
-                    ng-click="applyWindowing(400, 40)"
-                >
-                    CT Chest <small>(L40, W 400)</small>
-                </li>
-
                 <!--
                 @todo
                 <li class="wvToolbar__windowingPresetListItem"
@@ -76,15 +41,6 @@
                 -->
 
                 <!--
-                CT Angio
-                -->
-                <li class="wvToolbar__windowingPresetListItem"
-                    ng-click="applyWindowing(600, 300)"
-                >
-                    CT Angio <small>(L 300, W 600)</small>
-                </li>
-
-                <!--
                 @todo
                 <li class="wvToolbar__windowingPresetListItem"
                     ng-click="applyWindowing()"
@@ -93,7 +49,7 @@
                 </li>
                 -->
 
-                <!-- 
+                <!--
                 @todo
                 <li class="wvToolbar__windowingPresetListItem"
                     ng-click="applyWindowing()"

@@ -18,35 +18,47 @@
 #include "OrthancContextManager.h"
 #include "BaseController.h"
 #include "Instance/DicomRepository.h"
+#include "Instance/InstanceRepository.h"
 #include "Study/StudyController.h"
 #include "Series/SeriesRepository.h"
 #include "Series/SeriesController.h"
 #include "Image/ImageRepository.h"
 #include "Image/ImageController.h"
+#include "Language/LanguageController.h"
 #include "Annotation/AnnotationRepository.h"
 #include "Config/ConfigController.h"
 #include "Config/WebViewerConfiguration.h"
-#include "DecodedImageAdapter.h"
+#include "ShortTermCache/CacheContext.h"
+#include "ShortTermCache/CacheScheduler.h"
+#include "ShortTermCache/ViewerPrefetchPolicy.h"
+#include "SeriesInformationAdapter.h"
 
 namespace
 {
   // Needed locally for use by orthanc's callbacks
   OrthancPluginContext* _context;
+  CacheContext* _cache = NULL;
+  InstanceRepository* _instanceRepository = NULL;
   const WebViewerConfiguration* _config;
 
   void _configureDicomDecoderPolicy();
-  
+  void _configureOnChangeCallback();
+
   OrthancPluginErrorCode _decodeImageCallback(OrthancPluginImage** target,
-                                               const void* dicom,
-                                               const uint32_t size,
-                                               uint32_t frameIndex);
-  
+                                              const void* dicom,
+                                              const uint32_t size,
+                                              uint32_t frameIndex);
+
+  OrthancPluginErrorCode _onChangeCallback(OrthancPluginChangeType changeType,
+                                           OrthancPluginResourceType resourceType,
+                                           const char* resourceId);
+
   bool _isTransferSyntaxEnabled(const void* dicom,
-                                 const uint32_t size);
+                                const uint32_t size);
 
   bool _extractTransferSyntax(std::string& transferSyntax,
-                               const void* dicom,
-                               const uint32_t size);
+                              const void* dicom,
+                              const uint32_t size);
 
   bool _displayPerformanceWarning();
 }
@@ -94,10 +106,12 @@ void AbstractWebViewer::_serveBackEnd()
   ConfigController::setConfig(_config.get());
   
   // Register routes & controllers
+  // Note: if you add some routes here, don't forget to add them in the authorization plugin
   RegisterRoute<ImageController>("/osimis-viewer/images/");
   RegisterRoute<SeriesController>("/osimis-viewer/series/");
   RegisterRoute<ConfigController>("/osimis-viewer/config.js");
   RegisterRoute<StudyController>("/osimis-viewer/studies/");
+  RegisterRoute<LanguageController>("/osimis-viewer/languages/");
 
   // OrthancPluginRegisterRestCallbackNoLock(_context, "/osimis-viewer/is-stable-series/(.*)", IsStableSeries);
 }
@@ -114,8 +128,9 @@ AbstractWebViewer::AbstractWebViewer(OrthancPluginContext* context)
 
   // Instantiate repositories @warning member declaration order is important
   _dicomRepository.reset(new DicomRepository);
-  _imageRepository.reset(new ImageRepository(_dicomRepository.get()));
-  _seriesRepository.reset(new SeriesRepository(_dicomRepository.get()));
+  _imageRepository.reset(new ImageRepository(_dicomRepository.get(), _cache.get()));
+  _instanceRepository.reset(new InstanceRepository(_context));
+  _seriesRepository.reset(new SeriesRepository(_dicomRepository.get(), _instanceRepository.get()));
   _annotationRepository.reset(new AnnotationRepository);
 
   // Inject repositories within controllers (we can't do it without static method
@@ -124,6 +139,8 @@ AbstractWebViewer::AbstractWebViewer(OrthancPluginContext* context)
   ImageController::Inject(_imageRepository.get());
   ImageController::Inject(_annotationRepository.get());
   SeriesController::Inject(_seriesRepository.get());
+
+  ::_instanceRepository = _instanceRepository.get();
 }
 
 int32_t AbstractWebViewer::start()
@@ -155,12 +172,52 @@ int32_t AbstractWebViewer::start()
   // Share the config with the _decodeImageCallback and other orthanc callbacks
   ::_config = _config.get();
 
+  if (_config->shortTermCacheEnabled) {
+    _cache.reset(new CacheContext(_config->shortTermCachePath.string(),
+                                  _context,
+                                  _config->shortTermCacheDebugLogsEnabled,
+                                  _config->shortTermCachePrefetchOnInstanceStored,
+                                  _seriesRepository.get())
+                 );
+    ::_cache = _cache.get();
+
+    OrthancPlugins::CacheScheduler& scheduler = _cache->GetScheduler();
+    scheduler.RegisterPolicy(new OrthancPlugins::ViewerPrefetchPolicy(_context, _seriesRepository.get()));
+    scheduler.Register(CacheBundle_SeriesInformation,
+                       new OrthancPlugins::SeriesInformationAdapter(_context, scheduler), 1);
+    /* Set the quotas */
+    scheduler.SetQuota(CacheBundle_SeriesInformation, 1000, 0);    // Keep info about 1000 series
+
+    scheduler.Register(CacheBundle_DecodedImage,
+                       new ImageControllerCacheFactory(_imageRepository.get()),
+                       _config->shortTermCacheDecoderThreadsCound);
+    scheduler.SetQuota(CacheBundle_DecodedImage, 0, static_cast<uint64_t>(_config->shortTermCacheSize) * 1024 * 1024);
+
+    ImageController::Inject(_cache.get());
+  }
+
+  _instanceRepository->EnableCachingInMetadata(_config->instanceInfoCacheEnabled);
+
+  if (_config->keyImageCaptureEnabled) {
+    // register the OsimisNote tag
+    OrthancPluginRegisterDictionaryTag(_context,
+                                       0x7331,
+                                       0x1000,
+                                       OrthancPluginValueRepresentation_LT,
+                                       "OsimisNote",
+                                       1,
+                                       1
+                                       );
+  }
+
   // Inject configuration within components
-  _imageRepository->enableCachedImageStorage(_config->cachedImageStorageEnabled);
+  _imageRepository->enableCachedImageStorage(_config->persistentCachedImageStorageEnabled);
   _annotationRepository->enableAnnotationStorage(_config->annotationStorageEnabled);
 
   // Configure DICOM decoder policy (GDCM/internal)
   _configureDicomDecoderPolicy();
+
+  _configureOnChangeCallback();
 
   // Register routes
   _serveBackEnd();
@@ -173,10 +230,46 @@ int32_t AbstractWebViewer::start()
 AbstractWebViewer::~AbstractWebViewer()
 {
   OrthancPluginLogWarning(_context, "Finalizing the Web viewer");
+  ::_instanceRepository = NULL;
 }
 
 namespace
 {
+  void _configureOnChangeCallback()
+  {
+    if (::_cache !=NULL)
+    {
+      OrthancPluginRegisterOnChangeCallback(::_context, _onChangeCallback);
+    }
+  }
+
+  OrthancPluginErrorCode _onChangeCallback(OrthancPluginChangeType changeType,
+                                           OrthancPluginResourceType resourceType,
+                                           const char* resourceId)
+  {
+    try
+    {
+      if (changeType == OrthancPluginChangeType_NewInstance &&
+          resourceType == OrthancPluginResourceType_Instance)
+      {
+        ::_instanceRepository->SignalNewInstance(resourceId);
+        ::_cache->SignalNewInstance(resourceId);
+      }
+
+      return OrthancPluginErrorCode_Success;
+    }
+    catch (std::runtime_error& e)
+    {
+      OrthancPluginLogError(::_context, e.what());
+      return OrthancPluginErrorCode_Success;  // Ignore error
+    }
+    catch (...)
+    {
+      OrthancPluginLogError(::_context, "unexpected error in onChangeCallback");
+      return OrthancPluginErrorCode_Success;  // Ignore error
+    }
+  }
+
   void _configureDicomDecoderPolicy()
   {
     // Configure the DICOM decoder
@@ -193,9 +286,9 @@ namespace
   }
 
   OrthancPluginErrorCode _decodeImageCallback(OrthancPluginImage** target,
-                                               const void* dicom,
-                                               const uint32_t size,
-                                               uint32_t frameIndex)
+                                              const void* dicom,
+                                              const uint32_t size,
+                                              uint32_t frameIndex)
   {
     try
     {
@@ -230,10 +323,15 @@ namespace
       OrthancPluginLogError(::_context, s.c_str());
       return OrthancPluginErrorCode_Plugin;
     }
+    catch (...)
+    {
+      OrthancPluginLogError(::_context, "unexpected error in decodeImageCallback");
+      return OrthancPluginErrorCode_Plugin;
+    }
   }
 
   bool _isTransferSyntaxEnabled(const void* dicom,
-                                 const uint32_t size)
+                                const uint32_t size)
   {
     std::string formattedSize;
 
@@ -253,7 +351,7 @@ namespace
     std::string transferSyntax;
     if (!_extractTransferSyntax(transferSyntax, dicom, size))
     {
-      std::string s = ("Cannot extract the transfer syntax of this instance of " + 
+      std::string s = ("Cannot extract the transfer syntax of this instance of " +
                        formattedSize + ", will use GDCM to decode it");
       OrthancPluginLogInfo(::_context, s.c_str());
       return true;
@@ -262,14 +360,14 @@ namespace
     if (_config->enabledTransferSyntaxes.find(transferSyntax) != _config->enabledTransferSyntaxes.end())
     {
       // Decoding for this transfer syntax is enabled
-      std::string s = ("Using GDCM to decode this instance of " + 
+      std::string s = ("Using GDCM to decode this instance of " +
                        formattedSize + " with transfer syntax " + transferSyntax);
       OrthancPluginLogInfo(::_context, s.c_str());
       return true;
     }
     else
     {
-      std::string s = ("Won't use GDCM to decode this instance of " + 
+      std::string s = ("Won't use GDCM to decode this instance of " +
                        formattedSize + ", as its transfer syntax " + transferSyntax + " is disabled");
       OrthancPluginLogInfo(::_context, s.c_str());
       return false;
@@ -277,8 +375,8 @@ namespace
   }
 
   bool _extractTransferSyntax(std::string& transferSyntax,
-                               const void* dicom,
-                               const uint32_t size)
+                              const void* dicom,
+                              const uint32_t size)
   {
     Orthanc::DicomMap header;
     if (!Orthanc::DicomMap::ParseDicomMetaInformation(header, reinterpret_cast<const char*>(dicom), size))
@@ -307,7 +405,7 @@ namespace
   {
     (void) _displayPerformanceWarning;   // Disable warning about unused function
     OrthancPluginLogWarning(_context, "Performance warning in Web viewer: "
-                            "Non-release build, runtime debug assertions are turned on");
+                                      "Non-release build, runtime debug assertions are turned on");
     return true;
   }
 

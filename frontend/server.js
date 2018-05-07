@@ -1,7 +1,7 @@
 /*jshint node:true*/
 
-// This server purpose is for development only, in production, the frontend is served by the C++ Plugin:
-// see `backend/` folder.
+// This server purpose is for development only, in production, the frontend is
+// served by the C++ Plugin: see `backend/` folder.
 
 'use strict';
 
@@ -25,26 +25,44 @@ console.log('About to crank up node');
 console.log('PORT=' + port);
 console.log('NODE_ENV=' + environment);
 
+function wait(seconds){
+    /**
+     * Needed to test with latency in dev
+     */
+    var waitTill = new Date(new Date().getTime() + seconds * 1000);
+    while(waitTill > new Date()){}
+}
+
 // setting proxies
 var orthancProxy = httpProxy.createProxyServer();
 var orthancUrl = 'http://localhost:8042';
 
 // avoid crash on request cancel
 orthancProxy.on('error', function (err, req, res) {
+    console.log('crash avoided?');
 });
 
 app.all('/config.js', function(req, res, next) {
-    // Prefix config.js with osimis-viewer/. The proxy has lost the "osimis-viewer" because it's the
-    // relative path `../config.js` -> `/../config.js` -> `/config.js`
+    // Prefix config.js with osimis-viewer/. The proxy has lost the "osimis-
+    // viewer" because it's the relative path `../config.js` -> `/../config.js`
+    // -> `/config.js`
     req.url = '/osimis-viewer/' + req.url;
     next();
-})
+});
+app.all('/osimis-viewer/languages/*', function(req, res, next){
+    var splittedUrl = req.url.split('/osimis-viewer/languages/');
+    console.log('trying to get language', req.url, splittedUrl);
+    req.url = '/languages/' + splittedUrl[1] + ".json";
+    wait(2);
+    next()
+});
 app.all("/:service/*", function(req, res, next) {
     var toRedirectToOrthanc = [
         'osimis-viewer',
         'studies',
         'instances',
-        'series'
+        'series',
+        'tools'
     ];
 
     // Keep serving
@@ -55,8 +73,9 @@ app.all("/:service/*", function(req, res, next) {
     else {
         console.log('redirecting ' + req.url + ' to Orthanc server ' + orthancUrl);
 
-        // There's a problem when handling post requests, replace the bodyParser middleware as in https://github.com/nodejitsu/node-http-proxy/issues/180
-        // and handle manually the body parsing
+        // There's a problem when handling post requests, replace the
+        // bodyParser middleware as in https://github.com/nodejitsu/node-http-
+        // proxy/issues/180 and handle manually the body parsing
         req.removeAllListeners('data');
         req.removeAllListeners('end');
 
@@ -71,7 +90,7 @@ app.all("/:service/*", function(req, res, next) {
             }
             req.emit('end');
         });
-        
+
         orthancProxy.web(req, res, {target: orthancUrl});
     }
 });
@@ -80,7 +99,8 @@ switch (environment){
     case 'build':
         console.log('** BUILD **');
         app.use(express.static('./build/'));
-        // Any invalid calls for templateUrls are under app/* and should return 404
+        // Any invalid calls for templateUrls are under app/* and should return
+        // 404
         app.use('/app/*', function(req, res, next) {
             // @todo 404
             // four0four.send404(req, res);
@@ -100,7 +120,8 @@ switch (environment){
         app.use(express.static('./src/'));
         app.use(express.static('./'));
 
-        // Any invalid calls for templateUrls are under app/* and should return 404
+        // Any invalid calls for templateUrls are under app/* and should return
+        // 404
         app.use('/app/*', function(req, res, next) {
             // @todo 404
             // four0four.send404(req, res);

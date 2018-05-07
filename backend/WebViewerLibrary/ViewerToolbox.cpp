@@ -414,6 +414,21 @@ namespace OrthancPlugins
     }
   }
 
+  bool GetBoolValue(const Json::Value& configuration,
+                    const std::string& key,
+                    bool defaultValue)
+  {
+    if (configuration.type() != Json::objectValue ||
+        !configuration.isMember(key) ||
+        configuration[key].type() != Json::booleanValue)
+    {
+      return defaultValue;
+    }
+    else
+    {
+      return configuration[key].asBool();
+    }
+  }
 
   OrthancPluginPixelFormat Convert(Orthanc::PixelFormat format)
   {
@@ -427,6 +442,9 @@ namespace OrthancPlugins
 
       case Orthanc::PixelFormat_RGB24:
         return OrthancPluginPixelFormat_RGB24;
+
+      case Orthanc::PixelFormat_RGB48:
+        return OrthancPluginPixelFormat_RGB48;
 
       case Orthanc::PixelFormat_RGBA32:
         return OrthancPluginPixelFormat_RGBA32;
@@ -452,6 +470,9 @@ namespace OrthancPlugins
 
       case OrthancPluginPixelFormat_RGB24:
         return Orthanc::PixelFormat_RGB24;
+
+      case OrthancPluginPixelFormat_RGB48:
+        return Orthanc::PixelFormat_RGB48;
 
       case OrthancPluginPixelFormat_RGBA32:
         return Orthanc::PixelFormat_RGBA32;

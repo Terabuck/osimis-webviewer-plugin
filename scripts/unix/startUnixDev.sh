@@ -8,17 +8,9 @@
 # The testable page is located at: `http://127.0.0.1:9966/`
 # 
 # @pre
-# See `scripts/osx/InstallOsXDependencies.sh`. On linux, you must install a
+# See `scripts/osx/InstallOsXDependencies.sh` and
+# `scripts/unix/installAdditionalDevTools.sh`. On linux, you must install a
 # simular setup.
-# 
-# @post
-# See `scripts/unix/installAdditionalDevTools.sh`. 
-#
-# @warning
-# You have to install additional dev tools (see `@post` section) after
-# launching `startUnixDev.sh` and then rerun the `startUnixDev.sh` command with
-# the $1 parameter set to false, as `npm install` will remove the additional
-# dependencies.
 # 
 # @param {boolean} [$1=true]
 # Reinstall frontend dependencies.
@@ -41,6 +33,13 @@ if [ "$reinstallFrontendDep" = true ]; then
     # install frontend local dependencies
     cd frontend/
     npm install
+    npm install karma-firefox-launcher karma-growl-reporter\
+        phantomjs-prebuilt karma-phantomjs-launcher karma-safari-launcher karma-slimerjs-launcher\
+        karma-coverage plato jshint-stylish\
+        gulp-jscs gulp-jshint\
+        gulp-nodemon\
+        https://registry.npmjs.org/http-proxy/-/http-proxy-1.13.2.tgz
+    git checkout node_modules/gulp-injectInlineWorker/index.js
     bower install
     cd ../
 fi

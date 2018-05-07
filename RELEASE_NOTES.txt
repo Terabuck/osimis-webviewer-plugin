@@ -1,16 +1,96 @@
 Pending changes in the mainline
 ===============================
 
+=> Minimum Orthanc version: 1.3.1 <=
+
+Features:
+--------
+* All annotations are now editable when any annotation tool is selected
+* Added new real angle tool (there are now 2 angle tools: simple angle and lines angle)
+* Added synchronized browsing
+* Added options to configure the keyboard shortcuts ("KeyboardShortcuts" + "KeyboardShortcutsEnabled")
+* Added a combined tool that can handle 3 tools on mouse and/or touch gestures ("CombinedToolBehaviour")
+* Added an option to configure the mouse behaviour for the windowing tool ("WindowingBehaviour")
+* Added an option to preload high quality images on the frontend before the user needs them.
+* Added orientation markers
+* Added arrow+text annotations
+* Added key image capture to store snapshots with annotation
+* Windows presets can be configured in configuration file
+* Added a "Not for diagnostic usage" disclaimer since this viewer is not CE marked or FDA approved
+* Added options to configure the viewer UI:
+  "StudyDownloadEnabled", "VideoDisplayEnabled", "AnnotationStorageEnabled",
+  "KeyImageCaptureEnabled", "ShowStudyInformationBreadcrumb",
+  "ShowNoReportIconInSeriesList", "ReduceTimelineHeightOnSingleFrameSeries",
+  "ToolbarLayoutMode", "ToolbarButtonSize", "WindowingPresets",
+  "DefaultSelectedTool", "DefaultStudyIslandsDisplayMode",
+  "DefaultLanguage"
+* Added a one-column display mode for the study island
+* Added internationalization support (en-fr)
+* Added a tool to show/hide overlay text/icons
+* Added a loading spinner
+* WVP-139: added ability to play series in both directions
+
+
+Fixes:
+-----
+* Scrolling with wheel mouse: when reaching the end of a series, go back to the other end (this worked only in one direction)
+* Magnifying glass not always on top of image
+* WVB-312 + WVB-120: Wrong measurements in US and XA
+* WVB-330: WW/WL not working in IE 11
+* WVB-326: support for RGB48 images
+* WVB-293: support for YBR422 images
+* WVB-341: WindowingPresets are not visible
+* VS-192: ShortTermCache: invalidate instances when instance is received in case it is a 'resend' of an instance with modification (i.e. same image is uploaded again with rotation/flip)
+* WVP-142: Windowing: Ignore slope/intercept if PhotometricInterpretation is RGB
+
+
+Improvements:
+------------
+* speed-up initial study/series loading time.
+
+
+Experimental features:
+---------------------
+* Added a short term cache to store low/high quality images in the backend. 
+  To enable it, check the "ShortTermCache..." configurations.
+* Added prefetching on the backend to pre-compute low/high quality images
+  before the frontend requests them.  To enable it, check the 
+  "ShortTermCachePrefetchOnInstanceStored" configuration.
+* Added the ability to display custom icons in overlay
+
+
+Known issues:
+------------
+* The WebViewer currently does not work on iPhone (Safari and Chrome).
+* WVB-370: US images whose transfer syntax is JPEG are not displayed correctly (this issue was already affecting earlier versions)
+
+Remarks:
+-------
+* internal API has changed, especially the osimis-viewer/series route.
+
+Version 1.0.2
+========================
+
 => Minimum Orthanc version: 1.1.0 <=
+
+Fixes:
+-----
+* Annotation readback
+
 
 Version 1.0.1
 ========================
 
+=> Minimum Orthanc version: 1.1.0 <=
+
 Fixes:
 * WVB-312: US and XA measures are invalid
 
+
 Version 1.0.0
 ========================
+
+=> Minimum Orthanc version: 1.1.0 <=
 
 Features:
 * Zoom in the viewport using a magnifying glass.
@@ -18,6 +98,8 @@ Features:
 
 Version 0.9.1
 ========================
+
+=> Minimum Orthanc version: 1.1.0 <=
 
 Features:
 * Added a route to retrieve resized/resampled/recompressed images (i.e:

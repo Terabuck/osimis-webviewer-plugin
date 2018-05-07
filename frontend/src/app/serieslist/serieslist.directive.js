@@ -52,7 +52,7 @@
         .directive('wvSerieslist', wvSerieslist);
 
     /* @ngInject */
-    function wvSerieslist($q, wvStudyManager, wvSeriesManager, wvVideoManager, wvPdfInstanceManager, wvPaneManager) {
+    function wvSerieslist($q, $rootScope, wvStudyManager, wvSeriesManager, wvVideoManager, wvPdfInstanceManager, wvPaneManager) {
         var directive = {
             bindToController: true,
             controller: SerieslistVM,
@@ -64,6 +64,7 @@
                 onStudyLoaded: '&?wvOnStudyLoaded', // For testing convenience
                 displayMode: '=?wvDisplayMode',
                 videoDisplayEnabled: '=?wvVideoDisplayEnabled',
+                showNoReportIcon: '=?wvShowNoReportIcon',
 
                 // Selection-related
                 selectionEnabled: '=?wvSelectionEnabled',
@@ -79,11 +80,29 @@
             var vm = scope.vm;
 
             // Adapt serieslist on input change.
-            scope.$watch('vm.studyId', _setStudy);
+            scope.$watch('vm.studyId', function(id, old){
+                _setStudy(id);
+            });
 
-            function _setStudy(id, old) {
+            var rootscopeEventCleanerFunction = $rootScope.$on('studyChanged', function(event, studyId){
+                if(studyId === vm.study.id){
+                    _reloadStudy(studyId);                    
+                }
+            })
+
+            scope.$on('$destroy', function(){rootscopeEventCleanerFunction()});
+            
+
+            function _reloadStudy(id){
+                _setStudy(id, true);
+            }
+
+
+            function _setStudy(id, refresh) {
                 if (!id) return; 
                 // @todo handle IsStable === false
+
+                var useCache = !refresh;
 
                 vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
                 
@@ -101,11 +120,12 @@
                 wvStudyManager
                     .get(id)
                     .then(function(study) {
+                        // Bind study and item to the view model.
                         vm.study = study;
                     });
 
                 wvSeriesManager
-                    .listFromOrthancStudyId(id)
+                    .listFromOrthancStudyId(id, useCache)
                     .then(function(seriesList) {
                         // Set image series ids.
                         vm.seriesIds = seriesList.map(function(series) {
@@ -152,7 +172,7 @@
     }
 
     /* @ngInject */
-    function SerieslistVM() {
+    function SerieslistVM(wvPaneManager) {
         // Set initial values.
         this.seriesIds = [];
         this.pdfInstanceIds = [];
@@ -162,6 +182,26 @@
         this.selectedSeriesIds = this.selectedSeriesIds || [];
         this.selectedVideoIds = this.selectedVideoIds || [];
         this.selectedReportIds = this.selectedReportIds || [];
+
+        this.isActive = function(seriesId){
+            return wvPaneManager.isViewportItemDisplayed(seriesId);
+        };
+
+        this.isHighlighted = function(seriesId){
+            var selectedPane = wvPaneManager.getSelectedPane(),
+                hoveredPane = wvPaneManager.getHoveredPane();
+            return (selectedPane && 
+                (selectedPane.seriesId === seriesId 
+                    || selectedPane.videoId === seriesId 
+                    || selectedPane.reportId === seriesId
+                ))
+                || (hoveredPane && 
+                (
+                    hoveredPane.seriesId === seriesId 
+                    || hoveredPane.videoId === seriesId 
+                    || hoveredPane.reportId === seriesId
+                ))
+        };
 
         this.toggleSeriesSelection = function(seriesId) {
             // Do nothing if selection is disabled

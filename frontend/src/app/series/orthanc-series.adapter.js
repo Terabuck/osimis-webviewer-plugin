@@ -22,7 +22,7 @@
 
         function process(orthancSeries, studyId) {
             // Get tags
-            var tags = orthancSeries.tags;
+            var middleInstanceTags = orthancSeries.middleInstanceInfos.TagsSubset;
             
             // Group imageIds by instance
             var imageIdsByInstance = orthancSeries.instances
@@ -80,7 +80,7 @@
             var seriesList = imageIdsBySeries.map(function(imageIds, seriesIndex) {
                 var id = orthancSeries.id + ':' + seriesIndex;
 
-                return new WvSeries(id, studyId, imageIds, [], tags, availableQualities);
+                return new WvSeries(id, studyId, imageIds, [], middleInstanceTags, availableQualities);
             });
 
             return seriesList;

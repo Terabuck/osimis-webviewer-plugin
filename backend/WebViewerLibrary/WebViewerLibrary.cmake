@@ -36,13 +36,23 @@ add_library(WebViewerLibrary
   STATIC
 
   # The following files depend on GDCM
-  ${VIEWER_LIBRARY_DIR}/DecodedImageAdapter.cpp
-  
+  ${VIEWER_LIBRARY_DIR}/SeriesInformationAdapter.cpp
+
   ${VIEWER_LIBRARY_DIR}/OrthancContextManager.cpp
   ${VIEWER_LIBRARY_DIR}/BaseController.cpp
+  ${VIEWER_LIBRARY_DIR}/ShortTermCache/CacheIndex.h
+  ${VIEWER_LIBRARY_DIR}/ShortTermCache/ICacheFactory.h
+  ${VIEWER_LIBRARY_DIR}/ShortTermCache/IPrefetchPolicy.h
+  ${VIEWER_LIBRARY_DIR}/ShortTermCache/CacheIndex.h
+  ${VIEWER_LIBRARY_DIR}/ShortTermCache/CacheManager.cpp
+  ${VIEWER_LIBRARY_DIR}/ShortTermCache/CacheContext.cpp
+  ${VIEWER_LIBRARY_DIR}/ShortTermCache/CacheScheduler.cpp
+  ${VIEWER_LIBRARY_DIR}/ShortTermCache/ViewerPrefetchPolicy.cpp
   ${VIEWER_LIBRARY_DIR}/Annotation/AnnotationRepository.cpp
   ${VIEWER_LIBRARY_DIR}/Study/StudyController.cpp
+  ${VIEWER_LIBRARY_DIR}/Language/LanguageController.cpp
   ${VIEWER_LIBRARY_DIR}/Instance/DicomRepository.cpp
+  ${VIEWER_LIBRARY_DIR}/Instance/InstanceRepository.cpp
   ${VIEWER_LIBRARY_DIR}/Series/SeriesFactory.cpp
   ${VIEWER_LIBRARY_DIR}/Series/SeriesRepository.cpp
   ${VIEWER_LIBRARY_DIR}/Series/Series.cpp
@@ -81,6 +91,8 @@ target_include_directories(WebViewerLibrary PUBLIC ${VIEWER_LIBRARY_DIR}/)
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   target_compile_definitions(WebViewerLibrary PUBLIC -DPLUGIN_ENABLE_DEBUG_ROUTE=1)
 endif()
+
+target_compile_definitions(WebViewerLibrary PUBLIC -DORTHANC_SANDBOXED=0)
 
 # bind WebViewerLibrary to WebViewerDependencies so any executable/library embedding 
 # WebViewerLibrary.a also embed WebViewerDependencies.

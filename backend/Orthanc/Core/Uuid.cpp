@@ -142,21 +142,21 @@ namespace Orthanc
     }
 
 
-    TemporaryFile::TemporaryFile() : 
-      path_(CreateTemporaryPath(NULL))
-    {
-    }
+//    TemporaryFile::TemporaryFile() :
+//      path_(CreateTemporaryPath(NULL))
+//    {
+//    }
 
 
-    TemporaryFile::TemporaryFile(const char* extension) :
-      path_(CreateTemporaryPath(extension))
-    {
-    }
+//    TemporaryFile::TemporaryFile(const char* extension) :
+//      path_(CreateTemporaryPath(extension))
+//    {
+//    }
 
 
-    TemporaryFile::~TemporaryFile()
-    {
-      boost::filesystem::remove(path_);
-    }  
+//    TemporaryFile::~TemporaryFile()
+//    {
+//      boost::filesystem::remove(path_);
+//    }
   }
 }

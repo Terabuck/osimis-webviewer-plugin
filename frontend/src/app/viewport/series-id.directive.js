@@ -150,6 +150,14 @@
                             wvImageIndexParser.assign(scope, series.currentIndex);
                         }
                     }
+
+                    // For some reason, glitches happens on the image once it's
+                    // dropped. We thus redraw it to remove them...
+                    if (_resetViewportOnceImageLoads) {
+                        setTimeout(function() {
+                            viewportController.getModel().draw(false);
+                        });
+                    }
                 }
                 else {
                     viewportController.clearImage();
@@ -343,7 +351,7 @@
         this._series = null; // Make sure getSeries returns null during the loading of the new one.
 
         // Load series model
-        return this._seriesManager
+        this._seriesPromise = this._seriesManager
             .get(id)
             .then(function(series) {
                 _this._series = series;
@@ -356,10 +364,14 @@
 
                 return series;
             });
+        return this._seriesPromise;
     };
 
     SeriesIdVM.prototype.getSeries = function() {
         return this._series;
+    };
+    SeriesIdVM.prototype.getSeriesPromise = function() {
+        return this._seriesPromise;
     };
 
 })();

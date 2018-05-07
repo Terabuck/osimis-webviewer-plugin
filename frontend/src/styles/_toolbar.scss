@@ -15,27 +15,22 @@
     // can't use z-index properly to show buttons on top of the viewer, as any
     // popover will appear behind them (even with higher z-index) due to an
     // overflow property hidden somewhere.
-    overflow-y: auto;
-    overflow-x: visible;
+    // overflow-y: auto;
     white-space: nowrap;
     max-width: 100%;
 }
 
 .wvToolbar--right {
     right: 0;
-    width: 33px; // != $toolbarHeight since we're in the reverse order.
+    width: 42px; // != $toolbarHeight since we're in the reverse order.
 
-    // Allow user to scroll through the toolbar if screen is too small. 
-    overflow-x: auto;
-    overflow-y: visible;
+    // Allow user to scroll through the toolbar if screen is too small.
+    // overflow-x: auto;
     height: 100%;
-}
-
-.wvToolbar--right .wvButton--rotate, .wvToolbar--right .wvButton--rotate.fa { // make sure we have more precedence than .fa class
-    // Align rotated button position when toolbar is positioned at right.
-    left: -5px;
-    top: 5px;
-    min-width: 42px;
+    z-index: 2;
+    &.wvToolbar--big{
+        width: 68px;
+    }
 }
 
 /* Splitpane Grid Configuration */
@@ -53,31 +48,8 @@
     color: #333;
 }
 
-.wvToolbar__splitpaneConfigButton {
-    @extend .wvButton;
-
-    // Set black text on white background.
-    color: hsl(0, 0%, 9%);
-    &:hover, &:focus, &.active {
-        color: black;
-    }
-}
-.wvToolbar__splitpaneConfigButton--rotate {
-    @extend .wvToolbar__splitpaneConfigButton;
-
-    // Rotate icon.
-    transform: rotate(90deg);
-    width: 42px;
-    height: 32px;
-    line-height: 32px;
-    // padding: 0 0 0 13px;
-
-    left: -5px;
-    top: 1px;
-    margin-right: -10px;
-}
 input[type="radio"].wvToolbar__splitpaneConfigButtonInput {
-    // Hide the radio input, but make it fit the label, so we can rely on its 
+    // Hide the radio input, but make it fit the label, so we can rely on its
     // html caracteristics without having to suffer from its design.
     position: absolute;
     width: 0;

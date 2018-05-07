@@ -2,6 +2,7 @@
  * Orthanc - A Lightweight, RESTful DICOM Store
  * Copyright (C) 2012-2016 Sebastien Jodogne, Medical Physics
  * Department, University Hospital of Liege, Belgium
+ * Copyright (C) 2017 Osimis, Belgium
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -37,6 +38,7 @@
 #include "Toolbox.h"
 #include "Logging.h"
 
+#include <boost/thread/mutex.hpp>
 #include <string.h>
 #include <cassert>
 
@@ -64,7 +66,7 @@ namespace Orthanc
         return "Parameter out of range";
 
       case ErrorCode_NotEnoughMemory:
-        return "Not enough memory";
+        return "The server hosting Orthanc is running out of memory";
 
       case ErrorCode_BadParameterType:
         return "Bad type for a parameter";
@@ -155,6 +157,9 @@ namespace Orthanc
 
       case ErrorCode_NotAcceptable:
         return "Cannot send a response which is acceptable according to the Accept HTTP header";
+
+      case ErrorCode_NullPointer:
+        return "Cannot handle a NULL pointer";
 
       case ErrorCode_SQLiteNotOpened:
         return "SQLite: The database is not opened";
@@ -632,10 +637,10 @@ namespace Orthanc
         return "RGB";
 
       case PhotometricInterpretation_Monochrome1:
-        return "Monochrome1";
+        return "MONOCHROME1";
 
       case PhotometricInterpretation_Monochrome2:
-        return "Monochrome2";
+        return "MONOCHROME2";
 
       case PhotometricInterpretation_ARGB:
         return "ARGB";
@@ -647,25 +652,25 @@ namespace Orthanc
         return "HSV";
 
       case PhotometricInterpretation_Palette:
-        return "Palette color";
+        return "PALETTE COLOR";
 
       case PhotometricInterpretation_YBRFull:
-        return "YBR full";
+        return "YBR_FULL";
 
       case PhotometricInterpretation_YBRFull422:
-        return "YBR full 422";
+        return "YBR_FULL_422";
 
       case PhotometricInterpretation_YBRPartial420:
-        return "YBR partial 420"; 
+        return "YBR_PARTIAL_420"; 
 
       case PhotometricInterpretation_YBRPartial422:
-        return "YBR partial 422"; 
+        return "YBR_PARTIAL_422"; 
 
       case PhotometricInterpretation_YBR_ICT:
-        return "YBR ICT"; 
+        return "YBR_ICT"; 
 
       case PhotometricInterpretation_YBR_RCT:
-        return "YBR RCT"; 
+        return "YBR_RCT"; 
 
       case PhotometricInterpretation_Unknown:
         return "Unknown";
@@ -748,7 +753,123 @@ namespace Orthanc
       case PixelFormat_Float32:
         return "Grayscale (float 32bpp)";
 
+      case PixelFormat_Grayscale32:
+        return "Grayscale (unsigned 32bpp)";
+
+      case PixelFormat_RGB48:
+        return "RGB48";
+
       default:
+        throw OrthancException(ErrorCode_ParameterOutOfRange);
+    }
+  }
+
+
+  const char* EnumerationToString(ModalityManufacturer manufacturer)
+  {
+    switch (manufacturer)
+    {
+      case ModalityManufacturer_Generic:
+        return "Generic";
+
+      case ModalityManufacturer_GenericNoWildcardInDates:
+        return "GenericNoWildcardInDates";
+
+      case ModalityManufacturer_GenericNoUniversalWildcard:
+        return "GenericNoUniversalWildcard";
+
+      case ModalityManufacturer_StoreScp:
+        return "StoreScp";
+      
+      case ModalityManufacturer_ClearCanvas:
+        return "ClearCanvas";
+      
+      case ModalityManufacturer_Dcm4Chee:
+        return "Dcm4Chee";
+      
+      case ModalityManufacturer_Vitrea:
+        return "Vitrea";
+      
+      default:
+        throw OrthancException(ErrorCode_ParameterOutOfRange);
+    }
+  }
+
+
+  const char* EnumerationToString(DicomRequestType type)
+  {
+    switch (type)
+    {
+      case DicomRequestType_Echo:
+        return "Echo";
+        break;
+
+      case DicomRequestType_Find:
+        return "Find";
+        break;
+
+      case DicomRequestType_Get:
+        return "Get";
+        break;
+
+      case DicomRequestType_Move:
+        return "Move";
+        break;
+
+      case DicomRequestType_Store:
+        return "Store";
+        break;
+
+      default: 
+        throw OrthancException(ErrorCode_ParameterOutOfRange);
+    }
+  }
+
+
+  const char* EnumerationToString(TransferSyntax syntax)
+  {
+    switch (syntax)
+    {
+      case TransferSyntax_Deflated:
+        return "Deflated";
+
+      case TransferSyntax_Jpeg:
+        return "JPEG";
+
+      case TransferSyntax_Jpeg2000:
+        return "JPEG2000";
+
+      case TransferSyntax_JpegLossless:
+        return "JPEG Lossless";
+
+      case TransferSyntax_Jpip:
+        return "JPIP";
+
+      case TransferSyntax_Mpeg2:
+        return "MPEG2";
+
+      case TransferSyntax_Rle:
+        return "RLE";
+
+      default: 
+        throw OrthancException(ErrorCode_ParameterOutOfRange);
+    }
+  }
+
+
+  const char* EnumerationToString(DicomVersion version)
+  {
+    switch (version)
+    {
+      case DicomVersion_2008:
+        return "2008";
+        break;
+
+      case DicomVersion_2017c:
+        return "2017c";
+        break;
+
+      default: 
         throw OrthancException(ErrorCode_ParameterOutOfRange);
     }
   }
@@ -1049,6 +1170,160 @@ namespace Orthanc
   }
 
 
+  PhotometricInterpretation StringToPhotometricInterpretation(const char* value)
+  {
+    // http://dicom.nema.org/medical/dicom/2017a/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2
+    std::string s(value);
+
+    if (s == "MONOCHROME1")
+    {
+      return PhotometricInterpretation_Monochrome1;
+    }
+    
+    if (s == "MONOCHROME2")
+    {
+      return PhotometricInterpretation_Monochrome2;
+    }
+
+    if (s == "PALETTE COLOR")
+    {
+      return PhotometricInterpretation_Palette;
+    }
+    
+    if (s == "RGB")
+    {
+      return PhotometricInterpretation_RGB;
+    }
+    
+    if (s == "HSV")
+    {
+      return PhotometricInterpretation_HSV;
+    }
+    
+    if (s == "ARGB")
+    {
+      return PhotometricInterpretation_ARGB;
+    }    
+
+    if (s == "CMYK")
+    {
+      return PhotometricInterpretation_CMYK;
+    }    
+
+    if (s == "YBR_FULL")
+    {
+      return PhotometricInterpretation_YBRFull;
+    }
+    
+    if (s == "YBR_FULL_422")
+    {
+      return PhotometricInterpretation_YBRFull422;
+    }
+    
+    if (s == "YBR_PARTIAL_422")
+    {
+      return PhotometricInterpretation_YBRPartial422;
+    }
+    
+    if (s == "YBR_PARTIAL_420")
+    {
+      return PhotometricInterpretation_YBRPartial420;
+    }
+    
+    if (s == "YBR_ICT")
+    {
+      return PhotometricInterpretation_YBR_ICT;
+    }
+    
+    if (s == "YBR_RCT")
+    {
+      return PhotometricInterpretation_YBR_RCT;
+    }
+
+    throw OrthancException(ErrorCode_ParameterOutOfRange);
+  }
+  
+
+  ModalityManufacturer StringToModalityManufacturer(const std::string& manufacturer)
+  {
+    ModalityManufacturer result;
+    bool obsolete = false;
+    
+    if (manufacturer == "Generic")
+    {
+      return ModalityManufacturer_Generic;
+    }
+    else if (manufacturer == "GenericNoWildcardInDates")
+    {
+      return ModalityManufacturer_GenericNoWildcardInDates;
+    }
+    else if (manufacturer == "GenericNoUniversalWildcard")
+    {
+      return ModalityManufacturer_GenericNoUniversalWildcard;
+    }
+    else if (manufacturer == "ClearCanvas")
+    {
+      return ModalityManufacturer_ClearCanvas;
+    }
+    else if (manufacturer == "StoreScp")
+    {
+      return ModalityManufacturer_StoreScp;
+    }
+    else if (manufacturer == "Dcm4Chee")
+    {
+      return ModalityManufacturer_Dcm4Chee;
+    }
+    else if (manufacturer == "Vitrea")
+    {
+      return ModalityManufacturer_Vitrea;
+    }
+    else if (manufacturer == "AgfaImpax" ||
+             manufacturer == "SyngoVia")
+    {
+      result = ModalityManufacturer_GenericNoWildcardInDates;
+      obsolete = true;
+    }
+    else if (manufacturer == "EFilm2" ||
+             manufacturer == "MedInria")
+    {
+      result = ModalityManufacturer_Generic;
+      obsolete = true;
+    }
+    else
+    {
+      throw OrthancException(ErrorCode_ParameterOutOfRange);
+    }
+
+    if (obsolete)
+    {
+      LOG(WARNING) << "The \"" << manufacturer << "\" manufacturer is obsolete since "
+                   << "Orthanc 1.3.0. To guarantee compatibility with future Orthanc "
+                   << "releases, you should replace it by \""
+                   << EnumerationToString(result)
+                   << "\" in your configuration file.";
+    }
+
+    return result;
+  }
+
+
+  DicomVersion StringToDicomVersion(const std::string& version)
+  {
+    if (version == "2008")
+    {
+      return DicomVersion_2008;
+    }
+    else if (version == "2017c")
+    {
+      return DicomVersion_2017c;
+    }
+    else
+    {
+      throw OrthancException(ErrorCode_ParameterOutOfRange);
+    }
+  }
+
+
   unsigned int GetBytesPerPixel(PixelFormat format)
   {
     switch (format)
@@ -1065,11 +1340,15 @@ namespace Orthanc
 
       case PixelFormat_RGBA32:
       case PixelFormat_BGRA32:
+      case PixelFormat_Grayscale32:
         return 4;
 
       case PixelFormat_Float32:
         assert(sizeof(float) == 4);
         return 4;
+
+      case PixelFormat_RGB48:
+        return 6;
 
       default:
         throw OrthancException(ErrorCode_ParameterOutOfRange);
@@ -1080,14 +1359,17 @@ namespace Orthanc
   bool GetDicomEncoding(Encoding& encoding,
                         const char* specificCharacterSet)
   {
-    std::string s = specificCharacterSet;
+    std::string s = Toolbox::StripSpaces(specificCharacterSet);
     Toolbox::ToUpperCase(s);
 
     // http://dicom.nema.org/medical/dicom/current/output/html/part03.html#sect_C.12.1.1.2
     // https://github.com/dcm4che/dcm4che/blob/master/dcm4che-core/src/main/java/org/dcm4che3/data/SpecificCharacterSet.java
     if (s == "ISO_IR 6" ||
-        s == "ISO_IR 192" ||
         s == "ISO 2022 IR 6")
+    {
+      encoding = Encoding_Ascii;
+    }
+    else if (s == "ISO_IR 192")
     {
       encoding = Encoding_Utf8;
     }
@@ -1144,8 +1426,15 @@ namespace Orthanc
     {
       encoding = Encoding_Japanese;
     }
-    else if (s == "GB18030")
+    else if (s == "GB18030" || s == "GBK")
     {
+      /**
+       * According to tumashu@163.com, "In China, many dicom file's
+       * 0008,0005 tag is set as "GBK", instead of "GB18030", GBK is a
+       * subset of GB18030, and which is used frequently in China,
+       * suggest support it."
+       * https://groups.google.com/d/msg/orthanc-users/WMM8LMbjpUc/02-1f_yFCgAJ
+       **/
       encoding = Encoding_Chinese;
     }
     /*
@@ -1235,8 +1524,10 @@ namespace Orthanc
     // http://dicom.nema.org/medical/dicom/current/output/html/part03.html#sect_C.12.1.1.2
     switch (encoding)
     {
-      case Encoding_Utf8:
       case Encoding_Ascii:
+        return "ISO_IR 6";
+
+      case Encoding_Utf8:
         return "ISO_IR 192";
 
       case Encoding_Latin1:
@@ -1392,5 +1683,28 @@ namespace Orthanc
       default:
         throw OrthancException(ErrorCode_ParameterOutOfRange);
     }
-  }
+  }  
+
+
+//  static boost::mutex  defaultEncodingMutex_;  // Should not be necessary
+//  static Encoding      defaultEncoding_ = ORTHANC_DEFAULT_DICOM_ENCODING;
+  
+//  Encoding GetDefaultDicomEncoding()
+//  {
+//    boost::mutex::scoped_lock lock(defaultEncodingMutex_);
+//    return defaultEncoding_;
+//  }
+
+//  void SetDefaultDicomEncoding(Encoding encoding)
+//  {
+//    std::string name = EnumerationToString(encoding);
+    
+//    {
+//      boost::mutex::scoped_lock lock(defaultEncodingMutex_);
+//      defaultEncoding_ = encoding;
+//    }
+
+//    LOG(INFO) << "Default encoding for DICOM was changed to: " << name;
+//  }
+
 }

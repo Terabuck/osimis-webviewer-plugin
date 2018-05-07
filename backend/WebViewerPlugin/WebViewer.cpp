@@ -7,6 +7,7 @@
 #include <ViewerToolbox.h>
 #include <EmbeddedResources.h>
 #include "Version.h"
+#include "Language/LanguageController.h"
 
 namespace {
   // Needed locally for use by orthanc's callbacks
@@ -42,6 +43,11 @@ void WebViewer::_serveFrontEnd()
   std::string explorer;
   Orthanc::EmbeddedResources::GetFileResource(explorer, Orthanc::EmbeddedResources::ORTHANC_EXPLORER);
   OrthancPluginExtendOrthancExplorer(_context, explorer.c_str());
+
+  // configure languages
+  LanguageController::addLanguageFile("en", "/osimis-viewer/app/languages/en.json");
+  LanguageController::addLanguageFile("fr", "/osimis-viewer/app/languages/fr.json");
+  LanguageController::addLanguageFile("nl", "/osimis-viewer/app/languages/nl.json");
 }
 
 const std::string& WebViewer::getName()
