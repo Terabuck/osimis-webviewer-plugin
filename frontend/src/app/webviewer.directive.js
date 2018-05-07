@@ -131,7 +131,7 @@
         .directive('wvWebviewer', wvWebviewer);
 
     /* @ngInject */
-    function wvWebviewer($rootScope, wvStudyManager, wvAnnotationManager, wvSeriesManager, wvPaneManager) {
+    function wvWebviewer($rootScope, $timeout, wvStudyManager, wvAnnotationManager, wvSeriesManager, wvPaneManager, wvWindowingViewportTool, wvSynchronizer, wvViewerController, wvConfig) {
         var directive = {
             bindToController: true,
             controller: Controller,
@@ -140,6 +140,7 @@
             restrict: 'E',
             scope: {
                 readonly: '=?wvReadonly',
+                pickableStudyIdLabels: '=?wvPickableStudyIdLabels',  // {studyOrthancUuid: "text to display"}
                 pickableStudyIds: '=wvPickableStudyIds',
                 selectedStudyIds: '=?wvSelectedStudyIds',
                 seriesId: '=?wvSeriesId',
@@ -158,6 +159,9 @@
                 studyDownloadEnabled: '=?wvStudyDownloadEnabled',
                 videoDisplayEnabled: '=?wvVideoDisplayEnabled',
                 keyImageCaptureEnabled: '=?wvKeyImageCaptureEnabled',
+                combinedToolEnabled: '=?wvCombinedToolEnabled',
+                toggleOverlayTextButtonEnabled: '=?wvToggleOverlayTextButtonEnabled',
+                toggleOverlayIconsButtonEnabled: '=?wvToggleOverlayIconsButtonEnabled',
                 showNoReportIconInSeriesList: '=?wvShowNoReportIconInSeriesList',
                 reduceTimelineHeightOnSingleFrameSeries: '=?wvReduceTimelineHeightOnSingleFrameSeries',
                 buttonsSize: '=?wvButtonsSize',  // small | large
@@ -168,13 +172,16 @@
 
                 // Selection-related
                 seriesItemSelectionEnabled: '=?wvSeriesItemSelectionEnabled',
-                selectedSeriesItems: '=?wvSelectedSeriesItems' // readonly
+                selectedSeriesItems: '=?wvSelectedSeriesItems', // readonly
+
+                isAsideClosed: '=?wvIsAsideClosed'
             },
             transclude: {
                 wvLayoutTopLeft: '?wvLayoutTopLeft',
                 wvLayoutTopRight: '?wvLayoutTopRight',
                 wvLayoutRight: '?wvLayoutRight',
-                wvLayoutLeftBottom: '?wvLayoutLeftBottom'
+                wvLayoutLeftBottom: '?wvLayoutLeftBottom',
+                wvLayoutLeftTop: '?wvLayoutLeftTop'
             },
             templateUrl: 'app/webviewer.directive.html'
         };
@@ -182,6 +189,47 @@
 
         function link(scope, element, attrs, ctrls, transcludeFn) {
             var vm = scope.vm;
+
+            { // check browser compatibility
+                var browserName = wvConfig.browser.browser.name;
+                var browserMajorVersion = wvConfig.browser.browser.major;
+                var osName = wvConfig.browser.os.name;
+
+                vm.openIncompatibleBrowserModal = false;
+                console.log("Checking browser compatibility:", wvConfig.browser);
+                var minimalChromeVersion =  45;
+                var minimalSafariVersion = 9;
+                var minimalFirefoxVersion = 48;
+                var minimalEdgeVersion = 14;
+                var minimalIEVersion = 11;
+
+                if (osName === "Mac OS") {
+                    minimalChromeVersion = 48;
+                    minimalFirefoxVersion = 28;
+                } 
+                if (osName === "iOS" && wvConfig.browser.device.model === "iPhone") { // not supported at all on iPhone right now (too many bugs)
+                    minimalChromeVersion = 999;
+                    minimalFirefoxVersion = 999;
+                    minimalSafariVersion = 999;
+                }
+
+                if ((browserName === "Chrome" && browserMajorVersion >= minimalChromeVersion) 
+                    || (browserName === "Safari" && browserMajorVersion >= minimalSafariVersion) 
+                    || (browserName === "Firefox" && browserMajorVersion >= minimalFirefoxVersion) 
+                    || (browserName === "Edge" && browserMajorVersion >= minimalEdgeVersion) 
+                    || (browserName === "IE" && browserMajorVersion >= minimalIEVersion)){
+                    console.log(browserName + " Supported");
+                }
+                else{
+                    vm.openIncompatibleBrowserModal = true;
+                    vm.incompatibleBrowserErrorMessage = browserName + " version " + browserMajorVersion + " is not supported.  You might expect inconsistent behaviours and shall not use the viewer to produce a diagnostic.";
+                    console.log(vm.incompatibleBrowserErrorMessage);
+                }
+                
+                vm.onCloseWarning = function(){
+                    vm.openIncompatibleBrowserModal = false;
+                } 
+            }
 
             // Configure attributes default values
             vm.toolbarEnabled = typeof vm.toolbarEnabled !== 'undefined' ? vm.toolbarEnabled : true;
@@ -193,8 +241,9 @@
             vm.noticeEnabled = typeof vm.noticeEnabled !== 'undefined' ? vm.noticeEnabled : false;
             vm.noticeText = typeof vm.noticeText !== 'undefined' ? vm.noticeText : undefined;
             vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;
+            vm.isOverlayTextVisible = true;
+            vm.isOverlayIconsVisible = true;
             vm.tools = typeof vm.tools !== 'undefined' ? vm.tools : {
-                touchGesture: false,
                 windowing: false,
                 zoom: false,
                 pan: false,
@@ -205,6 +254,7 @@
                 },
                 lengthMeasure: false,
                 angleMeasure: false,
+                simpleAngleMeasure: false,
                 pixelProbe: false,
                 ellipticalRoi: false,
                 rectangleRoi: false,
@@ -218,25 +268,35 @@
                 hflip: false,
                 rotateLeft: false,
                 rotateRight: false,
-                arrowAnnotate: false
+                arrowAnnotate: false,
+                toggleSynchro: false,
+                nextSeries: false,
+                previousSeries: false
             };
+
+            if (vm.keyImageCaptureEnabled) { // activate
+                vm.tools.keyImageCapture = false;
+            }
+            if (vm.combinedToolEnabled) { // activate}
+                vm.tools.combinedTool = false;
+            }
+            if (vm.toggleOverlayTextButtonEnabled) { // activate}
+                vm.tools.toggleOverlayText = false;
+            }
+            if (vm.toggleOverlayIconsButtonEnabled) { // activate}
+                vm.tools.toggleOverlayIcons = false;
+            }
 
             console.log('default tool: ', vm.toolbarDefaultTool)
             if (vm.toolbarDefaultTool) {
                 vm.tools[vm.toolbarDefaultTool] = true;
                 vm.activeTool = vm.toolbarDefaultTool;
-            } else {
-                vm.tools.touchGesture = true;
-                vm.activeTool = 'touchGesture';
             }
 
-            if (vm.keyImageCaptureEnabled) { // activate
-                vm.tools.keyImageCapture = false;
-            }
             if (vm.toolboxButtonsOrdering === undefined) {
                 vm.toolboxButtonsOrdering = [
                     {type: "button", tool: "layout"},
-                    // {type: "button", tool: "touchGesture"},
+                    {type: "button", tool: "combinedTool"},
                     {type: "button", tool: "zoom"},
                     {type: "button", tool: "pan"},
                     {
@@ -259,6 +319,7 @@
                         title: "annotation",
                         buttons: [
                             {type: "button", tool: "lengthMeasure"},
+                            {type: "button", tool: "simpleAngleMeasure"},
                             {type: "button", tool: "angleMeasure"},
                             {type: "button", tool: "pixelProbe"},
                             {type: "button", tool: "ellipticalRoi"},
@@ -266,7 +327,13 @@
                             {type: "button", tool: "arrowAnnotate"},
                         ]
                     },
-                    {type: "button", tool: "keyImageCapture"}
+                    {type: "button", tool: "keyImageCapture"},
+                    {type: "button", tool: "toggleSynchro"},
+                    // Optional buttons to explicitely activate
+                    // {type: "button", tool: "previousSeries"},
+                    // {type: "button", tool: "nextSeries"},
+                    {type: "button", tool: "toggleOverlayText"},
+                    {type: "button", tool: "toggleOverlayIcons"},
                 ]
             }
             vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];
@@ -274,8 +341,18 @@
             vm.studyDownloadEnabled = typeof vm.studyDownloadEnabled !== 'undefined' ? vm.studyDownloadEnabled : false;
             vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
             vm.keyImageCaptureEnabled = typeof vm.keyImageCaptureEnabled !== 'undefined' ? vm.keyImageCaptureEnabled : false;
+            vm.combinedToolEnabled = typeof vm.combinedToolEnabled !== 'undefined' ? vm.combinedToolEnabled : false;
+            vm.toggleOverlayTextButtonEnabled = typeof vm.toggleOverlayTextButtonEnabled !== 'undefined' ? vm.toggleOverlayTextButtonEnabled : false;
+            vm.toggleOverlayIconsButtonEnabled = typeof vm.toggleOverlayIconsButtonEnabled !== 'undefined' ? vm.toggleOverlayIconsButtonEnabled : false;
             vm.studyIslandsDisplayMode = typeof vm.studyIslandsDisplayMode !== 'undefined' ? vm.studyIslandsDisplayMode : "grid";
             vm.paneManager = wvPaneManager;
+            vm.synchronizer = wvSynchronizer;
+            vm.wvWindowingViewportTool = wvWindowingViewportTool;
+
+            vm.wvViewerController = wvViewerController;
+            vm.wvViewerController.setOverlayTextVisible(__webViewerConfig.displayOverlayText);
+            vm.wvViewerController.setOverlayIconsVisible(__webViewerConfig.displayOverlayIcons);
+            vm.wvViewerController.setSelectedStudyIds(vm.selectedStudyIds);
 
             // Selection-related
             vm.seriesItemSelectionEnabled = typeof vm.seriesItemSelectionEnabled !== 'undefined' ? vm.seriesItemSelectionEnabled : false;
@@ -384,8 +461,8 @@
             var uaParser = new UAParser();
             vm.mobileInteraction = uaParser.getDevice().type === 'mobile';
             if(vm.mobileInteraction){
-                vm.tools.touchGesture = true;
-                vm.activeTool = 'touchGesture';            }
+                vm.tools.combinedTool = true;
+                vm.activeTool = 'combinedTool';            }
 
             // Adapt breadcrumb displayed info based on the selected pane.
             wvPaneManager
@@ -416,19 +493,34 @@
 
                 switch (action) {
                 case 'invert':
-                    selectedPane.csViewport.invert = !selectedPane.csViewport.invert;
+                    selectedPane.invertColor();
                     break;
                 case 'vflip':
-                    selectedPane.csViewport.vflip = !selectedPane.csViewport.vflip;
+                    selectedPane.flipVertical();
                     break;
                 case 'hflip':
-                    selectedPane.csViewport.hflip = !selectedPane.csViewport.hflip;
+                    selectedPane.flipHorizontal();
                     break;
                 case 'rotateLeft':
-                    selectedPane.csViewport.rotation = selectedPane.csViewport.rotation - 90;
+                    selectedPane.rotateLeft();
                     break;
                 case 'rotateRight':
-                    selectedPane.csViewport.rotation = selectedPane.csViewport.rotation + 90;
+                    selectedPane.rotateRight();
+                    break;
+                case 'toggleSynchro':
+                    vm.synchronizer.enable(!vm.synchronizer.isEnabled());
+                    break;
+                case 'toggleOverlayText':
+                    vm.wvViewerController.toggleOverlayText();
+                    break;
+                case 'toggleOverlayIcons':
+                    vm.wvViewerController.toggleOverlayIcons();
+                    break;
+                case 'previousSeries':
+                    vm.wvViewerController.previousSeries();
+                    break;
+                case 'nextSeries':
+                    vm.wvViewerController.nextSeries();
                     break;
                 default:
                     throw new Error('Unknown toolbar action.');
@@ -437,19 +529,14 @@
             // Apply viewport change when a windowing preset has been
             // selected (from the toolbar).
             vm.onWindowingPresetSelected = function(windowWidth, windowCenter) {
-                // Retrieve selected pane (or leave the function if none).
-                var selectedPane = wvPaneManager.getSelectedPane();
 
                 if (this.readonly) {
                     return;
                 }
-                if (!selectedPane.csViewport) {
-                    return;
-                }
 
-                // Apply windowing.
-                selectedPane.csViewport.voi.windowWidth = windowWidth;
-                selectedPane.csViewport.voi.windowCenter = windowCenter;
+                // Retrieve selected pane (or leave the function if none).
+                var selectedPane = wvPaneManager.getSelectedPane();
+                vm.wvWindowingViewportTool.applyWindowingToPane(selectedPane, windowWidth, windowCenter, true);
             };
 
             // Store each panes' states.
@@ -488,6 +575,7 @@
             scope.$watch('vm.selectedStudyIds', function(newValues, oldValues) {
                 // Log study ids
                 console.log('selected studies ids: ', newValues);
+                wvViewerController.setSelectedStudyIds(newValues);
 
                 // Consider oldValues to be empty if this watch function is
                 // called at initialization.
@@ -648,6 +736,22 @@
                     // Reset the viewport data
                     vm.panes[0].csViewport = null;
                 }
+            });
+
+            // when the studyIslandsDisplayMode the layout may changed and so some directive may need
+            // to recalculate their dimentions, so we need to trigger a "window change" event.
+            scope.$watch('vm.studyIslandsDisplayMode', function(){
+                asap(function(){
+                    $(window).trigger("resize");
+                });
+
+                // For some weird reason when the webviewer is on an iframe,
+                // asap is not working and is possibly triggered not at the good time.
+                // To be sure a window resize events is really trigerred we're calling it also after a $timeout
+                // Note: we do not remove asap to prevent a flash if the webviewer is not on an iframe.
+               $timeout(function() {
+                    $(window).trigger("resize");
+                });
             });
         }
     }

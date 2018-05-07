@@ -6,7 +6,9 @@
         "RESET": "réinitialiser"
     },
     "GENERAL_PARAGRAPHS": {
-        "DISCLAIMER_PARAGRAPH": "Ne pas utiliser pour faire un diagnostique."
+        "DISCLAIMER_PARAGRAPH": "Ne pas utiliser pour un diagnostique.",
+        "SCREEN_TOO_SMALL": "Votre écran est trop petit pour utiliser le viewer.",
+        "INCOMPATIBLE_BROWSER": "Votre navigateur n'est pas supporté.  Le comportement du viewer sera altéré.  Utilisez un autre navigateur si vous voulez émettre un diagnostique."
     },
     "MEDICAL_TERMS": {
         "ENTRIES": "entrées",
@@ -46,7 +48,8 @@
         },
         "STUDY": {
             "DOWNLOAD_STUDY": "Télécharger l’étude",
-            "UNTITLED_STUDY": "étude sans titre"
+            "UNTITLED_STUDY": "étude sans titre",
+            "LOADING_STUDY": "chargement en cours ..."
         },
         "TIMELINE": {
             "FPS": "ips",
@@ -58,6 +61,7 @@
             "PLAY": "lancer"
         },
         "TOOLBOX": {
+            "SIMPLE_ANGLE_MEASUREMENT": "mesure d’angle entre lignes",
             "ANGLE_MEASUREMENT": "mesure d’angle",
             "ARROW_ANNOTATE_TEXT": "annoter l’image avec du texte",
             "ELLIPTICAL_ROI": "roi élliptique",
@@ -68,14 +72,19 @@
             "LENGTH_MEASUREMENT": "mesure de taille",
             "PANNING": "déplacer",
             "PIXEL_PROBE": "pixel probe",
+            "PREVIOUS_SERIES": "série précédente",
             "MAGNIFYING_GLASS_CONFIG_LEGEND": "cliquer sur le bouton pour utiliser la loupe. Vous pouvez configurez les paramètres.",
             "MAGNIFYING_GLASS_LEVEL": "niveau de grossissement",
             "MAGNIFYING_GLASS_SIZE": "taille du grossissement",
+            "NEXT_SERIES": "série suivante",
             "RECTANGLE_ROI": "roi rectangulaire",
             "ROTATE_LEFT": "rotation sur la gauche",
             "ROTATE_RIGHT": "rotation sur la droite",
             "SPLIT_PANE_CONFIG_LEGEND_PARAGRAPH": "Changer la mise en page des viewports.",
-            "TOUCH_GESTURE": "geste tactile",
+            "SYNCHRONIZED_BROWSING" : "Navigation syncrhonisée",
+            "TOGGLE_LAYOUT_TEXT" : "Annotations textuelles",
+            "TOGGLE_LAYOUT_ICONS" : "Annotations visuelles",
+            "COMBINED_TOOL": "outil multiple",
             "WINDOWING_PRESET_LEGEND": "cliquer sur le bouton pour utiliser l’outil de windowing ou appliquer un preset pour le viewport sélectionné.",
             "ZOOM": "zoom"
         }

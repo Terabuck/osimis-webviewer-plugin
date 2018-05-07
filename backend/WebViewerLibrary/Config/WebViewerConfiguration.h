@@ -49,6 +49,8 @@ public:
   int shortTermCacheDecoderThreadsCound;
   int shortTermCacheSize;
 
+  bool instanceInfoCacheEnabled;
+
   bool gdcmEnabled;
   bool restrictTransferSyntaxes;
   std::set<std::string> enabledTransferSyntaxes;
@@ -66,13 +68,20 @@ public:
   std::string toolbarButtonSize;
   std::string defaultSelectedTool;
   std::string defaultStudyIslandsDisplayMode;
+  std::string customOverlayProviderUrl;
   Json::Value windowingPresets;
-
-  // If activated, this feature displays a button on each viewport. When the button is
-  // clicked, a new series is created with the image of the viewport, including the
-  // annotations. This image is considered as a DICOM Key Image Note (see
-  // `http://wiki.ihe.net/index.php/Key_Image_Note`).
+  Json::Value windowingBehaviour;
+  Json::Value combinedToolBehaviour;
+  Json::Value mouseWheelBehaviour;
+  Json::Value keyboardShortcuts;
+  bool keyboardShortcutsEnabled;
   bool keyImageCaptureEnabled;
+  bool combinedToolEnabled;
+
+  bool toggleOverlayTextButtonEnabled;
+  bool toggleOverlayIconsButtonEnabled;
+  bool displayOverlayText;
+  bool displayOverlayIcons;
 
   WebViewerConfiguration(OrthancPluginContext* context);
   /**

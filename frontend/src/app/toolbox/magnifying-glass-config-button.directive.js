@@ -107,14 +107,5 @@
         //     magnificationLevel: 5
         //     magnifyingGlassSize: 400
         // };
-
-
-        // Apply windowing preset to the selected pane.
-        // popoverScope.applyWindowing = function(windowWidth, windowCenter) {
-        //     _this.onWindowingPresetSelected({
-        //         $windowWidth: windowWidth,
-        //         $windowCenter: windowCenter
-        //     });
-        // };
     }
 })();

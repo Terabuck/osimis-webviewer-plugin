@@ -68,8 +68,8 @@
                 wvImageManager 
                     .get(middleImageId)
                     .then(function(image) {
-                        if (image.tags.RecommendedDisplayFrameRate) {
-                            _this.frameRate = +image.tags.RecommendedDisplayFrameRate; // make sure it's a number so input numbers referencing this var don't throw errors
+                        if (image.instanceInfos.TagsSubset.RecommendedDisplayFrameRate) {
+                            _this.frameRate = +image.instanceInfos.TagsSubset.RecommendedDisplayFrameRate; // make sure it's a number so input numbers referencing this var don't throw errors
                         }
                     });
             });
@@ -187,10 +187,14 @@
             this.currentShownIndex = this.getIndexOf(id);
         };
         WvSeries.prototype.getCurrentImageId = function() {
-           return this.imageIds[this.currentIndex];
+            if (this.currentIndex >= 0 && this.currentIndex < this.imageIds.length) {
+                return this.imageIds[this.currentIndex];
+            } else {
+                return null;
+            }
         };
 
-        WvSeries.prototype.getCurrentImage = function() {
+        WvSeries.prototype.getCurrentImagePromise = function() {
             var imageId = this.getCurrentImageId();
             return wvImageManager.get(imageId);
         };
@@ -233,11 +237,13 @@
         };
 
         WvSeries.prototype.goToPreviousImage = function(restartWhenSeriesEnd) {
+            restartWhenSeriesEnd = restartWhenSeriesEnd || false;
+
             if (this.currentIndex > 0) {
                 this.currentIndex--;
                 this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
             }
-            else if (this.currentIndex <= 0) {
+            else if (this.currentIndex <= 0 && restartWhenSeriesEnd) {
                 this.currentIndex = this.imageCount -1;
                 this.onCurrentImageIdChanged.trigger(this.getCurrentImageId(), this.setShownImage.bind(this));
             }
@@ -254,13 +260,13 @@
 
             // Limit index to available range of image
             if (newIndex < 0) {
-              newIndex = 0;
+              newIndex = -1;
             }
             else if (newIndex + 1 > this.imageCount) {
               return;
             }
 
-            // Do nothing when the image do not change
+            // Do nothing when the image does not change
             if (this.currentIndex == newIndex) {
                 return;
             }
@@ -271,7 +277,7 @@
 
         var _cancelAnimationId = null;
         var _timeLog;
-        WvSeries.prototype.play = function() {
+        WvSeries.prototype.playPreview = function() { // when playing in the viewport, we use the SeriesPlayer that can synchronize series
             var _this = this;
 
             // Do nothing when there is only one image
@@ -333,7 +339,7 @@
             this.isPlaying = true;
         };
 
-        WvSeries.prototype.pause = function() {
+        WvSeries.prototype.pausePreview = function() {
             if (_cancelAnimationId) {
                 cancelAnimationFrame(_cancelAnimationId);
                 _cancelAnimationId = null;
@@ -364,7 +370,46 @@
 
             return this._annotationGroup;
         };
-        
+
+        WvSeries.prototype.isSameOrientationAs = function(otherSeries) {
+            return (this.tags.ImageOrientationPatient == otherSeries.tags.ImageOrientationPatient);
+        };
+
+        WvSeries.prototype.isSameFrameOfReference = function(otherSeries) {
+            return (this.tags.FrameOfReferenceUID == otherSeries.tags.FrameOfReferenceUID);
+        };
+
+        WvSeries.prototype.hasSlices = function() {
+            return this.tags.SliceLocation !== undefined && this.tags.SliceThickness !== undefined;
+        };
+
+        WvSeries.prototype.getIndexOfClosestImageFrom = function(otherSliceLocation) {
+            var _this = this;
+            var imageTagsPromises = this.imageIds.map(function(imageId) {
+                return wvImageManager.get(imageId);
+            });
+
+            return Promise.all(imageTagsPromises).then(function(images) {
+                var closestIndex = -1;
+                var closestDistance = 99999;
+                var sliceThickness = images[0].instanceInfos.TagsSubset.SliceThickness;
+                // console.log("searching slice closest to ", otherSliceLocation);
+                for (var i=0; i < images.length; ++i) {
+                    var distance = Math.abs(images[i].instanceInfos.TagsSubset.SliceLocation - otherSliceLocation);
+
+                    // console.log(images[i].instanceInfos.TagsSubset.SliceLocation, otherSliceLocation);
+                    // console.log("distance = " + distance + ", sliceThickness = " + sliceThickness);
+                    if (distance < closestDistance && distance <= sliceThickness) {
+                        closestIndex = i;
+                        closestDistance = distance;
+                    }
+                }
+
+                return {'closestIndex':closestIndex, 'series': _this, 'closestDistance': closestDistance};
+            });
+
+        };
+
         ////////////////
 
         return WvSeries;

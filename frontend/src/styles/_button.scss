@@ -49,6 +49,16 @@
 
 }
 
+.wvButton--vflip {
+    @extend .wvButton;
+    // flip only the icon
+    &:before, &:after{
+        transform: scaleX(-1);
+        display: inline-block;
+    }
+
+}
+
 // button w/ blue underline
 .wvButton--underline, .fa.wvButton--underline {
     @extend .wvButton;

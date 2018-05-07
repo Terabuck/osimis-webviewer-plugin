@@ -15,7 +15,7 @@
      * @constructor osimis.Image
      */
     function Image(imageBinaryManager, annotationManager, // injected values
-                   id, tags, availableQualities, postProcesses
+                   id, instanceInfos, availableQualities, postProcesses
     ) {
         var _this = this;
 
@@ -23,7 +23,7 @@
         this._annotationManager = annotationManager;
 
         this.id = id;
-        this.tags = tags;
+        this.instanceInfos = instanceInfos;
         this._availableQualities = availableQualities;
 
         // collection of postprocesses

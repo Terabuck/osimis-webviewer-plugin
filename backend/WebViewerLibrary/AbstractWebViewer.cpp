@@ -18,11 +18,13 @@
 #include "OrthancContextManager.h"
 #include "BaseController.h"
 #include "Instance/DicomRepository.h"
+#include "Instance/InstanceRepository.h"
 #include "Study/StudyController.h"
 #include "Series/SeriesRepository.h"
 #include "Series/SeriesController.h"
 #include "Image/ImageRepository.h"
 #include "Image/ImageController.h"
+#include "Language/LanguageController.h"
 #include "Annotation/AnnotationRepository.h"
 #include "Config/ConfigController.h"
 #include "Config/WebViewerConfiguration.h"
@@ -36,6 +38,7 @@ namespace
   // Needed locally for use by orthanc's callbacks
   OrthancPluginContext* _context;
   CacheContext* _cache = NULL;
+  InstanceRepository* _instanceRepository = NULL;
   const WebViewerConfiguration* _config;
 
   void _configureDicomDecoderPolicy();
@@ -103,10 +106,12 @@ void AbstractWebViewer::_serveBackEnd()
   ConfigController::setConfig(_config.get());
   
   // Register routes & controllers
+  // Note: if you add some routes here, don't forget to add them in the authorization plugin
   RegisterRoute<ImageController>("/osimis-viewer/images/");
   RegisterRoute<SeriesController>("/osimis-viewer/series/");
   RegisterRoute<ConfigController>("/osimis-viewer/config.js");
   RegisterRoute<StudyController>("/osimis-viewer/studies/");
+  RegisterRoute<LanguageController>("/osimis-viewer/languages/");
 
   // OrthancPluginRegisterRestCallbackNoLock(_context, "/osimis-viewer/is-stable-series/(.*)", IsStableSeries);
 }
@@ -124,7 +129,8 @@ AbstractWebViewer::AbstractWebViewer(OrthancPluginContext* context)
   // Instantiate repositories @warning member declaration order is important
   _dicomRepository.reset(new DicomRepository);
   _imageRepository.reset(new ImageRepository(_dicomRepository.get(), _cache.get()));
-  _seriesRepository.reset(new SeriesRepository(_dicomRepository.get()));
+  _instanceRepository.reset(new InstanceRepository(_context));
+  _seriesRepository.reset(new SeriesRepository(_dicomRepository.get(), _instanceRepository.get()));
   _annotationRepository.reset(new AnnotationRepository);
 
   // Inject repositories within controllers (we can't do it without static method
@@ -133,6 +139,8 @@ AbstractWebViewer::AbstractWebViewer(OrthancPluginContext* context)
   ImageController::Inject(_imageRepository.get());
   ImageController::Inject(_annotationRepository.get());
   SeriesController::Inject(_seriesRepository.get());
+
+  ::_instanceRepository = _instanceRepository.get();
 }
 
 int32_t AbstractWebViewer::start()
@@ -188,6 +196,8 @@ int32_t AbstractWebViewer::start()
     ImageController::Inject(_cache.get());
   }
 
+  _instanceRepository->EnableCachingInMetadata(_config->instanceInfoCacheEnabled);
+
   if (_config->keyImageCaptureEnabled) {
     // register the OsimisNote tag
     OrthancPluginRegisterDictionaryTag(_context,
@@ -220,6 +230,7 @@ int32_t AbstractWebViewer::start()
 AbstractWebViewer::~AbstractWebViewer()
 {
   OrthancPluginLogWarning(_context, "Finalizing the Web viewer");
+  ::_instanceRepository = NULL;
 }
 
 namespace
@@ -241,6 +252,7 @@ namespace
       if (changeType == OrthancPluginChangeType_NewInstance &&
           resourceType == OrthancPluginResourceType_Instance)
       {
+        ::_instanceRepository->SignalNewInstance(resourceId);
         ::_cache->SignalNewInstance(resourceId);
       }
 
@@ -249,6 +261,11 @@ namespace
     catch (std::runtime_error& e)
     {
       OrthancPluginLogError(::_context, e.what());
+      return OrthancPluginErrorCode_Success;  // Ignore error
+    }
+    catch (...)
+    {
+      OrthancPluginLogError(::_context, "unexpected error in onChangeCallback");
       return OrthancPluginErrorCode_Success;  // Ignore error
     }
   }
@@ -304,6 +321,11 @@ namespace
 
       std::string s = "Cannot decode image using GDCM: " + std::string(e.what());
       OrthancPluginLogError(::_context, s.c_str());
+      return OrthancPluginErrorCode_Plugin;
+    }
+    catch (...)
+    {
+      OrthancPluginLogError(::_context, "unexpected error in decodeImageCallback");
       return OrthancPluginErrorCode_Plugin;
     }
   }

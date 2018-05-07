@@ -29,6 +29,7 @@ public:
   void getDicomFile(const std::string instanceId, OrthancPluginMemoryBuffer& buffer) const; // throws Orthanc::ErrorCode_UnknownResource
 //  void increfDicomFile(const std::string instanceId);
   void decrefDicomFile(const std::string instanceId) const;
+  void invalidateDicomFile(const std::string instanceId);
 //  void addDicomFile(const std::string instanceId, OrthancPluginMemoryBuffer& buffer);
   ~DicomRepository();
 

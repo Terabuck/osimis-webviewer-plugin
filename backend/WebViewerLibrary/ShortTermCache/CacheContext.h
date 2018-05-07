@@ -92,6 +92,7 @@ public:
 
   void SignalNewInstance(const char* instanceId)
   {
+    logger_->LogCacheDebugInfo(std::string("enqueuing new instance ") + instanceId);
     newInstances_.Enqueue(new DynamicString(instanceId));
   }
 

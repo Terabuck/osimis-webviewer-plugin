@@ -502,7 +502,7 @@ namespace OrthancPlugins
 
 
   void CacheManager::Invalidate(int bundleIndex,
-                                const std::string& item)
+                                const std::string& itemPrefix) // item is actually a prefix: when invalidating {id}/0, it will also invalidate {id}/0/pixel-quality, ...
   {
     using namespace Orthanc;
     SanityCheck();
@@ -512,10 +512,10 @@ namespace OrthancPlugins
 
     Bundle bundle = GetBundle(bundleIndex);
 
-    SQLite::Statement s(pimpl_->db_, SQLITE_FROM_HERE, "SELECT seq, fileUuid, fileSize FROM Cache WHERE bundle=? AND item=?");
+    SQLite::Statement s(pimpl_->db_, SQLITE_FROM_HERE, "SELECT seq, fileUuid, fileSize FROM Cache WHERE bundle=? AND item LIKE ?");
     s.BindInt(0, bundleIndex);
-    s.BindString(1, item);
-    if (s.Step())
+    s.BindString(1, itemPrefix + "%%");  // add a '%' after because we want to search on a prefix
+    while (s.Step())
     {
       int64_t seq = s.ColumnInt64(0);
       const std::string uuid = s.ColumnString(1);
@@ -526,11 +526,11 @@ namespace OrthancPlugins
       t.BindInt64(0, seq);
       if (t.Run())
       {
-        transaction->Commit();
         pimpl_->bundles_[bundleIndex] = bundle;
         pimpl_->storage_.Remove(uuid, Orthanc::FileContentType_Unknown);
       }
     }
+    transaction->Commit();
   }
 
 

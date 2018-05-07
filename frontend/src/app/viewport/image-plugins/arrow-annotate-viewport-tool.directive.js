@@ -53,7 +53,7 @@
 
         /* @ngInject */
         function Controller() {
-            WvBaseTool.call(this, 'arrowAnnotate', 'arrowAnnotateTouch');
+            WvBaseTool.call(this, 'arrowAnnotate', 'arrowAnnotateTouch', true);
         }
         Controller.prototype = Object.create(WvBaseTool.prototype)
         Controller.prototype.constructor = Controller;

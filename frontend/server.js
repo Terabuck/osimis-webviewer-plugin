@@ -25,6 +25,14 @@ console.log('About to crank up node');
 console.log('PORT=' + port);
 console.log('NODE_ENV=' + environment);
 
+function wait(seconds){
+    /**
+     * Needed to test with latency in dev
+     */
+    var waitTill = new Date(new Date().getTime() + seconds * 1000);
+    while(waitTill > new Date()){}
+}
+
 // setting proxies
 var orthancProxy = httpProxy.createProxyServer();
 var orthancUrl = 'http://localhost:8042';
@@ -40,7 +48,14 @@ app.all('/config.js', function(req, res, next) {
     // -> `/config.js`
     req.url = '/osimis-viewer/' + req.url;
     next();
-})
+});
+app.all('/osimis-viewer/languages/*', function(req, res, next){
+    var splittedUrl = req.url.split('/osimis-viewer/languages/');
+    console.log('trying to get language', req.url, splittedUrl);
+    req.url = '/languages/' + splittedUrl[1] + ".json";
+    wait(2);
+    next()
+});
 app.all("/:service/*", function(req, res, next) {
     var toRedirectToOrthanc = [
         'osimis-viewer',
@@ -75,7 +90,7 @@ app.all("/:service/*", function(req, res, next) {
             }
             req.emit('end');
         });
-        
+
         orthancProxy.web(req, res, {target: orthancUrl});
     }
 });

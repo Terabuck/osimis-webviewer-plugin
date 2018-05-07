@@ -100,6 +100,12 @@ void ImageRepository::CleanImageCache(const std::string& instanceId, uint32_t fr
   }
 }
 
+
+void ImageRepository::invalidateInstance(const std::string& instanceId)
+{
+  _dicomRepository->invalidateDicomFile(instanceId);
+}
+
 std::auto_ptr<Image> ImageRepository::_LoadImageFromOrthanc(const std::string& instanceId, uint32_t frameIndex, IImageProcessingPolicy* policy) const {
   BENCH_LOG(IMAGE_FORMATING, "");
 

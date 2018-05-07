@@ -62,6 +62,14 @@
             'handles.end2.x',
             'handles.end2.y',
         ],
+        simpleAngle: [
+            'handles.start.x',
+            'handles.start.y',
+            'handles.middle.x',
+            'handles.middle.y',
+            'handles.end.x',
+            'handles.end.y',
+        ],
         probe: [
             'handles.end.x',
             'handles.end.y',
@@ -121,6 +129,9 @@
      * Mutation is done to keep the variable references with cornerstoneTools.
      */
     CornerstoneAnnotationSynchronizer.prototype.syncByAnnotationType = function(type, annotations, baseResolution, newResolution) {
+        if (annotations === undefined || annotations.data === undefined) {
+            return;
+        }
         // For each annotation
         annotations.data.forEach(function(data) {
             // Use data.imageResolution in case baseResolution != data.imageResolution

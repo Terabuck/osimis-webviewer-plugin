@@ -74,7 +74,7 @@ std::set<ImageQuality> OnTheFlyDownloadAvailableQualityPolicy::retrieveByTags(
   // Decompressing<->Recompression takes time, so we avoid recompressing dicom images at all cost
   if (_isAlreadyCompressedWithinDicom(headerTags)) {
     // Set thumbnails only on medium sized images
-    if (_isLargerThan(750, 750, otherTags)) {
+    if (_isLargerThan(750, 750, otherTags["TagsSubset"])) {
       result.insert(ImageQuality(ImageQuality::LOW)); // 150x150 jpeg80
       BENCH_LOG("QUALITY", "low");
     }
@@ -91,7 +91,7 @@ std::set<ImageQuality> OnTheFlyDownloadAvailableQualityPolicy::retrieveByTags(
     BENCH_LOG("QUALITY", "low");
 
     // Set MQ on large images
-    if (_isLargerThan(1000, 1000, otherTags)) {
+    if (_isLargerThan(1000, 1000, otherTags["TagsSubset"])) {
       result.insert(ImageQuality(ImageQuality::MEDIUM)); // 1000x1000 jpeg80
       BENCH_LOG("QUALITY", "medium");
     }

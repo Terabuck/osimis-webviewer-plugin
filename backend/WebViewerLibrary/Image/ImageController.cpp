@@ -376,6 +376,11 @@ bool ImageControllerCacheFactory::Create(std::string& content,
   return true;
 }
 
+void ImageControllerCacheFactory::Invalidate(const std::string& item)
+{
+  this->imageRepository_->invalidateInstance(item);
+}
+
 std::auto_ptr<ImageProcessingRouteParser> ImageControllerUrlParser::imageProcessingRouteParser_;
 
 void ImageControllerUrlParser::init()

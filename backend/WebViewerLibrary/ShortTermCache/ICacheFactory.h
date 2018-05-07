@@ -38,5 +38,7 @@ namespace OrthancPlugins
     // call this method at the same time.
     virtual bool Create(std::string& content,
                         const std::string& key) = 0;
+
+    virtual void Invalidate(const std::string& item) = 0;
   };
 }

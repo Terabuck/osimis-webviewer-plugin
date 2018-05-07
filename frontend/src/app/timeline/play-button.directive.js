@@ -44,8 +44,38 @@
     }
 
     /* @ngInject */
-    function Controller() {
+    function Controller(wvSeriesPlayer) {
         // Set default values
         this.readonly = (typeof this.readonly === 'undefined') ? false : this.readonly;
+        this.wvSeriesPlayer = wvSeriesPlayer;
     }
+
+    Controller.prototype.play = function() {
+        if (this.wvSeriesPlayer.isPlaying(this.series)) {
+            this.wvSeriesPlayer.pause(this.series);    
+        } else {
+            this.wvSeriesPlayer.play(this.series);    
+        }
+    };
+
+    Controller.prototype.playReverse = function() {
+        if (this.wvSeriesPlayer.isPlayingReverse(this.series)) {
+            this.wvSeriesPlayer.pause(this.series);    
+        } else {
+            this.wvSeriesPlayer.playReverse(this.series);    
+        }
+    };
+
+    Controller.prototype.pause = function() {
+        this.wvSeriesPlayer.pause(this.series);
+    };
+
+    Controller.prototype.isPlaying = function() {
+        this.wvSeriesPlayer.isPlaying(this.series);
+    };
+    Controller.prototype.isPlayingReverse = function() {
+        this.wvSeriesPlayer.isPlayingReverse(this.series);
+    };
+
+
 })();

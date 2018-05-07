@@ -8,7 +8,7 @@
     <!-- Image Bars -->
     <use
         ng-repeat="i in [0, vm.imageCount] | range track by $index"
-        ng-click="!vm.readonly && vm.series.goToImage(i)"
+        ng-click="!vm.readonly && vm.goToImage(i)"
 
         xlink:href=""
         ng-attr-xlink:href="{{'#image-loading-bar-'+$parent.$id}}"
@@ -23,7 +23,7 @@
     <!-- Current Image Bar -->
     <use
         ng-if="vm.imageBarWidth"
-        ng-click="!vm.readonly && vm.series.goToImage(vm.currentImageIndex)"
+        ng-click="!vm.readonly && vm.goToImage(vm.currentImageIndex)"
 
         xlink:href=""
         ng-attr-xlink:href="{{'#image-loading-bar-'+$parent.$id}}"

@@ -119,6 +119,7 @@ namespace OrthancPlugins
         {
           if (prefetch.get() != NULL)
           {
+            that->cacheLogger_->LogCacheDebugInfo(std::string("dequeued prefetching ") + prefetch->GetValue());
             {
               boost::mutex::scoped_lock lock(that->invalidatedMutex_);
               that->invalidated_ = false;
@@ -265,6 +266,7 @@ namespace OrthancPlugins
       {
         prefetchers_[i]->SignalInvalidated(item);
       }
+      factory_->Invalidate(item);
     }
 
     void Prefetch(const std::string& item)
@@ -424,6 +426,7 @@ namespace OrthancPlugins
   void CacheScheduler::Prefetch(int bundle,
                                 const std::string& item)
   {
+    cacheLogger_->LogCacheDebugInfo(std::string("enqueuing prefetch ") + item);
     GetBundleScheduler(bundle).Prefetch(item);
   }
 
