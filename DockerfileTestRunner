@@ -2,7 +2,7 @@
 # It requires an orthanc server plug with the web viewer plugin (at ORTHANC_URL env variable).
 # This docker image may be run in conjonction with orthanc using test/docker-compose.yml
 
-FROM markadams/chromium-xvfb
+FROM osimis/chromium-xvfb:april-2017
 
 # install required dev tools (git is used by bower & npm for source retrieval)
 RUN apt-get update ;  apt-get install -y python3 python3-pip curl zip unzip \
