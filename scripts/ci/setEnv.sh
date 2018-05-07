@@ -35,7 +35,7 @@ function _setEnvMain {
 	elif [[ $branchName == "master" ]]; then
 		
 		# in the master branch, make sure the tag is clean ('1.2.3'; not 1.2.3-alpha) and there has been 0 commits since the tag has been set.
-		if [[ $gitLongTag =~ [0-9]+.[0-9]+.[0-9]+-0-[0-9a-g]{8}$ ]]; then 
+		if [[ $gitLongTag =~ [0-9]+.[0-9]+.[0-9]+-0-g[0-9a-f]{8}$ ]]; then 
 
 			releaseTag=$(echo $gitLongTag | sed -r "s/([0-9]+\.[0-9]+\.[0-9]+)-[0-9]+-.+/\1/")
 		else
