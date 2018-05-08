@@ -396,11 +396,13 @@ void WebViewerConfiguration::parseFile()
     shortTermCachePath /= "WebViewerCache";
 
     static const char* CONFIG_WEB_VIEWER = "WebViewer";
-    if (configuration.isMember(CONFIG_WEB_VIEWER))
-    {
+    if (configuration.isMember(CONFIG_WEB_VIEWER)) {
       // Parse the config content using an overridable method.
       _parseFile(configuration[CONFIG_WEB_VIEWER]);
+    } else {
+      _parseFile(Json::objectValue);
     }
+
   }
   /* Log on error and rethrow */
   catch (std::runtime_error& e)
