@@ -228,7 +228,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   combinedToolEnabled = OrthancPlugins::GetBoolValue(wvConfig, "CombinedToolEnabled", false);
   showStudyInformationBreadcrumb = OrthancPlugins::GetBoolValue(wvConfig, "ShowStudyInformationBreadcrumb", false);
   shortTermCachePrefetchOnInstanceStored = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCachePrefetchOnInstanceStored", false);
-  shortTermCacheEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheEnabled", true);
+  shortTermCacheEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheEnabled", false);
   shortTermCacheDebugLogsEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheDebugLogsEnabled", false);
   shortTermCachePath = OrthancPlugins::GetStringValue(wvConfig, "ShortTermCachePath", shortTermCachePath.string());
   shortTermCacheSize = OrthancPlugins::GetIntegerValue(wvConfig, "ShortTermCacheSize", 1000);
@@ -393,7 +393,7 @@ void WebViewerConfiguration::parseFile()
     }
 
     shortTermCachePath = OrthancPlugins::GetStringValue(configuration, "StorageDirectory", "."); // By default, the cache of the Web viewer is located inside the "StorageDirectory" of Orthanc
-    shortTermCachePath /= "WebViewerCache";
+    shortTermCachePath /= "OsimisWebViewerCache";
 
     static const char* CONFIG_WEB_VIEWER = "WebViewer";
     if (configuration.isMember(CONFIG_WEB_VIEWER)) {
