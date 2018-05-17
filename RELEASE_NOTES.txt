@@ -1,5 +1,16 @@
-Pending changes in the mainline
-===============================
+Version 1.1.1
+========================
+
+=> Minimum Orthanc version: 1.3.1 <=
+
+Fixes:
+-----
+* There was a conflict between Orthanc WebViewer cache and Osimis WebViewer cache.  
+  The ShortTermCache is now disabled by default and its default location is now OsimisWebViewerCache instead of WebViewerCache.
+
+
+Version 1.1.0
+========================
 
 => Minimum Orthanc version: 1.3.1 <=
 
