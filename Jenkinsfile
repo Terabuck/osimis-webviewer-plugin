@@ -7,7 +7,7 @@ def userInput = [
     buildDocker: true,
     launchDockerTests: true,
     buildWindows: isUserDevBranch ? false : true,
-    buildOSX: isUserDevBranch ? false : true
+    buildOSX: false
 ];
 
 // The built version, defined via `git describe` in scripts/ci/setEnv.sh call
