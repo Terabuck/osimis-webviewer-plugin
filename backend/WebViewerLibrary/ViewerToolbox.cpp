@@ -548,4 +548,20 @@ namespace OrthancPlugins
 
     return accessor;
   }
+
+  Json::Value SanitizeTag(const std::string& tagName, const Json::Value& value) {
+    // performs all kind of sanitizations to tags to correct invalid dicom tags from some modalities
+
+    Json::Value sanitized = value;
+
+    if (tagName == "Columns" || tagName == "Rows") { // Some US modalities have Rows="600\\0" !!!  keep only the first part
+
+      std::string stringValue = value.asString();
+      if (stringValue.find("\\") != -1) {
+        sanitized = Json::Value(stringValue.substr(0, stringValue.find("\\")));
+      }
+    }
+
+    return sanitized;
+  }
 }

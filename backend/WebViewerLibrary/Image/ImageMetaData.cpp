@@ -11,6 +11,7 @@
 #include <Core/Toolbox.h> // for TokenizeString && StripSpaces
 #include <Core/Images/ImageProcessing.h> // for GetMinMaxValue
 #include <Core/OrthancException.h> // for throws
+#include "ViewerToolbox.h"
 
 namespace
 {
@@ -114,8 +115,8 @@ ImageMetaData::ImageMetaData(const DicomMap& headerTags, const Json::Value& dico
   maxPixelValue = std::pow(2, bitsStored); // approximative value
 
   // set width/height
-  width = boost::lexical_cast<uint32_t>(Toolbox::StripSpaces(dicomTags["Columns"].asString()));
-  height = boost::lexical_cast<uint32_t>(Toolbox::StripSpaces(dicomTags["Rows"].asString()));
+  width = boost::lexical_cast<uint32_t>(Toolbox::StripSpaces(OrthancPlugins::SanitizeTag("Columns", dicomTags["Columns"]).asString()));
+  height = boost::lexical_cast<uint32_t>(Toolbox::StripSpaces(OrthancPlugins::SanitizeTag("Rows", dicomTags["Rows"]).asString()));
 
   // set sizeInBytes
   std::string photometricInterpretation = Toolbox::StripSpaces(dicomTags["PhotometricInterpretation"].asString());

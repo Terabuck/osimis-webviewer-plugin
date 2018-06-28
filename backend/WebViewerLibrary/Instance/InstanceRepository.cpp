@@ -60,7 +60,7 @@ Json::Value InstanceRepository::GetInstanceInfo(const std::string& instanceId) {
         instanceInfo = GenerateInstanceInfo(instanceId);
         StoreInstanceInfoInMetadata(instanceId, instanceInfo);
       }
-      return instanceInfo;
+      return SanitizeInstanceInfo(instanceInfo);  // the info that has been cached my contain inconsistent data -> re-sanitize it
   } else {
       return GenerateInstanceInfo(instanceId);
   }
@@ -146,9 +146,18 @@ Json::Value InstanceRepository::SimplifyInstanceTags(const Json::Value& instance
   {
     if (!instanceTags[*it].empty())
     {
-      toReturn[*it] = instanceTags[*it];
+      toReturn[*it] = OrthancPlugins::SanitizeTag(*it, instanceTags[*it]);
     }
   }
 
   return toReturn;
+}
+
+
+Json::Value InstanceRepository::SanitizeInstanceInfo(const Json::Value& instanceInfo) {
+  Json::Value sanitized = instanceInfo;
+  sanitized["TagsSubset"]["Columns"] = OrthancPlugins::SanitizeTag("Columns", instanceInfo["TagsSubset"]["Columns"]);
+  sanitized["TagsSubset"]["Rows"] = OrthancPlugins::SanitizeTag("Rows", instanceInfo["TagsSubset"]["Rows"]);
+
+  return sanitized;
 }

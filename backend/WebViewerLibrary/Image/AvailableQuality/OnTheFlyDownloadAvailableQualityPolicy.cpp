@@ -6,14 +6,15 @@
 #include <Core/OrthancException.h>
 #include <Core/Toolbox.h>
 #include "../../BenchmarkHelper.h"
+#include "ViewerToolbox.h"
 
 bool OnTheFlyDownloadAvailableQualityPolicy::_isLargerThan(
                                                               uint32_t width,
                                                               uint32_t height,
                                                               const Json::Value& otherTags)
 {
-  int columns = boost::lexical_cast<int>(otherTags["Columns"].asString());
-  int rows = boost::lexical_cast<int>(otherTags["Rows"].asString());
+  int columns = boost::lexical_cast<int>(OrthancPlugins::SanitizeTag("Columns", otherTags["Columns"]).asString());
+  int rows = boost::lexical_cast<int>(OrthancPlugins::SanitizeTag("Rows", otherTags["Rows"]).asString());
 
   return columns > width && rows > height;
 }

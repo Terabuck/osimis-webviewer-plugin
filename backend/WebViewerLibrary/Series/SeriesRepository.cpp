@@ -203,7 +203,7 @@ namespace {
     {
       if (!instanceTags[*it].empty())
       {
-        toReturn[*it] = instanceTags[*it];
+        toReturn[*it] = OrthancPlugins::SanitizeTag(*it, instanceTags[*it]);
       }
     }
 
