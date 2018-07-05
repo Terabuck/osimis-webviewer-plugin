@@ -757,8 +757,9 @@
     }
 
     /* @ngInject */
-    function Controller($rootScope, $scope) {
+    function Controller($rootScope, $scope, $window) {
         var vm = this;
+        vm.window = $window;
     }
 
 })();

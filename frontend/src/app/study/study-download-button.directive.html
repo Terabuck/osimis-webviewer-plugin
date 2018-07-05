@@ -5,6 +5,7 @@
     ng-if="!!vm.studyId"
 
     bs-tooltip
+    bs-enabled="!vm.window.USER_IS_TOUCHING"
     container="body"
     data-title="{{ 'COMPONENTS.STUDY.DOWNLOAD_STUDY' | translate | wvCapitalize }}"
     placement="right"

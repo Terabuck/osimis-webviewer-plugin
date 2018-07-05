@@ -8,7 +8,7 @@
 
         data-title="{{ 'COMPONENTS.TIMELINE.PREVIOUS' | translate | wvCapitalize }}"
         bs-tooltip data-placement="top"
-        class="wv-timeline-controls-button"
+        bs-enabled="!vm.window.USER_IS_TOUCHING"        class="wv-timeline-controls-button"
     ><span class="fa fa-step-backward" class="wv-timeline-controls-vertical-sizing"></span></span>
 
     <!-- Input Field -->
@@ -28,7 +28,7 @@
         ng-click="!vm.readonly && vm.series.goToNextImage()"
 
         bs-tooltip data-placement="top"
-        data-title="{{ 'COMPONENTS.TIMELINE.NEXT' | translate | wvCapitalize }}"
+        bs-enabled="!vm.window.USER_IS_TOUCHING"        data-title="{{ 'COMPONENTS.TIMELINE.NEXT' | translate | wvCapitalize }}"
         class="wv-timeline-controls-button"
     >
         <span class="fa fa-step-forward" class="wv-timeline-controls-vertical-sizing"></span>

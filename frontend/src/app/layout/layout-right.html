@@ -23,6 +23,7 @@
         > 
             <!-- Button: close -->
             <button
+                bs-enabled="!vm.window.USER_IS_TOUCHING"
                 bs-tooltip data-placement="left" data-title="Close"
                 ng-click="vm.closed = true;"
                 class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"
@@ -38,6 +39,7 @@
         >
             <!-- Button: open -->
             <button
+                bs-enabled="!vm.window.USER_IS_TOUCHING"
                 bs-tooltip data-placement="left" data-title="Open"
                 ng-click="vm.closed = false;"
                 class="wvAsideRight__action button__base wh__25 lh__25 va-m text-center"

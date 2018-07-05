@@ -77,7 +77,8 @@
     }
 
     /* @ngInject */
-    function layoutLeftCtrl() {
+    function layoutLeftCtrl($window) {
+        this.window = $window;
 
     }
 
