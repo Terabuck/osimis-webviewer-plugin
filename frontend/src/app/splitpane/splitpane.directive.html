@@ -2,6 +2,7 @@
 
     <div 
         ng-repeat="(id, $pane) in vm.paneManager.panes track by $id($pane)"
+        class="wvSplitpane__cellBorder--{{ $pane.studyColor }}"
         ng-class="{
             'wvSplitpane__cellBorder': !vm.paneManager.isPaneSelected($pane.x, $pane.y) || vm.paneManager.getPane($pane.x, $pane.y).isEmpty(),
             'wvSplitpane__cellBorder--selected': vm.paneManager.isPaneSelected($pane.x, $pane.y) && !vm.paneManager.getPane($pane.x, $pane.y).isEmpty()

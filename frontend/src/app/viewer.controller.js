@@ -73,7 +73,7 @@
             }
         }).then(function(nextStudy){
             var firstItemTuple = nextStudy.getNextItemId(),
-                paneOptions = {csViewport: null, isSelected: true};
+                paneOptions = {csViewport: null, isSelected: true, studyColor: nextStudy.color};
 
             if(firstItemTuple[1] == "series"){
                 paneOptions.seriesId = firstItemTuple[0];
@@ -102,7 +102,7 @@
             }
         }).then(function(previousStudy){
             var firstItemTuple = previousStudy.getNextItemId(),
-                paneOptions = {csViewport: null, isSelected: true};
+                paneOptions = {csViewport: null, isSelected: true, studyColor: study.color};
 
             if(firstItemTuple[1] == "series"){
                 paneOptions.seriesId = firstItemTuple[0];

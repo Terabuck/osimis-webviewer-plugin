@@ -682,7 +682,7 @@
                     wvStudyManager.get(newValues[0]).then(function(firstStudy){
                         var firstPane = wvPaneManager.getPane(0, 0);
                         if(firstStudy && firstPane.isEmpty()){
-                            wvPaneManager.setPane(0, 0, {seriesId: firstStudy.series[0], isSelected: true})
+                            wvPaneManager.setPane(0, 0, {seriesId: firstStudy.series[0], isSelected: true, studyColor: firstStudy.color})
                         };
                     });
                 }

@@ -18,7 +18,8 @@
             'highlighted': vm.isHighlighted(id)
         }"
         wv-draggable-item="{
-            reportId: id
+            reportId: id,
+            studyColor: vm.study.color
         }"
         ng-click="vm.toggleReportSelection(id)"
 
@@ -80,6 +81,7 @@
         ng-repeat="$video in vm.videos track by $video.id"
         wv-draggable-item="{
             videoId: $video.id
+            studyColor: vm.study.color
         }"
         ng-click="vm.toggleSelection($video.id)"
 
@@ -118,7 +120,8 @@
         wv-draggable-item="{
             seriesId: $series.id,
             csViewport: null,
-            imageIndex: 0
+            imageIndex: 0,
+            studyColor: vm.study.color
         }"
         ng-click="vm.toggleSeriesSelection($series.id)"
 

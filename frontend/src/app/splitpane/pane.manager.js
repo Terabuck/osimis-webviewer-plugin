@@ -223,6 +223,7 @@
         pane.videoId = config.videoId;
         pane.csViewport = config.csViewport;
         pane.imageIndex = config.imageIndex;
+        pane.studyColor = config.studyColor;
         // If the new pane is selected, unset the actually selected one.
         if (config.isSelected) {
             var previouslySelectedPane = this.getSelectedPane();
