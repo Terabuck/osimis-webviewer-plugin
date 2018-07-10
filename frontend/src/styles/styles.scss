@@ -3,3 +3,12 @@
 
 @import "webviewer.main.scss";
 @import "webviewer.components.scss";
+
+
+@media print {
+    @import "print";
+}
+
+body.print{
+    @import "print";
+}
