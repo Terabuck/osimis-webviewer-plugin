@@ -38,7 +38,6 @@
     "open-sans": "./local_dependencies/open-sans/",
     "font-awesome": "4.7.0",
     "cornerstone": "0.12.2",
-    "cornerstoneTools": "0.7.9",
     "cornerstoneMath": "0.1.6",
     "jpgjs": "notmasteryet/jpgjs",
     "hamsterjs": "1.1.3",
