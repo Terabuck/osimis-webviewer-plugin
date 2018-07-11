@@ -1,4 +1,6 @@
 /*! cornerstoneTools - v0.7.9 - 2016-07-13 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneTools */
+// modified by Osimis to fix the edition of arrow-text annotation
+
 // Begin Source: src/header.js
 if (typeof cornerstone === 'undefined') {
     cornerstone = {};
@@ -2408,7 +2410,7 @@ if (typeof cornerstoneTools === 'undefined') {
         var element = eventData.element;
         var data;
 
-        function doneChangingTextCallback(data, updatedText, deleteTool) {
+        function doneChangingTextCallback(updatedText, deleteTool) {
             if (deleteTool === true) {
                 cornerstoneTools.removeToolState(element, toolType, data);
             } else {
@@ -2454,7 +2456,7 @@ if (typeof cornerstoneTools === 'undefined') {
         var element = eventData.element;
         var data;
 
-        function doneChangingTextCallback(data, updatedText, deleteTool) {
+        function doneChangingTextCallback(updatedText, deleteTool) {
             console.log('pressCallback doneChangingTextCallback');
             if (deleteTool === true) {
                 cornerstoneTools.removeToolState(element, toolType, data);
@@ -5760,7 +5762,7 @@ if (typeof cornerstoneTools === 'undefined') {
         var element = eventData.element;
         var data;
 
-        function doneChangingTextCallback(data, updatedText, deleteTool) {
+        function doneChangingTextCallback(updatedText, deleteTool) {
             if (deleteTool === true) {
                 cornerstoneTools.removeToolState(element, toolType, data);
             } else {
@@ -5819,7 +5821,7 @@ if (typeof cornerstoneTools === 'undefined') {
         var element = eventData.element;
         var data;
 
-        function doneChangingTextCallback(data, updatedText, deleteTool) {
+        function doneChangingTextCallback(updatedText, deleteTool) {
             if (deleteTool === true) {
                 cornerstoneTools.removeToolState(element, toolType, data);
             } else {
