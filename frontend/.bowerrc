@@ -1,7 +1,4 @@
 {
   "directory": "bower_components",
-	"scripts": {
-		"postinstall": "gulp wiredep"
-	},
 	"registry": "https://registry.bower.io"
 }
