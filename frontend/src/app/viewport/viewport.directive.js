@@ -124,6 +124,7 @@
                 wvImage: '=?',
                 wvOnImageChange: '&?',
                 csViewport: '=?wvViewport',
+                model: '=?wvViewportModel',
                 wvEnableOverlay: '=?', // boolean [false]
                 wvLossless: '@?' // boolean [false] - Always fetch lossless if true
             }
@@ -159,7 +160,7 @@
         function link(scope, element, attrs, ctrls) {
             var enabledElement = element.children('div').children('.wv-cornerstone-enabled-image')[0];
             var model = new osimis.Viewport($q, cornerstone, enabledElement, !!scope.vm.wvLossless);
-
+            scope.vm.model = model
             scope.vm.setFocus = function(){
                 // because of unselectable, we set the focus on the click in case the viewer is embedded in an iframe.
                 // this should allow the iframe to get the focus

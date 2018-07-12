@@ -344,11 +344,13 @@
                 -->
                 <wv-viewport
                     ng-if="!!$pane.seriesId"
+                    
                     vp-series-id="$pane.seriesId" wv-size="{width: 1.0, height: 1.0}" wv-lossless="true"
                     wv-series="$pane.series" wv-image="$image"
                     wv-droppable-series-ext="!vm.readonly && vm.serieslistEnabled"
                     wv-scroll-on-wheel-series-ext="!vm.readonly"
                     wv-viewport="$pane.csViewport"
+                    wv-viewport-model="vm.viewports[$pane.$$hashKey]"
                     wv-image-index="$pane.imageIndex"
 
                     wv-mobile-viewport-tool="!vm.readonly && vm.tools.combinedTool"
@@ -405,6 +407,7 @@
                 ></wv-pane-overlay>
             </wv-pane-policy>
         </wv-splitpane>
+        <button class="closePrintButton" ng-click="vm.cancelPrintMode()"><span class="glyphicon glyphicon-remove"></span></button>
     </wv-layout-main>
 
 </wv-layout>

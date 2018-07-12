@@ -13,6 +13,7 @@
             'left': 'calc('+$pane.x+' * '+vm.rowWidth+' + 2px)',
             'top': 'calc('+$pane.y+' * '+vm.rowHeight+' + 2px)'
         }"
+        data-pane-hashkey="{{ $pane.$$hashKey }}"
         ng-click="!vm.readonly && vm.paneManager.selectPane($pane.x, $pane.y)"
         ng-mouseenter="!vm.readonly && (vm.paneManager.getPane($pane.x, $pane.y).isHovered = true)"
         ng-mouseleave="!vm.readonly && (vm.paneManager.getPane($pane.x, $pane.y).isHovered = false)"

@@ -43,11 +43,13 @@
 
         this.seriesId = undefined;
         this.csViewport = undefined;
+        // this.viewportModel = undefined;
         this.imageIndex = undefined;
         this.reportId = undefined;
         this.videoId = undefined;
         this.isSelected = false;
         this.isHovered = false;
+        this.studyColor = undefined;
     }
 
     /**
