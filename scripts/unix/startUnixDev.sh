@@ -11,18 +11,32 @@
 # See `scripts/osx/InstallOsXDependencies.sh` and
 # `scripts/unix/installAdditionalDevTools.sh`. On linux, you must install a
 # simular setup.
+# on JE OSX, launch ./scripts/unix/startUnixDev.sh false false
+# on AM Ubuntu, launch Orthanc separately and launch ./scripts/unix/startUnixDev.sh false false false true
 # 
 # @param {boolean} [$1=true]
 # Reinstall frontend dependencies.
 # 
 # @param {boolean} [$1=true]
 # Rebuild backend.
+# 
+# @param {boolean} [$1=false]
+# Launches orthanc.
+# 
+# @param {boolean} [$1=false]
+# Nginx needs sudo.
+
+
+
+./scripts/unix/startUnixDev.sh false false false true
 
 set -x
 set -e
 
 reinstallFrontendDep=${1:-true}
 rebuildBackend=${2:-true}
+launchOrthanc=${3:-false}
+nginxNeedsSudo=${4:-false}
 
 # Start from the repository root
 previousDir=$(pwd)
@@ -53,8 +67,13 @@ if [ "$rebuildBackend" = true ]; then
     ./backend/scripts/buildLocally.sh
 fi
 
+
 # Run nginx
-nginx -p ${rootDir}/reverse-proxy/ -c nginx.local.conf
+if [ "$nginxNeedsSudo" = true ]; then
+    sudo nginx -p ${rootDir}/reverse-proxy/ -c nginx.local.conf
+else
+    nginx -p ${rootDir}/reverse-proxy/ -c nginx.local.conf
+fi
 
 # Run Frontend Dev Process
 cd frontend/
@@ -63,14 +82,22 @@ gulp serve-dev &
 gulpPid=$!
 cd ../
 
-# Run Orthanc + Plugin
-cd ./backend/build/
-./Orthanc configOSX.json &
-orthancPid=$!
-cd ../../
+if [ "$launchOrthanc" = true ]; then
+
+  # Run Orthanc + Plugin
+  cd ./backend/build/
+  ./Orthanc configOSX.json &
+  orthancPid=$!
+  cd ../../
+
+fi
 
 # Kill orthanc, gulp & nginx on CTRL+C
-trap "nginx -p ${rootDir}/reverse-proxy/ -c nginx.local.conf -s stop; kill ${orthancPid}; kill ${gulpPid};" SIGINT ERR
+if [ "$nginxNeedsSudo" = true ]; then
+    trap "sudo nginx -p ${rootDir}/reverse-proxy/ -c nginx.local.conf -s stop; kill ${orthancPid}; kill ${gulpPid};" SIGINT ERR
+else
+    trap "nginx -p ${rootDir}/reverse-proxy/ -c nginx.local.conf -s stop; kill ${orthancPid}; kill ${gulpPid};" SIGINT ERR
+fi
 wait
 
 # Return to the previous folder
