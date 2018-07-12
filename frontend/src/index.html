@@ -130,12 +130,16 @@
                 orthancStudyId
             ];
 
-            // Set all the patient studies as pickable.
-            wvStudyManager
-                .getRelatedStudyIds(vm.selectedStudyIds)
-                .then(function(studyIds) {
-                    vm.pickableStudyIds = studyIds;
-                });
+            if (wvConfig.config.openAllPatientStudies) {
+                // Set all the patient studies as pickable.
+                wvStudyManager
+                    .getRelatedStudyIds(vm.selectedStudyIds)
+                    .then(function(studyIds) {
+                        vm.pickableStudyIds = studyIds;
+                    });
+            } else {
+                vm.pickableStudyIds = [orthancStudyId];    
+            }
         }
         // Display & convert orthanc series id (from url parameter) into
         // frontend series id.
@@ -161,11 +165,16 @@
                                 ];
 
                                 // Set all the patient studies as pickable.
-                                study
-                                    .getRelatedStudies()
-                                    .then(function(studyIds) {
-                                        vm.pickableStudyIds = studyIds;
-                                    });
+                                if (wvConfig.config.openAllPatientStudies) {
+                                    // Set all the patient studies as pickable.
+                                    study
+                                        .getRelatedStudies()
+                                        .then(function(studyIds) {
+                                            vm.pickableStudyIds = studyIds;
+                                        });
+                                } else {
+                                    vm.pickableStudyIds = [study.id];    
+                                }
                             });
                     }
                     // Otherwise, throw exception.

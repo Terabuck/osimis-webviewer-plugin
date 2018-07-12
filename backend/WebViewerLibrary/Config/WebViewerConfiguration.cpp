@@ -226,6 +226,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   annotationStorageEnabled = OrthancPlugins::GetBoolValue(wvConfig, "AnnotationStorageEnabled", false);
   keyImageCaptureEnabled = OrthancPlugins::GetBoolValue(wvConfig, "KeyImageCaptureEnabled", false);
   combinedToolEnabled = OrthancPlugins::GetBoolValue(wvConfig, "CombinedToolEnabled", false);
+  openAllPatientStudies = OrthancPlugins::GetBoolValue(wvConfig, "OpenAllPatientStudies", true);
   showStudyInformationBreadcrumb = OrthancPlugins::GetBoolValue(wvConfig, "ShowStudyInformationBreadcrumb", false);
   shortTermCachePrefetchOnInstanceStored = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCachePrefetchOnInstanceStored", false);
   shortTermCacheEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheEnabled", false);
@@ -455,6 +456,7 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["annotationStorageEnabled"] = annotationStorageEnabled;
   config["keyImageCaptureEnabled"] = keyImageCaptureEnabled;
   config["combinedToolEnabled"] = combinedToolEnabled;
+  config["openAllPatientStudies"] = openAllPatientStudies;
   config["showStudyInformationBreadcrumb"] = showStudyInformationBreadcrumb;
   config["windowingPresets"] = windowingPresets;
   config["combinedToolBehaviour"] = combinedToolBehaviour;
