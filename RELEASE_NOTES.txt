@@ -4,7 +4,7 @@ next version
 Fixes:
 -----
 * Improved support for some US modalities providing Columns/Rows tags as "600\\0" instead of "600"
-
+* Fixed the edition of arrow-text annotations
 
 Version 1.1.1
 ========================

@@ -12,7 +12,7 @@
 # `scripts/unix/installAdditionalDevTools.sh`. On linux, you must install a
 # simular setup.
 # on JE OSX, launch ./scripts/unix/startUnixDev.sh false false
-# on AM Ubuntu, launch Orthanc separately and launch ./scripts/unix/startUnixDev.sh false false false true
+# on AM Ubuntu, launch Orthanc separately and launch./scripts/unix/startUnixDev.sh false false false true
 # 
 # @param {boolean} [$1=true]
 # Reinstall frontend dependencies.
@@ -25,10 +25,6 @@
 # 
 # @param {boolean} [$1=false]
 # Nginx needs sudo.
-
-
-
-./scripts/unix/startUnixDev.sh false false false true
 
 set -x
 set -e
