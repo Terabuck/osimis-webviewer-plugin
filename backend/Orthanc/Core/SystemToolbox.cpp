@@ -2,7 +2,7 @@
  * Orthanc - A Lightweight, RESTful DICOM Store
  * Copyright (C) 2012-2016 Sebastien Jodogne, Medical Physics
  * Department, University Hospital of Liege, Belgium
- * Copyright (C) 2017 Osimis, Belgium
+ * Copyright (C) 2017-2018 Osimis S.A., Belgium
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -62,6 +62,14 @@
 #endif
 
 
+#include "Logging.h"
+#include "OrthancException.h"
+#include "Toolbox.h"
+
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 // Inclusions for UUID
 // http://stackoverflow.com/a/1626302
 
@@ -73,15 +81,6 @@ extern "C"
 #  include <uuid/uuid.h>
 #endif
 }
-
-
-#include "Logging.h"
-#include "OrthancException.h"
-#include "Toolbox.h"
-
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 
 
 namespace Orthanc
@@ -182,7 +181,7 @@ namespace Orthanc
   {
     if (!IsRegularFile(path))
     {
-      LOG(ERROR) << std::string("The path does not point to a regular file: ") << path;
+      LOG(ERROR) << "The path does not point to a regular file: " << path;
       throw OrthancException(ErrorCode_RegularFileExpected);
     }
 
@@ -210,7 +209,7 @@ namespace Orthanc
   {
     if (!IsRegularFile(path))
     {
-      LOG(ERROR) << std::string("The path does not point to a regular file: ") << path;
+      LOG(ERROR) << "The path does not point to a regular file: " << path;
       throw OrthancException(ErrorCode_RegularFileExpected);
     }
 
@@ -539,6 +538,42 @@ namespace Orthanc
   }
 
 
+  static boost::posix_time::ptime GetNow(bool utc)
+  {
+    if (utc)
+    {
+      return boost::posix_time::second_clock::universal_time();
+    }
+    else
+    {
+      return boost::posix_time::second_clock::local_time();
+    }
+  }
+
+
+  std::string SystemToolbox::GetNowIsoString(bool utc)
+  {
+    return boost::posix_time::to_iso_string(GetNow(utc));
+  }
+
+  
+  void SystemToolbox::GetNowDicom(std::string& date,
+                                  std::string& time,
+                                  bool utc)
+  {
+    boost::posix_time::ptime now = GetNow(utc);
+    tm tm = boost::posix_time::to_tm(now);
+
+    char s[32];
+    sprintf(s, "%04d%02d%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+    date.assign(s);
+
+    // TODO milliseconds
+    sprintf(s, "%02d%02d%02d.%06d", tm.tm_hour, tm.tm_min, tm.tm_sec, 0);
+    time.assign(s);
+  }
+
+
   std::string SystemToolbox::GenerateUuid()
   {
 #ifdef WIN32
@@ -558,28 +593,5 @@ namespace Orthanc
     uuid_unparse ( uuid, s );
 #endif
     return s;
-  }
-
-
-  std::string SystemToolbox::GetNowIsoString()
-  {
-    boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-    return boost::posix_time::to_iso_string(now);
-  }
-
-  
-  void SystemToolbox::GetNowDicom(std::string& date,
-                                  std::string& time)
-  {
-    boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-    tm tm = boost::posix_time::to_tm(now);
-
-    char s[32];
-    sprintf(s, "%04d%02d%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
-    date.assign(s);
-
-    // TODO milliseconds
-    sprintf(s, "%02d%02d%02d.%06d", tm.tm_hour, tm.tm_min, tm.tm_sec, 0);
-    time.assign(s);
   }
 }

@@ -92,7 +92,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   target_compile_definitions(WebViewerLibrary PUBLIC -DPLUGIN_ENABLE_DEBUG_ROUTE=1)
 endif()
 
-target_compile_definitions(WebViewerLibrary PUBLIC -DORTHANC_SANDBOXED=0)
+target_compile_definitions(WebViewerLibrary PUBLIC -DORTHANC_SANDBOXED=0 -DORTHANC_DEFAULT_DICOM_ENCODING=Encoding_Latin1)
 
 # bind WebViewerLibrary to WebViewerDependencies so any executable/library embedding 
 # WebViewerLibrary.a also embed WebViewerDependencies.

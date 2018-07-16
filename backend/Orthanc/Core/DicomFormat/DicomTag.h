@@ -2,7 +2,7 @@
  * Orthanc - A Lightweight, RESTful DICOM Store
  * Copyright (C) 2012-2016 Sebastien Jodogne, Medical Physics
  * Department, University Hospital of Liege, Belgium
- * Copyright (C) 2017 Osimis, Belgium
+ * Copyright (C) 2017-2018 Osimis S.A., Belgium
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -87,6 +87,9 @@ namespace Orthanc
     }
 
     std::string Format() const;
+
+    static bool ParseHexadecimal(DicomTag& tag,
+                                 const char* value);
 
     friend std::ostream& operator<< (std::ostream& o, const DicomTag& tag);
 
@@ -193,4 +196,14 @@ namespace Orthanc
   static const DicomTag DICOM_TAG_NUMBER_OF_STUDY_RELATED_INSTANCES(0x0020, 0x1208);  
   static const DicomTag DICOM_TAG_NUMBER_OF_SERIES_RELATED_INSTANCES(0x0020, 0x1209);  
   static const DicomTag DICOM_TAG_SOP_CLASSES_IN_STUDY(0x0008, 0x0062);  
+
+  // Tags to preserve relationships during anonymization
+  static const DicomTag DICOM_TAG_REFERENCED_IMAGE_SEQUENCE(0x0008, 0x1140);
+  static const DicomTag DICOM_TAG_REFERENCED_SOP_INSTANCE_UID(0x0008, 0x1155);
+  static const DicomTag DICOM_TAG_SOURCE_IMAGE_SEQUENCE(0x0008, 0x2112);
+  static const DicomTag DICOM_TAG_FRAME_OF_REFERENCE_UID(0x0020, 0x0052);
+  static const DicomTag DICOM_TAG_REFERENCED_FRAME_OF_REFERENCE_UID(0x3006, 0x0024);
+  static const DicomTag DICOM_TAG_RELATED_FRAME_OF_REFERENCE_UID(0x3006, 0x00c2);
+  static const DicomTag DICOM_TAG_CURRENT_REQUESTED_PROCEDURE_EVIDENCE_SEQUENCE(0x0040, 0xa375);
+  static const DicomTag DICOM_TAG_REFERENCED_SERIES_SEQUENCE(0x0008, 0x1115);
 }

@@ -2,7 +2,7 @@
  * Orthanc - A Lightweight, RESTful DICOM Store
  * Copyright (C) 2012-2016 Sebastien Jodogne, Medical Physics
  * Department, University Hospital of Liege, Belgium
- * Copyright (C) 2017 Osimis, Belgium
+ * Copyright (C) 2017-2018 Osimis S.A., Belgium
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -62,6 +62,15 @@
 #  include <boost/locale.hpp>
 #endif
 
+#if ORTHANC_ENABLE_SSL == 1
+// For OpenSSL initialization and finalization
+#  include <openssl/conf.h>
+#  include <openssl/engine.h>
+#  include <openssl/err.h>
+#  include <openssl/evp.h>
+#  include <openssl/ssl.h>
+#endif
+
 
 #if defined(_MSC_VER) && (_MSC_VER < 1800)
 // Patch for the missing "_strtoll" symbol when compiling with Visual Studio < 2013
@@ -87,8 +96,94 @@ extern "C"
 #endif
 
 
+// Inclusions for UUID
+// http://stackoverflow.com/a/1626302
+
+extern "C"
+{
+#if defined(_WIN32)
+#  include <rpc.h>
+#else
+#  include <uuid/uuid.h>
+#endif
+}
+
+
+
 namespace Orthanc
 {
+  void Toolbox::LinesIterator::FindEndOfLine()
+  {
+    lineEnd_ = lineStart_;
+
+    while (lineEnd_ < content_.size() &&
+           content_[lineEnd_] != '\n' &&
+           content_[lineEnd_] != '\r')
+    {
+      lineEnd_ += 1;
+    }
+  }
+  
+
+  Toolbox::LinesIterator::LinesIterator(const std::string& content) :
+    content_(content),
+    lineStart_(0)
+  {
+    FindEndOfLine();
+  }
+
+    
+  bool Toolbox::LinesIterator::GetLine(std::string& target) const
+  {
+    assert(lineStart_ <= content_.size() &&
+           lineEnd_ <= content_.size() &&
+           lineStart_ <= lineEnd_);
+
+    if (lineStart_ == content_.size())
+    {
+      return false;
+    }
+    else
+    {
+      target = content_.substr(lineStart_, lineEnd_ - lineStart_);
+      return true;
+    }
+  }
+
+    
+  void Toolbox::LinesIterator::Next()
+  {
+    lineStart_ = lineEnd_;
+
+    if (lineStart_ != content_.size())
+    {
+      assert(content_[lineStart_] == '\r' ||
+             content_[lineStart_] == '\n');
+
+      char second;
+      
+      if (content_[lineStart_] == '\r')
+      {
+        second = '\n';
+      }
+      else
+      {
+        second = '\r';
+      }
+        
+      lineStart_ += 1;
+
+      if (lineStart_ < content_.size() &&
+          content_[lineStart_] == second)
+      {
+        lineStart_ += 1;
+      }
+
+      FindEndOfLine();
+    }
+  }
+
+  
   void Toolbox::ToUpperCase(std::string& s)
   {
     std::transform(s.begin(), s.end(), s.begin(), toupper);
@@ -534,7 +629,7 @@ namespace Orthanc
 
     for (size_t i = 0; i < size; i++, p++)
     {
-      if (*p > 127 || (*p != 0 && iscntrl(*p)))
+      if (*p > 127 || *p == 0 || iscntrl(*p))
       {
         return false;
       }
@@ -543,6 +638,12 @@ namespace Orthanc
     return true;
   }
 
+
+  bool Toolbox::IsAsciiString(const std::string& s)
+  {
+    return IsAsciiString(s.c_str(), s.size());
+  }
+  
 
   std::string Toolbox::ConvertToAscii(const std::string& source)
   {
@@ -1329,7 +1430,7 @@ namespace Orthanc
     globalLocale_.reset();
   }
 
-  
+
   std::string Toolbox::ToUpperCaseWithAccents(const std::string& source)
   {
     if (globalLocale_.get() == NULL)
@@ -1370,4 +1471,95 @@ namespace Orthanc
     return boost::locale::conv::utf_to_utf<char>(w);
   }
 #endif
+
+
+  void Toolbox::InitializeOpenSsl()
+  {
+#if ORTHANC_ENABLE_SSL == 1
+    // https://wiki.openssl.org/index.php/Library_Initialization
+    SSL_library_init();
+    SSL_load_error_strings();
+    OpenSSL_add_all_algorithms();
+    ERR_load_crypto_strings();
+#endif
+  }
+
+
+  void Toolbox::FinalizeOpenSsl()
+  {
+#if ORTHANC_ENABLE_SSL == 1
+    // Finalize OpenSSL
+    // https://wiki.openssl.org/index.php/Library_Initialization#Cleanup
+#ifdef FIPS_mode_set
+    FIPS_mode_set(0);
+#endif
+    ENGINE_cleanup();
+    CONF_modules_unload(1);
+    EVP_cleanup();
+    CRYPTO_cleanup_all_ex_data();
+    ERR_remove_state(0);
+    ERR_free_strings();
+#endif
+  }
+
+
+  std::string Toolbox::GenerateUuid()
+  {
+#ifdef WIN32
+    UUID uuid;
+    UuidCreate ( &uuid );
+
+    unsigned char * str;
+    UuidToStringA ( &uuid, &str );
+
+    std::string s( ( char* ) str );
+
+    RpcStringFreeA ( &str );
+#else
+    uuid_t uuid;
+    uuid_generate_random ( uuid );
+    char s[37];
+    uuid_unparse ( uuid, s );
+#endif
+    return s;
+  }
+}
+
+
+
+OrthancLinesIterator* OrthancLinesIterator_Create(const std::string& content)
+{
+  return reinterpret_cast<OrthancLinesIterator*>(new Orthanc::Toolbox::LinesIterator(content));
+}
+
+
+bool OrthancLinesIterator_GetLine(std::string& target,
+                                         const OrthancLinesIterator* iterator)
+{
+  if (iterator != NULL)
+  {
+    return reinterpret_cast<const Orthanc::Toolbox::LinesIterator*>(iterator)->GetLine(target);
+  }
+  else
+  {
+    return false;
+  }
+}
+
+
+void OrthancLinesIterator_Next(OrthancLinesIterator* iterator)
+{
+  if (iterator != NULL)
+  {
+    reinterpret_cast<Orthanc::Toolbox::LinesIterator*>(iterator)->Next();
+  }
+}
+
+
+void OrthancLinesIterator_Free(OrthancLinesIterator* iterator)
+{
+  if (iterator != NULL)
+  {
+    delete reinterpret_cast<const Orthanc::Toolbox::LinesIterator*>(iterator);
+  }
 }

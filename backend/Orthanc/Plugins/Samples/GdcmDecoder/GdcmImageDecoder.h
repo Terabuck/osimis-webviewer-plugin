@@ -2,6 +2,7 @@
  * Orthanc - A Lightweight, RESTful DICOM Store
  * Copyright (C) 2012-2016 Sebastien Jodogne, Medical Physics
  * Department, University Hospital of Liege, Belgium
+ * Copyright (C) 2017-2018 Osimis S.A., Belgium
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -24,6 +25,18 @@
 #include <stdint.h>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
+
+
+// This is for compatibility with Orthanc SDK <= 1.3.0
+#if !defined(ORTHANC_PLUGINS_VERSION_IS_ABOVE)
+#define ORTHANC_PLUGINS_VERSION_IS_ABOVE(major, minor, revision) \
+  (ORTHANC_PLUGINS_MINIMAL_MAJOR_NUMBER > major ||               \
+   (ORTHANC_PLUGINS_MINIMAL_MAJOR_NUMBER == major &&             \
+    (ORTHANC_PLUGINS_MINIMAL_MINOR_NUMBER > minor ||             \
+     (ORTHANC_PLUGINS_MINIMAL_MINOR_NUMBER == minor &&           \
+      ORTHANC_PLUGINS_MINIMAL_REVISION_NUMBER >= revision))))
+#endif
+
 
 namespace OrthancPlugins
 {

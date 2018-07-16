@@ -2,7 +2,7 @@
  * Orthanc - A Lightweight, RESTful DICOM Store
  * Copyright (C) 2012-2016 Sebastien Jodogne, Medical Physics
  * Department, University Hospital of Liege, Belgium
- * Copyright (C) 2017 Osimis, Belgium
+ * Copyright (C) 2017-2018 Osimis S.A., Belgium
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -79,6 +79,24 @@ namespace Orthanc
 
   namespace Toolbox
   {
+    class LinesIterator
+    {
+    private:
+      const std::string& content_;
+      size_t             lineStart_;
+      size_t             lineEnd_;
+
+      void FindEndOfLine();
+  
+    public:
+      LinesIterator(const std::string& content);
+  
+      bool GetLine(std::string& target) const;
+
+      void Next();
+    };
+    
+    
     void ToUpperCase(std::string& s);  // Inplace version
 
     void ToLowerCase(std::string& s);  // Inplace version
@@ -152,6 +170,8 @@ namespace Orthanc
     bool IsAsciiString(const void* data,
                        size_t size);
 
+    bool IsAsciiString(const std::string& s);
+
     std::string ConvertToAscii(const std::string& source);
 
     std::string StripSpaces(const std::string& source);
@@ -212,5 +232,32 @@ namespace Orthanc
 
     std::string ToUpperCaseWithAccents(const std::string& source);
 #endif
+
+    void InitializeOpenSsl();
+    
+    void FinalizeOpenSsl();
+
+    std::string GenerateUuid();
   }
 }
+
+
+
+
+/**
+ * The plain C, opaque data structure "OrthancLinesIterator" is a thin
+ * wrapper around Orthanc::Toolbox::LinesIterator, and is only used by
+ * "../Resources/WebAssembly/dcdict.cc", in order to avoid code
+ * duplication
+ **/
+
+struct OrthancLinesIterator;
+
+OrthancLinesIterator* OrthancLinesIterator_Create(const std::string& content);
+
+bool OrthancLinesIterator_GetLine(std::string& target,
+                                  const OrthancLinesIterator* iterator);
+
+void OrthancLinesIterator_Next(OrthancLinesIterator* iterator);
+
+void OrthancLinesIterator_Free(OrthancLinesIterator* iterator);

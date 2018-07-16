@@ -2,7 +2,7 @@
  * Orthanc - A Lightweight, RESTful DICOM Store
  * Copyright (C) 2012-2016 Sebastien Jodogne, Medical Physics
  * Department, University Hospital of Liege, Belgium
- * Copyright (C) 2017 Osimis, Belgium
+ * Copyright (C) 2017-2018 Osimis S.A., Belgium
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -160,6 +160,12 @@ namespace Orthanc
 
       case ErrorCode_NullPointer:
         return "Cannot handle a NULL pointer";
+
+      case ErrorCode_DatabaseUnavailable:
+        return "The database is currently not available (probably a transient situation)";
+
+      case ErrorCode_CanceledJob:
+        return "This job was canceled";
 
       case ErrorCode_SQLiteNotOpened:
         return "SQLite: The database is not opened";
@@ -756,6 +762,9 @@ namespace Orthanc
       case PixelFormat_Grayscale32:
         return "Grayscale (unsigned 32bpp)";
 
+      case PixelFormat_Grayscale64:
+        return "Grayscale (unsigned 64bpp)";
+
       case PixelFormat_RGB48:
         return "RGB48";
 
@@ -874,6 +883,140 @@ namespace Orthanc
     }
   }
 
+
+  const char* EnumerationToString(ValueRepresentation vr)
+  {
+    switch (vr)
+    {
+      case ValueRepresentation_ApplicationEntity:     // AE
+        return "AE";
+
+      case ValueRepresentation_AgeString:             // AS
+        return "AS";
+
+      case ValueRepresentation_AttributeTag:          // AT (2 x uint16_t)
+        return "AT";
+
+      case ValueRepresentation_CodeString:            // CS
+        return "CS";
+
+      case ValueRepresentation_Date:                  // DA
+        return "DA";
+
+      case ValueRepresentation_DecimalString:         // DS
+        return "DS";
+
+      case ValueRepresentation_DateTime:              // DT
+        return "DT";
+
+      case ValueRepresentation_FloatingPointSingle:   // FL (float)
+        return "FL";
+
+      case ValueRepresentation_FloatingPointDouble:   // FD (double)
+        return "FD";
+
+      case ValueRepresentation_IntegerString:         // IS
+        return "IS";
+
+      case ValueRepresentation_LongString:            // LO
+        return "LO";
+
+      case ValueRepresentation_LongText:              // LT
+        return "LT";
+
+      case ValueRepresentation_OtherByte:             // OB
+        return "OB";
+
+      case ValueRepresentation_OtherDouble:           // OD
+        return "OD";
+
+      case ValueRepresentation_OtherFloat:            // OF
+        return "OF";
+
+      case ValueRepresentation_OtherLong:             // OL
+        return "OL";
+
+      case ValueRepresentation_OtherWord:             // OW
+        return "OW";
+
+      case ValueRepresentation_PersonName:            // PN
+        return "PN";
+
+      case ValueRepresentation_ShortString:           // SH
+        return "SH";
+
+      case ValueRepresentation_SignedLong:            // SL (int32_t)
+        return "SL";
+
+      case ValueRepresentation_Sequence:              // SQ
+        return "SQ";
+
+      case ValueRepresentation_SignedShort:           // SS (int16_t)
+        return "SS";
+
+      case ValueRepresentation_ShortText:             // ST
+        return "ST";
+
+      case ValueRepresentation_Time:                  // TM
+        return "TM";
+
+      case ValueRepresentation_UnlimitedCharacters:   // UC
+        return "UC";
+
+      case ValueRepresentation_UniqueIdentifier:      // UI (UID)
+        return "UI";
+
+      case ValueRepresentation_UnsignedLong:          // UL (uint32_t)
+        return "UL";
+
+      case ValueRepresentation_Unknown:               // UN
+        return "UN";
+
+      case ValueRepresentation_UniversalResource:     // UR (URI or URL)
+        return "UR";
+
+      case ValueRepresentation_UnsignedShort:         // US (uint16_t)
+        return "US";
+
+      case ValueRepresentation_UnlimitedText:         // UT
+        return "UT";
+
+      case ValueRepresentation_NotSupported:
+        return "Not supported";
+
+      default: 
+        throw OrthancException(ErrorCode_ParameterOutOfRange);
+    }
+  }
+
+
+  const char* EnumerationToString(JobState state)
+  {
+    switch (state)
+    {
+      case JobState_Pending:
+        return "Pending";
+        
+      case JobState_Running:
+        return "Running";
+        
+      case JobState_Success:
+        return "Success";
+        
+      case JobState_Failure:
+        return "Failure";
+        
+      case JobState_Paused:
+        return "Paused";
+        
+      case JobState_Retry:
+        return "Retry";
+        
+      default:
+        throw OrthancException(ErrorCode_ParameterOutOfRange);
+    }
+  }
+  
 
   Encoding StringToEncoding(const char* encoding)
   {
@@ -1324,6 +1467,68 @@ namespace Orthanc
   }
 
 
+  JobState StringToJobState(const std::string& state)
+  {
+    if (state == "Pending")
+    {
+      return JobState_Pending;
+    }
+    else if (state == "Running")
+    {
+      return JobState_Running;
+    }
+    else if (state == "Success")
+    {
+      return JobState_Success;
+    }
+    else if (state == "Failure")
+    {
+      return JobState_Failure;
+    }
+    else if (state == "Paused")
+    {
+      return JobState_Paused;
+    }
+    else if (state == "Retry")
+    {
+      return JobState_Retry;
+    }
+    else
+    {
+      throw OrthancException(ErrorCode_ParameterOutOfRange);
+    }
+  }
+
+
+  RequestOrigin StringToRequestOrigin(const std::string& origin)
+  {
+    if (origin == "Unknown")
+    {
+      return RequestOrigin_Unknown;
+    }
+    else if (origin == "DicomProtocol")
+    {
+      return RequestOrigin_DicomProtocol;
+    }
+    else if (origin == "RestApi")
+    {
+      return RequestOrigin_RestApi;
+    }
+    else if (origin == "Plugins")
+    {
+      return RequestOrigin_Plugins;
+    }
+    else if (origin == "Lua")
+    {
+      return RequestOrigin_Lua;
+    }
+    else
+    {
+      throw OrthancException(ErrorCode_ParameterOutOfRange);
+    }
+  }
+  
+
   unsigned int GetBytesPerPixel(PixelFormat format)
   {
     switch (format)
@@ -1349,6 +1554,9 @@ namespace Orthanc
 
       case PixelFormat_RGB48:
         return 6;
+
+      case PixelFormat_Grayscale64:
+        return 8;
 
       default:
         throw OrthancException(ErrorCode_ParameterOutOfRange);
@@ -1617,6 +1825,9 @@ namespace Orthanc
       case ErrorCode_NotAcceptable:
         return HttpStatus_406_NotAcceptable;
 
+      case ErrorCode_DatabaseUnavailable:
+        return HttpStatus_503_ServiceUnavailable;
+
       default:
         return HttpStatus_500_InternalServerError;
     }
@@ -1686,25 +1897,25 @@ namespace Orthanc
   }  
 
 
-//  static boost::mutex  defaultEncodingMutex_;  // Should not be necessary
-//  static Encoding      defaultEncoding_ = ORTHANC_DEFAULT_DICOM_ENCODING;
+  static boost::mutex  defaultEncodingMutex_;  // Should not be necessary
+  static Encoding      defaultEncoding_ = ORTHANC_DEFAULT_DICOM_ENCODING;
   
-//  Encoding GetDefaultDicomEncoding()
-//  {
-//    boost::mutex::scoped_lock lock(defaultEncodingMutex_);
-//    return defaultEncoding_;
-//  }
+  Encoding GetDefaultDicomEncoding()
+  {
+    boost::mutex::scoped_lock lock(defaultEncodingMutex_);
+    return defaultEncoding_;
+  }
 
-//  void SetDefaultDicomEncoding(Encoding encoding)
-//  {
-//    std::string name = EnumerationToString(encoding);
+  void SetDefaultDicomEncoding(Encoding encoding)
+  {
+    std::string name = EnumerationToString(encoding);
     
-//    {
-//      boost::mutex::scoped_lock lock(defaultEncodingMutex_);
-//      defaultEncoding_ = encoding;
-//    }
+    {
+      boost::mutex::scoped_lock lock(defaultEncodingMutex_);
+      defaultEncoding_ = encoding;
+    }
 
-//    LOG(INFO) << "Default encoding for DICOM was changed to: " << name;
-//  }
+    LOG(INFO) << "Default encoding for DICOM was changed to: " << name;
+  }
 
 }

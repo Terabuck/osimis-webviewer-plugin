@@ -2,7 +2,7 @@
  * Orthanc - A Lightweight, RESTful DICOM Store
  * Copyright (C) 2012-2016 Sebastien Jodogne, Medical Physics
  * Department, University Hospital of Liege, Belgium
- * Copyright (C) 2017 Osimis, Belgium
+ * Copyright (C) 2017-2018 Osimis S.A., Belgium
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -93,11 +93,12 @@ namespace Orthanc
     FILE* OpenFile(const std::string& path,
                    FileMode mode);
 
+    std::string GetNowIsoString(bool utc);
+
     std::string GenerateUuid();
 
-    std::string GetNowIsoString();
-
     void GetNowDicom(std::string& date,
-                     std::string& time);
+                     std::string& time,
+                     bool utc);
   }
 }

@@ -135,7 +135,7 @@ target_compile_definitions(OsimisWebViewer PRIVATE -DPRODUCT_VERSION_COMMIT_SHA1
 target_compile_definitions(OsimisWebViewer PRIVATE -DPRODUCT_VERSION_BUILD_YEAR_STRING=\"${PRODUCT_VERSION_BUILD_YEAR}\")
 target_compile_definitions(OsimisWebViewer PRIVATE -DPRODUCT_VERSION_BUILD_MONTH_STRING=\"${PRODUCT_VERSION_BUILD_MONTH}\")
 target_compile_definitions(OsimisWebViewer PRIVATE -DPRODUCT_VERSION_BUILD_DAY_STRING=\"${PRODUCT_VERSION_BUILD_DAY}\")
-
+target_compile_definitions(OsimisWebViewer PUBLIC -DORTHANC_DEFAULT_DICOM_ENCODING=Encoding_Latin1)
 # Check & rebuild if embedded resources has changed?
 if (STATIC_BUILD)
   add_dependencies(OsimisWebViewer EmbeddedResourcesGenerator)

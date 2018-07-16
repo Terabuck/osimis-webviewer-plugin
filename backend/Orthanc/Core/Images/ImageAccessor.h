@@ -2,7 +2,7 @@
  * Orthanc - A Lightweight, RESTful DICOM Store
  * Copyright (C) 2012-2016 Sebastien Jodogne, Medical Physics
  * Department, University Hospital of Liege, Belgium
- * Copyright (C) 2017 Osimis, Belgium
+ * Copyright (C) 2017-2018 Osimis S.A., Belgium
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -43,12 +43,32 @@ namespace Orthanc
   class ImageAccessor
   {
   private:
+    template <Orthanc::PixelFormat Format>
+    friend struct ImageTraits;
+    
     bool readOnly_;
     PixelFormat format_;
     unsigned int width_;
     unsigned int height_;
     unsigned int pitch_;
     uint8_t *buffer_;
+
+    template <typename T>
+    const T& GetPixelUnchecked(unsigned int x,
+                               unsigned int y) const
+    {
+      const uint8_t* row = reinterpret_cast<const uint8_t*>(buffer_) + y * pitch_;
+      return reinterpret_cast<const T*>(row) [x];
+    }
+
+
+    template <typename T>
+    T& GetPixelUnchecked(unsigned int x,
+                         unsigned int y)
+    {
+      uint8_t* row = reinterpret_cast<uint8_t*>(buffer_) + y * pitch_;
+      return reinterpret_cast<T*>(row) [x];
+    }
 
   public:
     ImageAccessor()
