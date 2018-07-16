@@ -1,6 +1,9 @@
 <!doctype html>
 <html ng-app="webviewer" class="wv-html">
 <head>
+    <script>
+        window.oldPrint = window.print;     
+    </script>
     <style>
         /* This helps the ng-show/ng-hide animations start at the right place. */
         /* Since Angular has this but needs to load, this gives us the class early. */
@@ -243,6 +246,9 @@
 
         $translate.use(vm.defaultLanguage);
     }]);
+    </script>
+    <script>
+        window.print = window.oldPrint;
     </script>
 </body>
 </html>

@@ -315,6 +315,20 @@
         <input type="radio" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'toggleOverlayIcons'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
+    <!-- print button -->
+    <label
+        ng-switch-when="print"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('print')"
+        class="wvButton--underline glyphicon glyphicon-print"
+        data-title="{{ 'COMPONENTS.TOOLBOX.PRINT' | translate | wvCapitalize }}"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        ng-class="{'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        bs-tooltip
+    >
+        <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'print'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
     <!-- Key Image Note -->
     <wv-keyimagenote-button
         ng-switch-when="keyImageCapture"

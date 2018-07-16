@@ -8,7 +8,8 @@
     "GENERAL_PARAGRAPHS": {
         "DISCLAIMER_PARAGRAPH": "Not for diagnostic usage.",
         "SCREEN_TOO_SMALL": "Your screen is to small to run the viewer correctly",
-        "INCOMPATIBLE_BROWSER": "You browser is not supported.  You might expect inconsistent behaviours and shall not use the viewer to produce a diagnostic."
+        "INCOMPATIBLE_BROWSER": "You browser is not supported.  You might expect inconsistent behaviours and shall not use the viewer to produce a diagnostic.",
+        "INCOMPATIBLE_PRINT_BROWSER": "You browser does not have a correct print support. You might expect inconsistent behaviours."
     },
     "MEDICAL_TERMS": {
         "ENTRIES": "entries",
@@ -74,6 +75,7 @@
             "PANNING": "panning",
             "PIXEL_PROBE": "pixel probe",
             "PREVIOUS_SERIES": "previous series",
+            "PRINT": "print",
             "MAGNIFYING_GLASS_CONFIG_LEGEND": "Click on the button to toggle the magnifying glass tool. You can configure its parameters in this panel.",
             "MAGNIFYING_GLASS_LEVEL": "magnification level",
             "MAGNIFYING_GLASS_SIZE": "magnification size",
