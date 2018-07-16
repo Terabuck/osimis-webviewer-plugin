@@ -281,7 +281,11 @@
                 vm.tools.combinedTool = false;
             }
             if (__webViewerConfig.printEnabled) { // activate}
-                vm.tools.print = false;
+                if (wvConfig.browser.browser.name == "IE") {
+                    console.log("Internet Explorer does not support printing -> this feature will be disabled");
+                } else {
+                    vm.tools.print = false;
+                }
             }
             if (vm.toggleOverlayTextButtonEnabled) { // activate}
                 vm.tools.toggleOverlayText = false;
