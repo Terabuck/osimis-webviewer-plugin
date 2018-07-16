@@ -128,7 +128,7 @@ ImageMetaData::ImageMetaData(const DicomMap& headerTags, const Json::Value& dico
     color = true;
   }
   int bitsAllocated = boost::lexical_cast<int>(Toolbox::StripSpaces(dicomTags["BitsAllocated"].asString())) * (color ? 3 : 1);
-  sizeInBytes = width * height * bitsAllocated;
+  sizeInBytes = width * height * ((bitsAllocated + 7)/8);
 
   // set stretched image (16bit -> 8bit dynamic compression)
   stretched = false;
