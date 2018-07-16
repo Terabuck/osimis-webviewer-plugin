@@ -80,7 +80,7 @@
         ng-show="vm.loaded && vm.videos.length > 0"
         ng-repeat="$video in vm.videos track by $video.id"
         wv-draggable-item="{
-            videoId: $video.id
+            videoId: $video.id,
             studyColor: vm.study.color
         }"
         ng-click="vm.toggleSelection($video.id)"
