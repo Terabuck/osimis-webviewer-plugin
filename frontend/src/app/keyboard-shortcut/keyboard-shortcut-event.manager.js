@@ -218,7 +218,7 @@
                 previousPaneWithContent.getStudy().then(function(study){
                     var currentItemId = previousPaneWithContent.seriesId || previousPaneWithContent.videoId || previousPaneWithContent.reportId,
                         nextItemTuple = study.getNextItemId(currentItemId),
-                        paneOptions = {csViewport: null, isSelected: true};
+                        paneOptions = {csViewport: null, isSelected: true, studyColor: study.color};
 
                     if(nextItemTuple[1] == "series"){
                         paneOptions.seriesId = nextItemTuple[0];

@@ -183,6 +183,7 @@
         this.selectedSeriesIds = this.selectedSeriesIds || [];
         this.selectedVideoIds = this.selectedVideoIds || [];
         this.selectedReportIds = this.selectedReportIds || [];
+        this.study = undefined;
 
         this.isActive = function(seriesId){
             return wvPaneManager.isViewportItemDisplayed(seriesId);
