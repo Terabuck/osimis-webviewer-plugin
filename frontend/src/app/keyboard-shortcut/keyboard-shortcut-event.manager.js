@@ -33,8 +33,8 @@
             }
 
             bindKey('shift', handlers.enterTemporaryToggleSynchro, handlers.exitTemporaryToggleSynchro, true);
-            bindKey('cmd + p', window.print);
-            bindKey('command + p', window.print);
+            // bindKey('cmd + p', window.print);
+            // bindKey('command + p', window.print);
         } else {
             console.log("keyboard shortcuts are disabled");
         }

@@ -271,8 +271,7 @@
                 arrowAnnotate: false,
                 toggleSynchro: false,
                 nextSeries: false,
-                previousSeries: false,
-                print: false
+                previousSeries: false
             };
 
             if (vm.keyImageCaptureEnabled) { // activate
@@ -280,6 +279,9 @@
             }
             if (vm.combinedToolEnabled) { // activate}
                 vm.tools.combinedTool = false;
+            }
+            if (__webViewerConfig.printEnabled) { // activate}
+                vm.tools.print = false;
             }
             if (vm.toggleOverlayTextButtonEnabled) { // activate}
                 vm.tools.toggleOverlayText = false;

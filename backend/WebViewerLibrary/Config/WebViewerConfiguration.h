@@ -77,6 +77,7 @@ public:
   bool keyboardShortcutsEnabled;
   bool keyImageCaptureEnabled;
   bool combinedToolEnabled;
+  bool printEnabled;
   bool openAllPatientStudies;
 
   bool toggleOverlayTextButtonEnabled;

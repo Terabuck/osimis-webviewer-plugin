@@ -80,12 +80,13 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   keyboardShortcuts["z"] = "selectZoomTool";
   keyboardShortcuts["w"] = "selectWindowingTool";
   keyboardShortcuts["ctrl + l"] = "selectLengthMeasureTool";
-  keyboardShortcuts["ctrl + p"] = "selectPixelProbeTool";
+  keyboardShortcuts["ctrl + i"] = "selectPixelProbeTool";
   keyboardShortcuts["ctrl + m"] = "selectMagnifyingGlassTool";
   keyboardShortcuts["ctrl + e"] = "selectEllipticalRoiTool";
   keyboardShortcuts["ctrl + r"] = "selectRectangleRoiTool";
   keyboardShortcuts["ctrl + a"] = "selectArrowAnnotateTool";
   keyboardShortcuts["ctrl + k"] = "selectKeyImageCaptureTool";
+  keyboardShortcuts["ctrl + p"] = "print";
   keyboardShortcuts["1, num1"] = "applyEmbeddedWindowingPreset1";
   keyboardShortcuts["2, num2"] = "applyEmbeddedWindowingPreset2";
   keyboardShortcuts["3, num3"] = "applyEmbeddedWindowingPreset3";
@@ -226,6 +227,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   annotationStorageEnabled = OrthancPlugins::GetBoolValue(wvConfig, "AnnotationStorageEnabled", false);
   keyImageCaptureEnabled = OrthancPlugins::GetBoolValue(wvConfig, "KeyImageCaptureEnabled", false);
   combinedToolEnabled = OrthancPlugins::GetBoolValue(wvConfig, "CombinedToolEnabled", false);
+  printEnabled = OrthancPlugins::GetBoolValue(wvConfig, "PrintEnabled", true);
   openAllPatientStudies = OrthancPlugins::GetBoolValue(wvConfig, "OpenAllPatientStudies", true);
   showStudyInformationBreadcrumb = OrthancPlugins::GetBoolValue(wvConfig, "ShowStudyInformationBreadcrumb", false);
   shortTermCachePrefetchOnInstanceStored = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCachePrefetchOnInstanceStored", false);
@@ -333,6 +335,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
       "setLayout1x1", "setLayout1x2", "setLayout2x1", "setLayout2x2",
       "play", "pause", "playPause", "selectNextPane", "selectPreviousPane",
       "loadSeriesInPane", "toggleOverlayText", "toggleOverlayIcons",
+      "print",
       "null"
     };
 
@@ -456,6 +459,7 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["annotationStorageEnabled"] = annotationStorageEnabled;
   config["keyImageCaptureEnabled"] = keyImageCaptureEnabled;
   config["combinedToolEnabled"] = combinedToolEnabled;
+  config["printEnabled"] = printEnabled;
   config["openAllPatientStudies"] = openAllPatientStudies;
   config["showStudyInformationBreadcrumb"] = showStudyInformationBreadcrumb;
   config["windowingPresets"] = windowingPresets;
