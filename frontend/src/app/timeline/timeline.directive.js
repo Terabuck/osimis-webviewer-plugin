@@ -73,7 +73,8 @@
     }
 
     /* @ngInject */
-    function Controller() {
+    function Controller($window) {
+        this.window = $window;
         // Set default values
         this.readonly = (typeof this.readonly === 'undefined') ? false : this.readonly;
     }

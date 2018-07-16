@@ -23,7 +23,7 @@
      */
     angular
     .module('webviewer', ['webviewer.layout', 'webviewer.toolbox', 'webviewer.translation', 'ngCookies', 'ngResource', 'ngSanitize', 'mgcrea.ngStrap', 'ngRangeFilter', 'debounce'])
-    .config(function($locationProvider, $compileProvider) {
+    .config(function($locationProvider, $compileProvider, $tooltipProvider) {
         // Warning: Web Viewer is uncompatible with <base> HTML element (due to SVG/XLink issue)! Don't use it!
         $locationProvider.html5Mode({
             enabled: true,
@@ -34,6 +34,28 @@
         if ($compileProvider.preAssignBindingsEnabled) {
             $compileProvider.preAssignBindingsEnabled(true);
         }
+
+        // Detect touch screen and disable tooltip if touch
+        window.addEventListener('touchstart', function onFirstTouch() {
+            // we could use a class
+            document.body.classList.add('user-is-touching');
+        
+            // or set some global variable
+            window.USER_IS_TOUCHING = true;
+
+            $tooltipProvider.options({trigger: "dontTrigger"});
+            console.log('disabling tooltip', $tooltipProvider);
+
+            // or set your app's state however you normally would
+            myFrameworkOfChoice.dispatchEvent('USER_IS_TOUCHING', true);
+        
+            // we only need to know once that a human touched the screen, so we can stop listening now
+            window.removeEventListener('touchstart', onFirstTouch, false);
+        }, false);
+
+        angular.extend($tooltipProvider.defaults, {
+            trigger: "hover"
+        });
     })
     // Configure with HttpRequest at init
     .run(function($q) {

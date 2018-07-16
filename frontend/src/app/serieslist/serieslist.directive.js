@@ -172,7 +172,8 @@
     }
 
     /* @ngInject */
-    function SerieslistVM(wvPaneManager) {
+    function SerieslistVM(wvPaneManager, $window) {
+        this.window = $window;
         // Set initial values.
         this.seriesIds = [];
         this.pdfInstanceIds = [];

@@ -48,7 +48,8 @@
     }
 
     /* @ngInject */
-    function toolboxGeneratorController($element, $scope, $popover) {
+    function toolboxGeneratorController($element, $scope, $popover, $window) {
         var _this = this;
+        _this.window = $window
     }
 })();

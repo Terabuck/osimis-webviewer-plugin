@@ -143,7 +143,7 @@
                 ng-show="vm.studyIslandsDisplayMode === 'oneCol'"
                 ng-click="vm.studyIslandsDisplayMode = 'grid'"
 
-                bs-tooltip
+                bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
                 data-title="{{ 'COMPONENTS.ASIDE_DISPLAY_MODE.GRID_DISPLAY' | translate | wvCapitalize }}"
                 placement="right"
             >
@@ -154,7 +154,7 @@
                 ng-show="vm.studyIslandsDisplayMode === 'grid'"
                 ng-click="vm.studyIslandsDisplayMode = 'list'"
 
-                bs-tooltip
+                bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
                 data-title="{{ 'COMPONENTS.ASIDE_DISPLAY_MODE.LIST_DISPLAY' | translate | wvCapitalize }}"
                 placement="right"
             >
@@ -165,7 +165,7 @@
                 ng-show="vm.studyIslandsDisplayMode === 'list'"
                 ng-click="vm.studyIslandsDisplayMode = 'oneCol'"
 
-                bs-tooltip
+                bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
                 data-title="{{ 'COMPONENTS.ASIDE_DISPLAY_MODE.ONE_COL_DISPLAY' | translate | wvCapitalize }}"
                 placement="right"
             >
@@ -317,6 +317,7 @@
 
                 wv-on-item-dropped="!vm.readonly && vm.onItemDroppedToPane($position.x, $position.y, $data);"
              >
+            
                 <!--
                 PDF Report
                 -->

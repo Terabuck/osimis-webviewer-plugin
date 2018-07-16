@@ -70,8 +70,8 @@
     }
 
     /* @ngInject */
-    function layoutRightCtrl() {
-        
+    function layoutRightCtrl($window) {
+        this.window = $window;
     }
 
 })();
