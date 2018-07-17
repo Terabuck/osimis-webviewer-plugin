@@ -11035,17 +11035,17 @@ Preferences._readFromStorage = function (prefObj) {
     });
   }
 
-  if ('onbeforeprint' in window) {
-    // Do not propagate before/afterprint events when they are not triggered
-    // from within this polyfill. (FF/IE).
-    var stopPropagationIfNeeded = function(event) {
-      if (event.detail !== 'custom' && event.stopImmediatePropagation) {
-        event.stopImmediatePropagation();
-      }
-    };
-    window.addEventListener('beforeprint', stopPropagationIfNeeded, false);
-    window.addEventListener('afterprint', stopPropagationIfNeeded, false);
-  }
+  // if ('onbeforeprint' in window) {
+  //   // Do not propagate before/afterprint events when they are not triggered
+  //   // from within this polyfill. (FF/IE).
+  //   var stopPropagationIfNeeded = function(event) {
+  //     if (event.detail !== 'custom' && event.stopImmediatePropagation) {
+  //       event.stopImmediatePropagation();
+  //     }
+  //   };
+  //   window.addEventListener('beforeprint', stopPropagationIfNeeded, false);
+  //   window.addEventListener('afterprint', stopPropagationIfNeeded, false);
+  // }
 })();
 
 
