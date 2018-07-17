@@ -18077,13 +18077,13 @@ window.addEventListener('keydown', function keydown(evt) {
   }
 });
 
-window.addEventListener('beforeprint', function beforePrint(evt) {
-  // PDFViewerApplication.beforePrint();
-});
+// window.addEventListener('beforeprint', function beforePrint(evt) {
+//   PDFViewerApplication.beforePrint();
+// });
 
-window.addEventListener('afterprint', function afterPrint(evt) {
-  // PDFViewerApplication.afterPrint();
-});
+// window.addEventListener('afterprint', function afterPrint(evt) {
+//   PDFViewerApplication.afterPrint();
+// });
 
 (function animationStartedClosure() {
   // The offsetParent is not set until the pdf.js iframe or object is visible.
