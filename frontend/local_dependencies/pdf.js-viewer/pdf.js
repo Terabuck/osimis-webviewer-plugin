@@ -16559,10 +16559,11 @@ var PDFViewerApplication = {
   },
 
   get supportsPrinting() {
-    var canvas = document.createElement('canvas');
-    var value = 'mozPrintCallback' in canvas;
+    return false;
+    // var canvas = document.createElement('canvas');
+    // var value = 'mozPrintCallback' in canvas;
 
-    return PDFJS.shadow(this, 'supportsPrinting', value);
+    // return PDFJS.shadow(this, 'supportsPrinting', value);
   },
 
   get supportsFullscreen() {
@@ -18077,11 +18078,11 @@ window.addEventListener('keydown', function keydown(evt) {
 });
 
 window.addEventListener('beforeprint', function beforePrint(evt) {
-  PDFViewerApplication.beforePrint();
+  // PDFViewerApplication.beforePrint();
 });
 
 window.addEventListener('afterprint', function afterPrint(evt) {
-  PDFViewerApplication.afterPrint();
+  // PDFViewerApplication.afterPrint();
 });
 
 (function animationStartedClosure() {
