@@ -780,7 +780,9 @@
                 var uaParser = new UAParser();
                 var isFirefox = (uaParser.getBrowser().name === 'Firefox');
                 var isIE = (uaParser.getBrowser().name === 'IE');
-                if(isFirefox || isIE){
+                var isEdge = (uaParser.getBrowser().name === 'Edge');
+                console.log("ua parser", uaParser.getBrowser());
+                if(isFirefox || isIE || isEdge){
                     $body.css('width', '8.5in');
                     $body.css('height', '11in');
                     // console.log('html size', $html.width(), $html.height());
@@ -871,6 +873,8 @@
                 $body.css('height', '100%');
                 // $html.css('width', '100%');
                 // $html.css('height', '100%');
+                $(".wv-cornerstone-enabled-image canvas").css('width', 'auto');
+                $(".wv-cornerstone-enabled-image canvas").css('height', 'auto');
                 $(window).trigger('resize');  // to force screen and canvas recalculation
             }
         
