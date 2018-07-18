@@ -873,6 +873,8 @@
                 $body.css('height', '100%');
                 // $html.css('width', '100%');
                 // $html.css('height', '100%');
+                $(".wv-cornerstone-enabled-image canvas").css('width', 'auto');
+                $(".wv-cornerstone-enabled-image canvas").css('height', 'auto');
                 $(window).trigger('resize');  // to force screen and canvas recalculation
             }
         
