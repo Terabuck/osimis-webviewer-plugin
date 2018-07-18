@@ -11,21 +11,20 @@
 bool OnTheFlyDownloadAvailableQualityPolicy::_isLargerThan(
                                                               uint32_t width,
                                                               uint32_t height,
-                                                              const Json::Value& otherTags)
+                                                              const Json::Value& dicomTags)
 {
-  int columns = boost::lexical_cast<int>(OrthancPlugins::SanitizeTag("Columns", otherTags["Columns"]).asString());
-  int rows = boost::lexical_cast<int>(OrthancPlugins::SanitizeTag("Rows", otherTags["Rows"]).asString());
+  int columns = boost::lexical_cast<int>(OrthancPlugins::SanitizeTag("Columns", dicomTags["Columns"]).asString());
+  int rows = boost::lexical_cast<int>(OrthancPlugins::SanitizeTag("Rows", dicomTags["Rows"]).asString());
 
   return columns > width && rows > height;
 }
 
-bool OnTheFlyDownloadAvailableQualityPolicy::_isAlreadyCompressedWithinDicom(
-                                                              const Json::Value& headerTags)
+bool OnTheFlyDownloadAvailableQualityPolicy::_canBeDecompressedInFrontend(
+                                                              const std::string& transferSyntax,
+    const Json::Value& dicomTags
+    )
 {
   using namespace Orthanc;
-
-  // Retrieve transfer syntax
-  std::string transferSyntax = headerTags["TransferSyntax"].asString();
 
   BENCH_LOG("TRANSFER_SYNTAX", transferSyntax);
 
@@ -51,7 +50,11 @@ bool OnTheFlyDownloadAvailableQualityPolicy::_isAlreadyCompressedWithinDicom(
         // boost::lexical_cast<uint32_t>(matches[1]) == 94 || // JPIP Referenced 
         // boost::lexical_cast<uint32_t>(matches[1]) == 95 )  // JPIP Referenced Deflate
     ) {
-      return true;
+      if (dicomTags["PhotometricInterpretation"].asString() == "PALETTE COLOR") {
+        return false;  // this won't decompress fine in the JS frontend
+      } else {
+        return true;
+      }
     }
     // Compress data manually if the raw format is not supported
     else {
@@ -64,18 +67,18 @@ bool OnTheFlyDownloadAvailableQualityPolicy::_isAlreadyCompressedWithinDicom(
   }
 }
 
-std::set<ImageQuality> OnTheFlyDownloadAvailableQualityPolicy::retrieveByTags(
-                                                              const Json::Value& headerTags,
-                                                              const Json::Value& otherTags)
+std::set<ImageQuality> OnTheFlyDownloadAvailableQualityPolicy::retrieve(
+                                                              const std::string& transferSyntax,
+                                                              const Json::Value& dicomTags)
 {
   using namespace Orthanc;
 
   std::set<ImageQuality> result;
 
   // Decompressing<->Recompression takes time, so we avoid recompressing dicom images at all cost
-  if (_isAlreadyCompressedWithinDicom(headerTags)) {
+  if (_canBeDecompressedInFrontend(transferSyntax, dicomTags)) {
     // Set thumbnails only on medium sized images
-    if (_isLargerThan(750, 750, otherTags["TagsSubset"])) {
+    if (_isLargerThan(750, 750, dicomTags)) {
       result.insert(ImageQuality(ImageQuality::LOW)); // 150x150 jpeg80
       BENCH_LOG("QUALITY", "low");
     }
@@ -86,13 +89,14 @@ std::set<ImageQuality> OnTheFlyDownloadAvailableQualityPolicy::retrieveByTags(
   }
   // When image is present in RAW format within dicom, we do additional compression
   else {
-    // Always provide thumbnail quality image (even if image is <150x150 since optimization includes
-    // dynamic reduction and lq jpeg compression instead of lossless)
-    result.insert(ImageQuality(ImageQuality::LOW)); // 150x150 jpeg80
-    BENCH_LOG("QUALITY", "low");
+    // Set thumbnails only on medium sized images
+    if (_isLargerThan(750, 750, dicomTags)) {
+      result.insert(ImageQuality(ImageQuality::LOW)); // 150x150 jpeg80
+      BENCH_LOG("QUALITY", "low");
+    }
 
     // Set MQ on large images
-    if (_isLargerThan(1000, 1000, otherTags["TagsSubset"])) {
+    if (_isLargerThan(2000, 2000, dicomTags)) {
       result.insert(ImageQuality(ImageQuality::MEDIUM)); // 1000x1000 jpeg80
       BENCH_LOG("QUALITY", "medium");
     }

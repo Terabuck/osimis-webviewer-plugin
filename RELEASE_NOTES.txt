@@ -11,12 +11,14 @@ Features:
 * When displaying multiple studies, the colors of the study island is now repeated around the viewports
 * Added an option to configure the loading of all patient studies or a single studies ("OpenAllPatientStudies" - true by default)
 * Improved support for some US modalities providing Columns/Rows tags as "600\\0" instead of "600"
+* Improved the loading of various quality levels: load lowest-quality only if image is larger than 750x750.
 
 Fixes:
 -----
 * WVB-371: It is impossible to edit a text annotation
 * WVB-376: US images encoded in YBR are not displayed correctly
-* WVB-364: disable tooltips on touch-screens
+* WVB-364: On touch-screens, tooltips stays visible
+* WVB-370: US images whose transfer syntax is JPEG are not displayed correctly
 
 Known issues:
 ------------
