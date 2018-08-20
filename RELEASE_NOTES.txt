@@ -1,3 +1,14 @@
+Version 1.1.2
+========================
+
+=> Minimum Orthanc version: 1.3.1 <=
+
+Fixes:
+-----
+* Only the build process has been updated.  The viewer behaves the same way as 1.1.1
+
+
+
 Version 1.1.1
 ========================
 

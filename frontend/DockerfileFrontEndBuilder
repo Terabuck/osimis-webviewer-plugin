@@ -9,6 +9,7 @@ RUN npm install --unsafe-perm --python=python2.7
 # Make sure the home-made developed injectInlineWorker plugin has not been erased by npm install
 COPY node_modules/gulp-injectInlineWorker/ node_modules/gulp-injectInlineWorker/
 
+COPY .bowerrc .
 COPY bower.json .
 RUN bower install --allow-root
 
