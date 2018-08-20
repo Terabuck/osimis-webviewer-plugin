@@ -21,8 +21,7 @@ bool OnTheFlyDownloadAvailableQualityPolicy::_isLargerThan(
 
 bool OnTheFlyDownloadAvailableQualityPolicy::_canBeDecompressedInFrontend(
                                                               const std::string& transferSyntax,
-    const Json::Value& dicomTags
-    )
+                                                              const Json::Value& dicomTags)
 {
   using namespace Orthanc;
 
