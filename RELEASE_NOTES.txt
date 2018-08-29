@@ -24,7 +24,7 @@ Known issues:
 ------------
 * The WebViewer currently does not work on iPhone (Safari and Chrome).
 * WVB-370: US images whose transfer syntax is JPEG are not displayed correctly (this issue was already affecting earlier versions)
-
+* CBCT slices might not be displayed in the correct order.  This is fixed by upgrading your Orthanc to version 1.4.2 or later.
 
 Version 1.1.1
 ========================
