@@ -20,7 +20,8 @@
         var languages = {
             en: 'english',
             fr: 'français',
-	    nl: 'nederlands'	
+            nl: 'nederlands',
+            pt: 'Português'
         };
         // languages Key array, automatically populated set with languages object
         var keysArray = [];
