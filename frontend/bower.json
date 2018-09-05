@@ -37,7 +37,7 @@
     "lodash": "4.17.10",
     "open-sans": "./local_dependencies/open-sans/",
     "font-awesome": "4.7.0",
-    "cornerstone": "0.12.2",
+    "cornerstone": "./local_dependencies/cornerstone/",
     "cornerstoneMath": "0.1.6",
     "cornerstoneTools": "./local_dependencies/cornerstoneTools/",
     "jpgjs": "notmasteryet/jpgjs",
@@ -71,7 +71,7 @@
     },
     "cornerstone": {
       "main": [
-        "dist/cornerstone.js"
+        "index.js"
       ]
     },
     "cornerstoneTools": {
