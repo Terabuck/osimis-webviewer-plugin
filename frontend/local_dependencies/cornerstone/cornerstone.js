@@ -833,6 +833,7 @@ function doesImageNeedToBeRendered(enabledElement, image) {
 function getRenderCanvas(enabledElement, image, invalidated) {
   if (!enabledElement.renderingTools.grayscaleRenderCanvas) {
     enabledElement.renderingTools.grayscaleRenderCanvas = document.createElement('canvas');
+    initializeGrayscaleRenderCanvas(enabledElement, image);
   }
 
   var grayscaleRenderCanvas = enabledElement.renderingTools.grayscaleRenderCanvas;
