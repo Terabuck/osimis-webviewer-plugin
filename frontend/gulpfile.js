@@ -340,7 +340,7 @@ gulp.task('optimize', ['inject'], function() {
         // @todo remove duplicate build files (induced by duplicate build file request on different *.html)
         // Get the css
         .pipe(cssFilter)
-        .pipe($.minifyCss())
+        .pipe($.cleanCss())
         .pipe(cssFilter.restore())
         // Get the custom javascript
         .pipe(jsAppFilter)
