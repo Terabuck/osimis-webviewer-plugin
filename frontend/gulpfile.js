@@ -309,14 +309,12 @@ gulp.task('optimize', gulp.series('inject', function optimizeTask() {
         // Replace the font .css locations
         .pipe(inject(fontsCss, 'fonts'))
         .pipe(assets) // Concatenate all assets from the html with useref
-        .pipe(print())
-        .pipe(gulp.dest('/tmp/refactoring/'))
-        //.pipe($.useref({searchPath: ['./', config.client]}))
-        // @todo remove duplicate build files (induced by duplicate build file request on different *.html)
         // Get the css
         .pipe(jsAndCssFilter) // don't know why there's still index.html and bower.json in the stream which was not the case with previous version
         .pipe(cssFilter)
-        .pipe($.cleanCss())
+        .pipe($.cleanCss({
+            rebaseTo: config.temp + "styles/",  // right now all files are still in config.temp
+        }))
         .pipe(cssFilter.restore)
         // Get the custom javascript
         .pipe(jsAppFilter)
@@ -336,9 +334,6 @@ gulp.task('optimize', gulp.series('inject', function optimizeTask() {
         .pipe(jslibFilter.restore)
         // Take inventory of the file names for future rev numbers
         // .pipe($.rev())
-        // Apply the concat and file replacement with useref
-//        .pipe(assets.restore())
-//        .pipe($.useref())
         // Replace the file names in the html & bower.json with rev numbers
         //   .pipe($.revReplace({
         //      replaceInExtensions: ['.js', '.css', '.html', '.hbs', '.json'] // Replace also in bower.json
