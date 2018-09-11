@@ -284,11 +284,9 @@ gulp.task('optimize', gulp.series('inject', function optimizeTask() {
     log('Optimizing the js, css, and html');
 
     var assets = $.useref({searchPath: ['./', config.client]});
-    // Filters are named for the gulp-useref path
     var cssFilter = filter('**/*.css', {restore: true, dot: true});
     var jsAppFilter = $.filter(['**/' + config.optimized.app], {restore: true, dot: true});
     var jslibFilter = $.filter(['**/' + config.optimized.lib], {restore: true, dot: true});
-    var jsAndCssFilter = $.filter(['**/*.css', '**/*.js'], {restore: true, dot: true});
     var templateCache = config.temp + config.templateCache.file;
 
     // Assume .css font-inject files exist in the font directories
@@ -304,13 +302,12 @@ gulp.task('optimize', gulp.series('inject', function optimizeTask() {
 
     // Build/Optimise js, css & html
     var buildStream = gulp
-        .src(config.tempIndexes.concat(['./bower.json']))
+        .src(config.tempIndexes)
         .pipe(inject(templateCache, 'templates'))
         // Replace the font .css locations
         .pipe(inject(fontsCss, 'fonts'))
         .pipe(assets) // Concatenate all assets from the html with useref
         // Get the css
-        .pipe(jsAndCssFilter) // don't know why there's still index.html and bower.json in the stream which was not the case with previous version
         .pipe(cssFilter)
         .pipe($.cleanCss({
             rebaseTo: config.temp + "styles/",  // right now all files are still in config.temp
@@ -338,7 +335,6 @@ gulp.task('optimize', gulp.series('inject', function optimizeTask() {
         //   .pipe($.revReplace({
         //      replaceInExtensions: ['.js', '.css', '.html', '.hbs', '.json'] // Replace also in bower.json
         //   }))
-        .pipe(jsAndCssFilter.restore)
         .pipe(gulp.dest(config.build));
         // Write the rev-manifest.json - used by @osisync
         // .pipe($.rev.manifest())
