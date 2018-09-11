@@ -62,7 +62,7 @@ gulp.src = function() {
  * List the available gulp tasks
  */
 gulp.task('help', $.taskListing);
-gulp.task('default', ['help']);
+gulp.task('default', gulp.series('help'));
 
 /**
  * Generate the soure code documentation.
@@ -71,7 +71,7 @@ gulp.task('default', ['help']);
  *
  * @return {Stream}
  */
-gulp.task('docs', [], function() {
+gulp.task('docs', function() {
     return gulp
         .src(config.alljs)
         .pipe($.ngdocs.process({
@@ -114,13 +114,62 @@ gulp.task('plato', function(done) {
     startPlatoVisualizer(done);
 });
 
+/**
+ * Remove all files from the build, temp, and reports folders
+ * @param  {Function} done - callback when complete
+ */
+gulp.task('clean', function(done) {
+    var delconfig = [].concat(config.build, config.temp, config.report);
+    log('Cleaning: ' + $.util.colors.blue(delconfig));
+    del(delconfig, done);
+});
 
+/**
+ * Remove all fonts from the build folder
+ * @param  {Function} done - callback when complete
+ */
+gulp.task('clean-fonts', function(done) {
+    clean(config.build + 'fonts/**/*.*', done);
+});
+
+/**
+ * Remove all images from the build folder
+ * @param  {Function} done - callback when complete
+ */
+gulp.task('clean-images', function(done) {
+    clean(config.build + 'images/**/*.*', done);
+});
+
+/**
+ * Remove all styles from the build and temp folders
+ * @param  {Function} done - callback when complete
+ */
+gulp.task('clean-styles', function(done) {
+    var files = [].concat(
+        config.temp + '**/*.css',
+        config.build + 'styles/**/*.css'
+    );
+    clean(files, done);
+});
+
+/**
+ * Remove all js and html from the build and temp folders
+ * @param  {Function} done - callback when complete
+ */
+gulp.task('clean-code', function(done) {
+    var files = [].concat(
+        config.temp + '**/*.js',
+        config.build + 'js/**/*.js',
+        config.build + '**/*.html'
+    );
+    clean(files, done);
+});
 
 /**
  * Compile scss to css
  * @return {Stream}
  */
-gulp.task('styles', ['clean-styles'], function() {
+gulp.task('styles', gulp.series('clean-styles'), function() {
     log('Compiling scss --> CSS');
 
     return gulp
@@ -139,7 +188,7 @@ gulp.task('styles', ['clean-styles'], function() {
  * Copy fonts
  * @return {Stream}
  */
-gulp.task('fonts', ['clean-fonts'], function() {
+gulp.task('fonts', gulp.series('clean-fonts'), function() {
     log('Copying fonts');
 
     return gulp
@@ -151,7 +200,7 @@ gulp.task('fonts', ['clean-fonts'], function() {
  * Compress images
  * @return {Stream}
  */
-gulp.task('images', ['clean-images'], function() {
+gulp.task('images', gulp.series('clean-images'), function() {
     log('Compressing and copying images');
 
     return gulp
@@ -164,7 +213,7 @@ gulp.task('images', ['clean-images'], function() {
  * Create $templateCache from the html templates
  * @return {Stream}
  */
-gulp.task('templatecache', ['clean-code'], function() {
+gulp.task('templatecache', gulp.series('clean-code'), function() {
     log('Creating an AngularJS $templateCache');
 
     return gulp
@@ -177,6 +226,34 @@ gulp.task('templatecache', ['clean-code'], function() {
             config.templateCache.options
         ))
         .pipe(gulp.dest(config.temp));
+});
+
+/**
+ * Inject all the spec files into the specs.html
+ * @return {Stream}
+ */
+gulp.task('build-specs', gulp.series('templatecache'), function(done) {
+    log('building the spec runner');
+
+    var wiredep = require('wiredep').stream;
+    var templateCache = config.temp + config.templateCache.file;
+    var options = config.getWiredepDefaultOptions();
+    var specs = config.specs;
+
+    if (args.startServers) {
+        specs = [].concat(specs, config.serverIntegrationSpecs);
+    }
+    options.devDependencies = true;
+
+    return gulp
+        .src(config.specRunner)
+        .pipe(wiredep(options))
+        .pipe(inject(config.js, '', config.jsOrder))
+        .pipe(inject(config.testlibraries, 'testlibraries'))
+        .pipe(inject(config.specHelpers, 'spechelpers'))
+        .pipe(inject(specs, 'specs', ['**/*']))
+        .pipe(inject(templateCache, 'templates'))
+        .pipe(gulp.dest(config.client));
 });
 
 /**
@@ -199,7 +276,7 @@ gulp.task('wiredep-scss', function() {
  * Wire-up the bower dependencies
  * @return {Stream}
  */
-gulp.task('wiredep', ['wiredep-scss'], function() {
+gulp.task('wiredep', gulp.series('wiredep-scss'), function() {
     log('Wiring the bower dependencies into the html');
 
     var wiredep = require('wiredep').stream;
@@ -225,7 +302,7 @@ gulp.task('wiredep', ['wiredep-scss'], function() {
         .pipe(gulp.dest(config.temp));
 });
 
-gulp.task('inject', ['wiredep', 'styles', 'templatecache'], function() {
+gulp.task('inject', gulp.series('wiredep', 'styles', 'templatecache'), function() {
     log('Wire up css into the html, after files are ready');
 
     var pipe = gulp
@@ -243,72 +320,11 @@ gulp.task('inject', ['wiredep', 'styles', 'templatecache'], function() {
 });
 
 /**
- * Run the spec runner
- * @return {Stream}
- */
-gulp.task('serve-specs', ['build-specs'], function(done) {
-    log('run the spec runner');
-    serve(true /* isDev */, true /* specRunner */);
-    done();
-});
-
-/**
- * Inject all the spec files into the specs.html
- * @return {Stream}
- */
-gulp.task('build-specs', ['templatecache'], function(done) {
-    log('building the spec runner');
-
-    var wiredep = require('wiredep').stream;
-    var templateCache = config.temp + config.templateCache.file;
-    var options = config.getWiredepDefaultOptions();
-    var specs = config.specs;
-
-    if (args.startServers) {
-        specs = [].concat(specs, config.serverIntegrationSpecs);
-    }
-    options.devDependencies = true;
-
-    return gulp
-        .src(config.specRunner)
-        .pipe(wiredep(options))
-        .pipe(inject(config.js, '', config.jsOrder))
-        .pipe(inject(config.testlibraries, 'testlibraries'))
-        .pipe(inject(config.specHelpers, 'spechelpers'))
-        .pipe(inject(specs, 'specs', ['**/*']))
-        .pipe(inject(templateCache, 'templates'))
-        .pipe(gulp.dest(config.client));
-});
-
-gulp.task('copy-languages', function() {
-   return gulp
-       .src(config.client + 'languages/**/*')
-       .pipe(gulp.dest(config.build + 'languages'));
-});
-
-/**
- * Build everything
- * This is separate so we can run tests on
- * optimize before handling image or fonts
- */
-gulp.task('build', ['docs', 'optimize', 'images', 'fonts', 'copy-languages'], function() {
-    log('Building everything');
-
-    var msg = {
-        title: 'gulp build',
-        subtitle: 'Deployed to the build folder',
-        message: 'Running `gulp serve-build`'
-    };
-    del(config.temp);
-    log(msg);
-});
-
-/**
  * Optimize all files, move to a build folder,
  * and inject them into the new index.html
  * @return {Stream}
  */
-gulp.task('optimize', ['inject'], function() {
+gulp.task('optimize', gulp.series('inject'), function() {
     log('Optimizing the js, css, and html');
 
     var assets = $.useref.assets({searchPath: ['./', config.client]});
@@ -376,54 +392,37 @@ gulp.task('optimize', ['inject'], function() {
 });
 
 /**
- * Remove all files from the build, temp, and reports folders
- * @param  {Function} done - callback when complete
+ * Run the spec runner
+ * @return {Stream}
  */
-gulp.task('clean', function(done) {
-    var delconfig = [].concat(config.build, config.temp, config.report);
-    log('Cleaning: ' + $.util.colors.blue(delconfig));
-    del(delconfig, done);
+gulp.task('serve-specs', gulp.series('build-specs'), function(done) {
+    log('run the spec runner');
+    serve(true /* isDev */, true /* specRunner */);
+    done();
+});
+
+
+gulp.task('copy-languages', function() {
+   return gulp
+       .src(config.client + 'languages/**/*')
+       .pipe(gulp.dest(config.build + 'languages'));
 });
 
 /**
- * Remove all fonts from the build folder
- * @param  {Function} done - callback when complete
+ * Build everything
+ * This is separate so we can run tests on
+ * optimize before handling image or fonts
  */
-gulp.task('clean-fonts', function(done) {
-    clean(config.build + 'fonts/**/*.*', done);
-});
+gulp.task('build', gulp.series('docs', 'optimize', 'images', 'fonts', 'copy-languages'), function() {
+    log('Building everything');
 
-/**
- * Remove all images from the build folder
- * @param  {Function} done - callback when complete
- */
-gulp.task('clean-images', function(done) {
-    clean(config.build + 'images/**/*.*', done);
-});
-
-/**
- * Remove all styles from the build and temp folders
- * @param  {Function} done - callback when complete
- */
-gulp.task('clean-styles', function(done) {
-    var files = [].concat(
-        config.temp + '**/*.css',
-        config.build + 'styles/**/*.css'
-    );
-    clean(files, done);
-});
-
-/**
- * Remove all js and html from the build and temp folders
- * @param  {Function} done - callback when complete
- */
-gulp.task('clean-code', function(done) {
-    var files = [].concat(
-        config.temp + '**/*.js',
-        config.build + 'js/**/*.js',
-        config.build + '**/*.html'
-    );
-    clean(files, done);
+    var msg = {
+        title: 'gulp build',
+        subtitle: 'Deployed to the build folder',
+        message: 'Running `gulp serve-build`'
+    };
+    del(config.temp);
+    log(msg);
 });
 
 /**
@@ -432,7 +431,7 @@ gulp.task('clean-code', function(done) {
  *    gulp test --startServers
  * @return {Stream}
  */
-gulp.task('test', ['templatecache'], function(done) {
+gulp.task('test', gulp.series('templatecache'), function(done) {
     startTests(true /*singleRun*/ , done);
 });
 
@@ -451,7 +450,7 @@ gulp.task('autotest', function(done) {
  * --debug-brk or --debug
  * --nosync
  */
-gulp.task('serve-dev', ['inject'], function() {
+gulp.task('serve-dev', gulp.series('inject'), function() {
     serve(true /*isDev*/);
 });
 
@@ -463,7 +462,7 @@ gulp.task('serve-dev', ['inject'], function() {
  * serve the osisync *slave* dev environment
  * watch and preprocess files
  */
-gulp.task('osisync', ['inject'], function() {
+gulp.task('osisync', gulp.series('inject'), function() {
     log('OsiSync: Watch and update changes and serve files');
 
     gulp.watch(config.indexes, ['inject']);
@@ -506,7 +505,7 @@ gulp.task('osisync', ['inject'], function() {
  * --debug-brk or --debug
  * --nosync
  */
-gulp.task('serve-build', ['build'], function() {
+gulp.task('serve-build', gulp.series('build'), function() {
     serve(false /*isDev*/);
 });
 
@@ -542,7 +541,8 @@ gulp.task('bump', function() {
 /**
  * Optimize the code and re-load browserSync
  */
-gulp.task('browserSyncReload', ['optimize'], browserSync.reload);
+gulp.task('browserSyncReload', gulp.series('optimize'), browserSync.reload);
+
 
 ////////////////
 
