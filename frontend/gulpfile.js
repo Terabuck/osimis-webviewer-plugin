@@ -11,6 +11,9 @@ var taskListing = require('gulp-task-listing');
 var _ = require('lodash');
 var $ = require('gulp-load-plugins')({lazy: true});
 var osisync = require('osisync');
+const print = require('gulp-print').default;
+const filter = require('gulp-filter');
+
 $.injectInlineWorker = require('gulp-injectInlineWorker/index.js');
 var mergeStream = require('merge-stream')
 
@@ -238,7 +241,7 @@ gulp.task('wiredep', gulp.series('wiredep-scss', function wiredepTask() {
     // Only include stubs if flag is enabled
     var js = args.stubs ? [].concat(config.js, config.stubsjs) : config.js;
 
-    // gulp.fonts contains the eot, svg, ttf, ... file paths (with glob)
+    // config.fonts contains the eot, svg, ttf, ... file paths (with glob)
     // this command replace those extensions with .css
     // as it is the standard that font packages comes with a .css in the same folder as the fonts to
     // include them.
@@ -282,10 +285,10 @@ gulp.task('optimize', gulp.series('inject', function optimizeTask() {
 
     var assets = $.useref({searchPath: ['./', config.client]});
     // Filters are named for the gulp-useref path
-    var cssFilter = $.filter('**/*.css', {restore: true});
-    var jsAppFilter = $.filter('**/' + config.optimized.app, {restore: true});
-    var jslibFilter = $.filter('**/' + config.optimized.lib, {restore: true});
-
+    var cssFilter = filter('**/*.css', {restore: true, dot: true});
+    var jsAppFilter = $.filter(['**/' + config.optimized.app], {restore: true, dot: true});
+    var jslibFilter = $.filter(['**/' + config.optimized.lib], {restore: true, dot: true});
+    var jsAndCssFilter = $.filter(['**/*.css', '**/*.js'], {restore: true, dot: true});
     var templateCache = config.temp + config.templateCache.file;
 
     // Assume .css font-inject files exist in the font directories
@@ -306,8 +309,12 @@ gulp.task('optimize', gulp.series('inject', function optimizeTask() {
         // Replace the font .css locations
         .pipe(inject(fontsCss, 'fonts'))
         .pipe(assets) // Concatenate all assets from the html with useref
+        .pipe(print())
+        .pipe(gulp.dest('/tmp/refactoring/'))
+        //.pipe($.useref({searchPath: ['./', config.client]}))
         // @todo remove duplicate build files (induced by duplicate build file request on different *.html)
         // Get the css
+        .pipe(jsAndCssFilter) // don't know why there's still index.html and bower.json in the stream which was not the case with previous version
         .pipe(cssFilter)
         .pipe($.cleanCss())
         .pipe(cssFilter.restore)
@@ -336,6 +343,7 @@ gulp.task('optimize', gulp.series('inject', function optimizeTask() {
         //   .pipe($.revReplace({
         //      replaceInExtensions: ['.js', '.css', '.html', '.hbs', '.json'] // Replace also in bower.json
         //   }))
+        .pipe(jsAndCssFilter.restore)
         .pipe(gulp.dest(config.build));
         // Write the rev-manifest.json - used by @osisync
         // .pipe($.rev.manifest())
@@ -366,13 +374,12 @@ gulp.task('copy-languages', function() {
  * This is separate so we can run tests on
  * optimize before handling image or fonts
  */
-gulp.task('build', gulp.series('optimize', 'images', 'fonts', 'copy-languages', function buildTask(done) {
+gulp.task('build', gulp.series('clean', 'images', 'fonts', 'copy-languages', 'optimize', function buildTask(done) {
     log('Building everything');
 
     var msg = {
         title: 'gulp build',
-        subtitle: 'Deployed to the build folder',
-        message: 'Running `gulp serve-build`'
+        subtitle: 'completed'
     };
     del(config.temp);
     log(msg);
