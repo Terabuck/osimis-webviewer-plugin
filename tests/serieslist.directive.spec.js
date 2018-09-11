@@ -14,7 +14,7 @@ describe('serieslist', function() {
 
     describe('directive', function() {
 
-        it('should display a list of DICOM multiframe instances as a list of series', function() {
+        it('should display a list of DICOM multiframe instances as a list of series', function(done) {
 
             $scope.studyId = undefined;
 
@@ -47,7 +47,7 @@ describe('serieslist', function() {
                             catch(e) {
                                 reject(e);
                             }
-                            
+                            done();
                         };
                         $scope.$apply();
                     });
@@ -56,7 +56,7 @@ describe('serieslist', function() {
 
         });
 
-        it('should display the list of series when unsupported series are present (eg. DICOM SR)', function() {
+        it('should display the list of series when unsupported series are present (eg. DICOM SR)', function(done) {
 
             $scope.studyId = undefined;
 
@@ -88,11 +88,13 @@ describe('serieslist', function() {
                             catch (e) {
                                 reject(e);
                             }
+                            done();
                         };
                         
                         $scope.$apply();
                     });
                 })
+                .done()
                 ;
 
         });
