@@ -20,8 +20,6 @@ var mergeStream = require('merge-stream')
 // Set optional dev dependencies
 if (taskName === 'serve-dev' || taskName === 'serve-build' || taskName === 'osisync') {
     $.nodemon = require('gulp-nodemon') || null;
-    $.jscs = require('gulp-jscs') || null;
-    $.jshint = require('gulp-jshint') || null;
 }
 
 var serverPort = osisync.getPort() || process.env.PORT || config.defaultPort;
@@ -40,8 +38,6 @@ var nodeDebugPort = osisync.getPort() || 5858;
  * --debug    : Launch debugger with node-inspector.
  * --debug-brk: Launch debugger and break on 1st line with node-inspector.
  * --startServers: Will start servers for midway tests on the test task.
- * --novet    : Disable jscs & jshint
- * --nojscs   : Disable jscs
  */
 
 /**
@@ -49,26 +45,6 @@ var nodeDebugPort = osisync.getPort() || 5858;
  */
 gulp.task('help', gulp.series(taskListing));
 gulp.task('default', gulp.series('help'));
-
-/**
- * vet the code and create coverage report
- * @return {Stream}
- */
-gulp.task('vet', function() {
-    if (!args.novet) {
-        log('Analyzing source with JSHint and JSCS');
-
-        return gulp
-            .src(config.alljs)
-            .pipe($.if(args.verbose, $.print()))
-            .pipe($.jshint())
-            .pipe($.jshint.reporter('jshint-stylish', {verbose: true}))
-    //        .pipe($.jshint.reporter('fail'))
-            .pipe($.if(!args.nojscs, $.jscs()));
-    }
-});
-
-
 
 /**
  * Remove all files from the build, temp, and reports folders
