@@ -348,7 +348,7 @@
             vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
             vm.keyImageCaptureEnabled = typeof vm.keyImageCaptureEnabled !== 'undefined' ? vm.keyImageCaptureEnabled : false;
             vm.combinedToolEnabled = typeof vm.combinedToolEnabled !== 'undefined' ? vm.combinedToolEnabled : false;
-            vm.studyIslandsDisplayMode = typeof vm.studyIslandsDisplayMode !== 'undefined' ? vm.studyIslandsDisplayMode : "grid";
+            vm.studyIslandsDisplayMode = vm.wvViewerController.getStudyIslandDisplayMode(__webViewerConfig.defaultStudyIslandsDisplayMode || "grid");
             vm.paneManager = wvPaneManager;
             vm.synchronizer = wvSynchronizer;
             vm.wvWindowingViewportTool = wvWindowingViewportTool;
@@ -748,9 +748,11 @@
                 }
             });
 
-            // when the studyIslandsDisplayMode the layout may changed and so some directive may need
-            // to recalculate their dimentions, so we need to trigger a "window change" event.
-            scope.$watch('vm.studyIslandsDisplayMode', function(){
+            // when the studyIslandsDisplayMode changes, the layout may change and so some directive may need
+            // to recalculate their dimensions, so we need to trigger a "window change" event.
+            scope.$watch('vm.studyIslandsDisplayMode', function(newValue, oldValue){
+                vm.wvViewerController.saveStudyIslandDisplayMode(newValue);
+                window.localStorage.setItem("studyIslandsDisplayMode", newValue);
                 asap(function(){
                     $(window).trigger("resize");
                 });

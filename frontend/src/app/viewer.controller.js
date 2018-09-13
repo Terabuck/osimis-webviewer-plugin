@@ -17,6 +17,14 @@
         return value;
     }
 
+    var getStringFromLocalStorage = function(key, defaultValue) {
+        var value = window.localStorage.getItem(key);
+        if (value === null) {
+            return defaultValue;
+        }
+        return value;
+    }
+
     function ViewerController($q, wvPaneManager, wvStudyManager) {
         this._isOverlayTextVisible = getBoolFromLocalStorage("isOverlayTextVisible", true);
         this._isOverlayIconsVisible = getBoolFromLocalStorage("isOverlayIconsVisible", true);
@@ -36,6 +44,14 @@
         window.localStorage.setItem("isOverlayIconsVisible", this._isOverlayIconsVisible);
         window.localStorage.setItem("layoutX", this._layoutX);
         window.localStorage.setItem("layoutY", this._layoutY);
+    }
+
+    ViewerController.prototype.getStudyIslandDisplayMode = function(defaultValue) {
+        return getStringFromLocalStorage("studyIslandsDisplayMode", defaultValue);
+    }
+
+    ViewerController.prototype.saveStudyIslandDisplayMode = function(displayMode) {
+        window.localStorage.setItem("studyIslandsDisplayMode", displayMode);
     }
 
 

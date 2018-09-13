@@ -106,8 +106,8 @@
     }])
     // Define a basic controller
     .controller('MainController', [
-        '$scope', '$location', '$translate', 'wvConfig', 'wvStudyManager', 'wvSeriesManager',
-        function($scope, $location, $translate, wvConfig, wvStudyManager, wvSeriesManager)
+        '$scope', '$location', '$translate', 'wvConfig', 'wvStudyManager', 'wvSeriesManager', 'wvViewerController',
+        function($scope, $location, $translate, wvConfig, wvStudyManager, wvSeriesManager, wvViewerController)
     {
         var vm = this;
 
@@ -123,6 +123,7 @@
         vm.pickableStudyIdLabels = {};
         vm.selectedStudyIds = [];
         vm.seriesId = undefined;
+        vm.wvViewerController = wvViewerController;
 
         // Display orthanc study.
         if (orthancStudyId) {
@@ -238,7 +239,7 @@
         vm.toolbarLayoutMode = __webViewerConfig.toolbarLayoutMode || "flat";
         vm.toolbarButtonSize = __webViewerConfig.toolbarButtonSize || "small";
         vm.defaultSelectedTool = __webViewerConfig.defaultSelectedTool || "zoom";
-        vm.studyIslandsDisplayMode = __webViewerConfig.defaultStudyIslandsDisplayMode || "grid";
+        vm.studyIslandsDisplayMode = vm.wvViewerController.getStudyIslandDisplayMode(__webViewerConfig.defaultStudyIslandsDisplayMode || "grid");
 
         $translate.use(vm.defaultLanguage);
     }]);
