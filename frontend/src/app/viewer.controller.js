@@ -1,14 +1,30 @@
 (function(osimis) {
     'use strict';
 
+    var getBoolFromLocalStorage = function(key, defaultValue) {
+        var value = window.localStorage.getItem(key);
+        if (value === null) {
+            return defaultValue;
+        }
+        return value === "true";
+    }
+
     function ViewerController($q, wvPaneManager, wvStudyManager) {
-        this._isOverlayTextVisible = true;
-        this._isOverlayIconsVisible = true;
+        this._isOverlayTextVisible = getBoolFromLocalStorage("isOverlayTextVisible", true);
+        this._isOverlayIconsVisible = getBoolFromLocalStorage("isOverlayIconsVisible", true);
         this._selectedStudyIds = [];
         this.wvPaneManager = wvPaneManager;
         this.wvStudyManager = wvStudyManager;
         this.$q = $q;
+
+        this.saveStateToLocalStorage();        
     }
+    
+    ViewerController.prototype.saveStateToLocalStorage = function() {
+        window.localStorage.setItem("isOverlayTextVisible", this._isOverlayTextVisible);
+        window.localStorage.setItem("isOverlayIconsVisible", this._isOverlayIconsVisible);
+    }
+
 
     ViewerController.prototype.setSelectedStudyIds = function(selectedStudyIds) {
         this._selectedStudyIds = selectedStudyIds;
@@ -17,23 +33,27 @@
 
     ViewerController.prototype.toggleOverlayText = function() {
         this._isOverlayTextVisible = !this._isOverlayTextVisible;
+        this.saveStateToLocalStorage();        
     }
     ViewerController.prototype.isOverlayTextVisible = function() {
     	return this._isOverlayTextVisible;
     }
     ViewerController.prototype.setOverlayTextVisible = function(enabled) {
         this._isOverlayTextVisible = enabled;
+        this.saveStateToLocalStorage();        
     }
 
 
     ViewerController.prototype.toggleOverlayIcons = function() {
         this._isOverlayIconsVisible = !this._isOverlayIconsVisible;
+        this.saveStateToLocalStorage();        
     }
     ViewerController.prototype.isOverlayIconsVisible = function() {
     	return this._isOverlayIconsVisible;
     }
     ViewerController.prototype.setOverlayIconsVisible = function(enabled) {
         this._isOverlayIconsVisible = enabled;
+        this.saveStateToLocalStorage();        
     }
 
     ViewerController.prototype.nextSeries = function() {

@@ -160,8 +160,6 @@
                 videoDisplayEnabled: '=?wvVideoDisplayEnabled',
                 keyImageCaptureEnabled: '=?wvKeyImageCaptureEnabled',
                 combinedToolEnabled: '=?wvCombinedToolEnabled',
-                toggleOverlayTextButtonEnabled: '=?wvToggleOverlayTextButtonEnabled',
-                toggleOverlayIconsButtonEnabled: '=?wvToggleOverlayIconsButtonEnabled',
                 showNoReportIconInSeriesList: '=?wvShowNoReportIconInSeriesList',
                 reduceTimelineHeightOnSingleFrameSeries: '=?wvReduceTimelineHeightOnSingleFrameSeries',
                 buttonsSize: '=?wvButtonsSize',  // small | large
@@ -287,10 +285,10 @@
                     vm.tools.print = false;
                 }
             }
-            if (vm.toggleOverlayTextButtonEnabled) { // activate}
+            if (__webViewerConfig.toggleOverlayTextButtonEnabled) { // activate}
                 vm.tools.toggleOverlayText = false;
             }
-            if (vm.toggleOverlayIconsButtonEnabled) { // activate}
+            if (__webViewerConfig.toggleOverlayIconsButtonEnabled) { // activate}
                 vm.tools.toggleOverlayIcons = false;
             }
 
@@ -351,16 +349,18 @@
             vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
             vm.keyImageCaptureEnabled = typeof vm.keyImageCaptureEnabled !== 'undefined' ? vm.keyImageCaptureEnabled : false;
             vm.combinedToolEnabled = typeof vm.combinedToolEnabled !== 'undefined' ? vm.combinedToolEnabled : false;
-            vm.toggleOverlayTextButtonEnabled = typeof vm.toggleOverlayTextButtonEnabled !== 'undefined' ? vm.toggleOverlayTextButtonEnabled : false;
-            vm.toggleOverlayIconsButtonEnabled = typeof vm.toggleOverlayIconsButtonEnabled !== 'undefined' ? vm.toggleOverlayIconsButtonEnabled : false;
             vm.studyIslandsDisplayMode = typeof vm.studyIslandsDisplayMode !== 'undefined' ? vm.studyIslandsDisplayMode : "grid";
             vm.paneManager = wvPaneManager;
             vm.synchronizer = wvSynchronizer;
             vm.wvWindowingViewportTool = wvWindowingViewportTool;
 
             vm.wvViewerController = wvViewerController;
-            vm.wvViewerController.setOverlayTextVisible(__webViewerConfig.displayOverlayText);
-            vm.wvViewerController.setOverlayIconsVisible(__webViewerConfig.displayOverlayIcons);
+            if (!__webViewerConfig.toggleOverlayIconsButtonEnabled) {
+                vm.wvViewerController.setOverlayIconsVisible(__webViewerConfig.displayOverlayIcons);
+            }
+            if (!__webViewerConfig.toggleOverlayTextButtonEnabled) {
+                vm.wvViewerController.setOverlayTextVisible(__webViewerConfig.displayOverlayText);
+            }
             vm.wvViewerController.setSelectedStudyIds(vm.selectedStudyIds);
 
             // Selection-related
