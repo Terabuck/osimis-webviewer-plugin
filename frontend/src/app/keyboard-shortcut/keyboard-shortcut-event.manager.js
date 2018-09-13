@@ -182,16 +182,16 @@
             };
 
             handlers.setLayout1x1 = function() {
-                wvPaneManager.setLayout(1, 1);
+                wvViewerController.setLayout(1, 1);
             };
             handlers.setLayout1x2 = function() {
-                wvPaneManager.setLayout(1, 2);
+                wvViewerController.setLayout(1, 2);
             };
             handlers.setLayout2x1 = function() {
-                wvPaneManager.setLayout(2, 1);
+                wvViewerController.setLayout(2, 1);
             };
             handlers.setLayout2x2 = function() {
-                wvPaneManager.setLayout(2, 2);
+                wvViewerController.setLayout(2, 2);
             };
 
             handlers.selectNextPane = function() {

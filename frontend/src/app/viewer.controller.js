@@ -9,9 +9,20 @@
         return value === "true";
     }
 
+    var getIntFromLocalStorage = function(key, defaultValue) {
+        var value = parseInt(window.localStorage.getItem(key));
+        if (value === null) {
+            return defaultValue;
+        }
+        return value;
+    }
+
     function ViewerController($q, wvPaneManager, wvStudyManager) {
         this._isOverlayTextVisible = getBoolFromLocalStorage("isOverlayTextVisible", true);
         this._isOverlayIconsVisible = getBoolFromLocalStorage("isOverlayIconsVisible", true);
+        this._layoutX = getIntFromLocalStorage("layoutX", 1);
+        this._layoutY = getIntFromLocalStorage("layoutY", 1);
+
         this._selectedStudyIds = [];
         this.wvPaneManager = wvPaneManager;
         this.wvStudyManager = wvStudyManager;
@@ -23,6 +34,8 @@
     ViewerController.prototype.saveStateToLocalStorage = function() {
         window.localStorage.setItem("isOverlayTextVisible", this._isOverlayTextVisible);
         window.localStorage.setItem("isOverlayIconsVisible", this._isOverlayIconsVisible);
+        window.localStorage.setItem("layoutX", this._layoutX);
+        window.localStorage.setItem("layoutY", this._layoutY);
     }
 
 
@@ -54,6 +67,17 @@
     ViewerController.prototype.setOverlayIconsVisible = function(enabled) {
         this._isOverlayIconsVisible = enabled;
         this.saveStateToLocalStorage();        
+    }
+
+    ViewerController.prototype.setLayout = function(x, y) {
+        this._layoutX = x;
+        this._layoutY = y;
+        this.saveStateToLocalStorage();
+        this.wvPaneManager.setLayout(x, y);
+    }
+
+    ViewerController.prototype.getLayout = function() {
+        return {x: this._layoutX, y: this._layoutY};
     }
 
     ViewerController.prototype.nextSeries = function() {

@@ -239,8 +239,7 @@
             vm.noticeEnabled = typeof vm.noticeEnabled !== 'undefined' ? vm.noticeEnabled : false;
             vm.noticeText = typeof vm.noticeText !== 'undefined' ? vm.noticeText : undefined;
             vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;
-            vm.isOverlayTextVisible = true;
-            vm.isOverlayIconsVisible = true;
+            vm.wvViewerController = wvViewerController;
             vm.tools = typeof vm.tools !== 'undefined' ? vm.tools : {
                 windowing: false,
                 zoom: false,
@@ -257,8 +256,8 @@
                 ellipticalRoi: false,
                 rectangleRoi: false,
                 layout: {
-                    x: 1,
-                    y: 1
+                    x: vm.wvViewerController.getLayout().x,
+                    y: vm.wvViewerController.getLayout().y
                 },
                 play: false,
                 overlay: true,
@@ -354,7 +353,6 @@
             vm.synchronizer = wvSynchronizer;
             vm.wvWindowingViewportTool = wvWindowingViewportTool;
 
-            vm.wvViewerController = wvViewerController;
             if (!__webViewerConfig.toggleOverlayIconsButtonEnabled) {
                 vm.wvViewerController.setOverlayIconsVisible(__webViewerConfig.displayOverlayIcons);
             }
@@ -557,7 +555,7 @@
             // Keep pane layout model in sync.
             scope.$watch('vm.tools.layout', function(layout) {
                 // Update panes' layout.
-                wvPaneManager.setLayout(layout.x, layout.y);
+                vm.wvViewerController.setLayout(layout.x, layout.y);
             }, true);
             vm.onItemDroppedToPane = function(x, y, config) {
                 // Set dropped pane as selected
