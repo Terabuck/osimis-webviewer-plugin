@@ -10,11 +10,11 @@
     }
 
     var getIntFromLocalStorage = function(key, defaultValue) {
-        var value = parseInt(window.localStorage.getItem(key));
+        var value = window.localStorage.getItem(key);
         if (value === null) {
             return defaultValue;
         }
-        return value;
+        return parseInt(value);
     }
 
     var getStringFromLocalStorage = function(key, defaultValue) {
