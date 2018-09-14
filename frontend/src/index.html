@@ -70,8 +70,6 @@
         wv-study-download-enabled="vm.studyDownloadEnabled"
         wv-key-image-capture-enabled="vm.keyImageCaptureEnabled"
         wv-combined-tool-enabled="vm.combinedToolEnabled"
-        wv-toggle-overlay-text-button-enabled="vm.toggleOverlayTextButtonEnabled"
-        wv-toggle-overlay-icons-button-enabled="vm.toggleOverlayIconsButtonEnabled"
 
         wv-study-islands-display-mode="vm.studyIslandsDisplayMode"
 
@@ -108,8 +106,8 @@
     }])
     // Define a basic controller
     .controller('MainController', [
-        '$scope', '$location', '$translate', 'wvConfig', 'wvStudyManager', 'wvSeriesManager',
-        function($scope, $location, $translate, wvConfig, wvStudyManager, wvSeriesManager)
+        '$scope', '$location', '$translate', 'wvConfig', 'wvStudyManager', 'wvSeriesManager', 'wvViewerController',
+        function($scope, $location, $translate, wvConfig, wvStudyManager, wvSeriesManager, wvViewerController)
     {
         var vm = this;
 
@@ -125,6 +123,7 @@
         vm.pickableStudyIdLabels = {};
         vm.selectedStudyIds = [];
         vm.seriesId = undefined;
+        vm.wvViewerController = wvViewerController;
 
         // Display orthanc study.
         if (orthancStudyId) {
@@ -235,14 +234,12 @@
         vm.annotationStorageEnabled = __webViewerConfig.annotationStorageEnabled;
         vm.keyImageCaptureEnabled = __webViewerConfig.keyImageCaptureEnabled;
         vm.combinedToolEnabled = __webViewerConfig.combinedToolEnabled;
-        vm.toggleOverlayTextButtonEnabled = __webViewerConfig.toggleOverlayTextButtonEnabled;
-        vm.toggleOverlayIconsButtonEnabled = __webViewerConfig.toggleOverlayIconsButtonEnabled;
         vm.showNoReportIconInSeriesList = __webViewerConfig.showNoReportIconInSeriesList;
         vm.reduceTimelineHeightOnSingleFrameSeries = __webViewerConfig.reduceTimelineHeightOnSingleFrameSeries;
         vm.toolbarLayoutMode = __webViewerConfig.toolbarLayoutMode || "flat";
         vm.toolbarButtonSize = __webViewerConfig.toolbarButtonSize || "small";
         vm.defaultSelectedTool = __webViewerConfig.defaultSelectedTool || "zoom";
-        vm.studyIslandsDisplayMode = __webViewerConfig.defaultStudyIslandsDisplayMode || "grid";
+        vm.studyIslandsDisplayMode = vm.wvViewerController.getStudyIslandDisplayMode(__webViewerConfig.defaultStudyIslandsDisplayMode || "grid");
 
         $translate.use(vm.defaultLanguage);
     }]);

@@ -13,6 +13,8 @@ Features:
 * Improved support for some US modalities providing Columns/Rows tags as "600\\0" instead of "600"
 * Improved the loading of various quality levels: load lowest-quality only if image is larger than 750x750.
 * Improved detection of Patient Orientation to allow synchronization of series (now accepting 10° max between orientations)
+* Saving some UI state in the browser local storage to re-open the viewer with the same settings (Study island display mode, 
+  layout and overlay texts)
 
 Fixes:
 -----

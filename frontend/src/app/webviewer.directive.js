@@ -160,8 +160,6 @@
                 videoDisplayEnabled: '=?wvVideoDisplayEnabled',
                 keyImageCaptureEnabled: '=?wvKeyImageCaptureEnabled',
                 combinedToolEnabled: '=?wvCombinedToolEnabled',
-                toggleOverlayTextButtonEnabled: '=?wvToggleOverlayTextButtonEnabled',
-                toggleOverlayIconsButtonEnabled: '=?wvToggleOverlayIconsButtonEnabled',
                 showNoReportIconInSeriesList: '=?wvShowNoReportIconInSeriesList',
                 reduceTimelineHeightOnSingleFrameSeries: '=?wvReduceTimelineHeightOnSingleFrameSeries',
                 buttonsSize: '=?wvButtonsSize',  // small | large
@@ -241,8 +239,7 @@
             vm.noticeEnabled = typeof vm.noticeEnabled !== 'undefined' ? vm.noticeEnabled : false;
             vm.noticeText = typeof vm.noticeText !== 'undefined' ? vm.noticeText : undefined;
             vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;
-            vm.isOverlayTextVisible = true;
-            vm.isOverlayIconsVisible = true;
+            vm.wvViewerController = wvViewerController;
             vm.tools = typeof vm.tools !== 'undefined' ? vm.tools : {
                 windowing: false,
                 zoom: false,
@@ -259,8 +256,8 @@
                 ellipticalRoi: false,
                 rectangleRoi: false,
                 layout: {
-                    x: 1,
-                    y: 1
+                    x: vm.wvViewerController.getLayout().x,
+                    y: vm.wvViewerController.getLayout().y
                 },
                 play: false,
                 overlay: true,
@@ -287,10 +284,10 @@
                     vm.tools.print = false;
                 }
             }
-            if (vm.toggleOverlayTextButtonEnabled) { // activate}
+            if (__webViewerConfig.toggleOverlayTextButtonEnabled) { // activate}
                 vm.tools.toggleOverlayText = false;
             }
-            if (vm.toggleOverlayIconsButtonEnabled) { // activate}
+            if (__webViewerConfig.toggleOverlayIconsButtonEnabled) { // activate}
                 vm.tools.toggleOverlayIcons = false;
             }
 
@@ -351,16 +348,17 @@
             vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
             vm.keyImageCaptureEnabled = typeof vm.keyImageCaptureEnabled !== 'undefined' ? vm.keyImageCaptureEnabled : false;
             vm.combinedToolEnabled = typeof vm.combinedToolEnabled !== 'undefined' ? vm.combinedToolEnabled : false;
-            vm.toggleOverlayTextButtonEnabled = typeof vm.toggleOverlayTextButtonEnabled !== 'undefined' ? vm.toggleOverlayTextButtonEnabled : false;
-            vm.toggleOverlayIconsButtonEnabled = typeof vm.toggleOverlayIconsButtonEnabled !== 'undefined' ? vm.toggleOverlayIconsButtonEnabled : false;
-            vm.studyIslandsDisplayMode = typeof vm.studyIslandsDisplayMode !== 'undefined' ? vm.studyIslandsDisplayMode : "grid";
+            vm.studyIslandsDisplayMode = vm.wvViewerController.getStudyIslandDisplayMode(__webViewerConfig.defaultStudyIslandsDisplayMode || "grid");
             vm.paneManager = wvPaneManager;
             vm.synchronizer = wvSynchronizer;
             vm.wvWindowingViewportTool = wvWindowingViewportTool;
 
-            vm.wvViewerController = wvViewerController;
-            vm.wvViewerController.setOverlayTextVisible(__webViewerConfig.displayOverlayText);
-            vm.wvViewerController.setOverlayIconsVisible(__webViewerConfig.displayOverlayIcons);
+            if (!__webViewerConfig.toggleOverlayIconsButtonEnabled) {
+                vm.wvViewerController.setOverlayIconsVisible(__webViewerConfig.displayOverlayIcons);
+            }
+            if (!__webViewerConfig.toggleOverlayTextButtonEnabled) {
+                vm.wvViewerController.setOverlayTextVisible(__webViewerConfig.displayOverlayText);
+            }
             vm.wvViewerController.setSelectedStudyIds(vm.selectedStudyIds);
 
             // Selection-related
@@ -557,7 +555,7 @@
             // Keep pane layout model in sync.
             scope.$watch('vm.tools.layout', function(layout) {
                 // Update panes' layout.
-                wvPaneManager.setLayout(layout.x, layout.y);
+                vm.wvViewerController.setLayout(layout.x, layout.y);
             }, true);
             vm.onItemDroppedToPane = function(x, y, config) {
                 // Set dropped pane as selected
@@ -750,9 +748,11 @@
                 }
             });
 
-            // when the studyIslandsDisplayMode the layout may changed and so some directive may need
-            // to recalculate their dimentions, so we need to trigger a "window change" event.
-            scope.$watch('vm.studyIslandsDisplayMode', function(){
+            // when the studyIslandsDisplayMode changes, the layout may change and so some directive may need
+            // to recalculate their dimensions, so we need to trigger a "window change" event.
+            scope.$watch('vm.studyIslandsDisplayMode', function(newValue, oldValue){
+                vm.wvViewerController.saveStudyIslandDisplayMode(newValue);
+                window.localStorage.setItem("studyIslandsDisplayMode", newValue);
                 asap(function(){
                     $(window).trigger("resize");
                 });
