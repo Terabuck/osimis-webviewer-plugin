@@ -278,7 +278,7 @@ gulp.task('optimize', gulp.series('inject', function optimizeTask() {
 
     // Build/Optimise js, css & html
     var buildStream = gulp
-        .src(config.tempIndexes)
+        .src(config.tempIndexes.concat(['./bower.json']))
         .pipe(inject(templateCache, 'templates'))
         // Replace the font .css locations
         .pipe(inject(fontsCss, 'fonts'))
