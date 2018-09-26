@@ -381,8 +381,8 @@
 
         var getVectorsFromOrientation = function(orientationTag) {
             var split = orientationTag.split("\\");
-            var x = split.splice(0, 3).map((s) => parseFloat(s));
-            var y = split.splice(0, 3).map((s) => parseFloat(s));
+            var x = split.splice(0, 3).map(function(s) {return parseFloat(s);});
+            var y = split.splice(0, 3).map(function(s) {return parseFloat(s);});
             return {x: x, y: y};
         };
 
