@@ -48,9 +48,6 @@
                                 return undefined;
                             }
 
-                            var rows = tags.Rows;
-                            var columns = tags.Columns;
-
                             var imageOrientation = tags.ImageOrientationPatient.split('\\');
                             var imagePosition = tags.ImagePositionPatient.split('\\');
                             var pixelSpacing = tags.PixelSpacing.split('\\');
@@ -62,19 +59,19 @@
 
                                 // Retrieve from tag
                                 // @warning May differ from loaded quality!
-                                rows: tags.Rows,
-                                columns: tags.Columns,
+                                rows: parseFloat(tags.Rows),
+                                columns: parseFloat(tags.Columns),
 
                                 // See ftp://dicom.nema.org/MEDICAL/dicom/2015b/output/chtml/part03/sect_C.7.6.2.html
 
                                 // Retrieved from tag `Image Orientation (Patient)`
-                                rowCosines: new cornerstoneMath.Vector3(imageOrientation[0], imageOrientation[1], imageOrientation[2]),
-                                columnCosines: new cornerstoneMath.Vector3(imageOrientation[3], imageOrientation[4], imageOrientation[5]),
+                                rowCosines: new cornerstoneMath.Vector3(parseFloat(imageOrientation[0]), parseFloat(imageOrientation[1]), parseFloat(imageOrientation[2])),
+                                columnCosines: new cornerstoneMath.Vector3(parseFloat(imageOrientation[3]), parseFloat(imageOrientation[4]), parseFloat(imageOrientation[5])),
 
                                 // Retrieve from tag  Image Position (Patient)`
-                                imagePositionPatient: new cornerstoneMath.Vector3(imagePosition[0], imagePosition[1], imagePosition[2]),
-                                rowPixelSpacing: pixelSpacing[0],
-                                columnPixelSpacing: pixelSpacing[1]
+                                imagePositionPatient: new cornerstoneMath.Vector3(parseFloat(imagePosition[0]), parseFloat(imagePosition[1]), parseFloat(imagePosition[2])),
+                                rowPixelSpacing: parseFloat(pixelSpacing[0]),
+                                columnPixelSpacing: parseFloat(pixelSpacing[1])
                             };     
                         }
                     }
