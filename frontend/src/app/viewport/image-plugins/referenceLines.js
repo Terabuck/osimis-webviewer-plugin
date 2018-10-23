@@ -34,48 +34,6 @@
   }
 
 
-  // ReferenceLines.prototype.computeOffsets = function() {
-  //     // store the current offsets between slices
-  //     var panes = this._wvPaneManager.getAllPanes();
-  //     var this_ = this;
-  //     if (this._enabled && panes.length > 1) {
-  //         for (var i=0; i < panes.length; ++i) {
-  //             for (var j=0; j < panes.length; ++j) {
-  //                 if (i != j && panes[i].seriesId !== undefined && panes[j].seriesId !== undefined
-  //                     && panes[i].seriesId != panes[j].seriesId) {
-
-  //                     this.updateOffsetBetweenPanes(panes[i], panes[j]);
-  //                 }
-  //             }
-  //         }
-  //     }
-  // }
-
-  // Synchronizer.prototype.updateOffsetBetweenPanes = function(paneA, paneB) {
-
-  //     if (paneA.series.isSameOrientationAs(paneB.series)) {
-
-  //         if (!(paneA.seriesId in this._offsets)) {
-  //             this._offsets[paneA.seriesId] = {};    
-  //         }
-
-  //         var this_ = this;
-  //         paneB.series.getCurrentImagePromise().then(function(imageB) {
-  //             paneA.series.getCurrentImagePromise().then(function(imageA) {
-
-  //                 var offset = imageB.instanceInfos.TagsSubset.SliceLocation - imageA.instanceInfos.TagsSubset.SliceLocation;
-  //                 if (Math.abs(offset) <= imageA.instanceInfos.TagsSubset.SliceThickness) {
-  //                     offset = 0; // if the offset is smaller than a slice, there is no "intention" to have an offset
-  //                 }
-
-  //                 this_._offsets[paneA.seriesId][paneB.seriesId] = offset;
-
-  //             });
-  //         });
-  //     } else {
-  //         delete this._offsets[paneA.seriesId];
-  //     }
-  // }
 
   ReferenceLines.prototype.isEnabled = function() {
       return this._enabled;
@@ -203,13 +161,6 @@
             // Then draw viewport.
             var enabledElement = enabledElementObject.element;
             cornerstone.updateImage(enabledElement, false); // Draw image. Do not invalidate cornerstone cache!
-            // $(enabledElementObject.element).trigger("CornerstoneImageRendered", {
-            //     viewport: enabledElementObject.viewport,
-            //     element : enabledElementObject.element,
-            //     image : enabledElementObject.image,
-            //     enabledElement : enabledElementObject,
-            //     canvasContext: enabledElementObject.canvas.getContext('2d')
-            // });
         });
 
     });
