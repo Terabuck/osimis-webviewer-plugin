@@ -131,7 +131,7 @@
         .directive('wvWebviewer', wvWebviewer);
 
     /* @ngInject */
-    function wvWebviewer($rootScope, $timeout, $translate, wvStudyManager, wvAnnotationManager, wvSeriesManager, wvPaneManager, wvWindowingViewportTool, wvSynchronizer, wvViewerController, wvConfig) {
+    function wvWebviewer($rootScope, $timeout, $translate, wvStudyManager, wvAnnotationManager, wvSeriesManager, wvPaneManager, wvWindowingViewportTool, wvSynchronizer, wvReferenceLines, wvViewerController, wvConfig) {
         var directive = {
             bindToController: true,
             controller: Controller,
@@ -267,6 +267,7 @@
                 rotateRight: false,
                 arrowAnnotate: false,
                 toggleSynchro: false,
+                toggleReferenceLines: false,
                 nextSeries: false,
                 previousSeries: false
             };
@@ -334,6 +335,7 @@
                     {type: "button", tool: "print"},
                     {type: "button", tool: "keyImageCapture"},
                     {type: "button", tool: "toggleSynchro"},
+                    {type: "button", tool: "toggleReferenceLines"},
                     // Optional buttons to explicitely activate
                     // {type: "button", tool: "previousSeries"},
                     // {type: "button", tool: "nextSeries"},
@@ -351,6 +353,7 @@
             vm.studyIslandsDisplayMode = vm.wvViewerController.getStudyIslandDisplayMode(__webViewerConfig.defaultStudyIslandsDisplayMode || "grid");
             vm.paneManager = wvPaneManager;
             vm.synchronizer = wvSynchronizer;
+            vm.referenceLines = wvReferenceLines;
             vm.wvWindowingViewportTool = wvWindowingViewportTool;
 
             if (!__webViewerConfig.toggleOverlayIconsButtonEnabled) {
@@ -516,6 +519,9 @@
                     break;
                 case 'toggleSynchro':
                     vm.synchronizer.enable(!vm.synchronizer.isEnabled());
+                    break;
+                case 'toggleReferenceLines':
+                    vm.referenceLines.enable(!vm.referenceLines.isEnabled());
                     break;
                 case 'toggleOverlayText':
                     vm.wvViewerController.toggleOverlayText();

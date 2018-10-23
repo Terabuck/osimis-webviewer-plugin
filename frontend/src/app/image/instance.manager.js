@@ -66,6 +66,8 @@
              * - @param {object} tags
              * Object containing tags on format {tag1: content1, ...}
              * 
+             * - @param {object} seriesId
+             * 
              * @description
              * A callback function triggered each time a tag as been defined.
              * 
@@ -147,8 +149,9 @@
             return _infosByInstances[id];
         }
 
-        function setInfos(id, instanceInfos) {
-        	// Always wrap tags in a promise to stay consistant with the API.
+        function setInfos(id, instanceInfos, seriesId) {
+            instanceInfos["SeriesOrthancId"] = seriesId;
+          // Always wrap tags in a promise to stay consistant with the API.
             var infosPromise = $q.when(instanceInfos);
         	
         	// Store the tags.

@@ -1,3 +1,4 @@
+
 (function() {
     'use strict';
     /**
@@ -119,6 +120,7 @@
 
             var enabledElement = viewport.getEnabledElement();
             cornerstoneTools.orientationMarkers.enable(enabledElement);
+
             viewport.draw(false);
 
             // This tool also requires imagePlane cornerstone meta data. Those

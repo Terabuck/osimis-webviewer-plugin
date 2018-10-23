@@ -106,7 +106,7 @@
      * Doc available at the head of the file
      * @ngInject
      */
-    function wvViewport($, _, cornerstone, cornerstoneTools, $rootScope, $q, $parse, wvImageManager) {
+    function wvViewport($, _, cornerstone, cornerstoneTools, $rootScope, $q, $parse, wvImageManager, wvReferenceLines) {
         var directive = {
             transclude: true,
             bindToController: true,
@@ -159,7 +159,7 @@
          */
         function link(scope, element, attrs, ctrls) {
             var enabledElement = element.children('div').children('.wv-cornerstone-enabled-image')[0];
-            var model = new osimis.Viewport($q, cornerstone, enabledElement, !!scope.vm.wvLossless);
+            var model = new osimis.Viewport($q, cornerstone, enabledElement, !!scope.vm.wvLossless, wvReferenceLines);
             scope.vm.model = model
             scope.vm.setFocus = function(){
                 // because of unselectable, we set the focus on the click in case the viewer is embedded in an iframe.

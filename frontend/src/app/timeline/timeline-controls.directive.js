@@ -29,7 +29,7 @@
         .directive('wvTimelineControls', wvTimelineControls);
 
     /* @ngInject */
-    function wvTimelineControls(wvSynchronizer) {
+    function wvTimelineControls() {
         var directive = {
             bindToController: true,
             controller: Controller,
@@ -50,7 +50,7 @@
     }
 
     /* @ngInject */
-    function Controller(wvSynchronizer) {
+    function Controller(wvSynchronizer, wvReferenceLines) {
         var vm = this;
 
         // Set default values
@@ -69,6 +69,7 @@
             if (typeof value !== 'undefined') {
                 vm.series.goToImage(value-1);
                 wvSynchronizer.update(vm.series);
+                wvReferenceLines.update(vm.series);
             }
             else {
                 return vm.series.currentIndex + 1

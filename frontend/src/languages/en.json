@@ -81,6 +81,7 @@
             "MAGNIFYING_GLASS_SIZE": "magnification size",
             "NEXT_SERIES": "next series",
             "RECTANGLE_ROI": "rectangle roi",
+            "REFERENCE_LINES" : "Reference lines",
             "ROTATE_LEFT": "rotate to the left",
             "ROTATE_RIGHT": "rotate to the right",
             "SPLIT_PANE_CONFIG_LEGEND_PARAGRAPH": "Change the viewport layout.",

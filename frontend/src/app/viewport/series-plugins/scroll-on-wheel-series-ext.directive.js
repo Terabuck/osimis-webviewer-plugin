@@ -53,7 +53,7 @@
     }
 
     /* @ngInject */
-    function Controller($scope, $element, $attrs, hamster, wvPaneManager, wvSeriesManager, wvSynchronizer, wvConfig, wvZoomViewportTool) {
+    function Controller($scope, $element, $attrs, hamster, wvPaneManager, wvSeriesManager, wvSynchronizer, wvReferenceLines, wvConfig, wvZoomViewportTool) {
         var vm = this;
         this.wvConfig = wvConfig;
 
@@ -83,12 +83,14 @@
             if (toolName === "previousImage") {
 
                 series.goToPreviousImage(true);
-                wvSynchronizer.update(series);          
+                wvSynchronizer.update(series);  
+                wvReferenceLines.update(series);
 
             } else if (toolName === "nextImage") {
 
                 series.goToNextImage(true);
                 wvSynchronizer.update(series);          
+                wvReferenceLines.update(series);
 
             } else if (toolName === "zoomIn") {
 

@@ -61,13 +61,14 @@
     }
 
     /* @ngInject */
-    function Controller($scope, wvImageBinaryManager, wvSynchronizer) {
+    function Controller($scope, wvImageBinaryManager, wvSynchronizer, wvReferenceLines) {
         var _this = this;
 
         // Set default values
         this.readonly = (typeof this.readonly === 'undefined') ? false : this.readonly;
 
         this.wvSynchronizer = wvSynchronizer;
+        this.wvReferenceLines = wvReferenceLines;
         
         // [<image index>: [<image quality: int>, ...], ...] - image-index != image-id
         this.imageQualities = [];
@@ -200,6 +201,7 @@
     Controller.prototype.goToImage = function(i) {
         this.series.goToImage(i);
         this.wvSynchronizer.update(this.series);
+        this.wvReferenceLines.update(this.series);
     };
 
     Controller.prototype._listenSeries = function() {

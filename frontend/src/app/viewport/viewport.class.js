@@ -24,13 +24,15 @@
      */
     function Viewport(
         Promise, cornerstone, 
-        domElement, isDiagnosisViewport
+        domElement, isDiagnosisViewport,
+        wvReferenceLines
     ) {
         // Dependencies
         this._Promise = Promise;
         this._cornerstone = cornerstone;
         this._CornerstoneAnnotationSynchronizer = new osimis.CornerstoneAnnotationSynchronizer();
         this._CornerstoneViewportSynchronizer = new osimis.CornerstoneViewportSynchronizer();
+        this._wvReferenceLines = wvReferenceLines;
 
         // Params
         this._enabledElement = domElement;
@@ -55,7 +57,8 @@
         // Set quality policy
         if (isDiagnosisViewport) {
             this._qualityPolicy = osimis.QualityForDiagnosis;
-        }
+            $(this._enabledElement).on('CornerstoneImageRendered', function(e, eventData) {wvReferenceLines.onImageRendered(e, eventData);});
+          }
         else {
             this._qualityPolicy = osimis.QualityForThumbnail;
         }
@@ -584,7 +587,10 @@
         viewportData = osimis.CornerstoneViewportWrapper.wrapCornerstoneViewport(
             viewportData,
             baseResolution,
-            baseResolution
+            baseResolution,
+            null,
+            null,
+            null
         );
 
         // Keep original image size if image is smaller than viewport if

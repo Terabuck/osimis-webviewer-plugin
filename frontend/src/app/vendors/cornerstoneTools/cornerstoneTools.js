@@ -7681,8 +7681,10 @@ if (typeof cornerstoneTools === 'undefined') {
         // if we have no toolData for this element, return immediately as there is nothing to do
         var toolData = cornerstoneTools.getToolState(e.currentTarget, toolType);
         if (toolData === undefined) {
-            return;
+          console.log("no toolData", e.currentTarget);  
+          return;
         }
+        console.log("toolData", e.currentTarget, toolData);  
 
         // Get the enabled elements associated with this synchronization context and draw them
         var syncContext = toolData.data[0].synchronizationContext;

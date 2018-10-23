@@ -12,7 +12,7 @@
      */
 
     /* @ngInject */
-    function wvKeyboardShortcutEventManager($rootScope, wvConfig, wvStudyManager, wvPaneManager, wvSynchronizer, wvSeriesPlayer, wvViewerController){
+    function wvKeyboardShortcutEventManager($rootScope, wvConfig, wvStudyManager, wvPaneManager, wvSynchronizer, wvReferenceLines, wvSeriesPlayer, wvViewerController){
         this.previousSynchroStatus = undefined;
 
         keyboardJS.setContext('viewerShortcut');
@@ -95,6 +95,17 @@
             handlers.disableSynchro = function() {
                 wvSynchronizer.enable(false);
             };
+
+            handlers.toggleReferenceLines = function() {
+                wvReferenceLines.toggle();
+            };
+            handlers.enableReferenceLines = function() {
+                wvReferenceLines.enable(true);
+            };
+            handlers.disableReferenceLines = function() {
+                wvReferenceLines.enable(false);
+            };
+
             handlers.enterTemporaryToggleSynchro = function() {
                 if (this_.previousSynchroStatus === undefined) {
                     this_.previousSynchroStatus = wvSynchronizer.isEnabled();
@@ -153,12 +164,14 @@
                 var selectedPane = wvPaneManager.getSelectedPane();
                 selectedPane.series.goToPreviousImage(true);
                 wvSynchronizer.update(selectedPane.series);
+                wvReferenceLines.update(selectedPane.series);
             };
 
             handlers.nextImage = function() {
                 var selectedPane = wvPaneManager.getSelectedPane();
                 selectedPane.series.goToNextImage(true);
                 wvSynchronizer.update(selectedPane.series);
+                wvReferenceLines.update(selectedPane.series);
             };
 
             handlers.rotateLeft = function() {

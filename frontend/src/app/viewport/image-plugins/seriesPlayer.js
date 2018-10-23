@@ -11,7 +11,7 @@
 (function(osimis) {
     'use strict';
 
-    function SeriesPlayer($rootScope, $timeout, wvSynchronizer) {
+    function SeriesPlayer($rootScope, $timeout, wvSynchronizer, wvReferenceLines) {
         // Injections.
         this.$rootScope = $rootScope;
         this.$timeout = $timeout;
@@ -19,6 +19,7 @@
         this._isPlayingReverse = false;
         this._cancelAnimationId = null;
         this.wvSynchronizer = wvSynchronizer;
+        this.wvReferenceLines = wvReferenceLines;
     }
 
     SeriesPlayer.prototype.play = function(series) {
@@ -62,6 +63,7 @@
                         // Go to next image
                         series_.goToNextImage(true);
                         this_.wvSynchronizer.update(series_);
+                        this_.wvReferenceLines.update(series_);
 
                         // Benchmark play loop
                         // if (console.time && console.timeEnd) {
@@ -123,6 +125,7 @@
                         // Go to next image
                         series_.goToPreviousImage(true);
                         this_.wvSynchronizer.update(series_);
+                        this_.wvReferenceLines.update(series_);
 
                         // Benchmark play loop
                         // if (console.time && console.timeEnd) {

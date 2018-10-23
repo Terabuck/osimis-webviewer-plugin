@@ -287,6 +287,20 @@
         <input type="radio" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'toggleSynchro'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
+    <!-- ReferenceLines -->
+    <label
+        ng-switch-when="toggleReferenceLines"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('toggleReferenceLines')"
+        class="wvButton--underline fa fa-bars"
+        ng-class="{'active': vm.toolbox.wvReferenceLines.isEnabled(), 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        data-title="{{ 'COMPONENTS.TOOLBOX.REFERENCE_LINES' | translate | wvCapitalize }}"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
+        >
+        <input type="radio" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'toggleReferenceLines'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
     <!-- Toggle Overlay Text -->
     <label
         ng-switch-when="toggleOverlayText"

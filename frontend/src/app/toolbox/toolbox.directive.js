@@ -111,9 +111,10 @@
     }
 
     /* @ngInject */
-    function toolboxCtrl($element, wvSynchronizer, wvViewerController) {
+    function toolboxCtrl($element, wvSynchronizer, wvReferenceLines, wvViewerController) {
         var _this = this;
         this.wvSynchronizer = wvSynchronizer;
+        this.wvReferenceLines = wvReferenceLines;
         this.wvViewerController = wvViewerController;
 
         // Apply windowing preset to the selected pane.
