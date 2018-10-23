@@ -389,7 +389,7 @@
         WvSeries.prototype.isSameOrientationAs = function(otherSeries) {
             // compute the dot products of normals to check they have the same orientations
             var thisSeriesVectors = getVectorsFromOrientation(this.tags.ImageOrientationPatient);
-            var otherSeriesVectors = getVectorsFromOrientation(this.tags.ImageOrientationPatient);
+            var otherSeriesVectors = getVectorsFromOrientation(otherSeries.ImageOrientationPatient);
 
             var thisSeriesNormal = crossProduct(thisSeriesVectors.x, thisSeriesVectors.y);
             var otherSeriesNormal = crossProduct(otherSeriesVectors.x, otherSeriesVectors.y);
