@@ -22,10 +22,34 @@
 
   ReferenceLines.prototype.enable = function(enabled) {
       this._enabled = enabled;
+
+      var allPanes = this._wvPaneManager.getAllPanes();
+      $.each(allPanes, function(index, pane) {
+        if (pane.series != undefined) {
+          var imageId = pane.series.getCurrentImageId();
+          
+          // console.log("ReferenceLines.enable, forcing redraw ", imageId);
+          var enabledElementObjects = cornerstone.getEnabledElementsByImageId(imageId);
+          enabledElementObjects
+            // Bypass thumbnails (as they wont ever be used w/ annotations)
+            .filter(function(enabledElementObject) {
+                return enabledElementObject._syncAnnotationResolution;
+            })
+            // Redraw the image - don't use cornerstone#draw because bugs occurs (only when debugger is off)
+            // those issues may come from changing the cornerstoneImageObject when image resolution change (cornerstone probably cache it)
+            .forEach(function(enabledElementObject) {
+    
+                // Then draw viewport.
+                var enabledElement = enabledElementObject.element;
+                cornerstone.updateImage(enabledElement, false); // Draw image. Do not invalidate cornerstone cache!
+            });
+          }
+      });
+
       if (this._enabled) {
-          console.log("ReferenceLines is now enabled");
+        console.log("ReferenceLines is now enabled");
       } else {
-          console.log("ReferenceLines is now disabled");
+        console.log("ReferenceLines is now disabled");
       }
   }
 
@@ -109,7 +133,7 @@
 
   ReferenceLines.prototype.onImageRendered = function(e, eventData) {
 
-    console.log("rendering reference lines on ", eventData.image.imageId);
+    // console.log("rendering reference lines on ", eventData.image.imageId);
     var instanceId = eventData.image.imageId.split(":")[0];
     var that = this;
 
@@ -128,12 +152,12 @@
     
           var imageId = referencePane.series.getCurrentImageId();
           if (imageId != null) {
-            console.log("rendering line from ", imageId, " on ", eventData.image.imageId);
+            // console.log("rendering line from ", imageId, " on ", eventData.image.imageId);
 
             var referenceImagePlane = cornerstoneTools.metaData.get('imagePlane', imageId);
             that.renderReferenceLine(context, eventData, e.currentTarget, referenceImagePlane);
           } else {
-            console.log("no reference lines to render for this series on ", eventData.image.imageId);
+            // console.log("no reference lines to render for this series on ", eventData.image.imageId);
           }
         });
 
@@ -146,7 +170,7 @@
     var referencePanes = this.getListOfReferencingPanes(updatedSeries);
     $.each(referencePanes, function(index, referencePane) {
       var imageId = referencePane.series.getCurrentImageId();
-      console.log("ReferenceLines.update, need to redraw ", imageId);
+      // console.log("ReferenceLines.update, need to redraw ", imageId);
       var enabledElementObjects = cornerstone.getEnabledElementsByImageId(imageId);
       enabledElementObjects
         // Bypass thumbnails (as they wont ever be used w/ annotations)
@@ -157,7 +181,7 @@
         // those issues may come from changing the cornerstoneImageObject when image resolution change (cornerstone probably cache it)
         .forEach(function(enabledElementObject) {
 
-            console.log("ReferenceLines.update, redrawing ", imageId);
+            // console.log("ReferenceLines.update, redrawing ", imageId);
             // Then draw viewport.
             var enabledElement = enabledElementObject.element;
             cornerstone.updateImage(enabledElement, false); // Draw image. Do not invalidate cornerstone cache!
