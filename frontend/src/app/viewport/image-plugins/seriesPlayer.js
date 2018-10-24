@@ -178,8 +178,8 @@
         .factory('wvSeriesPlayer', wvSeriesPlayer);
 
     /* @ngInject */
-    function wvSeriesPlayer($rootScope, $timeout, wvSynchronizer) {
-        return new SeriesPlayer($rootScope, $timeout, wvSynchronizer);
+    function wvSeriesPlayer($rootScope, $timeout, wvSynchronizer, wvReferenceLines) {
+        return new SeriesPlayer($rootScope, $timeout, wvSynchronizer, wvReferenceLines);
     }
 })(osimis || (this.osimis = {}));
 
