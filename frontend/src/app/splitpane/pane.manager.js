@@ -235,6 +235,10 @@
             // Trigger selected pane changed event.
             this.onSelectedPaneChanged.trigger(newlySelectedPane);
         }
+
+        // if (typeof config.seriesId !== 'undefined') {
+        //   this._wvReferenceLines.update(config.seriesId);
+        // }
     };
 
     PaneManager.prototype.getAllPanes = function(){

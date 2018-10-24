@@ -243,7 +243,7 @@
                         paneOptions.reportId = nextItemTuple[0];
                     }
                     if(nextItemTuple[0] !== currentItemId){
-                        wvPaneManager.setPane(selectedPane.x, selectedPane.y, paneOptions)
+                      wvViewerController.setPane(selectedPane.x, selectedPane.y, paneOptions)
                     }
                 });
             };

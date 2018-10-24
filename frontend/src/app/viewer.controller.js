@@ -25,7 +25,10 @@
         return value;
     }
 
-    function ViewerController($q, wvPaneManager, wvStudyManager) {
+    // the ViewerController has been introduced mainly to avoid circular dependencies betwwen all "modules"
+    // ViewerController is a central contact point that can dispatch the calls to other modules that do not have to "know" him
+
+    function ViewerController($q, wvPaneManager, wvStudyManager, wvReferenceLines, wvSeriesManager) {
         this._isOverlayTextVisible = getBoolFromLocalStorage("isOverlayTextVisible", true);
         this._isOverlayIconsVisible = getBoolFromLocalStorage("isOverlayIconsVisible", true);
         this._layoutX = getIntFromLocalStorage("layoutX", 1);
@@ -34,6 +37,8 @@
         this._selectedStudyIds = [];
         this.wvPaneManager = wvPaneManager;
         this.wvStudyManager = wvStudyManager;
+        this.wvReferenceLines = wvReferenceLines;
+        this.wvSeriesManager = wvSeriesManager;
         this.$q = $q;
 
         this.saveStateToLocalStorage();        
@@ -96,6 +101,16 @@
         return {x: this._layoutX, y: this._layoutY};
     }
 
+    ViewerController.prototype.setPane = function(x, y, paneOptions) {
+      var that = this;
+      this.wvPaneManager.setPane(x, y, paneOptions);
+      if (paneOptions.seriesId !== undefined) {
+        this.wvSeriesManager.get(paneOptions.seriesId).then(function(series) {
+          that.wvReferenceLines.update(series);
+        });
+      }
+    }
+
     ViewerController.prototype.nextSeries = function() {
         var selectedPane = this.wvPaneManager.getSelectedPane();
         var this_ = this;
@@ -103,7 +118,7 @@
             config.csViewport = null;
             config.imageIndex = 0;
             config.isSelected = true;
-            this_.wvPaneManager.setPane(selectedPane.x, selectedPane.y, config);
+            this_.setPane(selectedPane.x, selectedPane.y, config);
         });
     }
 
@@ -114,7 +129,7 @@
             config.csViewport = null;
             config.imageIndex = 0;
             config.isSelected = true;
-            this_.wvPaneManager.setPane(selectedPane.x, selectedPane.y, config);
+            this_.setPane(selectedPane.x, selectedPane.y, config);
         });
     }
 
@@ -143,7 +158,7 @@
                 paneOptions.reportId = firstItemTuple[0];
             }
 
-            this_.wvPaneManager.setPane(selectedPane.x, selectedPane.y, paneOptions)
+            this_.setPane(selectedPane.x, selectedPane.y, paneOptions)
         })
     };
 
@@ -172,7 +187,7 @@
                 paneOptions.reportId = firstItemTuple[0];
             }
 
-            this_.wvPaneManager.setPane(selectedPane.x, selectedPane.y, paneOptions)
+            this_.setPane(selectedPane.x, selectedPane.y, paneOptions)
         })
     };
 
@@ -181,7 +196,7 @@
         .factory('wvViewerController', wvViewerController);
 
     /* @ngInject */
-    function wvViewerController($q, wvPaneManager, wvStudyManager) {
-        return new ViewerController($q, wvPaneManager, wvStudyManager);
+    function wvViewerController($q, wvPaneManager, wvStudyManager, wvReferenceLines, wvSeriesManager) {
+        return new ViewerController($q, wvPaneManager, wvStudyManager, wvReferenceLines, wvSeriesManager);
     }
 })(osimis || (this.osimis = {}));

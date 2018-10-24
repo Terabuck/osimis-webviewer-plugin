@@ -568,7 +568,7 @@
                 config.isSelected = true;
 
                 // Change pane's configuration.
-                wvPaneManager.setPane(x, y, config);
+                wvViewerController.setPane(x, y, config);
             };
 
             // Enable/Disable annotation storage/retrieval from backend
@@ -698,7 +698,7 @@
                     wvStudyManager.get(newValues[0]).then(function(firstStudy){
                         var firstPane = wvPaneManager.getPane(0, 0);
                         if(firstStudy && firstPane.isEmpty()){
-                            wvPaneManager.setPane(0, 0, {seriesId: firstStudy.series[0], isSelected: true, studyColor: firstStudy.color})
+                          wvViewerController.setPane(0, 0, {seriesId: firstStudy.series[0], isSelected: true, studyColor: firstStudy.color})
                         };
                     });
                 }
