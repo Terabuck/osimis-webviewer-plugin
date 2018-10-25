@@ -21,6 +21,7 @@ Fixes:
 -----
 * Key image captures are now reduced in size to max 1M pixels.  Larger images were not supported on many browsers.
 * WVB-378: Secondary capture images are invalid and can not be pushed to other DICOM modalities
+* WVB-280: YBR - JPEG lossy compressed high quality images are not displayed
 * WVB-371: It is impossible to edit a text annotation
 * WVB-376: US images encoded in YBR are not displayed correctly
 * WVB-364: On touch-screens, tooltips stays visible

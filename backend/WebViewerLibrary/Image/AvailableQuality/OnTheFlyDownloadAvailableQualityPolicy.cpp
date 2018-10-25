@@ -35,7 +35,7 @@ bool OnTheFlyDownloadAvailableQualityPolicy::_canBeDecompressedInFrontend(
     // Only accept formats that are supported by the frontend.
     if (boost::regex_match(transferSyntax.c_str(), matches, regexp) && (
         // see http://www.dicomlibrary.com/dicom/transfer-syntax/
-        boost::lexical_cast<uint32_t>(matches[1]) == 50 || // Lossy JPEG 8-bit Image Compression
+        (boost::lexical_cast<uint32_t>(matches[1]) == 50 && (dicomTags["PhotometricInterpretation"].asString() == "MONOCHROME1" || dicomTags["PhotometricInterpretation"].asString() == "MONOCHROME2"))  || // Lossy JPEG 8-bit Image Compression
         // boost::lexical_cast<uint32_t>(matches[1]) == 51 || // Lossy JPEG 12-bit Image Compression
         // boost::lexical_cast<uint32_t>(matches[1]) == 57 || // JPEG Lossless, Nonhierarchical (Processes 14) 
         boost::lexical_cast<uint32_t>(matches[1]) == 70 )// || // JPEG Lossless, Nonhierarchical, First-Order Prediction (Default Transfer Syntax for Lossless JPEG Image Compression)
