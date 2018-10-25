@@ -185,23 +185,14 @@
                     .then(function(infos) {
                         // Clone tags to ensure we don't corrupt them (they may
                         // be passed by reference).
-                        var tags = _.cloneDeep(infos.TagsSubset);
+                        //var tags = _.cloneDeep(infos.TagsSubset);
+                        var tags = {};
 
                         // Use KO as a modality, as requested by the client.
                         tags.Modality = 'KO';
-
-                        // Avoid `Use "Content" to inject an image into a new
-                        // DICOM instance` & `Trying to override a value
-                        // inherited from a parent module` backend error.
-                        delete tags.PixelData;
-                        delete tags.SeriesInstanceUID;
-                        delete tags.StudyInstanceUID;
-
-                        tags = {
-                            Modality: 'KO',
-                            SeriesDescription: '*' + tags.SeriesDescription,
-                            OsimisNote: note
-                        };
+                        tags.SOPClassUID = '1.2.840.10008.5.1.4.1.1.88.59',
+                        tags.SeriesDescription = '*' + tags.SeriesDescription,
+                        tags.OsimisNote = note
 
                         // Retrieve study Id
                         return instanceManager
@@ -281,6 +272,16 @@
 
             // create a fake scope for the viewport
             var $scope = $rootScope.$new();
+
+            var pixelsCount = width * height;
+            var maxPixelsCount = 1*1024*1024;
+            if (pixelsCount > maxPixelsCount) {
+              var ratio = Math.sqrt(pixelsCount / maxPixelsCount);
+              width = Math.round(width / ratio);
+              height = Math.round(height / ratio);
+              console.log("limiting the size of the capture to (" + width + "x" + height + ")");
+            }
+
             $scope.size = {
                 width: width + 'px',
                 height: height + 'px'

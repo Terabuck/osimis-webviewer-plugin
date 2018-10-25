@@ -143,23 +143,25 @@
 
         var referencePanes = that.getListOfReferencingPanes(series); // [e.currentTarget]; // syncContext.getSourceElements();
 
-        // Create the canvas context and reset it to the pixel coordinate system
-        var context = eventData.canvasContext.canvas.getContext('2d');
-        cornerstone.setToPixelCoordinateSystem(eventData.enabledElement, context);
-    
-        // // Iterate over each referenced element
-        $.each(referencePanes, function(index, referencePane) {
-    
-          var imageId = referencePane.series.getCurrentImageId();
-          if (imageId != null) {
-            // console.log("rendering line from ", imageId, " on ", eventData.image.imageId);
+        if (referencePanes !== undefined && referencePanes.length > 0) {
+          // Create the canvas context and reset it to the pixel coordinate system
+          var context = eventData.canvasContext.canvas.getContext('2d');
+          cornerstone.setToPixelCoordinateSystem(eventData.enabledElement, context);
+      
+          // // Iterate over each referenced element
+          $.each(referencePanes, function(index, referencePane) {
+      
+            var imageId = referencePane.series.getCurrentImageId();
+            if (imageId != null) {
+              // console.log("rendering line from ", imageId, " on ", eventData.image.imageId);
 
-            var referenceImagePlane = cornerstoneTools.metaData.get('imagePlane', imageId);
-            that.renderReferenceLine(context, eventData, e.currentTarget, referenceImagePlane);
-          } else {
-            // console.log("no reference lines to render for this series on ", eventData.image.imageId);
-          }
-        });
+              var referenceImagePlane = cornerstoneTools.metaData.get('imagePlane', imageId);
+              that.renderReferenceLine(context, eventData, e.currentTarget, referenceImagePlane);
+            } else {
+              // console.log("no reference lines to render for this series on ", eventData.image.imageId);
+            }
+          });
+        }
 
       });
   
