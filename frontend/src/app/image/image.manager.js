@@ -51,6 +51,10 @@
      * # @pre The image's series has been loaded via wvSeriesManager
      */
     ImageManager.prototype.get = function(id) {
+        if (id == null) {
+          return Promise.resolve(null);
+        }
+
         var instanceManager = this._instanceManager;
         var postProcessorClasses = this._postProcessorClasses;
         var modelCache = this._modelCache;

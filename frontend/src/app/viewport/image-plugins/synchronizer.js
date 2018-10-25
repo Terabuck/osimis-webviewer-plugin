@@ -53,7 +53,7 @@
 
     Synchronizer.prototype.updateOffsetBetweenPanes = function(paneA, paneB) {
 
-        if (paneA.series.isSameOrientationAs(paneB.series)) {
+      if (paneA.series.isSameOrientationAs(paneB.series)) {
 
             if (!(paneA.seriesId in this._offsets)) {
                 this._offsets[paneA.seriesId] = {};    
@@ -63,6 +63,9 @@
             paneB.series.getCurrentImagePromise().then(function(imageB) {
                 paneA.series.getCurrentImagePromise().then(function(imageA) {
 
+                    if (imageB == null || imageA == null) {
+                      return;
+                    }
                     var offset = imageB.instanceInfos.TagsSubset.SliceLocation - imageA.instanceInfos.TagsSubset.SliceLocation;
                     if (Math.abs(offset) <= imageA.instanceInfos.TagsSubset.SliceThickness) {
                         offset = 0; // if the offset is smaller than a slice, there is no "intention" to have an offset

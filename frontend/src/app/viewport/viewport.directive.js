@@ -292,6 +292,10 @@
                     var newCsViewport = newImageId && scope.vm.csViewport || null;
                     _firstWatch = _firstWatch && newImageId === oldImageId;
 
+                    if (newImageId == null) { // force clearing the image if there's nothing to display
+                      model.clearImage();
+                    }
+
                     // Assert values (because if they are not finite, they
                     // will always return false on equality comparison,
                     // thus triggering infinite $digest cycles.
@@ -310,7 +314,7 @@
                     // Case 2:
                     //   RESET IMAGE
                     else if (!newImageId && oldImageId) {
-                        model.clearImage();
+                        // already handled above
                     }
                     // Case 3:
                     // If image has changed, we update it
