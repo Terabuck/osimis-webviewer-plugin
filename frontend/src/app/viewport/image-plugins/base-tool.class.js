@@ -127,7 +127,7 @@
         cornerstoneTools.touchInput.enable(enabledElement);
 
         if (this.isAnnotationTool) {
-            console.log("deactivating all annotation tools (make the annotation editable but not active)", this.annotationTools);
+            //console.log("deactivating all annotation tools (make the annotation editable but not active)", this.annotationTools);
             this.annotationTools.forEach(function(value){cornerstoneTools[value].deactivate(enabledElement, 1)});
         }
 
