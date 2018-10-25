@@ -5,6 +5,7 @@ next version
 
 Features:
 --------
+* Now displaying reference lines to display the intersection of images in different planes
 * Added print support (not supported on Internet Explorer).  The feature can be enabled/disabled through the "PrintEnabled" 
   option (true by default).  Note that, due to conflicts, we had to remove print support for pdf instances.  If you need
   to print pdf instances, download the file and print it from your pdf viewer.
