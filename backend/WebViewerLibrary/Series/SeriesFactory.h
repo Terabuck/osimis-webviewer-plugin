@@ -16,6 +16,7 @@ public:
                                      const Json::Value& instancesInfos,
                                      const Json::Value& studyInfo);
 
+
 private:
   const std::auto_ptr<IAvailableQualityPolicy> _availableQualityPolicy;
 };

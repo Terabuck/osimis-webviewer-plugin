@@ -15,7 +15,7 @@
 #include "../Image/Utilities/ScopedBuffers.h" // for ScopedOrthancPluginMemoryBuffer
 #include "ViewerToolbox.h"
 
-std::string metadataId = "9998";
+std::string instanceMetadataId = "9998";
 int instanceInfoJsonVersion = 1;
 
 InstanceRepository::InstanceRepository(OrthancPluginContext* context)
@@ -39,7 +39,7 @@ void InstanceRepository::SignalNewInstance(const std::string& instanceId) {
 
 void InstanceRepository::StoreInstanceInfoInMetadata(const std::string& instanceId, const Json::Value& instanceInfo) {
 
-  std::string url = "/instances/" + instanceId + "/metadata/" + metadataId;
+  std::string url = "/instances/" + instanceId + "/metadata/" + instanceMetadataId;
   Json::FastWriter fastWriter;
   std::string instanceInfoContent = fastWriter.write(instanceInfo);
   ScopedOrthancPluginMemoryBuffer buffer(_context);
@@ -54,7 +54,7 @@ Json::Value InstanceRepository::GetInstanceInfo(const std::string& instanceId) {
       Json::Value instanceInfo;
 
       // if information has not been cached yet (or is obsolete, update it)
-      if (!OrthancPlugins::GetJsonFromOrthanc(instanceInfo, _context, "/instances/" + instanceId + "/metadata/" + metadataId)
+      if (!OrthancPlugins::GetJsonFromOrthanc(instanceInfo, _context, "/instances/" + instanceId + "/metadata/" + instanceMetadataId)
           || instanceInfo["Version"] != instanceInfoJsonVersion)
       {
         instanceInfo = GenerateInstanceInfo(instanceId);

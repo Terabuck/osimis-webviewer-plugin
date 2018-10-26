@@ -130,7 +130,7 @@ AbstractWebViewer::AbstractWebViewer(OrthancPluginContext* context)
   _dicomRepository.reset(new DicomRepository);
   _imageRepository.reset(new ImageRepository(_dicomRepository.get(), _cache.get()));
   _instanceRepository.reset(new InstanceRepository(_context));
-  _seriesRepository.reset(new SeriesRepository(_dicomRepository.get(), _instanceRepository.get()));
+  _seriesRepository.reset(new SeriesRepository(_context, _dicomRepository.get(), _instanceRepository.get()));
   _annotationRepository.reset(new AnnotationRepository);
 
   // Inject repositories within controllers (we can't do it without static method
@@ -197,6 +197,7 @@ int32_t AbstractWebViewer::start()
   }
 
   _instanceRepository->EnableCachingInMetadata(_config->instanceInfoCacheEnabled);
+  _seriesRepository->EnableCachingInMetadata(_config->instanceInfoCacheEnabled);
 
   if (_config->keyImageCaptureEnabled) {
     // register the OsimisNote tag

@@ -97,9 +97,11 @@ int SeriesController::_ProcessRequest()
     
     // Load the series with an auto_ptr so it's freed at the end of thit method
     std::auto_ptr<Series> series(seriesRepository_->GetSeries(this->seriesId_));
+    Json::Value seriesInfo;
+    series->ToJson(seriesInfo);
 
     // Answer Request with the series' information as JSON
-    return this->_AnswerBuffer(series->ToJson(), "application/json");
+    return this->_AnswerBuffer(seriesInfo.toStyledString(), "application/json");
   }
   // @note if the exception has been thrown from some constructor,
   // memory leaks may happen. we should fix the bug instead of focusing on those memory leaks.

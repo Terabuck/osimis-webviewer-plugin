@@ -46,6 +46,19 @@ struct ImageQuality {
     }
   }
 
+  static inline EImageQuality fromString(const std::string& qualityString) {
+    if (qualityString == "low")
+        return LOW;
+    if (qualityString == "medium")
+        return MEDIUM;
+    if (qualityString == "lossless")
+        return LOSSLESS;
+    if (qualityString == "pixeldata")
+        return PIXELDATA;
+
+    return NONE;
+  }
+
   inline std::string toProcessingPolicytString() const {
     switch(_quality) {
     case LOW:

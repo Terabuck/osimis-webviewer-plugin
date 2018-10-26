@@ -16,6 +16,7 @@ Features:
 * Improved detection of Patient Orientation to allow synchronization of series (now accepting 10° max between orientations)
 * Saving some UI state in the browser local storage to re-open the viewer with the same settings (Study island display mode, 
   layout and overlay texts)
+* Slightly optimized the loading of series when "InstanceInfoCacheEnabled" is set to "true"
 
 Fixes:
 -----

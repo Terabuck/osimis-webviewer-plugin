@@ -32,21 +32,30 @@ Series::Series(const std::string& seriesId, const std::string& contentType, cons
 
 }
 
-std::string Series::ToJson() const {
-  Json::Value result;
-  result["id"] = _seriesId;
-  result["contentType"] = _contentType;
-  result["middleInstanceInfos"] = _seriesTags;
-  result["instancesInfos"] = _instancesInfos;
-  result["instances"] = _orderedInstances;
-  result["study"] = _studyInfo;
-  // result["tags"] = OrthancPlugins::ConvertDicomMapToJson(*_seriesTags.get());
+void Series::ToJson(Json::Value& output) const
+{
+  output["id"] = _seriesId;
+  output["contentType"] = _contentType;
+  output["middleInstanceInfos"] = _seriesTags;
+  output["instancesInfos"] = _instancesInfos;
+  output["instances"] = _orderedInstances;
+  output["study"] = _studyInfo;
 
-  BOOST_FOREACH(ImageQuality quality, _imageQualities) {
-    result["availableQualities"].append(quality.toString());
+  BOOST_FOREACH(ImageQuality quality, _imageQualities)
+  {
+    output["availableQualities"].append(quality.toString());
   }
 
-  return result.toStyledString();
+}
+
+Series* Series::FromJson(const Json::Value& seriesJson)
+{
+  std::set<ImageQuality> imageQualities;
+//  Json::Value imageQualitiesJson =
+  for (size_t i = 0; i < seriesJson["availableQualities"].size(); i++) {
+    imageQualities.insert(ImageQuality::fromString(seriesJson["availableQualities"][(int)i].asString()));
+  }
+  return new Series(seriesJson["id"].asString(), seriesJson["contentType"].asString(), seriesJson["middleInstanceInfos"], seriesJson["instancesInfos"], seriesJson["instances"], imageQualities, seriesJson["study"]);
 }
 
 std::vector<ImageQuality> Series::GetOrderedImageQualities(ImageQuality::EImageQuality higherThan) const
