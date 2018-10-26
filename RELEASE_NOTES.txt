@@ -26,6 +26,7 @@ Fixes:
 * WVB-376: US images encoded in YBR are not displayed correctly
 * WVB-364: On touch-screens, tooltips stays visible
 * WVB-370: US images whose transfer syntax is JPEG are not displayed correctly
+* WVB-372: MR Breast file can not be visualized
 
 Known issues:
 ------------
