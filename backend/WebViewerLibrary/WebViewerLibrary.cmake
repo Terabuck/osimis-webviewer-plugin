@@ -106,9 +106,9 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR
     ${CMAKE_SYSTEM_NAME} STREQUAL "kFreeBSD")
   get_target_property(Flags WebViewerLibrary COMPILE_FLAGS)
   if(Flags STREQUAL "Flags-NOTFOUND")
-    SET(Flags "-fPIC -ldl")
+    SET(Flags "-fPIC -ldl -Wno-deprecated")
   else()
-    SET(Flags "${Flags} -fPIC")
+    SET(Flags "${Flags} -fPIC -Wno-deprecated")
   endif()
   set_target_properties(WebViewerLibrary PROPERTIES
       COMPILE_FLAGS ${Flags})
