@@ -9,8 +9,8 @@
 #ifndef GIL_RESAMPLE_HPP
 #define GIL_RESAMPLE_HPP
 
-#include <boost/lambda/lambda.hpp>
-#include <boost/lambda/bind.hpp>
+//#include <boost/lambda/lambda.hpp>
+//#include <boost/lambda/bind.hpp>
 #include "dynamic_image/dynamic_image_all.hpp"
 #include "affine.hpp"
 

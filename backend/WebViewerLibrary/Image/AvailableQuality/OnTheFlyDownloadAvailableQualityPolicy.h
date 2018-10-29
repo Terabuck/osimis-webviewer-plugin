@@ -22,5 +22,5 @@ private:
 public:
   // Returns available qualities depending on the image DICOM tags
   // @todo use image as an input
-  virtual std::set<ImageQuality> retrieve(const std::string& transferSyntax, const Json::Value& dicomTags);
+  virtual std::set<ImageQuality::EImageQuality> retrieve(const std::string& transferSyntax, const Json::Value& dicomTags);
 };

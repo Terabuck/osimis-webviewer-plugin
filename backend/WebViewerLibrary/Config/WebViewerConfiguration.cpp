@@ -270,8 +270,18 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   }
 
   {// validate combinedToolBehaviour
-    std::set<std::string> combinedToolAllowedToolNames = { "windowing", "pan", "zoom" };
-    std::set<std::string> combinedToolAllowedActions = { "leftMouseButton", "middleMouseButton", "rightMouseButton", "oneTouchPan", "twoTouchPan", "threeTouchPan"};
+    std::set<std::string> combinedToolAllowedToolNames;
+    combinedToolAllowedToolNames.insert("windowing");
+    combinedToolAllowedToolNames.insert("pan");
+    combinedToolAllowedToolNames.insert("zoom");
+
+    std::set<std::string> combinedToolAllowedActions;
+    combinedToolAllowedActions.insert("leftMouseButton");
+    combinedToolAllowedActions.insert("middleMouseButton");
+    combinedToolAllowedActions.insert("rightMouseButton");
+    combinedToolAllowedActions.insert("oneTouchPan");
+    combinedToolAllowedActions.insert("twoTouchPan");
+    combinedToolAllowedActions.insert("threeTouchPan");
 
     Json::Value::Members members = combinedToolBehaviour.getMemberNames();
 
@@ -295,8 +305,17 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   }
 
   {// validate windowingBehaviour
-    std::set<std::string> windowingAllowedDirections = { "left", "right", "up", "down" };
-    std::set<std::string> windowingAllowedToolNames = { "decrease-ww", "increase-ww", "decrease-wc", "increase-wc"};
+    std::set<std::string> windowingAllowedDirections;
+    windowingAllowedDirections.insert("left");
+    windowingAllowedDirections.insert("right");
+    windowingAllowedDirections.insert("up");
+    windowingAllowedDirections.insert("down");
+
+    std::set<std::string> windowingAllowedToolNames;
+    windowingAllowedToolNames.insert("decrease-ww");
+    windowingAllowedToolNames.insert("increase-ww");
+    windowingAllowedToolNames.insert("decrease-wc");
+    windowingAllowedToolNames.insert("increase-wc");
 
     Json::Value::Members members = windowingBehaviour.getMemberNames();
 
@@ -320,24 +339,56 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   }
 
   {// validate keyboard shortcuts
-    std::set<std::string> keyboardShortcutsAllowedToolNames = {
-      "nextStudy", "previousStudy", "nextSeries", "previousSeries", "nextImage", "previousImage",
-      "rotateLeft", "rotateRight", "flipVertical", "flipHorizontal", "invertColor",
-      "selectCombinedTool", "selectPanTool", "selectWindowingTool", "selectZoomTool",
-      "selectMagnifyingGlassTool", "selectLengthMeasureTool", "selectPixelProbeTool",
-      "selectEllipticalRoiTool", "selectRectangleRoiTool", "selectArrowAnnotateTool",
-      "selectKeyImageCaptureTool",
-      "applyEmbeddedWindowingPreset1", "applyEmbeddedWindowingPreset2", "applyEmbeddedWindowingPreset3",
-      "applyEmbeddedWindowingPreset4", "applyEmbeddedWindowingPreset5",
-      "applyConfigWindowingPreset1", "applyConfigWindowingPreset2", "applyConfigWindowingPreset3",
-      "applyConfigWindowingPreset4", "applyConfigWindowingPreset5",
-      "toggleSynchro", "enableSynchro", "disableSynchro",
-      "setLayout1x1", "setLayout1x2", "setLayout2x1", "setLayout2x2",
-      "play", "pause", "playPause", "selectNextPane", "selectPreviousPane",
-      "loadSeriesInPane", "toggleOverlayText", "toggleOverlayIcons",
-      "print",
-      "null"
-    };
+    std::set<std::string> keyboardShortcutsAllowedToolNames;
+    keyboardShortcutsAllowedToolNames.insert("nextStudy");
+    keyboardShortcutsAllowedToolNames.insert("previousStudy");
+    keyboardShortcutsAllowedToolNames.insert("nextSeries");
+    keyboardShortcutsAllowedToolNames.insert("previousSeries");
+    keyboardShortcutsAllowedToolNames.insert("nextImage");
+    keyboardShortcutsAllowedToolNames.insert("previousImage");
+    keyboardShortcutsAllowedToolNames.insert("rotateLeft");
+    keyboardShortcutsAllowedToolNames.insert("rotateRight");
+    keyboardShortcutsAllowedToolNames.insert("flipVertical");
+    keyboardShortcutsAllowedToolNames.insert("flipHorizontal");
+    keyboardShortcutsAllowedToolNames.insert("invertColor");
+    keyboardShortcutsAllowedToolNames.insert("selectCombinedTool");
+    keyboardShortcutsAllowedToolNames.insert("selectPanTool");
+    keyboardShortcutsAllowedToolNames.insert("selectWindowingTool");
+    keyboardShortcutsAllowedToolNames.insert("selectZoomTool");
+    keyboardShortcutsAllowedToolNames.insert("selectMagnifyingGlassTool");
+    keyboardShortcutsAllowedToolNames.insert("selectLengthMeasureTool");
+    keyboardShortcutsAllowedToolNames.insert("selectPixelProbeTool");
+    keyboardShortcutsAllowedToolNames.insert("selectEllipticalRoiTool");
+    keyboardShortcutsAllowedToolNames.insert("selectRectangleRoiTool");
+    keyboardShortcutsAllowedToolNames.insert("selectArrowAnnotateTool");
+    keyboardShortcutsAllowedToolNames.insert("selectKeyImageCaptureTool");
+    keyboardShortcutsAllowedToolNames.insert("applyEmbeddedWindowingPreset1");
+    keyboardShortcutsAllowedToolNames.insert("applyEmbeddedWindowingPreset2");
+    keyboardShortcutsAllowedToolNames.insert("applyEmbeddedWindowingPreset3");
+    keyboardShortcutsAllowedToolNames.insert("applyEmbeddedWindowingPreset4");
+    keyboardShortcutsAllowedToolNames.insert("applyEmbeddedWindowingPreset5");
+    keyboardShortcutsAllowedToolNames.insert("applyConfigWindowingPreset1");
+    keyboardShortcutsAllowedToolNames.insert("applyConfigWindowingPreset2");
+    keyboardShortcutsAllowedToolNames.insert("applyConfigWindowingPreset3");
+    keyboardShortcutsAllowedToolNames.insert("applyConfigWindowingPreset4");
+    keyboardShortcutsAllowedToolNames.insert("applyConfigWindowingPreset5");
+    keyboardShortcutsAllowedToolNames.insert("toggleSynchro");
+    keyboardShortcutsAllowedToolNames.insert("enableSynchro");
+    keyboardShortcutsAllowedToolNames.insert("disableSynchro");
+    keyboardShortcutsAllowedToolNames.insert("setLayout1x1");
+    keyboardShortcutsAllowedToolNames.insert("setLayout1x2");
+    keyboardShortcutsAllowedToolNames.insert("setLayout2x1");
+    keyboardShortcutsAllowedToolNames.insert("setLayout2x2");
+    keyboardShortcutsAllowedToolNames.insert("play");
+    keyboardShortcutsAllowedToolNames.insert("pause");
+    keyboardShortcutsAllowedToolNames.insert("playPause");
+    keyboardShortcutsAllowedToolNames.insert("selectNextPane");
+    keyboardShortcutsAllowedToolNames.insert("selectPreviousPane");
+    keyboardShortcutsAllowedToolNames.insert("loadSeriesInPane");
+    keyboardShortcutsAllowedToolNames.insert("toggleOverlayText");
+    keyboardShortcutsAllowedToolNames.insert("toggleOverlayIcons");
+    keyboardShortcutsAllowedToolNames.insert("print");
+    keyboardShortcutsAllowedToolNames.insert("null");
 
     Json::Value::Members members = keyboardShortcuts.getMemberNames();
 
@@ -357,8 +408,15 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   }
 
   {// validate mouse wheel
-    std::set<std::string> mouseWheelAllowedDirections = { "up", "down" };
-    std::set<std::string> mouseWheelAllowedToolNames = { "nextImage", "previousImage", "zoomIn", "zoomOut"};
+    std::set<std::string> mouseWheelAllowedDirections;
+    mouseWheelAllowedDirections.insert("up");
+    mouseWheelAllowedDirections.insert("down");
+
+    std::set<std::string> mouseWheelAllowedToolNames;
+    mouseWheelAllowedToolNames.insert("nextImage");
+    mouseWheelAllowedToolNames.insert("previousImage");
+    mouseWheelAllowedToolNames.insert("zoomIn");
+    mouseWheelAllowedToolNames.insert("zoomOut");
 
     Json::Value::Members members = mouseWheelBehaviour.getMemberNames();
 

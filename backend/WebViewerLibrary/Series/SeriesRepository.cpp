@@ -29,8 +29,8 @@ namespace {
 SeriesRepository::SeriesRepository(OrthancPluginContext* context, DicomRepository* dicomRepository, InstanceRepository* instanceRepository)
   : _context(context),
     _dicomRepository(dicomRepository),
-    _seriesFactory(std::auto_ptr<IAvailableQualityPolicy>(new OnTheFlyDownloadAvailableQualityPolicy)),
     _instanceRepository(instanceRepository),
+    _seriesFactory(std::auto_ptr<IAvailableQualityPolicy>(new OnTheFlyDownloadAvailableQualityPolicy)),
     _cachingInMetadataEnabled(false)
 {
 }
@@ -95,7 +95,7 @@ std::auto_ptr<Series> SeriesRepository::GenerateSeriesInfo(const std::string& se
   if (getInstanceTags)
   {
     BENCH(RETRIEVE_ALL_INSTANCES_TAGS)
-    for(Json::ValueIterator itr = slicesShort.begin(); itr != slicesShort.end(); itr++) {
+    for(Json::ValueConstIterator itr = slicesShort.begin(); itr != slicesShort.end(); itr++) {
       std::string instanceId = (*itr)[0].asString();
 
       instancesInfos[instanceId] = _instanceRepository->GetInstanceInfo(instanceId);
@@ -164,7 +164,7 @@ namespace {
     std::string transferSyntax;
 
     if (transfertSyntaxValue->IsBinary()) {
-      throw OrthancException(ErrorCode::ErrorCode_CorruptedFile);
+      throw OrthancException(Orthanc::ErrorCode_CorruptedFile);
     }
     else if (transfertSyntaxValue == NULL || transfertSyntaxValue->IsNull()) {
       // Set default transfer syntax if not found

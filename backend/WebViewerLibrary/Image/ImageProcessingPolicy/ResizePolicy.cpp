@@ -58,7 +58,8 @@ std::auto_ptr<IImageContainer> ResizePolicy::Apply(std::auto_ptr<IImageContainer
   outBuffer->SetFormat(accessor->GetFormat());
   outBuffer->SetWidth(outWidth);
   outBuffer->SetHeight(outHeight);
-  Orthanc::ImageAccessor outAccessor = outBuffer->GetAccessor();
+  Orthanc::ImageAccessor outAccessor;
+  outBuffer->GetWriteableAccessor(outAccessor);
   RawImageContainer* outRawImage = new RawImageContainer(outBuffer);
 
   // Resize the input and put the result in the output

@@ -2,11 +2,11 @@
 
 #include <boost/thread.hpp>
 #include <boost/lexical_cast.hpp>
-#include "../Orthanc/Core/IDynamicObject.h"
-#include "../Orthanc/Core/SystemToolbox.h"
-#include "../Orthanc/Core/FileStorage/FilesystemStorage.h"
-#include "../Orthanc/Core/SQLite/Connection.h"
-#include "../Orthanc/Plugins/Samples/GdcmDecoder/GdcmDecoderCache.h"
+#include "Core/IDynamicObject.h"
+#include "Core/SystemToolbox.h"
+#include "Core/FileStorage/FilesystemStorage.h"
+#include "Core/SQLite/Connection.h"
+#include "Plugins/Samples/GdcmDecoder/GdcmDecoderCache.h"
 #include "CacheManager.h"
 #include "CacheScheduler.h"
 #include "json/json.h"
@@ -27,8 +27,8 @@ class CacheLogger
   OrthancPluginContext* pluginContext_;
 public:
   CacheLogger(OrthancPluginContext* pluginContext, bool debugLogsEnabled)
-    : pluginContext_(pluginContext),
-      debugLogsEnabled_(debugLogsEnabled)
+    : debugLogsEnabled_(debugLogsEnabled),
+      pluginContext_(pluginContext)
   {}
 
   void LogCacheDebugInfo(const std::string& message);

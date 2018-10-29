@@ -30,10 +30,42 @@
 #   include(${VIEWER_LIBRARY_DIR}/WebViewerLibrary.cmake)
 #   # target WebViewerLibrary is available
 
+
+set(STATIC_BUILD ON CACHE BOOL "Static build of the third-party libraries (necessary for Windows)")
+set(STANDALONE_BUILD ON CACHE BOOL "Standalone build (all the resources are embedded, necessary for releases)")
+set(ALLOW_DOWNLOADS ON CACHE BOOL "Allow CMake to download packages")
+set(ORTHANC_FRAMEWORK_SOURCE "hg" CACHE STRING "Source of the Orthanc source code (can be \"hg\", \"archive\", \"web\" or \"path\")")
+set(ORTHANC_FRAMEWORK_ROOT "" CACHE STRING "Path to the Orthanc source directory, if ORTHANC_FRAMEWORK_SOURCE is \"path\"")
+
+# Advanced parameters to fine-tune linking against system libraries
+set(USE_SYSTEM_GDCM OFF CACHE BOOL "Use the system version of Grassroot DICOM (GDCM)")
+set(USE_SYSTEM_ORTHANC_SDK OFF CACHE BOOL "Use the system version of the Orthanc plugin SDK")
+
+
+# Download and setup the Orthanc framework
+include(${CMAKE_SOURCE_DIR}/Resources/CMake/DownloadOrthancFramework.cmake)
+
+set(ORTHANC_FRAMEWORK_PLUGIN ON)
+
+include(${ORTHANC_ROOT}/Resources/CMake/OrthancFrameworkParameters.cmake)
+
+set(ENABLE_LOCALE OFF)         # Disable support for locales (notably in Boost)
+set(ENABLE_GOOGLE_TEST ON)
+set(ENABLE_SQLITE ON)
+
+include(${ORTHANC_ROOT}/Resources/CMake/OrthancFrameworkConfiguration.cmake)
+include_directories(${ORTHANC_ROOT})
+
+add_definitions(
+  -DORTHANC_ENABLE_LOGGING_PLUGIN=1
+  )
+
 # create an intermediary WebViewerLibrary to avoid source recompilation
 # for both unit tests and web viewer library
 add_library(WebViewerLibrary
   STATIC
+
+  ${ORTHANC_CORE_SOURCES}
 
   # The following files depend on GDCM
   ${VIEWER_LIBRARY_DIR}/SeriesInformationAdapter.cpp

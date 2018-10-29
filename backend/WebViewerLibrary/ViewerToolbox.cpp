@@ -135,7 +135,7 @@ namespace OrthancPlugins
     Json::Value json;
     Orthanc::DicomArray array(map);
 
-    for(int i=0; i<array.GetSize(); ++i) {
+    for(size_t i=0; i<array.GetSize(); ++i) {
       const Orthanc::DicomElement& element = array.GetElement(i);
       const Orthanc::DicomTag& tag = element.GetTag();
       const Orthanc::DicomValue& value = element.GetValue();
@@ -536,17 +536,14 @@ namespace OrthancPlugins
   }
 
 
-  Orthanc::ImageAccessor ImageReader::GetAccessor() const
+  void ImageReader::GetAccessor(Orthanc::ImageAccessor& output) const
   {
-    Orthanc::ImageAccessor accessor;
-
-    accessor.AssignReadOnly(Convert(OrthancPluginGetImagePixelFormat(context_, image_)),
+    output.AssignReadOnly(Convert(OrthancPluginGetImagePixelFormat(context_, image_)),
                             OrthancPluginGetImageWidth(context_, image_),
                             OrthancPluginGetImageHeight(context_, image_),
                             OrthancPluginGetImagePitch(context_, image_),
                             OrthancPluginGetImageBuffer(context_, image_));
 
-    return accessor;
   }
 
   Json::Value SanitizeTag(const std::string& tagName, const Json::Value& value) {
@@ -557,7 +554,7 @@ namespace OrthancPlugins
     if (tagName == "Columns" || tagName == "Rows") { // Some US modalities have Rows="600\\0" !!!  keep only the first part
 
       std::string stringValue = value.asString();
-      if (stringValue.find("\\") != -1) {
+      if (stringValue.find("\\") != std::string::npos) {
         sanitized = Json::Value(stringValue.substr(0, stringValue.find("\\")));
       }
     }

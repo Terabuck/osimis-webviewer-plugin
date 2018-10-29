@@ -13,8 +13,8 @@ bool OnTheFlyDownloadAvailableQualityPolicy::_isLargerThan(
                                                               uint32_t height,
                                                               const Json::Value& dicomTags)
 {
-  int columns = boost::lexical_cast<int>(OrthancPlugins::SanitizeTag("Columns", dicomTags["Columns"]).asString());
-  int rows = boost::lexical_cast<int>(OrthancPlugins::SanitizeTag("Rows", dicomTags["Rows"]).asString());
+  uint32_t columns = boost::lexical_cast<uint32_t>(OrthancPlugins::SanitizeTag("Columns", dicomTags["Columns"]).asString());
+  uint32_t rows = boost::lexical_cast<uint32_t>(OrthancPlugins::SanitizeTag("Rows", dicomTags["Rows"]).asString());
 
   return columns > width && rows > height;
 }
@@ -66,42 +66,42 @@ bool OnTheFlyDownloadAvailableQualityPolicy::_canBeDecompressedInFrontend(
   }
 }
 
-std::set<ImageQuality> OnTheFlyDownloadAvailableQualityPolicy::retrieve(
+std::set<ImageQuality::EImageQuality> OnTheFlyDownloadAvailableQualityPolicy::retrieve(
                                                               const std::string& transferSyntax,
                                                               const Json::Value& dicomTags)
 {
   using namespace Orthanc;
 
-  std::set<ImageQuality> result;
+  std::set<ImageQuality::EImageQuality> result;
 
   // Decompressing<->Recompression takes time, so we avoid recompressing dicom images at all cost
   if (_canBeDecompressedInFrontend(transferSyntax, dicomTags)) {
     // Set thumbnails only on medium sized images
     if (_isLargerThan(750, 750, dicomTags)) {
-      result.insert(ImageQuality(ImageQuality::LOW)); // 150x150 jpeg80
+      result.insert(ImageQuality::LOW); // 150x150 jpeg80
       BENCH_LOG("QUALITY", "low");
     }
 
     // Always set HQ/RAW (for medical reasons)
-    result.insert(ImageQuality(ImageQuality::PIXELDATA)); // raw file (unknown format)
+    result.insert(ImageQuality::PIXELDATA); // raw file (unknown format)
     BENCH_LOG("QUALITY", "pixeldata");
   }
   // When image is present in RAW format within dicom, we do additional compression
   else {
     // Set thumbnails only on medium sized images
     if (_isLargerThan(750, 750, dicomTags)) {
-      result.insert(ImageQuality(ImageQuality::LOW)); // 150x150 jpeg80
+      result.insert(ImageQuality::LOW); // 150x150 jpeg80
       BENCH_LOG("QUALITY", "low");
     }
 
     // Set MQ on large images
     if (_isLargerThan(2000, 2000, dicomTags)) {
-      result.insert(ImageQuality(ImageQuality::MEDIUM)); // 1000x1000 jpeg80
+      result.insert(ImageQuality::MEDIUM); // 1000x1000 jpeg80
       BENCH_LOG("QUALITY", "medium");
     }
 
     // Always set HQ/Lossless (for medical reasons)
-    result.insert(ImageQuality(ImageQuality::LOSSLESS)); // lossless png
+    result.insert(ImageQuality::LOSSLESS); // lossless png
     BENCH_LOG("QUALITY", "lossless");
   }
 

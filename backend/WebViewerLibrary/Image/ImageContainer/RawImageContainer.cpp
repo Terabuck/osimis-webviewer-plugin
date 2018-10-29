@@ -14,8 +14,9 @@ RawImageContainer::RawImageContainer(OrthancPluginImage* data)
                             dataAsImageWrapper_->GetHeight(), dataAsImageWrapper_->GetPitch(), dataAsImageWrapper_->GetBuffer());
 }
 
-RawImageContainer::RawImageContainer(Orthanc::ImageBuffer* data) : accessor_(data->GetAccessor())
+RawImageContainer::RawImageContainer(Orthanc::ImageBuffer* data)
 {
+  data->GetWriteableAccessor(accessor_);
   dataAsImageBuffer_ = data;
   dataAsImageWrapper_ = NULL;
 }

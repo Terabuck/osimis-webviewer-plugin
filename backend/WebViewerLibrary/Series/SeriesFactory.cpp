@@ -22,7 +22,7 @@ std::auto_ptr<Series> SeriesFactory::CreateSeries(const std::string& seriesId,
                                                   const Json::Value& studyInfo)
 {
   std::string contentType;
-  std::set<ImageQuality> imageQualities;
+  std::set<ImageQuality::EImageQuality> imageQualities;
 
   // Check the middle instance's type (`[multiframe] image / pdf / image`
   // instance.

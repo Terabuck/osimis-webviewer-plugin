@@ -53,7 +53,7 @@ COPY ./WebViewerPlugin/ /root/osimis-webviewer/backend/WebViewerPlugin/
 # /!\ @warning THIS COMMENT MUST STAY AT LINE 52, AS IT IS USED BY `sed` IN `backend/scripts/buildDocker.sh` FILE  /!\
 
 # Rerun cmake with final target (the webviewer plugin & the unit tests)
-# Build & cache the webviewer plugin with embedded frontend (targets: EmbeddedResourcesGenerator, OsimisWebViewer & UnitTests)
+# Build & cache the webviewer plugin with embedded frontend (targets: OsimisWebViewer & UnitTests)
 # Remove the build directory to recover space
 # Remove the Orthanc viewer to avoid conflicts with the Osimis Viewer (2 buttons to open 2 viewers)
 RUN (mkdir /root/osimis-webviewer/frontend/ || true) && \
@@ -66,7 +66,6 @@ RUN (mkdir /root/osimis-webviewer/frontend/ || true) && \
     -DBUILD_INTERMEDIATE_TARGETS:BOOL=ON \
     -DBUILD_FINAL_TARGETS:BOOL=ON \
     .. && \
-    make -j$(nproc) EmbeddedResourcesGenerator && \
     make -j$(nproc) UnitTests && \
     make -j$(nproc) OsimisWebViewer && \
     cp -L UnitTests /root/OsimisViewerUnitTests && \

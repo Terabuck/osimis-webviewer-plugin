@@ -100,9 +100,9 @@ void AnnotationRepository::setByImageId(const std::string &instanceId, uint32_t 
   }
 
   // Add the current image's annotation to the json.
-  for (Json::ValueIterator it = value.begin(); it != value.end(); it++) {
+  for (Json::ValueConstIterator it = value.begin(); it != value.end(); it++) {
     std::string tool = it.key().asString();
-    Json::Value &annotations = *it;
+    const Json::Value &annotations = *it;
     annotationsByImageIds[imageId][tool] = annotations;
   }
 

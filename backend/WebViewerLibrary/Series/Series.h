@@ -30,7 +30,7 @@ class Series {
   friend class SeriesFactory;
 
 public:
-  std::vector<ImageQuality> GetOrderedImageQualities(ImageQuality::EImageQuality higherThan = ImageQuality::NONE) const;
+  std::vector<ImageQuality::EImageQuality> GetOrderedImageQualities(ImageQuality::EImageQuality higherThan = ImageQuality::NONE) const;
   static Series* FromJson(const Json::Value& seriesJson);
   void ToJson(Json::Value& output) const;
 
@@ -41,7 +41,7 @@ private:
          const Json::Value& seriesTags,
          const Json::Value& instancesInfos,
          const Json::Value& orderedInstances,
-         const std::set<ImageQuality>& imageQualities,
+         const std::set<ImageQuality::EImageQuality>& imageQualities,
          const Json::Value& studyInfo);
 
   std::string _seriesId;
@@ -51,5 +51,5 @@ private:
   Json::Value _orderedInstances;
   Json::Value _studyInfo;
 
-  std::set<ImageQuality> _imageQualities;
+  std::set<ImageQuality::EImageQuality> _imageQualities;
 };

@@ -205,7 +205,7 @@ std::auto_ptr<Image> ImageRepository::_LoadImageFromOrthanc(const std::string& i
                                                                     height,
                                                                     false);
 
-        destRgb24 = destBuffer->GetAccessor();
+        destBuffer->GetWriteableAccessor(destRgb24);
         ConvertRGB48ToRGB24(destRgb24, sourceRgb48);
 
         std::auto_ptr<RawImageContainer> data(new RawImageContainer(destBuffer));

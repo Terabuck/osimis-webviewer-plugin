@@ -29,6 +29,7 @@ struct ImageQuality {
   bool operator==(const ImageQuality& o) const { return _quality == o._quality; }
   bool operator>(const ImageQuality& o) const { return _quality > o._quality; }
   bool operator>=(const ImageQuality& o) const { return _quality >= o._quality; }
+  //ImageQuality& ImageQuality::operator=(const ImageQuality& o) {this->_quality = o._quality; return *this;}
 
   inline EImageQuality toInt() const {
     return _quality;
@@ -43,7 +44,11 @@ struct ImageQuality {
       return "lossless";
     case PIXELDATA:
       return "pixeldata";
+    case NONE:
+      return "unknown";
     }
+
+    return "unknown";
   }
 
   static inline EImageQuality fromString(const std::string& qualityString) {
@@ -69,7 +74,10 @@ struct ImageQuality {
       return "high-quality";
     case PIXELDATA:
       return "pixeldata-quality";
+    case NONE:
+      return "unknown";
     }
+    return "unknown";
   }
 
   static inline EImageQuality fromProcessingPolicytString(const std::string& processingPolicyString) {

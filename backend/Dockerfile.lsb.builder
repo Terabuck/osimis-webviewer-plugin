@@ -33,6 +33,11 @@ RUN mkdir /src
 RUN mkdir /build
 RUN mkdir /frontend
 
+RUN hg clone https://bitbucket.org/sjodogne/orthanc /orthanc
+# synch to mainline after 1.4.2
+WORKDIR /orthanc
+RUN hg update -c 1153b1a
+
 COPY . /src
 
 ARG JS_FRONTEND_VERSION=dev
@@ -43,5 +48,5 @@ RUN unzip /tmp/frontend.zip -d /frontend
 RUN ls -al /frontend
 WORKDIR /build
 
-RUN LSB_CC=gcc-4.8 LSB_CXX=g++-4.8 cmake ../src -DCMAKE_BUILD_TYPE=Release -DJS_CLIENT_PATH=/frontend  -DCMAKE_TOOLCHAIN_FILE=../src/Resources/CMake/LinuxStandardBaseToolchain.cmake
+RUN LSB_CC=gcc-4.8 LSB_CXX=g++-4.8 cmake ../src -DCMAKE_BUILD_TYPE=Release -DJS_CLIENT_PATH=/frontend -DORTHANC_FRAMEWORK_ROOT=/orthanc -DORTHANC_FRAMEWORK_SOURCE=path -DUSE_LEGACY_JSONCPP=ON -DCMAKE_TOOLCHAIN_FILE=../src/Resources/CMake/LinuxStandardBaseToolchain.cmake
 RUN make -j 5

@@ -29,7 +29,8 @@
 
 # Create unit test executable
 add_executable(UnitTests
-  ${GTEST_SOURCES}
+  ${GOOGLE_TEST_SOURCES}
+
   ${VIEWER_TESTS_DIR}/UnitTestsMain.cpp
   )
 add_dependencies(UnitTests WebViewerLibrary)

@@ -119,7 +119,7 @@ namespace {
 
       return OrthancPluginErrorCode_Success;
     }
-    catch (std::runtime_error& e)
+    catch (...)
     {
       std::string s = "Unknown static resource in plugin: " + std::string(request->groups[0]);
       OrthancPluginLogError(::_context, s.c_str());

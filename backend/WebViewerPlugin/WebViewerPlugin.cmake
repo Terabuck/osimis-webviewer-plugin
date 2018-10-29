@@ -88,11 +88,13 @@ endif()
 # Always embed at least ORTHANC_EXPLORER, even if STANDALONE_BUILD is off?
 if (STANDALONE_BUILD)
 EmbedResources(
+    --no-upcase-check
   ORTHANC_EXPLORER  ${RESOURCES_DIR}/OrthancExplorer.js
   WEB_VIEWER  ${JS_CLIENT_PATH}
   )
 else()
 EmbedResources(
+    --no-upcase-check
   ORTHANC_EXPLORER  ${RESOURCES_DIR}/OrthancExplorer.js
   )
 endif()
@@ -136,10 +138,6 @@ target_compile_definitions(OsimisWebViewer PRIVATE -DPRODUCT_VERSION_BUILD_YEAR_
 target_compile_definitions(OsimisWebViewer PRIVATE -DPRODUCT_VERSION_BUILD_MONTH_STRING=\"${PRODUCT_VERSION_BUILD_MONTH}\")
 target_compile_definitions(OsimisWebViewer PRIVATE -DPRODUCT_VERSION_BUILD_DAY_STRING=\"${PRODUCT_VERSION_BUILD_DAY}\")
 target_compile_definitions(OsimisWebViewer PUBLIC -DORTHANC_DEFAULT_DICOM_ENCODING=Encoding_Latin1)
-# Check & rebuild if embedded resources has changed?
-if (STATIC_BUILD)
-  add_dependencies(OsimisWebViewer EmbeddedResourcesGenerator)
-endif()
 
 add_dependencies(OsimisWebViewer WebViewerLibrary)
 target_link_libraries(OsimisWebViewer WebViewerLibrary)

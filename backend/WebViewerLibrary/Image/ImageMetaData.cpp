@@ -112,7 +112,7 @@ ImageMetaData::ImageMetaData(const DicomMap& headerTags, const Json::Value& dico
   // set minPixelValue & maxPixelValue
   int bitsStored = boost::lexical_cast<int>(Toolbox::StripSpaces(dicomTags["BitsStored"].asString()));
   minPixelValue = 0; // approximative value
-  maxPixelValue = std::pow(2, bitsStored); // approximative value
+  maxPixelValue = 2 << (bitsStored-1); // approximative value
 
   // set width/height
   width = boost::lexical_cast<uint32_t>(Toolbox::StripSpaces(OrthancPlugins::SanitizeTag("Columns", dicomTags["Columns"]).asString()));

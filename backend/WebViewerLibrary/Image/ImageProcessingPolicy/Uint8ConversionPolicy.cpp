@@ -59,7 +59,8 @@ std::auto_ptr<IImageContainer> Uint8ConversionPolicy::Apply(std::auto_ptr<IImage
       inAccessor->GetHeight(),
       true
   ));
-  Orthanc::ImageAccessor outAccessor = outBuffer->GetAccessor();
+  Orthanc::ImageAccessor outAccessor;
+  outBuffer->GetWriteableAccessor(outAccessor);
 
   if (pixelFormat == Orthanc::PixelFormat_Grayscale16)
   {

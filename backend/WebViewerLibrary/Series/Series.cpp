@@ -26,8 +26,15 @@
 #include <boost/foreach.hpp>
 
 Series::Series(const std::string& seriesId, const std::string& contentType, const Json::Value& seriesTags, const Json::Value& instancesInfos,
-    const Json::Value& orderedInstances, const std::set<ImageQuality>& imageQualities, const Json::Value& studyInfo)
-    : _seriesId(seriesId), _contentType(contentType), _seriesTags(seriesTags), _instancesInfos(instancesInfos), _orderedInstances(orderedInstances), _imageQualities(imageQualities), _studyInfo(studyInfo)
+    const Json::Value& orderedInstances, const std::set<ImageQuality::EImageQuality>& imageQualities, const Json::Value& studyInfo)
+    : _seriesId(seriesId), 
+    _contentType(contentType), 
+    _seriesTags(seriesTags), 
+    _instancesInfos(instancesInfos), 
+    _orderedInstances(orderedInstances), 
+    _studyInfo(studyInfo),
+    _imageQualities(imageQualities)
+    
 {
 
 }
@@ -50,7 +57,7 @@ void Series::ToJson(Json::Value& output) const
 
 Series* Series::FromJson(const Json::Value& seriesJson)
 {
-  std::set<ImageQuality> imageQualities;
+  std::set<ImageQuality::EImageQuality> imageQualities;
 //  Json::Value imageQualitiesJson =
   for (size_t i = 0; i < seriesJson["availableQualities"].size(); i++) {
     imageQualities.insert(ImageQuality::fromString(seriesJson["availableQualities"][(int)i].asString()));
@@ -58,18 +65,18 @@ Series* Series::FromJson(const Json::Value& seriesJson)
   return new Series(seriesJson["id"].asString(), seriesJson["contentType"].asString(), seriesJson["middleInstanceInfos"], seriesJson["instancesInfos"], seriesJson["instances"], imageQualities, seriesJson["study"]);
 }
 
-std::vector<ImageQuality> Series::GetOrderedImageQualities(ImageQuality::EImageQuality higherThan) const
+std::vector<ImageQuality::EImageQuality> Series::GetOrderedImageQualities(ImageQuality::EImageQuality higherThan) const
 {
-  std::vector<ImageQuality> toReturn;
+  std::vector<ImageQuality::EImageQuality> toReturn;
 
-  if (_imageQualities.find(ImageQuality(ImageQuality::LOW)) != _imageQualities.end() && ImageQuality::LOW > higherThan)
-    toReturn.push_back(ImageQuality(ImageQuality::LOW));
-  if (_imageQualities.find(ImageQuality(ImageQuality::MEDIUM)) != _imageQualities.end() && ImageQuality::MEDIUM > higherThan)
-    toReturn.push_back(ImageQuality(ImageQuality::MEDIUM));
-  if (_imageQualities.find(ImageQuality(ImageQuality::LOSSLESS)) != _imageQualities.end() && ImageQuality::LOSSLESS > higherThan)
-    toReturn.push_back(ImageQuality(ImageQuality::LOSSLESS));
-  if (_imageQualities.find(ImageQuality(ImageQuality::PIXELDATA)) != _imageQualities.end() && ImageQuality::PIXELDATA > higherThan)
-    toReturn.push_back(ImageQuality(ImageQuality::PIXELDATA));
+  if (_imageQualities.find(ImageQuality::LOW) != _imageQualities.end() && ImageQuality::LOW > higherThan)
+    toReturn.push_back(ImageQuality::LOW);
+  if (_imageQualities.find(ImageQuality::MEDIUM) != _imageQualities.end() && ImageQuality::MEDIUM > higherThan)
+    toReturn.push_back(ImageQuality::MEDIUM);
+  if (_imageQualities.find(ImageQuality::LOSSLESS) != _imageQualities.end() && ImageQuality::LOSSLESS > higherThan)
+    toReturn.push_back(ImageQuality::LOSSLESS);
+  if (_imageQualities.find(ImageQuality::PIXELDATA) != _imageQualities.end() && ImageQuality::PIXELDATA > higherThan)
+    toReturn.push_back(ImageQuality::PIXELDATA);
 
   return toReturn;
 }
