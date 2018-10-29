@@ -60,7 +60,7 @@ else()
 endif()
 
 
-macro(DownloadPackage MD5 Url TargetDirectory EnableTargetDirectory)
+macro(DownloadPackage MD5 Url TargetDirectory)
   if (NOT IS_DIRECTORY "${TargetDirectory}")
     GetUrlFilename(TMP_FILENAME "${Url}")
 
@@ -76,13 +76,24 @@ macro(DownloadPackage MD5 Url TargetDirectory EnableTargetDirectory)
 	message(FATAL_ERROR "CMake is not allowed to download from Internet. Please set the ALLOW_DOWNLOADS option to ON")
       endif()
 
-      if (MD5)
-        file(DOWNLOAD "${Url}" "${TMP_PATH}" SHOW_PROGRESS EXPECTED_MD5 "${MD5}")
+      if ("${MD5}" STREQUAL "no-check")
+        message(WARNING "Not checking the MD5 of: ${Url}")
+        file(DOWNLOAD "${Url}" "${TMP_PATH}" SHOW_PROGRESS TIMEOUT 300 INACTIVITY_TIMEOUT 60)
       else()
-        file(DOWNLOAD "${Url}" "${TMP_PATH}" SHOW_PROGRESS)
+        file(DOWNLOAD "${Url}" "${TMP_PATH}" SHOW_PROGRESS TIMEOUT 300 INACTIVITY_TIMEOUT 60 EXPECTED_MD5 "${MD5}")
       endif()
+
     else()
       message("Using local copy of ${Url}")
+
+      if ("${MD5}" STREQUAL "no-check")
+        message(WARNING "Not checking the MD5 of: ${Url}")
+      else()
+        file(MD5 ${TMP_PATH} ActualMD5)
+        if (NOT "${ActualMD5}" STREQUAL "${MD5}")
+          message(FATAL_ERROR "The MD5 hash of a previously download file is invalid: ${TMP_PATH}")
+        endif()
+      endif()
     endif()
 
     GetUrlExtension(TMP_EXTENSION "${Url}")
@@ -122,40 +133,23 @@ macro(DownloadPackage MD5 Url TargetDirectory EnableTargetDirectory)
           OUTPUT_QUIET
           )
       elseif ("${TMP_EXTENSION}" STREQUAL "zip")
-        if (${EnableTargetDirectory})
-          execute_process(
-            COMMAND ${ZIP_EXECUTABLE} x -y ${TMP_PATH} -o${TargetDirectory}
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            RESULT_VARIABLE Failure
-            OUTPUT_QUIET
-            )
-        else()
-          execute_process(
-            COMMAND ${ZIP_EXECUTABLE} x -y ${TMP_PATH}
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            RESULT_VARIABLE Failure
-            OUTPUT_QUIET
-            )
-        endif()
+        execute_process(
+          COMMAND ${ZIP_EXECUTABLE} x -y ${TMP_PATH}
+          WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+          RESULT_VARIABLE Failure
+          OUTPUT_QUIET
+          )
       else()
         message(FATAL_ERROR "Support your platform here")
       endif()
 
     else()
       if ("${TMP_EXTENSION}" STREQUAL "zip")
-        if (${EnableTargetDirectory})
-          execute_process(
-            COMMAND sh -c "${UNZIP_EXECUTABLE} -q ${TMP_PATH} -d${TargetDirectory}"
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            RESULT_VARIABLE Failure
-          )
-        else()
-          execute_process(
-            COMMAND sh -c "${UNZIP_EXECUTABLE} -q ${TMP_PATH}"
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            RESULT_VARIABLE Failure
-          )
-        endif()
+        execute_process(
+          COMMAND sh -c "${UNZIP_EXECUTABLE} -q ${TMP_PATH}"
+          WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+          RESULT_VARIABLE Failure
+        )
       elseif (("${TMP_EXTENSION}" STREQUAL "gz") OR ("${TMP_EXTENSION}" STREQUAL "tgz"))
         #message("tar xvfz ${TMP_PATH}")
         execute_process(
