@@ -10,12 +10,12 @@ set -e
 srcRoot="${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"
 cd "${srcRoot}/demo/" # Make sure we're in the demo folder
 
-# instanciate a wvb container to extract the wvb .so
+# instanciate a viewer-lsb-builder container to extract the wvb .so
 mkdir -p binaries
-wvbContainerId=$(docker create osimis/orthanc-webviewer-plugin:latest-local) 
-docker cp --follow-link "$wvbContainerId:/usr/share/orthanc/plugins/libOsimisWebViewer.so" binaries/
+wvbContainerId=$(docker create osimis/viewer-lsb-builder:$COMMIT_ID) 
+docker cp --follow-link "$wvbContainerId:/tmplibOsimisWebViewer.so" binaries/
 docker rm $wvbContainerId
 
 # Build demo docker image
-docker rmi -f osimis/orthanc-webviewer-plugin/demo:latest-local || true # @todo Use trap to clean image instead
-docker build -t osimis/orthanc-webviewer-plugin/demo:latest-local .
+docker rmi -f osimis/orthanc/demo:latest-local || true # @todo Use trap to clean image instead
+docker build -t osimis/orthanc/demo:latest-local .
