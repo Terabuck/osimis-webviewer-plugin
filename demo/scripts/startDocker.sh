@@ -25,7 +25,7 @@ srcRoot="${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"
 demoRoot="${srcRoot}/demo/"
 
 # $1 Name of the docker image
-dockerImageName=${1:-"osimis/orthanc/demo:latest-local"}
+dockerImageName=${1:-"osimis/orthanc-wvb-demo:latest-local"}
 
 # $2 Port used for deployment
 port=${2:-8042}
