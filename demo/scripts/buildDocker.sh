@@ -10,6 +10,8 @@ set -e
 srcRoot="${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"
 cd "${srcRoot}/demo/" # Make sure we're in the demo folder
 
+source $srcRoot/scripts/ci/.env
+
 # instanciate a viewer-lsb-builder container to extract the wvb .so
 mkdir -p binaries
 export COMMIT_ID
