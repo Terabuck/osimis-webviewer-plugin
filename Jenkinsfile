@@ -165,6 +165,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
                     int demoPort = random.nextInt(maxPort - minPort + 1) + minPort;
 
                     // Build demo
+                    sh 'scripts/ci/setEnv.sh ${BRANCH_NAME}'
                     sh "demo/scripts/buildDocker.sh"
 
                     // Load docker registry (required by docker-compose)

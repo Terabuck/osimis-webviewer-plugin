@@ -12,6 +12,7 @@ cd "${srcRoot}/demo/" # Make sure we're in the demo folder
 
 # instanciate a viewer-lsb-builder container to extract the wvb .so
 mkdir -p binaries
+export COMMIT_ID
 wvbContainerId=$(docker create osimis/viewer-lsb-builder:$COMMIT_ID) 
 docker cp --follow-link "$wvbContainerId:/tmplibOsimisWebViewer.so" binaries/
 docker rm $wvbContainerId
