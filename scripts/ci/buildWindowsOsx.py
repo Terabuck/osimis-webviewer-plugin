@@ -57,7 +57,12 @@ def build(config):
                                   buildFolderPath = buildFolder,
                                   cmakeTargetName = 'OsimisWebViewer',
                                   cmakeTargetsOSX = ['OsimisWebViewer', 'UnitTests'],
-                                  cmakeArguments = ['-DJS_CLIENT_CLEAN_FIRST:BOOL=ON', '-DVIEWER_VERSION_FULL:STRING='+str(args.viewerVersion)],
+                                  cmakeArguments = [
+                                    '-DJS_CLIENT_CLEAN_FIRST:BOOL=ON', 
+                                    '-DVIEWER_VERSION_FULL:STRING='+str(args.viewerVersion),
+                                    '-DORTHANC_FRAMEWORK_VERSION=default',
+                                    '-DORTHANC_FRAMEWORK_SOURCE=hg'
+                                    ],
                                   builder = config['builder'],
                                   config = BuildHelpers.CONFIG_RELEASE
                                   )
