@@ -45,6 +45,7 @@ WORKDIR /build
 RUN LSB_CC=gcc-4.8 LSB_CXX=g++-4.8 cmake ../src -DCMAKE_BUILD_TYPE=Release -DJS_CLIENT_PATH=/frontend -DORTHANC_FRAMEWORK_ROOT=/orthanc -DORTHANC_FRAMEWORK_SOURCE=path -DUSE_LEGACY_JSONCPP=ON -DCMAKE_TOOLCHAIN_FILE=../src/Resources/CMake/LinuxStandardBaseToolchain.cmake
 RUN make -j 5
 
+RUN ./UnitTests
 
 #########################################################################################################################
 ## AWS uploader
