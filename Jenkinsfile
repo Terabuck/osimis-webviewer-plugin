@@ -142,24 +142,6 @@ lock(resource: 'webviewer', inversePrecedence: false) {
                 }}}
             }
 
-
-            stage('Build: docker') {
-                node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
-                    sh 'scripts/ci/ciBuildDockerImage.sh'
-                }}}
-            }
-
-            if (userInput['launchDockerTests']) {
-                stage('Test: unit + integration') {
-                    node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
-                        // @note Requires the built docker image to work
-                        // @todo use root docker-compose.yml instead
-                        sh 'scripts/ci/ciPrepareTests.sh'
-                        sh 'scripts/ci/ciRunCppTests.sh'
-                        sh 'scripts/ci/ciRunJsTests.sh'
-                    }}}
-                }
-            }
         })
     }
 
