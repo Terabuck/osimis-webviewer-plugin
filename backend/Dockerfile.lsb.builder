@@ -1,20 +1,14 @@
-FROM ubuntu:18.04
+FROM ubuntu:18.04 as cpp-builder
 
 RUN apt-get -y clean && apt-get -y update
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install wget nano build-essential unzip cmake mercurial uuid-dev libcurl4-openssl-dev liblua5.1-0-dev libgtest-dev libpng-dev libsqlite3-dev libssl-dev libjpeg-dev zlib1g-dev libdcmtk2-dev libboost-all-dev libwrap0-dev libcharls-dev libjsoncpp-dev libpugixml-dev && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install wget nano build-essential unzip cmake mercurial uuid-dev libcurl4-openssl-dev liblua5.1-0-dev libgtest-dev libpng-dev libsqlite3-dev libssl-dev libjpeg-dev zlib1g-dev libdcmtk2-dev libboost-all-dev libwrap0-dev libcharls-dev libjsoncpp-dev libpugixml-dev alien g++-4.8 lsb && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # install LSB-SDK
 RUN mkdir /Downloads
 WORKDIR /Downloads
 RUN wget https://ftp.linuxbase.org/pub/lsb/bundles/released-5.0.0/sdk/lsb-sdk-5.0.0-3.x86_64.tar.gz
-# cd ~/Downloads
-# wget https://ftp.linuxbase.org/pub/lsb/bundles/released-5.0.0/sdk/lsb-sdk-5.0.0-3.x86_64.tar.gz
 RUN tar xvf lsb-sdk-5.0.0-3.x86_64.tar.gz
 WORKDIR /Downloads/lsb-sdk/
-
-RUN apt-get -y clean && apt-get -y update
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install alien g++-4.8
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install lsb
 
 # instead of running ./install.sh that requires some input from the user, we have exploded the script:
 RUN alien -ick lsb-build-base-5.0.5-3.x86_64.rpm
@@ -50,3 +44,14 @@ WORKDIR /build
 
 RUN LSB_CC=gcc-4.8 LSB_CXX=g++-4.8 cmake ../src -DCMAKE_BUILD_TYPE=Release -DJS_CLIENT_PATH=/frontend -DORTHANC_FRAMEWORK_ROOT=/orthanc -DORTHANC_FRAMEWORK_SOURCE=path -DUSE_LEGACY_JSONCPP=ON -DCMAKE_TOOLCHAIN_FILE=../src/Resources/CMake/LinuxStandardBaseToolchain.cmake
 RUN make -j 5
+
+
+#########################################################################################################################
+## AWS uploader
+#########################################################################################################################
+
+FROM anigeo/awscli
+
+COPY --from=cpp-builder /build/libOsimisWebViewer.so /tmp
+
+RUN ls -al /tmp

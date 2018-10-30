@@ -134,6 +134,13 @@ lock(resource: 'webviewer', inversePrecedence: false) {
     // Build docker & launch tests
     if (userInput['buildDocker']) {
         buildMap.put('docker', {
+            stage('Build: LSB') {
+                node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+                    sh 'scripts/ci/ciBuildLsb.sh'
+                }}}
+            }
+
+
             stage('Build: docker') {
                 node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
                     sh 'scripts/ci/ciBuildDockerImage.sh'
@@ -240,18 +247,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
         })
     }
 
-    // Publish docker release
-    if (userInput['buildDocker']) {
-        publishMap.put('docker', {
-            stage('Publish: orthanc -> DockerHub') {
-                node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkinsosimis') {
-                        sh 'scripts/ci/ciPushDockerImage.sh'
-                    }
-                }}}
-            }
-        })
-    }
+    // note: the LSB is published directly.  We do not publish the osimis/orthanc-webviewer-plugin docker image anymore
 
     parallel(publishMap)
 
@@ -260,15 +256,6 @@ lock(resource: 'webviewer', inversePrecedence: false) {
         node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
                 sh 'scripts/ci/ciPushFrontend.sh tagWithReleaseTag'
-            }
-        }}}
-    }
-
-    // Publish cpp code for static build within web viewer pro
-    stage('Publish: cpp -> AWS (release)') {
-        node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
-            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
-                sh 'scripts/ci/ciPushBackend.sh tagWithReleaseTag'
             }
         }}}
     }
