@@ -5,7 +5,6 @@ def isUserDevBranch = env.BRANCH_NAME != "dev" && env.BRANCH_NAME != "master" &&
 
 def userInput = [
     buildDocker: true,
-    launchDockerTests: true,
     buildWindows: isUserDevBranch ? false : true,
     buildOSX: false
 ];
@@ -25,7 +24,6 @@ else {
             userInput = input(
                 id: 'userInput', message: 'Configure build', parameters: [
                     [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildDocker'], description: 'Build Docker (/!\\ false -> disable tests & deployment)', name: 'buildDocker'],
-                    [$class: 'BooleanParameterDefinition', defaultValue: userInput['launchDockerTests'], description: 'Launch Docker Tests (including JS Unit Tests & Integration Tests)', name: 'launchDockerTests'],
                     [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildWindows'], description: 'Build Windows', name: 'buildWindows'],
                     [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildOSX'], description: 'Build OSX', name: 'buildOSX']
                 ]
