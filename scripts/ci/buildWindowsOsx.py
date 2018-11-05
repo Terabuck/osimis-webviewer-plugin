@@ -53,22 +53,49 @@ def build(config):
     os.makedirs(buildFolder, exist_ok = True)
     os.chdir(buildFolder)
 
-    ret = BuildHelpers.buildCMake(cmakeListsFolderPath = os.path.join(rootFolder, 'backend'),
-                                  buildFolderPath = buildFolder,
-                                  cmakeTargetName = 'OsimisWebViewer',
-                                  cmakeTargetsOSX = ['OsimisWebViewer', 'UnitTests'],
-                                  cmakeArguments = [
-                                    '-DJS_CLIENT_CLEAN_FIRST:BOOL=ON', 
-                                    '-DVIEWER_VERSION_FULL:STRING='+str(args.viewerVersion),
-                                    '-DJS_CLIENT_PATH=frontend-build',
-                                    '-DORTHANC_FRAMEWORK_VERSION=mainline',
-                                    '-DORTHANC_FRAMEWORK_SOURCE=hg'
-                                    ],
-                                  builder = config['builder'],
-                                  config = BuildHelpers.CONFIG_RELEASE
-                                  )
-    if ret != 0:
-        exit(ret)
+    orthancFrameworkVersion = "mainline"
+    orthancFrameworkSource = "hg"
+
+    if platform.system() == 'Darwin':
+        CmdHelpers.runExitIfFails("runing CMake",
+            "cmake -DJS_CLIENT_CLEAN_FIRST:BOOL=ON -DVIEWER_VERSION_FULL:STRING={version} -DORTHANC_FRAMEWORK_VERSION={framework} -DORTHANC_FRAMEWORK_SOURCE={source} -DJS_CLIENT_PATH={frontend} {folder} -G Xcode".format(
+                version = args.viewerVersion,
+                folder = os.path.join(rootFolder, 'backend'),
+                framework = orthancFrameworkVersion,
+                source = orthancFrameworkSource,
+                frontend = os.path.abspath(os.path.join(buildFolder, "frontend-build"))
+                ),
+            stdoutCallback = logging.info
+            )
+
+        CmdHelpers.runExitIfFails("building WVB",
+            "xcodebuild -project {projectPath} -target OsimisWebViewer -configuration Release".format(
+                projectPath = os.path.join(rootFolder, 'build/osx/OsimisWebViewer.xcodeproj')
+                ),
+            stdoutCallback = logging.info
+            )
+
+
+    else:
+
+        ret = BuildHelpers.buildCMake(cmakeListsFolderPath = os.path.join(rootFolder, 'backend'),
+		        buildFolderPath = buildFolder,
+		        cmakeTargetName = 'OsimisWebViewer',
+		        cmakeTargetsOSX = ['OsimisWebViewer', 'UnitTests'],
+		        cmakeArguments = [
+		            '-DJS_CLIENT_CLEAN_FIRST:BOOL=ON', 
+		            '-DVIEWER_VERSION_FULL:STRING='+str(args.viewerVersion),
+		            '-DJS_CLIENT_PATH=frontend-build',
+                '-DORTHANC_FRAMEWORK_VERSION=' + orthancFrameworkVersion,
+                '-DORTHANC_FRAMEWORK_SOURCE=' + orthancFrameworkSource, 
+#               '-DORTHANC_FRAMEWORK_SOURCE=path', 
+#               '-DORTHANC_FRAMEWORK_ROOT=C:/Users/alain/osimis/orthanc.hg',
+		            ],
+		        builder = config['builder'],
+		        config = BuildHelpers.CONFIG_RELEASE
+		        )
+	      if ret != 0:
+		        exit(ret)
 
     logging.info("Running unit tests ({name})".format(name = config['name']))
 

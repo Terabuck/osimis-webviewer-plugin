@@ -14,10 +14,6 @@ include(${ORTHANC_ROOT}/Resources/CMake/Compiler.cmake)
 include(${RESOURCES_DIR}/CMake/GdcmConfiguration.cmake)
 include(${ORTHANC_ROOT}/Resources/CMake/GoogleTestConfiguration.cmake)
 
-## Include GIL boost library - adobe version with numeric extensions
-include_directories(SYSTEM ${LOCAL_DEPENDENCIES_DIR}/boost-1_60_0/)
-include_directories(SYSTEM ${LOCAL_DEPENDENCIES_DIR}/gil-2_1_1/)
-
 ## Check that the Orthanc SDK headers are available or download them
 if (STATIC_BUILD OR NOT USE_SYSTEM_ORTHANC_SDK)
   include_directories(${CMAKE_SOURCE_DIR}/Orthanc/Sdk-1.3.1)

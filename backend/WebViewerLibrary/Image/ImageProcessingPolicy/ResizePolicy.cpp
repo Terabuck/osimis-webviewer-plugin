@@ -1,7 +1,5 @@
 #include "ResizePolicy.h"
 
-//#include <boost/gil/extension/resample.hpp>
-//#include <boost/gil/extension/sampler.hpp>
 #include <Core/OrthancException.h>
 
 #include "../../Logging.h"
@@ -73,12 +71,48 @@ std::auto_ptr<IImageContainer> ResizePolicy::Apply(std::auto_ptr<IImageContainer
       unsigned int heightRatio = (unsigned int)((inHeight<<16)/outHeight) +1;
 
       int x2, y2;
-      for (int i = 0; i < outHeight; i++) {
-        for (int j = 0; j < outWidth; j++) {
+
+      for (unsigned int i = 0; i < outHeight; i++) {
+        for (unsigned int j = 0; j < outWidth; j++) {
           x2 = (( j * widthRatio) >> 16) ;
           y2 = (( i * heightRatio) >> 16) ;
 
           outBuffer[(i * outPitch) + j] = inBuffer[(y2 * inPitch) + x2] ;
+        }
+      }
+    } else if (accessor->GetBytesPerPixel() == 2) {
+      unsigned int bytesPerPixels = accessor->GetBytesPerPixel();
+      const char* inBuffer = reinterpret_cast<const char*>(accessor->GetConstBuffer());
+      char* outBuffer = reinterpret_cast<char*>(outAccessor.GetBuffer());
+      unsigned int widthRatio = (unsigned int)((inWidth<<16)/outWidth) +1;
+      unsigned int heightRatio = (unsigned int)((inHeight<<16)/outHeight) +1;
+
+      int x2, y2;
+      for (unsigned int i = 0; i < outHeight; i++) {
+        for (unsigned int j = 0; j < outWidth; j++) {
+          x2 = (( j * widthRatio) >> 16) ;
+          y2 = (( i * heightRatio) >> 16) ;
+
+          *(unsigned short*)&(outBuffer[(i * outPitch) + j * bytesPerPixels]) = *(unsigned short*)&(inBuffer[(y2 * inPitch) + x2 * bytesPerPixels]) ;
+        }
+      }
+    } else if (accessor->GetBytesPerPixel() >= 2) {
+      unsigned int bytesPerPixels = accessor->GetBytesPerPixel();
+      const char* inBuffer = reinterpret_cast<const char*>(accessor->GetConstBuffer());
+      char* outBuffer = reinterpret_cast<char*>(outAccessor.GetBuffer());
+      unsigned int widthRatio = (unsigned int)((inWidth<<16)/outWidth) +1;
+      unsigned int heightRatio = (unsigned int)((inHeight<<16)/outHeight) +1;
+
+      int x2, y2;
+
+      for (unsigned int i = 0; i < outHeight; i++) {
+        for (unsigned int j = 0; j < outWidth; j++) {
+          x2 = (( j * widthRatio) >> 16) ;
+          y2 = (( i * heightRatio) >> 16) ;
+
+          for (unsigned int b = 0; b < bytesPerPixels; b++) {
+            outBuffer[(i * outPitch) + j * bytesPerPixels + b] = inBuffer[(y2 * inPitch) + x2 * bytesPerPixels + b] ;
+          }
         }
       }
     } else{
@@ -87,11 +121,6 @@ std::auto_ptr<IImageContainer> ResizePolicy::Apply(std::auto_ptr<IImageContainer
   }
 
   RawImageContainer* outRawImage = new RawImageContainer(outBuffer.release());
-
-//  // Resize the input and put the result in the output
-//  RawImageContainer::gil_image_view_t inGILView = inRawImage->GetGILImageView();
-//  RawImageContainer::gil_image_view_t outGILView = outRawImage->GetGILImageView();
-//  boost::gil::resize_view(inGILView, outGILView, boost::gil::nearest_neighbor_sampler()); // boost::gil::bilinear_sampler() also available
 
   // Update image metadata
   metaData->width = outWidth;
