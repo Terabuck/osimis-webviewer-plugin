@@ -23,7 +23,6 @@
 #   (within CMakeLists.txt)
 #	  # Set all required variables
 #   set(RESOURCES_DIR ${CMAKE_SOURCE_DIR}/Resources)
-#   set(ORTHANC_DIR ${CMAKE_SOURCE_DIR}/Orthanc)
 #   set(LOCAL_DEPENDENCIES_DIR ${CMAKE_SOURCE_DIR}/Dependencies)
 #   set(VIEWER_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/WebViewerLibrary)
 #   # Build intermediate WebViewerLibrary

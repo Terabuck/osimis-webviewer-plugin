@@ -2,11 +2,6 @@
 ## Note that the include_directories command affects and is meant for every targets (including those outside of this .cmake file)
 
 ## Build dependencies
-#set(ORTHANC_ROOT ${ORTHANC_DIR}) # required by orthanc's cmake
-#set(ORTHANC_DISABLE_PATCH ON)  # No need for the "patch" command-line tool
-#set(USE_SYSTEM_GOOGLE_TEST ON CACHE BOOL "Use the system version of Google Test")
-#set(USE_GTEST_DEBIAN_SOURCE_PACKAGE OFF CACHE BOOL "Use the sources of Google Test shipped with libgtest-dev (Debian only)")
-#mark_as_advanced(USE_GTEST_DEBIAN_SOURCE_PACKAGE)
 
 include(CheckIncludeFiles)
 include(CheckIncludeFileCXX)
@@ -25,7 +20,7 @@ include_directories(SYSTEM ${LOCAL_DEPENDENCIES_DIR}/gil-2_1_1/)
 
 ## Check that the Orthanc SDK headers are available or download them
 if (STATIC_BUILD OR NOT USE_SYSTEM_ORTHANC_SDK)
-  include_directories(${ORTHANC_DIR}/Sdk-1.3.1)
+  include_directories(${CMAKE_SOURCE_DIR}/Orthanc/Sdk-1.3.1)
 else ()
   CHECK_INCLUDE_FILE_CXX(orthanc/OrthancCPlugin.h HAVE_ORTHANC_H)
   if (NOT HAVE_ORTHANC_H)

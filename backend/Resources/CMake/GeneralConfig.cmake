@@ -10,11 +10,11 @@ set(ALLOW_DOWNLOADS ON CACHE BOOL "Allow CMake to download packages")
 set(STANDALONE_BUILD ON CACHE BOOL "Standalone build (all the resources are embedded, necessary for releases)")
 
 # Advanced parameters to fine-tune linking against system libraries
-set(USE_SYSTEM_BOOST ON CACHE BOOL "Use the system version of Boost")
-set(USE_SYSTEM_GDCM ON CACHE BOOL "Use the system version of Grassroot DICOM (GDCM)")
-set(USE_SYSTEM_JSONCPP ON CACHE BOOL "Use the system version of JsonCpp")
-set(USE_SYSTEM_SQLITE ON CACHE BOOL "Use the system version of SQLite")
-set(USE_SYSTEM_ORTHANC_SDK ON CACHE BOOL "Use the system version of the Orthanc plugin SDK")
+set(USE_SYSTEM_BOOST OFF CACHE BOOL "Use the system version of Boost")
+set(USE_SYSTEM_GDCM OFF CACHE BOOL "Use the system version of Grassroot DICOM (GDCM)")
+set(USE_SYSTEM_JSONCPP OFF CACHE BOOL "Use the system version of JsonCpp")
+set(USE_SYSTEM_SQLITE OFF CACHE BOOL "Use the system version of SQLite")
+set(USE_SYSTEM_ORTHANC_SDK OFF CACHE BOOL "Use the system version of the Orthanc plugin SDK")
 
 ## Use c++11
 #include(CheckCXXCompilerFlag)

@@ -21,7 +21,6 @@
 # Usage:
 #   (within CMakeLists.txt)
 #   # Set all required variables
-#   set(ORTHANC_DIR ${CMAKE_SOURCE_DIR}/Orthanc)
 #   set(VIEWER_PLUGIN_DIR ${CMAKE_SOURCE_DIR}/WebViewerPlugin)
 #   set(VIEWER_FRONTEND_DIR ${CMAKE_SOURCE_DIR}/../frontend)
 #   set(VIEWER_VERSION_FULL "0.0.0-0-gxxxxxxxx-dirty" CACHE STRING "Product version - should be generated via git describe") # generated via `git describe --tags --long --dirty=-dirty`
