@@ -6,12 +6,14 @@ WORKDIR /frontend
 COPY package.json .
 COPY local_dependencies/ local_dependencies/
 RUN npm install --unsafe-perm --python=python2.7
-# Make sure the home-made developed injectInlineWorker plugin has not been erased by npm install
-COPY node_modules/gulp-injectInlineWorker/ node_modules/gulp-injectInlineWorker/
+
+RUN echo '{"registry":"https://registry.bower.io"}' > .bowerrc
 
 COPY .bowerrc .
 COPY bower.json .
 RUN bower install --allow-root
+# Make sure the home-made developed injectInlineWorker plugin has not been erased by npm install
+COPY node_modules/gulp-injectInlineWorker/ node_modules/gulp-injectInlineWorker/
 
 # Build frontend
 WORKDIR /frontend
