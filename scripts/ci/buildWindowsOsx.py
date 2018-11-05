@@ -94,8 +94,8 @@ def build(config):
 		        builder = config['builder'],
 		        config = BuildHelpers.CONFIG_RELEASE
 		        )
-	      if ret != 0:
-		        exit(ret)
+        if ret != 0:
+            exit(ret)
 
     logging.info("Running unit tests ({name})".format(name = config['name']))
 
