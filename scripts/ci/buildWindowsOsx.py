@@ -75,9 +75,14 @@ def build(config):
             stdoutCallback = logging.info
             )
 
+        CmdHelpers.runExitIfFails("building UnitTests",
+            "xcodebuild -project {projectPath} -target UnitTests -configuration Release".format(
+                projectPath = os.path.join(rootFolder, 'build/osx/OsimisWebViewer.xcodeproj')
+                ),
+            stdoutCallback = logging.info
+            )
 
     else:
-
         ret = BuildHelpers.buildCMake(cmakeListsFolderPath = os.path.join(rootFolder, 'backend'),
 		        buildFolderPath = buildFolder,
 		        cmakeTargetName = 'OsimisWebViewer',
