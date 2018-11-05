@@ -3,8 +3,6 @@
 #include <memory>
 #include <string>
 #include <json/value.h>
-#include <boost/scope_exit.hpp>
-#include <boost/pointer_cast.hpp>
 #include <Core/OrthancException.h>
 #include <Core/DicomFormat/DicomMap.h> // To retrieve transfer syntax
 #include <Core/Toolbox.h> // For _getTransferSyntax -> Orthanc::Toolbox::StripSpaces

@@ -3,8 +3,6 @@
 #include <memory>
 #include <string>
 #include <json/value.h>
-#include <boost/scope_exit.hpp>
-#include <boost/pointer_cast.hpp>
 #include <Core/OrthancException.h>
 #include <Core/DicomFormat/DicomMap.h> // To retrieve transfer syntax
 #include <Core/Toolbox.h> // For _getTransferSyntax -> Orthanc::Toolbox::StripSpaces
@@ -112,9 +110,7 @@ std::auto_ptr<Series> SeriesRepository::GenerateSeriesInfo(const std::string& se
   _dicomRepository->getDicomFile(middleInstanceId, dicom);
 
   // Clean middle instance's dicom file (at scope end)
-  BOOST_SCOPE_EXIT(_dicomRepository, &middleInstanceId) {
-    _dicomRepository->decrefDicomFile(middleInstanceId);
-  } BOOST_SCOPE_EXIT_END;
+  DicomRepository::ScopedDecref autoDecref(_dicomRepository, middleInstanceId);
 
   // Get middle instance's tags (the DICOM meta-informations)
   Orthanc::DicomMap dicomMapToFillTags1;

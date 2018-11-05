@@ -60,6 +60,7 @@ def build(config):
                                   cmakeArguments = [
                                     '-DJS_CLIENT_CLEAN_FIRST:BOOL=ON', 
                                     '-DVIEWER_VERSION_FULL:STRING='+str(args.viewerVersion),
+                                    '-DJS_CLIENT_PATH=frontend-build',
                                     '-DORTHANC_FRAMEWORK_VERSION=mainline',
                                     '-DORTHANC_FRAMEWORK_SOURCE=hg'
                                     ],

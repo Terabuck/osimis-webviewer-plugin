@@ -48,7 +48,7 @@ set(ORTHANC_FRAMEWORK_PLUGIN ON)
 
 include(${ORTHANC_ROOT}/Resources/CMake/OrthancFrameworkParameters.cmake)
 
-set(ENABLE_LOCALE OFF)         # Disable support for locales (notably in Boost)
+set(ENABLE_LOCALE ON)
 set(ENABLE_GOOGLE_TEST ON)
 set(ENABLE_SQLITE ON)
 
@@ -117,6 +117,7 @@ add_library(WebViewerLibrary
   )
 
 target_include_directories(WebViewerLibrary PUBLIC ${VIEWER_LIBRARY_DIR}/)
+target_include_directories(WebViewerLibrary PUBLIC ${BOOST_SOURCES_DIR})
 
 # Enable image processing *generic* http routes on debug mode
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")

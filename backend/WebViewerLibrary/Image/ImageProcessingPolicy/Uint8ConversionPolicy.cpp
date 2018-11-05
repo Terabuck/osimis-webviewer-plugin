@@ -3,6 +3,7 @@
 #include <Core/Images/ImageBuffer.h> // for ImageBuffer
 #include <Core/Images/ImageProcessing.h> // for ImageProcessing::GetMinMaxValue
 #include <Core/OrthancException.h>
+#include <stdexcept>
 #include "../../Logging.h"
 #include "../../BenchmarkHelper.h"
 

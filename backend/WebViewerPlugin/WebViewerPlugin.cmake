@@ -38,16 +38,17 @@ string(TIMESTAMP PRODUCT_VERSION_BUILD_YEAR %Y)
 string(TIMESTAMP PRODUCT_VERSION_BUILD_MONTH %m)
 string(TIMESTAMP PRODUCT_VERSION_BUILD_DAY %d)
 set(PRODUCT_VERSION_SHORT_STRING "${PRODUCT_VERSION_MAJOR}.${PRODUCT_VERSION_MINOR}.${PRODUCT_VERSION_PATCH}")  #used by cmake directly to set .so/.dylib version numbers
-message(${PRODUCT_VERSION_MAJOR})
-message(${PRODUCT_VERSION_MINOR})
-message(${PRODUCT_VERSION_PATCH})
-message(${PRODUCT_VERSION_COMMIT_NUMBER})
-message(${PRODUCT_VERSION_COMMIT_SHA1_STRING})
-message(${PRODUCT_VERSION_SHORT_STRING})
+message("PRODUCT_VERSION_MAJOR: " ${PRODUCT_VERSION_MAJOR})
+message("PRODUCT_VERSION_MINOR: " ${PRODUCT_VERSION_MINOR})
+message("PRODUCT_VERSION_PATCH: " ${PRODUCT_VERSION_PATCH})
+message("PRODUCT_VERSION_MAPRODUCT_VERSION_COMMIT_NUMBERJOR: " ${PRODUCT_VERSION_COMMIT_NUMBER})
+message("PRODUCT_VERSION_COMMIT_SHA1_STRING: " ${PRODUCT_VERSION_COMMIT_SHA1_STRING})
+message("PRODUCT_VERSION_SHORT_STRING: " ${PRODUCT_VERSION_SHORT_STRING})
 
 # Set build parameters
 set(STANDALONE_BUILD ON CACHE BOOL "Standalone build (all the resources are embedded, necessary for releases)")
 set(JS_CLIENT_PATH "${VIEWER_FRONTEND_DIR}/build" CACHE STRING "Path of the front-end build folder")
+file(TO_CMAKE_PATH "${JS_CLIENT_PATH}" JS_CLIENT_PATH)
 
 # Force js download. This is useful to ensure CI always uses the latest 
 # frontend builds, while keeping the progressive build benefits.

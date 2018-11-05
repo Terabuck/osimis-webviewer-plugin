@@ -18,8 +18,8 @@
  **/
 
 #include <orthanc/OrthancCPlugin.h>
-#include <Core/OrthancException.h>
 #include "WebViewer.h"
+#include "Core/OrthancException.h"
 
 WebViewer* _webViewer;
 

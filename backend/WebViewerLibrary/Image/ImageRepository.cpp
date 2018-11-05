@@ -3,7 +3,6 @@
 #include <json/writer.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/lock_guard.hpp> 
-#include <boost/scope_exit.hpp>
 
 #include <Core/OrthancException.h> // for throws
 #include <Core/DicomFormat/DicomMap.h>
@@ -131,9 +130,8 @@ std::auto_ptr<Image> ImageRepository::_LoadImageFromOrthanc(const std::string& i
     _dicomRepository->getDicomFile(instanceId, dicom);
 
     //   Clean dicom file (at scope end)
-    BOOST_SCOPE_EXIT(_dicomRepository, &instanceId) {
-      _dicomRepository->decrefDicomFile(instanceId);
-    } BOOST_SCOPE_EXIT_END;
+    DicomRepository::ScopedDecref autoDecref(_dicomRepository, instanceId);
+
     //   Get instance's tags (the DICOM meta-informations)
     Orthanc::DicomMap headerTags;
     if (!Orthanc::DicomMap::ParseDicomMetaInformation(headerTags, reinterpret_cast<const char*>(dicom.data), dicom.size))
@@ -173,9 +171,7 @@ std::auto_ptr<Image> ImageRepository::_LoadImageFromOrthanc(const std::string& i
                                                               reinterpret_cast<const void*>(dicom.data), dicom.size, frameIndex);
 
     // Clean dicom file (at scope end)
-    BOOST_SCOPE_EXIT(_dicomRepository, &instanceId) {
-      _dicomRepository->decrefDicomFile(instanceId);
-    } BOOST_SCOPE_EXIT_END;
+    DicomRepository::ScopedDecref autoDecref(_dicomRepository, instanceId);
 
     // Throw exception if frame couldn't be decoded
     if (frame == NULL) {
