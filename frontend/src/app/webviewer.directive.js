@@ -291,6 +291,9 @@
             if (__webViewerConfig.toggleOverlayIconsButtonEnabled) { // activate}
                 vm.tools.toggleOverlayIcons = false;
             }
+            if (true) {//__webViewerConfig.customCommandEnabled) { // activate
+              vm.tools.customCommand = false;
+            }
 
             console.log('default tool: ', vm.toolbarDefaultTool)
             if (vm.toolbarDefaultTool) {
@@ -341,6 +344,7 @@
                     // {type: "button", tool: "nextSeries"},
                     {type: "button", tool: "toggleOverlayText"},
                     {type: "button", tool: "toggleOverlayIcons"},
+                    {type: "button", tool: "customCommand"},
                 ]
             }
             vm.viewports = {};

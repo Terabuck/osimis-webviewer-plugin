@@ -2,7 +2,7 @@
 <div ng-show="vm.openIncompatibleBrowserModal" class="wvWarning wvPrintExclude">
     <div class="wvWarning-content clearfix">
         <span class="wvWarning-text ">
-            <h2 class="mb10"><span class="fa fa-exclamation-triangle wvWarning-icon mr5"></span>Warning!</h2>
+            <h2 class="mb10"><i class="fa fa-exclamation-triangle wvWarning-icon mr5"></i>Warning!</h2>
             <p class="mn mb10" style="color:#000">
             {{ 'GENERAL_PARAGRAPHS.INCOMPATIBLE_BROWSER' | translate }}
             </h5>
@@ -171,7 +171,7 @@
                 data-title="{{ 'COMPONENTS.ASIDE_DISPLAY_MODE.ONE_COL_DISPLAY' | translate | wvCapitalize }}"
                 placement="right"
             >
-                <span class="fa fa-ellipsis-v"></span>
+                <i class="fa fa-ellipsis-v"></i>
             </div>
             <p ng-if="vm.displayDisclaimer && vm.studyIslandsDisplayMode !== 'oneCol'" class="clear disclaimer mbn">{{ "GENERAL_PARAGRAPHS.DISCLAIMER_PARAGRAPH" | translate }}</p>
             <ng-transclude
