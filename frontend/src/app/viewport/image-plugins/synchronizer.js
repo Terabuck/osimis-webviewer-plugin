@@ -22,10 +22,10 @@
     Synchronizer.prototype.enable = function(enabled) {
         this._enabled = enabled;
         if (this._enabled) {
-            console.log("Synchronization is now enabled");
+            console.log("Synchronization is now enabled", this._offsets);
             this.computeOffsets();
         } else {
-            console.log("Synchronization is now disabled");
+            console.log("Synchronization is now disabled", this._offsets);
         }
     }
 
@@ -75,8 +75,6 @@
 
                 });
             });
-        } else {
-            delete this._offsets[paneA.seriesId];
         }
     }
 
