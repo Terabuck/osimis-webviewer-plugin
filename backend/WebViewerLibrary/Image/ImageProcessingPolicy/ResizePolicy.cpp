@@ -63,60 +63,70 @@ std::auto_ptr<IImageContainer> ResizePolicy::Apply(std::auto_ptr<IImageContainer
   outBuffer->GetWriteableAccessor(outAccessor);
   outPitch = outAccessor.GetPitch();
 
-  {// resize
-    if (accessor->GetBytesPerPixel() == 1) {
-      const char* inBuffer = reinterpret_cast<const char*>(accessor->GetConstBuffer());
-      char* outBuffer = reinterpret_cast<char*>(outAccessor.GetBuffer());
-      unsigned int widthRatio = (unsigned int)((inWidth<<16)/outWidth) +1;
-      unsigned int heightRatio = (unsigned int)((inHeight<<16)/outHeight) +1;
+  {// nearest neighbour resizing
 
-      int x2, y2;
+    unsigned int bytesPerPixels = accessor->GetBytesPerPixel();
+    const char* inBuffer = reinterpret_cast<const char*>(accessor->GetConstBuffer());
+    char* outBuffer = reinterpret_cast<char*>(outAccessor.GetBuffer());
+    unsigned int widthRatio = (unsigned int)((inWidth<<16)/outWidth) +1;  // the <<16 shifts are there to avoid using floats computation (and also avoi int -> float -> int conversions)
+    unsigned int heightRatio = (unsigned int)((inHeight<<16)/outHeight) +1;
 
-      for (unsigned int i = 0; i < outHeight; i++) {
-        for (unsigned int j = 0; j < outWidth; j++) {
+    int x2, y2;
+    const char* inLineBuffer;
+    char* out;
+    char* outLineBuffer = outBuffer;
+
+    if (bytesPerPixels == 1)
+    {
+      for (unsigned int i = 0; i < outHeight; i++, outLineBuffer += outPitch)
+      {
+        y2 = (( i * heightRatio) >> 16) ;
+        inLineBuffer = &inBuffer[(y2 * inPitch)];
+        out = outLineBuffer;
+
+        for (unsigned int j = 0; j < outWidth; j++, out += bytesPerPixels)
+        {
           x2 = (( j * widthRatio) >> 16) ;
-          y2 = (( i * heightRatio) >> 16) ;
 
-          outBuffer[(i * outPitch) + j] = inBuffer[(y2 * inPitch) + x2] ;
+          *out = inLineBuffer[x2 * bytesPerPixels];
         }
       }
-    } else if (accessor->GetBytesPerPixel() == 2) {
-      unsigned int bytesPerPixels = accessor->GetBytesPerPixel();
-      const char* inBuffer = reinterpret_cast<const char*>(accessor->GetConstBuffer());
-      char* outBuffer = reinterpret_cast<char*>(outAccessor.GetBuffer());
-      unsigned int widthRatio = (unsigned int)((inWidth<<16)/outWidth) +1;
-      unsigned int heightRatio = (unsigned int)((inHeight<<16)/outHeight) +1;
+    }
+    else if (bytesPerPixels == 2)
+    {
+      for (unsigned int i = 0; i < outHeight; i++, outLineBuffer += outPitch)
+      {
+        y2 = (( i * heightRatio) >> 16) ;
+        inLineBuffer = &inBuffer[(y2 * inPitch)];
+        out = outLineBuffer;
 
-      int x2, y2;
-      for (unsigned int i = 0; i < outHeight; i++) {
-        for (unsigned int j = 0; j < outWidth; j++) {
+        for (unsigned int j = 0; j < outWidth; j++, out += bytesPerPixels)
+        {
           x2 = (( j * widthRatio) >> 16) ;
-          y2 = (( i * heightRatio) >> 16) ;
 
-          *(unsigned short*)&(outBuffer[(i * outPitch) + j * bytesPerPixels]) = *(unsigned short*)&(inBuffer[(y2 * inPitch) + x2 * bytesPerPixels]) ;
+          *(unsigned short*)out = *(unsigned short*)&(inLineBuffer[x2 * bytesPerPixels]);
         }
       }
-    } else if (accessor->GetBytesPerPixel() >= 2) {
-      unsigned int bytesPerPixels = accessor->GetBytesPerPixel();
-      const char* inBuffer = reinterpret_cast<const char*>(accessor->GetConstBuffer());
-      char* outBuffer = reinterpret_cast<char*>(outAccessor.GetBuffer());
-      unsigned int widthRatio = (unsigned int)((inWidth<<16)/outWidth) +1;
-      unsigned int heightRatio = (unsigned int)((inHeight<<16)/outHeight) +1;
+    }
+    else
+    {
+      for (unsigned int i = 0; i < outHeight; i++, outLineBuffer += outPitch)
+      {
+        y2 = (( i * heightRatio) >> 16) ;
+        inLineBuffer = &inBuffer[(y2 * inPitch)];
+        out = outLineBuffer;
 
-      int x2, y2;
-
-      for (unsigned int i = 0; i < outHeight; i++) {
-        for (unsigned int j = 0; j < outWidth; j++) {
+        for (unsigned int j = 0; j < outWidth; j++)
+        {
           x2 = (( j * widthRatio) >> 16) ;
-          y2 = (( i * heightRatio) >> 16) ;
 
-          for (unsigned int b = 0; b < bytesPerPixels; b++) {
-            outBuffer[(i * outPitch) + j * bytesPerPixels + b] = inBuffer[(y2 * inPitch) + x2 * bytesPerPixels + b] ;
+          for (unsigned int b = 0; b < bytesPerPixels; b++, out++)
+          {
+            *out = inLineBuffer[x2 * bytesPerPixels + b];
           }
         }
       }
-    } else{
-      throw Orthanc::OrthancException(Orthanc::ErrorCode_NotImplemented);
+
     }
   }
 
