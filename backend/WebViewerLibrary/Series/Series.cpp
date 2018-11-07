@@ -55,6 +55,14 @@ void Series::ToJson(Json::Value& output) const
 
 }
 
+std::string Series::GetModality() const
+{
+  if (_seriesTags["TagsSubset"].isMember("Modality") && _seriesTags["TagsSubset"]["Modality"].isString())
+    return _seriesTags["TagsSubset"]["Modality"].asString();
+  else
+    return std::string();
+}
+
 Series* Series::FromJson(const Json::Value& seriesJson)
 {
   std::set<ImageQuality::EImageQuality> imageQualities;

@@ -170,6 +170,11 @@
 
             return seriesPromise
                 .then(function(response) {
+                    if (response.data["skipped"] == true) {
+                      console.log("skipping series " + seriesId);
+                      return;
+                    }
+
                     var instancesInfos = response.data.instancesInfos;
                     var studyId = response.data.study.ID;
                     var contentType = response.data.contentType;

@@ -8,9 +8,11 @@
 
 #include "../BenchmarkHelper.h" // for BENCH(*)
 #include "../OrthancContextManager.h"
+#include "Config/WebViewerConfiguration.h"
 
 
 SeriesRepository* SeriesController::seriesRepository_ = NULL;
+const WebViewerConfiguration* SeriesController::_config = NULL;
 
 template<>
 void SeriesController::Inject<SeriesRepository>(SeriesRepository* obj) {
@@ -97,6 +99,13 @@ int SeriesController::_ProcessRequest()
     
     // Load the series with an auto_ptr so it's freed at the end of thit method
     std::auto_ptr<Series> series(seriesRepository_->GetSeries(this->seriesId_));
+    if (_config->modalitiesToSkip.find(series->GetModality()) != _config->modalitiesToSkip.end()) {
+
+      Json::Value modalitySkippedResponse;
+      modalitySkippedResponse["skipped"] = true;
+      OrthancPluginLogWarning(context, "skipping series whose Modality is listed in ModalitiesToHide");
+      return this->_AnswerBuffer(modalitySkippedResponse);
+    }
     Json::Value seriesInfo;
     series->ToJson(seriesInfo);
 

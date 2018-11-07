@@ -34,6 +34,7 @@ public:
   static Series* FromJson(const Json::Value& seriesJson);
   void ToJson(Json::Value& output) const;
 
+  std::string GetModality() const;
 private:
   // takes seriesTags memory ownership
   Series(const std::string& seriesId,
@@ -52,4 +53,5 @@ private:
   Json::Value _studyInfo;
 
   std::set<ImageQuality::EImageQuality> _imageQualities;
+
 };

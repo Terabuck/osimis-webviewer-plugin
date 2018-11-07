@@ -106,6 +106,7 @@ void AbstractWebViewer::_serveBackEnd()
   // since Orthanc API doesn't allow us to pass attributes when processing REST request)
   ConfigController::setConfig(_config.get());
   CustomCommandController::setConfig(_config.get());
+  SeriesController::setConfig(_config.get());
 
   // Register routes & controllers
   // Note: if you add some routes here, don't forget to add them in the authorization plugin
