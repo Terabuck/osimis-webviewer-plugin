@@ -249,7 +249,10 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   toggleOverlayIconsButtonEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ToggleOverlayIconsButtonEnabled", false);
   displayOverlayText = OrthancPlugins::GetBoolValue(wvConfig, "DisplayOverlayText", true);
   displayOverlayIcons = OrthancPlugins::GetBoolValue(wvConfig, "DisplayOverlayIcons", true);
-
+  customCommandEnabled = OrthancPlugins::GetBoolValue(wvConfig, "CustomCommandEnabled", false);
+  customCommandLuaCode = OrthancPlugins::GetStringValue(wvConfig, "CustomCommandLuaCode", std::string());
+  customCommandIconClass = OrthancPlugins::GetStringValue(wvConfig, "CustomCommandIconClass", "fa fa-external-link-square-alt");
+  customCommandIconLabel = OrthancPlugins::GetStringValue(wvConfig, "CustomCommandIconLabel", "custom action");
 
   if (toolbarLayoutMode != "flat" && toolbarLayoutMode != "tree")
   {
@@ -537,6 +540,9 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["toggleOverlayIconsButtonEnabled"] = toggleOverlayIconsButtonEnabled;
   config["displayOverlayText"] = displayOverlayText;
   config["displayOverlayIcons"] = displayOverlayIcons;
+  config["customCommandEnabled"] = customCommandEnabled;
+  config["customCommandIconClass"] = customCommandIconClass;
+  config["customCommandIconLabel"] = customCommandIconLabel;
 
   if (customOverlayProviderUrl.length() > 0) {
     config["customOverlayProviderUrl"] = customOverlayProviderUrl;

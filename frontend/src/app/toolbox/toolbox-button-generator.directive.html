@@ -373,12 +373,13 @@
         ng-switch-when="customCommand"
         ng-if="vm.toolbox.buttons.hasOwnProperty('customCommand')"
         class="wvButton--underline"
-        data-title="vm.toolbox.customCommandTitle"
+        data-title="{{ vm.toolbox.customCommandIconLabel | wvCapitalize}}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
+        ng-class="{'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
         >
-        <i class="fas fa-external-link-square-alt"></i>
+        <i class="{{ vm.toolbox.customCommandIconClass }}"></i>
         <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'customCommand'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 

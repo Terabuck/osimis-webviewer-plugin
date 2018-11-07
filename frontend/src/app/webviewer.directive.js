@@ -231,8 +231,10 @@
 
             // Configure attributes default values
             vm.toolbarEnabled = typeof vm.toolbarEnabled !== 'undefined' ? vm.toolbarEnabled : true;
-            vm.toolbarPosition = typeof vm.toolbarPosition !== 'undefined' ? vm.toolbarPosition : 'top';
+            vm.toolbarPosition = typeof vm.toolbarPosition !== 'undefined' ? vm.toolbarPosition : 'right';
             vm.buttonsSize = typeof vm.buttonsSize !== 'undefined' ? vm.buttonsSize : 'small';
+            vm.customCommandIconLabel = typeof vm.customCommandIconLabel !== 'undefined' ? vm.customCommandIconLabel : 'custom command';
+            vm.customCommandIconClass = typeof vm.customCommandIconClass !== 'undefined' ? vm.customCommandIconClass : 'fas fa-exclamation';
             vm.serieslistEnabled = typeof vm.serieslistEnabled !== 'undefined' ? vm.serieslistEnabled : true;
             vm.studyinformationEnabled = typeof vm.studyinformationEnabled !== 'undefined' ? vm.studyinformationEnabled : true;
             vm.leftHandlesEnabled = typeof vm.leftHandlesEnabled !== 'undefined' ? vm.leftHandlesEnabled : true;
@@ -291,8 +293,10 @@
             if (__webViewerConfig.toggleOverlayIconsButtonEnabled) { // activate}
                 vm.tools.toggleOverlayIcons = false;
             }
-            if (true) {//__webViewerConfig.customCommandEnabled) { // activate
+            if (__webViewerConfig.customCommandEnabled) { // activate
               vm.tools.customCommand = false;
+              vm.customCommandIconLabel = __webViewerConfig.customCommandIconLabel;
+              vm.customCommandIconClass = __webViewerConfig.customCommandIconClass;
             }
 
             console.log('default tool: ', vm.toolbarDefaultTool)
@@ -541,6 +545,9 @@
                     break;
                 case 'print':
                     window.print();
+                    break;
+                case 'customCommand':
+                    vm.wvViewerController.executeCustomCommand();
                     break;
                 default:
                     throw new Error('Unknown toolbar action.');

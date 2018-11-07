@@ -28,7 +28,7 @@
     // the ViewerController has been introduced mainly to avoid circular dependencies betwwen all "modules"
     // ViewerController is a central contact point that can dispatch the calls to other modules that do not have to "know" him
 
-    function ViewerController($q, wvPaneManager, wvStudyManager, wvReferenceLines, wvSeriesManager) {
+    function ViewerController($q, wvPaneManager, wvStudyManager, wvReferenceLines, wvSeriesManager, wvConfig) {
         this._isOverlayTextVisible = getBoolFromLocalStorage("isOverlayTextVisible", true);
         this._isOverlayIconsVisible = getBoolFromLocalStorage("isOverlayIconsVisible", true);
         this._layoutX = getIntFromLocalStorage("layoutX", 1);
@@ -39,6 +39,7 @@
         this.wvStudyManager = wvStudyManager;
         this.wvReferenceLines = wvReferenceLines;
         this.wvSeriesManager = wvSeriesManager;
+        this.wvConfig = wvConfig;
         this.$q = $q;
 
         this.saveStateToLocalStorage();        
@@ -109,6 +110,24 @@
           that.wvReferenceLines.update(series);
         });
       }
+    }
+
+    ViewerController.prototype.executeCustomCommand = function() {
+      var selectedPane = this.wvPaneManager.getSelectedPane();
+      var that = this;
+      selectedPane.getImage().then(function(image) {
+        console.log(image.id);
+        var request = new osimis.HttpRequest();
+        request.setHeaders(that.wvConfig.httpRequestHeaders);
+        request.setCache(false);
+        
+        request.post(that.wvConfig.orthancApiURL + '/osimis-viewer/custom-command', image.id.split(":")[0])
+          .then(function(response) {
+            console.log("custom-command done");
+          })
+
+      });
+
     }
 
     ViewerController.prototype.nextSeries = function() {
@@ -196,7 +215,7 @@
         .factory('wvViewerController', wvViewerController);
 
     /* @ngInject */
-    function wvViewerController($q, wvPaneManager, wvStudyManager, wvReferenceLines, wvSeriesManager) {
-        return new ViewerController($q, wvPaneManager, wvStudyManager, wvReferenceLines, wvSeriesManager);
+    function wvViewerController($q, wvPaneManager, wvStudyManager, wvReferenceLines, wvSeriesManager, wvConfig) {
+        return new ViewerController($q, wvPaneManager, wvStudyManager, wvReferenceLines, wvSeriesManager, wvConfig);
     }
 })(osimis || (this.osimis = {}));
