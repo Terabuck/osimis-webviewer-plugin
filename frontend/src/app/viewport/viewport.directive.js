@@ -66,7 +66,7 @@
  * wvOverlay directive by default. It may be overloaded using standard transclusion. It is therefore
  * important to not put any whitespace between the DOM element's start and end tags, otherwise the default
  * overlay will be overloaded with white space.
- * By setting the overlay's css _position_ attribute to _absolute_, the ovgetViewporterlay can position information to the top, right, bottom and left sides
+ * By setting the overlay's css _position_ attribute to _absolute_, the overlay can position information to the top, right, bottom and left sides
  * of the viewport.
  *
  * @example
