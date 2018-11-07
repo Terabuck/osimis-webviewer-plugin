@@ -99,7 +99,7 @@ int SeriesController::_ProcessRequest()
     
     // Load the series with an auto_ptr so it's freed at the end of thit method
     std::auto_ptr<Series> series(seriesRepository_->GetSeries(this->seriesId_));
-    if (_config->modalitiesToSkip.find(series->GetModality()) != _config->modalitiesToSkip.end()) {
+    if (_config->modalitiesToIgnore.find(series->GetModality()) != _config->modalitiesToIgnore.end()) {
 
       Json::Value modalitySkippedResponse;
       modalitySkippedResponse["skipped"] = true;
