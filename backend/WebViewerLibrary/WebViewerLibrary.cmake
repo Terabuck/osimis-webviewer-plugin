@@ -71,6 +71,7 @@ add_library(WebViewerLibrary
 
   ${VIEWER_LIBRARY_DIR}/OrthancContextManager.cpp
   ${VIEWER_LIBRARY_DIR}/BaseController.cpp
+  ${VIEWER_LIBRARY_DIR}/CustomCommand/CustomCommandController.cpp
   ${VIEWER_LIBRARY_DIR}/ShortTermCache/CacheIndex.h
   ${VIEWER_LIBRARY_DIR}/ShortTermCache/ICacheFactory.h
   ${VIEWER_LIBRARY_DIR}/ShortTermCache/IPrefetchPolicy.h

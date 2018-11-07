@@ -37,6 +37,8 @@
                 buttons: '=wvToolboxButtons', // input + output
                 buttonsOrdering: '=wvToolboxButtonsOrdering',
                 buttonsSize: '=?wvToolboxButtonsSize',  
+                customCommandIconLabel: '=?wvCustomCommandIconLabel',
+                customCommandIconClass: '=?wvCustomCommandIconClass',
                 tool: '=?wvActiveTool', // output (duplicate with buttons as an output
                 onActionClicked: '&?wvOnActionClicked', 
                 windowingPresets: '=wvWindowingPresets',

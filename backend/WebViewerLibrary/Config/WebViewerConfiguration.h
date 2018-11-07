@@ -84,6 +84,10 @@ public:
   bool toggleOverlayIconsButtonEnabled;
   bool displayOverlayText;
   bool displayOverlayIcons;
+  bool customCommandEnabled;
+  std::string customCommandLuaCode;
+  std::string customCommandIconClass;
+  std::string customCommandIconLabel;
 
   WebViewerConfiguration(OrthancPluginContext* context);
   /**

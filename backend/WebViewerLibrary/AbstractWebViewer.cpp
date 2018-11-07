@@ -25,6 +25,7 @@
 #include "Image/ImageRepository.h"
 #include "Image/ImageController.h"
 #include "Language/LanguageController.h"
+#include "CustomCommand/CustomCommandController.h"
 #include "Annotation/AnnotationRepository.h"
 #include "Config/ConfigController.h"
 #include "Config/WebViewerConfiguration.h"
@@ -104,7 +105,8 @@ void AbstractWebViewer::_serveBackEnd()
   // Inject config within ConfigController (we can't do it without static method
   // since Orthanc API doesn't allow us to pass attributes when processing REST request)
   ConfigController::setConfig(_config.get());
-  
+  CustomCommandController::setConfig(_config.get());
+
   // Register routes & controllers
   // Note: if you add some routes here, don't forget to add them in the authorization plugin
   RegisterRoute<ImageController>("/osimis-viewer/images/");
@@ -112,6 +114,7 @@ void AbstractWebViewer::_serveBackEnd()
   RegisterRoute<ConfigController>("/osimis-viewer/config.js");
   RegisterRoute<StudyController>("/osimis-viewer/studies/");
   RegisterRoute<LanguageController>("/osimis-viewer/languages/");
+  RegisterRoute<CustomCommandController>("/osimis-viewer/custom-command");
 
   // OrthancPluginRegisterRestCallbackNoLock(_context, "/osimis-viewer/is-stable-series/(.*)", IsStableSeries);
 }

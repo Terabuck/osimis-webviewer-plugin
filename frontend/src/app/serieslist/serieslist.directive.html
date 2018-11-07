@@ -29,7 +29,7 @@
         placement="right"
     >
         <div class="wvSerieslist__picture">
-            <span class="wvSerieslist__placeholderIcon fa fa-file-text"></span>
+            <i class="wvSerieslist__placeholderIcon fa fa-file-alt"></i>
 
             <span ng-if="vm.paneManager.hasReportBeenViewed(id)" class="wvSerieslist__badge--{{vm.study.color}} mr40 mb40">
                 <i class="fa fa-eye" aria-hidden="true"></i>
@@ -55,7 +55,7 @@
         placement="right"
     >
         <div class="wvSerieslist__picture">
-            <span class="wvSerieslist__placeholderIcon wvSerieslist__placeholderIcon--strikeout fa fa-file-text"></span>
+            <i class="wvSerieslist__placeholderIcon wvSerieslist__placeholderIcon--strikeout fa fa-file-alt"></i>
         </div>
         <div
             ng-if="vm.displayMode === 'list'"
@@ -91,7 +91,7 @@
         placement="right"
     >
         <div class="wvSerieslist__picture">
-            <span class="wvSerieslist__placeholderIcon fa fa-video-camera"></span>
+            <i class="wvSerieslist__placeholderIcon fa fa-video-camera"></i>
 
             <span ng-if="vm.paneManager.hasVideoBeenViewed($video.id)" class="wvSerieslist__badge--{{vm.study.color}} mr40 mb40">
                 <i class="fa fa-eye" aria-hidden="true"></i>

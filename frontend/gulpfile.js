@@ -64,6 +64,10 @@ gulp.task('clean-fonts', function(done) {
     clean(config.build + 'fonts/**/*.*', done);
 });
 
+gulp.task('clean-webfonts', function(done) {
+  clean(config.build + 'webfonts/*.*', done);
+});
+
 /**
  * Remove all images from the build folder
  * @param  {Function} done - callback when complete
@@ -120,13 +124,24 @@ gulp.task('styles', gulp.series('clean-styles', function stylesTask() {
  * Copy fonts
  * @return {Stream}
  */
-gulp.task('fonts', gulp.series('clean-fonts', function fontsTask() {
+gulp.task('webfonts', gulp.series('clean-webfonts', function webfontsTask() {
+  log('Copying webfonts');
+
+  return gulp
+      .src(config.webfonts)
+      .pipe(gulp.dest(config.build + 'webfonts'))
+      ;
+}));
+
+gulp.task('fonts', gulp.series('clean-fonts', 'webfonts', function fontsTask() {
     log('Copying fonts');
 
     return gulp
         .src(config.fonts)
-        .pipe(gulp.dest(config.build + 'fonts'));
+        .pipe(gulp.dest(config.build + 'fonts'))
+        ;
 }));
+
 
 /**
  * Compress images

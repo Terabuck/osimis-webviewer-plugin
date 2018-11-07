@@ -21,50 +21,8 @@ void ConfigController::setConfig(const WebViewerConfiguration* config) {
 }
 
 int ConfigController::_ParseURLPostFix(const std::string& urlPostfix) {
-  // Retrieve context so we can use orthanc's logger.
-  OrthancPluginContext* context = OrthancContextManager::Get();
-
-  try {
-    // /osimis-viewer/config
-  
     // There is no additional parameter to parse, so we can just return success
     return 200;
-  }
-  catch (const Orthanc::OrthancException& exc) {
-    // Log detailed Orthanc error.
-    std::string message("(ConfigController) Orthanc::OrthancException during URL parsing ");
-    message += boost::lexical_cast<std::string>(exc.GetErrorCode());
-    message += "/";
-    message += boost::lexical_cast<std::string>(exc.GetHttpStatus());
-    message += " ";
-    message += exc.What();
-    OrthancPluginLogError(context, message.c_str());
-
-    return this->_AnswerError(exc.GetHttpStatus());
-  }
-  catch (const std::exception& exc) {
-    // Log detailed std error.
-    std::string message("(ConfigController) std::exception during URL parsing ");
-    message += exc.what();
-    OrthancPluginLogError(context, message.c_str());
-
-    return this->_AnswerError(500);
-  }
-  catch (const std::string& exc) {
-    // Log string error (shouldn't happen).
-    std::string message("(ConfigController) std::string during URL parsing ");
-    message += exc;
-    OrthancPluginLogError(context, message.c_str());
-
-    return this->_AnswerError(500);
-  }
-  catch (...) {
-    // Log unknown error (shouldn't happen).
-    std::string message("(ConfigController) Unknown Exception during URL parsing");
-    OrthancPluginLogError(context, message.c_str());
-
-    return this->_AnswerError(500);
-  }
 }
 
 int ConfigController::_ProcessRequest()

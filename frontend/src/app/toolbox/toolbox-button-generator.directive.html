@@ -123,13 +123,14 @@
     <label
         ng-switch-when="angleMeasure"
         ng-if="vm.toolbox.buttons.hasOwnProperty('angleMeasure')"
-        class="wvButton--underline fa fa-angle-double-left"
+        class="wvButton--underline"
         ng-class="{active: vm.toolbox.tool === 'angleMeasure', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         data-title="{{ 'COMPONENTS.TOOLBOX.ANGLE_MEASUREMENT' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
         >
+        <i class="fa fa-angle-double-left"></i>
         <input id="toolbox-angle-measure-button" type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="angleMeasure" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
@@ -137,13 +138,14 @@
     <label
         ng-switch-when="pixelProbe"
         ng-if="vm.toolbox.buttons.hasOwnProperty('pixelProbe')"
-        class="wvButton--underline glyphicon glyphicon-record"
+        class="wvButton--underline"
         ng-class="{active: vm.toolbox.tool === 'pixelProbe', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         data-title="{{ 'COMPONENTS.TOOLBOX.PIXEL_PROBE' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
         >
+        <i class="far fa-dot-circle"></i>
         <input id="toolbox-pixel-probe-button" type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="pixelProbe" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
@@ -151,13 +153,14 @@
     <label
         ng-switch-when="ellipticalRoi"
         ng-if="vm.toolbox.buttons.hasOwnProperty('ellipticalRoi')"
-        class="wvButton--underline fa fa-circle-o"
+        class="wvButton--underline"
         ng-class="{active: vm.toolbox.tool === 'ellipticalRoi', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         data-title="{{ 'COMPONENTS.TOOLBOX.ELLIPTICAL_ROI' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
         >
+        <i class="far fa-circle"></i>
         <input id="toolbox-elliptical-roi-button" type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="ellipticalRoi" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
@@ -165,13 +168,14 @@
     <label
         ng-switch-when="rectangleRoi"
         ng-if="vm.toolbox.buttons.hasOwnProperty('rectangleRoi')"
-        class="wvButton--underline glyphicon glyphicon glyphicon-unchecked"
+        class="wvButton--underline"
         ng-class="{active: vm.toolbox.tool === 'rectangleRoi', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         data-title="{{ 'COMPONENTS.TOOLBOX.RECTANGLE_ROI' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
         >
+        <i class="far fa-square"></i>
         <input id="toolbox-rectangle-roi-button" type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="rectangleRoi" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
@@ -179,13 +183,14 @@
     <label
         ng-switch-when="arrowAnnotate"
         ng-if="vm.toolbox.buttons.hasOwnProperty('arrowAnnotate')"
-        class="wvButton--underline fa fa-arrow-right"
+        class="wvButton--underline"
         ng-class="{active: vm.toolbox.tool === 'arrowAnnotate', 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         data-title="{{ 'COMPONENTS.TOOLBOX.ARROW_ANNOTATE_TEXT' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
         >
+        <i class="fa fa-arrow-right"></i>
         <input id="toolbox-arrow-annotate-button" type="radio" ng-disabled="vm.toolbox.readonly" ng-model="vm.toolbox.tool" value="arrowAnnotate" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
@@ -193,13 +198,14 @@
     <label
         ng-switch-when="rotateLeft"
         ng-if="vm.toolbox.buttons.hasOwnProperty('rotateLeft')"
-        class="wvButton--underline fa fa-rotate-left"
+        class="wvButton--underline"
         data-title="{{ 'COMPONENTS.TOOLBOX.ROTATE_LEFT' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         ng-class="{'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
         >
+        <i class="fa fa-undo"></i>
         <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'rotateLeft'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
@@ -207,13 +213,14 @@
     <label
         ng-switch-when="rotateRight"
         ng-if="vm.toolbox.buttons.hasOwnProperty('rotateRight')"
-        class="wvButton--underline fa fa-rotate-right"
+        class="wvButton--underline"
         data-title="{{ 'COMPONENTS.TOOLBOX.ROTATE_RIGHT' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         ng-class="{'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
         >
+        <i class="fa fa-undo fa-flip-horizontal"></i>
         <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'rotateRight'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
@@ -221,13 +228,14 @@
     <label
         ng-switch-when="previousSeries"
         ng-if="vm.toolbox.buttons.hasOwnProperty('previousSeries')"
-        class="wvButton--underline fa fa-play fa-vflip wvButton--vflip"
+        class="wvButton--underline"
         data-title="{{ 'COMPONENTS.TOOLBOX.PREVIOUS_SERIES' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         ng-class="{'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
         >
+        <i class="fa fa-play fa-vflip"></i>
         <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'previousSeries'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
@@ -235,13 +243,14 @@
     <label
         ng-switch-when="nextSeries"
         ng-if="vm.toolbox.buttons.hasOwnProperty('nextSeries')"
-        class="wvButton--underline fa fa-play"
+        class="wvButton--underline"
         data-title="{{ 'COMPONENTS.TOOLBOX.NEXT_SERIES' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         ng-class="{'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
         >
+        <i class="fa fa-play"></i>
         <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'nextSeries'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
@@ -249,13 +258,14 @@
     <label
         ng-switch-when="hflip"
         ng-if="vm.toolbox.buttons.hasOwnProperty('hflip')"
-        class="wvButton--underline fa fa-exchange"
+        class="wvButton--underline"
         data-title="{{ 'COMPONENTS.TOOLBOX.FLIP_HORIZONTALLY' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         ng-class="{'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
         >
+        <i class="fa fa-exchange-alt"></i>
         <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'hflip'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
@@ -263,13 +273,14 @@
     <label
         ng-switch-when="vflip"
         ng-if="vm.toolbox.buttons.hasOwnProperty('vflip')"
-        class="wvButton--underline fa fa-exchange wvButton--rotate"
+        class="wvButton--underline"
         data-title="{{ 'COMPONENTS.TOOLBOX.FLIP_VERTICALLY' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         ng-class="{'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
         >
+        <i class="fa fa-exchange-alt fa-rotate-90"></i>
         <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'vflip'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
@@ -277,13 +288,14 @@
     <label
         ng-switch-when="toggleSynchro"
         ng-if="vm.toolbox.buttons.hasOwnProperty('toggleSynchro')"
-        class="wvButton--underline fa fa-link"
+        class="wvButton--underline"
         ng-class="{'active': vm.toolbox.wvSynchronizer.isEnabled(), 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         data-title="{{ 'COMPONENTS.TOOLBOX.SYNCHRONIZED_BROWSING' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
         >
+        <i class="fa fa-link"></i>
         <input type="radio" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'toggleSynchro'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
@@ -291,13 +303,14 @@
     <label
         ng-switch-when="toggleReferenceLines"
         ng-if="vm.toolbox.buttons.hasOwnProperty('toggleReferenceLines')"
-        class="wvButton--underline fa fa-bars"
+        class="wvButton--underline"
         ng-class="{'active': vm.toolbox.wvReferenceLines.isEnabled(), 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         data-title="{{ 'COMPONENTS.TOOLBOX.REFERENCE_LINES' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
         >
+        <i class="fa fa-bars"></i>
         <input type="radio" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'toggleReferenceLines'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
@@ -305,13 +318,14 @@
     <label
         ng-switch-when="toggleOverlayText"
         ng-if="vm.toolbox.buttons.hasOwnProperty('toggleOverlayText')"
-        class="wvButton--underline fa fa-align-left"
+        class="wvButton--underline"
         ng-class="{'active': vm.toolbox.wvViewerController.isOverlayTextVisible(), 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         data-title="{{ 'COMPONENTS.TOOLBOX.TOGGLE_LAYOUT_TEXT' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
         >
+        <i class="fa fa-align-left"></i>
         <input type="radio" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'toggleOverlayText'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
@@ -319,13 +333,14 @@
     <label
         ng-switch-when="toggleOverlayIcons"
         ng-if="vm.toolbox.buttons.hasOwnProperty('toggleOverlayIcons')"
-        class="wvButton--underline fa fa-location-arrow"
+        class="wvButton--underline"
         ng-class="{'active': vm.toolbox.wvViewerController.isOverlayIconsVisible(), 'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
         data-title="{{ 'COMPONENTS.TOOLBOX.TOGGLE_LAYOUT_ICONS' | translate | wvCapitalize }}"
         data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         data-container="body"
         bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
         >
+        <i class="fa fa-location-arrow"></i>
         <input type="radio" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'toggleOverlayIcons'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
@@ -352,4 +367,20 @@
         wv-popover-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
         wv-on-keyimagenote-created="vm.toolbox.createKeyImageNote($note)"
     ></wv-keyimagenote-button>
-</div>
+
+    <!-- Custom command button -->
+    <label
+        ng-switch-when="customCommand"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('customCommand')"
+        class="wvButton--underline"
+        data-title="{{ vm.toolbox.customCommandIconLabel | wvCapitalize}}"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        ng-class="{'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        bs-tooltip bs-enabled="!vm.window.USER_IS_TOUCHING"
+        >
+        <i class="{{ vm.toolbox.customCommandIconClass }}"></i>
+        <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'customCommand'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
+  </div>

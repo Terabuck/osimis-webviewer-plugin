@@ -36,7 +36,7 @@
     "bootstrap": "3.3.7",
     "lodash": "4.17.10",
     "open-sans": "./local_dependencies/open-sans/",
-    "font-awesome": "4.7.0",
+    "font-awesome": "5.5.0",
     "cornerstone": "./local_dependencies/cornerstone/",
     "cornerstoneMath": "0.1.6",
     "cornerstoneTools": "./local_dependencies/cornerstoneTools/",
@@ -106,7 +106,7 @@
     },
     "font-awesome": {
       "main": [
-        "css/font-awesome.css"
+        "web-fonts-with-css/fontawesome-all.css"
       ]
     },
     "png.js": {
