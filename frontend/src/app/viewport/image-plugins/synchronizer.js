@@ -11,10 +11,11 @@
 (function(osimis) {
     'use strict';
 
-    function Synchronizer(Promise, wvPaneManager) {
+    function Synchronizer(Promise, wvPaneManager, wvReferenceLines) {
         // Injections.
         this._Promise = Promise;
         this._wvPaneManager = wvPaneManager;
+        this._wvReferenceLines = wvReferenceLines;
         this._enabled = true;
         this._offsets = {};
     }
@@ -124,6 +125,7 @@
                             //console.log("Closest index is " + closestIndexResponse.closestIndex);
                             //console.log(closestIndexResponse.series);
                             closestIndexResponse.series.goToImage(closestIndexResponse.closestIndex);
+                            this_._wvReferenceLines.update(closestIndexResponse.series, false);
                     });
                 }
             });
@@ -137,7 +139,7 @@
         .factory('wvSynchronizer', wvSynchronizer);
 
     /* @ngInject */
-    function wvSynchronizer($q, wvPaneManager) {
-        return new Synchronizer($q, wvPaneManager);
+    function wvSynchronizer($q, wvPaneManager, wvReferenceLines) {
+        return new Synchronizer($q, wvPaneManager, wvReferenceLines);
     }
 })(osimis || (this.osimis = {}));

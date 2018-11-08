@@ -124,10 +124,10 @@
     var series = that._seriesInfosByInstanceId[instanceId];
 
     if (this._lastUpdatedSeries != null && this._lastUpdatedSeries.id == series.id) {
-      console.log("not rendering reference lines on the currently selected series ", series.id);
+      // console.log("not rendering reference lines on the currently selected series ", series.id);
       return;
     } else {
-      console.log("rendering reference lines series ", series.id);
+      // console.log("rendering reference lines series ", series.id);
     }
 
     var referencePanes = that.getListOfReferencingPanes(series); // [e.currentTarget]; // syncContext.getSourceElements();
@@ -140,7 +140,7 @@
       var color = cornerstoneTools.toolColors.getActiveColor();
       var lineWidth = cornerstoneTools.toolStyle.getToolWidth();
   
-      cornerstone.setToPixelCoordinateSystem(eventData.enabledElement, context);
+      //cornerstone.setToPixelCoordinateSystem(eventData.enabledElement, context);
   
       // Iterate over each referenced element
       $.each(referencePanes, function(index, referencePane) {
@@ -160,9 +160,13 @@
 
 
   ReferenceLines.prototype.update = function(updatedSeries, updateCurrentSelectedSeries) {
+    if (updatedSeries == null || updatedSeries.getCurrentImageId() == null) { // this can happen when the synchronizer updates the reference lines
+      return; 
+    }
+
     if (updateCurrentSelectedSeries === undefined || updateCurrentSelectedSeries) {
       this._lastUpdatedSeries = updatedSeries;
-      console.log("updating ", updatedSeries.id);
+//      console.log("updating ", updatedSeries.id);
     }
     
     var instanceId = updatedSeries.getCurrentImageId().split(":")[0];
