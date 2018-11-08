@@ -142,16 +142,9 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
     }
   }
 
-  if (wvConfig.isMember("ModalitiesToIgnore") && wvConfig["ModalitiesToIgnore"].type() == Json::arrayValue)
+  if (wvConfig.isMember("SeriesToIgnore"))
   {
-    for (Json::Value::ArrayIndex i = 0; i < wvConfig["ModalitiesToIgnore"].size(); i++)
-    {
-      Json::Value modality = wvConfig["ModalitiesToIgnore"][i];
-      if (modality.isString())
-      {
-        modalitiesToIgnore.insert(modality.asString());
-      }
-    }
+    seriesToIgnore = wvConfig["SeriesToIgnore"];
   }
 
   // Retrieve windowing preset (if set).

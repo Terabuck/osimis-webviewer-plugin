@@ -54,7 +54,7 @@ public:
   bool gdcmEnabled;
   bool restrictTransferSyntaxes;
   std::set<std::string> enabledTransferSyntaxes;
-  std::set<std::string> modalitiesToIgnore;
+  Json::Value seriesToIgnore;
 
   // Frontend Variables
   bool showStudyInformationBreadcrumb;

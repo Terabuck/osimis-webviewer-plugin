@@ -35,6 +35,7 @@ public:
   void ToJson(Json::Value& output) const;
 
   std::string GetModality() const;
+  std::string GetMiddleInstanceId() const;
 private:
   // takes seriesTags memory ownership
   Series(const std::string& seriesId,

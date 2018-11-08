@@ -18,7 +18,7 @@ Features:
   layout and overlay texts)
 * Slightly optimized the loading of series when "InstanceInfoCacheEnabled" is set to "true"
 * Added a "custom command" button whose action can be customized through LuaScript
-* Added an option to ignore images from certain modalities.  This is defined in the configuration file in ModalitiesToIgnore.
+* Added an option to ignore series based on tags values.  This is defined in the configuration file in SeriesToIgnore.
 
 Fixes:
 -----

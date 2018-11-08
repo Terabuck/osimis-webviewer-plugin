@@ -63,6 +63,16 @@ std::string Series::GetModality() const
     return std::string();
 }
 
+std::string Series::GetMiddleInstanceId() const
+{
+  if (_orderedInstances.size() > 0)
+  {
+    return _orderedInstances[_orderedInstances.size() / 2][0].asString();
+  }
+  else
+    return std::string();
+}
+
 Series* Series::FromJson(const Json::Value& seriesJson)
 {
   std::set<ImageQuality::EImageQuality> imageQualities;
