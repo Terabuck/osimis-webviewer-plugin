@@ -18,32 +18,19 @@
       this._wvSeriesManager = wvSeriesManager;
       this._enabled = true;
       this._disabledDuringRedraw = false;
+      this._lastUpdatedSeries = null;
+      this._seriesInfosByInstanceId = {};
     }
 
   ReferenceLines.prototype.enable = function(enabled) {
       this._enabled = enabled;
 
+      var that = this;
       var allPanes = this._wvPaneManager.getAllPanes();
       $.each(allPanes, function(index, pane) {
         if (pane.series != undefined) {
-          var imageId = pane.series.getCurrentImageId();
-          
-          // console.log("ReferenceLines.enable, forcing redraw ", imageId);
-          var enabledElementObjects = cornerstone.getEnabledElementsByImageId(imageId);
-          enabledElementObjects
-            // Bypass thumbnails (as they wont ever be used w/ annotations)
-            .filter(function(enabledElementObject) {
-                return enabledElementObject._syncAnnotationResolution;
-            })
-            // Redraw the image - don't use cornerstone#draw because bugs occurs (only when debugger is off)
-            // those issues may come from changing the cornerstoneImageObject when image resolution change (cornerstone probably cache it)
-            .forEach(function(enabledElementObject) {
-    
-                // Then draw viewport.
-                var enabledElement = enabledElementObject.element;
-                cornerstone.updateImage(enabledElement, false); // Draw image. Do not invalidate cornerstone cache!
-            });
-          }
+          that.update(pane.series, false);
+         }
       });
 
       if (this._enabled) {
@@ -119,8 +106,6 @@
     var lineWidth = cornerstoneTools.toolStyle.getToolWidth();
 
     // draw the referenceLines
-    context.setTransform(1, 0, 0, 1, 0, 0);
-
     context.save();
     context.beginPath();
     context.strokeStyle = color;
@@ -129,48 +114,64 @@
     context.lineTo(refLineEndCanvas.x, refLineEndCanvas.y);
     context.stroke();
     context.restore();
+
   }
 
   ReferenceLines.prototype.onImageRendered = function(e, eventData) {
 
-    // console.log("rendering reference lines on ", eventData.image.imageId);
     var instanceId = eventData.image.imageId.split(":")[0];
     var that = this;
+    var series = that._seriesInfosByInstanceId[instanceId];
 
-    this._wvInstanceManager.getInfos(instanceId).then(function(instanceInfo) {
-      
-      that._wvSeriesManager.get(instanceInfo["SeriesOrthancId"]).then(function(series) {
+    if (this._lastUpdatedSeries != null && this._lastUpdatedSeries.id == series.id) {
+      console.log("not rendering reference lines on the currently selected series ", series.id);
+      return;
+    } else {
+      console.log("rendering reference lines series ", series.id);
+    }
 
-        var referencePanes = that.getListOfReferencingPanes(series); // [e.currentTarget]; // syncContext.getSourceElements();
+    var referencePanes = that.getListOfReferencingPanes(series); // [e.currentTarget]; // syncContext.getSourceElements();
 
-        if (referencePanes !== undefined && referencePanes.length > 0) {
-          // Create the canvas context and reset it to the pixel coordinate system
-          var context = eventData.canvasContext.canvas.getContext('2d');
-          cornerstone.setToPixelCoordinateSystem(eventData.enabledElement, context);
-      
-          // // Iterate over each referenced element
-          $.each(referencePanes, function(index, referencePane) {
-      
-            var imageId = referencePane.series.getCurrentImageId();
-            if (imageId != null) {
-              // console.log("rendering line from ", imageId, " on ", eventData.image.imageId);
+    if (referencePanes !== undefined && referencePanes.length > 0) {
+      // Create the canvas context and reset it to the pixel coordinate system
+      var context = eventData.canvasContext.canvas.getContext('2d');
+      context.setTransform(1, 0, 0, 1, 0, 0);
 
-              var referenceImagePlane = cornerstoneTools.metaData.get('imagePlane', imageId);
-              that.renderReferenceLine(context, eventData, e.currentTarget, referenceImagePlane);
-            } else {
-              // console.log("no reference lines to render for this series on ", eventData.image.imageId);
-            }
-          });
-        }
-
-      });
+      var color = cornerstoneTools.toolColors.getActiveColor();
+      var lineWidth = cornerstoneTools.toolStyle.getToolWidth();
   
-    });
+      cornerstone.setToPixelCoordinateSystem(eventData.enabledElement, context);
+  
+      // Iterate over each referenced element
+      $.each(referencePanes, function(index, referencePane) {
+  
+        var imageId = referencePane.series.getCurrentImageId();
+        if (imageId != null) {
+          // console.log("rendering line from ", imageId, " on ", eventData.image.imageId);
+
+          var referenceImagePlane = cornerstoneTools.metaData.get('imagePlane', imageId);
+          that.renderReferenceLine(context, eventData, e.currentTarget, referenceImagePlane);
+        }
+      });
+
+    }
+
   }
 
-  ReferenceLines.prototype.update = function(updatedSeries) {
+
+  ReferenceLines.prototype.update = function(updatedSeries, updateCurrentSelectedSeries) {
+    if (updateCurrentSelectedSeries === undefined || updateCurrentSelectedSeries) {
+      this._lastUpdatedSeries = updatedSeries;
+      console.log("updating ", updatedSeries.id);
+    }
+    
+    var instanceId = updatedSeries.getCurrentImageId().split(":")[0];
+    this._seriesInfosByInstanceId[instanceId] = updatedSeries;
+
     var referencePanes = this.getListOfReferencingPanes(updatedSeries);
+
     $.each(referencePanes, function(index, referencePane) {
+  
       var imageId = referencePane.series.getCurrentImageId();
       // console.log("ReferenceLines.update, need to redraw ", imageId);
       var enabledElementObjects = cornerstone.getEnabledElementsByImageId(imageId);
