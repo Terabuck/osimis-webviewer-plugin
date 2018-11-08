@@ -14,7 +14,7 @@
     };
 
     ZoomViewportTool.prototype.applyZoomToViewport = function(viewport, delta) {
-        var viewportData = viewport.getViewport();
+        var viewportData = viewport.getViewportData();
         var scale = +viewportData.scale;
 
         viewportData.scale = Math.min(Math.max(scale + (delta / 100), 0.01), 100.0);

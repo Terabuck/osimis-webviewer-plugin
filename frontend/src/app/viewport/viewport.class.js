@@ -457,12 +457,12 @@
      * @ngdoc method
      * @methodOf osimis.Viewport
      *
-     * @name osimis.Viewport#getViewport
+     * @name osimis.Viewport#getViewportData
      * @return {object} Return cornerstone viewport data (see cornerstone doc).
      * 
      * @description
      */
-    Viewport.prototype.getViewport = function() {
+    Viewport.prototype.getViewportData = function() {
         // Do not use cornerstone#getViewport directly as it copies the viewport 
         // data, into a new object - thus, breaking the osimis' cornerstone 
         // viewport data abstraction. We thus have rewrap it again.

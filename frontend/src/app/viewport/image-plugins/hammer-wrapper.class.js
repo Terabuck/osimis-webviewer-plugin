@@ -35,7 +35,7 @@
                 return;
             maxTouchCountInThisMove = Math.max(maxTouchCountInThisMove, _this._touchCount);
 
-            var viewportData = _this._viewport.getViewport();
+            var viewportData = _this._viewport.getViewportData();
             var deltaX, deltaY, scale;
             scale = +viewportData.scale;
             deltaX = ev.center.x - lastTouchPanningCenter.x;

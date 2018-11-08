@@ -14,7 +14,7 @@
     };
 
     PanViewportTool.prototype.applyPanToViewport = function(viewport, deltaX, deltaY) {
-        var viewportData = viewport.getViewport();
+        var viewportData = viewport.getViewportData();
 
         var scale = +viewportData.scale;
         var x = +viewportData.translation.x;
