@@ -406,7 +406,11 @@
             return this.tags.SliceLocation !== undefined && this.tags.SliceThickness !== undefined;
         };
 
-        WvSeries.prototype.getIndexOfClosestImageFrom = function(otherSliceLocation) {
+        WvSeries.prototype.getImageCount = function() {
+          return this.imageIds.length;
+        };
+
+      WvSeries.prototype.getIndexOfClosestImageFrom = function(otherSliceLocation) {
             var _this = this;
             var imageTagsPromises = this.imageIds.map(function(imageId) {
                 return wvImageManager.get(imageId);

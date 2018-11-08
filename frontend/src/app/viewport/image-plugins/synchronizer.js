@@ -95,9 +95,9 @@
         var toReturn = [];
         var panes = this._wvPaneManager.getAllPanes();
 
-        if (this._enabled && panes.length > 1 && series.hasSlices()) {
+        if (this._enabled && panes.length > 1 && series.hasSlices() && series.getImageCount() >= 10) {
             for (var i=0; i < panes.length; ++i) {
-                if (panes[i].seriesId !== undefined && panes[i].seriesId != series.id && panes[i].series.hasSlices()) {
+                if (panes[i].seriesId !== undefined && panes[i].seriesId != series.id && panes[i].series.hasSlices() && panes[i].series.getImageCount() >= 10) {
 
                     if (panes[i].series.isSameOrientationAs(series)) {
                         toReturn.push(panes[i]);
