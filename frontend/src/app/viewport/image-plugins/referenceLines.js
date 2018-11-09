@@ -54,7 +54,7 @@
       var toReturn = [];
       var panes = this._wvPaneManager.getAllPanes();
 
-      if (this._enabled && panes.length > 1 && series.hasSlices()) {
+      if (panes.length > 1 && series.hasSlices()) {
           for (var i=0; i < panes.length; ++i) {
               if (panes[i].seriesId !== undefined && panes[i].seriesId != series.id && panes[i].series.hasSlices()) {
 
@@ -118,6 +118,10 @@
   }
 
   ReferenceLines.prototype.onImageRendered = function(e, eventData) {
+
+    if (!this._enabled) {
+      return false;
+    }
 
     var instanceId = eventData.image.imageId.split(":")[0];
     var that = this;
