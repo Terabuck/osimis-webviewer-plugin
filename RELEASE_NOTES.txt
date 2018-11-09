@@ -9,6 +9,8 @@ Features:
 * Added print support (not supported on Internet Explorer).  The feature can be enabled/disabled through the "PrintEnabled" 
   option (true by default).  Note that, due to conflicts, we had to remove print support for pdf instances.  If you need
   to print pdf instances, download the file and print it from your pdf viewer.
+* The combined tool (windowing on the left mouse button, pan on the middle mouse button and zoom on the right mouse button) is 
+  now enabled by default and is the default selected tool (unless specified in the configuration "DefaultSelectedTool")
 * When displaying multiple studies, the colors of the study island is now repeated around the viewports
 * Added an option to configure the loading of all patient studies or a single studies ("OpenAllPatientStudies" - true by default)
 * Improved support for some US modalities providing Columns/Rows tags as "600\\0" instead of "600"
@@ -17,8 +19,9 @@ Features:
 * Saving some UI state in the browser local storage to re-open the viewer with the same settings (Study island display mode, 
   layout and overlay texts)
 * Slightly optimized the loading of series when "InstanceInfoCacheEnabled" is set to "true"
-* Added a "custom command" button whose action can be customized through LuaScript
-* Added an option to ignore series based on tags values.  This is defined in the configuration file in SeriesToIgnore.
+* Added a "custom command" button whose action can be customized through LuaScript.  This is defined in the configuration file 
+  in "CustomCommandEnabled", ...
+* Added an option to ignore series based on tags values.  This is defined in the configuration file in "SeriesToIgnore".
 
 Fixes:
 -----
