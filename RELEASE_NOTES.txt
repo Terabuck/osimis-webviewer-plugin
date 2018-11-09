@@ -34,6 +34,11 @@ Fixes:
 * WVB-370: US images whose transfer syntax is JPEG are not displayed correctly
 * WVB-372: MR Breast file can not be visualized
 
+API Changes:
+-----------
+* there's a new route (POST) to /osimis-viewer/custom-command/{instanceId}
+
+
 Known issues:
 ------------
 * The WebViewer currently does not work on iPhone (Safari and Chrome).

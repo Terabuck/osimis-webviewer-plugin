@@ -115,9 +115,7 @@ void AbstractWebViewer::_serveBackEnd()
   RegisterRoute<ConfigController>("/osimis-viewer/config.js");
   RegisterRoute<StudyController>("/osimis-viewer/studies/");
   RegisterRoute<LanguageController>("/osimis-viewer/languages/");
-  RegisterRoute<CustomCommandController>("/osimis-viewer/custom-command");
-
-  // OrthancPluginRegisterRestCallbackNoLock(_context, "/osimis-viewer/is-stable-series/(.*)", IsStableSeries);
+  RegisterRoute<CustomCommandController>("/osimis-viewer/custom-command/");
 }
 
 AbstractWebViewer::AbstractWebViewer(OrthancPluginContext* context)

@@ -20,13 +20,13 @@ private:
    */
   static const WebViewerConfiguration* _config;
 
+  std::string instanceId_;
 
 public:
   CustomCommandController(OrthancPluginRestOutput* response, const std::string& url, const OrthancPluginHttpRequest* request);
 
 protected:
-  virtual int _OnEmptyURLPostFix() { return 200; }
-  virtual int _ParseURLPostFix(const std::string& urlPostfix) { return 200; }
+  virtual int _ParseURLPostFix(const std::string& urlPostfix);
   virtual int _ProcessRequest();
 
 public:

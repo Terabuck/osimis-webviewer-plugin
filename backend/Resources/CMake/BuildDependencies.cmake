@@ -1,5 +1,5 @@
-## This configure and build all dependencies (including some copied orthanc files)
-## Note that the include_directories command affects and is meant for every targets (including those outside of this .cmake file)
+# This configure and build all dependencies (including some copied orthanc files)
+# Note that the include_directories command affects and is meant for every targets (including those outside of this .cmake file)
 
 ## Build dependencies
 

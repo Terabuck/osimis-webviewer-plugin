@@ -121,9 +121,9 @@
         request.setHeaders(that.wvConfig.httpRequestHeaders);
         request.setCache(false);
         
-        request.post(that.wvConfig.orthancApiURL + '/osimis-viewer/custom-command', image.id.split(":")[0])
+        request.post(that.wvConfig.orthancApiURL + '/osimis-viewer/custom-command/' + image.id.split(":")[0], "")
           .then(function(response) {
-            console.log("custom-command done");
+            console.log("custom-command executed");
           })
 
       });

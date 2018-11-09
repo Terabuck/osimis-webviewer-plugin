@@ -23,6 +23,65 @@ CustomCommandController::CustomCommandController(OrthancPluginRestOutput* respon
 
 }
 
+int CustomCommandController::_ParseURLPostFix(const std::string& urlPostfix) {
+  // Retrieve context so we can use orthanc's logger.
+  OrthancPluginContext* context = OrthancContextManager::Get();
+
+  try {
+    // /osimis-viewer/custom-command/<instance_uid>
+    boost::regex regexp("^([^/]+)$");
+
+    // Parse URL
+    boost::cmatch matches;
+    if (!boost::regex_match(urlPostfix.c_str(), matches, regexp)) {
+      // Return 404 error on badly formatted URL - @todo use ErrorCode_UriSyntax instead
+      return this->_AnswerError(404);
+    }
+    else {
+      // Store seriesId
+      this->instanceId_ = matches[1];
+
+      return 200;
+    }
+  }
+  catch (const Orthanc::OrthancException& exc) {
+    // Log detailed Orthanc error.
+    std::string message("(CustomCommandController) Orthanc::OrthancException during URL parsing ");
+    message += boost::lexical_cast<std::string>(exc.GetErrorCode());
+    message += "/";
+    message += boost::lexical_cast<std::string>(exc.GetHttpStatus());
+    message += " ";
+    message += exc.What();
+    OrthancPluginLogError(context, message.c_str());
+
+    return this->_AnswerError(exc.GetHttpStatus());
+  }
+  catch (const std::exception& exc) {
+    // Log detailed std error.
+    std::string message("(CustomCommandController) std::exception during URL parsing ");
+    message += exc.what();
+    OrthancPluginLogError(context, message.c_str());
+
+    return this->_AnswerError(500);
+  }
+  catch (const std::string& exc) {
+    // Log string error (shouldn't happen).
+    std::string message("(CustomCommandController) std::string during URL parsing ");
+    message += exc;
+    OrthancPluginLogError(context, message.c_str());
+
+    return this->_AnswerError(500);
+  }
+  catch (...) {
+    // Log unknown error (shouldn't happen).
+    std::string message("(CustomCommandController) Unknown Exception during URL parsing");
+    OrthancPluginLogError(context, message.c_str());
+
+    return this->_AnswerError(500);
+  }
+}
+
+
 int CustomCommandController::_ProcessRequest()
 {
   // Retrieve context so we can use orthanc's logger.
@@ -33,8 +92,7 @@ int CustomCommandController::_ProcessRequest()
       if (this->request_->method == OrthancPluginHttpMethod_Post)
       {
           std::string url = "/tools/execute-script";
-          std::string instanceId = std::string(this->request_->body, this->request_->bodySize);
-          std::string luaCode = "local instanceId = " + instanceId + "\n" + _config->customCommandLuaCode;
+          std::string luaCode = "local instanceId = \"" + instanceId_ + "\" \n" + _config->customCommandLuaCode;
           ScopedOrthancPluginMemoryBuffer buffer(context);
 
           // actually, we don't check the success or not, there's nothing to do anyway !
