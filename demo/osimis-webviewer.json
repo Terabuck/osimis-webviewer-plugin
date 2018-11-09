@@ -9,6 +9,8 @@
         "ShortTermCacheEnabled" : true,
         "ShortTermCacheDebugLogsEnabled" : true,
         "ShortTermCachePrefetchOnInstanceStored" : true,
-        "KeyImageCaptureEnabled" : true
+        "KeyImageCaptureEnabled" : true,
+        "CombinedToolEnabled" : true,
+        "DefaultTool" : "combinedTool"
     }
 }
