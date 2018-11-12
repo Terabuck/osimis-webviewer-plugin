@@ -17,9 +17,9 @@
       this._wvInstanceManager = wvInstanceManager;
       this._wvSeriesManager = wvSeriesManager;
       this._enabled = true;
-      this._disabledDuringRedraw = false;
       this._lastUpdatedSeries = null;
       this._seriesInfosByInstanceId = {};
+      this.onReferenceLineStatusUpdated = new osimis.Listener();
     }
 
   ReferenceLines.prototype.enable = function(enabled) {
@@ -38,7 +38,8 @@
       } else {
         console.log("ReferenceLines is now disabled");
       }
-  }
+      this.triggerOnReferenceLineStatusUpdated();
+    }
 
   ReferenceLines.prototype.toggle = function() {
       this.enable(!this._enabled);
@@ -127,6 +128,10 @@
     var that = this;
     var series = that._seriesInfosByInstanceId[instanceId];
 
+    if (series === undefined) {
+      return;
+    }
+
     if (this._lastUpdatedSeries != null && this._lastUpdatedSeries.id == series.id) {
       // console.log("not rendering reference lines on the currently selected series ", series.id);
       return;
@@ -199,8 +204,42 @@
         });
 
     });
+
+    this.triggerOnReferenceLineStatusUpdated();
   }
 
+  ReferenceLines.prototype.triggerOnReferenceLineStatusUpdated = function() { // mainly used by the Liveshare to synchronize state
+    
+    var status = {
+      enabled: this._enabled,
+      lastUpdatedSeriesId: (this._lastUpdatedSeries != null ? this._lastUpdatedSeries.id : null),
+      seriesIdByInstanceId: {}
+    };
+    var that = this;
+    Object.keys(this._seriesInfosByInstanceId).forEach(function(instanceId) {
+      status.seriesIdByInstanceId[instanceId] = that._seriesInfosByInstanceId[instanceId].id;
+    })
+    this.onReferenceLineStatusUpdated.trigger(status);
+  }
+
+  ReferenceLines.prototype.restoreReferenceLineStatus = function(status) { // mainly used by the Liveshare to synchronize state
+    if (Object.keys(status).length >= 3) {  // wait until the status has been initialized 
+      this._enabled = status.enabled;
+      this._lastUpdatedSeriesId = status.lastUpdatedSeries;  
+      
+      var that = this;
+      Object.keys(status.seriesIdByInstanceId).forEach(function(instanceId) {
+        that._wvSeriesManager.get(status.seriesIdByInstanceId[instanceId]).then(function(series) {
+          that._seriesInfosByInstanceId[instanceId] = series;
+        })
+      })
+
+      // update all reference lines
+      Object.keys(this._seriesInfosByInstanceId).forEach(function(instanceId) {
+        that.update(that._seriesInfosByInstanceId[instanceId], status.lastUpdatedSeriesId == that._seriesInfosByInstanceId[instanceId].id);
+      })
+    }
+  }
   angular
       .module('webviewer')
       .factory('wvReferenceLines', wvReferenceLines);
