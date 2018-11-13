@@ -147,7 +147,7 @@
     @extend .wvButton;
 
     // Prevent multi line buttons.
-    max-height: 2.8rem;
+    max-height: calc(2.8rem - 2px);
     max-width: 100%;
     overflow: hidden;
 
