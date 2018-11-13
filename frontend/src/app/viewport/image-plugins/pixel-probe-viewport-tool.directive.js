@@ -42,8 +42,8 @@
         }
 
         /* @ngInject */
-        function Controller() {
-            WvBaseTool.call(this, 'probe', 'probeTouch', true);
+        function Controller(wvPanViewportTool, wvZoomViewportTool, $scope) {
+            WvBaseTool.call(this, 'probe', 'probeTouch', true, wvPanViewportTool, wvZoomViewportTool, $scope);
         }
         Controller.prototype = Object.create(WvBaseTool.prototype)
         Controller.prototype.constructor = Controller;

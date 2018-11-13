@@ -42,8 +42,8 @@
         }
 
         /* @ngInject */
-        function Controller() {
-            WvBaseTool.call(this, 'zoom', 'zoomTouchPinch'); // this somehow enables the zoom tool of cornerstone
+        function Controller(wvPanViewportTool, wvZoomViewportTool, $scope) {
+            WvBaseTool.call(this, 'zoom', 'zoomTouchDrag', false, wvPanViewportTool, wvZoomViewportTool, $scope); //'zoomTouchPinch'); // this somehow enables the zoom tool of cornerstone
         }
         Controller.prototype = Object.create(WvBaseTool.prototype)
         Controller.prototype.constructor = Controller;

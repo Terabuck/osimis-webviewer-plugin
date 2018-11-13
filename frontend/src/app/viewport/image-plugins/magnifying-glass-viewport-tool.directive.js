@@ -65,8 +65,8 @@
         }
 
         /* @ngInject */
-        function MagnifyingGlassCtrl() {
-            WvBaseTool.call(this, 'magnify', 'magnifyTouchDrag');
+        function MagnifyingGlassCtrl(wvPanViewportTool, wvZoomViewportTool, $scope) {
+            WvBaseTool.call(this, 'magnify', 'magnifyTouchDrag', false, wvPanViewportTool, wvZoomViewportTool, $scope);
 
             // BaseTool class as been made for annotation. This is not one.
             // We overide this method so the glass is not shown once toggled

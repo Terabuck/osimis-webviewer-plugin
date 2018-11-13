@@ -231,7 +231,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   videoDisplayEnabled = OrthancPlugins::GetBoolValue(wvConfig, "VideoDisplayEnabled", true);
   annotationStorageEnabled = OrthancPlugins::GetBoolValue(wvConfig, "AnnotationStorageEnabled", false);
   keyImageCaptureEnabled = OrthancPlugins::GetBoolValue(wvConfig, "KeyImageCaptureEnabled", false);
-  combinedToolEnabled = OrthancPlugins::GetBoolValue(wvConfig, "CombinedToolEnabled", true);
+  combinedToolEnabled = OrthancPlugins::GetBoolValue(wvConfig, "CombinedToolEnabled", false);
   printEnabled = OrthancPlugins::GetBoolValue(wvConfig, "PrintEnabled", true);
   openAllPatientStudies = OrthancPlugins::GetBoolValue(wvConfig, "OpenAllPatientStudies", true);
   showStudyInformationBreadcrumb = OrthancPlugins::GetBoolValue(wvConfig, "ShowStudyInformationBreadcrumb", false);
@@ -246,7 +246,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   showNoReportIconInSeriesList = OrthancPlugins::GetBoolValue(wvConfig, "ShowNoReportIconInSeriesList", false);
   toolbarLayoutMode = OrthancPlugins::GetStringValue(wvConfig, "ToolbarLayoutMode", "flat");
   toolbarButtonSize = OrthancPlugins::GetStringValue(wvConfig, "ToolbarButtonSize", "small");
-  defaultSelectedTool = OrthancPlugins::GetStringValue(wvConfig, "DefaultSelectedTool", "combinedTool");
+  defaultSelectedTool = OrthancPlugins::GetStringValue(wvConfig, "DefaultSelectedTool", "windowing");
   defaultStudyIslandsDisplayMode = OrthancPlugins::GetStringValue(wvConfig, "DefaultStudyIslandsDisplayMode", "grid");
   defaultLanguage = OrthancPlugins::GetStringValue(wvConfig, "DefaultLanguage", "en");
   customOverlayProviderUrl = OrthancPlugins::GetStringValue(wvConfig, "CustomOverlayProviderUrl", "");  // must be provided as a url relative to orthanc root url (i.e.: "/../customOverlays/")
