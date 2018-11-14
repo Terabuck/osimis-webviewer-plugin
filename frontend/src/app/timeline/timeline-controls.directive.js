@@ -75,5 +75,17 @@
                 return vm.series.currentIndex + 1
             }
         }
+
+        this.goToNextImage = function() {
+            vm.series.goToNextImage();
+            wvSynchronizer.update(vm.series);
+            wvReferenceLines.update(vm.series);
+        }
+
+        this.goToPreviousImage = function() {
+            vm.series.goToPreviousImage();
+            wvSynchronizer.update(vm.series);
+            wvReferenceLines.update(vm.series);
+        }
     }
 })();
