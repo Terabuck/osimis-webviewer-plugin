@@ -23,18 +23,21 @@
 
             if (lastTouchPanningCenter === null){
                 lastTouchPanningCenter = ev.center;
+                // console.log("starting new touch", lastTouchPanningCenter.x, lastTouchPanningCenter.y);
                 return;
             }
-            if (ev.isFinal){
+            
+            _this._hammer.on("panend", function(ev) { // reset when pan is finished
+                // console.log("clearing touch");  
                 maxTouchCountInThisMove = 0;
                 lastTouchPanningCenter = null;
-                return;
-            }
+            })
             
             if (_this._touchCount < maxTouchCountInThisMove) // we are releasing a twoTouch move one finger before the other -> don't apply the one touch action
                 return;
             maxTouchCountInThisMove = Math.max(maxTouchCountInThisMove, _this._touchCount);
 
+            // console.log("touch", ev.center.x, ev.center.y);
             var viewportData = _this._viewport.getViewportData();
             var deltaX, deltaY, scale;
             scale = +viewportData.scale;
@@ -52,6 +55,8 @@
         });
 
         this.destroy = function() {
+            lastTouchPanningCenter = null;
+            maxTouchCountInThisMove = null;
             this._hammer.destroy();
         }
     };

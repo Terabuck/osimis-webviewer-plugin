@@ -411,7 +411,7 @@ if (typeof cornerstoneTools === 'undefined') {
         preventNextPinch = false;
     
     function onTouch(e) {
-        console.log(e.type);
+        // console.log(e.type);
         var element = e.target.parentNode,
             event,
             eventType;
