@@ -21,4 +21,4 @@ docker rm $wvbContainerId
 
 # Build demo docker image
 docker rmi -f osimis/orthanc-wvb-demo:latest-local || true # @todo Use trap to clean image instead
-docker build -t osimis/orthanc-wvb-demo:latest-local .
+docker build --no-cache -t osimis/orthanc-wvb-demo:latest-local .

@@ -3,30 +3,34 @@ next version
 
 => Minimum Orthanc version: 1.3.1 <=
 
-Features:
---------
+New features:
+------------
+
 * Now displaying reference lines to show the intersection of images in different planes
 * Added print support (not supported on Internet Explorer).  The feature can be enabled/disabled through the "PrintEnabled" 
   option (true by default).  Note that, due to conflicts, we had to remove print support for pdf instances.  If you need
   to print pdf instances, download the file and print it from your pdf viewer.
+* Added a "custom command" button whose action can be customized through LuaScript.  This is defined in the configuration file 
+  in "CustomCommandEnabled", ...
+* Added an option to ignore series based on tags values.  This is defined in the configuration file in "SeriesToIgnore".
+
+Improvements:
+------------
 * Whatever the current selected tool, the middle mouse button can be used to pan the image and
   the right mouse button can be used to zoom in the image.
 * The windowing tool is now the default tool (unless specified in the configuration file in "DefaultSelectedTool").  Given the
   new middle and right mouse button functions, you now have the 3 most common tools directly available by default.
 * When displaying multiple studies, the colors of the study island is now repeated around the viewports
-* Added an option to configure the loading of all patient studies or a single studies ("OpenAllPatientStudies" - true by default)
-* Improved support for some US modalities providing Columns/Rows tags as "600\\0" instead of "600"
-* Improved the loading of various quality levels: load lowest-quality only if image is larger than 750x750.
-* Improved detection of Patient Orientation to allow synchronization of series (now accepting 10° max between orientations)
 * Saving some UI state in the browser local storage to re-open the viewer with the same settings (Study island display mode, 
   layout and overlay texts)
+* Added an option to configure the loading of all patient studies or a single study ("OpenAllPatientStudies" - true by default)
+* Improved the loading of various quality levels: load lowest-quality only if image is larger than 750x750.
+* Improved detection of Patient Orientation to allow synchronization of series (now accepting 10° max between orientations)
 * Slightly optimized the loading of series when "InstanceInfoCacheEnabled" is set to "true"
-* Added a "custom command" button whose action can be customized through LuaScript.  This is defined in the configuration file 
-  in "CustomCommandEnabled", ...
-* Added an option to ignore series based on tags values.  This is defined in the configuration file in "SeriesToIgnore".
 
 Fixes:
 -----
+* Improved support for some US modalities providing Columns/Rows tags as "600\\0" instead of "600"
 * Key image captures are now reduced in size to max 1M pixels.  Larger images were not supported on many browsers.
 * WVB-378: Secondary capture images are invalid and can not be pushed to other DICOM modalities
 * WVB-280: YBR - JPEG lossy compressed high quality images are not displayed
