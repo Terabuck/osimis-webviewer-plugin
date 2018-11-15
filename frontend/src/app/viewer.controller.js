@@ -196,7 +196,7 @@
             }
         }).then(function(previousStudy){
             var firstItemTuple = previousStudy.getNextItemId(),
-                paneOptions = {csViewport: null, isSelected: true, studyColor: study.color};
+                paneOptions = {csViewport: null, isSelected: true, studyColor: previousStudy.color};
 
             if(firstItemTuple[1] == "series"){
                 paneOptions.seriesId = firstItemTuple[0];
