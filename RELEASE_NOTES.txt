@@ -49,6 +49,7 @@ Known issues:
 ------------
 * The WebViewer currently does not work on iPhone (Safari and Chrome).
 * CBCT slices might not be displayed in the correct order.  This is fixed by upgrading your Orthanc to version 1.4.2 or later.
+* WVB-383: In the study picker, the studies order is undefined
 
 Version 1.1.1
 ========================
