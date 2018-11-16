@@ -5,13 +5,13 @@
 # @pre Execute `startDocker.sh`
 #
 # @param {string} $1 Tag of the docker image being stopped.
-#                    Default: `osimis/orthanc-webviewer-plugin:latest-local`
+#                    Default: `osimis/orthanc:latest-local`
 
 set -x
 set -e
 
 # $1 Name of the docker image
-dockerImageName=${1:-"osimis/orthanc-webviewer-plugin/demo:latest-local"}
+dockerImageName=${1:-"osimis/orthanc-wvb-demo:latest-local"}
 
 # Stop & remove demo container
 docker stop $(docker ps -a -q --filter ancestor=${dockerImageName}) || true

@@ -11,6 +11,7 @@
 #include <Core/Toolbox.h> // for TokenizeString && StripSpaces
 #include <Core/Images/ImageProcessing.h> // for GetMinMaxValue
 #include <Core/OrthancException.h> // for throws
+#include "ViewerToolbox.h"
 
 namespace
 {
@@ -111,11 +112,11 @@ ImageMetaData::ImageMetaData(const DicomMap& headerTags, const Json::Value& dico
   // set minPixelValue & maxPixelValue
   int bitsStored = boost::lexical_cast<int>(Toolbox::StripSpaces(dicomTags["BitsStored"].asString()));
   minPixelValue = 0; // approximative value
-  maxPixelValue = std::pow(2, bitsStored); // approximative value
+  maxPixelValue = 2 << (bitsStored-1); // approximative value
 
   // set width/height
-  width = boost::lexical_cast<uint32_t>(Toolbox::StripSpaces(dicomTags["Columns"].asString()));
-  height = boost::lexical_cast<uint32_t>(Toolbox::StripSpaces(dicomTags["Rows"].asString()));
+  width = boost::lexical_cast<uint32_t>(Toolbox::StripSpaces(OrthancPlugins::SanitizeTag("Columns", dicomTags["Columns"]).asString()));
+  height = boost::lexical_cast<uint32_t>(Toolbox::StripSpaces(OrthancPlugins::SanitizeTag("Rows", dicomTags["Rows"]).asString()));
 
   // set sizeInBytes
   std::string photometricInterpretation = Toolbox::StripSpaces(dicomTags["PhotometricInterpretation"].asString());
@@ -127,7 +128,7 @@ ImageMetaData::ImageMetaData(const DicomMap& headerTags, const Json::Value& dico
     color = true;
   }
   int bitsAllocated = boost::lexical_cast<int>(Toolbox::StripSpaces(dicomTags["BitsAllocated"].asString())) * (color ? 3 : 1);
-  sizeInBytes = width * height * bitsAllocated;
+  sizeInBytes = width * height * ((bitsAllocated + 7)/8);
 
   // set stretched image (16bit -> 8bit dynamic compression)
   stretched = false;

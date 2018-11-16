@@ -12,5 +12,5 @@
  */
 class IAvailableQualityPolicy {
 public:
-  virtual std::set<ImageQuality> retrieveByTags(const Json::Value& headerTags, const Json::Value& otherTags) = 0;
+  virtual std::set<ImageQuality::EImageQuality> retrieve(const std::string& transferSyntax, const Json::Value& dicomTags) = 0;
 };

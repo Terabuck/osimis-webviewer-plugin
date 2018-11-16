@@ -22,4 +22,5 @@ protected:
   void StoreInstanceInfoInMetadata(const std::string& instanceId, const Json::Value& instanceInfo);
   Json::Value GenerateInstanceInfo(const std::string& instanceId);
   static Json::Value SimplifyInstanceTags(const Json::Value& instanceTags);
+  static Json::Value SanitizeInstanceInfo(const Json::Value& instanceInfo);
 };

@@ -6,7 +6,7 @@
 #include <algorithm>    // std::transform
 #include <boost/algorithm/string/join.hpp>
 #include <boost/bind.hpp>
-#include <boost/lambda/lambda.hpp>
+//#include <boost/lambda/lambda.hpp>
 #include "IImageProcessingPolicy.h"
 
 class CompositePolicy : public IImageProcessingPolicy {

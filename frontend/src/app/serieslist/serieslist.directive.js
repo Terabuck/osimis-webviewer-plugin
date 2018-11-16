@@ -172,7 +172,8 @@
     }
 
     /* @ngInject */
-    function SerieslistVM(wvPaneManager) {
+    function SerieslistVM(wvPaneManager, $window) {
+        this.window = $window;
         // Set initial values.
         this.seriesIds = [];
         this.pdfInstanceIds = [];
@@ -182,6 +183,7 @@
         this.selectedSeriesIds = this.selectedSeriesIds || [];
         this.selectedVideoIds = this.selectedVideoIds || [];
         this.selectedReportIds = this.selectedReportIds || [];
+        this.study = undefined;
 
         this.isActive = function(seriesId){
             return wvPaneManager.isViewportItemDisplayed(seriesId);

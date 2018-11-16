@@ -24,13 +24,15 @@
      */
     function Viewport(
         Promise, cornerstone, 
-        domElement, isDiagnosisViewport
+        domElement, isDiagnosisViewport,
+        wvReferenceLines
     ) {
         // Dependencies
         this._Promise = Promise;
         this._cornerstone = cornerstone;
         this._CornerstoneAnnotationSynchronizer = new osimis.CornerstoneAnnotationSynchronizer();
         this._CornerstoneViewportSynchronizer = new osimis.CornerstoneViewportSynchronizer();
+        this._wvReferenceLines = wvReferenceLines;
 
         // Params
         this._enabledElement = domElement;
@@ -55,7 +57,8 @@
         // Set quality policy
         if (isDiagnosisViewport) {
             this._qualityPolicy = osimis.QualityForDiagnosis;
-        }
+            $(this._enabledElement).on('CornerstoneImageRendered', function(e, eventData) {wvReferenceLines.onImageRendered(e, eventData);});
+          }
         else {
             this._qualityPolicy = osimis.QualityForThumbnail;
         }
@@ -454,12 +457,12 @@
      * @ngdoc method
      * @methodOf osimis.Viewport
      *
-     * @name osimis.Viewport#getViewport
+     * @name osimis.Viewport#getViewportData
      * @return {object} Return cornerstone viewport data (see cornerstone doc).
      * 
      * @description
      */
-    Viewport.prototype.getViewport = function() {
+    Viewport.prototype.getViewportData = function() {
         // Do not use cornerstone#getViewport directly as it copies the viewport 
         // data, into a new object - thus, breaking the osimis' cornerstone 
         // viewport data abstraction. We thus have rewrap it again.
@@ -584,7 +587,10 @@
         viewportData = osimis.CornerstoneViewportWrapper.wrapCornerstoneViewport(
             viewportData,
             baseResolution,
-            baseResolution
+            baseResolution,
+            null,
+            null,
+            null
         );
 
         // Keep original image size if image is smaller than viewport if
@@ -675,7 +681,7 @@
      */
     Viewport.prototype.resizeCanvas = function(newCanvasWidth, newCanvasHeight) {
         var enabledElement = this._enabledElement;
-    
+        //unit = unit || "px";
         // Retrieve previous canvas size
         var oldCanvasWidth = this._canvasWidth;
         var oldCanvasHeight = this._canvasHeight;
@@ -690,25 +696,29 @@
         // based on the canvas' parent element size. For safety, we want to
         // rely on this method's parameters instead.
         var canvas = this._enabledElementObject.canvas;
-        canvas.width = newCanvasWidth;
-        canvas.height = newCanvasHeight;
+        canvas.width = newCanvasWidth; //+ unit;
+        canvas.height = newCanvasHeight; //+ unit;
         canvas.style.width = newCanvasWidth + "px";
         canvas.style.height = newCanvasHeight + "px";
 
         // Scale the image to the new canvas size
+        this.displayImageZone(oldCanvasWidth, oldCanvasHeight);
+        
+        // We expect method's user to call #draw after.
+    };
+
+    Viewport.prototype.displayImageZone = function(oldWidth, oldHeight){
         if (this._viewportData) {
             // Retrieve bounding boxes from old canvas.
             var displayedImageZone = this._viewportData._trackImageZone || this._viewportData._getDisplayedImageZone(
-                oldCanvasWidth,
-                oldCanvasHeight
+                oldWidth,
+                oldHeight
             );
 
             // Fit old bounding boxes into new canvas.
             this._viewportData._displayImageZone(displayedImageZone, this._canvasWidth, this._canvasHeight);
         }
-        
-        // We expect method's user to call #draw after.
-    };
+    }
 
     osimis.Viewport = Viewport;
 

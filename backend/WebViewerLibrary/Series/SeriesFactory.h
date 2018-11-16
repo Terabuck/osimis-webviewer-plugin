@@ -12,9 +12,10 @@ public:
   std::auto_ptr<Series> CreateSeries(const std::string& seriesId,
                                      const Json::Value& slicesShort,
                                      const Json::Value& middleInstanceMetaInfoTags,
-                                     const Json::Value& middleInstancesInfos,
+                                     const Json::Value& middleInstanceInfos,
                                      const Json::Value& instancesInfos,
                                      const Json::Value& studyInfo);
+
 
 private:
   const std::auto_ptr<IAvailableQualityPolicy> _availableQualityPolicy;

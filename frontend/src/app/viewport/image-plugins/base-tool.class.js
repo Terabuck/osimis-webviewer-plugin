@@ -19,9 +19,17 @@
 (function(osimis) {
     'use strict';
 
-    function BaseTool(toolName, toolName2, isAnnotationTool) {
+    function BaseTool(toolName, toolName2, isAnnotationTool, wvPanViewportTool, wvZoomViewportTool, $scope, useDefaultMiddleAndRightButtonBehaviour) {
         this.viewports = [];
 
+        if (useDefaultMiddleAndRightButtonBehaviour === undefined) {
+          useDefaultMiddleAndRightButtonBehaviour = true
+        }
+        this.useDefaultMiddleAndRightButtonBehaviour = useDefaultMiddleAndRightButtonBehaviour;
+        this._hammersForMiddleAndRightButton = {};
+        this.wvPanViewportTool = wvPanViewportTool;
+        this.wvZoomViewportTool = wvZoomViewportTool;
+        this.$scope = $scope;
         this.toolName = toolName;
         this.toolName2 = toolName2; // in case of additional mobile tool.
         this.isActivated = false;
@@ -127,7 +135,7 @@
         cornerstoneTools.touchInput.enable(enabledElement);
 
         if (this.isAnnotationTool) {
-            console.log("deactivating all annotation tools (make the annotation editable but not active)", this.annotationTools);
+            //console.log("deactivating all annotation tools (make the annotation editable but not active)", this.annotationTools);
             this.annotationTools.forEach(function(value){cornerstoneTools[value].deactivate(enabledElement, 1)});
         }
 
@@ -137,7 +145,47 @@
         if (this.toolName2) {
             cornerstoneTools[this.toolName2].activate(enabledElement);
         }
-    };
+
+        if (this.useDefaultMiddleAndRightButtonBehaviour) {
+          cornerstoneTools["zoomTouchPinch"].activate(enabledElement, 1);  // always activate zoomTouchPinch (for all tools)
+          this._hammersForMiddleAndRightButton[viewport] = {};
+          this._hammersForMiddleAndRightButton[viewport]["twoTouchPan"] = new osi.HammerWrapper(enabledElement, 2, viewport, "pan", this.wvWindowingViewportTool, this.wvPanViewportTool);
+
+          // install mouse handler
+          var $enabledElement = $(viewport.getEnabledElement());
+          var that = this;
+
+          $enabledElement.on('mousedown.combinedTool', function(e) {
+              var isTouchEvent = !e.pageX && !e.pageY && !!e.originalEvent.touches;
+              var mouseButton = !isTouchEvent ? e.which : 1;
+              var lastX = !isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX;
+              var lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
+
+              $(document).one('mouseup', function(e) {
+                  $(document).unbind('mousemove.combinedTool');
+              });
+
+              $(document).on('mousemove.combinedTool', function(e) {
+                  // Prevent issues on touchscreens.
+                  e.preventDefault();
+
+                  that.$scope.$apply(function() {  // @todo necessary ?
+                      var deltaX = (!isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX) - lastX;
+                      var deltaY = (!isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY) - lastY;
+                      lastX = !isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX;
+                      lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
+
+                      if (mouseButton === 2) { // middle-click + move
+                        that.wvPanViewportTool.applyPanToViewport(viewport, deltaX, deltaY);
+                      }
+                      else if (mouseButton === 3) { // right-click + move
+                        that.wvZoomViewportTool.applyZoomToViewport(viewport, deltaY);
+                      }
+                  });
+              });
+          });
+        }
+      };
 
     /**
      * @ngdoc method
@@ -160,7 +208,7 @@
         cornerstoneTools.touchInput.disable(enabledElement);
 
         if (this.isAnnotationTool) {
-            console.log("enabling all annotation tools (display the annotations but make them readonly)", this.annotationTools);
+            // console.log("enabling all annotation tools (display the annotations but make them readonly)", this.annotationTools);
             this.annotationTools.forEach(function(value){cornerstoneTools[value].enable(enabledElement, 1)});
         }
 
@@ -170,6 +218,21 @@
         if (this.toolName2) {
             cornerstoneTools[this.toolName2].enable(enabledElement);
         }
+
+        if (this.useDefaultMiddleAndRightButtonBehaviour) {
+          cornerstoneTools["zoomTouchPinch"].enable(enabledElement, 1);  // always activate zoomTouchPinch (for all tools)
+
+          // Remove touch handlers
+          for (var action in this._hammersForMiddleAndRightButton[viewport]) {
+            this._hammersForMiddleAndRightButton[viewport][action].destroy();    
+          }
+          delete this._hammersForMiddleAndRightButton[viewport];
+
+          // Remove mouse handlers
+          var $enabledElement = $(viewport.getEnabledElement());
+          $enabledElement.off('mousedown.combinedTool');
+        }
+      
     };
 
     /**

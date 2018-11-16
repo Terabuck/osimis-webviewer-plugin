@@ -33,6 +33,7 @@ scripts/ci/.env
 npm-debug.log
 /build-*/
 *.orig
+.vscode/
 
 # CI build side files
 build/

@@ -52,8 +52,8 @@
         }
 
         /* @ngInject */
-        function Controller() {
-            WvBaseTool.call(this, 'arrowAnnotate', 'arrowAnnotateTouch', true);
+        function Controller(wvPanViewportTool, wvZoomViewportTool, $scope) {
+            WvBaseTool.call(this, 'arrowAnnotate', 'arrowAnnotateTouch', true, wvPanViewportTool, wvZoomViewportTool, $scope);
         }
         Controller.prototype = Object.create(WvBaseTool.prototype)
         Controller.prototype.constructor = Controller;

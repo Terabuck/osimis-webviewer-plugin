@@ -25,6 +25,7 @@
 #include "Image/ImageRepository.h"
 #include "Image/ImageController.h"
 #include "Language/LanguageController.h"
+#include "CustomCommand/CustomCommandController.h"
 #include "Annotation/AnnotationRepository.h"
 #include "Config/ConfigController.h"
 #include "Config/WebViewerConfiguration.h"
@@ -104,7 +105,9 @@ void AbstractWebViewer::_serveBackEnd()
   // Inject config within ConfigController (we can't do it without static method
   // since Orthanc API doesn't allow us to pass attributes when processing REST request)
   ConfigController::setConfig(_config.get());
-  
+  CustomCommandController::setConfig(_config.get());
+  SeriesController::setConfig(_config.get());
+
   // Register routes & controllers
   // Note: if you add some routes here, don't forget to add them in the authorization plugin
   RegisterRoute<ImageController>("/osimis-viewer/images/");
@@ -112,8 +115,7 @@ void AbstractWebViewer::_serveBackEnd()
   RegisterRoute<ConfigController>("/osimis-viewer/config.js");
   RegisterRoute<StudyController>("/osimis-viewer/studies/");
   RegisterRoute<LanguageController>("/osimis-viewer/languages/");
-
-  // OrthancPluginRegisterRestCallbackNoLock(_context, "/osimis-viewer/is-stable-series/(.*)", IsStableSeries);
+  RegisterRoute<CustomCommandController>("/osimis-viewer/custom-command/");
 }
 
 AbstractWebViewer::AbstractWebViewer(OrthancPluginContext* context)
@@ -130,7 +132,7 @@ AbstractWebViewer::AbstractWebViewer(OrthancPluginContext* context)
   _dicomRepository.reset(new DicomRepository);
   _imageRepository.reset(new ImageRepository(_dicomRepository.get(), _cache.get()));
   _instanceRepository.reset(new InstanceRepository(_context));
-  _seriesRepository.reset(new SeriesRepository(_dicomRepository.get(), _instanceRepository.get()));
+  _seriesRepository.reset(new SeriesRepository(_context, _dicomRepository.get(), _instanceRepository.get()));
   _annotationRepository.reset(new AnnotationRepository);
 
   // Inject repositories within controllers (we can't do it without static method
@@ -197,6 +199,7 @@ int32_t AbstractWebViewer::start()
   }
 
   _instanceRepository->EnableCachingInMetadata(_config->instanceInfoCacheEnabled);
+  _seriesRepository->EnableCachingInMetadata(_config->instanceInfoCacheEnabled);
 
   if (_config->keyImageCaptureEnabled) {
     // register the OsimisNote tag

@@ -10,7 +10,7 @@
         <div ng-switch-when="button" ng-switch="groupOrButton.tool" class="inline-object">
             <wv-toolbox-button-generator wv-button="groupOrButton"></wv-toolbox-button-generator>
         </div>
-        <div ng-switch-when="group" class="inline-object" ng-class="{'mh10': vm.layoutMode == 'flat'}">
+        <div ng-switch-when="group" class="inline-object" ng-class="{'mh10': vm.layoutMode == 'flat' && vm.toolbarPosition == 'top'}">
             <wv-toolbox-group-generator wv-group="groupOrButton"></wv-toolbox-group-generator>
         </div>
     </div>

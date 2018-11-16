@@ -12,7 +12,7 @@
      */
 
     /* @ngInject */
-    function wvKeyboardShortcutEventManager($rootScope, wvConfig, wvStudyManager, wvPaneManager, wvSynchronizer, wvSeriesPlayer, wvViewerController){
+    function wvKeyboardShortcutEventManager($rootScope, wvConfig, wvStudyManager, wvPaneManager, wvSynchronizer, wvReferenceLines, wvSeriesPlayer, wvViewerController){
         this.previousSynchroStatus = undefined;
 
         keyboardJS.setContext('viewerShortcut');
@@ -33,6 +33,8 @@
             }
 
             bindKey('shift', handlers.enterTemporaryToggleSynchro, handlers.exitTemporaryToggleSynchro, true);
+            // bindKey('cmd + p', window.print);
+            // bindKey('command + p', window.print);
         } else {
             console.log("keyboard shortcuts are disabled");
         }
@@ -93,6 +95,17 @@
             handlers.disableSynchro = function() {
                 wvSynchronizer.enable(false);
             };
+
+            handlers.toggleReferenceLines = function() {
+                wvReferenceLines.toggle();
+            };
+            handlers.enableReferenceLines = function() {
+                wvReferenceLines.enable(true);
+            };
+            handlers.disableReferenceLines = function() {
+                wvReferenceLines.enable(false);
+            };
+
             handlers.enterTemporaryToggleSynchro = function() {
                 if (this_.previousSynchroStatus === undefined) {
                     this_.previousSynchroStatus = wvSynchronizer.isEnabled();
@@ -151,12 +164,14 @@
                 var selectedPane = wvPaneManager.getSelectedPane();
                 selectedPane.series.goToPreviousImage(true);
                 wvSynchronizer.update(selectedPane.series);
+                wvReferenceLines.update(selectedPane.series);
             };
 
             handlers.nextImage = function() {
                 var selectedPane = wvPaneManager.getSelectedPane();
                 selectedPane.series.goToNextImage(true);
                 wvSynchronizer.update(selectedPane.series);
+                wvReferenceLines.update(selectedPane.series);
             };
 
             handlers.rotateLeft = function() {
@@ -180,16 +195,16 @@
             };
 
             handlers.setLayout1x1 = function() {
-                wvPaneManager.setLayout(1, 1);
+                wvViewerController.setLayout(1, 1);
             };
             handlers.setLayout1x2 = function() {
-                wvPaneManager.setLayout(1, 2);
+                wvViewerController.setLayout(1, 2);
             };
             handlers.setLayout2x1 = function() {
-                wvPaneManager.setLayout(2, 1);
+                wvViewerController.setLayout(2, 1);
             };
             handlers.setLayout2x2 = function() {
-                wvPaneManager.setLayout(2, 2);
+                wvViewerController.setLayout(2, 2);
             };
 
             handlers.selectNextPane = function() {
@@ -218,7 +233,7 @@
                 previousPaneWithContent.getStudy().then(function(study){
                     var currentItemId = previousPaneWithContent.seriesId || previousPaneWithContent.videoId || previousPaneWithContent.reportId,
                         nextItemTuple = study.getNextItemId(currentItemId),
-                        paneOptions = {csViewport: null, isSelected: true};
+                        paneOptions = {csViewport: null, isSelected: true, studyColor: study.color};
 
                     if(nextItemTuple[1] == "series"){
                         paneOptions.seriesId = nextItemTuple[0];
@@ -228,7 +243,7 @@
                         paneOptions.reportId = nextItemTuple[0];
                     }
                     if(nextItemTuple[0] !== currentItemId){
-                        wvPaneManager.setPane(selectedPane.x, selectedPane.y, paneOptions)
+                      wvViewerController.setPane(selectedPane.x, selectedPane.y, paneOptions)
                     }
                 });
             };
@@ -308,6 +323,9 @@
             handlers.applyConfigWindowingPreset5 = function() {
                 applyConfigWindowingPreset(4);
             };
+            handlers.print = function(){
+                window.print();
+            }
 
             return handlers;
         }

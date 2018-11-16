@@ -131,7 +131,7 @@
         .directive('wvWebviewer', wvWebviewer);
 
     /* @ngInject */
-    function wvWebviewer($rootScope, $timeout, wvStudyManager, wvAnnotationManager, wvSeriesManager, wvPaneManager, wvWindowingViewportTool, wvSynchronizer, wvViewerController, wvConfig) {
+    function wvWebviewer($rootScope, $timeout, $translate, wvStudyManager, wvAnnotationManager, wvSeriesManager, wvPaneManager, wvWindowingViewportTool, wvSynchronizer, wvReferenceLines, wvViewerController, wvConfig) {
         var directive = {
             bindToController: true,
             controller: Controller,
@@ -160,8 +160,6 @@
                 videoDisplayEnabled: '=?wvVideoDisplayEnabled',
                 keyImageCaptureEnabled: '=?wvKeyImageCaptureEnabled',
                 combinedToolEnabled: '=?wvCombinedToolEnabled',
-                toggleOverlayTextButtonEnabled: '=?wvToggleOverlayTextButtonEnabled',
-                toggleOverlayIconsButtonEnabled: '=?wvToggleOverlayIconsButtonEnabled',
                 showNoReportIconInSeriesList: '=?wvShowNoReportIconInSeriesList',
                 reduceTimelineHeightOnSingleFrameSeries: '=?wvReduceTimelineHeightOnSingleFrameSeries',
                 buttonsSize: '=?wvButtonsSize',  // small | large
@@ -235,14 +233,15 @@
             vm.toolbarEnabled = typeof vm.toolbarEnabled !== 'undefined' ? vm.toolbarEnabled : true;
             vm.toolbarPosition = typeof vm.toolbarPosition !== 'undefined' ? vm.toolbarPosition : 'top';
             vm.buttonsSize = typeof vm.buttonsSize !== 'undefined' ? vm.buttonsSize : 'small';
+            vm.customCommandIconLabel = typeof vm.customCommandIconLabel !== 'undefined' ? vm.customCommandIconLabel : 'custom command';
+            vm.customCommandIconClass = typeof vm.customCommandIconClass !== 'undefined' ? vm.customCommandIconClass : 'fas fa-exclamation';
             vm.serieslistEnabled = typeof vm.serieslistEnabled !== 'undefined' ? vm.serieslistEnabled : true;
             vm.studyinformationEnabled = typeof vm.studyinformationEnabled !== 'undefined' ? vm.studyinformationEnabled : true;
             vm.leftHandlesEnabled = typeof vm.leftHandlesEnabled !== 'undefined' ? vm.leftHandlesEnabled : true;
             vm.noticeEnabled = typeof vm.noticeEnabled !== 'undefined' ? vm.noticeEnabled : false;
             vm.noticeText = typeof vm.noticeText !== 'undefined' ? vm.noticeText : undefined;
             vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;
-            vm.isOverlayTextVisible = true;
-            vm.isOverlayIconsVisible = true;
+            vm.wvViewerController = wvViewerController;
             vm.tools = typeof vm.tools !== 'undefined' ? vm.tools : {
                 windowing: false,
                 zoom: false,
@@ -259,8 +258,8 @@
                 ellipticalRoi: false,
                 rectangleRoi: false,
                 layout: {
-                    x: 1,
-                    y: 1
+                    x: vm.wvViewerController.getLayout().x,
+                    y: vm.wvViewerController.getLayout().y
                 },
                 play: false,
                 overlay: true,
@@ -270,6 +269,7 @@
                 rotateRight: false,
                 arrowAnnotate: false,
                 toggleSynchro: false,
+                toggleReferenceLines: false,
                 nextSeries: false,
                 previousSeries: false
             };
@@ -280,11 +280,23 @@
             if (vm.combinedToolEnabled) { // activate}
                 vm.tools.combinedTool = false;
             }
-            if (vm.toggleOverlayTextButtonEnabled) { // activate}
+            if (__webViewerConfig.printEnabled) { // activate}
+                if (wvConfig.browser.browser.name == "IE") {
+                    console.log("Internet Explorer does not support printing -> this feature will be disabled");
+                } else {
+                    vm.tools.print = false;
+                }
+            }
+            if (__webViewerConfig.toggleOverlayTextButtonEnabled) { // activate}
                 vm.tools.toggleOverlayText = false;
             }
-            if (vm.toggleOverlayIconsButtonEnabled) { // activate}
+            if (__webViewerConfig.toggleOverlayIconsButtonEnabled) { // activate}
                 vm.tools.toggleOverlayIcons = false;
+            }
+            if (__webViewerConfig.customCommandEnabled) { // activate
+              vm.tools.customCommand = false;
+              vm.customCommandIconLabel = __webViewerConfig.customCommandIconLabel;
+              vm.customCommandIconClass = __webViewerConfig.customCommandIconClass;
             }
 
             console.log('default tool: ', vm.toolbarDefaultTool)
@@ -327,31 +339,37 @@
                             {type: "button", tool: "arrowAnnotate"},
                         ]
                     },
+                    {type: "button", tool: "print"},
                     {type: "button", tool: "keyImageCapture"},
                     {type: "button", tool: "toggleSynchro"},
+                    {type: "button", tool: "toggleReferenceLines"},
                     // Optional buttons to explicitely activate
                     // {type: "button", tool: "previousSeries"},
                     // {type: "button", tool: "nextSeries"},
                     {type: "button", tool: "toggleOverlayText"},
                     {type: "button", tool: "toggleOverlayIcons"},
+                    {type: "button", tool: "customCommand"},
                 ]
             }
+            vm.viewports = {};
             vm.pickableStudyIds = typeof vm.pickableStudyIds !== 'undefined' ? vm.pickableStudyIds : [];
             vm.selectedStudyIds = typeof vm.selectedStudyIds !== 'undefined' ? vm.selectedStudyIds : [];
             vm.studyDownloadEnabled = typeof vm.studyDownloadEnabled !== 'undefined' ? vm.studyDownloadEnabled : false;
             vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
             vm.keyImageCaptureEnabled = typeof vm.keyImageCaptureEnabled !== 'undefined' ? vm.keyImageCaptureEnabled : false;
             vm.combinedToolEnabled = typeof vm.combinedToolEnabled !== 'undefined' ? vm.combinedToolEnabled : false;
-            vm.toggleOverlayTextButtonEnabled = typeof vm.toggleOverlayTextButtonEnabled !== 'undefined' ? vm.toggleOverlayTextButtonEnabled : false;
-            vm.toggleOverlayIconsButtonEnabled = typeof vm.toggleOverlayIconsButtonEnabled !== 'undefined' ? vm.toggleOverlayIconsButtonEnabled : false;
-            vm.studyIslandsDisplayMode = typeof vm.studyIslandsDisplayMode !== 'undefined' ? vm.studyIslandsDisplayMode : "grid";
+            vm.studyIslandsDisplayMode = vm.wvViewerController.getStudyIslandDisplayMode(__webViewerConfig.defaultStudyIslandsDisplayMode || "grid");
             vm.paneManager = wvPaneManager;
             vm.synchronizer = wvSynchronizer;
+            vm.referenceLines = wvReferenceLines;
             vm.wvWindowingViewportTool = wvWindowingViewportTool;
 
-            vm.wvViewerController = wvViewerController;
-            vm.wvViewerController.setOverlayTextVisible(__webViewerConfig.displayOverlayText);
-            vm.wvViewerController.setOverlayIconsVisible(__webViewerConfig.displayOverlayIcons);
+            if (!__webViewerConfig.toggleOverlayIconsButtonEnabled) {
+                vm.wvViewerController.setOverlayIconsVisible(__webViewerConfig.displayOverlayIcons);
+            }
+            if (!__webViewerConfig.toggleOverlayTextButtonEnabled) {
+                vm.wvViewerController.setOverlayTextVisible(__webViewerConfig.displayOverlayText);
+            }
             vm.wvViewerController.setSelectedStudyIds(vm.selectedStudyIds);
 
             // Selection-related
@@ -510,6 +528,9 @@
                 case 'toggleSynchro':
                     vm.synchronizer.enable(!vm.synchronizer.isEnabled());
                     break;
+                case 'toggleReferenceLines':
+                    vm.referenceLines.enable(!vm.referenceLines.isEnabled());
+                    break;
                 case 'toggleOverlayText':
                     vm.wvViewerController.toggleOverlayText();
                     break;
@@ -521,6 +542,12 @@
                     break;
                 case 'nextSeries':
                     vm.wvViewerController.nextSeries();
+                    break;
+                case 'print':
+                    window.print();
+                    break;
+                case 'customCommand':
+                    vm.wvViewerController.executeCustomCommand();
                     break;
                 default:
                     throw new Error('Unknown toolbar action.');
@@ -545,14 +572,14 @@
             // Keep pane layout model in sync.
             scope.$watch('vm.tools.layout', function(layout) {
                 // Update panes' layout.
-                wvPaneManager.setLayout(layout.x, layout.y);
+                vm.wvViewerController.setLayout(layout.x, layout.y);
             }, true);
             vm.onItemDroppedToPane = function(x, y, config) {
                 // Set dropped pane as selected
                 config.isSelected = true;
 
                 // Change pane's configuration.
-                wvPaneManager.setPane(x, y, config);
+                wvViewerController.setPane(x, y, config);
             };
 
             // Enable/Disable annotation storage/retrieval from backend
@@ -682,7 +709,7 @@
                     wvStudyManager.get(newValues[0]).then(function(firstStudy){
                         var firstPane = wvPaneManager.getPane(0, 0);
                         if(firstStudy && firstPane.isEmpty()){
-                            wvPaneManager.setPane(0, 0, {seriesId: firstStudy.series[0], isSelected: true})
+                          wvViewerController.setPane(0, 0, {seriesId: firstStudy.series[0], isSelected: true, studyColor: firstStudy.color})
                         };
                     });
                 }
@@ -738,9 +765,11 @@
                 }
             });
 
-            // when the studyIslandsDisplayMode the layout may changed and so some directive may need
-            // to recalculate their dimentions, so we need to trigger a "window change" event.
-            scope.$watch('vm.studyIslandsDisplayMode', function(){
+            // when the studyIslandsDisplayMode changes, the layout may change and so some directive may need
+            // to recalculate their dimensions, so we need to trigger a "window change" event.
+            scope.$watch('vm.studyIslandsDisplayMode', function(newValue, oldValue){
+                vm.wvViewerController.saveStudyIslandDisplayMode(newValue);
+                window.localStorage.setItem("studyIslandsDisplayMode", newValue);
                 asap(function(){
                     $(window).trigger("resize");
                 });
@@ -753,12 +782,144 @@
                     $(window).trigger("resize");
                 });
             });
+
+            console.log('registering media change events');
+
+            function beforePrint(event){
+                console.log('beforePrint');
+                var $body = $('body');
+                $body.addClass("print");
+
+                // because firefox does not support/executes codes after the cloned document as been rendered
+                // https://bugzilla.mozilla.org/show_bug.cgi?format=default&id=1048317
+                // we cannot calculate using the good body size for the clone document
+                // so we have to hardcode the body width (meaning we can only renders in A4 in firefox);
+                var uaParser = new UAParser();
+                var isFirefox = (uaParser.getBrowser().name === 'Firefox');
+                var isIE = (uaParser.getBrowser().name === 'IE');
+                var isEdge = (uaParser.getBrowser().name === 'Edge');
+                console.log("ua parser", uaParser.getBrowser());
+                if(isFirefox || isIE || isEdge){
+                    $body.css('width', '8.5in');
+                    $body.css('height', '11in');
+                    // console.log('html size', $html.width(), $html.height());
+                }
+
+                if(isIE){
+                    window.alert($translate.instant('GENERAL_PARAGRAPHS.INCOMPATIBLE_PRINT_BROWSER'));
+                }
+
+                console.log('body size', $body.width(), $body.height());
+                
+                var panes = vm.paneManager.getAllPanes();
+                var $splitpane = $("wv-splitpane");
+                var splitpaneSize = {width: $splitpane.width(), height: $splitpane.height()}
+                var panesCount = {
+                    x: vm.tools.layout.x,
+                    y: vm.tools.layout.y
+                }
+        
+                for(var i = 0; i < panes.length; i++){
+                    var $pane = panes[i];
+                    var viewport = vm.viewports[$pane.$$hashKey];
+                    var paneSize = {
+                        originalWidth: viewport.getCanvasSize().width,
+                        originalHeight: viewport.getCanvasSize().height,
+                        originalRatio: 0,
+                        paneFinalWidth: splitpaneSize.width / panesCount.x,
+                        paneFinalHeight: splitpaneSize.height / panesCount.y,
+                        paneFinalRatio: 0,
+                        canvasFinalWidth: 0,
+                        canvasFinalHeight: 0,
+                        canvasFinalRatio: 0
+                    };
+                    paneSize.originalRatio = paneSize.originalWidth / paneSize.originalHeight;
+                    paneSize.paneFinalRatio = paneSize.paneFinalWidth / paneSize.paneFinalHeight;
+
+                    if(paneSize.paneFinalRatio > 1){
+                        // If pane width ratio means it's width is larger than it's height
+                        if(paneSize.paneFinalRatio > paneSize.originalRatio){
+                            // the final pane is larger than the original
+                            // So we should fit on the height to recalc the ratio
+                            console.log('case 1');
+                            paneSize.canvasFinalHeight = paneSize.paneFinalHeight;
+                            paneSize.canvasFinalWidth = paneSize.canvasFinalHeight * paneSize.originalRatio; // Then we calc the width according the ratio
+                        } else {
+                            // the final pane is higher than or equal to the original
+                            // So we should fit on the width
+                            console.log('case 2');
+                            paneSize.canvasFinalWidth = paneSize.paneFinalWidth;
+                            paneSize.canvasFinalHeight = paneSize.canvasFinalWidth / paneSize.originalRatio; // Then we calc the width according the ratio
+
+                        }
+                    } else {
+                        // If pane width ratio means it's height is higher than it's height
+                        if(paneSize.paneFinalRatio > paneSize.originalRatio){
+                            // the final pane is larger than the original
+                            // So we should fit on the height to recalc the ratio
+                            console.log('case 3');
+                            paneSize.canvasFinalHeight = paneSize.paneFinalHeight;
+                            paneSize.canvasFinalWidth = paneSize.canvasFinalHeight * paneSize.originalRatio; // Then we calc the width according the ratio
+                        } else {
+                            // the final pane is higher than or equal to the original
+                            // So we should fit on the width
+                            console.log('case 4');
+                            paneSize.canvasFinalWidth = paneSize.paneFinalWidth;
+                            paneSize.canvasFinalHeight = paneSize.canvasFinalWidth / paneSize.originalRatio; // Then we calc the width according the ratio
+
+                        }
+                    }
+                    
+                    paneSize.canvasFinalRatio = paneSize.canvasFinalWidth / paneSize.canvasFinalHeight;
+                    console.log('paneSizes:', paneSize, 'splitpaneSize:', splitpaneSize, "panesCount:", panesCount);
+                    // viewport.resizeCanvas(paneSize.canvasFinalWidth, paneSize.canvasFinalHeight);
+                    // viewport.draw();
+                    var $canvas = $("[data-pane-hashkey='" + $pane.$$hashKey + "']").find('canvas');
+                    $canvas.width(paneSize.canvasFinalWidth);
+                    $canvas.height(paneSize.canvasFinalHeight);
+                }
+            
+            };
+        
+            function afterPrint(){
+                console.log("afterprint");
+                var $body = $('body');
+                // var $html = $('html');
+                $body.removeClass("print");
+                $body.css('width', '100%');
+                $body.css('height', '100%');
+                // $html.css('width', '100%');
+                // $html.css('height', '100%');
+                $(".wv-cornerstone-enabled-image canvas").css('width', 'auto');
+                $(".wv-cornerstone-enabled-image canvas").css('height', 'auto');
+                $(window).trigger('resize');  // to force screen and canvas recalculation
+            }
+        
+            window.addEventListener("beforeprint", function(event){
+                beforePrint(event)
+            })
+            var printMedia = window.matchMedia('print');
+            printMedia.addListener(function(mql) {
+            if(mql.matches) {
+                console.log('webkit equivalent of onbeforeprint');
+                beforePrint();
+            }
+            });
+
+           window.addEventListener("afterprint", function(){
+                afterPrint();
+            });$
+        
+            vm.cancelPrintMode = function(){
+                afterPrint();
+            }
         }
     }
 
     /* @ngInject */
-    function Controller($rootScope, $scope) {
+    function Controller($rootScope, $scope, $window) {
         var vm = this;
+        vm.window = $window;
     }
 
 })();

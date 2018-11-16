@@ -41,7 +41,7 @@
             link: link,
             restrict: 'E',
             scope: {
-                readonly: '=?wvReadonly'
+                readonly: '=?wvReadonly',
             },
             templateUrl: 'app/splitpane/splitpane.directive.html',
             transclude: {
@@ -60,6 +60,7 @@
         var vm = this;
 
         vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;
+
 
         // Trigger $(window).resize() on layout change & set row & columns width
         $scope.$watch('vm.paneManager.layout', _updateLayout, true);

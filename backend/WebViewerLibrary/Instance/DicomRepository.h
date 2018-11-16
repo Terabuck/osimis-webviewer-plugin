@@ -17,6 +17,25 @@
  *
  */
 class DicomRepository : public boost::noncopyable {
+public:
+  class ScopedDecref
+  {
+    DicomRepository* repository_;
+    const std::string& instanceId_;
+  public:
+    ScopedDecref(DicomRepository* repository, const std::string& instanceId)
+      : repository_(repository),
+        instanceId_(instanceId)
+    {
+    }
+
+    ~ScopedDecref()
+    {
+      repository_->decrefDicomFile(instanceId_);
+    }
+  };
+
+private:
 
   struct DicomFile
   {

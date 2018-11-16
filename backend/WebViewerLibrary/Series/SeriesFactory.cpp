@@ -17,16 +17,16 @@ SeriesFactory::SeriesFactory(std::auto_ptr<IAvailableQualityPolicy> availableQua
 std::auto_ptr<Series> SeriesFactory::CreateSeries(const std::string& seriesId,
                                                   const Json::Value& slicesShort,
                                                   const Json::Value& middleInstanceMetaInfoTags,
-                                                  const Json::Value& middleInstancesInfos,
+                                                  const Json::Value& middleInstanceInfos,
                                                   const Json::Value& instancesInfos,
                                                   const Json::Value& studyInfo)
 {
   std::string contentType;
-  std::set<ImageQuality> imageQualities;
+  std::set<ImageQuality::EImageQuality> imageQualities;
 
   // Check the middle instance's type (`[multiframe] image / pdf / image`
   // instance.
-  Json::Value mimeType = middleInstancesInfos["TagsSubset"]["MIMETypeOfEncapsulatedDocument"];
+  Json::Value mimeType = middleInstanceInfos["TagsSubset"]["MIMETypeOfEncapsulatedDocument"];
   std::string transferSyntax = middleInstanceMetaInfoTags["TransferSyntax"].asString();
 
   // If the middle instance is a `pdf` instance, set `pdf` type & keep 
@@ -62,9 +62,9 @@ std::auto_ptr<Series> SeriesFactory::CreateSeries(const std::string& seriesId,
     // Retrieve available image formats. This may throw if dicom instance is
     // in fact not related to image. Therefore, we rely on this exception to 
     // deliver HTTP 500 error on unsupported format.
-    imageQualities = _availableQualityPolicy->retrieveByTags(middleInstanceMetaInfoTags, middleInstancesInfos);
+    imageQualities = _availableQualityPolicy->retrieve(middleInstanceMetaInfoTags["TransferSyntax"].asString(), middleInstanceInfos["TagsSubset"]);
   }
   
   // Create the series
-  return std::auto_ptr<Series>(new Series(seriesId, contentType, middleInstancesInfos, instancesInfos, slicesShort, imageQualities, studyInfo));
+  return std::auto_ptr<Series>(new Series(seriesId, contentType, middleInstanceInfos, instancesInfos, slicesShort, imageQualities, studyInfo));
 }

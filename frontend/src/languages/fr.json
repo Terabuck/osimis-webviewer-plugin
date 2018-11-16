@@ -8,7 +8,8 @@
     "GENERAL_PARAGRAPHS": {
         "DISCLAIMER_PARAGRAPH": "Ne pas utiliser pour un diagnostique.",
         "SCREEN_TOO_SMALL": "Votre écran est trop petit pour utiliser le viewer.",
-        "INCOMPATIBLE_BROWSER": "Votre navigateur n'est pas supporté.  Le comportement du viewer sera altéré.  Utilisez un autre navigateur si vous voulez émettre un diagnostique."
+        "INCOMPATIBLE_BROWSER": "Votre navigateur n'est pas supporté.  Le comportement du viewer sera altéré. Utilisez un autre navigateur si vous voulez émettre un diagnostique.",
+        "INCOMPATIBLE_PRINT_BROWSER": "Votre navigateur ne supporte pas toutes les fonctionalités d’impression. utilisez un autre navigateur si vous souhaitez effectuer une impression."
     },
     "MEDICAL_TERMS": {
         "ENTRIES": "entrées",
@@ -73,6 +74,7 @@
             "PANNING": "déplacer",
             "PIXEL_PROBE": "pixel probe",
             "PREVIOUS_SERIES": "série précédente",
+            "PRINT": "imprimer",
             "MAGNIFYING_GLASS_CONFIG_LEGEND": "cliquer sur le bouton pour utiliser la loupe. Vous pouvez configurez les paramètres.",
             "MAGNIFYING_GLASS_LEVEL": "niveau de grossissement",
             "MAGNIFYING_GLASS_SIZE": "taille du grossissement",

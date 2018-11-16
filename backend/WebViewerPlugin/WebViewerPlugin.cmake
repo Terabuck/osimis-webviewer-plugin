@@ -21,7 +21,6 @@
 # Usage:
 #   (within CMakeLists.txt)
 #   # Set all required variables
-#   set(ORTHANC_DIR ${CMAKE_SOURCE_DIR}/Orthanc)
 #   set(VIEWER_PLUGIN_DIR ${CMAKE_SOURCE_DIR}/WebViewerPlugin)
 #   set(VIEWER_FRONTEND_DIR ${CMAKE_SOURCE_DIR}/../frontend)
 #   set(VIEWER_VERSION_FULL "0.0.0-0-gxxxxxxxx-dirty" CACHE STRING "Product version - should be generated via git describe") # generated via `git describe --tags --long --dirty=-dirty`
@@ -39,16 +38,17 @@ string(TIMESTAMP PRODUCT_VERSION_BUILD_YEAR %Y)
 string(TIMESTAMP PRODUCT_VERSION_BUILD_MONTH %m)
 string(TIMESTAMP PRODUCT_VERSION_BUILD_DAY %d)
 set(PRODUCT_VERSION_SHORT_STRING "${PRODUCT_VERSION_MAJOR}.${PRODUCT_VERSION_MINOR}.${PRODUCT_VERSION_PATCH}")  #used by cmake directly to set .so/.dylib version numbers
-message(${PRODUCT_VERSION_MAJOR})
-message(${PRODUCT_VERSION_MINOR})
-message(${PRODUCT_VERSION_PATCH})
-message(${PRODUCT_VERSION_COMMIT_NUMBER})
-message(${PRODUCT_VERSION_COMMIT_SHA1_STRING})
-message(${PRODUCT_VERSION_SHORT_STRING})
+message("PRODUCT_VERSION_MAJOR: " ${PRODUCT_VERSION_MAJOR})
+message("PRODUCT_VERSION_MINOR: " ${PRODUCT_VERSION_MINOR})
+message("PRODUCT_VERSION_PATCH: " ${PRODUCT_VERSION_PATCH})
+message("PRODUCT_VERSION_MAPRODUCT_VERSION_COMMIT_NUMBERJOR: " ${PRODUCT_VERSION_COMMIT_NUMBER})
+message("PRODUCT_VERSION_COMMIT_SHA1_STRING: " ${PRODUCT_VERSION_COMMIT_SHA1_STRING})
+message("PRODUCT_VERSION_SHORT_STRING: " ${PRODUCT_VERSION_SHORT_STRING})
 
 # Set build parameters
 set(STANDALONE_BUILD ON CACHE BOOL "Standalone build (all the resources are embedded, necessary for releases)")
 set(JS_CLIENT_PATH "${VIEWER_FRONTEND_DIR}/build" CACHE STRING "Path of the front-end build folder")
+file(TO_CMAKE_PATH "${JS_CLIENT_PATH}" JS_CLIENT_PATH)
 
 # Force js download. This is useful to ensure CI always uses the latest 
 # frontend builds, while keeping the progressive build benefits.
@@ -73,7 +73,7 @@ MESSAGE( STATUS "JS_FRONTEND_VERSION:            " ${JS_FRONTEND_VERSION} )
 # Download the frontend lib
 if(NOT ${JS_FRONTEND_VERSION} STREQUAL "LOCAL") 
   # ORTHANC_ROOT & DownloadPackage.cmake are included within BuildDependencies.cmake
-  DownloadPackage(FALSE "http://orthanc.osimis.io/public/osimisWebViewer/${JS_FRONTEND_VERSION}.zip" ${JS_CLIENT_PATH} TRUE)
+  DownloadPackage(no-check "http://orthanc.osimis.io/public/osimisWebViewer/${JS_FRONTEND_VERSION}.zip" ${JS_CLIENT_PATH} TRUE)
 endif()
 
 # Check JS_FRONTEND content exists
@@ -88,11 +88,13 @@ endif()
 # Always embed at least ORTHANC_EXPLORER, even if STANDALONE_BUILD is off?
 if (STANDALONE_BUILD)
 EmbedResources(
+    --no-upcase-check
   ORTHANC_EXPLORER  ${RESOURCES_DIR}/OrthancExplorer.js
   WEB_VIEWER  ${JS_CLIENT_PATH}
   )
 else()
 EmbedResources(
+    --no-upcase-check
   ORTHANC_EXPLORER  ${RESOURCES_DIR}/OrthancExplorer.js
   )
 endif()
@@ -135,11 +137,7 @@ target_compile_definitions(OsimisWebViewer PRIVATE -DPRODUCT_VERSION_COMMIT_SHA1
 target_compile_definitions(OsimisWebViewer PRIVATE -DPRODUCT_VERSION_BUILD_YEAR_STRING=\"${PRODUCT_VERSION_BUILD_YEAR}\")
 target_compile_definitions(OsimisWebViewer PRIVATE -DPRODUCT_VERSION_BUILD_MONTH_STRING=\"${PRODUCT_VERSION_BUILD_MONTH}\")
 target_compile_definitions(OsimisWebViewer PRIVATE -DPRODUCT_VERSION_BUILD_DAY_STRING=\"${PRODUCT_VERSION_BUILD_DAY}\")
-
-# Check & rebuild if embedded resources has changed?
-if (STATIC_BUILD)
-  add_dependencies(OsimisWebViewer EmbeddedResourcesGenerator)
-endif()
+target_compile_definitions(OsimisWebViewer PUBLIC -DORTHANC_DEFAULT_DICOM_ENCODING=Encoding_Latin1)
 
 add_dependencies(OsimisWebViewer WebViewerLibrary)
 target_link_libraries(OsimisWebViewer WebViewerLibrary)

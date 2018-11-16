@@ -1,6 +1,6 @@
 #include "KLVWriter.h"
-#include <boost/asio.hpp> // for cross platform htonl include
 #include <boost/foreach.hpp>
+#include <assert.h>
 
 KLVWriter::KLVWriter()
 {
@@ -70,7 +70,7 @@ std::string KLVWriter::write() {
     {
       // revert endianness
       char valueBigEndian[4] = {0, 0, 0, 0};
-      for (int i=0; i<length; ++i)
+      for (uint32_t i=0; i<length; ++i)
       {
         // use reinterpet_cast on ptr because standard cast change value content (unsigned to signed)
         valueBigEndian[i] += *reinterpret_cast<const char*>(&value[length-1-i]);

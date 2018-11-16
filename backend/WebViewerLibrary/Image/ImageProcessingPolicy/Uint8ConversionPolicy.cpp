@@ -3,6 +3,7 @@
 #include <Core/Images/ImageBuffer.h> // for ImageBuffer
 #include <Core/Images/ImageProcessing.h> // for ImageProcessing::GetMinMaxValue
 #include <Core/OrthancException.h>
+#include <stdexcept>
 #include "../../Logging.h"
 #include "../../BenchmarkHelper.h"
 
@@ -59,7 +60,8 @@ std::auto_ptr<IImageContainer> Uint8ConversionPolicy::Apply(std::auto_ptr<IImage
       inAccessor->GetHeight(),
       true
   ));
-  Orthanc::ImageAccessor outAccessor = outBuffer->GetAccessor();
+  Orthanc::ImageAccessor outAccessor;
+  outBuffer->GetWriteableAccessor(outAccessor);
 
   if (pixelFormat == Orthanc::PixelFormat_Grayscale16)
   {

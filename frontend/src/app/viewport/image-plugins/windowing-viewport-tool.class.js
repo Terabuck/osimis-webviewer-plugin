@@ -39,7 +39,7 @@
         };
 
 	    this.applyWindowingToViewport = function(viewport, deltaX, deltaY, applyToSynchronizedViewports) {
-	        var viewportData = viewport.getViewport();
+	        var viewportData = viewport.getViewportData();
 
 	        // Retrieve image min/max image pixel value and define a
 	        // strength parameter proportional to the dynamic range of the

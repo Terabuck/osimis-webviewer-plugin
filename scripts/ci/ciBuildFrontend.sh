@@ -28,8 +28,8 @@ docker cp $(pwd)/ $JS_BUILDER_CONTAINER_ID:/
 # run
 docker start -a $JS_BUILDER_CONTAINER_ID
 
-# copy the build output folder to the host
-docker cp $JS_BUILDER_CONTAINER_ID:/frontend/build/ $SRC_ROOT/frontend/build/
+# # copy the build output folder to the host
+# docker cp $JS_BUILDER_CONTAINER_ID:/frontend/frontend-build/ $SRC_ROOT/frontend/build/
 
 # copy the zip output folder to the host
 docker cp $JS_BUILDER_CONTAINER_ID:/tmp/output/frontend-build.zip $SRC_ROOT/frontend/

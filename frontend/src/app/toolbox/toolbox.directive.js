@@ -37,6 +37,8 @@
                 buttons: '=wvToolboxButtons', // input + output
                 buttonsOrdering: '=wvToolboxButtonsOrdering',
                 buttonsSize: '=?wvToolboxButtonsSize',  
+                customCommandIconLabel: '=?wvCustomCommandIconLabel',
+                customCommandIconClass: '=?wvCustomCommandIconClass',
                 tool: '=?wvActiveTool', // output (duplicate with buttons as an output
                 onActionClicked: '&?wvOnActionClicked', 
                 windowingPresets: '=wvWindowingPresets',
@@ -111,9 +113,10 @@
     }
 
     /* @ngInject */
-    function toolboxCtrl($element, wvSynchronizer, wvViewerController) {
+    function toolboxCtrl($element, wvSynchronizer, wvReferenceLines, wvViewerController) {
         var _this = this;
         this.wvSynchronizer = wvSynchronizer;
+        this.wvReferenceLines = wvReferenceLines;
         this.wvViewerController = wvViewerController;
 
         // Apply windowing preset to the selected pane.

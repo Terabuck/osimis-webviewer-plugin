@@ -21,7 +21,6 @@
 # Usage:
 #   (within CMakeLists.txt)
 #   # Set all required variables
-#   set(ORTHANC_DIR ${CMAKE_SOURCE_DIR}/Orthanc)
 #   set(VIEWER_TESTS_DIR ${CMAKE_SOURCE_DIR}/WebViewerTests)
 #   # Make sure WebViewerLibrary target is available (see `WebViewerLibrary/WebViewerLibrary.cmake`)
 #   # Build unit tests
@@ -29,7 +28,8 @@
 
 # Create unit test executable
 add_executable(UnitTests
-  ${GTEST_SOURCES}
+  ${GOOGLE_TEST_SOURCES}
+
   ${VIEWER_TESTS_DIR}/UnitTestsMain.cpp
   )
 add_dependencies(UnitTests WebViewerLibrary)

@@ -39,7 +39,7 @@
 
         /* @ngInject */
         function Controller($scope, wvPanViewportTool, wvZoomViewportTool, wvWindowingViewportTool) {
-            WvBaseTool.call(this, 'default');
+            WvBaseTool.call(this, 'default', undefined, false, wvPanViewportTool, wvZoomViewportTool, $scope);
 
             this._activateInputs = function(viewport) {
                 var _this = this;

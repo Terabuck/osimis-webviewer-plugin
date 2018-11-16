@@ -67,7 +67,8 @@
         if (this._trackImageZone && canvasWidth && canvasHeight) {
             this._displayImageZone(this._trackImageZone, canvasWidth, canvasHeight);
         }
-    }
+
+      }
 
     /**
      * @ngdoc method
@@ -542,7 +543,7 @@
      * Return a wrapped cornerstone viewport data objet, managing multiple
      * image resolution. Every input is garanteed to not change.
      */
-    CornerstoneViewportWrapper.wrapCornerstoneViewport = function(cornerstoneViewport, originalImageResolution, currentImageResolution, canvasWidth, canvasHeight, trackedImageZone) {
+    CornerstoneViewportWrapper.wrapCornerstoneViewport = function(cornerstoneViewport, originalImageResolution, currentImageResolution, canvasWidth, canvasHeight, trackedImageZone, enabledElement) {
         // Make sure inputs wont be changed.
         cornerstoneViewport = _.cloneDeep(cornerstoneViewport);
         originalImageResolution = _.cloneDeep(originalImageResolution);
@@ -556,7 +557,8 @@
             cornerstoneViewport,
             canvasWidth,
             canvasHeight,
-            trackedImageZone
+            trackedImageZone,
+            enabledElement
         );
 
         // Return the wrapped object

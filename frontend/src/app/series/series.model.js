@@ -371,8 +371,31 @@
             return this._annotationGroup;
         };
 
+        var crossProduct = function(a, b) {
+            return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+        };
+
+        var dotProduct = function(a, b) {
+            return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+        };
+
+        var getVectorsFromOrientation = function(orientationTag) {
+            var split = orientationTag.split("\\");
+            var x = split.splice(0, 3).map(function(s) {return parseFloat(s);});
+            var y = split.splice(0, 3).map(function(s) {return parseFloat(s);});
+            return {x: x, y: y};
+        };
+
         WvSeries.prototype.isSameOrientationAs = function(otherSeries) {
-            return (this.tags.ImageOrientationPatient == otherSeries.tags.ImageOrientationPatient);
+            // compute the dot products of normals to check they have the same orientations
+            var thisSeriesVectors = getVectorsFromOrientation(this.tags.ImageOrientationPatient);
+            var otherSeriesVectors = getVectorsFromOrientation(otherSeries.tags.ImageOrientationPatient);
+
+            var thisSeriesNormal = crossProduct(thisSeriesVectors.x, thisSeriesVectors.y);
+            var otherSeriesNormal = crossProduct(otherSeriesVectors.x, otherSeriesVectors.y);
+            var dotProductNormals = dotProduct(thisSeriesNormal, otherSeriesNormal);
+
+            return dotProductNormals > 0.984;  // we do accept orientation that are "close" to each other (10° max -> cos(10°) = 0.984)
         };
 
         WvSeries.prototype.isSameFrameOfReference = function(otherSeries) {
@@ -383,7 +406,11 @@
             return this.tags.SliceLocation !== undefined && this.tags.SliceThickness !== undefined;
         };
 
-        WvSeries.prototype.getIndexOfClosestImageFrom = function(otherSliceLocation) {
+        WvSeries.prototype.getImageCount = function() {
+          return this.imageIds.length;
+        };
+
+      WvSeries.prototype.getIndexOfClosestImageFrom = function(otherSliceLocation) {
             var _this = this;
             var imageTagsPromises = this.imageIds.map(function(imageId) {
                 return wvImageManager.get(imageId);

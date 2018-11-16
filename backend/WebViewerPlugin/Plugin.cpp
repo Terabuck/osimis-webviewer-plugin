@@ -18,8 +18,8 @@
  **/
 
 #include <orthanc/OrthancCPlugin.h>
-#include <Core/OrthancException.h>
 #include "WebViewer.h"
+#include "Core/OrthancException.h"
 
 WebViewer* _webViewer;
 
@@ -38,11 +38,11 @@ extern "C"
       OrthancPluginLogError(context, ("Error while initializing the WebViewer plugin: " + std::string(e.What())).c_str());
       return -1;
     }
-    catch (std::runtime_error& e)
-    {
-      OrthancPluginLogError(context, ("Error while initializing the WebViewer plugin: " + std::string(e.what())).c_str());
-      return -2;
-    }
+    // catch (std::runtime_error& e)
+    // {
+    //   OrthancPluginLogError(context, ("Error while initializing the WebViewer plugin: " + std::string(e.what())).c_str());
+    //   return -2;
+    // }
     catch (...)
     {
       OrthancPluginLogError(context, "Unexpected error while initializing the WebViewer plugin");

@@ -18,17 +18,18 @@
             'highlighted': vm.isHighlighted(id)
         }"
         wv-draggable-item="{
-            reportId: id
+            reportId: id,
+            studyColor: vm.study.color
         }"
         ng-click="vm.toggleReportSelection(id)"
 
         bs-tooltip
-        bs-enabled="vm.displayMode !== 'list'"
+        bs-enabled="vm.displayMode !== 'list' && !vm.window.USER_IS_TOUCHING"
         data-title="{{ 'COMPONENTS.SERIES_LIST.PDF_REPORT' | translate }}"
         placement="right"
     >
         <div class="wvSerieslist__picture">
-            <span class="wvSerieslist__placeholderIcon fa fa-file-text"></span>
+            <i class="wvSerieslist__placeholderIcon fa fa-file-alt"></i>
 
             <span ng-if="vm.paneManager.hasReportBeenViewed(id)" class="wvSerieslist__badge--{{vm.study.color}} mr40 mb40">
                 <i class="fa fa-eye" aria-hidden="true"></i>
@@ -49,12 +50,12 @@
         }"
 
         bs-tooltip
-        bs-enabled="vm.displayMode !== 'list'"
+        bs-enabled="vm.displayMode !== 'list' && !vm.window.USER_IS_TOUCHING"
         data-title="{{ 'COMPONENTS.SERIES_LIST.NO_REPORT_AVAILABLE_PARAGRAPH' | translate }}"
         placement="right"
     >
         <div class="wvSerieslist__picture">
-            <span class="wvSerieslist__placeholderIcon wvSerieslist__placeholderIcon--strikeout fa fa-file-text"></span>
+            <i class="wvSerieslist__placeholderIcon wvSerieslist__placeholderIcon--strikeout fa fa-file-alt"></i>
         </div>
         <div
             ng-if="vm.displayMode === 'list'"
@@ -79,17 +80,18 @@
         ng-show="vm.loaded && vm.videos.length > 0"
         ng-repeat="$video in vm.videos track by $video.id"
         wv-draggable-item="{
-            videoId: $video.id
+            videoId: $video.id,
+            studyColor: vm.study.color
         }"
         ng-click="vm.toggleSelection($video.id)"
 
         bs-tooltip
-        bs-enabled="vm.displayMode !== 'list'"
+        bs-enabled="vm.displayMode !== 'list' && !vm.window.USER_IS_TOUCHING"
         data-title="{{ 'COMPONENTS.SERIES_LIST.VIDEO_LABEL_PARAGRAPH' | translate:{'videoDescription': $video.tags.SeriesDescription} }}"
         placement="right"
     >
         <div class="wvSerieslist__picture">
-            <span class="wvSerieslist__placeholderIcon fa fa-video-camera"></span>
+            <i class="wvSerieslist__placeholderIcon fa fa-video"></i>
 
             <span ng-if="vm.paneManager.hasVideoBeenViewed($video.id)" class="wvSerieslist__badge--{{vm.study.color}} mr40 mb40">
                 <i class="fa fa-eye" aria-hidden="true"></i>
@@ -118,12 +120,13 @@
         wv-draggable-item="{
             seriesId: $series.id,
             csViewport: null,
-            imageIndex: 0
+            imageIndex: 0,
+            studyColor: vm.study.color
         }"
         ng-click="vm.toggleSeriesSelection($series.id)"
 
         bs-tooltip
-        bs-enabled="vm.displayMode !== 'list'"
+        bs-enabled="vm.displayMode !== 'list' && !vm.window.USER_IS_TOUCHING"
         data-title="{{$series.tags.SeriesDescription || ('COMPONENTS.SERIES_LIST.UNTITLED_SERIES' | translate | wvCapitalize)}}"
         placement="right"
     >

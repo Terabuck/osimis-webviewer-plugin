@@ -3,8 +3,6 @@
 #include <memory>
 #include <string>
 #include <json/value.h>
-#include <boost/scope_exit.hpp>
-#include <boost/pointer_cast.hpp>
 #include <Core/OrthancException.h>
 #include <Core/DicomFormat/DicomMap.h> // To retrieve transfer syntax
 #include <Core/Toolbox.h> // For _getTransferSyntax -> Orthanc::Toolbox::StripSpaces
@@ -15,7 +13,7 @@
 #include "../Image/Utilities/ScopedBuffers.h" // for ScopedOrthancPluginMemoryBuffer
 #include "ViewerToolbox.h"
 
-std::string metadataId = "9998";
+std::string instanceMetadataId = "9998";
 int instanceInfoJsonVersion = 1;
 
 InstanceRepository::InstanceRepository(OrthancPluginContext* context)
@@ -39,7 +37,7 @@ void InstanceRepository::SignalNewInstance(const std::string& instanceId) {
 
 void InstanceRepository::StoreInstanceInfoInMetadata(const std::string& instanceId, const Json::Value& instanceInfo) {
 
-  std::string url = "/instances/" + instanceId + "/metadata/" + metadataId;
+  std::string url = "/instances/" + instanceId + "/metadata/" + instanceMetadataId;
   Json::FastWriter fastWriter;
   std::string instanceInfoContent = fastWriter.write(instanceInfo);
   ScopedOrthancPluginMemoryBuffer buffer(_context);
@@ -54,13 +52,13 @@ Json::Value InstanceRepository::GetInstanceInfo(const std::string& instanceId) {
       Json::Value instanceInfo;
 
       // if information has not been cached yet (or is obsolete, update it)
-      if (!OrthancPlugins::GetJsonFromOrthanc(instanceInfo, _context, "/instances/" + instanceId + "/metadata/" + metadataId)
+      if (!OrthancPlugins::GetJsonFromOrthanc(instanceInfo, _context, "/instances/" + instanceId + "/metadata/" + instanceMetadataId)
           || instanceInfo["Version"] != instanceInfoJsonVersion)
       {
         instanceInfo = GenerateInstanceInfo(instanceId);
         StoreInstanceInfoInMetadata(instanceId, instanceInfo);
       }
-      return instanceInfo;
+      return SanitizeInstanceInfo(instanceInfo);  // the info that has been cached my contain inconsistent data -> re-sanitize it
   } else {
       return GenerateInstanceInfo(instanceId);
   }
@@ -146,9 +144,18 @@ Json::Value InstanceRepository::SimplifyInstanceTags(const Json::Value& instance
   {
     if (!instanceTags[*it].empty())
     {
-      toReturn[*it] = instanceTags[*it];
+      toReturn[*it] = OrthancPlugins::SanitizeTag(*it, instanceTags[*it]);
     }
   }
 
   return toReturn;
+}
+
+
+Json::Value InstanceRepository::SanitizeInstanceInfo(const Json::Value& instanceInfo) {
+  Json::Value sanitized = instanceInfo;
+  sanitized["TagsSubset"]["Columns"] = OrthancPlugins::SanitizeTag("Columns", instanceInfo["TagsSubset"]["Columns"]);
+  sanitized["TagsSubset"]["Rows"] = OrthancPlugins::SanitizeTag("Rows", instanceInfo["TagsSubset"]["Rows"]);
+
+  return sanitized;
 }

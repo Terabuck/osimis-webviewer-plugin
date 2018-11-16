@@ -5,9 +5,8 @@ def isUserDevBranch = env.BRANCH_NAME != "dev" && env.BRANCH_NAME != "master" &&
 
 def userInput = [
     buildDocker: true,
-    launchDockerTests: true,
     buildWindows: isUserDevBranch ? false : true,
-    buildOSX: isUserDevBranch ? false : true
+    buildOSX: false
 ];
 
 // The built version, defined via `git describe` in scripts/ci/setEnv.sh call
@@ -25,7 +24,6 @@ else {
             userInput = input(
                 id: 'userInput', message: 'Configure build', parameters: [
                     [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildDocker'], description: 'Build Docker (/!\\ false -> disable tests & deployment)', name: 'buildDocker'],
-                    [$class: 'BooleanParameterDefinition', defaultValue: userInput['launchDockerTests'], description: 'Launch Docker Tests (including JS Unit Tests & Integration Tests)', name: 'launchDockerTests'],
                     [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildWindows'], description: 'Build Windows', name: 'buildWindows'],
                     [$class: 'BooleanParameterDefinition', defaultValue: userInput['buildOSX'], description: 'Build OSX', name: 'buildOSX']
                 ]
@@ -134,23 +132,14 @@ lock(resource: 'webviewer', inversePrecedence: false) {
     // Build docker & launch tests
     if (userInput['buildDocker']) {
         buildMap.put('docker', {
-            stage('Build: docker') {
+            stage('Build: LSB') {
                 node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
-                    sh 'scripts/ci/ciBuildDockerImage.sh'
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
+                        sh 'scripts/ci/ciBuildLsb.sh'
+                    }
                 }}}
             }
 
-            if (userInput['launchDockerTests']) {
-                stage('Test: unit + integration') {
-                    node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
-                        // @note Requires the built docker image to work
-                        // @todo use root docker-compose.yml instead
-                        sh 'scripts/ci/ciPrepareTests.sh'
-                        sh 'scripts/ci/ciRunCppTests.sh'
-                        sh 'scripts/ci/ciRunJsTests.sh'
-                    }}}
-                }
-            }
         })
     }
 
@@ -176,6 +165,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
                     int demoPort = random.nextInt(maxPort - minPort + 1) + minPort;
 
                     // Build demo
+                    sh 'scripts/ci/setEnv.sh ${BRANCH_NAME}'
                     sh "demo/scripts/buildDocker.sh"
 
                     // Load docker registry (required by docker-compose)
@@ -240,18 +230,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
         })
     }
 
-    // Publish docker release
-    if (userInput['buildDocker']) {
-        publishMap.put('docker', {
-            stage('Publish: orthanc -> DockerHub') {
-                node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkinsosimis') {
-                        sh 'scripts/ci/ciPushDockerImage.sh'
-                    }
-                }}}
-            }
-        })
-    }
+    // note: the LSB is published directly.  We do not publish the osimis/orthanc-webviewer-plugin docker image anymore
 
     parallel(publishMap)
 
@@ -260,15 +239,6 @@ lock(resource: 'webviewer', inversePrecedence: false) {
         node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
                 sh 'scripts/ci/ciPushFrontend.sh tagWithReleaseTag'
-            }
-        }}}
-    }
-
-    // Publish cpp code for static build within web viewer pro
-    stage('Publish: cpp -> AWS (release)') {
-        node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
-            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
-                sh 'scripts/ci/ciPushBackend.sh tagWithReleaseTag'
             }
         }}}
     }

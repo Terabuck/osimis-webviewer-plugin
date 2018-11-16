@@ -8,11 +8,11 @@ CacheContext::CacheContext(const std::string& path,
                            bool debugLogsEnabled,
                            bool prefetchOnInstanceStored,
                            SeriesRepository* seriesRepository)
-  : storage_(path),
+  : pluginContext_(pluginContext),
+    storage_(path),
+    seriesRepository_(seriesRepository),
     stop_(false),
-    pluginContext_(pluginContext),
-    prefetchOnInstanceStored_(prefetchOnInstanceStored),
-    seriesRepository_(seriesRepository)
+    prefetchOnInstanceStored_(prefetchOnInstanceStored)
 {
   boost::filesystem::path p(path);
   db_.Open((p / "cache.db").string());
@@ -71,7 +71,7 @@ void CacheContext::NewInstancesThread(CacheContext* that)
             try {
               std::auto_ptr<Series> series = that->seriesRepository_->GetSeries(seriesId);  // TODO: clarify difference between series cache and series repository (there's clearly a lot of redundancy there !)
 
-              std::vector<ImageQuality> qualitiesToPrefetch = series->GetOrderedImageQualities();
+              std::vector<ImageQuality::EImageQuality> qualitiesToPrefetch = series->GetOrderedImageQualities();
               BOOST_FOREACH(ImageQuality quality, qualitiesToPrefetch) {
                 that->GetScheduler().Prefetch(OrthancPlugins::CacheBundle_DecodedImage, instanceId + "/0/" + quality.toProcessingPolicytString()); // TODO: for multi-frame images, we should prefetch all frames and not onlyt the first one !
               }

@@ -14,13 +14,13 @@ class OnTheFlyDownloadAvailableQualityPolicy : public IAvailableQualityPolicy
 {
 private:
   // Used to choose MQ based on image size
-  bool _isLargerThan(uint32_t width, uint32_t height, const Json::Value& otherTags);
+  bool _isLargerThan(uint32_t width, uint32_t height, const Json::Value& dicomTags);
 
   // Used to choose either PIXELDATA or LOSSLESS based on transferSyntax
-  bool _isAlreadyCompressedWithinDicom(const Json::Value& headerTags);
+  bool _canBeDecompressedInFrontend(const std::string& headerTags, const Json::Value& dicomTags);
 
 public:
   // Returns available qualities depending on the image DICOM tags
   // @todo use image as an input
-  virtual std::set<ImageQuality> retrieveByTags(const Json::Value& headerTags, const Json::Value& otherTags);
+  virtual std::set<ImageQuality::EImageQuality> retrieve(const std::string& transferSyntax, const Json::Value& dicomTags);
 };

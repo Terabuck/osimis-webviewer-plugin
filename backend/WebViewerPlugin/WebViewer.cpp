@@ -48,6 +48,7 @@ void WebViewer::_serveFrontEnd()
   LanguageController::addLanguageFile("en", "/osimis-viewer/app/languages/en.json");
   LanguageController::addLanguageFile("fr", "/osimis-viewer/app/languages/fr.json");
   LanguageController::addLanguageFile("nl", "/osimis-viewer/app/languages/nl.json");
+  LanguageController::addLanguageFile("pt", "/osimis-viewer/app/languages/pt.json");
 }
 
 const std::string& WebViewer::getName()
@@ -118,7 +119,7 @@ namespace {
 
       return OrthancPluginErrorCode_Success;
     }
-    catch (std::runtime_error& e)
+    catch (...)
     {
       std::string s = "Unknown static resource in plugin: " + std::string(request->groups[0]);
       OrthancPluginLogError(::_context, s.c_str());

@@ -50,6 +50,7 @@
     }
 
     /* @ngInject */
-    function StudyDownloadButtonVM() {
+    function StudyDownloadButtonVM($window) {
+        this.window = $window;
     }
 })();

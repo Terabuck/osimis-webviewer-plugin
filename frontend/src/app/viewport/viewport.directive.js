@@ -66,7 +66,7 @@
  * wvOverlay directive by default. It may be overloaded using standard transclusion. It is therefore
  * important to not put any whitespace between the DOM element's start and end tags, otherwise the default
  * overlay will be overloaded with white space.
- * By setting the overlay's css _position_ attribute to _absolute_, the ovgetViewporterlay can position information to the top, right, bottom and left sides
+ * By setting the overlay's css _position_ attribute to _absolute_, the overlay can position information to the top, right, bottom and left sides
  * of the viewport.
  *
  * @example
@@ -106,7 +106,7 @@
      * Doc available at the head of the file
      * @ngInject
      */
-    function wvViewport($, _, cornerstone, cornerstoneTools, $rootScope, $q, $parse, wvImageManager) {
+    function wvViewport($, _, cornerstone, cornerstoneTools, $rootScope, $q, $parse, wvImageManager, wvReferenceLines) {
         var directive = {
             transclude: true,
             bindToController: true,
@@ -124,6 +124,7 @@
                 wvImage: '=?',
                 wvOnImageChange: '&?',
                 csViewport: '=?wvViewport',
+                model: '=?wvViewportModel',
                 wvEnableOverlay: '=?', // boolean [false]
                 wvLossless: '@?' // boolean [false] - Always fetch lossless if true
             }
@@ -158,8 +159,8 @@
          */
         function link(scope, element, attrs, ctrls) {
             var enabledElement = element.children('div').children('.wv-cornerstone-enabled-image')[0];
-            var model = new osimis.Viewport($q, cornerstone, enabledElement, !!scope.vm.wvLossless);
-
+            var model = new osimis.Viewport($q, cornerstone, enabledElement, !!scope.vm.wvLossless, wvReferenceLines);
+            scope.vm.model = model
             scope.vm.setFocus = function(){
                 // because of unselectable, we set the focus on the click in case the viewer is embedded in an iframe.
                 // this should allow the iframe to get the focus
@@ -291,6 +292,10 @@
                     var newCsViewport = newImageId && scope.vm.csViewport || null;
                     _firstWatch = _firstWatch && newImageId === oldImageId;
 
+                    if (newImageId == null) { // force clearing the image if there's nothing to display
+                      model.clearImage();
+                    }
+
                     // Assert values (because if they are not finite, they
                     // will always return false on equality comparison,
                     // thus triggering infinite $digest cycles.
@@ -309,7 +314,7 @@
                     // Case 2:
                     //   RESET IMAGE
                     else if (!newImageId && oldImageId) {
-                        model.clearImage();
+                        // already handled above
                     }
                     // Case 3:
                     // If image has changed, we update it

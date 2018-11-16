@@ -8,9 +8,12 @@
 
 #include "../BenchmarkHelper.h" // for BENCH(*)
 #include "../OrthancContextManager.h"
+#include "ViewerToolbox.h"
+#include "Config/WebViewerConfiguration.h"
 
 
 SeriesRepository* SeriesController::seriesRepository_ = NULL;
+const WebViewerConfiguration* SeriesController::_config = NULL;
 
 template<>
 void SeriesController::Inject<SeriesRepository>(SeriesRepository* obj) {
@@ -98,8 +101,54 @@ int SeriesController::_ProcessRequest()
     // Load the series with an auto_ptr so it's freed at the end of thit method
     std::auto_ptr<Series> series(seriesRepository_->GetSeries(this->seriesId_));
 
+    // filter out series
+    if (!_config->seriesToIgnore.empty())
+    {
+      std::string middleInstanceId = series->GetMiddleInstanceId();
+
+      if (!middleInstanceId.empty())
+      {
+        // get all tags from the middle instance
+        Json::Value middleInstanceTags;
+        if (OrthancPlugins::GetJsonFromOrthanc(middleInstanceTags, context, "/instances/" + middleInstanceId + "/tags?simplify=true"))
+        {
+          Json::Value::Members filterNames = _config->seriesToIgnore.getMemberNames();
+          for (size_t i = 0; i < filterNames.size(); i++)
+          {
+            Json::Value filter = _config->seriesToIgnore[filterNames[i]];
+            if (filter.type() == Json::objectValue)
+            {
+              bool allTagsMatching = true;
+              Json::Value::Members tagNames = filter.getMemberNames();
+              for (size_t j = 0; j < tagNames.size(); j++)
+              {
+                if (!middleInstanceTags.isMember(tagNames[j]) || middleInstanceTags[tagNames[j]] != filter[tagNames[j]])
+                {
+                  allTagsMatching = false;
+                  break;
+                }
+              }
+
+              if (allTagsMatching)
+              {
+                Json::Value modalitySkippedResponse;
+                modalitySkippedResponse["skipped"] = true;
+                std::string logMessage = std::string("skipping series ") + this->seriesId_ + ", filtered out by the '" + filterNames[i] + "' filter";
+                OrthancPluginLogWarning(context, logMessage.c_str());
+                return this->_AnswerBuffer(modalitySkippedResponse);
+              }
+
+            }
+          }
+        }
+      }
+    }
+
+    Json::Value seriesInfo;
+    series->ToJson(seriesInfo);
+
     // Answer Request with the series' information as JSON
-    return this->_AnswerBuffer(series->ToJson(), "application/json");
+    return this->_AnswerBuffer(seriesInfo.toStyledString(), "application/json");
   }
   // @note if the exception has been thrown from some constructor,
   // memory leaks may happen. we should fix the bug instead of focusing on those memory leaks.

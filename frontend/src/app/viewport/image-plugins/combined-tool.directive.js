@@ -46,14 +46,7 @@
         /* @ngInject */
         function MobileViewportToolVM($scope, wvConfig, wvPanViewportTool, wvWindowingViewportTool, wvZoomViewportTool) {
             // Enable zoom via pinch
-            WvBaseTool.call(this, 'zoomTouchPinch');  // this somehow enables the zoom tool of cornerstone
-
-            // "combinedToolLeftButton" : "windowing",
-            // "combinedToolMiddleButton" : "pan",
-            // "combinedToolRightButton" : "zoom",
-            // "combinedToolOneTouchPan" : "windowing",
-            // "combinedToolTwoTouchPan" : "pan",
-            // "combinedToolThreeTouchPan" : "windowing"
+            WvBaseTool.call(this, 'zoomTouchPinch', undefined, false, wvPanViewportTool, wvZoomViewportTool, $scope, false);
 
             // Cache hammer instances for memory clean up
             var _hammers = {};

@@ -46,7 +46,8 @@
         },
         "STUDY": {
             "DOWNLOAD_STUDY": "Studie downloaden",
-            "UNTITLED_STUDY": "Naamloze studie"
+            "UNTITLED_STUDY": "Naamloze studie",
+            "LOADING_STUDY": "Bezig met laden studie..."
         },
         "TIMELINE": {
             "FPS": "fps",
@@ -68,13 +69,19 @@
             "LENGTH_MEASUREMENT": "afstandsmeting",
             "PANNING": "verplaatsen",
             "PIXEL_PROBE": "pixel probe",
+            "PREVIOUS_SERIES": "vorig beeld",
+            "PRINT": "afdrukken",
             "MAGNIFYING_GLASS_CONFIG_LEGEND": "Klik op de knop om het vergrootglas in of uit te schakelen. Je kan hier de parameters wijzigen.",
             "MAGNIFYING_GLASS_LEVEL": "vergrotingsfactor",
             "MAGNIFYING_GLASS_SIZE": "grootte van vergrootglas",
+            "NEXT_SERIES": "volgend beeld",
             "RECTANGLE_ROI": "rechthoekige ROI",
             "ROTATE_LEFT": "linksom draaien",
             "ROTATE_RIGHT": "rechtsom draaien",
             "SPLIT_PANE_CONFIG_LEGEND_PARAGRAPH": "Verander de viewport-layout.",
+            "SYNCHRONIZED_BROWSING" : "Gesynchroniseerd bladeren",
+            "TOGGLE_LAYOUT_TEXT" : "Annotaties in/uitschakelen",
+            "TOGGLE_LAYOUT_ICONS" : "Orientatie-icoon in/uitschakelen",
             "COMBINED_TOOL": "Aanraakgebaar",
             "WINDOWING_PRESET_LEGEND": "Klik op de knop om de windowing-tool in of uit te schakelen of een voorinstelling toe te passen op de geselecteerde viewport.",
             "ZOOM": "zoom"

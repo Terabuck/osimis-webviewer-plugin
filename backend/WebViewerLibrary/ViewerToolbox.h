@@ -87,6 +87,8 @@ namespace OrthancPlugins
                          const Orthanc::ImageAccessor& accessor,
                          uint8_t quality);
  
+  Json::Value SanitizeTag(const std::string& tagName, const Json::Value& value);
+
   class ImageReader
   {
   private:
@@ -100,6 +102,6 @@ namespace OrthancPlugins
 
     ~ImageReader();
 
-    Orthanc::ImageAccessor GetAccessor() const;
+    void GetAccessor(Orthanc::ImageAccessor& output) const;
   };
 }

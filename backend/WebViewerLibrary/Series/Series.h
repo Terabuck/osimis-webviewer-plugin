@@ -26,14 +26,16 @@
 #include <Core/DicomFormat/DicomMap.h>
 #include "../Image/AvailableQuality/ImageQuality.h"
 
-class Series : public boost::noncopyable {
+class Series {
   friend class SeriesFactory;
 
 public:
-  std::string ToJson() const;
-  std::vector<ImageQuality> GetOrderedImageQualities(ImageQuality::EImageQuality higherThan = ImageQuality::NONE) const;
+  std::vector<ImageQuality::EImageQuality> GetOrderedImageQualities(ImageQuality::EImageQuality higherThan = ImageQuality::NONE) const;
+  static Series* FromJson(const Json::Value& seriesJson);
+  void ToJson(Json::Value& output) const;
 
-
+  std::string GetModality() const;
+  std::string GetMiddleInstanceId() const;
 private:
   // takes seriesTags memory ownership
   Series(const std::string& seriesId,
@@ -41,7 +43,7 @@ private:
          const Json::Value& seriesTags,
          const Json::Value& instancesInfos,
          const Json::Value& orderedInstances,
-         const std::set<ImageQuality>& imageQualities,
+         const std::set<ImageQuality::EImageQuality>& imageQualities,
          const Json::Value& studyInfo);
 
   std::string _seriesId;
@@ -51,5 +53,6 @@ private:
   Json::Value _orderedInstances;
   Json::Value _studyInfo;
 
-  std::set<ImageQuality> _imageQualities;
+  std::set<ImageQuality::EImageQuality> _imageQualities;
+
 };

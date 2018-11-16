@@ -170,12 +170,17 @@
 
             return seriesPromise
                 .then(function(response) {
+                    if (response.data["skipped"] == true) {
+                      console.log("skipping series " + seriesId);
+                      return;
+                    }
+
                     var instancesInfos = response.data.instancesInfos;
                     var studyId = response.data.study.ID;
                     var contentType = response.data.contentType;
 
                     // Cache instance tags in wvInstanceManager
-                    _cacheInstancesInfos(instancesInfos);
+                    _cacheInstancesInfos(instancesInfos, seriesId);
 
                     // Return list of image series when series' content is
                     // images.
@@ -323,10 +328,10 @@
                 });
         }
 
-        function _cacheInstancesInfos(instancesInfos) {
+        function _cacheInstancesInfos(instancesInfos, seriesId) {
             for (var instanceId in instancesInfos) {
                 if (instancesInfos.hasOwnProperty(instanceId)) {
-                    wvInstanceManager.setInfos(instanceId, instancesInfos[instanceId]);
+                    wvInstanceManager.setInfos(instanceId, instancesInfos[instanceId], seriesId);
                 }
             }
         }

@@ -3,8 +3,6 @@
 #include <memory>
 #include <string>
 #include <json/value.h>
-#include <boost/scope_exit.hpp>
-#include <boost/pointer_cast.hpp>
 #include <Core/OrthancException.h>
 #include <Core/DicomFormat/DicomMap.h> // To retrieve transfer syntax
 #include <Core/Toolbox.h> // For _getTransferSyntax -> Orthanc::Toolbox::StripSpaces
@@ -12,8 +10,12 @@
 #include "../OrthancContextManager.h"
 #include "../BenchmarkHelper.h"
 #include "../Image/AvailableQuality/OnTheFlyDownloadAvailableQualityPolicy.h"
+#include "../Image/Utilities/ScopedBuffers.h" // for ScopedOrthancPluginMemoryBuffer
 #include "../Instance/InstanceRepository.h"
 #include "ViewerToolbox.h"
+
+std::string seriesMetadataId = "9997";
+int seriesInfoJsonVersion = 1;
 
 namespace {
   std::string _getTransferSyntax(const Orthanc::DicomMap& headerTags);
@@ -22,18 +24,60 @@ namespace {
   Json::Value simplifyInstanceTags(const Json::Value& instanceTags);
 }
 
-SeriesRepository::SeriesRepository(DicomRepository* dicomRepository, InstanceRepository* instanceRepository)
-  : _dicomRepository(dicomRepository), _seriesFactory(std::auto_ptr<IAvailableQualityPolicy>(new OnTheFlyDownloadAvailableQualityPolicy)),
-    _instanceRepository(instanceRepository)
+SeriesRepository::SeriesRepository(OrthancPluginContext* context, DicomRepository* dicomRepository, InstanceRepository* instanceRepository)
+  : _context(context),
+    _dicomRepository(dicomRepository),
+    _instanceRepository(instanceRepository),
+    _seriesFactory(std::auto_ptr<IAvailableQualityPolicy>(new OnTheFlyDownloadAvailableQualityPolicy)),
+    _cachingInMetadataEnabled(false)
 {
 }
 
-std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId, bool getInstanceTags) {
-  OrthancPluginContext* context = OrthancContextManager::Get();
-  
+void SeriesRepository::EnableCachingInMetadata(bool enable) {
+  _cachingInMetadataEnabled = enable;
+}
+
+void SeriesRepository::StoreSeriesInfoInMetadata(const std::string& seriesId, const Series& series)
+{
+  std::string url = "/series/" + seriesId + "/metadata/" + seriesMetadataId;
+
+  Json::Value seriesJson;
+  series.ToJson(seriesJson);
+  seriesJson["Version"] = seriesInfoJsonVersion;
+  Json::FastWriter fastWriter;
+  std::string infoContent = fastWriter.write(seriesJson);
+  ScopedOrthancPluginMemoryBuffer buffer(_context);
+
+  // actually, we don't check the success or not, there's nothing to do anyway !
+  OrthancPluginRestApiPutAfterPlugins(_context, buffer.getPtr(), url.c_str(), infoContent.c_str(), infoContent.size());
+
+}
+
+std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId, bool getInstanceTags)
+{
+  if (_cachingInMetadataEnabled && getInstanceTags)
+  {
+    Json::Value seriesInfo;
+    // if information has not been cached yet (or is obsolete, update it)
+    if (!OrthancPlugins::GetJsonFromOrthanc(seriesInfo, _context, "/series/" + seriesId + "/metadata/" + seriesMetadataId)
+        || seriesInfo["Version"] != seriesInfoJsonVersion)
+    {
+      std::auto_ptr<Series> output = GenerateSeriesInfo(seriesId, getInstanceTags);
+      StoreSeriesInfoInMetadata(seriesId, *output);
+      return output;
+    } else {
+      return std::auto_ptr<Series>(Series::FromJson(seriesInfo));
+    }
+  } else {
+    return GenerateSeriesInfo(seriesId, getInstanceTags);
+  }
+}
+
+std::auto_ptr<Series> SeriesRepository::GenerateSeriesInfo(const std::string& seriesId, bool getInstanceTags)
+{
   // Retrieve series' slices (instances & frames)
   Json::Value orderedSlices;
-  if (!OrthancPlugins::GetJsonFromOrthanc(orderedSlices, context, "/series/" + seriesId + "/ordered-slices"))
+  if (!OrthancPlugins::GetJsonFromOrthanc(orderedSlices, _context, "/series/" + seriesId + "/ordered-slices"))
   {
     throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
   }
@@ -49,7 +93,7 @@ std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId, b
   if (getInstanceTags)
   {
     BENCH(RETRIEVE_ALL_INSTANCES_TAGS)
-    for(Json::ValueIterator itr = slicesShort.begin(); itr != slicesShort.end(); itr++) {
+    for(Json::ValueConstIterator itr = slicesShort.begin(); itr != slicesShort.end(); itr++) {
       std::string instanceId = (*itr)[0].asString();
 
       instancesInfos[instanceId] = _instanceRepository->GetInstanceInfo(instanceId);
@@ -66,9 +110,7 @@ std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId, b
   _dicomRepository->getDicomFile(middleInstanceId, dicom);
 
   // Clean middle instance's dicom file (at scope end)
-  BOOST_SCOPE_EXIT(_dicomRepository, &middleInstanceId) {
-    _dicomRepository->decrefDicomFile(middleInstanceId);
-  } BOOST_SCOPE_EXIT_END;
+  DicomRepository::ScopedDecref autoDecref(_dicomRepository, middleInstanceId);
 
   // Get middle instance's tags (the DICOM meta-informations)
   Orthanc::DicomMap dicomMapToFillTags1;
@@ -99,7 +141,7 @@ std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId, b
   }
 
   Json::Value studyInfo;
-  if (!OrthancPlugins::GetJsonFromOrthanc(studyInfo, context, "/series/" + seriesId + "/study"))
+  if (!OrthancPlugins::GetJsonFromOrthanc(studyInfo, _context, "/series/" + seriesId + "/study"))
   {
     throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
   }
@@ -118,7 +160,7 @@ namespace {
     std::string transferSyntax;
 
     if (transfertSyntaxValue->IsBinary()) {
-      throw OrthancException(ErrorCode::ErrorCode_CorruptedFile);
+      throw OrthancException(Orthanc::ErrorCode_CorruptedFile);
     }
     else if (transfertSyntaxValue == NULL || transfertSyntaxValue->IsNull()) {
       // Set default transfer syntax if not found
@@ -203,7 +245,7 @@ namespace {
     {
       if (!instanceTags[*it].empty())
       {
-        toReturn[*it] = instanceTags[*it];
+        toReturn[*it] = OrthancPlugins::SanitizeTag(*it, instanceTags[*it]);
       }
     }
 

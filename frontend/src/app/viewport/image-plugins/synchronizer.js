@@ -11,10 +11,11 @@
 (function(osimis) {
     'use strict';
 
-    function Synchronizer(Promise, wvPaneManager) {
+    function Synchronizer(Promise, wvPaneManager, wvReferenceLines) {
         // Injections.
         this._Promise = Promise;
         this._wvPaneManager = wvPaneManager;
+        this._wvReferenceLines = wvReferenceLines;
         this._enabled = true;
         this._offsets = {};
     }
@@ -22,10 +23,10 @@
     Synchronizer.prototype.enable = function(enabled) {
         this._enabled = enabled;
         if (this._enabled) {
-            console.log("Synchronization is now enabled");
+            console.log("Synchronization is now enabled", this._offsets);
             this.computeOffsets();
         } else {
-            console.log("Synchronization is now disabled");
+            console.log("Synchronization is now disabled", this._offsets);
         }
     }
 
@@ -53,7 +54,7 @@
 
     Synchronizer.prototype.updateOffsetBetweenPanes = function(paneA, paneB) {
 
-        if (paneA.series.isSameOrientationAs(paneB.series)) {
+      if (paneA.series.isSameOrientationAs(paneB.series)) {
 
             if (!(paneA.seriesId in this._offsets)) {
                 this._offsets[paneA.seriesId] = {};    
@@ -63,6 +64,9 @@
             paneB.series.getCurrentImagePromise().then(function(imageB) {
                 paneA.series.getCurrentImagePromise().then(function(imageA) {
 
+                    if (imageB == null || imageA == null) {
+                      return;
+                    }
                     var offset = imageB.instanceInfos.TagsSubset.SliceLocation - imageA.instanceInfos.TagsSubset.SliceLocation;
                     if (Math.abs(offset) <= imageA.instanceInfos.TagsSubset.SliceThickness) {
                         offset = 0; // if the offset is smaller than a slice, there is no "intention" to have an offset
@@ -72,8 +76,6 @@
 
                 });
             });
-        } else {
-            delete this._offsets[paneA.seriesId];
         }
     }
 
@@ -94,9 +96,9 @@
         var toReturn = [];
         var panes = this._wvPaneManager.getAllPanes();
 
-        if (this._enabled && panes.length > 1 && series.hasSlices()) {
+        if (this._enabled && panes.length > 1 && series.hasSlices() && series.getImageCount() >= 10) {
             for (var i=0; i < panes.length; ++i) {
-                if (panes[i].seriesId !== undefined && panes[i].seriesId != series.id && panes[i].series.hasSlices()) {
+                if (panes[i].seriesId !== undefined && panes[i].seriesId != series.id && panes[i].series.hasSlices() && panes[i].series.getImageCount() >= 10) {
 
                     if (panes[i].series.isSameOrientationAs(series)) {
                         toReturn.push(panes[i]);
@@ -123,6 +125,7 @@
                             //console.log("Closest index is " + closestIndexResponse.closestIndex);
                             //console.log(closestIndexResponse.series);
                             closestIndexResponse.series.goToImage(closestIndexResponse.closestIndex);
+                            this_._wvReferenceLines.update(closestIndexResponse.series, false);
                     });
                 }
             });
@@ -136,7 +139,7 @@
         .factory('wvSynchronizer', wvSynchronizer);
 
     /* @ngInject */
-    function wvSynchronizer($q, wvPaneManager) {
-        return new Synchronizer($q, wvPaneManager);
+    function wvSynchronizer($q, wvPaneManager, wvReferenceLines) {
+        return new Synchronizer($q, wvPaneManager, wvReferenceLines);
     }
 })(osimis || (this.osimis = {}));

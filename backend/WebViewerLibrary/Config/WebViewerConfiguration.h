@@ -54,6 +54,7 @@ public:
   bool gdcmEnabled;
   bool restrictTransferSyntaxes;
   std::set<std::string> enabledTransferSyntaxes;
+  Json::Value seriesToIgnore;
 
   // Frontend Variables
   bool showStudyInformationBreadcrumb;
@@ -77,11 +78,17 @@ public:
   bool keyboardShortcutsEnabled;
   bool keyImageCaptureEnabled;
   bool combinedToolEnabled;
+  bool printEnabled;
+  bool openAllPatientStudies;
 
   bool toggleOverlayTextButtonEnabled;
   bool toggleOverlayIconsButtonEnabled;
   bool displayOverlayText;
   bool displayOverlayIcons;
+  bool customCommandEnabled;
+  std::string customCommandLuaCode;
+  std::string customCommandIconClass;
+  std::string customCommandIconLabel;
 
   WebViewerConfiguration(OrthancPluginContext* context);
   /**

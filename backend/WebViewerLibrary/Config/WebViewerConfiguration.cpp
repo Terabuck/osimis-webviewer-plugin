@@ -79,23 +79,24 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   keyboardShortcuts["p"] = "selectPanTool";
   keyboardShortcuts["z"] = "selectZoomTool";
   keyboardShortcuts["w"] = "selectWindowingTool";
-  keyboardShortcuts["ctrl + l"] = "selectLengthMeasureTool";
-  keyboardShortcuts["ctrl + p"] = "selectPixelProbeTool";
-  keyboardShortcuts["ctrl + m"] = "selectMagnifyingGlassTool";
-  keyboardShortcuts["ctrl + e"] = "selectEllipticalRoiTool";
-  keyboardShortcuts["ctrl + r"] = "selectRectangleRoiTool";
-  keyboardShortcuts["ctrl + a"] = "selectArrowAnnotateTool";
-  keyboardShortcuts["ctrl + k"] = "selectKeyImageCaptureTool";
+  keyboardShortcuts["ctrl + l, command + l"] = "selectLengthMeasureTool";
+  keyboardShortcuts["ctrl + i, command + i"] = "selectPixelProbeTool";
+  keyboardShortcuts["ctrl + m, command + m"] = "selectMagnifyingGlassTool";
+  keyboardShortcuts["ctrl + e, command + e"] = "selectEllipticalRoiTool";
+  keyboardShortcuts["ctrl + o, command + o"] = "selectRectangleRoiTool";
+  keyboardShortcuts["ctrl + a, command + a"] = "selectArrowAnnotateTool";
+  keyboardShortcuts["ctrl + k, command + k"] = "selectKeyImageCaptureTool";
+  keyboardShortcuts["ctrl + p, command + p"] = "print";
   keyboardShortcuts["1, num1"] = "applyEmbeddedWindowingPreset1";
   keyboardShortcuts["2, num2"] = "applyEmbeddedWindowingPreset2";
   keyboardShortcuts["3, num3"] = "applyEmbeddedWindowingPreset3";
   keyboardShortcuts["4, num4"] = "applyEmbeddedWindowingPreset4";
   keyboardShortcuts["5, num5"] = "applyEmbeddedWindowingPreset5";
-  keyboardShortcuts["ctrl + 1, ctrl + num1"] = "applyConfigWindowingPreset1";
-  keyboardShortcuts["ctrl + 2, ctrl + num2"] = "applyConfigWindowingPreset2";
-  keyboardShortcuts["ctrl + 3, ctrl + num3"] = "applyConfigWindowingPreset3";
-  keyboardShortcuts["ctrl + 4, ctrl + num4"] = "applyConfigWindowingPreset4";
-  keyboardShortcuts["ctrl + 5, ctrl + num5"] = "applyConfigWindowingPreset5";
+  keyboardShortcuts["ctrl + 1, ctrl + num1, command + 1, command + num1"] = "applyConfigWindowingPreset1";
+  keyboardShortcuts["ctrl + 2, ctrl + num2, command + 2, command + num2"] = "applyConfigWindowingPreset2";
+  keyboardShortcuts["ctrl + 3, ctrl + num3, command + 3, command + num3"] = "applyConfigWindowingPreset3";
+  keyboardShortcuts["ctrl + 4, ctrl + num4, command + 4, command + num4"] = "applyConfigWindowingPreset4";
+  keyboardShortcuts["ctrl + 5, ctrl + num5, command + 5, command + num5"] = "applyConfigWindowingPreset5";
   keyboardShortcuts["s"] = "toggleSynchro";
   keyboardShortcuts["f1"] = "setLayout1x1";
   keyboardShortcuts["f2"] = "setLayout1x2";
@@ -139,6 +140,11 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
         }
       }
     }
+  }
+
+  if (wvConfig.isMember("SeriesToIgnore"))
+  {
+    seriesToIgnore = wvConfig["SeriesToIgnore"];
   }
 
   // Retrieve windowing preset (if set).
@@ -226,6 +232,8 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   annotationStorageEnabled = OrthancPlugins::GetBoolValue(wvConfig, "AnnotationStorageEnabled", false);
   keyImageCaptureEnabled = OrthancPlugins::GetBoolValue(wvConfig, "KeyImageCaptureEnabled", false);
   combinedToolEnabled = OrthancPlugins::GetBoolValue(wvConfig, "CombinedToolEnabled", false);
+  printEnabled = OrthancPlugins::GetBoolValue(wvConfig, "PrintEnabled", true);
+  openAllPatientStudies = OrthancPlugins::GetBoolValue(wvConfig, "OpenAllPatientStudies", true);
   showStudyInformationBreadcrumb = OrthancPlugins::GetBoolValue(wvConfig, "ShowStudyInformationBreadcrumb", false);
   shortTermCachePrefetchOnInstanceStored = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCachePrefetchOnInstanceStored", false);
   shortTermCacheEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShortTermCacheEnabled", false);
@@ -238,7 +246,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   showNoReportIconInSeriesList = OrthancPlugins::GetBoolValue(wvConfig, "ShowNoReportIconInSeriesList", false);
   toolbarLayoutMode = OrthancPlugins::GetStringValue(wvConfig, "ToolbarLayoutMode", "flat");
   toolbarButtonSize = OrthancPlugins::GetStringValue(wvConfig, "ToolbarButtonSize", "small");
-  defaultSelectedTool = OrthancPlugins::GetStringValue(wvConfig, "DefaultSelectedTool", "zoom");
+  defaultSelectedTool = OrthancPlugins::GetStringValue(wvConfig, "DefaultSelectedTool", "windowing");
   defaultStudyIslandsDisplayMode = OrthancPlugins::GetStringValue(wvConfig, "DefaultStudyIslandsDisplayMode", "grid");
   defaultLanguage = OrthancPlugins::GetStringValue(wvConfig, "DefaultLanguage", "en");
   customOverlayProviderUrl = OrthancPlugins::GetStringValue(wvConfig, "CustomOverlayProviderUrl", "");  // must be provided as a url relative to orthanc root url (i.e.: "/../customOverlays/")
@@ -246,7 +254,10 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   toggleOverlayIconsButtonEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ToggleOverlayIconsButtonEnabled", false);
   displayOverlayText = OrthancPlugins::GetBoolValue(wvConfig, "DisplayOverlayText", true);
   displayOverlayIcons = OrthancPlugins::GetBoolValue(wvConfig, "DisplayOverlayIcons", true);
-
+  customCommandEnabled = OrthancPlugins::GetBoolValue(wvConfig, "CustomCommandEnabled", false);
+  customCommandLuaCode = OrthancPlugins::GetStringValue(wvConfig, "CustomCommandLuaCode", std::string());
+  customCommandIconClass = OrthancPlugins::GetStringValue(wvConfig, "CustomCommandIconClass", "fa fa-external-link-square-alt");
+  customCommandIconLabel = OrthancPlugins::GetStringValue(wvConfig, "CustomCommandIconLabel", "custom action");
 
   if (toolbarLayoutMode != "flat" && toolbarLayoutMode != "tree")
   {
@@ -267,8 +278,18 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   }
 
   {// validate combinedToolBehaviour
-    std::set<std::string> combinedToolAllowedToolNames = { "windowing", "pan", "zoom" };
-    std::set<std::string> combinedToolAllowedActions = { "leftMouseButton", "middleMouseButton", "rightMouseButton", "oneTouchPan", "twoTouchPan", "threeTouchPan"};
+    std::set<std::string> combinedToolAllowedToolNames;
+    combinedToolAllowedToolNames.insert("windowing");
+    combinedToolAllowedToolNames.insert("pan");
+    combinedToolAllowedToolNames.insert("zoom");
+
+    std::set<std::string> combinedToolAllowedActions;
+    combinedToolAllowedActions.insert("leftMouseButton");
+    combinedToolAllowedActions.insert("middleMouseButton");
+    combinedToolAllowedActions.insert("rightMouseButton");
+    combinedToolAllowedActions.insert("oneTouchPan");
+    combinedToolAllowedActions.insert("twoTouchPan");
+    combinedToolAllowedActions.insert("threeTouchPan");
 
     Json::Value::Members members = combinedToolBehaviour.getMemberNames();
 
@@ -292,8 +313,17 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   }
 
   {// validate windowingBehaviour
-    std::set<std::string> windowingAllowedDirections = { "left", "right", "up", "down" };
-    std::set<std::string> windowingAllowedToolNames = { "decrease-ww", "increase-ww", "decrease-wc", "increase-wc"};
+    std::set<std::string> windowingAllowedDirections;
+    windowingAllowedDirections.insert("left");
+    windowingAllowedDirections.insert("right");
+    windowingAllowedDirections.insert("up");
+    windowingAllowedDirections.insert("down");
+
+    std::set<std::string> windowingAllowedToolNames;
+    windowingAllowedToolNames.insert("decrease-ww");
+    windowingAllowedToolNames.insert("increase-ww");
+    windowingAllowedToolNames.insert("decrease-wc");
+    windowingAllowedToolNames.insert("increase-wc");
 
     Json::Value::Members members = windowingBehaviour.getMemberNames();
 
@@ -317,23 +347,56 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   }
 
   {// validate keyboard shortcuts
-    std::set<std::string> keyboardShortcutsAllowedToolNames = {
-      "nextStudy", "previousStudy", "nextSeries", "previousSeries", "nextImage", "previousImage",
-      "rotateLeft", "rotateRight", "flipVertical", "flipHorizontal", "invertColor",
-      "selectCombinedTool", "selectPanTool", "selectWindowingTool", "selectZoomTool",
-      "selectMagnifyingGlassTool", "selectLengthMeasureTool", "selectPixelProbeTool",
-      "selectEllipticalRoiTool", "selectRectangleRoiTool", "selectArrowAnnotateTool",
-      "selectKeyImageCaptureTool",
-      "applyEmbeddedWindowingPreset1", "applyEmbeddedWindowingPreset2", "applyEmbeddedWindowingPreset3",
-      "applyEmbeddedWindowingPreset4", "applyEmbeddedWindowingPreset5",
-      "applyConfigWindowingPreset1", "applyConfigWindowingPreset2", "applyConfigWindowingPreset3",
-      "applyConfigWindowingPreset4", "applyConfigWindowingPreset5",
-      "toggleSynchro", "enableSynchro", "disableSynchro",
-      "setLayout1x1", "setLayout1x2", "setLayout2x1", "setLayout2x2",
-      "play", "pause", "playPause", "selectNextPane", "selectPreviousPane",
-      "loadSeriesInPane", "toggleOverlayText", "toggleOverlayIcons",
-      "null"
-    };
+    std::set<std::string> keyboardShortcutsAllowedToolNames;
+    keyboardShortcutsAllowedToolNames.insert("nextStudy");
+    keyboardShortcutsAllowedToolNames.insert("previousStudy");
+    keyboardShortcutsAllowedToolNames.insert("nextSeries");
+    keyboardShortcutsAllowedToolNames.insert("previousSeries");
+    keyboardShortcutsAllowedToolNames.insert("nextImage");
+    keyboardShortcutsAllowedToolNames.insert("previousImage");
+    keyboardShortcutsAllowedToolNames.insert("rotateLeft");
+    keyboardShortcutsAllowedToolNames.insert("rotateRight");
+    keyboardShortcutsAllowedToolNames.insert("flipVertical");
+    keyboardShortcutsAllowedToolNames.insert("flipHorizontal");
+    keyboardShortcutsAllowedToolNames.insert("invertColor");
+    keyboardShortcutsAllowedToolNames.insert("selectCombinedTool");
+    keyboardShortcutsAllowedToolNames.insert("selectPanTool");
+    keyboardShortcutsAllowedToolNames.insert("selectWindowingTool");
+    keyboardShortcutsAllowedToolNames.insert("selectZoomTool");
+    keyboardShortcutsAllowedToolNames.insert("selectMagnifyingGlassTool");
+    keyboardShortcutsAllowedToolNames.insert("selectLengthMeasureTool");
+    keyboardShortcutsAllowedToolNames.insert("selectPixelProbeTool");
+    keyboardShortcutsAllowedToolNames.insert("selectEllipticalRoiTool");
+    keyboardShortcutsAllowedToolNames.insert("selectRectangleRoiTool");
+    keyboardShortcutsAllowedToolNames.insert("selectArrowAnnotateTool");
+    keyboardShortcutsAllowedToolNames.insert("selectKeyImageCaptureTool");
+    keyboardShortcutsAllowedToolNames.insert("applyEmbeddedWindowingPreset1");
+    keyboardShortcutsAllowedToolNames.insert("applyEmbeddedWindowingPreset2");
+    keyboardShortcutsAllowedToolNames.insert("applyEmbeddedWindowingPreset3");
+    keyboardShortcutsAllowedToolNames.insert("applyEmbeddedWindowingPreset4");
+    keyboardShortcutsAllowedToolNames.insert("applyEmbeddedWindowingPreset5");
+    keyboardShortcutsAllowedToolNames.insert("applyConfigWindowingPreset1");
+    keyboardShortcutsAllowedToolNames.insert("applyConfigWindowingPreset2");
+    keyboardShortcutsAllowedToolNames.insert("applyConfigWindowingPreset3");
+    keyboardShortcutsAllowedToolNames.insert("applyConfigWindowingPreset4");
+    keyboardShortcutsAllowedToolNames.insert("applyConfigWindowingPreset5");
+    keyboardShortcutsAllowedToolNames.insert("toggleSynchro");
+    keyboardShortcutsAllowedToolNames.insert("enableSynchro");
+    keyboardShortcutsAllowedToolNames.insert("disableSynchro");
+    keyboardShortcutsAllowedToolNames.insert("setLayout1x1");
+    keyboardShortcutsAllowedToolNames.insert("setLayout1x2");
+    keyboardShortcutsAllowedToolNames.insert("setLayout2x1");
+    keyboardShortcutsAllowedToolNames.insert("setLayout2x2");
+    keyboardShortcutsAllowedToolNames.insert("play");
+    keyboardShortcutsAllowedToolNames.insert("pause");
+    keyboardShortcutsAllowedToolNames.insert("playPause");
+    keyboardShortcutsAllowedToolNames.insert("selectNextPane");
+    keyboardShortcutsAllowedToolNames.insert("selectPreviousPane");
+    keyboardShortcutsAllowedToolNames.insert("loadSeriesInPane");
+    keyboardShortcutsAllowedToolNames.insert("toggleOverlayText");
+    keyboardShortcutsAllowedToolNames.insert("toggleOverlayIcons");
+    keyboardShortcutsAllowedToolNames.insert("print");
+    keyboardShortcutsAllowedToolNames.insert("null");
 
     Json::Value::Members members = keyboardShortcuts.getMemberNames();
 
@@ -353,8 +416,15 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   }
 
   {// validate mouse wheel
-    std::set<std::string> mouseWheelAllowedDirections = { "up", "down" };
-    std::set<std::string> mouseWheelAllowedToolNames = { "nextImage", "previousImage", "zoomIn", "zoomOut"};
+    std::set<std::string> mouseWheelAllowedDirections;
+    mouseWheelAllowedDirections.insert("up");
+    mouseWheelAllowedDirections.insert("down");
+
+    std::set<std::string> mouseWheelAllowedToolNames;
+    mouseWheelAllowedToolNames.insert("nextImage");
+    mouseWheelAllowedToolNames.insert("previousImage");
+    mouseWheelAllowedToolNames.insert("zoomIn");
+    mouseWheelAllowedToolNames.insert("zoomOut");
 
     Json::Value::Members members = mouseWheelBehaviour.getMemberNames();
 
@@ -455,6 +525,8 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["annotationStorageEnabled"] = annotationStorageEnabled;
   config["keyImageCaptureEnabled"] = keyImageCaptureEnabled;
   config["combinedToolEnabled"] = combinedToolEnabled;
+  config["printEnabled"] = printEnabled;
+  config["openAllPatientStudies"] = openAllPatientStudies;
   config["showStudyInformationBreadcrumb"] = showStudyInformationBreadcrumb;
   config["windowingPresets"] = windowingPresets;
   config["combinedToolBehaviour"] = combinedToolBehaviour;
@@ -473,6 +545,9 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["toggleOverlayIconsButtonEnabled"] = toggleOverlayIconsButtonEnabled;
   config["displayOverlayText"] = displayOverlayText;
   config["displayOverlayIcons"] = displayOverlayIcons;
+  config["customCommandEnabled"] = customCommandEnabled;
+  config["customCommandIconClass"] = customCommandIconClass;
+  config["customCommandIconLabel"] = customCommandIconLabel;
 
   if (customOverlayProviderUrl.length() > 0) {
     config["customOverlayProviderUrl"] = customOverlayProviderUrl;
