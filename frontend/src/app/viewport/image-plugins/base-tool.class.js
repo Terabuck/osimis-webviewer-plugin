@@ -208,7 +208,7 @@
         cornerstoneTools.touchInput.disable(enabledElement);
 
         if (this.isAnnotationTool) {
-            console.log("enabling all annotation tools (display the annotations but make them readonly)", this.annotationTools);
+            // console.log("enabling all annotation tools (display the annotations but make them readonly)", this.annotationTools);
             this.annotationTools.forEach(function(value){cornerstoneTools[value].enable(enabledElement, 1)});
         }
 

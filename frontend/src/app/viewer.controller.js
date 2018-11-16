@@ -116,7 +116,7 @@
       var selectedPane = this.wvPaneManager.getSelectedPane();
       var that = this;
       selectedPane.getImage().then(function(image) {
-        console.log(image.id);
+//        console.log(image.id);
         var request = new osimis.HttpRequest();
         request.setHeaders(that.wvConfig.httpRequestHeaders);
         request.setCache(false);
