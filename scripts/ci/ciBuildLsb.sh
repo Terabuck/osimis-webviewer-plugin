@@ -18,7 +18,7 @@ fi
 # build the LSB
 
 cd $SRC_ROOT/backend/
-docker build -t osimis/viewer-lsb-builder:$COMMIT_ID --build-arg JS_FRONTEND_VERSION=$COMMIT_ID -f Dockerfile.lsb.builder .
+docker build -t osimis/viewer-lsb-builder:$COMMIT_ID --build-arg JS_FRONTEND_VERSION=$COMMIT_ID --build-arg VIEWER_VERSION_FULL=VIEWER_VERSION -f Dockerfile.lsb.builder .
 
 
 # upload to AWS.  

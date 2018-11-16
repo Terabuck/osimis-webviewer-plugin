@@ -46,7 +46,8 @@ RUN unzip /tmp/frontend.zip -d /frontend
 RUN ls -al /frontend
 WORKDIR /build
 
-RUN LSB_CC=gcc-4.8 LSB_CXX=g++-4.8 cmake ../src -DCMAKE_BUILD_TYPE=Release -DJS_CLIENT_PATH=/frontend/frontend-build -DORTHANC_FRAMEWORK_ROOT=/orthanc -DORTHANC_FRAMEWORK_SOURCE=path -DUSE_LEGACY_JSONCPP=ON -DCMAKE_TOOLCHAIN_FILE=../src/Resources/CMake/LinuxStandardBaseToolchain.cmake
+ARG VIEWER_VERSION_FULL=0.0.0-0-gxxxxxxxx-dirty
+RUN LSB_CC=gcc-4.8 LSB_CXX=g++-4.8 cmake ../src -DCMAKE_BUILD_TYPE=Release -DVIEWER_VERSION_FULL=$VIEWER_VERSION_FULL -DJS_CLIENT_PATH=/frontend/frontend-build -DORTHANC_FRAMEWORK_ROOT=/orthanc -DORTHANC_FRAMEWORK_SOURCE=path -DUSE_LEGACY_JSONCPP=ON -DCMAKE_TOOLCHAIN_FILE=../src/Resources/CMake/LinuxStandardBaseToolchain.cmake
 RUN make -j 5
 
 RUN ./UnitTests
