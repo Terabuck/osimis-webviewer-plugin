@@ -45,8 +45,8 @@ image for Linux.
 [This article](http://www.osimis.io/en/blog/2016/06/03/deploy-Orthanc-on-a-PC-in-38-seconds.html)
 details the installation process on Windows.
 
-[This procedure](https://bitbucket.org/snippets/osimis/eynLn) details the
-docker image installation process on Linux.
+[This procedure](https://osimis.atlassian.net/wiki/spaces/OKB/pages/26738689/How+to+use+osimis+orthanc+Docker+images#Howtouseosimis/orthancDockerimages?-Quickstart) explains how to use the
+docker image on Linux.
 
 For Mac OS X, the procedure is very similar to the windows' one. Unzip the
 downloaded folder and double click on the `startOrthanc.command` file.
@@ -54,122 +54,8 @@ downloaded folder and double click on the `startOrthanc.command` file.
 ## Configuration
 
 Orthanc is configurable via a [JSON file](https://orthanc.chu.ulg.ac.be/book/users/configuration.html).
-This plugin provide a few optional options as well.
+This plugin provide a few optional options as well.  Check [this page](https://osimis.atlassian.net/wiki/spaces/OKB/pages/10321921/Osimis+Web+Viewer+-+Configuration+file) for a full list.
 
-```json
-{
-  /**
-   * General configuration of Orthanc
-   **/
-
-  /* ... (see the Orthanc documentation for the other options) ... */
-
-  /**
-   * Orthanc options having significant impact on the Web Viewer
-   **/
-
-  // Enable the HTTP server. If this parameter is set to "false",
-  // Orthanc acts as a pure DICOM server. The REST API and Orthanc
-  // Explorer will not be available. 
-  "HttpServerEnabled" : true,
-
-  // HTTP port for the REST services and for the GUI
-  "HttpPort" : 8042,
-
-  // When the following option is "true", if an error is encountered
-  // while calling the REST API, a JSON message describing the error
-  // is put in the HTTP answer. This feature can be disabled if the
-  // HTTP client does not properly handles such answers.
-  "HttpDescribeErrors" : true,
-
-  // Enable HTTP compression to improve network bandwidth utilization,
-  // at the expense of more computations on the server. Orthanc
-  // supports the "gzip" and "deflate" HTTP encodings.
-  // May be disabled to avoid useless image recompression overhead.
-  "HttpCompressionEnabled" : true,
-
-  // Set the timeout for HTTP requests issued by Orthanc (in seconds).
-  "HttpTimeout" : 10,
-
-  // Whether remote hosts can connect to the HTTP server
-  // In development mode, useful to set to true when using docker on OSX.
-  "RemoteAccessAllowed" : false,
-  
-  // The maximum number of active jobs in the Orthanc scheduler. When
-  // this limit is reached, the addition of new jobs is blocked until
-  // some job finishes.
-  "LimitJobs" : 10,
-
-  // Enable or disable HTTP Keep-Alive (deprecated). Set this option
-  // to "true" only in the case of high HTTP loads.
-  "KeepAlive" : false,
-
-  "Plugins" : [
-    // Uncomment one of the following lines according to your platform.  
-    // Update the path to the DLL on your system.  The path is relative to the working folder
-    // Orthanc will start from.  If you are unsure what the working folder is,
-    // use and absolute path
-    
-    // "C:\\Program Files (x86)\\Orthanc\\Orthanc Server 1.1.0\\OsimisWebViewer.dll" // for Windows 
-    // "libOsimisWebViewer.so" // for Linux
-    // "libOsimisWebViewer.dylib" // for OSX
-  ],
-
-  /**
-   * Osimis WebViewer Configuration
-   **/
-  "WebViewer" : {
-    // Show the `download study` button in the frontend.
-    // You may want to disable this feature if you disable access to
-    // the underlying REST route for authentication reasons.
-    // Default: true
-    "StudyDownloadEnabled": true,
-
-    // Display MPEG-4 DICOM video (non-bd only) within the frontend. You
-    // may disable this feature if you disable access to the underlying
-    // REST route for authentication reasons.
-    // Default: true
-    "VideoDisplayEnabled": true,
-
-    // Store image annotations made by users as Orthanc Attachment 9999 and
-    // retrieve them autommatically each time the viewer is opened.
-    // Default: false
-    "AnnotationStorageEnabled": false,
-
-    // This option displays a button on each viewport. When the user clicks 
-    // on the button, a new DICOM series is created with the image of the
-    // viewport, including the annotations. You must ensure your server allows
-    // large requests. You must also includes a new dicom tag in the
-    // dictionary (see the Dictionary json attribute below).
-    // Default: false
-    "KeyImageCaptureEnabled": false
-
-    // Store low/high quality images in a short term cache
-    "ShortTermCacheEnabled": true,
-
-    // Path where the short term cache is stored
-    "ShortTermCachePath": "/OrthancStorage/WebViewerCache",
-
-    // Maximum size of the short term cache (in MB)
-    "ShortTermCacheSize": 1000,
-
-    // Start pre-computing the low/high quality images as soon as they are 
-    // received in Orthanc.
-    "ShortTermCachePrefetchOnInstanceStored": false,
-
-    // Number of threads used by the short term cache to pre-compute the
-    // low/high quality images.
-    "ShortTermCacheThreads": 4,
-
-    // Display cache debug logs (mainly for developers)
-    "ShortTermCacheDebugLogsEnabled": false,
-
-    // Preload high quality images on the frontend before the user actually
-    // needs them
-    "HighQualityImagePreloadingEnabled": true
-  }
-}
-```
 
 ## Licensing
 
@@ -197,7 +83,7 @@ address={San Francisco, {CA}, {USA}}
 
 ## Contact & Bug/Feedback Report
 
-Any question/feedback/bug report are well appreciated. You may send them by mail to osimis' support at `support@osimis.io`.
+Any question/feedback/bug report are well appreciated. You may report them on the [Orthanc Users Group](https://groups.google.com/forum/#!forum/orthanc-users).
 
 The full bug/feedback report procedure is available in the 
 `procedures/report-bug-or-feedback.md` file.
