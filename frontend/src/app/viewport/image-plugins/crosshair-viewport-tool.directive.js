@@ -1,4 +1,10 @@
-var synchronizer = new cornerstoneTools.Synchronizer("cornerstonenewimage", cornerstoneTools.updateImageSynchronizer);
+// hack: let's pass all usefull objects as global to avoid passing them in the toolState
+var crossHairCornerstoneSynchronizer = new cornerstoneTools.Synchronizer("cornerstonenewimage", cornerstoneTools.updateImageSynchronizer);
+var crossHairWvInstanceManager = undefined;
+var crossHairWvPaneManager = undefined;
+var crossHairWvSeriesManager = undefined;
+var crossHairWvReferenceLines = undefined;
+var crossHairWvSynchronizer = undefined;
 
 (function($, cornerstone, cornerstoneTools) {
 
@@ -9,12 +15,6 @@ var synchronizer = new cornerstoneTools.Synchronizer("cornerstonenewimage", corn
   function chooseLocation(e, eventData) {
       e.stopImmediatePropagation(); // Prevent CornerstoneToolsTouchStartActive from killing any press events
       
-      // if we have no toolData for this element, return immediately as there is nothing to do
-      var toolData = cornerstoneTools.getToolState(e.currentTarget, toolType);
-      if (!toolData) {
-          return;
-      }
-
       // Get current element target information
       var sourceElement = e.currentTarget;
       var sourceEnabledElement = cornerstone.getEnabledElement(sourceElement);
@@ -29,13 +29,7 @@ var synchronizer = new cornerstoneTools.Synchronizer("cornerstonenewimage", corn
       var patientPoint = cornerstoneTools.imagePointToPatientPoint(sourceImagePoint, sourceImagePlane);
 
       // Get the enabled elements associated with this synchronization context
-      var syncContext = toolData.data[0].synchronizationContext;
-      var wvInstanceManager = toolData.data[0].wvInstanceManager;
-      var wvReferenceLines = toolData.data[0].wvReferenceLines;
-      var wvSeriesManager = toolData.data[0].wvSeriesManager;
-      var wvPaneManager = toolData.data[0].wvPaneManager;
-      var wvSynchronizer = toolData.data[0].wvSynchronizer;
-      var enabledElements = syncContext.getSourceElements();
+      var enabledElements = crossHairCornerstoneSynchronizer.getSourceElements();
 
       // Iterate over each synchronized element
       $.each(enabledElements, function(index, targetElement) {
@@ -58,13 +52,10 @@ var synchronizer = new cornerstoneTools.Synchronizer("cornerstonenewimage", corn
           }
       
           //wvInstanceManager.getInfos(sourceImage.imageId.split(":")[0]).then(function(sourceInstanceInfos) {
-          wvInstanceManager.getInfos(targetImage.imageId.split(":")[0]).then(function(targetInstanceInfos) {
-            var targetPanes = wvPaneManager.getPanesDisplayingSeries(targetInstanceInfos["SeriesOrthancId"] + ":0");
+          crossHairWvInstanceManager.getInfos(targetImage.imageId.split(":")[0]).then(function(targetInstanceInfos) {
+            var targetPanes = crossHairWvPaneManager.getPanesDisplayingSeries(targetInstanceInfos["SeriesOrthancId"] + ":0");
 
             if (targetPanes.length > 0)  {
-              // wvSeriesManager.get(sourceInstanceInfos["SeriesOrthancId"] + ":0").then(function(sourceSeries) {
-              //   wvSeriesManager.get(targetInstanceInfos["SeriesOrthancId"] + ":0").then(function(targetSeries) {
-                  // console.log(sourceSeries, targetSeries);
 
               var minDistance = Number.MAX_VALUE;
               var newImageIndex = -1;
@@ -88,66 +79,13 @@ var synchronizer = new cornerstoneTools.Synchronizer("cornerstonenewimage", corn
                 $.each(targetPanes, function(index, targetPane) {
                   console.log("changing displayed image in series: " + targetPane.series.id + " to " + newImageIndex);
                   targetPane.series.goToImage(newImageIndex);
-                  wvSynchronizer.update(targetPane.series);
-                  wvReferenceLines.update(targetPane.series);
+                  crossHairWvSynchronizer.update(targetPane.series);
+                  crossHairWvReferenceLines.update(targetPane.series);
                 });
               }
             }
           });
 
-          // var minDistance = Number.MAX_VALUE;
-          // var newImageIdIndex = -1;
-
-          // // Find within the element's stack the closest image plane to selected location
-          // $.each(stackData.imageIds, function(index, imageId) {
-          //     var imagePlane = cornerstoneTools.metaData.get('imagePlane', imageId);
-          //     var imagePosition = imagePlane.imagePositionPatient;
-          //     var row = imagePlane.rowCosines.clone();
-          //     var column = imagePlane.columnCosines.clone();
-          //     var normal = column.clone().cross(row.clone());
-          //     var distance = Math.abs(normal.clone().dot(imagePosition) - normal.clone().dot(patientPoint));
-          //     //console.log(index + '=' + distance);
-          //     if (distance < minDistance) {
-          //         minDistance = distance;
-          //         newImageIdIndex = index;
-          //     }
-          // });
-
-          // if (newImageIdIndex === stackData.currentImageIdIndex) {
-          //     return;
-          // }
-
-          // // Switch the loaded image to the required image
-          // if (newImageIdIndex !== -1 && stackData.imageIds[newImageIdIndex] !== undefined) {
-          //     var startLoadingHandler = cornerstoneTools.loadHandlerManager.getStartLoadHandler();
-          //     var endLoadingHandler = cornerstoneTools.loadHandlerManager.getEndLoadHandler();
-          //     var errorLoadingHandler = cornerstoneTools.loadHandlerManager.getErrorLoadingHandler();
-
-          //     if (startLoadingHandler) {
-          //         startLoadingHandler(targetElement);
-          //     }
-
-          //     var loader;
-          //     if (stackData.preventCache === true) {
-          //         loader = cornerstone.loadImage(stackData.imageIds[newImageIdIndex]);
-          //     } else {
-          //         loader = cornerstone.loadAndCacheImage(stackData.imageIds[newImageIdIndex]);
-          //     }
-
-          //     loader.then(function(image) {
-          //         var viewport = cornerstone.getViewport(targetElement);
-          //         stackData.currentImageIdIndex = newImageIdIndex;
-          //         cornerstone.displayImage(targetElement, image, viewport);
-          //         if (endLoadingHandler) {
-          //             endLoadingHandler(targetElement);
-          //         }
-          //     }, function(error) {
-          //         var imageId = stackData.imageIds[newImageIdIndex];
-          //         if (errorLoadingHandler) {
-          //             errorLoadingHandler(targetElement, imageId, error);
-          //         }
-          //     });
-          // }
       });
   }
 
@@ -179,21 +117,16 @@ var synchronizer = new cornerstoneTools.Synchronizer("cornerstonenewimage", corn
           mouseButtonMask: mouseButtonMask,
       };
       
-      // Clear any currently existing toolData
-      var toolData = cornerstoneTools.getToolState(element, toolType);
-      toolData = [];
-
-      cornerstoneTools.addToolState(element, toolType, {
-        wvInstanceManager: wvInstanceManager,
-        wvReferenceLines: wvReferenceLines,
-        wvSeriesManager: wvSeriesManager,
-        wvSynchronizer: wvSynchronizer,
-        wvPaneManager: wvPaneManager,
-        synchronizationContext: synchronizer
-      });
+      // set the reference to all global objects
+      if (crossHairWvInstanceManager === undefined) {
+        crossHairWvInstanceManager = wvInstanceManager;
+        crossHairWvPaneManager = wvPaneManager;
+        crossHairWvSeriesManager = wvSeriesManager;
+        crossHairWvReferenceLines = wvReferenceLines;
+        crossHairWvSynchronizer = wvSynchronizer;
+      }
 
       $(element).off('CornerstoneToolsMouseDown', mouseDownCallback);
-
       $(element).on('CornerstoneToolsMouseDown', eventData, mouseDownCallback);
   }
 
@@ -230,18 +163,9 @@ var synchronizer = new cornerstoneTools.Synchronizer("cornerstonenewimage", corn
       return false; // false = causes jquery to preventDefault() and stopPropagation() this event
   }
 
-  function enableTouch(element, synchronizationContext) {
-      // Clear any currently existing toolData
-      var toolData = cornerstoneTools.getToolState(element, toolType);
-      toolData = [];
-
-      cornerstoneTools.addToolState(element, toolType, {
-          synchronizationContext: synchronizationContext,
-          // TODO
-      });
+  function enableTouch(element) {
 
       $(element).off('CornerstoneToolsTouchStart', dragStartCallback);
-
       $(element).on('CornerstoneToolsTouchStart', dragStartCallback);
   }
 
@@ -325,17 +249,17 @@ var synchronizer = new cornerstoneTools.Synchronizer("cornerstonenewimage", corn
       cornerstoneTools.touchInput.enable(enabledElement);
 
 
-      synchronizer.add(enabledElement);
+      crossHairCornerstoneSynchronizer.add(enabledElement);
       cornerstoneTools[this.toolName].activate(enabledElement, 1, wvInstanceManager, wvReferenceLines, wvSynchronizer, wvSeriesManager, wvPaneManager);
       if (this.toolName2) {
-        cornerstoneTools[this.toolName2].activate(enabledElement, synchronizer);
+        cornerstoneTools[this.toolName2].activate(enabledElement);
       }
 
     };
 
     Controller.prototype._deactivateInputs = function (viewport) {
       var enabledElement = viewport.getEnabledElement();
-      synchronizer.remove(enabledElement);
+      crossHairCornerstoneSynchronizer.remove(enabledElement);
 
       WvBaseTool.prototype._deactivateInputs.call(this, viewport);
     };
