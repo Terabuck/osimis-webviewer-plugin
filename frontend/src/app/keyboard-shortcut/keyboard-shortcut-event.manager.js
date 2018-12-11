@@ -260,6 +260,10 @@
                 angular.element('#toolbox-zoom-button').click();
             };
 
+            handlers.selectCrossHairTool = function() {
+              angular.element('#toolbox-crossHair-button').click();
+            };
+
             handlers.selectWindowingTool = function() {
                 angular.element('#toolbox-windowing-button').click();
             };

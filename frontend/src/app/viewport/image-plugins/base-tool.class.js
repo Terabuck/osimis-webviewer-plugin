@@ -57,7 +57,7 @@
         this.viewports.push(viewport)
     
         // For tools related to cornerstone (@todo split BaseTool in AnnotationTools & others)
-        if (cornerstoneTools[this.toolName]) {
+        if (cornerstoneTools[this.toolName] && this.isAnnotationTool) {
             // Set tool in enable mode (it's a 1D state machine with 4
             // states) - display annotations but ignore inputs.
             var enabledElement = viewport.getEnabledElement();

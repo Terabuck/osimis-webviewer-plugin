@@ -129,20 +129,23 @@
             // Load image tags if not already in loading.
             if (!_infosByInstances.hasOwnProperty(id)) {
                 // rebuild the info as done in backend
+                console.log("I thought this was not used anymore -> we need to get 'SeriesOrthancId'");
+                return "error";
+                // var request = new osimis.HttpRequest();
+                // request.setHeaders(wvConfig.httpRequestHeaders);
+                // _infosByInstances[id] = request
+                //     .get(wvConfig.orthancApiURL + '/instances/'+id+'/simplified-tags')
+                //     .then(function(response) {
+                //         var tags = response.data;
 
-                var request = new osimis.HttpRequest();
-                request.setHeaders(wvConfig.httpRequestHeaders);
-                _infosByInstances[id] = request
-                    .get(wvConfig.orthancApiURL + '/instances/'+id+'/simplified-tags')
-                    .then(function(response) {
-                        var tags = response.data;
-
-                        return { "TagsSubset" : tags };
-                    }, function(err) {
-                    	// @todo uncache & do something with the error.
+                //         return { "TagsSubset" : tags,
+                //         "SeriesOrthancId": TODO !!!
+                //       };
+                //     }, function(err) {
+                //     	// @todo uncache & do something with the error.
                     	
-                    	return $q.reject(err);
-                    });
+                //     	return $q.reject(err);
+                //     });
             }
 
             // Return the tags promise.
