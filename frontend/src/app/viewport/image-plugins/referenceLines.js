@@ -17,20 +17,9 @@
     this._wvInstanceManager = wvInstanceManager;
     this._wvSeriesManager = wvSeriesManager;
     this._enabled = true;
-    this._crossHairEnabled = false;
     this._lastUpdatedSeries = null;
     this._seriesInfosByInstanceId = {};
     this.onReferenceLineStatusUpdated = new osimis.Listener();
-  }
-
-  ReferenceLines.prototype.enableCrossHair = function (enabled) {
-    this._crossHairEnabled = enabled;
-    var synchronizer = new cornerstoneTools.Synchronizer("cornerstonenewimage", cornerstoneTools.updateImageSynchronizer);
-    cornerstoneTools.crosshairs.enable(axialElement, 1, synchronizer);
-  }
-
-  ReferenceLines.prototype.isCrossHairEnabled = function () {
-    return this._crossHairEnabled;
   }
 
   ReferenceLines.prototype.enable = function (enabled) {

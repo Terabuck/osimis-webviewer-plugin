@@ -69,20 +69,20 @@ var crossHairWvSynchronizer = undefined;
                   var normal = column.clone().cross(row.clone());
                   var distance = Math.abs(normal.clone().dot(targetImagePosition) - normal.clone().dot(patientPoint));
                   // console.log(index + '=' + distance);
-                  if (distance < minDistance) {
+                  if (distance < minDistance && distance < 10) {
                       minDistance = distance;
                       newImageIndex = index;
                   }
               });
 
-              if (newImageIndex != -1) {
+              // if (newImageIndex != -1) {
                 $.each(targetPanes, function(index, targetPane) {
                   console.log("changing displayed image in series: " + targetPane.series.id + " to " + newImageIndex);
                   targetPane.series.goToImage(newImageIndex);
                   crossHairWvSynchronizer.update(targetPane.series);
                   crossHairWvReferenceLines.update(targetPane.series);
                 });
-              }
+              // }
             }
           });
 
