@@ -237,33 +237,22 @@ var crossHairWvSynchronizer = undefined;
     Controller.prototype = Object.create(WvBaseTool.prototype)
     Controller.prototype.constructor = Controller;
 
-    // BaseTool class as been made for annotation. This is not one.
-    // We overide this method so the glass is not shown once toggled
-    // off. When we deactivate an annotation, we let the annotation
-    // shown, but only deactivate the inputs.
-    // For tools related to cornerstone (@todo split BaseTool in AnnotationTools & others)
-    Controller.prototype._activateInputs = function (viewport) {
-      var enabledElement = viewport.getEnabledElement();
-      //        WvBaseTool.prototype._activateInputs.call(this, viewport);
-
-      // Listen to events
-      cornerstoneTools.mouseInput.enable(enabledElement);
-      cornerstoneTools.touchInput.enable(enabledElement);
-
-
+    Controller.prototype._activateInputsInternal = function (enabledElement) {
       crossHairCornerstoneSynchronizer.add(enabledElement);
       cornerstoneTools[this.toolName].activate(enabledElement, 1, wvInstanceManager, wvReferenceLines, wvSynchronizer, wvSeriesManager, wvPaneManager);
       if (this.toolName2) {
         cornerstoneTools[this.toolName2].activate(enabledElement);
       }
 
-    };
+    }
 
-    Controller.prototype._deactivateInputs = function (viewport) {
-      var enabledElement = viewport.getEnabledElement();
+    Controller.prototype._deactivateInputsInternal = function (enabledElement) {
       crossHairCornerstoneSynchronizer.remove(enabledElement);
 
-      WvBaseTool.prototype._deactivateInputs.call(this, viewport);
+      cornerstoneTools[this.toolName].disable(enabledElement);
+      if (this.toolName2) {
+        cornerstoneTools[this.toolName2].disable(enabledElement);
+      }
     };
 
     return directive;
