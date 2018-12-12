@@ -51,7 +51,6 @@ var crossHairWvSynchronizer = undefined;
             return;
           }
       
-          //wvInstanceManager.getInfos(sourceImage.imageId.split(":")[0]).then(function(sourceInstanceInfos) {
           crossHairWvInstanceManager.getInfos(targetImage.imageId.split(":")[0]).then(function(targetInstanceInfos) {
             var targetPanes = crossHairWvPaneManager.getPanesDisplayingSeries(targetInstanceInfos["SeriesOrthancId"] + ":0");
 
@@ -69,22 +68,25 @@ var crossHairWvSynchronizer = undefined;
                   var normal = column.clone().cross(row.clone());
                   var distance = Math.abs(normal.clone().dot(targetImagePosition) - normal.clone().dot(patientPoint));
                   // console.log(index + '=' + distance);
-                  if (distance < minDistance && distance < 10) {
+                  if (distance < minDistance && distance <= targetImagePlane.sliceThickness) {
                       minDistance = distance;
                       newImageIndex = index;
                   }
               });
 
-              // if (newImageIndex != -1) {
-                $.each(targetPanes, function(index, targetPane) {
-                  console.log("changing displayed image in series: " + targetPane.series.id + " to " + newImageIndex);
-                  targetPane.series.goToImage(newImageIndex);
-                  crossHairWvSynchronizer.update(targetPane.series);
-                  crossHairWvReferenceLines.update(targetPane.series);
-                });
-              // }
+              $.each(targetPanes, function(index, targetPane) {
+                console.log("changing displayed image in series: " + targetPane.series.id + " to " + newImageIndex);
+                targetPane.series.goToImage(newImageIndex);
+                crossHairWvSynchronizer.update(targetPane.series);
+                crossHairWvReferenceLines.update(targetPane.series, false);
+              });
             }
           });
+          crossHairWvInstanceManager.getInfos(sourceImage.imageId.split(":")[0]).then(function(sourceInstanceInfos) {
+            var sourcePane = crossHairWvPaneManager.getPanesDisplayingSeries(sourceInstanceInfos["SeriesOrthancId"] + ":0")[0];
+            crossHairWvReferenceLines.update(sourcePane.series, true);
+          });
+          
 
       });
   }

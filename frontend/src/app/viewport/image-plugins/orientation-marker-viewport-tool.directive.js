@@ -44,7 +44,8 @@
                                 !tags.Columns ||
                                 !tags.ImageOrientationPatient ||
                                 !tags.ImagePositionPatient ||
-                                !tags.PixelSpacing
+                                !tags.PixelSpacing ||
+                                !tags.SliceThickness
                             ) {
                                 return undefined;
                             }
@@ -72,7 +73,8 @@
                                 // Retrieve from tag  Image Position (Patient)`
                                 imagePositionPatient: new cornerstoneMath.Vector3(parseFloat(imagePosition[0]), parseFloat(imagePosition[1]), parseFloat(imagePosition[2])),
                                 rowPixelSpacing: parseFloat(pixelSpacing[0]),
-                                columnPixelSpacing: parseFloat(pixelSpacing[1])
+                                columnPixelSpacing: parseFloat(pixelSpacing[1]),
+                                sliceThickness: parseFloat(tags.SliceThickness)
                             };     
                         }
                     }
