@@ -75,7 +75,7 @@ var crossHairWvSynchronizer = undefined;
               });
 
               $.each(targetPanes, function(index, targetPane) {
-                console.log("changing displayed image in series: " + targetPane.series.id + " to " + newImageIndex);
+                // console.log("changing displayed image in series: " + targetPane.series.id + " to " + newImageIndex);
                 targetPane.series.goToImage(newImageIndex);
                 crossHairWvSynchronizer.update(targetPane.series);
                 crossHairWvReferenceLines.update(targetPane.series, false);
