@@ -284,6 +284,19 @@
         return null;
     };
 
+    PaneManager.prototype.getPanesDisplayingSeries = function(seriesId) {
+      var toReturn = [];
+      // Search the pane at that position.
+      for (var i=0; i<this.panes.length; ++i) {
+          var pane = this.panes[i];
+          if (pane.seriesId == seriesId) {
+              toReturn.push(pane);
+          }
+      }
+
+      return toReturn;
+  };
+
     /**
      * @ngdoc method
      * @methodOf osimis.PaneManager

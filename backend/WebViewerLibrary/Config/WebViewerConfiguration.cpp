@@ -359,6 +359,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
     keyboardShortcutsAllowedToolNames.insert("flipVertical");
     keyboardShortcutsAllowedToolNames.insert("flipHorizontal");
     keyboardShortcutsAllowedToolNames.insert("invertColor");
+    keyboardShortcutsAllowedToolNames.insert("selectCrossHairTool");
     keyboardShortcutsAllowedToolNames.insert("selectCombinedTool");
     keyboardShortcutsAllowedToolNames.insert("selectPanTool");
     keyboardShortcutsAllowedToolNames.insert("selectWindowingTool");
