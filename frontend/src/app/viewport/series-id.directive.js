@@ -163,8 +163,8 @@
                     viewportController.clearImage();
                     // wv-image-index
                     if (wvImageIndexParser && wvImageIndexParser.assign) {
-                        _cancelCyclicCall = wvImageIndexParser(scope) !== 0;
-                        wvImageIndexParser.assign(scope, 0);
+                        _cancelCyclicCall = wvImageIndexParser(scope) !== -1;
+                        wvImageIndexParser.assign(scope, -1);
                     }
                 }
 
