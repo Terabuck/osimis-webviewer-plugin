@@ -53,7 +53,7 @@ def build(config):
     os.makedirs(buildFolder, exist_ok = True)
     os.chdir(buildFolder)
 
-    orthancFrameworkVersion = "mainline"
+    orthancFrameworkVersion = "1.5.0"
     orthancFrameworkSource = "hg"
 
     if platform.system() == 'Darwin':

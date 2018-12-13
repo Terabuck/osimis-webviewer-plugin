@@ -32,9 +32,8 @@ RUN mkdir /build
 RUN mkdir /frontend
 
 RUN hg clone https://bitbucket.org/sjodogne/orthanc /orthanc
-# synch to mainline after 1.4.2
 WORKDIR /orthanc
-RUN hg update -c 1153b1a
+RUN hg update -c Orthanc-1.5.0
 
 COPY . /src
 
