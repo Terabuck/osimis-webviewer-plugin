@@ -155,16 +155,28 @@ int SeriesController::_ProcessRequest()
   // however, in case of memory leak due to bad alloc, we should clean memory.
   // @todo avoid memory allocation within constructor
   catch (const Orthanc::OrthancException& exc) {
-    // Log detailed Orthanc error.
-    std::string message("(SeriesController) Orthanc::OrthancException ");
-    message += boost::lexical_cast<std::string>(exc.GetErrorCode());
-    message += "/";
-    message += boost::lexical_cast<std::string>(exc.GetHttpStatus());
-    message += " ";
-    message += exc.What();
-    OrthancPluginLogError(context, message.c_str());
 
-    return this->_AnswerError(exc.GetHttpStatus());
+    if (exc.GetErrorCode() == Orthanc::ErrorCode_IncompatibleImageFormat)
+    {
+      Json::Value modalitySkippedResponse;
+      modalitySkippedResponse["skipped"] = true;
+      std::string logMessage = std::string("skipping series ") + this->seriesId_ + ", unsupported series: '" + exc.GetDetails() + "'";
+      OrthancPluginLogWarning(context, logMessage.c_str());
+      return this->_AnswerBuffer(modalitySkippedResponse);
+    }
+    else
+    {
+      // Log detailed Orthanc error.
+      std::string message("(SeriesController) Orthanc::OrthancException ");
+      message += boost::lexical_cast<std::string>(exc.GetErrorCode());
+      message += "/";
+      message += boost::lexical_cast<std::string>(exc.GetHttpStatus());
+      message += " ";
+      message += exc.What();
+      OrthancPluginLogError(context, message.c_str());
+
+      return this->_AnswerError(exc.GetHttpStatus());
+    }
   }
   catch (const std::exception& exc) {
     // Log detailed std error.

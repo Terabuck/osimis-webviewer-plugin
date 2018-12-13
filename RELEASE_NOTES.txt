@@ -5,6 +5,11 @@ New features:
 
 * 3-D Cross-Hair
 
+Improvements:
+------------
+* SEG files are ignored since they can not be displayed anyway.
+
+
 Version 1.2.0
 ========================
 

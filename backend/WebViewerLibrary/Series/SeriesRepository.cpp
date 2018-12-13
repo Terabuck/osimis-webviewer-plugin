@@ -20,6 +20,7 @@ int seriesInfoJsonVersion = 1;
 namespace {
   std::string _getTransferSyntax(const Orthanc::DicomMap& headerTags);
   bool _isDicomSr(const Json::Value &tags);
+  bool _isDicomSeg(const Json::Value &tags);
   bool _isDicomPr(const Json::Value &tags);
   Json::Value simplifyInstanceTags(const Json::Value& instanceTags);
 }
@@ -136,8 +137,9 @@ std::auto_ptr<Series> SeriesRepository::GenerateSeriesInfo(const std::string& se
   // message, also
   // @warning We make the assumption DICOM SR & PR are always a single alone
   //          instance contained within a separate series.
-  if (::_isDicomSr(middleInstanceInfos["TagsSubset"]) || ::_isDicomPr(middleInstanceInfos["TagsSubset"])) {
-    throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_IncompatibleImageFormat));
+  std::string modality = middleInstanceInfos["TagsSubset"]["Modality"].asString();
+  if (modality == "SR" || modality == "PR" || modality == "SEG") {
+    throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_IncompatibleImageFormat), "unsupported modality: " + modality);
   }
 
   Json::Value studyInfo;
@@ -184,6 +186,16 @@ namespace {
     std::string modality = tags["Modality"].asString();
 
     return (modality == "SR");
+  }
+
+  bool _isDicomSeg(const Json::Value &tags) {
+    if (tags["Modality"].empty()) {
+      return false;
+    }
+
+    std::string modality = tags["Modality"].asString();
+
+    return (modality == "SEG");
   }
 
   bool _isDicomPr(const Json::Value &tags) {
