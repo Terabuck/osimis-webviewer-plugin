@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/thread/mutex.hpp>
+#include <boost/noncopyable.hpp>
 #include <deque>
 #include <string>
 #include <orthanc/OrthancCPlugin.h>
