@@ -287,6 +287,25 @@
                 binary: klvData.binary,
                 isSigned: isSigned
             });
+
+            {
+                // in WVB-338, we have seen pixels wrongly decoded by the jpeg-lossless decoder.  We have noticed the following mapping
+                // between expected values and decompressed values:
+                // 3984 -> 25572
+                //  400 -> 24672
+                //    0 -> 24576
+                // after analysis, it appears that the decompressed values contain 2 1s at bits 13 & 14 which are outisde bits stored !!!
+                // and, if these two bits are removed, the remaining value must be multiplied by 4.
+                // So, let's hack !
+                var maxPossiblePixelValue = Math.pow(2, +tags.BitsStored);
+                if (pixelArray[0] > maxPossiblePixelValue && tags.BitsStored == 12 && (pixelArray[0] & 0x6000) == 0x6000) {
+                    var bitsStoredMask = 0x0FFF;
+                    for (var i=0; i < pixelArray.length; i++) {
+                        pixelArray[i] = (pixelArray[i] & bitsStoredMask) * 4;
+                    }
+                }
+            }
+    
             break;
         }
 
