@@ -1,11 +1,11 @@
-FROM osimis/webapp-builder:1.1.1
+FROM osimis/webapp-builder:2.0.0
 
 # Install frontend dependencies
 WORKDIR /frontend
 
 COPY package.json .
 COPY local_dependencies/ local_dependencies/
-RUN npm install --unsafe-perm --python=python2.7
+RUN npm install
 
 COPY .bowerrc .
 COPY bower.json .
