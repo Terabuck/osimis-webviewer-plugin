@@ -39,18 +39,40 @@
             var vm = scope.vm;
 
             scope.$watch('vm.studyId', function(studyId) {
-                if (!studyId) {
-                    vm.downloadLink = '#';
-                }
-                else {
-                    vm.downloadLink = wvConfig.orthancApiURL + '/studies/' + studyId + '/archive';
+                if (wvConfig.downloadHandler !== undefined)
+                {
+                    vm.downloadLink = undefined;
+                } else {
+                    if (!studyId) {
+                        vm.downloadLink = '#';
+                    }
+                    else {
+                        vm.downloadLink = wvConfig.orthancApiURL + '/studies/' + studyId + '/archive';
+                    }
                 }
             });
         }
     }
 
     /* @ngInject */
-    function StudyDownloadButtonVM($window) {
+    function StudyDownloadButtonVM($window, wvConfig, wvStudyManager) {
         this.window = $window;
+        this.wvConfig = wvConfig;
+        var vm = this;
+
+        //wvConfig.downloadHandler = function(studyOrthancId, studyInstanceUid) {console.log("will download ", studyOrthancId, studyInstanceUid);}
+
+        this.clicked = function() {
+
+            if (wvConfig.downloadHandler !== undefined) // TODO wvConfig.config.toto
+            {
+                wvStudyManager.get(vm.studyId).then(function(study) {
+                    wvConfig.downloadHandler(vm.studyId, study.tags["StudyInstanceUID"]);
+                });
+                
+            }
+
+        }
+
     }
 })();
