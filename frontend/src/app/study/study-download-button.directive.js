@@ -62,17 +62,15 @@
 
         //wvConfig.downloadHandler = function(studyOrthancId, studyInstanceUid) {console.log("will download ", studyOrthancId, studyInstanceUid);}
 
-        this.clicked = function() {
+        this.clicked = function(event) {
 
-            if (wvConfig.downloadHandler !== undefined) // TODO wvConfig.config.toto
+            if (wvConfig.downloadHandler !== undefined)
             {
+                event.preventDefault();
                 wvStudyManager.get(vm.studyId).then(function(study) {
                     wvConfig.downloadHandler(vm.studyId, study.tags["StudyInstanceUID"]);
                 });
-                
             }
-
         }
-
     }
 })();
