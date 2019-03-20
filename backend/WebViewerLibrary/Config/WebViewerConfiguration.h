@@ -55,6 +55,7 @@ public:
   bool restrictTransferSyntaxes;
   std::set<std::string> enabledTransferSyntaxes;
   Json::Value seriesToIgnore;
+  Json::Value SeriesToIgnoreFromMetadata;
 
   // Frontend Variables
   bool showStudyInformationBreadcrumb;

@@ -146,6 +146,10 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   {
     seriesToIgnore = wvConfig["SeriesToIgnore"];
   }
+  if (wvConfig.isMember("SeriesToIgnoreFromMetadata"))
+  {
+    seriesToIgnoreFromMetadata = wvConfig["SeriesToIgnoreFromMetadata"];
+  }
 
   // Retrieve windowing preset (if set).
   if (wvConfig.isMember("WindowingPresets") &&

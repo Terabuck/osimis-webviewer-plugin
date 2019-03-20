@@ -101,7 +101,7 @@ int SeriesController::_ProcessRequest()
     // Load the series with an auto_ptr so it's freed at the end of thit method
     std::auto_ptr<Series> series(seriesRepository_->GetSeries(this->seriesId_));
 
-    // filter out series
+    // filter out series based on tags
     if (!_config->seriesToIgnore.empty())
     {
       std::string middleInstanceId = series->GetMiddleInstanceId();
@@ -130,6 +130,49 @@ int SeriesController::_ProcessRequest()
               }
 
               if (allTagsMatching)
+              {
+                Json::Value modalitySkippedResponse;
+                modalitySkippedResponse["skipped"] = true;
+                std::string logMessage = std::string("skipping series ") + this->seriesId_ + ", filtered out by the '" + filterNames[i] + "' filter";
+                OrthancPluginLogWarning(context, logMessage.c_str());
+                return this->_AnswerBuffer(modalitySkippedResponse);
+              }
+
+            }
+          }
+        }
+      }
+    }
+
+    // filter out series based on metadata
+    if (!_config->seriesToIgnoreFromMetadata.empty())
+    {
+      std::string middleInstanceId = series->GetMiddleInstanceId();
+
+      if (!middleInstanceId.empty())
+      {
+        // get all metadatas from the middle instance
+        Json::Value middleInstanceMetadatas;
+        if (OrthancPlugins::GetJsonFromOrthanc(middleInstanceMetadatas, context, "/instances/" + middleInstanceId + "/metadata?expand"))
+        {
+          Json::Value::Members filterNames = _config->seriesToIgnoreFromMetadata.getMemberNames();
+          for (size_t i = 0; i < filterNames.size(); i++)
+          {
+            Json::Value filter = _config->seriesToIgnoreFromMetadata[filterNames[i]];
+            if (filter.type() == Json::objectValue)
+            {
+              bool allMetadatasMatching = true;
+              Json::Value::Members metadataNames = filter.getMemberNames();
+              for (size_t j = 0; j < metadataNames.size(); j++)
+              {
+                if (!middleInstanceMetadatas.isMember(metadataNames[j]) || middleInstanceMetadatas[metadataNames[j]] != filter[metadataNames[j]])
+                {
+                  allMetadatasMatching = false;
+                  break;
+                }
+              }
+
+              if (allMetadatasMatching)
               {
                 Json::Value modalitySkippedResponse;
                 modalitySkippedResponse["skipped"] = true;
