@@ -8,6 +8,7 @@ New features:
 Improvements:
 ------------
 * SEG files are ignored since they can not be displayed anyway.
+* Added an option to ignore series based on metadata values.  This is defined in the configuration file in "SeriesToIgnoreFromMetadata".
 
 
 Version 1.2.0
