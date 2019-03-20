@@ -47,6 +47,11 @@ if (MSVC) # VS2012 does not support tuples correctly yet
   add_definitions(/D _VARIADIC_MAX=10)
 endif()
 
+# speed up build
+if(MSVC)
+  add_definitions(/MP)
+endif()
+
 # Add headers required by boost chrono when benchmark are ON
 if (BENCHMARK)
   add_definitions( 
