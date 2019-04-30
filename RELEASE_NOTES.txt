@@ -5,6 +5,13 @@ New features:
 
 * 3-D Cross-Hair
 
+Changes:
+-------
+
+* Instead of showing the StudyDate, the overlay now displayes SeriesDate - SeriesTime.  If there are no SeriesDate and SeriesTime, the overlay
+  shows StudyDate - StudyTime.
+
+
 Improvements:
 ------------
 * SEG files are ignored since they can not be displayed anyway.

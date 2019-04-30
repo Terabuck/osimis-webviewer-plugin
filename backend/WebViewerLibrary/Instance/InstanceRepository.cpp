@@ -14,7 +14,7 @@
 #include "ViewerToolbox.h"
 
 std::string instanceMetadataId = "9998";
-int instanceInfoJsonVersion = 1;
+int instanceInfoJsonVersion = 2;
 
 InstanceRepository::InstanceRepository(OrthancPluginContext* context)
   : _context(context),
@@ -107,6 +107,9 @@ Json::Value InstanceRepository::SimplifyInstanceTags(const Json::Value& instance
   tagsToKeep.push_back("OsimisNote");
   tagsToKeep.push_back("StudyDescription");
   tagsToKeep.push_back("StudyDate");
+  tagsToKeep.push_back("StudyTime");
+  tagsToKeep.push_back("SeriesDate");
+  tagsToKeep.push_back("SeriesTime");
   tagsToKeep.push_back("SeriesNumber");
   tagsToKeep.push_back("SeriesDescription");
 

@@ -95,7 +95,26 @@
                 var lines = [];
 
                 ArrayHelpers.pushIfDefined(lines, seriesTags.StudyDescription);
-                ArrayHelpers.pushIfDefined(lines, seriesTags.StudyDate);
+                var dateAndTime = undefined;
+                if (seriesTags.SeriesDate !== undefined && seriesTags.SeriesDate.length >= 8) {
+                    dateAndTime = seriesTags.SeriesDate;
+                    if (seriesTags.SeriesTime != undefined) {
+                        dateAndTime = dateAndTime + " - " + seriesTags.SeriesTime.substr(0, 2) + ":" + seriesTags.SeriesTime.substr(2, 2);
+                        if (seriesTags.SeriesTime.length >= 6) {
+                            dateAndTime = dateAndTime + ":" + seriesTags.SeriesTime.substr(4, 2);
+                        } 
+                    }
+                }
+                if (dateAndTime === undefined && seriesTags.StudyDate !== undefined && seriesTags.StudyDate.length >= 8) {
+                    dateAndTime = seriesTags.StudyDate;
+                    if (seriesTags.StudyTime != undefined) {
+                        dateAndTime = dateAndTime + " - " + seriesTags.StudyTime.substr(0, 2) + ":" + seriesTags.StudyTime.substr(2, 2);
+                        if (seriesTags.StudyTime.length >= 6) {
+                            dateAndTime = dateAndTime + ":" + seriesTags.StudyTime.substr(4, 2);
+                        } 
+                    }
+                }
+                ArrayHelpers.pushIfDefined(lines, dateAndTime);
 
                 var lineElements = [];
                 ArrayHelpers.pushIfDefinedWithPrefix(lineElements, "#", seriesTags.SeriesNumber);
