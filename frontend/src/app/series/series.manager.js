@@ -253,7 +253,7 @@
             var useCache = useCache !== undefined ? useCache : true;
             request.setHeaders(wvConfig.httpRequestHeaders);
             request.setCache(useCache);
-            return request.get(wvConfig.orthancApiURL + '/studies/'+studyId)
+            return request.get(wvConfig.orthancApiURL + '/osimis-viewer/studies/'+studyId)
                 .then(function(response) {
                     var orthancStudy = response.data;
                     var orthancSeriesIds = orthancStudy.Series;

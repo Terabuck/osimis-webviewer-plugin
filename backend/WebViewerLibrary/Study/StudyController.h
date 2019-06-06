@@ -24,4 +24,8 @@ private:
   static AnnotationRepository* annotationRepository_;
 
   std::string studyId_;
+  bool isAnnotationRequest_;
+
+  int ProcessAnnotationRequest(OrthancPluginContext* context);
+  int ProcessStudyInfoRequest(OrthancPluginContext* context);
 };

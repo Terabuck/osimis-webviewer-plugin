@@ -2,14 +2,16 @@
 
 #include <memory>
 #include <string>
+#include <algorithm>
 #include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp> // to retrieve exception error code for log
+#include <boost/range/algorithm.hpp>
 #include <Core/OrthancException.h>
 
 #include "../Annotation/AnnotationRepository.h"
 #include "../BenchmarkHelper.h" // for BENCH(*)
 #include "../OrthancContextManager.h"
-
+#include "ViewerToolbox.h"
 
 AnnotationRepository* StudyController::annotationRepository_ = NULL;
 
@@ -30,19 +32,28 @@ int StudyController::_ParseURLPostFix(const std::string& urlPostfix) {
 
   try {
     // /osimis-viewer/studies/<Study_uid>/annotations
-    boost::regex regexp("^([^/]+)/annotations$");
+    // /osimis-viewer/studies/<Study_uid>
+
+    boost::regex regexpAnnotations("^([^/]+)/annotations$");
+    boost::regex regexpSimpleStudy("^([^/]+)$");
 
     // Parse URL
     boost::cmatch matches;
-    if (!boost::regex_match(urlPostfix.c_str(), matches, regexp)) {
-      // Return 404 error on badly formatted URL - @todo use ErrorCode_UriSyntax instead
-      return this->_AnswerError(404);
-    }
-    else {
+    if (!boost::regex_match(urlPostfix.c_str(), matches, regexpAnnotations)) {
+      if (!boost::regex_match(urlPostfix.c_str(), matches, regexpSimpleStudy)) {
+        // Return 404 error on badly formatted URL - @todo use ErrorCode_UriSyntax instead
+        return this->_AnswerError(404);
+      } else {
+        // Store StudyId
+        this->studyId_ = matches[1];
+        this->isAnnotationRequest_ = false;
+
+        return 200;
+      }
+    } else {
       // Store StudyId
       this->studyId_ = matches[1];
-
-      BENCH_LOG(STUDY_ID, studyId_);
+      this->isAnnotationRequest_ = true;
 
       return 200;
     }
@@ -84,6 +95,62 @@ int StudyController::_ParseURLPostFix(const std::string& urlPostfix) {
   }
 }
 
+int StudyController::ProcessAnnotationRequest(OrthancPluginContext* context)
+{
+  // Answer 403 Forbidden if annotation storage is disabled
+  if (!this->annotationRepository_->isAnnotationStorageEnabled()) {
+    return this->_AnswerError(403);
+  }
+  // Answer Request with the study's annotations as JSON else
+  else {
+    Json::Value annotations = annotationRepository_->getByStudyId(this->studyId_);
+    return this->_AnswerBuffer(annotations);
+  }
+}
+
+int StudyController::ProcessStudyInfoRequest(OrthancPluginContext* context)
+{
+  std::vector<std::string> seriesDisplayOrder;
+  Json::Value studyInfo;
+  OrthancPlugins::GetJsonFromOrthanc(studyInfo, context, "/studies/" + this->studyId_);
+
+  Json::Value seriesDisplayOrderJson;
+  if (OrthancPlugins::GetJsonFromOrthanc(seriesDisplayOrderJson, context, "/studies/" + this->studyId_ + "/metadata/seriesDisplayOrder"))
+  {
+    seriesDisplayOrder.clear();
+    for (Json::ArrayIndex i = 0; i < seriesDisplayOrderJson.size(); i++)
+    {
+      seriesDisplayOrder.push_back(seriesDisplayOrderJson[(int)i].asString());
+    }
+
+    for (Json::ArrayIndex i = 0; i < studyInfo["Series"].size(); i++)
+    {
+      const std::string& seriesId = studyInfo["Series"][(int)i].asString();
+      if (boost::range::find(seriesDisplayOrder, seriesId) == seriesDisplayOrder.end()) {
+        seriesDisplayOrder.push_back(seriesId);
+      }
+    }
+  } else {
+    // by default, sort series according to the alphabetical order of their ids (at least, this is reproducible !)
+    for (Json::ArrayIndex i = 0; i < studyInfo["Series"].size(); i++)
+    {
+      seriesDisplayOrder.push_back(studyInfo["Series"][(int)i].asString());
+    }
+    boost::range::sort(seriesDisplayOrder);
+  }
+
+  // now, reorder the series in the Json
+  studyInfo["Series"] = Json::arrayValue;
+
+  for (size_t i = 0; i < seriesDisplayOrder.size(); i++) {
+    studyInfo["Series"].append(seriesDisplayOrder[i]);
+  }
+
+  return this->_AnswerBuffer(studyInfo);
+
+}
+
+
 int StudyController::_ProcessRequest()
 {
   // Retrieve context so we can use orthanc's logger.
@@ -92,14 +159,10 @@ int StudyController::_ProcessRequest()
   try {
     BENCH(FULL_PROCESS);
 
-    // Answer 403 Forbidden if annotation storage is disabled
-    if (!this->annotationRepository_->isAnnotationStorageEnabled()) {
-      return this->_AnswerError(403);
-    }
-    // Answer Request with the study's annotations as JSON else
-    else {
-      Json::Value annotations = annotationRepository_->getByStudyId(this->studyId_);
-      return this->_AnswerBuffer(annotations);
+    if (this->isAnnotationRequest_) {
+      return this->ProcessAnnotationRequest(context);
+    } else {
+      return this->ProcessStudyInfoRequest(context);
     }
   }
   // @note if the exception has been thrown from some constructor,

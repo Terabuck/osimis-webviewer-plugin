@@ -18,6 +18,9 @@ Improvements:
 ------------
 * SEG files are ignored since they can not be displayed anyway.
 * Added an option to ignore series based on metadata values.  This is defined in the configuration file in "SeriesToIgnoreFromMetadata".
+* It is now possible to define the display order of series by providing the list of series id in the "seriesDisplayOrder" metadata.  If the metadata
+  is not defined, the series are now displayed according to the alphabetical order of their series id (in past version, the order was the one provided
+  by Orthanc and could depend on the order of object creation in Orthanc)
 
 
 Version 1.2.0
