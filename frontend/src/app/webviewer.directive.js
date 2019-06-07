@@ -131,7 +131,7 @@
         .directive('wvWebviewer', wvWebviewer);
 
     /* @ngInject */
-    function wvWebviewer($rootScope, $timeout, $translate, wvStudyManager, wvAnnotationManager, wvSeriesManager, wvPaneManager, wvWindowingViewportTool, wvSynchronizer, wvReferenceLines, wvViewerController, wvConfig) {
+    function wvWebviewer($rootScope, $timeout, $translate, wvStudyManager, wvAnnotationManager, wvImageManager, wvPaneManager, wvWindowingViewportTool, wvSynchronizer, wvReferenceLines, wvViewerController, wvConfig) {
         var directive = {
             bindToController: true,
             controller: Controller,
@@ -159,6 +159,7 @@
                 studyDownloadEnabled: '=?wvStudyDownloadEnabled',
                 videoDisplayEnabled: '=?wvVideoDisplayEnabled',
                 keyImageCaptureEnabled: '=?wvKeyImageCaptureEnabled',
+                downloadAsJpegEnabled: '=?wvDownloadAsJpegEnabled',
                 combinedToolEnabled: '=?wvCombinedToolEnabled',
                 showNoReportIconInSeriesList: '=?wvShowNoReportIconInSeriesList',
                 reduceTimelineHeightOnSingleFrameSeries: '=?wvReduceTimelineHeightOnSingleFrameSeries',
@@ -278,6 +279,9 @@
             if (vm.keyImageCaptureEnabled) { // activate
                 vm.tools.keyImageCapture = false;
             }
+            if (vm.downloadAsJpegEnabled) { // activate
+                vm.tools.downloadAsJpeg = false;
+            }
             if (vm.combinedToolEnabled) { // activate}
                 vm.tools.combinedTool = false;
             }
@@ -341,6 +345,7 @@
                         ]
                     },
                     {type: "button", tool: "print"},
+                    {type: "button", tool: "downloadAsJpeg"},
                     {type: "button", tool: "keyImageCapture"},
                     {type: "button", tool: "toggleSynchro"},
                     {type: "button", tool: "toggleReferenceLines"},
@@ -359,6 +364,7 @@
             vm.studyDownloadEnabled = typeof vm.studyDownloadEnabled !== 'undefined' ? vm.studyDownloadEnabled : false;
             vm.videoDisplayEnabled = typeof vm.videoDisplayEnabled !== 'undefined' ? vm.videoDisplayEnabled : true;
             vm.keyImageCaptureEnabled = typeof vm.keyImageCaptureEnabled !== 'undefined' ? vm.keyImageCaptureEnabled : false;
+            vm.downloadAsJpegEnabled = typeof vm.downloadAsJpegEnabled !== 'undefined' ? vm.downloadAsJpegEnabled : false;
             vm.combinedToolEnabled = typeof vm.combinedToolEnabled !== 'undefined' ? vm.combinedToolEnabled : false;
             vm.studyIslandsDisplayMode = vm.wvViewerController.getStudyIslandDisplayMode(__webViewerConfig.defaultStudyIslandsDisplayMode || "grid");
             vm.paneManager = wvPaneManager;
@@ -547,6 +553,12 @@
                     break;
                 case 'print':
                     window.print();
+                    break;
+                case 'downloadAsJpeg':
+                    console.log("TODO: downloadAsJpeg");
+                    selectedPane.downloadAsJpeg();
+                    //wvImageManager.createAnnotedImage(id, width, height, serializedCsViewport);
+
                     break;
                 case 'customCommand':
                     vm.wvViewerController.executeCustomCommand();

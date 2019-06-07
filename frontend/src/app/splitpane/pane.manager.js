@@ -11,13 +11,14 @@
 (function(osimis) {
     'use strict';
 
-    function PaneManager(Promise, studyManager, seriesManager, $timeout, wvConfig) {
+    function PaneManager(Promise, studyManager, seriesManager, $timeout, wvConfig, wvImageManager) {
         // Injections.
         this._Promise = Promise;
         this._studyManager = studyManager;
         this._seriesManager = seriesManager;
         this.$timeout = $timeout;
         this._wvConfig = wvConfig;
+        this._wvImageManager = wvImageManager;
 
         // Default config.
         this.layout = {
@@ -28,7 +29,7 @@
         // Panes.
         // Must keep reference as it's databound in `wvWebviewer` views.
         this.panes = [
-            new osimis.Pane($timeout, this._Promise, this._studyManager, this._seriesManager, 0, 0, this._wvConfig)
+            new osimis.Pane($timeout, this._Promise, this._studyManager, this._seriesManager, 0, 0, this._wvConfig, this._wvImageManager)
         ];
         this.panes[0].isSelected = true;
 
@@ -118,7 +119,7 @@
                     var pane = removedPanes.pop();
                     // If none exist, create a new one.
                     if (!pane) {
-                        pane = new osimis.Pane(this.$timeout, this._Promise, this._studyManager, this._seriesManager, x, y, this._wvConfig);
+                        pane = new osimis.Pane(this.$timeout, this._Promise, this._studyManager, this._seriesManager, x, y, this._wvConfig, this._wvImageManager);
                     }
                     // Otherwise, move the previously removed pane into its new
                     // position.
@@ -535,7 +536,7 @@
         .factory('wvPaneManager', wvPaneManager);
 
     /* @ngInject */
-    function wvPaneManager($q, wvStudyManager, wvSeriesManager, $timeout, wvConfig) {
-        return new PaneManager($q, wvStudyManager, wvSeriesManager, $timeout, wvConfig);
+    function wvPaneManager($q, wvStudyManager, wvSeriesManager, $timeout, wvConfig, wvImageManager) {
+        return new PaneManager($q, wvStudyManager, wvSeriesManager, $timeout, wvConfig, wvImageManager);
     }
 })(osimis || (this.osimis = {}));

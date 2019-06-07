@@ -78,6 +78,7 @@ public:
   Json::Value keyboardShortcuts;
   bool keyboardShortcutsEnabled;
   bool keyImageCaptureEnabled;
+  bool downloadAsJpegEnabled;
   bool combinedToolEnabled;
   bool printEnabled;
   bool openAllPatientStudies;

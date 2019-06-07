@@ -20,12 +20,13 @@
 (function(osimis) {
     'use strict';
 
-    function Pane($timeout, Promise, studyManager, seriesManager, x, y, wvConfig) {
+    function Pane($timeout, Promise, studyManager, seriesManager, x, y, wvConfig, wvImageManager) {
         // Injections
         this._Promise = Promise;
         this._studyManager = studyManager;
         this._seriesManager = seriesManager;
         this._wvConfig = wvConfig;
+        this._wvImageManager = wvImageManager;
         this.$timeout = $timeout;
 
         // @warning This parameter is used for other services to access the
@@ -192,6 +193,42 @@
     Pane.prototype.invertColor = function() {
         this.csViewport.invert = !this.csViewport.invert;
     };
+
+    Pane.prototype.downloadAsJpeg = function() {
+        var that = this;
+        var serializedCsViewport = this.csViewport.serialize(this.csViewport.originalImageResolution.width, this.csViewport.originalImageResolution.height);
+        var imageId = this.series.imageIds[this.imageIndex];
+
+        return this._wvImageManager.get(imageId).then(function(image){
+            var captureWidth = image.instanceInfos.TagsSubset["Columns"] || 600;
+            var captureHeight = image.instanceInfos.TagsSubset["Rows"] || 400;
+    
+            if (captureWidth < 512) { // if image is too small, the annotation will appear 'pixelized' -> increase the size
+                var upscaleRatio = 512 / captureWidth;
+                captureWidth = Math.round(captureWidth * upscaleRatio);
+                captureHeight = Math.round(captureHeight * upscaleRatio);
+            }
+    
+            console.log("creating a new capture image (" + captureWidth + " x " + captureHeight + ")");
+    
+            that._wvImageManager
+                .createAnnotedImage(imageId, captureWidth, captureHeight, serializedCsViewport, "image/jpeg")
+                .then(function(imageData) {
+                    console.log("Downloading image (" + imageData.length + " bytes)");
+                    var element = document.createElement('a');
+                    element.setAttribute('href', imageData);
+                    element.setAttribute('download', that.series.tags["PatientName"] + " - " + that.series.tags["StudyDescription"] + " - " + that.series.tags["SeriesDescription"] + ".jpg");
+                  
+                    element.style.display = 'none';
+                    document.body.appendChild(element);
+                  
+                    element.click();
+                  
+                    document.body.removeChild(element);
+                });
+        });
+    
+    }
 
     Pane.prototype.getNextSeriesPaneConfigPromise = function(){
         var selectedPane = this;

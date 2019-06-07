@@ -67,6 +67,7 @@
             "SIMPLE_ANGLE_MEASUREMENT": "angle measurement",
             "ARROW_ANNOTATE_TEXT": "annotate the image with text",
             "CROSS_HAIR" : "3D cross-hair",
+            "DOWNLOAD_AS_JPEG": "download as jpeg",
             "ELLIPTICAL_ROI": "elliptical roi",
             "FLIP_HORIZONTALLY": "flip horizontally",
             "FLIP_VERTICALLY": "flip vertically",

@@ -4,6 +4,8 @@ New features:
 ------------
 
 * 3-D Cross-Hair
+* Added a button to download the current viewport as jpeg.  It must be enabled by setting the "DownloadAsJpegEnabled" option 
+  to true in the configuration file
 
 Changes:
 -------

@@ -267,12 +267,15 @@
          * 
          * @todo move in @RootAggregate (ie. image-model)
          */
-        imageManager.createAnnotedImage = function(id, width, height, serializedCsViewport) {
+        imageManager.createAnnotedImage = function(id, width, height, serializedCsViewport, contentType) {
             // create a fake viewport containing the image to save it with the annotations
 
             // create a fake scope for the viewport
             var $scope = $rootScope.$new();
 
+            if (contentType === undefined) {
+                contentType = "image/png";
+            }
             var pixelsCount = width * height;
             var maxPixelsCount = 1*1024*1024;
             if (pixelsCount > maxPixelsCount) {
@@ -339,7 +342,7 @@
 
                     // save the image to base64 data (96 dpi png image)
                     var canvas = fakeViewport.find('canvas').get(0);
-                    image = canvas.toDataURL();
+                    image = canvas.toDataURL(contentType);
 
                     _destroyFakeViewport();
 

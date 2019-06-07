@@ -373,6 +373,21 @@
         <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'print'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
     </label>
 
+    <!-- Download as jpeg -->
+    <label
+        ng-switch-when="downloadAsJpeg"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('downloadAsJpeg')"
+        class="wvButton--underline"
+        data-title="{{ 'COMPONENTS.TOOLBOX.DOWNLOAD_AS_JPEG' | translate | wvCapitalize }}"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        ng-class="{'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        bs-tooltip
+    >
+      <i class="fa fa-file-download"></i>
+      <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'downloadAsJpeg'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
     <!-- Key Image Note -->
     <wv-keyimagenote-button
         ng-switch-when="keyImageCapture"

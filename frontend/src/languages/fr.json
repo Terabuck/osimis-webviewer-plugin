@@ -65,6 +65,7 @@
             "SIMPLE_ANGLE_MEASUREMENT": "mesure d’angle entre lignes",
             "ANGLE_MEASUREMENT": "mesure d’angle",
             "ARROW_ANNOTATE_TEXT": "annoter l’image avec du texte",
+            "DOWNLOAD_AS_JPEG": "télécharger en jpeg",
             "ELLIPTICAL_ROI": "roi élliptique",
             "FLIP_HORIZONTALLY": "retournement horizontal",
             "FLIP_VERTICALLY": "retournement vertical",

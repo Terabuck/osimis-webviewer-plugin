@@ -235,6 +235,7 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   videoDisplayEnabled = OrthancPlugins::GetBoolValue(wvConfig, "VideoDisplayEnabled", true);
   annotationStorageEnabled = OrthancPlugins::GetBoolValue(wvConfig, "AnnotationStorageEnabled", false);
   keyImageCaptureEnabled = OrthancPlugins::GetBoolValue(wvConfig, "KeyImageCaptureEnabled", false);
+  downloadAsJpegEnabled = OrthancPlugins::GetBoolValue(wvConfig, "DownloadAsJpegEnabled", false);
   combinedToolEnabled = OrthancPlugins::GetBoolValue(wvConfig, "CombinedToolEnabled", false);
   printEnabled = OrthancPlugins::GetBoolValue(wvConfig, "PrintEnabled", true);
   openAllPatientStudies = OrthancPlugins::GetBoolValue(wvConfig, "OpenAllPatientStudies", true);
@@ -529,6 +530,7 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["videoDisplayEnabled"] = videoDisplayEnabled;
   config["annotationStorageEnabled"] = annotationStorageEnabled;
   config["keyImageCaptureEnabled"] = keyImageCaptureEnabled;
+  config["downloadAsJpegEnabled"] = downloadAsJpegEnabled;
   config["combinedToolEnabled"] = combinedToolEnabled;
   config["printEnabled"] = printEnabled;
   config["openAllPatientStudies"] = openAllPatientStudies;
