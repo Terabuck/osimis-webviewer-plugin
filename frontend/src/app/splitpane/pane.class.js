@@ -211,11 +211,22 @@
             console.log("creating a new capture image (" + captureWidth + " x " + captureHeight + ")");
     
             wvImageManager
-                .createAnnotedImage(imageId, captureWidth, captureHeight, serializedCsViewport, "image/jpeg")
+                .createAnnotedImage(imageId, captureWidth, captureHeight, serializedCsViewport, "image/jpeg", false, 0.8)
                 .then(function(imageData) {
                     console.log("Downloading image (" + imageData.length + " bytes)");
+                    
+                    // convert the data uri to blob
+                    var binaryImageData = atob(imageData.split(',')[1]); 
+                    var array = [];
+                    for(var i = 0; i < binaryImageData.length; i++) 
+                        array.push(binaryImageData.charCodeAt(i));
+                    var blob = new Blob([new Uint8Array(array)], {type: "image/jpeg"});
+                    
+                    var url = window.URL.createObjectURL(blob);
+
                     var element = document.createElement('a');
-                    element.setAttribute('href', imageData);
+                    //element.setAttribute('href', imageData);
+                    element.setAttribute('href', url);
                     element.setAttribute('download', that.series.tags["PatientName"] + " - " + that.series.tags["StudyDescription"] + " - " + that.series.tags["SeriesDescription"] + ".jpg");
                   
                     element.style.display = 'none';

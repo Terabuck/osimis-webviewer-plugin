@@ -174,7 +174,7 @@
 
         return this
             // Create annoted image.
-            .createAnnotedImage(imageId, width, height, serializedCsViewport)
+            .createAnnotedImage(imageId, width, height, serializedCsViewport, "image/png", true, 1)
             // Prepare new dicom tags for captured image.
             .then(function(b64PixelData) {
                 var instanceId = imageId.split(':')[0];
@@ -267,18 +267,15 @@
          * 
          * @todo move in @RootAggregate (ie. image-model)
          */
-        imageManager.createAnnotedImage = function(id, width, height, serializedCsViewport, contentType) {
+        imageManager.createAnnotedImage = function(id, width, height, serializedCsViewport, contentType, limitSize, compressionRatio) {
             // create a fake viewport containing the image to save it with the annotations
 
             // create a fake scope for the viewport
             var $scope = $rootScope.$new();
 
-            if (contentType === undefined) {
-                contentType = "image/png";
-            }
             var pixelsCount = width * height;
             var maxPixelsCount = 1*1024*1024;
-            if (pixelsCount > maxPixelsCount) {
+            if (pixelsCount > maxPixelsCount && limitSize) {
               var ratio = Math.sqrt(pixelsCount / maxPixelsCount);
               width = Math.round(width / ratio);
               height = Math.round(height / ratio);
@@ -340,9 +337,10 @@
                 $timeout(function() {
                     var image = null;
 
-                    // save the image to base64 data (96 dpi png image)
+                    // save the image to base64 data (96 dpi)
                     var canvas = fakeViewport.find('canvas').get(0);
-                    image = canvas.toDataURL(contentType);
+                    
+                    image = canvas.toDataURL(contentType, compressionRatio);
 
                     _destroyFakeViewport();
 
