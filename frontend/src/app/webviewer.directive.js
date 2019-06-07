@@ -555,10 +555,7 @@
                     window.print();
                     break;
                 case 'downloadAsJpeg':
-                    console.log("TODO: downloadAsJpeg");
-                    selectedPane.downloadAsJpeg();
-                    //wvImageManager.createAnnotedImage(id, width, height, serializedCsViewport);
-
+                    selectedPane.downloadAsJpeg(wvImageManager);
                     break;
                 case 'customCommand':
                     vm.wvViewerController.executeCustomCommand();

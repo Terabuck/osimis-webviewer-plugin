@@ -11,14 +11,13 @@
 (function(osimis) {
     'use strict';
 
-    function PaneManager(Promise, studyManager, seriesManager, $timeout, wvConfig, wvImageManager) {
+    function PaneManager(Promise, studyManager, seriesManager, $timeout, wvConfig) {
         // Injections.
         this._Promise = Promise;
         this._studyManager = studyManager;
         this._seriesManager = seriesManager;
         this.$timeout = $timeout;
         this._wvConfig = wvConfig;
-        this._wvImageManager = wvImageManager;
 
         // Default config.
         this.layout = {
@@ -119,7 +118,7 @@
                     var pane = removedPanes.pop();
                     // If none exist, create a new one.
                     if (!pane) {
-                        pane = new osimis.Pane(this.$timeout, this._Promise, this._studyManager, this._seriesManager, x, y, this._wvConfig, this._wvImageManager);
+                        pane = new osimis.Pane(this.$timeout, this._Promise, this._studyManager, this._seriesManager, x, y, this._wvConfig);
                     }
                     // Otherwise, move the previously removed pane into its new
                     // position.
@@ -536,7 +535,7 @@
         .factory('wvPaneManager', wvPaneManager);
 
     /* @ngInject */
-    function wvPaneManager($q, wvStudyManager, wvSeriesManager, $timeout, wvConfig, wvImageManager) {
-        return new PaneManager($q, wvStudyManager, wvSeriesManager, $timeout, wvConfig, wvImageManager);
+    function wvPaneManager($q, wvStudyManager, wvSeriesManager, $timeout, wvConfig) {
+        return new PaneManager($q, wvStudyManager, wvSeriesManager, $timeout, wvConfig);
     }
 })(osimis || (this.osimis = {}));

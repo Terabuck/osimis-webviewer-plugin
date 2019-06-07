@@ -20,13 +20,12 @@
 (function(osimis) {
     'use strict';
 
-    function Pane($timeout, Promise, studyManager, seriesManager, x, y, wvConfig, wvImageManager) {
+    function Pane($timeout, Promise, studyManager, seriesManager, x, y, wvConfig) {
         // Injections
         this._Promise = Promise;
         this._studyManager = studyManager;
         this._seriesManager = seriesManager;
         this._wvConfig = wvConfig;
-        this._wvImageManager = wvImageManager;
         this.$timeout = $timeout;
 
         // @warning This parameter is used for other services to access the
@@ -194,12 +193,12 @@
         this.csViewport.invert = !this.csViewport.invert;
     };
 
-    Pane.prototype.downloadAsJpeg = function() {
+    Pane.prototype.downloadAsJpeg = function(wvImageManager) {
         var that = this;
         var serializedCsViewport = this.csViewport.serialize(this.csViewport.originalImageResolution.width, this.csViewport.originalImageResolution.height);
         var imageId = this.series.imageIds[this.imageIndex];
 
-        return this._wvImageManager.get(imageId).then(function(image){
+        return wvImageManager.get(imageId).then(function(image){
             var captureWidth = image.instanceInfos.TagsSubset["Columns"] || 600;
             var captureHeight = image.instanceInfos.TagsSubset["Rows"] || 400;
     
@@ -211,7 +210,7 @@
     
             console.log("creating a new capture image (" + captureWidth + " x " + captureHeight + ")");
     
-            that._wvImageManager
+            wvImageManager
                 .createAnnotedImage(imageId, captureWidth, captureHeight, serializedCsViewport, "image/jpeg")
                 .then(function(imageData) {
                     console.log("Downloading image (" + imageData.length + " bytes)");
