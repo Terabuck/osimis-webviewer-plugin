@@ -275,11 +275,13 @@
 
             var pixelsCount = width * height;
             var maxPixelsCount = 1*1024*1024;
-            if (pixelsCount > maxPixelsCount && limitSize) {
+            var scaling = 1;
+            if (pixelsCount > maxPixelsCount && (limitSize || wvConfig.browser.browser.name !== "Chrome")) {  // even on Firefox 67, we have seen that canvas.toDataUrl was not working with 3000x4000 images
               var ratio = Math.sqrt(pixelsCount / maxPixelsCount);
               width = Math.round(width / ratio);
               height = Math.round(height / ratio);
               console.log("limiting the size of the capture to (" + width + "x" + height + ")");
+              scaling = 1 / ratio;
             }
 
             $scope.size = {
@@ -287,17 +289,12 @@
                 height: height + 'px'
             };
             $scope.imageId = id;
-            var viewport = serializedCsViewport && osimis.CornerstoneViewportWrapper.deserialize(serializedCsViewport, width, height) || null;
-            viewport.scale = 1;
-            viewport.translation.x = 0;
-            viewport.translation.y = 0;
-
             
             var csViewportData = {
                 invert: serializedCsViewport.csViewportData.invert,
                 hflip: false,
                 vflip: false,
-                scale : 1,
+                scale : scaling,
                 translation: {x : 0, y : 0},
                 rotation: serializedCsViewport.csViewportData.rotation,
                 modalityLUT: undefined,
@@ -313,50 +310,29 @@
             };
             $scope.csViewport = new osimis.CornerstoneViewportWrapper(serializedCsViewport.imageResolution, serializedCsViewport.imageResolution, csViewportData, width, height, null); 
 
+            var fakeViewportId = "FAKE-VIEWPORT-USED-IN-IMAGE-SERVICE-" + Math.floor(Math.random() * 1000000000);
 
             var fakeViewport = $compile([
-                '<wv-viewport id="FAKE-VIEWPORT-USED-IN-IMAGE-SERVICE"',
-                'wv-image-id="imageId"',
-                'wv-viewport="csViewport"',
-                'wv-size="size"',
-                'wv-lossless="true"',
+                '<wv-viewport id="' + fakeViewportId + '"',
+                    'wv-image-id="imageId"',
+                    'wv-viewport="csViewport"',
+                    'wv-size="size"',
+                    'wv-lossless="true"',
 
-                'wv-angle-measure-viewport-tool="true"',
-                'wv-simple-angle-measure-viewport-tool="true"',
-                'wv-length-measure-viewport-tool="true"',
-                'wv-elliptical-roi-viewport-tool="true"',
-                'wv-zoom-viewport-tool="true"',
-                'wv-pan-viewport-tool="true"',
-                'wv-pixel-probe-viewport-tool="true"',
-                'wv-rectangle-roi-viewport-tool="true"',
-                'wv-arrow-annotate-viewport-tool="true"',
-//                    'wv-invert-contrast-viewport-tool="???"',
-                'wv-orientation-marker-viewport-tool',
+                    'wv-angle-measure-viewport-tool="true"',
+                    'wv-simple-angle-measure-viewport-tool="true"',
+                    'wv-length-measure-viewport-tool="true"',
+                    'wv-elliptical-roi-viewport-tool="true"',
+                    'wv-zoom-viewport-tool="true"',
+                    'wv-pan-viewport-tool="true"',
+                    'wv-pixel-probe-viewport-tool="true"',
+                    'wv-rectangle-roi-viewport-tool="true"',
+                    'wv-arrow-annotate-viewport-tool="true"',
+    //                    'wv-invert-contrast-viewport-tool="???"',
+                    'wv-orientation-marker-viewport-tool',
                 '>',
                 '</wv-viewport>'
             ].join('\n'))($scope);
-
-    //         var fakeViewport = $compile([
-    //             '<wv-viewport id="FAKE-VIEWPORT-USED-IN-IMAGE-SERVICE"',
-    //                 'wv-image-id="imageId"',
-    //                 'wv-viewport="csViewport"',
-    //                 'wv-size="size"',
-    //                 'wv-lossless="true"',
-
-    //                 'wv-angle-measure-viewport-tool="true"',
-    //                 'wv-simple-angle-measure-viewport-tool="true"',
-    //                 'wv-length-measure-viewport-tool="true"',
-    //                 'wv-elliptical-roi-viewport-tool="true"',
-    //                 'wv-zoom-viewport-tool="true"',
-    //                 'wv-pan-viewport-tool="true"',
-    //                 'wv-pixel-probe-viewport-tool="true"',
-    //                 'wv-rectangle-roi-viewport-tool="true"',
-    //                 'wv-arrow-annotate-viewport-tool="true"',
-    // //                    'wv-invert-contrast-viewport-tool="???"',
-    //                 'wv-orientation-marker-viewport-tool',
-    //             '>',
-    //             '</wv-viewport>'
-    //         ].join('\n'))($scope);
 
             // append the element to the body as it is required to define its size
             // make sure it's harmless
@@ -372,7 +348,7 @@
                 body.css('overflow', _oldBodyOverflow);
                 
                 // remove element from body
-                $('#FAKE-VIEWPORT-USED-IN-IMAGE-SERVICE').remove();
+                $('#' + fakeViewportId).remove();
 
                 // destroy useless scope
                 $scope.$destroy();
