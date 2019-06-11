@@ -287,31 +287,78 @@
                 height: height + 'px'
             };
             $scope.imageId = id;
-            $scope.csViewport = serializedCsViewport && osimis.CornerstoneViewportWrapper.deserialize(serializedCsViewport, width, height) || null;
+            var viewport = serializedCsViewport && osimis.CornerstoneViewportWrapper.deserialize(serializedCsViewport, width, height) || null;
+            viewport.scale = 1;
+            viewport.translation.x = 0;
+            viewport.translation.y = 0;
+
+            
+            var csViewportData = {
+                invert: serializedCsViewport.csViewportData.invert,
+                hflip: false,
+                vflip: false,
+                scale : 1,
+                translation: {x : 0, y : 0},
+                rotation: serializedCsViewport.csViewportData.rotation,
+                modalityLUT: undefined,
+                voiLUT: undefined,
+                voi: {
+                    windowWidth: serializedCsViewport.csViewportData.voi.windowWidth,
+                    windowCenter: serializedCsViewport.csViewportData.voi.windowCenter
+                },
+                imageResolution : {
+                    width: width,
+                    height: height
+                }
+            };
+            $scope.csViewport = new osimis.CornerstoneViewportWrapper(serializedCsViewport.imageResolution, serializedCsViewport.imageResolution, csViewportData, width, height, null); 
+
 
             var fakeViewport = $compile([
                 '<wv-viewport id="FAKE-VIEWPORT-USED-IN-IMAGE-SERVICE"',
-                    'wv-image-id="imageId"',
-                    'wv-viewport="csViewport"',
-                    'wv-size="size"',
-                    'wv-lossless="true"',
+                'wv-image-id="imageId"',
+                'wv-viewport="csViewport"',
+                'wv-size="size"',
+                'wv-lossless="true"',
 
-                    'wv-angle-measure-viewport-tool="true"',
-                    'wv-simple-angle-measure-viewport-tool="true"',
-                    'wv-length-measure-viewport-tool="true"',
-                    'wv-elliptical-roi-viewport-tool="true"',
-                    'wv-zoom-viewport-tool="true"',
-                    'wv-pan-viewport-tool="true"',
-                    'wv-pixel-probe-viewport-tool="true"',
-                    'wv-rectangle-roi-viewport-tool="true"',
-                    'wv-arrow-annotate-viewport-tool="true"',
-    //                    'wv-invert-contrast-viewport-tool="???"',
-                    'wv-orientation-marker-viewport-tool',
+                'wv-angle-measure-viewport-tool="true"',
+                'wv-simple-angle-measure-viewport-tool="true"',
+                'wv-length-measure-viewport-tool="true"',
+                'wv-elliptical-roi-viewport-tool="true"',
+                'wv-zoom-viewport-tool="true"',
+                'wv-pan-viewport-tool="true"',
+                'wv-pixel-probe-viewport-tool="true"',
+                'wv-rectangle-roi-viewport-tool="true"',
+                'wv-arrow-annotate-viewport-tool="true"',
+//                    'wv-invert-contrast-viewport-tool="???"',
+                'wv-orientation-marker-viewport-tool',
                 '>',
                 '</wv-viewport>'
             ].join('\n'))($scope);
 
-            // happend the element to the body as it is required to define its size
+    //         var fakeViewport = $compile([
+    //             '<wv-viewport id="FAKE-VIEWPORT-USED-IN-IMAGE-SERVICE"',
+    //                 'wv-image-id="imageId"',
+    //                 'wv-viewport="csViewport"',
+    //                 'wv-size="size"',
+    //                 'wv-lossless="true"',
+
+    //                 'wv-angle-measure-viewport-tool="true"',
+    //                 'wv-simple-angle-measure-viewport-tool="true"',
+    //                 'wv-length-measure-viewport-tool="true"',
+    //                 'wv-elliptical-roi-viewport-tool="true"',
+    //                 'wv-zoom-viewport-tool="true"',
+    //                 'wv-pan-viewport-tool="true"',
+    //                 'wv-pixel-probe-viewport-tool="true"',
+    //                 'wv-rectangle-roi-viewport-tool="true"',
+    //                 'wv-arrow-annotate-viewport-tool="true"',
+    // //                    'wv-invert-contrast-viewport-tool="???"',
+    //                 'wv-orientation-marker-viewport-tool',
+    //             '>',
+    //             '</wv-viewport>'
+    //         ].join('\n'))($scope);
+
+            // append the element to the body as it is required to define its size
             // make sure it's harmless
             var body = $('body');
             var _oldBodyOverflow = body.css('overflow');
