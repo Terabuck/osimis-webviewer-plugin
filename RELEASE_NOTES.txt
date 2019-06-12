@@ -5,7 +5,9 @@ New features:
 
 * 3-D Cross-Hair
 * Added a button to download the current viewport as jpeg.  It must be enabled by setting the "DownloadAsJpegEnabled" option 
-  to true in the configuration file
+  to true in the configuration file.  The exported image is identical to the one being displayed in the viewport (including annotations, 
+  windowing, rotation, ...).  Note that, on Chrome, the exported image has the same resolution as the original DICOM image while, in Firefox,
+  the exported image size is limited to 1M pixels.
 
 Changes:
 -------
