@@ -368,7 +368,7 @@
                     _destroyFakeViewport();
 
                     resolve(image);
-                });
+                }, 1000);  // we had to introduce this 1000ms delay for Firefox (dicom image was not loaded and rendered image was all black)
             })
         };
 
