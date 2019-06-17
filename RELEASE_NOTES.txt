@@ -25,6 +25,12 @@ Improvements:
 * It is now possible to define the display order of series by providing the list of series id in the "seriesDisplayOrder" metadata.  If the metadata
   is not defined, the series are now displayed according to the alphabetical order of their series id (in past version, the order was the one provided
   by Orthanc and could depend on the order of object creation in Orthanc)
+* The synchronized browsing is now active when displaying twice the same series
+
+
+API Changes:
+-----------
+* there's a new route (GET) to /osimis-viewer/studies/{studyId}
 
 
 Version 1.2.0
