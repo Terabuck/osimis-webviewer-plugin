@@ -44,7 +44,7 @@
             deltaX = ev.center.x - lastTouchPanningCenter.x;
             deltaY = ev.center.y - lastTouchPanningCenter.y;
             if (_this._toolName === "windowing") {
-                wvWindowingViewportTool.applyWindowingToViewport(_this._viewport, deltaX, deltaY, true);
+                wvWindowingViewportTool.applyWindowingToViewport(_this._viewport, deltaX, deltaY, false);
             } else if (_this._toolName === "pan") {
                 wvPanViewportTool.applyPanToViewport(_this._viewport, deltaX, deltaY);
             }

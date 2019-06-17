@@ -26,6 +26,7 @@ Improvements:
   is not defined, the series are now displayed according to the alphabetical order of their series id (in past version, the order was the one provided
   by Orthanc and could depend on the order of object creation in Orthanc)
 * The synchronized browsing is now active when displaying twice the same series
+* The windowing tool is now applied only to the current viewport.
 
 
 API Changes:

@@ -66,7 +66,7 @@
                             lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
 
                             if (mouseButton === 1) { // left-click + move
-                                wvWindowingViewportTool.applyWindowingToViewport(viewport, deltaX, deltaY, true);
+                                wvWindowingViewportTool.applyWindowingToViewport(viewport, deltaX, deltaY, false);
                             }
                             else if (mouseButton === 2) { // middle-click + move
                                 wvPanViewportTool.applyPanToViewport(viewport, deltaX, deltaY);
