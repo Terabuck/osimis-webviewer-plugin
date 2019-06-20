@@ -140,6 +140,16 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
         }
       }
     }
+    else
+    {
+      // by default, use GDCM only for JPEG 2000
+      restrictTransferSyntaxes = true;
+
+      enabledTransferSyntaxes.insert("1.2.840.10008.1.2.4.90");   // JPEG 2000 Image Compression (Lossless Only)
+      enabledTransferSyntaxes.insert("1.2.840.10008.1.2.4.91");   // JPEG 2000 Image Compression
+      enabledTransferSyntaxes.insert("1.2.840.10008.1.2.4.92");   // JPEG 2000 Part 2 Multicomponent Image Compression (Lossless Only)
+      enabledTransferSyntaxes.insert("1.2.840.10008.1.2.4.93");   // JPEG 2000 Part 2 Multicomponent Image Compression
+    }
   }
 
   if (wvConfig.isMember("SeriesToIgnore"))

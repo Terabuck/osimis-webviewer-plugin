@@ -288,6 +288,10 @@ namespace
     }
   }
 
+  boost::mutex gdcmDecoderMutex; // it seems that the GDCM decoder is not supporting being used from multiple threads at the same time.
+    // right now (as of Orthanc 1.5.6, there's a mutex in the OrthancPlugins::DecodeUnsafe method that prevents _decodeImageCallback
+    // to be called from multiple threads.  However, this mutex might be removed some day so we do add one here.
+
   OrthancPluginErrorCode _decodeImageCallback(OrthancPluginImage** target,
                                               const void* dicom,
                                               const uint32_t size,
@@ -295,6 +299,7 @@ namespace
   {
     try
     {
+      boost::mutex::scoped_lock lock(gdcmDecoderMutex);
       if (!_isTransferSyntaxEnabled(dicom, size))
       {
         *target = NULL;

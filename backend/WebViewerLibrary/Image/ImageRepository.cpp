@@ -121,22 +121,27 @@ std::auto_ptr<Image> ImageRepository::_LoadImageFromOrthanc(const std::string& i
   // Load already compressed instance frame (if the policy type is PixelDataQuality, because it's faster
   // then loading the dicom file & checking the transferSyntax tag)
   if (dynamic_cast<PixelDataQualityPolicy*>(policy) != NULL) {
-    BENCH(GET_FRAME_FROM_DICOM__RAW);
+    BENCH(GET_FRAME_FROM_DICOM__RAW_TOTAL);
     //boost::lock_guard<boost::mutex> guard(mutex_); // check what happens if only one thread asks for frame at a time
 
     // Retrieve dicom header tags (for transferSyntax which determine PixelData format)
     //   Get instance's dicom file
     OrthancPluginMemoryBuffer dicom; // no need to free - memory managed by dicomRepository
-    _dicomRepository->getDicomFile(instanceId, dicom);
-
+    {
+      BENCH(GET_FRAME_FROM_DICOM__RAW_GET_DICOM_FILE);
+      _dicomRepository->getDicomFile(instanceId, dicom);
+    }
     //   Clean dicom file (at scope end)
     DicomRepository::ScopedDecref autoDecref(_dicomRepository, instanceId);
 
     //   Get instance's tags (the DICOM meta-informations)
     Orthanc::DicomMap headerTags;
-    if (!Orthanc::DicomMap::ParseDicomMetaInformation(headerTags, reinterpret_cast<const char*>(dicom.data), dicom.size))
     {
-      throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_CorruptedFile));
+      BENCH(GET_FRAME_FROM_DICOM__RAW_PARSE_DICOM_FILE);
+      if (!Orthanc::DicomMap::ParseDicomMetaInformation(headerTags, reinterpret_cast<const char*>(dicom.data), dicom.size))
+      {
+        throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_CorruptedFile));
+      }
     }
 
     // Retrieve the frame as Raw PixelData
@@ -156,20 +161,25 @@ std::auto_ptr<Image> ImageRepository::_LoadImageFromOrthanc(const std::string& i
   }
   // Load bitmap orthanc instance frame
   else {
-    BENCH(GET_FRAME_FROM_DICOM);
+    BENCH(GET_FRAME_FROM_DICOM_TOTAL);
 
     //boost::lock_guard<boost::mutex> guard(mutex_); // check what happens if only one thread asks for frame at a time
 
     // Retrieve dicom file
-    OrthancPluginMemoryBuffer dicom = { 0 };
-    _dicomRepository->getDicomFile(instanceId, dicom);
-
+    OrthancPluginMemoryBuffer dicom;
+    {
+      BENCH(GET_FRAME_FROM_DICOM__GET_DICOM_FILE);
+      _dicomRepository->getDicomFile(instanceId, dicom);
+    }
     // @note dicom tags could be gathered from DICOM instance in this case
 
-    // Retrieve frame from dicom file
-    OrthancPluginImage* frame = OrthancPluginDecodeDicomImage(OrthancContextManager::Get(),
-                                                              reinterpret_cast<const void*>(dicom.data), dicom.size, frameIndex);
-
+    OrthancPluginImage* frame = NULL;
+    {
+      BENCH(GET_FRAME_FROM_DICOM__DECODE_DICOM_IMAGE);
+      // Retrieve frame from dicom file
+       frame = OrthancPluginDecodeDicomImage(OrthancContextManager::Get(),
+                                                                reinterpret_cast<const void*>(dicom.data), dicom.size, frameIndex);
+    }
     // Clean dicom file (at scope end)
     DicomRepository::ScopedDecref autoDecref(_dicomRepository, instanceId);
 

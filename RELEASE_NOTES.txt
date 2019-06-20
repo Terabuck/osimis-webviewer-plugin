@@ -16,7 +16,8 @@ Changes:
   shows StudyDate - StudyTime.  
   Note that this has an impact on the instance info that have been cached (check the "InstanceInfoCacheEnabled" entry in the configuration file); 
   these information will be invalidated and will need to be recomputed next time you open a study.  This might slow down re-opening time of older studies.
-
+* By default, the GDCM library is now only used for JPEG2000 decompression while the default decoder is used for all other Transfer Syntaxes.  
+  This speeds up decoding of i.e. multiframe MG series.
 
 Improvements:
 ------------
