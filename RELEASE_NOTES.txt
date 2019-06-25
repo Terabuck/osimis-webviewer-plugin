@@ -18,6 +18,8 @@ Changes:
   these information will be invalidated and will need to be recomputed next time you open a study.  This might slow down re-opening time of older studies.
 * By default, the GDCM library is now only used for JPEG2000 decompression while the default decoder is used for all other Transfer Syntaxes.  
   This speeds up decoding of i.e. multiframe MG series.
+* Query arguments (i.e ?token=1234) are passed as HTTP Headers of every request that is sent to Orthanc easing the integration with the orthanc-authorization
+  plugin
 
 Improvements:
 ------------
