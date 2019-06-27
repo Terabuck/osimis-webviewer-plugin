@@ -59,6 +59,10 @@
             for (var key in urlParams.keys()) {
                 this.httpRequestHeaders[key] = urlParams.get(key);
             }
+
+            if (urlParams.get("language")) {
+                __webViewerConfig.defaultLanguage = urlParams.get("language");
+            }
         }
         this.config = __webViewerConfig;
 

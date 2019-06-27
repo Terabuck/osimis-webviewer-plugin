@@ -20,6 +20,8 @@ Changes:
   This speeds up decoding of i.e. multiframe MG series.
 * Query arguments (i.e ?token=1234) are passed as HTTP Headers of every request that is sent to Orthanc easing the integration with the orthanc-authorization
   plugin
+* You can now specify the language through a query argument (i.e. ?language=en)
+* Added Chinese translations (zh)
 
 Improvements:
 ------------
