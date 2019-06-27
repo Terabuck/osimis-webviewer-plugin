@@ -7,6 +7,7 @@
 #include <boost/lexical_cast.hpp> // to retrieve exception error code for log
 #include <boost/range/algorithm.hpp>
 #include <Core/OrthancException.h>
+#include <Core/Toolbox.h>
 
 #include "../Annotation/AnnotationRepository.h"
 #include "../BenchmarkHelper.h" // for BENCH(*)
@@ -145,13 +146,16 @@ int StudyController::ProcessStudyInfoRequest(OrthancPluginContext* context)
         if (studyInfoSeries[i]["MainDicomTags"].isMember("SeriesNumber"))
         {
           const std::string& seriesNumberString = studyInfoSeries[i]["MainDicomTags"]["SeriesNumber"].asString();
-          int seriesNumberInt = boost::lexical_cast<int>(seriesNumberString);
-          seriesNumbers.push_back(seriesNumberInt);
-          if (seriesNumbersToSeriesId.find(seriesNumberInt) == seriesNumbersToSeriesId.end())
+          if (Orthanc::Toolbox::IsInteger(seriesNumberString))
           {
-            seriesNumbersToSeriesId[seriesNumberInt] = std::vector<std::string>();
+            int seriesNumberInt = boost::lexical_cast<int>(seriesNumberString);
+            seriesNumbers.push_back(seriesNumberInt);
+            if (seriesNumbersToSeriesId.find(seriesNumberInt) == seriesNumbersToSeriesId.end())
+            {
+              seriesNumbersToSeriesId[seriesNumberInt] = std::vector<std::string>();
+            }
+            seriesNumbersToSeriesId[seriesNumberInt].push_back(seriesId);
           }
-          seriesNumbersToSeriesId[seriesNumberInt].push_back(seriesId);
         }
       }
 
