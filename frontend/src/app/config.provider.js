@@ -54,11 +54,12 @@
         this.httpRequestHeaders = {};
 
         // by default, all query arguments are transformed into headers (for passing the auth token)
-        if (URLSearchParams !== undefined) {
+        if (window.URLSearchParams !== undefined) {
             var urlParams = urlParams = new URLSearchParams(window.location.search);
-            for (var key in urlParams.keys()) {
-                this.httpRequestHeaders[key] = urlParams.get(key);
-            }
+            var that = this;
+            urlParams.forEach(function(value, key) {
+                that.httpRequestHeaders[key] = value;
+            })
 
             if (urlParams.get("language")) {
                 __webViewerConfig.defaultLanguage = urlParams.get("language");
