@@ -54,11 +54,12 @@
         this.httpRequestHeaders = {};
 
         // by default, all query arguments are transformed into headers (for passing the auth token)
-        var urlParams = urlParams = new URLSearchParams(window.location.search);
-        for (var pairQueryArgument of urlParams.entries()) {
-            this.httpRequestHeaders[pairQueryArgument[0]] = pairQueryArgument[1];
+        if (URLSearchParams !== undefined) {
+            var urlParams = urlParams = new URLSearchParams(window.location.search);
+            for (var key in urlParams.keys()) {
+                this.httpRequestHeaders[key] = urlParams.get(key);
+            }
         }
-
         this.config = __webViewerConfig;
 
         if (__webViewerConfig.customOverlayProviderUrl) {
