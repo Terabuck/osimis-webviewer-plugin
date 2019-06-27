@@ -21,7 +21,8 @@
             en: 'english',
             fr: 'français',
             nl: 'nederlands',
-            pt: 'Português'
+            pt: 'Português',
+            zh: 'Chinese'
         };
         // languages Key array, automatically populated set with languages object
         var keysArray = [];
