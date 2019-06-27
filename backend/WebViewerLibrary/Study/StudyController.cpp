@@ -136,7 +136,7 @@ int StudyController::ProcessStudyInfoRequest(OrthancPluginContext* context)
   } else {
     {// first try to sort series based on the series number
       std::vector<int> seriesNumbers;
-      std::map<int, std::vector<std::string>> seriesNumbersToSeriesId;
+      std::map<int, std::vector<std::string> > seriesNumbersToSeriesId;
       seriesDisplayOrder.clear();
 
       for (Json::ArrayIndex i = 0; i < studyInfoSeries.size(); i++)
@@ -157,10 +157,12 @@ int StudyController::ProcessStudyInfoRequest(OrthancPluginContext* context)
 
       boost::range::sort(seriesNumbers);
 
-      for (auto seriesNumber : seriesNumbers)
+      for (size_t si = 0; si < seriesNumbers.size(); si++)
       {
-        for (auto seriesId : seriesNumbersToSeriesId[seriesNumber])
+        const int& seriesNumber = seriesNumbers[si];
+        for (size_t sj = 0; sj < seriesNumbersToSeriesId[seriesNumber].size(); sj++)
         {
+          const std::string& seriesId = seriesNumbersToSeriesId[seriesNumber][sj];
           seriesDisplayOrder.push_back(seriesId);
         }
       }
@@ -177,8 +179,9 @@ int StudyController::ProcessStudyInfoRequest(OrthancPluginContext* context)
     }
     boost::range::sort(remainingSeriesIds);
 
-    for (auto seriesId: remainingSeriesIds)
+    for (size_t si = 0; si < remainingSeriesIds.size(); si++)
     {
+      const std::string& seriesId = remainingSeriesIds[si];
       seriesDisplayOrder.push_back(seriesId);
     }
   }
