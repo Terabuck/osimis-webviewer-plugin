@@ -114,6 +114,9 @@ int StudyController::ProcessStudyInfoRequest(OrthancPluginContext* context)
   Json::Value studyInfo;
   OrthancPlugins::GetJsonFromOrthanc(studyInfo, context, "/studies/" + this->studyId_);
 
+  Json::Value studyInfoSeries;
+  OrthancPlugins::GetJsonFromOrthanc(studyInfoSeries, context, "/studies/" + this->studyId_ + "/series?expand=true");
+
   Json::Value seriesDisplayOrderJson;
   if (OrthancPlugins::GetJsonFromOrthanc(seriesDisplayOrderJson, context, "/studies/" + this->studyId_ + "/metadata/seriesDisplayOrder"))
   {
@@ -131,12 +134,53 @@ int StudyController::ProcessStudyInfoRequest(OrthancPluginContext* context)
       }
     }
   } else {
-    // by default, sort series according to the alphabetical order of their ids (at least, this is reproducible !)
+    {// first try to sort series based on the series number
+      std::vector<int> seriesNumbers;
+      std::map<int, std::vector<std::string>> seriesNumbersToSeriesId;
+      seriesDisplayOrder.clear();
+
+      for (Json::ArrayIndex i = 0; i < studyInfoSeries.size(); i++)
+      {
+        const std::string& seriesId = studyInfoSeries[i]["ID"].asString();
+        if (studyInfoSeries[i]["MainDicomTags"].isMember("SeriesNumber"))
+        {
+          const std::string& seriesNumberString = studyInfoSeries[i]["MainDicomTags"]["SeriesNumber"].asString();
+          int seriesNumberInt = boost::lexical_cast<int>(seriesNumberString);
+          seriesNumbers.push_back(seriesNumberInt);
+          if (seriesNumbersToSeriesId.find(seriesNumberInt) == seriesNumbersToSeriesId.end())
+          {
+            seriesNumbersToSeriesId[seriesNumberInt] = std::vector<std::string>();
+          }
+          seriesNumbersToSeriesId[seriesNumberInt].push_back(seriesId);
+        }
+      }
+
+      boost::range::sort(seriesNumbers);
+
+      for (auto seriesNumber : seriesNumbers)
+      {
+        for (auto seriesId : seriesNumbersToSeriesId[seriesNumber])
+        {
+          seriesDisplayOrder.push_back(seriesId);
+        }
+      }
+    }
+
+    // all series that did not had a SeriesNumber shall be added at the end (and sorted in alphabetical order of their ids (at least, this is reproducible !))
+    std::vector<std::string> remainingSeriesIds;
     for (Json::ArrayIndex i = 0; i < studyInfo["Series"].size(); i++)
     {
-      seriesDisplayOrder.push_back(studyInfo["Series"][(int)i].asString());
+      const std::string& seriesId = studyInfo["Series"][(int)i].asString();
+      if (boost::range::find(seriesDisplayOrder, seriesId) == seriesDisplayOrder.end()) {
+        remainingSeriesIds.push_back(seriesId);
+      }
     }
-    boost::range::sort(seriesDisplayOrder);
+    boost::range::sort(remainingSeriesIds);
+
+    for (auto seriesId: remainingSeriesIds)
+    {
+      seriesDisplayOrder.push_back(seriesId);
+    }
   }
 
   // now, reorder the series in the Json
