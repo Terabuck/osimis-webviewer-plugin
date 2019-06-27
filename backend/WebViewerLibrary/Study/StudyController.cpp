@@ -149,9 +149,9 @@ int StudyController::ProcessStudyInfoRequest(OrthancPluginContext* context)
           if (Orthanc::Toolbox::IsInteger(seriesNumberString))
           {
             int seriesNumberInt = boost::lexical_cast<int>(seriesNumberString);
-            seriesNumbers.push_back(seriesNumberInt);
             if (seriesNumbersToSeriesId.find(seriesNumberInt) == seriesNumbersToSeriesId.end())
             {
+              seriesNumbers.push_back(seriesNumberInt);
               seriesNumbersToSeriesId[seriesNumberInt] = std::vector<std::string>();
             }
             seriesNumbersToSeriesId[seriesNumberInt].push_back(seriesId);
