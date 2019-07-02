@@ -168,6 +168,15 @@
         var annotations = this._annotations;
         setByEndUser = setByEndUser || false;
 
+        // insert a uuid for those annotations that don't have it yet
+        if (annotation && annotation.data && annotation.data.data) {
+            for (var i in annotation.data.data) {
+                if (annotation.data.data[i]["uuid"] === undefined) {
+                    annotation.data.data[i]["uuid"] = UUIDjs.create(4).toString();
+                }
+            }
+        }
+
         // As annotations are stateless, clone them to avoid unexpected
         // behavior
         annotation = _.cloneDeep(annotation);

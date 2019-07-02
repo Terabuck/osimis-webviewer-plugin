@@ -56,7 +56,8 @@
     "pdf.js-viewer": "./local_dependencies/pdf.js-viewer/",
     "keyboardjs": "2.4.1",
     "angular-translate": "2.18.0",
-    "angular-translate-loader-static-files": "2.18.0"
+    "angular-translate-loader-static-files": "2.18.0",
+    "uuid-js": "0.7.5"
   },
   "resolutions": {
     "jquery": "2.2.4",

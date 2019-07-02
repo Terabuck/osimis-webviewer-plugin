@@ -37,6 +37,7 @@ Improvements:
 API Changes:
 -----------
 * there's a new route (GET) to /osimis-viewer/studies/{studyId}
+* Annotations now have an additional 'uuid' field
 
 
 Version 1.2.0
