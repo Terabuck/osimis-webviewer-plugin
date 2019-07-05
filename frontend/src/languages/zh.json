@@ -66,6 +66,8 @@
           "ANGLE_MEASUREMENT": "线角测量",
           "SIMPLE_ANGLE_MEASUREMENT": "角度测量",
           "ARROW_ANNOTATE_TEXT": "用文本注释图像",
+          "CROSS_HAIR" : "3D 瞄准线",
+          "DOWNLOAD_AS_JPEG": "下载 jpeg 图像",
           "ELLIPTICAL_ROI": "椭圆形 ROI",
           "FLIP_HORIZONTALLY": "水平翻转",
           "FLIP_VERTICALLY": "垂直翻转",
