@@ -188,17 +188,29 @@
                     console.error('err', err);
                 });
         }
-        // Show study list if study & series haven't been set via URL.
-        else {
-            vm.mode = 'dev';
+        else
+        {
+            // try to get multiple series ids from the url param
+            var urlParams = urlParams = new URLSearchParams(window.location.search);
+            if ($location.search().pickableStudyIds) {
+                vm.pickableStudyIds = $location.search().pickableStudyIds.split(",");
+                if ($location.search().selectedStudyIds) {
+                    vm.selectedStudyIds = $location.search().selectedStudyIds.split(",");
+                } else {
+                    vm.selectedStudyIds = vm.pickableStudyIds;
+                }
+            } else { // Show study list if study & series haven't been set via URL (dev mode).
+                vm.mode = 'dev';
 
-            // Set all orthanc studies as pickable.
-            wvStudyManager
-                .getAllStudyIds()
-                .then(function(studyIds) {
-                    vm.pickableStudyIds = studyIds;
-                });
+                // Set all orthanc studies as pickable.
+                wvStudyManager
+                    .getAllStudyIds()
+                    .then(function(studyIds) {
+                        vm.pickableStudyIds = studyIds;
+                    });
+            }
         }
+        
 
         // Configure the user interface depending on the user angent/browser.
         var userInterfacePolicy = new osimis.UserAgentBasedInterfacePolicy();
