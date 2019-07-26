@@ -38,7 +38,7 @@ API Changes:
 -----------
 * there's a new route (GET) to /osimis-viewer/studies/{studyId}
 * Annotations now have an additional 'uuid' field
-
+* It's now possible to specify multiple study ids in the url parameters: index.html?pickableStudyIds={id1},{id2},{id3}&selectedStudyIds={id1},{id3}
 
 Version 1.2.0
 ========================
