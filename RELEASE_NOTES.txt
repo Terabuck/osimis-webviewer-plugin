@@ -33,6 +33,7 @@ Improvements:
 * The synchronized browsing is now active when displaying twice the same series
 * The windowing tool is now applied only to the current viewport.
 * Integration with Orthanc Explorer: if ?token=1234 is passed when opening the Orthanc Explorer, it will also open the viewer with that url search params.
+  (This will work only from Orthanc 1.5.8)
 
 
 API Changes:
