@@ -42,7 +42,7 @@ $('#study').live('pagebeforecreate', function() {
       var urlSearchParams = {
         "study" : $.mobile.pageData.uuid
       };
-      if (authorizationTokens !== undefined) {
+      if ("authorizationTokens" in window) {
         for (var token in authorizationTokens) {
           urlSearchParams[token] = authorizationTokens[token];
         }
