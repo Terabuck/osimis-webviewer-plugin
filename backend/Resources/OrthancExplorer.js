@@ -11,8 +11,16 @@ $('#series').live('pagebeforecreate', function() {
   b.insertBefore($('#series-delete').parent().parent());
   b.click(function() {
     if ($.mobile.pageData) {
-      var series = $.mobile.pageData.uuid;
-      window.open('../osimis-viewer/app/index.html?series=' + series);
+      var urlSearchParams = {
+        "series" : $.mobile.pageData.uuid
+      };
+      if (authorizationTokens !== undefined) {
+        for (var token in authorizationTokens) {
+          urlSearchParams[token] = authorizationTokens[token];
+        }
+      }
+  
+      window.open('../osimis-viewer/app/index.html?' + $.param(urlSearchParams));
     }
   });
 });
@@ -30,8 +38,17 @@ $('#study').live('pagebeforecreate', function() {
   b.insertBefore($('#study-delete').parent().parent());
   b.click(function() {
     if ($.mobile.pageData) {
-      var study = $.mobile.pageData.uuid;
-      window.open('../osimis-viewer/app/index.html?study=' + study);
+
+      var urlSearchParams = {
+        "study" : $.mobile.pageData.uuid
+      };
+      if (authorizationTokens !== undefined) {
+        for (var token in authorizationTokens) {
+          urlSearchParams[token] = authorizationTokens[token];
+        }
+      }
+
+      window.open('../osimis-viewer/app/index.html?' + $.param(urlSearchParams));
     }
   });
 });
