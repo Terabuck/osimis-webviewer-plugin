@@ -35,6 +35,11 @@ Improvements:
 * Integration with Orthanc Explorer: if ?token=1234 is passed when opening the Orthanc Explorer, it will also open the viewer with that url search params.
   (This will work only from Orthanc 1.5.8)
 
+Fixes:
+-----
+
+* WVP-161: Sync browsing doesn't work if the same series is displayed in two viewports
+
 
 API Changes:
 -----------
