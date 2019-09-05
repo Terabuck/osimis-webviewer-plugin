@@ -6,7 +6,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install wget nano build-essential 
 WORKDIR /
 RUN git clone https://bitbucket.org/osimis/osimis-webviewer-plugin.git
 
-ARG VIEWER_VERSION=1.2.0
+ARG VIEWER_VERSION=1.3.0
 WORKDIR /osimis-webviewer-plugin/
 RUN git describe --long --tags > /full-version.txt
 
