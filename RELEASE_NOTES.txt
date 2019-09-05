@@ -67,9 +67,6 @@ Known Issues:
 * WVB-389: YBR_FULL_422 multiframe US can not be visualized
 
 * WVP-125: Some image orientation markers may be hidden behind the loading bar.  Workaround: resize the browser window
-* WVP-127: LIVESHARE host screen magnifying glass is not reflected in attendee screen.
-* WVP-128: LIVESHARE attendee screen is not updated when the study island is changed from Grid to List.
-* WVP-129: LIVESHARE screen of attendee is not reflected by the removal of annotation in host.
 * WVP-136: Some measurement tool stays active when not finished
 * WVP-163: With IE11, the application may freeze while auto-playing multiple synchronized series
 * WVP-167: Some annotations / measurements disappear when saving the image as JPEG
