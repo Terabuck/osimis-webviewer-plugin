@@ -47,6 +47,26 @@ API Changes:
 * Annotations now have an additional 'uuid' field
 * It's now possible to specify multiple study ids in the url parameters: index.html?pickableStudyIds={id1},{id2},{id3}&selectedStudyIds={id1},{id3}
 
+
+Known issues:
+------------
+* CBCT slices might not be displayed in the correct order.  This is fixed by upgrading your Orthanc to version 1.4.2 or later.
+* if a series contains one instance without position or IndexInSeries, the whole series is not displayed.  This is fixed by upgrading 
+  your Orthanc to version 1.5.7 or later.
+* WVB-309: Video player might be cropped if the browser window is very wide.  Workaround: resize the browser window
+* WVB-344: When the cache is enabled, some rgb48 images won't display.
+* WVB-349: Usability: when clicking a viewport to flip/rotate it while a measure tool is selected will create a measure.
+* WVB-383: In the study picker, the studies order is undefined
+* WVB-384: The WebViewer currently does not work on iPhone (Safari and Chrome).
+* WVB-389: YBR_FULL_422 multiframe US can not be visualized
+* WVB-387: X-Ray Radiofluoroscopic Image Storage (multi-frames) are very slow to load
+
+* WVP-125: Some image orientation markers may be hidden behind the loading bar.  Workaround: resize the browser window
+* WVP-136: Some measurement tool stays active when not finished
+* WVP-167: Some annotations / measurements disappear when saving the image as JPEG
+* WVP-163: With IE11, the application may freeze while auto-playing multiple synchronized series
+
+
 Version 1.2.0
 ========================
 
