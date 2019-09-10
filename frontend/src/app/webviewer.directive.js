@@ -299,7 +299,7 @@
                 vm.tools.toggleSynchro = false;
             }
             if (__webViewerConfig.referenceLinesEnabled) { // activate}
-                vm.tools.referenceLines = false;
+                vm.tools.toggleReferenceLines = false;
             }
             if (__webViewerConfig.crossHairEnabled) { // activate}
                 vm.tools.crossHair = false;
