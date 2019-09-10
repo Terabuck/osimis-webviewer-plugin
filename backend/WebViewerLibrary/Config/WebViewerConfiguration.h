@@ -82,6 +82,9 @@ public:
   bool combinedToolEnabled;
   bool printEnabled;
   bool openAllPatientStudies;
+  bool synchronizedBrowsingEnabled;
+  bool referenceLinesEnabled;
+  bool crossHairEnabled;
 
   bool toggleOverlayTextButtonEnabled;
   bool toggleOverlayIconsButtonEnabled;

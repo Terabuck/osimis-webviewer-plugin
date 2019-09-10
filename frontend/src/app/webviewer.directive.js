@@ -269,9 +269,6 @@
                 rotateLeft: false,
                 rotateRight: false,
                 arrowAnnotate: false,
-                toggleSynchro: false,
-                toggleReferenceLines: false,
-                crossHair: false,
                 nextSeries: false,
                 previousSeries: false
             };
@@ -298,6 +295,16 @@
             if (__webViewerConfig.toggleOverlayIconsButtonEnabled) { // activate}
                 vm.tools.toggleOverlayIcons = false;
             }
+            if (__webViewerConfig.synchronizedBrowsingEnabled) { // activate}
+                vm.tools.toggleSynchro = false;
+            }
+            if (__webViewerConfig.referenceLinesEnabled) { // activate}
+                vm.tools.referenceLines = false;
+            }
+            if (__webViewerConfig.crossHairEnabled) { // activate}
+                vm.tools.crossHair = false;
+            }
+
             if (__webViewerConfig.customCommandEnabled) { // activate
               vm.tools.customCommand = false;
               vm.customCommandIconLabel = __webViewerConfig.customCommandIconLabel;

@@ -26,6 +26,8 @@ Changes:
   plugin
 * You can now specify the language through a query argument (i.e. ?language=en)
 * Added Chinese translations (zh)
+* Added 3 configurations to enable/disable tools: SynchronizedBrowsingEnabled, ReferenceLinesEnabled, CrossHairEnabled
+
 
 Improvements:
 ------------

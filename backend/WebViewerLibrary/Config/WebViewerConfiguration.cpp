@@ -265,6 +265,9 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   defaultStudyIslandsDisplayMode = OrthancPlugins::GetStringValue(wvConfig, "DefaultStudyIslandsDisplayMode", "grid");
   defaultLanguage = OrthancPlugins::GetStringValue(wvConfig, "DefaultLanguage", "en");
   customOverlayProviderUrl = OrthancPlugins::GetStringValue(wvConfig, "CustomOverlayProviderUrl", "");  // must be provided as a url relative to orthanc root url (i.e.: "/../customOverlays/")
+  synchronizedBrowsingEnabled = OrthancPlugins::GetBoolValue(wvConfig, "SynchronizedBrowsingEnabled", true);
+  referenceLinesEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ReferenceLinesEnabled", true);
+  crossHairEnabled = OrthancPlugins::GetBoolValue(wvConfig, "CrossHairEnabled", true);
   toggleOverlayTextButtonEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ToggleOverlayTextButtonEnabled", false);
   toggleOverlayIconsButtonEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ToggleOverlayIconsButtonEnabled", false);
   displayOverlayText = OrthancPlugins::GetBoolValue(wvConfig, "DisplayOverlayText", true);
@@ -558,6 +561,9 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["defaultSelectedTool"] = defaultSelectedTool;
   config["defaultStudyIslandsDisplayMode"] = defaultStudyIslandsDisplayMode;
   config["defaultLanguage"] = defaultLanguage;
+  config["synchronizedBrowsingEnabled"] = synchronizedBrowsingEnabled;
+  config["referenceLinesEnabled"] = referenceLinesEnabled;
+  config["crossHairEnabled"] = crossHairEnabled;
   config["toggleOverlayTextButtonEnabled"] = toggleOverlayTextButtonEnabled;
   config["toggleOverlayIconsButtonEnabled"] = toggleOverlayIconsButtonEnabled;
   config["displayOverlayText"] = displayOverlayText;
