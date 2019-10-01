@@ -88,8 +88,22 @@ std::auto_ptr<Series> SeriesRepository::GenerateSeriesInfo(const std::string& se
   Json::Value instancesInfos;
 
   // Retrieve middle instance id
+  std::string middleInstanceId;
   int instanceCount = slicesShort.size();
-  std::string middleInstanceId = slicesShort[instanceCount / 2][0].asString();
+
+  if (instanceCount == 0) // this happens with a single US which has no "position"
+  {
+    Json::Value seriesInfo;
+    if (!OrthancPlugins::GetJsonFromOrthanc(seriesInfo, _context, "/series/" + seriesId))
+    {
+      throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
+    }
+    middleInstanceId = seriesInfo["Instances"][0].asString();
+  }
+  else
+  {
+    middleInstanceId = slicesShort[instanceCount / 2][0].asString();
+  }
 
   if (getInstanceTags)
   {
@@ -104,7 +118,6 @@ std::auto_ptr<Series> SeriesRepository::GenerateSeriesInfo(const std::string& se
   {// only get the middle instance tags
     instancesInfos[middleInstanceId] = _instanceRepository->GetInstanceInfo(middleInstanceId);
   }
-
 
   // Get middle instance's dicom file
   OrthancPluginMemoryBuffer dicom; // no need to free - memory managed by dicomRepository
