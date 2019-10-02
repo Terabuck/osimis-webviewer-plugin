@@ -7,7 +7,8 @@ Fixes:
 -----
 
 * fix loading of /osimis-viewer/images/{id}/0/8bit/invert-monochrome1/jpeg:100 for US instances when ShortTermCache was enabled
-
+* synchronized browsing is now disabled when the tool is deactivated by setting SynchronizedBrowsingEnabled=false 
+* reference lines are now disabled when the tool is deactivated by setting ReferenceLinesEnabled=false 
 
 
 Version 1.3.0

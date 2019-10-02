@@ -230,6 +230,11 @@
                 } 
             }
 
+            vm.paneManager = wvPaneManager;
+            vm.synchronizer = wvSynchronizer;
+            vm.referenceLines = wvReferenceLines;
+            vm.wvWindowingViewportTool = wvWindowingViewportTool;
+
             // Configure attributes default values
             vm.toolbarEnabled = typeof vm.toolbarEnabled !== 'undefined' ? vm.toolbarEnabled : true;
             vm.toolbarPosition = typeof vm.toolbarPosition !== 'undefined' ? vm.toolbarPosition : 'top';
@@ -297,9 +302,13 @@
             }
             if (__webViewerConfig.synchronizedBrowsingEnabled) { // activate}
                 vm.tools.toggleSynchro = false;
+            } else {
+                vm.synchronizer.enable(false);  // disable it when the button is not present
             }
             if (__webViewerConfig.referenceLinesEnabled) { // activate}
                 vm.tools.toggleReferenceLines = false;
+            } else {
+                vm.referenceLines.enable(false);  // disable it when the button is not present
             }
             if (__webViewerConfig.crossHairEnabled) { // activate}
                 vm.tools.crossHair = false;
@@ -374,10 +383,6 @@
             vm.downloadAsJpegEnabled = typeof vm.downloadAsJpegEnabled !== 'undefined' ? vm.downloadAsJpegEnabled : false;
             vm.combinedToolEnabled = typeof vm.combinedToolEnabled !== 'undefined' ? vm.combinedToolEnabled : false;
             vm.studyIslandsDisplayMode = vm.wvViewerController.getStudyIslandDisplayMode(__webViewerConfig.defaultStudyIslandsDisplayMode || "grid");
-            vm.paneManager = wvPaneManager;
-            vm.synchronizer = wvSynchronizer;
-            vm.referenceLines = wvReferenceLines;
-            vm.wvWindowingViewportTool = wvWindowingViewportTool;
 
             if (!__webViewerConfig.toggleOverlayIconsButtonEnabled) {
                 vm.wvViewerController.setOverlayIconsVisible(__webViewerConfig.displayOverlayIcons);
