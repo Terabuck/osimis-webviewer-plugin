@@ -113,7 +113,7 @@ std::auto_ptr<Series> SeriesRepository::GenerateSeriesInfo(const std::string& se
   if (getInstanceTags)
   {
     BENCH(RETRIEVE_ALL_INSTANCES_TAGS)
-    for(Json::ValueConstIterator itr = slicesShort.begin(); itr != slicesShort.end(); itr++) {
+    for(Json::ValueIterator itr = slicesShort.begin(); itr != slicesShort.end(); itr++) {
       std::string instanceId = (*itr)[0].asString();
 
       instancesInfos[instanceId] = _instanceRepository->GetInstanceInfo(instanceId);
