@@ -19,7 +19,7 @@
 # @env {string} AWS_SECRET_ACCESS_KEY
 # AWS credential KEY.
 # 
-# @env {number} [PORT=9966]
+# @env {number} [PORT=19966]
 # The port used to display
 #
 # @env {string} [SUBNET=10.0.0.1/28]
@@ -34,7 +34,7 @@ set -e
 
 srcRoot="${REPOSITORY_PATH:-$(git rev-parse --show-toplevel)}"
 
-port=${PORT:-9966}
+port=${PORT:-19966}
 subnet=${SUBNET:-10.0.0.1/28}
 
 # Execute `frontend/scripts/buildDocker.sh`

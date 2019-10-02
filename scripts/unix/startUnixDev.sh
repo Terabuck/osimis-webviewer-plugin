@@ -5,7 +5,7 @@
 # reverse proxy, and uses gulp to be able to change frontend files without 
 # having to rebuild the backend.
 # 
-# The testable page is located at: `http://127.0.0.1:9966/`
+# The testable page is located at: `http://127.0.0.1:19966/`
 # 
 # @pre
 # See `scripts/osx/InstallOsXDependencies.sh` and
