@@ -1,7 +1,13 @@
+Changes:
+-------
+
+* now displaying the PatientBirthDate in the top left overlay below PatientName and PatientID
+
 Fixes:
 -----
 
 * fix loading of /osimis-viewer/images/{id}/0/8bit/invert-monochrome1/jpeg:100 for US instances when ShortTermCache was enabled
+
 
 
 Version 1.3.0

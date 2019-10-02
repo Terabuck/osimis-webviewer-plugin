@@ -87,6 +87,7 @@
 
                 ArrayHelpers.pushIfDefined(lines, seriesTags.PatientName);
                 ArrayHelpers.pushIfDefined(lines, seriesTags.PatientID);
+                ArrayHelpers.pushIfDefined(lines, seriesTags.PatientBirthDate);
                 ArrayHelpers.pushIfDefined(lines, seriesTags.OsimisNote);
 
                 return lines;
