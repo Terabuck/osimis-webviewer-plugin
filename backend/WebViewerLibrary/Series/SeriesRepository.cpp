@@ -84,26 +84,40 @@ std::auto_ptr<Series> SeriesRepository::GenerateSeriesInfo(const std::string& se
   }
 
   // Get each instance's tags (to avoid an additional request at each series' images)
-  const Json::Value &slicesShort = orderedSlices["SlicesShort"];
+  Json::Value &slicesShort = orderedSlices["SlicesShort"];
+  Json::Value sortedInstancesIds;
   Json::Value instancesInfos;
 
   // Retrieve middle instance id
   std::string middleInstanceId;
-  int instanceCount = slicesShort.size();
+  int sortedSlicesCount = slicesShort.size();
 
-  if (instanceCount == 0) // this happens with a single US which has no "position"
+  if (sortedSlicesCount == 0) // this happens with a single US which has no "position" or with single DX, in this case, fake the sortedslices
   {
     Json::Value seriesInfo;
     if (!OrthancPlugins::GetJsonFromOrthanc(seriesInfo, _context, "/series/" + seriesId))
     {
       throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
     }
-    middleInstanceId = seriesInfo["Instances"][0].asString();
+    for(Json::ValueConstIterator itr = seriesInfo["Instances"].begin(); itr != seriesInfo["Instances"].end(); itr++) {
+      std::string instanceId = (*itr).asString();
+      Json::Value array;
+      array.append(instanceId);
+      array.append(0);
+      array.append(1);
+      slicesShort.append(array);
+    }
   }
   else
   {
-    middleInstanceId = slicesShort[instanceCount / 2][0].asString();
+    for(Json::ValueConstIterator itr = slicesShort.begin(); itr != slicesShort.end(); itr++) {
+      std::string instanceId = (*itr)[0].asString();
+
+      sortedInstancesIds.append(instanceId);
+    }
   }
+
+  middleInstanceId = slicesShort[sortedInstancesIds.size() / 2][0].asString();
 
   if (getInstanceTags)
   {
