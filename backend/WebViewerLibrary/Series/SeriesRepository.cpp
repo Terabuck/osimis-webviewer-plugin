@@ -78,7 +78,7 @@ std::auto_ptr<Series> SeriesRepository::GenerateSeriesInfo(const std::string& se
 {
   // Retrieve series' slices (instances & frames)
   Json::Value orderedSlices;
-  if (!OrthancPlugins::GetJsonFromOrthanc(orderedSlices, _context, "/series/" + seriesId + "/ordered-slices"))
+  if (!OrthancPlugins::GetJsonFromOrthanc(orderedSlices, _context, "/series/" + seriesId + "/ordered-slices") || orderedSlices.size() == 0)
   {
     throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
   }
@@ -89,24 +89,6 @@ std::auto_ptr<Series> SeriesRepository::GenerateSeriesInfo(const std::string& se
 
   // Retrieve middle instance id
   std::string middleInstanceId;
-  int sortedSlicesCount = slicesShort.size();
-
-  if (sortedSlicesCount == 0) // this happens with a single US which has no "position" or with single DX, in this case, fake the sortedslices
-  {
-    Json::Value seriesInfo;
-    if (!OrthancPlugins::GetJsonFromOrthanc(seriesInfo, _context, "/series/" + seriesId))
-    {
-      throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
-    }
-    for(Json::ValueIterator itr = seriesInfo["Instances"].begin(); itr != seriesInfo["Instances"].end(); itr++) {
-      std::string instanceId = (*itr).asString();
-      Json::Value array;
-      array.append(instanceId);
-      array.append(0);
-      array.append(1);
-      slicesShort.append(array);
-    }
-  }
 
   middleInstanceId = slicesShort[slicesShort.size() / 2][0].asString();
 
