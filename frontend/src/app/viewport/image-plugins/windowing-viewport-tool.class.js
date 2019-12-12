@@ -1,7 +1,7 @@
 /**
  * @ngdoc object
  * @memberOf osimis
- * 
+ *
  * @name osimis.WindowingViewportTool
  *
  * @description
@@ -38,7 +38,7 @@
             }
         };
 
-	    this.applyWindowingToViewport = function(viewport, deltaX, deltaY, applyToSynchronizedViewports) {
+	    this.applyWindowingToViewport = function(viewport, deltaX, deltaY, deltaFromStartX, deltaFromStartY, applyToSynchronizedViewports) {
 	        var viewportData = viewport.getViewportData();
 
 	        // Retrieve image min/max image pixel value and define a
@@ -48,17 +48,25 @@
 	        var minPixelValue = viewport.getCurrentImageMinPixelValue();
 	        var maxPixelValue = viewport.getCurrentImageMaxPixelValue();
 	        var pixelValueDelta = maxPixelValue - minPixelValue;
-	        var strength = Math.max(1, Math.log2(pixelValueDelta) - 7);
+            var distanceFromStartPoint = Math.sqrt(deltaFromStartX * deltaFromStartX + deltaFromStartY * deltaFromStartY);
+            var strength = 1;
 
-	        // Retrieve the current scale of the image, so user has more
-	        // refined control over zoomed images. For instance, when user
-	        // zooms to a specific zone of a mammography, he wishes to
-	        // adjust the windowing more precisely than when he sees the
-	        // whole image. A better solution would be to define the
-	        // strength based on the currently viewed image zone dynamic,
-	        // instead of the whole image dynamic, but that's fine for now.
-	        // var scale = Math.max(1, Math.min(+viewportData.getScaleForFullResolution(), 3));
-	        var scale = 1;
+            // fine tuning in the first 50 pixels (move 1 pixel = change value WW/WC by 1)
+            // then, increase the sensitivity in the next N pixels such that, when
+            // the distance is greater than 50+N, moving by 1 pixel changes the WW/WC value by pixelValueDelta/2*N
+            // examples when N = 200:
+            // image      pixelValueDelta        first 50 pixels     from 100->101   from 200->201
+            // MRI            2374                   1                   3.3             6.9
+            // RX             1006                   1                   1.5             3.5
+            // test image    58000                   1                  30.5           145.6
+            var highSensitivityDistance = 200;
+            if (distanceFromStartPoint > 50)
+            {
+                strength = Math.min(1, (distanceFromStartPoint - 50) / (highSensitivityDistance + 50));
+                strength = 1 + strength * (pixelValueDelta / (2 * highSensitivityDistance));
+            }
+
+            //console.log(pixelValueDelta, distanceFromStartPoint, strength);
 
 	        var deltaWW = 0;
 	        var deltaWC = 0;
@@ -89,13 +97,13 @@
 	        }
 
 	        // Calculate the new ww/wc.
-	        var newWindowWidth = +viewportData.voi.windowWidth + (deltaWW / scale * strength);
-	        var newWindowCenter = +viewportData.voi.windowCenter + (deltaWC / scale * strength);
+	        var newWindowWidth = +viewportData.voi.windowWidth + (deltaWW * strength);
+	        var newWindowCenter = +viewportData.voi.windowCenter + (deltaWC * strength);
 
 	        if (newWindowWidth <= 1) {
 	            newWindowWidth = 1;
 	        }
-            
+
             viewportData.voi.windowWidth = newWindowWidth;
             viewportData.voi.windowCenter = newWindowCenter;
 

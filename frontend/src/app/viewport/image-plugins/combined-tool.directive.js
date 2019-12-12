@@ -74,8 +74,10 @@
                 $enabledElement.on('mousedown.combinedTool', function(e) {
                     var isTouchEvent = !e.pageX && !e.pageY && !!e.originalEvent.touches;
                     var mouseButton = !isTouchEvent ? e.which : 1;
-                    var lastX = !isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX;
-                    var lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
+                    var startX = !isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX;
+                    var startY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
+                    var lastX = startX;
+                    var lastY = startY;
 
                     $(document).one('mouseup', function(e) {
                         $(document).unbind('mousemove.combinedTool');
@@ -88,26 +90,28 @@
                         $scope.$apply(function() {  // @todo necessary ?
                             var deltaX = (!isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX) - lastX;
                             var deltaY = (!isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY) - lastY;
+                            var deltaFromStartX = (!isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX) - startX;
+                            var deltaFromStartY = (!isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY) - startY;
                             lastX = !isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX;
                             lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
 
                             if (mouseButton === 1 && wvConfig.config.combinedToolBehaviour["leftMouseButton"]) { // left-click + move
-                                _this._applyTool(wvConfig.config.combinedToolBehaviour["leftMouseButton"], viewport, deltaX, deltaY);
+                                _this._applyTool(wvConfig.config.combinedToolBehaviour["leftMouseButton"], viewport, deltaX, deltaY, deltaFromStartX, deltaFromStartY);
                             }
                             else if (mouseButton === 2 && wvConfig.config.combinedToolBehaviour["middleMouseButton"]) { // middle-click + move
-                                _this._applyTool(wvConfig.config.combinedToolBehaviour["middleMouseButton"], viewport, deltaX, deltaY);
+                                _this._applyTool(wvConfig.config.combinedToolBehaviour["middleMouseButton"], viewport, deltaX, deltaY, deltaFromStartX, deltaFromStartY);
                             }
                             else if (mouseButton === 3 && wvConfig.config.combinedToolBehaviour["rightMouseButton"]) { // right-click + move
-                                _this._applyTool(wvConfig.config.combinedToolBehaviour["rightMouseButton"], viewport, deltaX, deltaY);
+                                _this._applyTool(wvConfig.config.combinedToolBehaviour["rightMouseButton"], viewport, deltaX, deltaY, deltaFromStartX, deltaFromStartY);
                             }
                         });
                     });
                 });
             };
 
-            this._applyTool = function(toolName, viewport, deltaX, deltaY) {
+            this._applyTool = function(toolName, viewport, deltaX, deltaY, deltaFromStartX, deltaFromStartY) {
                 if (toolName === "windowing") {
-                    wvWindowingViewportTool.applyWindowingToViewport(viewport, deltaX, deltaY, false);
+                    wvWindowingViewportTool.applyWindowingToViewport(viewport, deltaX, deltaY, deltaFromStartX, deltaFromStartY, false);
                 }
                 else if (toolName === "pan") {
                     wvPanViewportTool.applyPanToViewport(viewport, deltaX, deltaY);
@@ -123,7 +127,7 @@
 
                 // Remove touch handlers
                 for (var action in _hammers[viewport]) {
-                    _hammers[viewport][action].destroy();    
+                    _hammers[viewport][action].destroy();
                 }
                 delete _hammers[viewport];
 

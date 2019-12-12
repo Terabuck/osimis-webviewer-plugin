@@ -1,6 +1,7 @@
 (function(module) {
 
     var lastTouchPanningCenter = null;  // this is shared betwwen all HammerWrappers because the final event is often received by the oneTouch handler (i.e: when you release your twoTouch, you often release one finger after the other and the final event is issued by the oneTouch handler)
+    var startTouchPanningCenter = null;
     var maxTouchCountInThisMove = 0;
 
     function HammerWrapper(enabledElement, touchCount, viewport, toolName, wvWindowingViewportTool, wvPanViewportTool) {
@@ -22,29 +23,31 @@
             }
 
             if (lastTouchPanningCenter === null){
-                lastTouchPanningCenter = ev.center;
+                startTouchPanningCenter = ev.center;
+                lastTouchPanningCenter = startTouchPanningCenter;
                 // console.log("starting new touch", lastTouchPanningCenter.x, lastTouchPanningCenter.y);
                 return;
             }
-            
+
             _this._hammer.on("panend", function(ev) { // reset when pan is finished
-                // console.log("clearing touch");  
+                // console.log("clearing touch");
                 maxTouchCountInThisMove = 0;
                 lastTouchPanningCenter = null;
+                startTouchPanningCenter = null;
             })
-            
+
             if (_this._touchCount < maxTouchCountInThisMove) // we are releasing a twoTouch move one finger before the other -> don't apply the one touch action
                 return;
             maxTouchCountInThisMove = Math.max(maxTouchCountInThisMove, _this._touchCount);
 
             // console.log("touch", ev.center.x, ev.center.y);
-            var viewportData = _this._viewport.getViewportData();
-            var deltaX, deltaY, scale;
-            scale = +viewportData.scale;
-            deltaX = ev.center.x - lastTouchPanningCenter.x;
-            deltaY = ev.center.y - lastTouchPanningCenter.y;
+            var deltaX = ev.center.x - lastTouchPanningCenter.x;
+            var deltaY = ev.center.y - lastTouchPanningCenter.y;
+            var deltaFromStartX = ev.center.x - startTouchPanningCenter.x;
+            var deltaFromStartX = ev.center.y - startTouchPanningCenter.y;
+
             if (_this._toolName === "windowing") {
-                wvWindowingViewportTool.applyWindowingToViewport(_this._viewport, deltaX, deltaY, false);
+                wvWindowingViewportTool.applyWindowingToViewport(_this._viewport, deltaX, deltaY, deltaFromStartX, deltaFromStartX, false);
             } else if (_this._toolName === "pan") {
                 wvPanViewportTool.applyPanToViewport(_this._viewport, deltaX, deltaY);
             }

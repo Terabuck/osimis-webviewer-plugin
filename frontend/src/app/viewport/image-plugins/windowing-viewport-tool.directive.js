@@ -48,8 +48,10 @@
                 $enabledElement.on('touchstart.windowingTool mousedown.windowingTool', function(e) {
                     var isTouchEvent = !e.pageX && !e.pageY && !!e.originalEvent.touches;
                     var mouseButton = !isTouchEvent ? e.which : 1;
-                    var lastX = !isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX;
-                    var lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
+                    var startX = !isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX;
+                    var startY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
+                    var lastX = startX;
+                    var lastY = startY;
 
                     $(document).one('touchstart mouseup', function(e) {
                         $(document).unbind('touchmove.windowingTool mousemove.windowingTool');
@@ -62,11 +64,13 @@
                         $scope.$apply(function() {  // @todo necessary ?
                             var deltaX = (!isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX) - lastX;
                             var deltaY = (!isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY) - lastY;
+                            var deltaFromStartX = (!isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX) - startX;
+                            var deltaFromStartY = (!isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY) - startY;
                             lastX = !isTouchEvent ? e.pageX : e.originalEvent.touches[0].pageX;
                             lastY = !isTouchEvent ? e.pageY : e.originalEvent.touches[0].pageY;
 
                             if (mouseButton === 1) { // left-click + move
-                                wvWindowingViewportTool.applyWindowingToViewport(viewport, deltaX, deltaY, false);
+                                wvWindowingViewportTool.applyWindowingToViewport(viewport, deltaX, deltaY, deltaFromStartX, deltaFromStartY, false);
                             }
                             else if (mouseButton === 2) { // middle-click + move
                                 wvPanViewportTool.applyPanToViewport(viewport, deltaX, deltaY);
