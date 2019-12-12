@@ -59,9 +59,16 @@ std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId, b
   if (_cachingInMetadataEnabled && getInstanceTags)
   {
     Json::Value seriesInfo;
+    if (!OrthancPlugins::GetJsonFromOrthanc(seriesInfo, _context, "/series/" + seriesId))
+    {
+      throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
+    }
+
+    Json::Value seriesCachedInfo;
     // if information has not been cached yet (or is obsolete, update it)
-    if (!OrthancPlugins::GetJsonFromOrthanc(seriesInfo, _context, "/series/" + seriesId + "/metadata/" + seriesMetadataId)
-        || seriesInfo["Version"] != seriesInfoJsonVersion)
+    if (!OrthancPlugins::GetJsonFromOrthanc(seriesCachedInfo, _context, "/series/" + seriesId + "/metadata/" + seriesMetadataId)
+        || seriesInfo["Version"] != seriesInfoJsonVersion
+        || seriesCachedInfo["instancesInfos"].size() != seriesInfo["Instances"].size())  // new instances have been added
     {
       std::auto_ptr<Series> output = GenerateSeriesInfo(seriesId, getInstanceTags);
       StoreSeriesInfoInMetadata(seriesId, *output);
