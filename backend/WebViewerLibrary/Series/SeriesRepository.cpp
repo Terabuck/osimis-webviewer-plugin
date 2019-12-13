@@ -81,11 +81,37 @@ std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId, b
   }
 }
 
+struct SortableInstance
+{
+  std::string instanceId;
+  size_t      indexInSeries;
+
+  SortableInstance(const std::string& instanceId, size_t indexInSeries)
+    : instanceId(instanceId),
+      indexInSeries(indexInSeries)
+  {
+  }
+
+  static bool Comparator(const SortableInstance& a,
+                         const SortableInstance& b)
+  {
+    return a.indexInSeries < b.indexInSeries;
+  }
+
+};
+
+
 std::auto_ptr<Series> SeriesRepository::GenerateSeriesInfo(const std::string& seriesId, bool getInstanceTags)
 {
   // Retrieve series' slices (instances & frames)
   Json::Value orderedSlices;
   if (!OrthancPlugins::GetJsonFromOrthanc(orderedSlices, _context, "/series/" + seriesId + "/ordered-slices") || orderedSlices.size() == 0)
+  {
+    throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
+  }
+
+  Json::Value seriesInfo;
+  if (!OrthancPlugins::GetJsonFromOrthanc(seriesInfo, _context, "/series/" + seriesId + "/instances"))
   {
     throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
   }
@@ -96,6 +122,30 @@ std::auto_ptr<Series> SeriesRepository::GenerateSeriesInfo(const std::string& se
 
   // Retrieve middle instance id
   std::string middleInstanceId;
+  int sortedSlicesCount = slicesShort.size();
+
+  if (sortedSlicesCount != seriesInfo.size() ) // this can happen with series with slices from various orientation -> take them all, numbered by InstanceNumber
+  {
+    std::vector<SortableInstance> sortedInstances;
+    for (Json::ArrayIndex i = 0; i < seriesInfo.size(); i++)
+    {
+      sortedInstances.push_back(SortableInstance(seriesInfo[i]["ID"].asString(), seriesInfo[i]["IndexInSeries"].asUInt()));
+    }
+
+    std::sort(sortedInstances.begin(), sortedInstances.end(), SortableInstance::Comparator);
+
+    slicesShort.clear();
+    for (size_t i = 0; i < sortedInstances.size(); i++)
+    {
+      std::string instanceId = sortedInstances[i].instanceId;
+
+      Json::Value array;
+      array.append(instanceId);
+      array.append(0);
+      array.append(1);
+      slicesShort.append(array);
+    }
+  }
 
   middleInstanceId = slicesShort[slicesShort.size() / 2][0].asString();
 
