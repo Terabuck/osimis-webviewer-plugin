@@ -103,7 +103,7 @@
                         dateAndTime = dateAndTime + " - " + seriesTags.SeriesTime.substr(0, 2) + ":" + seriesTags.SeriesTime.substr(2, 2);
                         if (seriesTags.SeriesTime.length >= 6) {
                             dateAndTime = dateAndTime + ":" + seriesTags.SeriesTime.substr(4, 2);
-                        } 
+                        }
                     }
                 }
                 if (dateAndTime === undefined && seriesTags.StudyDate !== undefined && seriesTags.StudyDate.length >= 8) {
@@ -112,7 +112,7 @@
                         dateAndTime = dateAndTime + " - " + seriesTags.StudyTime.substr(0, 2) + ":" + seriesTags.StudyTime.substr(2, 2);
                         if (seriesTags.StudyTime.length >= 6) {
                             dateAndTime = dateAndTime + ":" + seriesTags.StudyTime.substr(4, 2);
-                        } 
+                        }
                     }
                 }
                 ArrayHelpers.pushIfDefined(lines, dateAndTime);
@@ -129,6 +129,10 @@
             vm.getBottomLeftArea = function(seriesTags, instanceTags) { // this has been added for Avignon, it still needs to be checked with nico how it should be done for good
                 var lines = [];
 
+                if (instanceTags.InstanceNumber !== undefined)
+                {
+                    lines.push("# " + instanceTags.InstanceNumber);
+                }
                 ArrayHelpers.pushIfDefined(lines, instanceTags.PatientOrientation);
                 ArrayHelpers.pushIfDefined(lines, instanceTags.ImageLaterality);
                 ArrayHelpers.pushIfDefined(lines, instanceTags.ViewPosition);
