@@ -13,6 +13,7 @@
 #include "../Image/Utilities/ScopedBuffers.h" // for ScopedOrthancPluginMemoryBuffer
 #include "../Instance/InstanceRepository.h"
 #include "ViewerToolbox.h"
+#include "Series/SeriesHelpers.h"
 
 std::string seriesMetadataId = "9997";
 int seriesInfoJsonVersion = 1;
@@ -65,94 +66,42 @@ std::auto_ptr<Series> SeriesRepository::GetSeries(const std::string& seriesId, b
     }
 
     Json::Value seriesCachedInfo;
+
     // if information has not been cached yet (or is obsolete, update it)
     if (!OrthancPlugins::GetJsonFromOrthanc(seriesCachedInfo, _context, "/series/" + seriesId + "/metadata/" + seriesMetadataId)
-        || seriesInfo["Version"] != seriesInfoJsonVersion
+        || seriesCachedInfo["Version"] != seriesInfoJsonVersion
         || seriesCachedInfo["instancesInfos"].size() != seriesInfo["Instances"].size())  // new instances have been added
     {
       std::auto_ptr<Series> output = GenerateSeriesInfo(seriesId, getInstanceTags);
       StoreSeriesInfoInMetadata(seriesId, *output);
       return output;
     } else {
-      return std::auto_ptr<Series>(Series::FromJson(seriesInfo));
+      return std::auto_ptr<Series>(Series::FromJson(seriesCachedInfo));
     }
   } else {
     return GenerateSeriesInfo(seriesId, getInstanceTags);
   }
 }
 
-struct SortableInstance
-{
-  std::string instanceId;
-  size_t      indexInSeries;
-
-  SortableInstance(const std::string& instanceId, size_t indexInSeries)
-    : instanceId(instanceId),
-      indexInSeries(indexInSeries)
-  {
-  }
-
-  static bool Comparator(const SortableInstance& a,
-                         const SortableInstance& b)
-  {
-    return a.indexInSeries < b.indexInSeries;
-  }
-
-};
 
 
 std::auto_ptr<Series> SeriesRepository::GenerateSeriesInfo(const std::string& seriesId, bool getInstanceTags)
 {
-  // Retrieve series' slices (instances & frames)
-  Json::Value orderedSlices;
-  if (!OrthancPlugins::GetJsonFromOrthanc(orderedSlices, _context, "/series/" + seriesId + "/ordered-slices") || orderedSlices.size() == 0)
-  {
-    throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
-  }
+  Json::Value sortedSlicesShort;
 
-  Json::Value seriesInfo;
-  if (!OrthancPlugins::GetJsonFromOrthanc(seriesInfo, _context, "/series/" + seriesId + "/instances"))
-  {
-    throw Orthanc::OrthancException(static_cast<Orthanc::ErrorCode>(OrthancPluginErrorCode_InexistentItem));
-  }
+  SeriesHelpers::GetOrderedSeries(_context, sortedSlicesShort, seriesId);
 
-  // Get each instance's tags (to avoid an additional request at each series' images)
-  Json::Value &slicesShort = orderedSlices["SlicesShort"];
   Json::Value instancesInfos;
 
   // Retrieve middle instance id
   std::string middleInstanceId;
-  int sortedSlicesCount = slicesShort.size();
 
-  if (sortedSlicesCount != seriesInfo.size() ) // this can happen with series with slices from various orientation -> take them all, numbered by InstanceNumber
-  {
-    std::vector<SortableInstance> sortedInstances;
-    for (Json::ArrayIndex i = 0; i < seriesInfo.size(); i++)
-    {
-      sortedInstances.push_back(SortableInstance(seriesInfo[i]["ID"].asString(), seriesInfo[i]["IndexInSeries"].asUInt()));
-    }
-
-    std::sort(sortedInstances.begin(), sortedInstances.end(), SortableInstance::Comparator);
-
-    slicesShort.clear();
-    for (size_t i = 0; i < sortedInstances.size(); i++)
-    {
-      std::string instanceId = sortedInstances[i].instanceId;
-
-      Json::Value array;
-      array.append(instanceId);
-      array.append(0);
-      array.append(1);
-      slicesShort.append(array);
-    }
-  }
-
-  middleInstanceId = slicesShort[slicesShort.size() / 2][0].asString();
+  middleInstanceId = sortedSlicesShort[sortedSlicesShort.size() / 2][0].asString();
 
   if (getInstanceTags)
   {
     BENCH(RETRIEVE_ALL_INSTANCES_TAGS)
-    for(Json::ValueIterator itr = slicesShort.begin(); itr != slicesShort.end(); itr++) {
+    for(Json::ValueIterator itr = sortedSlicesShort.begin(); itr != sortedSlicesShort.end(); itr++) {
       std::string instanceId = (*itr)[0].asString();
 
       instancesInfos[instanceId] = _instanceRepository->GetInstanceInfo(instanceId);
@@ -206,7 +155,7 @@ std::auto_ptr<Series> SeriesRepository::GenerateSeriesInfo(const std::string& se
   }
 
   // Create a series based on tags and ordered instances
-  return std::auto_ptr<Series>(_seriesFactory.CreateSeries(seriesId, slicesShort, tags1, middleInstanceInfos, instancesInfos, studyInfo));
+  return std::auto_ptr<Series>(_seriesFactory.CreateSeries(seriesId, sortedSlicesShort, tags1, middleInstanceInfos, instancesInfos, studyInfo));
 }
 
 namespace {
@@ -321,5 +270,3 @@ namespace {
     return toReturn;
   }
 }
-
-

@@ -12,7 +12,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
@@ -86,6 +86,7 @@ add_library(WebViewerLibrary
   ${VIEWER_LIBRARY_DIR}/Instance/DicomRepository.cpp
   ${VIEWER_LIBRARY_DIR}/Instance/InstanceRepository.cpp
   ${VIEWER_LIBRARY_DIR}/Series/SeriesFactory.cpp
+  ${VIEWER_LIBRARY_DIR}/Series/SeriesHelpers.cpp
   ${VIEWER_LIBRARY_DIR}/Series/SeriesRepository.cpp
   ${VIEWER_LIBRARY_DIR}/Series/Series.cpp
   ${VIEWER_LIBRARY_DIR}/Series/SeriesController.cpp
@@ -127,7 +128,7 @@ endif()
 
 target_compile_definitions(WebViewerLibrary PUBLIC -DORTHANC_SANDBOXED=0 -DORTHANC_DEFAULT_DICOM_ENCODING=Encoding_Latin1)
 
-# bind WebViewerLibrary to WebViewerDependencies so any executable/library embedding 
+# bind WebViewerLibrary to WebViewerDependencies so any executable/library embedding
 # WebViewerLibrary.a also embed WebViewerDependencies.
 add_dependencies(WebViewerLibrary WebViewerDependencies)
 target_link_libraries(WebViewerLibrary WebViewerDependencies)

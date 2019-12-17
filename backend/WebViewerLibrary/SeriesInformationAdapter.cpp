@@ -13,7 +13,7 @@
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  **/
@@ -25,6 +25,8 @@
 
 #include <boost/regex.hpp>
 
+#include "Series/SeriesHelpers.h"
+
 namespace OrthancPlugins
 {
   bool SeriesInformationAdapter::Create(std::string& content,
@@ -33,11 +35,10 @@ namespace OrthancPlugins
     std::string message = "Ordering instances of series: " + seriesId;
     OrthancPluginLogInfo(context_, message.c_str());
 
-    Json::Value series, study, patient, ordered;
+    Json::Value series, study, patient;
     if (!GetJsonFromOrthanc(series, context_, "/series/" + seriesId) ||
         !GetJsonFromOrthanc(study, context_, "/studies/" + series["ID"].asString() + "/module?simplify") ||
         !GetJsonFromOrthanc(patient, context_, "/studies/" + series["ID"].asString() + "/module-patient?simplify") ||
-        !GetJsonFromOrthanc(ordered, context_, "/series/" + series["ID"].asString() + "/ordered-slices") ||
         !series.isMember("Instances") ||
         series["Instances"].type() != Json::arrayValue)
     {
@@ -50,22 +51,15 @@ namespace OrthancPlugins
     result["StudyDescription"] = study["StudyDescription"].asString();
     result["PatientID"] = patient["PatientID"].asString();
     result["PatientName"] = patient["PatientName"].asString();
-    result["Type"] = ordered["Type"];
-    result["Slices"] = ordered["Slices"];
+    result["Slices"] = Json::arrayValue;
 
-    boost::regex pattern("^/instances/([a-f0-9-]+)/frames/([0-9]+)$");
+    Json::Value sortedSlicesShort;
+    SeriesHelpers::GetOrderedSeries(context_, sortedSlicesShort, seriesId);
 
-    for (Json::Value::ArrayIndex i = 0; i < result["Slices"].size(); i++)
+    for (Json::Value::ArrayIndex i = 0; i < sortedSlicesShort.size(); i++)
     {
-      boost::cmatch what;
-      if (regex_match(result["Slices"][i].asCString(), what, pattern))
-      {
-        result["Slices"][i] = std::string(what[1]) + "/" + std::string(what[2]);
-      }
-      else
-      {
-        return false;
-      }
+      std::string slice = sortedSlicesShort[i][0].asString() + "/" + boost::lexical_cast<std::string>(sortedSlicesShort[i][1].asUInt());
+      result["Slices"].append(slice);
     }
 
     content = result.toStyledString();
