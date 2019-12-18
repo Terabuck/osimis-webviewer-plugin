@@ -87,7 +87,7 @@
 
                 ArrayHelpers.pushIfDefined(lines, seriesTags.PatientName);
                 ArrayHelpers.pushIfDefined(lines, seriesTags.PatientID);
-                ArrayHelpers.pushIfDefined(lines, seriesTags.PatientBirthDate);
+                ArrayHelpers.pushIfDefined(lines, _convertDate(seriesTags.PatientBirthDate));
                 ArrayHelpers.pushIfDefined(lines, seriesTags.OsimisNote);
 
                 return lines;
@@ -98,7 +98,7 @@
                 ArrayHelpers.pushIfDefined(lines, seriesTags.StudyDescription);
                 var dateAndTime = undefined;
                 if (seriesTags.SeriesDate !== undefined && seriesTags.SeriesDate.length >= 8) {
-                    dateAndTime = seriesTags.SeriesDate;
+                    dateAndTime = _convertDate(seriesTags.SeriesDate);
                     if (seriesTags.SeriesTime != undefined) {
                         dateAndTime = dateAndTime + " - " + seriesTags.SeriesTime.substr(0, 2) + ":" + seriesTags.SeriesTime.substr(2, 2);
                         if (seriesTags.SeriesTime.length >= 6) {
@@ -107,7 +107,7 @@
                     }
                 }
                 if (dateAndTime === undefined && seriesTags.StudyDate !== undefined && seriesTags.StudyDate.length >= 8) {
-                    dateAndTime = seriesTags.StudyDate;
+                    dateAndTime = _convertDate(seriesTags.StudyDate);
                     if (seriesTags.StudyTime != undefined) {
                         dateAndTime = dateAndTime + " - " + seriesTags.StudyTime.substr(0, 2) + ":" + seriesTags.StudyTime.substr(2, 2);
                         if (seriesTags.StudyTime.length >= 6) {

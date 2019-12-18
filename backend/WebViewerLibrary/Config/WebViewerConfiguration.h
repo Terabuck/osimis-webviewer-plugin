@@ -71,6 +71,7 @@ public:
   std::string defaultSelectedTool;
   std::string defaultStudyIslandsDisplayMode;
   std::string customOverlayProviderUrl;
+  std::string dateFormat;
   Json::Value windowingPresets;
   Json::Value windowingBehaviour;
   Json::Value combinedToolBehaviour;

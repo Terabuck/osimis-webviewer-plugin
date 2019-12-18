@@ -276,6 +276,12 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   customCommandLuaCode = OrthancPlugins::GetStringValue(wvConfig, "CustomCommandLuaCode", std::string());
   customCommandIconClass = OrthancPlugins::GetStringValue(wvConfig, "CustomCommandIconClass", "fa fa-external-link-square-alt");
   customCommandIconLabel = OrthancPlugins::GetStringValue(wvConfig, "CustomCommandIconLabel", "custom action");
+  dateFormat = OrthancPlugins::GetStringValue(wvConfig, "DateFormat", std::string("YYYYMMDD"));
+
+  if (showStudyInformationBreadcrumb)
+  {
+    OrthancPluginLogWarning(_context, "The study breadcrumb has been disabled in 1.3.1 to avoid wrong patient/study identification when displaying multiple patient/studies in the same viewer");
+  }
 
   if (toolbarLayoutMode != "flat" && toolbarLayoutMode != "tree")
   {
@@ -547,7 +553,7 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["combinedToolEnabled"] = combinedToolEnabled;
   config["printEnabled"] = printEnabled;
   config["openAllPatientStudies"] = openAllPatientStudies;
-  config["showStudyInformationBreadcrumb"] = showStudyInformationBreadcrumb;
+  config["showStudyInformationBreadcrumb"] = false;  // removed as part of WVB-397
   config["windowingPresets"] = windowingPresets;
   config["combinedToolBehaviour"] = combinedToolBehaviour;
   config["windowingBehaviour"] = windowingBehaviour;
@@ -571,6 +577,7 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   config["customCommandEnabled"] = customCommandEnabled;
   config["customCommandIconClass"] = customCommandIconClass;
   config["customCommandIconLabel"] = customCommandIconLabel;
+  config["dateFormat"] = dateFormat;
 
   if (customOverlayProviderUrl.length() > 0) {
     config["customOverlayProviderUrl"] = customOverlayProviderUrl;

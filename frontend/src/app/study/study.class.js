@@ -1,7 +1,7 @@
 /**
  * @ngdoc object
  * @memberOf osimis
- * 
+ *
  * @name osimis.Study
  *
  * @description
@@ -10,17 +10,12 @@
 (function(osimis) {
     'use strict';
 
-    // Replace dicom date format into standard one.
-    function _convertDate(date) {
-        return date.replace(/^([0-9]{4})([0-9]{2})([0-9]{2})$/, '$1/$2/$3');
-    }
-
     function Study(Promise, studyManager, seriesManager, id, tags, seriesIds, pdfInstanceIds, videoIds) {
         // Injections.
         this._Promise = Promise;
         this._studyManager = studyManager;
         this._seriesManager = seriesManager
-        
+
         // constructor
         this.series = seriesIds; // @todo remove, use seriesIds instead
         this.videoIds = videoIds;
@@ -54,7 +49,7 @@
     /**
      * @ngdoc method
      * @methodOf osimis.Study
-     * 
+     *
      * @name osimis.Study#getRelatedStudies
      *
      * @return {Promise<Array<osimis.Study>>}
@@ -67,7 +62,7 @@
      * that patient.
      */
     Study.prototype.getRelatedStudies = function() {
-        var Promise = this._Promise; 
+        var Promise = this._Promise;
         var studyManager = this._studyManager;
 
         return studyManager
@@ -87,15 +82,15 @@
     /**
      * @ngdoc method
      * @methodOf osimis.Study
-     * 
+     *
      * @name osimis.Study#setHasBeenViewed
      *
      * @param {boolean} hasBeenViewed
      * The value to set.
-     * 
+     *
      * @description
      * Define wether the study has already been viewed by the end-user or not.
-     * The attribute is intended to be used to toggle a 
+     * The attribute is intended to be used to toggle a
      */
     Study.prototype.setHasBeenViewed = function(hasBeenViewed) {
         this.hasBeenViewed = hasBeenViewed;
@@ -104,19 +99,19 @@
     /**
      * @ngdoc method
      * @methodOf osimis.Study
-     * 
+     *
      * @name osimis.Study#setColor
      *
      * @param {string} [color='gray']
      * The color to set. Can be one of these values:
-     * 
+     *
      * * gray
      * * blue
      * * red
      * * green
      * * yellow
      * * violet
-     * 
+     *
      * @description
      * Define the study color. This method is mostly used to differentiate
      * studies from each others.
@@ -128,12 +123,12 @@
     /**
      * @ngdoc method
      * @methodOf osimis.Study
-     * 
+     *
      * @name osimis.Study#hasColor
      *
      * @return {boolean}
      * Return true when the color is not the default one (gray).
-     * 
+     *
      * @description
      * Method used to know if a study already has a default color.
      */
@@ -144,13 +139,13 @@
 
     /**
      * Get the next itemId with the type of the item next to it.
-     * 
+     *
      * The ordering is make by type of the item
      * series > video > report
-     * 
+     *
      * @param itemId
      * the item id or undefined. If it is undefined, it will return the first item found following the function logic.
-     * 
+     *
      * @return Array[nextItemId, nextItemType<"series"|"video"|"report">]
      */
     Study.prototype.getNextItemId = function(itemId){
@@ -222,18 +217,18 @@
         }
 
         return [_itemId, nextItemType]
-        
+
     };
 
     /**
      * Get the previoud itemId with the type of the item next to it.
-     * 
+     *
      * The ordering is make by type of the item
      * series > video > report
-     * 
+     *
      * @param itemId
      * the item id or undefined. If it is undefined, it will return the first item found following the function logic.
-     * 
+     *
      * @return Array[previousItemId, previousItemType<"series"|"video"|"report">]
      */
     Study.prototype.getPreviousItemId = function(itemId){
@@ -241,7 +236,7 @@
             previousItemType,
             _itemId,
             _previousIndex;
-        
+
         if(itemId){
             if(this.seriesIds.indexOf(itemId) > -1){
                 currentItemType = "series";
@@ -306,7 +301,7 @@
         }
 
         return [_itemId, previousItemType]
-        
+
     };
 
     osimis.Study = Study;
