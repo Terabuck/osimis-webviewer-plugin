@@ -106,8 +106,9 @@
 
             viewportData.voi.windowWidth = newWindowWidth;
             viewportData.voi.windowCenter = newWindowCenter;
+            viewportData.voi.hasModifiedWindowing = true;
 
-	        // Update viewport values & redraw the viewport.
+            // Update viewport values & redraw the viewport.
 	        viewport.setViewport(viewportData);
 	        viewport.draw(false);
 

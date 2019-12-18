@@ -1,6 +1,6 @@
 /**
  * @ngdoc directive
- * 
+ *
  * @name webviewer.directive:vpSeriesId
  *
  * @param {string} [vpSeriesId] The id of the displayed series.
@@ -28,18 +28,18 @@
  *
  * @restrict Attribute
  * @requires webviewer.directive:wvViewport
- * 
+ *
  * @description
  * The `vpSeriesId` directive is an extension of the `wvViewport` directive.
  * It sets and updates the images displayed on the viewport, based on the one available in the series.
  * The relative series model can be retrieved via attribute and therefore be controlled externaly.
- * 
+ *
  * This directive is also meant to be extended the same way `wvViewport` is.
  * Have a look at the _series-plugins/_ folder for an exhaustive list of series-related features.
- * 
+ *
  * @example
  * Display a specific series with some informations and a play button:
- * 
+ *
  * ```html
  * <wv-viewport wv-series-id="'your-series-id'" wv-series="$series" wv-size="{width: '100px', height: '100px'}"
  *              wv-image-id="imageId" wv-image="$image" wv-lossless="true"
@@ -85,9 +85,9 @@
              *
              * In this directive, we make use of multiple ones at once.
              *
-             * 
+             *
              * These ways however do not work well together, and produce infine recursive loops:
-             * 
+             *
              * [call to controller] ctrl->setSmtg('data');
              *                   |     •
              *                   •     |
@@ -98,7 +98,7 @@
              *                   |     |
              *                   •     |
              * [html attribute watch] scope.$watch($parse($attrs.smtg), function(data) { ctrl->setSmtg(data) });
-             * 
+             *
              *
              * _cancelCyclicCall is used to fix revoke the infinite loop before it happens.
              * When true, the HTML attribute watch is ignored. The variable is then automaticaly set back to false
@@ -108,7 +108,7 @@
              * methods (which is currently considered as a viewmodel) and only use the directive's controller to change the scope
              * attributes. No _cancelCyclicCall variable would be required that way but it requires to create an additional (meaningless)
              * abstraction layer.
-             * 
+             *
              * @type {Boolean}
              */
             var _cancelCyclicCall = false;
@@ -129,8 +129,8 @@
                     // Update series' displayed image
                     var viewportModel = viewportController.getModel();
                     viewportModel.onImageChanged.once(function(image) {
-                        // Ignore if this image is not the one loaded from the 
-                        // series. This may happen for instance if the image 
+                        // Ignore if this image is not the one loaded from the
+                        // series. This may happen for instance if the image
                         // loading has failed.
                         if (image.id !== imageId) {
                             return;
@@ -185,7 +185,7 @@
                 else {
                     // Keep the defined series' image index. This is required
                     // for services such as liveshare. It is not the `wvSeriesId`
-                    // responsibility to set the new image id, but the 
+                    // responsibility to set the new image id, but the
                     // `wvSeriesId`'s user.
                     var imageIndex = wvImageIndexParser(scope) || 0;
 
@@ -193,7 +193,7 @@
                     // viewport data as it was first defined by the user.
                     // It is required to do this because the series is loaded
                     // asynchronously.
-                    // 
+                    //
                     // If users want to change the series and reset the
                     // viewport, he does:
                     // - `wv-series-id="stg"`
@@ -210,7 +210,7 @@
                     // 4. Series is loaded.
                     //    Viewport is taken from the previous image id.
                     //
-                    // We therfore need to delay the viewport reset until 
+                    // We therfore need to delay the viewport reset until
                     // the series has loaded (in this case).
                     //
                     // @warning This only works when viewport is reset.
@@ -294,7 +294,7 @@
 
         /**
          * @type {osimis.Listener}
-         * 
+         *
          * @description
          * Callback used to update Angular databound HTML attributes (&
          * events).

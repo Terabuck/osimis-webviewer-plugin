@@ -41,6 +41,8 @@
         // Fit image to the viewport by default
         this._fitImageToViewport = true;
 
+        this._windowingMode = "image"; // per default, each image has its own windowing
+
         // Other stuffs
         // @deprecated?
         this._currentImage = null;
@@ -229,6 +231,8 @@
         var enabledElement = this._enabledElement;
         var canvas = this._canvas;
         var _this = this;
+
+        this._windowingMode = "image"; // each time we load a new series, we get back to the image by image windowing
 
         resetViewport = resetViewport || false;
 
@@ -530,11 +534,28 @@
      * @description
      * # @todo abstract from cornerstone
      */
-    Viewport.prototype.setViewport = function(viewportData) {
+    Viewport.prototype.setViewport = function(viewportData, imageWindowCenter, imageWindowWidth) {
         // Assert viewportData is a wrapped viewport data, not the cornestone
         // one.
         if (viewportData.constructor !== osimis.CornerstoneViewportWrapper) {
             throw new Error('setViewport called with non wrapped viewport');
+        }
+
+        if (viewportData.voi.hasModifiedWindowing !== undefined && viewportData.voi.hasModifiedWindowing) { // we are changing the windowing manually, keep this windowing for the whole series (WVP-169)
+            this._windowingMode = "series";
+        }
+        else if (imageWindowCenter !== undefined && imageWindowWidth !== undefined && this._windowingMode == "image" && (viewportData)) {
+            // we changed the image that might have another windowing as the previous image
+            var windowCenters = imageWindowCenter.split('\\');
+            var windowWidths = imageWindowWidth.split('\\');
+
+            // Only take the first ww/wc available, ignore others (if
+            // there is any).
+            windowCenter = +windowCenters[0] || 127.5;
+            windowWidth = +windowWidths[0] || 256;
+
+            viewportData.voi.windowCenter = windowCenter;
+            viewportData.voi.windowWidth = windowWidth;
         }
 
         // Make sure to adapt wrapped viewport's current image resolution to

@@ -131,7 +131,7 @@
         };
 
         function areViewportEqual(oldCsViewport, newCsViewport) {
-            return oldCsViewport._cornerstoneViewportData.hflip === newCsViewport._cornerstoneViewportData.hflip && 
+            return oldCsViewport._cornerstoneViewportData.hflip === newCsViewport._cornerstoneViewportData.hflip &&
                 oldCsViewport._cornerstoneViewportData.invert === newCsViewport._cornerstoneViewportData.invert &&
                 oldCsViewport._cornerstoneViewportData.modalityLUT === newCsViewport._cornerstoneViewportData.modalityLUT &&
                 oldCsViewport._cornerstoneViewportData.pixelReplication === newCsViewport._cornerstoneViewportData.pixelReplication &&
@@ -233,7 +233,7 @@
                                 // Set/Reset the viewport
                                 resetViewport = resetViewport || !newCsViewport;
                                 if (!resetViewport && newCsViewport) {
-                                    model.setViewport(newCsViewport);
+                                    model.setViewport(newCsViewport, newImage.instanceInfos.TagsSubset.WindowCenter, newImage.instanceInfos.TagsSubset.WindowWidth);
                                 }
 
                                 // Set image & draw
@@ -333,7 +333,7 @@
                                 // Set/Reset the viewport
                                 var resetViewport = undefined;
                                 if (newCsViewport) {
-                                    model.setViewport(newCsViewport); // newUnserializedCsViewport
+                                    model.setViewport(newCsViewport, newImage.instanceInfos.TagsSubset.WindowCenter, newImage.instanceInfos.TagsSubset.WindowWidth); // newUnserializedCsViewport
                                     resetViewport = false;
                                 }
                                 else {

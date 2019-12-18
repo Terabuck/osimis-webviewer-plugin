@@ -148,6 +148,7 @@
         // Apply windowing.
         this.csViewport.voi.windowWidth = windowWidth;
         this.csViewport.voi.windowCenter = windowCenter;
+        this.csViewport.voi.hasModifiedWindowing = true; // windowing has been modified manually
     };
 
     Pane.prototype.applyEmbeddedWindowingPreset = function(presetsIndex) {
@@ -201,43 +202,43 @@
         return wvImageManager.get(imageId).then(function(image){
             var captureWidth = image.instanceInfos.TagsSubset["Columns"] || 600;
             var captureHeight = image.instanceInfos.TagsSubset["Rows"] || 400;
-    
+
             if (captureWidth < 512) { // if image is too small, the annotation will appear 'pixelized' -> increase the size
                 var upscaleRatio = 512 / captureWidth;
                 captureWidth = Math.round(captureWidth * upscaleRatio);
                 captureHeight = Math.round(captureHeight * upscaleRatio);
             }
-    
+
             console.log("creating a new capture image (" + captureWidth + " x " + captureHeight + ")");
-    
+
             wvImageManager
                 .createAnnotedImage(imageId, captureWidth, captureHeight, serializedCsViewport, "image/jpeg", false, 0.8)
                 .then(function(imageData) {
                     console.log("Downloading image (" + imageData.length + " bytes)");
-                    
+
                     // convert the data uri to blob
-                    var binaryImageData = atob(imageData.split(',')[1]); 
+                    var binaryImageData = atob(imageData.split(',')[1]);
                     var array = [];
-                    for(var i = 0; i < binaryImageData.length; i++) 
+                    for(var i = 0; i < binaryImageData.length; i++)
                         array.push(binaryImageData.charCodeAt(i));
                     var blob = new Blob([new Uint8Array(array)], {type: "image/jpeg"});
-                    
+
                     var url = window.URL.createObjectURL(blob);
 
                     var element = document.createElement('a');
                     //element.setAttribute('href', imageData);
                     element.setAttribute('href', url);
                     element.setAttribute('download', that.series.tags["PatientName"] + " - " + that.series.tags["StudyDescription"] + " - " + that.series.tags["SeriesDescription"] + ".jpg");
-                  
+
                     element.style.display = 'none';
                     document.body.appendChild(element);
-                  
+
                     element.click();
-                  
+
                     document.body.removeChild(element);
                 });
         });
-    
+
     }
 
     Pane.prototype.getNextSeriesPaneConfigPromise = function(){

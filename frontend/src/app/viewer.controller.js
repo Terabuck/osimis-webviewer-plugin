@@ -42,9 +42,9 @@
         this.wvConfig = wvConfig;
         this.$q = $q;
 
-        this.saveStateToLocalStorage();        
+        this.saveStateToLocalStorage();
     }
-    
+
     ViewerController.prototype.saveStateToLocalStorage = function() {
         window.localStorage.setItem("isOverlayTextVisible", this._isOverlayTextVisible);
         window.localStorage.setItem("isOverlayIconsVisible", this._isOverlayIconsVisible);
@@ -68,27 +68,27 @@
 
     ViewerController.prototype.toggleOverlayText = function() {
         this._isOverlayTextVisible = !this._isOverlayTextVisible;
-        this.saveStateToLocalStorage();        
+        this.saveStateToLocalStorage();
     }
     ViewerController.prototype.isOverlayTextVisible = function() {
     	return this._isOverlayTextVisible;
     }
     ViewerController.prototype.setOverlayTextVisible = function(enabled) {
         this._isOverlayTextVisible = enabled;
-        this.saveStateToLocalStorage();        
+        this.saveStateToLocalStorage();
     }
 
 
     ViewerController.prototype.toggleOverlayIcons = function() {
         this._isOverlayIconsVisible = !this._isOverlayIconsVisible;
-        this.saveStateToLocalStorage();        
+        this.saveStateToLocalStorage();
     }
     ViewerController.prototype.isOverlayIconsVisible = function() {
     	return this._isOverlayIconsVisible;
     }
     ViewerController.prototype.setOverlayIconsVisible = function(enabled) {
         this._isOverlayIconsVisible = enabled;
-        this.saveStateToLocalStorage();        
+        this.saveStateToLocalStorage();
     }
 
     ViewerController.prototype.setLayout = function(x, y) {
@@ -120,7 +120,7 @@
         var request = new osimis.HttpRequest();
         request.setHeaders(that.wvConfig.httpRequestHeaders);
         request.setCache(false);
-        
+
         request.post(that.wvConfig.orthancApiURL + '/osimis-viewer/custom-command/' + image.id.split(":")[0], "")
           .then(function(response) {
             console.log("custom-command executed");
@@ -155,7 +155,7 @@
     ViewerController.prototype.nextStudy = function() {
         var selectedPane = this.wvPaneManager.getSelectedPane();
         var this_ = this;
-        
+
         selectedPane.getStudy().then(function(study){
             var selectedStudyIds = this_._selectedStudyIds;
             var currentIndex = selectedStudyIds.indexOf(study.id);
@@ -184,7 +184,7 @@
     ViewerController.prototype.previousStudy = function() {
         var selectedPane = this.wvPaneManager.getSelectedPane();
         var this_ = this;
-        
+
         selectedPane.getStudy().then(function(study){
             var selectedStudyIds = this_._selectedStudyIds;
             var currentIndex = selectedStudyIds.indexOf(study.id);
