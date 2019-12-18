@@ -131,7 +131,7 @@
 
                 if (instanceTags.InstanceNumber !== undefined)
                 {
-                    lines.push("# " + instanceTags.InstanceNumber);
+                    lines.push("Image Number: " + instanceTags.InstanceNumber);
                 }
                 ArrayHelpers.pushIfDefined(lines, instanceTags.PatientOrientation);
                 ArrayHelpers.pushIfDefined(lines, instanceTags.ImageLaterality);
