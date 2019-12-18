@@ -2,20 +2,28 @@ Changes:
 -------
 
 * The study breadcrumb has been removed to avoid wrong patient/study identification when displaying multiple patient/studies in the same viewer
-* now displaying the PatientBirthDate in the top left overlay below PatientName and PatientID
-* changed the dynamic of the windowing tool:
+* Now displaying the PatientBirthDate and PatientSex in the top left overlay below PatientName and PatientID.
+  Note that, the PatientSex being cached in metadata (InstanceInfoCacheEnabled), this cache will be regenerated, this might slow down the loading of old studies.
+* Now displaying the InstanceNumber in the bottom left overlay
+* Changed the dynamic of the windowing tool:
   - in the first 50 pixels: moving by 1 pixel changes the WW/WC value by 1
   - then, the WW/WC increments varies with the distance from the start of the movement
   This allows for fine tuning the WW/WC and also handling large values.
-* the format of dates can now be configured in a "DateFormat" configuration.  The default is the DICOM format "YYYYMMDD" as before.
+* The format of dates can now be configured in a "DateFormat" configuration.  The default is the DICOM format "YYYYMMDD" as before.
+* When images of a series each contain a different windowCenter/windowWidth, the individual windowCenter/windowWidth is applied until the user modifies the windowing
+  himself.  Once this is done, these settings are applied to all instances.
+
 
 Fixes:
 -----
 
-* fix loading of /osimis-viewer/images/{id}/0/8bit/invert-monochrome1/jpeg:100 for US instances when ShortTermCache was enabled
-* synchronized browsing is now disabled when the tool is deactivated by setting SynchronizedBrowsingEnabled=false
-* reference lines are now disabled when the tool is deactivated by setting ReferenceLinesEnabled=false
-
+* Fix loading of /osimis-viewer/images/{id}/0/8bit/invert-monochrome1/jpeg:100 for US instances when ShortTermCache was enabled
+* Synchronized browsing is now disabled when the tool is deactivated by setting SynchronizedBrowsingEnabled=false
+* Reference lines are now disabled when the tool is deactivated by setting ReferenceLinesEnabled=false
+* WVB-400: slice-ordering & incomplete series:
+           - now invalidating the cache (InstanceInfoCacheEnabled) if it does not contain the right number of instances info
+           - ordering the slices per ImagePositionPatient first and, if not possible, by ImageNumber
+           - slices ordered by ImagePositionPatient are now displayed in the usual order (top of body as the first slide)
 
 
 Version 1.3.0

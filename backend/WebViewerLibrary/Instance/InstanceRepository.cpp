@@ -14,7 +14,7 @@
 #include "ViewerToolbox.h"
 
 std::string instanceMetadataId = "9998";
-int instanceInfoJsonVersion = 2;
+int instanceInfoJsonVersion = 3; // 2 -> 3: Added PatientSex in instances
 
 InstanceRepository::InstanceRepository(OrthancPluginContext* context)
   : _context(context),
@@ -103,6 +103,7 @@ Json::Value InstanceRepository::SimplifyInstanceTags(const Json::Value& instance
   tagsToKeep.push_back("PatientName");
   tagsToKeep.push_back("PatientID");
   tagsToKeep.push_back("PatientBirthDate");
+  tagsToKeep.push_back("PatientSex");
   tagsToKeep.push_back("PatientIdentityRemoved");
   tagsToKeep.push_back("OsimisNote");
   tagsToKeep.push_back("StudyDescription");

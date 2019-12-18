@@ -87,7 +87,17 @@
 
                 ArrayHelpers.pushIfDefined(lines, seriesTags.PatientName);
                 ArrayHelpers.pushIfDefined(lines, seriesTags.PatientID);
-                ArrayHelpers.pushIfDefined(lines, _convertDate(seriesTags.PatientBirthDate));
+
+                var dobAndSex = _convertDate(seriesTags.PatientBirthDate);
+                if (seriesTags.PatientSex !== undefined && seriesTags.PatientSex.length > 0) {
+                    if (dobAndSex === undefined) {
+                        dobAndSex = seriesTags.PatientSex;
+                    } else {
+                        dobAndSex = dobAndSex + " - " + seriesTags.PatientSex;
+                    }
+                }
+
+                ArrayHelpers.pushIfDefined(lines, dobAndSex);
                 ArrayHelpers.pushIfDefined(lines, seriesTags.OsimisNote);
 
                 return lines;

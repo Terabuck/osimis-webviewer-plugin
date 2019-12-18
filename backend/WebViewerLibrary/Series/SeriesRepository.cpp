@@ -16,7 +16,8 @@
 #include "Series/SeriesHelpers.h"
 
 std::string seriesMetadataId = "9997";
-int seriesInfoJsonVersion = 1;
+int seriesInfoJsonVersion = 2; // 1 -> 2: Added PatientSex in instances
+
 
 namespace {
   std::string _getTransferSyntax(const Orthanc::DicomMap& headerTags);
@@ -222,6 +223,7 @@ namespace {
     tagsToKeep.push_back("PatientName");
     tagsToKeep.push_back("PatientID");
     tagsToKeep.push_back("PatientBirthDate");
+    tagsToKeep.push_back("PatientSex");
     tagsToKeep.push_back("PatientIdentityRemoved");
     tagsToKeep.push_back("OsimisNote");
     tagsToKeep.push_back("StudyDescription");
