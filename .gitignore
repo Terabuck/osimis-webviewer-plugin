@@ -22,6 +22,7 @@
 /frontend/docs/
 /frontend/*.zip
 scripts/ci/.env
+scripts/ci/env
 # other
 /.env
 /report/
