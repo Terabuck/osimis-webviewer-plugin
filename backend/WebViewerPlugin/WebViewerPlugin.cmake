@@ -100,8 +100,9 @@ EmbedResources(
 endif()
 
 # Append resources.rc to windows' build
-if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows" AND ${CMAKE_BUILD_TYPE} STREQUAL "Release")
-  list(APPEND VIEWER_PLUGIN_WINDOWS_SOURCES ${VIEWER_PLUGIN_DIR}/resources.rc)
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows" AND
+    ${CMAKE_BUILD_TYPE} STREQUAL "Release")
+    list(APPEND VIEWER_PLUGIN_WINDOWS_SOURCES ${VIEWER_PLUGIN_DIR}/resources.rc)
 endif()
 
 # Create OsimisWebViewer Plugin as a dynamic library
