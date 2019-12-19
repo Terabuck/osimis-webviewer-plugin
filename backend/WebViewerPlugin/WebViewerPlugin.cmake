@@ -99,6 +99,10 @@ EmbedResources(
   )
 endif()
 
+if (NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
+
 # Append resources.rc to windows' build
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows" AND
     ${CMAKE_BUILD_TYPE} STREQUAL "Release")
