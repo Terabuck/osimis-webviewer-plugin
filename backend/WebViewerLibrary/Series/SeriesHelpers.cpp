@@ -111,7 +111,13 @@ public:
 
     if (instanceInfoInSeries["MainDicomTags"].isMember("NumberOfFrames"))
     {
-      framesCount_ = boost::lexical_cast<unsigned int>(instanceInfoInSeries["MainDicomTags"]["NumberOfFrames"].asString());
+      try
+      {
+        framesCount_ = boost::lexical_cast<unsigned int>(instanceInfoInSeries["MainDicomTags"]["NumberOfFrames"].asString());
+      }
+      catch (boost::bad_lexical_cast&)
+      {
+      }
     }
 
     std::vector<float> tmp;
@@ -131,14 +137,26 @@ public:
 
     if (instanceInfoInSeries["MainDicomTags"].isMember("InstanceNumber"))
     {
-      indexInSeries_ = boost::lexical_cast<unsigned int>(instanceInfoInSeries["MainDicomTags"]["InstanceNumber"].asString());
-      hasIndexInSeries_ = true;
+      try
+      {
+        indexInSeries_ = boost::lexical_cast<unsigned int>(instanceInfoInSeries["MainDicomTags"]["InstanceNumber"].asString());
+        hasIndexInSeries_ = true;
+      }
+      catch (boost::bad_lexical_cast&)
+      {
+      }
     }
 
     if (!hasIndexInSeries_ && instanceInfoInSeries["MainDicomTags"].isMember("ImageIndex"))
     {
-      indexInSeries_ = boost::lexical_cast<unsigned int>(instanceInfoInSeries["MainDicomTags"]["ImageIndex"].asString());
-      hasIndexInSeries_ = true;
+      try
+      {
+        indexInSeries_ = boost::lexical_cast<unsigned int>(instanceInfoInSeries["MainDicomTags"]["ImageIndex"].asString());
+        hasIndexInSeries_ = true;
+      }
+      catch (boost::bad_lexical_cast&)
+      {
+      }
     }
   }
 
