@@ -59,8 +59,8 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   combinedToolBehaviour["twoTouchPan"] = "pan";
   combinedToolBehaviour["threeTouchPan"] = Json::nullValue;
 
-  mouseWheelBehaviour["down"] = "previousImage";
-  mouseWheelBehaviour["up"] = "nextImage";
+  mouseWheelBehaviour["down"] = "nextImage";
+  mouseWheelBehaviour["up"] = "previousImage";
 
   keyboardShortcuts = Json::Value(Json::objectValue);
   keyboardShortcuts["left"] = "previousImage";

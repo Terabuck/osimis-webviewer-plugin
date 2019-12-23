@@ -9,6 +9,7 @@ Changes:
   - in the first 50 pixels: moving by 1 pixel changes the WW/WC value by 1
   - then, the WW/WC increments varies with the distance from the start of the movement
   This allows for fine tuning the WW/WC and also handling large values.
+* Changed the default behaviour of the mouse wheel: going down will move to the next image in the series
 * The format of dates can now be configured in a "DateFormat" configuration.  The default is the DICOM format "YYYYMMDD" as before.
 * When images of a series each contain a different windowCenter/windowWidth, the individual windowCenter/windowWidth is applied until the user modifies the windowing
   himself.  Once this is done, these settings are applied to all instances.
