@@ -13,7 +13,7 @@ Changes:
 * The format of dates can now be configured in a "DateFormat" configuration.  The default is the DICOM format "YYYYMMDD" as before.
 * When images of a series each contain a different windowCenter/windowWidth, the individual windowCenter/windowWidth is applied until the user modifies the windowing
   himself.  Once this is done, these settings are applied to all instances.
-
+* Default windowing presets have changed (WVB-402).
 
 Fixes:
 -----
