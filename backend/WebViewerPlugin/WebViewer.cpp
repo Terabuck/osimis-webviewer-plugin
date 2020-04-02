@@ -48,6 +48,7 @@ void WebViewer::_serveFrontEnd()
   LanguageController::addLanguageFile("en", "/osimis-viewer/app/languages/en.json");
   LanguageController::addLanguageFile("fr", "/osimis-viewer/app/languages/fr.json");
   LanguageController::addLanguageFile("nl", "/osimis-viewer/app/languages/nl.json");
+  LanguageController::addLanguageFile("es", "/osimis-viewer/app/languages/es.json");
   LanguageController::addLanguageFile("pt", "/osimis-viewer/app/languages/pt.json");
   LanguageController::addLanguageFile("zh", "/osimis-viewer/app/languages/zh.json");
 }
@@ -78,7 +79,7 @@ namespace {
 
     const std::string path = std::string(WEB_VIEWER_PATH) + std::string(request->groups[0]);
     const char* mime = OrthancPlugins::GetMimeType(path);
-    
+
     std::string s;
     try
     {
