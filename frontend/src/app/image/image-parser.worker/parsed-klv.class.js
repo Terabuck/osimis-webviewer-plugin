@@ -1,9 +1,9 @@
 /**
  * @ngdoc object
  * @memberOf osimis
- * 
+ *
  * @name osimis.ParsedKlv
- * 
+ *
  * @description
  * The `osimis.ParsedKlv` class provide raw image pixels & image information
  * from an image KLV data blob & the related instance dicom tags. It's main
@@ -38,7 +38,7 @@
         // Process windowing default values.
         var windowing = _processWindowing(pixels, klvData, tags, pixelValuesBoundaries.min, pixelValuesBoundaries.max);
 
-        // Retrieve pixel spacing if available in dicom tags, so we can 
+        // Retrieve pixel spacing if available in dicom tags, so we can
         // map pixel coordinates with physical ones.
         var columnPixelSpacing = 0;  // use really invalid values to make sure the user realizes the measure is invald (note: cornerstone will display pixels dimensions in this case)
         var rowPixelSpacing = 0;     // @todo Disable the measure tools in this case (note: this can be done later).
@@ -127,11 +127,11 @@
      *
      * @return {Uint8Array|Int8Array|Uint16Array|int16Array}
      * The typed pixel array.
-     * 
+     *
      * @description
      * This method returns a typed array containing the uncompressed pixels of
-     * the image. We can easily retrieve the buffer out of it using 
-     * `array.buffer`, and use that value as a `transferable object` to 
+     * the image. We can easily retrieve the buffer out of it using
+     * `array.buffer`, and use that value as a `transferable object` to
      * transfer data between a web worker and the main thread without having to
      * copy its memory blob.
      */
@@ -147,7 +147,7 @@
      *
      * @return {object}
      * The cornerstone metadata.
-     * 
+     *
      * @description
      * This method returns an object with most of the metadata required to have
      * a cornerstone's image object. These meta data are meant to be transfered
@@ -167,7 +167,7 @@
      *
      * @return {string}
      * The array type.
-     * 
+     *
      * @description
      * A typed array can't be transfered through web worker, although a raw
      * buffer can. The purpose of this method is to transfer the type of the
@@ -214,11 +214,11 @@
             MinPixelValue: 3, // {number} the floor value to unstretch pixels to.
             MaxPixelValue: 4, // {number} the ceiling value to unstretch pixels to.
             Stretched: 5, // {boolean} true if the image has to be unstretched.
-            
+
             // The image binary.
             ImageBinary: 6
         };
-        
+
         return {
             height: klvReader.getUInt(keys.Height),
             width: klvReader.getUInt(keys.Width),
@@ -239,7 +239,7 @@
         // General values used everywhere.
         var isRgb32 = tags.PhotometricInterpretation !== 'MONOCHROME1' && tags.PhotometricInterpretation !== 'MONOCHROME2';
         var isSigned = !!(+tags.PixelRepresentation);
-        
+
         // Decompress image binary into raw pixel.
         // @todo Use latest browser methods to do this faster.
         switch (compressionFormat.toLowerCase()) {
@@ -247,7 +247,7 @@
             // Decompress lossy jpeg
             // @note IE10 & safari tested/compatible
             pixelArray = _decompressJpeg(klvData.binary);
-            
+
             // Stretch back dynamic if needed
             pixelArray = _stretchBackDynamic(pixelArray, {
                 isRgb32: isRgb32,
@@ -259,7 +259,7 @@
                     //     if we stretch to `2^tags.BitStored` (many
                     //     jpeg only use 9 bits out of the 12 `said` to
                     //     be stored by the BitsStored tag). We could
-                    //     otherwise use 0 as low and 
+                    //     otherwise use 0 as low and
                     //     `Math.pow(2, tags.BitsStored)` as high.
                     low: klvData.minPixelValue,
                     high: klvData.maxPixelValue
@@ -305,7 +305,7 @@
                     }
                 }
             }
-    
+
             break;
         }
 
@@ -325,7 +325,7 @@
 
         // Decompress to raw pixels.
         var s = new Uint8Array(decoder.decompress(config.binary.buffer));
-        
+
         // Retrieve bits information.
         // `decoder.numComp === 3 -> rgb`
         // `decoder.numComp === 1 -> grayscale`
@@ -405,7 +405,7 @@
             }
         } else if (png.bits === 16) {
             // Cast uint8_t array to (u)int16_t array
-            
+
             pixels = _convertPngEndianness(s, config);
 
         }
@@ -449,13 +449,13 @@
 
     // if isRgb32
     //  -> Uint32 == Uint8 * 4 (RGBA)
-    // 
+    //
     // if !isRgb32 && IsSigned
     //  -> Int16
-    // 
+    //
     // if !isRgb32 && !IsSigned
     //  -> Uint16
-    // 
+    //
     function _stretchBackDynamic(s, config) {
         var pixels = null;
         var buf, index, i;
@@ -498,7 +498,7 @@
 
         for (var i = 0, length = pixels.length; i < length; i++) {
             pixels[i] = scale * pixels[i] + offset;
-        }    
+        }
     }
 
     function _processPixelValuesBoundaries(pixelArray, tags) {
@@ -538,7 +538,7 @@
 
     function _processWindowing(pixelArray, klvData, tags, minPixelValue, maxPixelValue) {
         var isRgb32 = tags.PhotometricInterpretation !== 'MONOCHROME1' && tags.PhotometricInterpretation !== 'MONOCHROME2';
-        
+
         var windowCenter = 0;
         var windowWidth = 0;
 
@@ -556,7 +556,7 @@
             var windowCenters = tags.WindowCenter.split('\\');
             var windowWidths = tags.WindowWidth.split('\\');
 
-            // Only take the first ww/wc available, ignore others (if 
+            // Only take the first ww/wc available, ignore others (if
             // there is any).
             windowCenter = +windowCenters[0] || 127.5;
             windowWidth = +windowWidths[0] || 256;
@@ -578,7 +578,7 @@
             // print information such as a 'G' position label printed in the
             // image. This can be achieved by bypassing the highest and lowest
             // pixels, from the min/max algorithm used to determine the default
-            // windowing. In our samples, those overlay can also have value 
+            // windowing. In our samples, those overlay can also have value
             // `0x010101` instead of `0x000`, that's why we bypass 2 values
             // insteead of just one.
             var thresholdDelta = 2;
@@ -614,13 +614,16 @@
             minPixelValueForWWWC = minPixelValueForWWWC + thresholdDelta > maxPixelValueForWWWC ? minPixelValue : minPixelValueForWWWC;
             maxPixelValueForWWWC = minPixelValueForWWWC + thresholdDelta > maxPixelValueForWWWC ? maxPixelValue : maxPixelValueForWWWC;
 
+            minPixelValueForWWWC = minPixelValueForWWWC * slope + intercept;
+            maxPixelValueForWWWC = maxPixelValueForWWWC * slope + intercept;
+
             windowCenter = minPixelValueForWWWC + (maxPixelValueForWWWC - minPixelValueForWWWC) / 2 || 127.5;
             windowWidth = (maxPixelValueForWWWC - minPixelValueForWWWC) || 256;
         }
 
         // Return result.
         return {
-            windowCenter: windowCenter, 
+            windowCenter: windowCenter,
             windowWidth: windowWidth,
             slope: slope,
             intercept: intercept
