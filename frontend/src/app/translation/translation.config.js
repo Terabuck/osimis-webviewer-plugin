@@ -19,6 +19,7 @@
         var wvConfig = wvConfigProvider._config;
         var languages = {
             en: 'english',
+            es: 'spanish',
             fr: 'français',
             nl: 'nederlands',
             pt: 'Português',
