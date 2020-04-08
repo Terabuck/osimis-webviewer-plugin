@@ -1,14 +1,14 @@
 /**
  * @ngdoc directive
  * @name webviewer.directive:wvStudyDownloadButton
- * 
+ *
  * @param {wvStudyId} wvStudyId
  * The id of the study to be downloaded. If it is undefined, the button is
  * hidden.
  *
  * @scope
  * @restrict Element
- * 
+ *
  * @description
  * The `wvStudyDownloadButton` directive displays a download button. When the
  * user clicks on this study, the study is downloaded.
@@ -47,7 +47,7 @@
                         vm.downloadLink = '#';
                     }
                     else {
-                        vm.downloadLink = wvConfig.orthancApiURL + '/studies/' + studyId + '/archive';
+                        vm.downloadLink = wvConfig.orthancApiURL + '/studies/' + studyId + '/archive' + window.location.search;
                     }
                 }
             });

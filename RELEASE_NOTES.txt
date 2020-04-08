@@ -7,7 +7,7 @@ Fixes:
 -----
 
 * fix automatic windowing of files without windowing tags and RescaleSlope != 1
-
+* include window.location.search arguments in study download link
 
 Version 1.3.1
 ========================
