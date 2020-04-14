@@ -55,7 +55,7 @@
 
         // by default, all query arguments are transformed into headers (for passing the auth token)
         if (window.URLSearchParams !== undefined) {
-            var urlParams = urlParams = new URLSearchParams(window.location.search);
+            var urlParams = new URLSearchParams(window.location.search);
             var that = this;
             urlParams.forEach(function(value, key) {
                 that.httpRequestHeaders[key] = value;
@@ -63,6 +63,19 @@
 
             if (urlParams.get("language")) {
                 __webViewerConfig.defaultLanguage = urlParams.get("language");
+            }
+        } else { // for IE 11 !
+            var searchString = window.location.search.replace("?", "");
+            console.log(searchString);
+            var searches = searchString.split("&");
+            for (var i = 0; i < searches.length; i++) {
+                var tokens = searches[i].split("=");
+                if (tokens.length == 2) {
+                    this.httpRequestHeaders[tokens[0]] = tokens[1];
+                    if (tokens[0] == "language") {
+                        __webViewerConfig.defaultLanguage = tokens[1];
+                    }
+                }
             }
         }
         this.config = __webViewerConfig;
