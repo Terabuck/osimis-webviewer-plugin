@@ -205,17 +205,17 @@
                 if (osName === "Mac OS") {
                     minimalChromeVersion = 48;
                     minimalFirefoxVersion = 28;
-                } 
+                }
                 if (osName === "iOS" && wvConfig.browser.device.model === "iPhone") { // not supported at all on iPhone right now (too many bugs)
                     minimalChromeVersion = 999;
                     minimalFirefoxVersion = 999;
                     minimalSafariVersion = 999;
                 }
 
-                if ((browserName === "Chrome" && browserMajorVersion >= minimalChromeVersion) 
-                    || (browserName === "Safari" && browserMajorVersion >= minimalSafariVersion) 
-                    || (browserName === "Firefox" && browserMajorVersion >= minimalFirefoxVersion) 
-                    || (browserName === "Edge" && browserMajorVersion >= minimalEdgeVersion) 
+                if ((browserName === "Chrome" && browserMajorVersion >= minimalChromeVersion)
+                    || (browserName === "Safari" && browserMajorVersion >= minimalSafariVersion)
+                    || (browserName === "Firefox" && browserMajorVersion >= minimalFirefoxVersion)
+                    || (browserName === "Edge" && browserMajorVersion >= minimalEdgeVersion)
                     || (browserName === "IE" && browserMajorVersion >= minimalIEVersion)){
                     console.log(browserName + " Supported");
                 }
@@ -224,10 +224,10 @@
                     vm.incompatibleBrowserErrorMessage = browserName + " version " + browserMajorVersion + " is not supported.  You might expect inconsistent behaviours and shall not use the viewer to produce a diagnostic.";
                     console.log(vm.incompatibleBrowserErrorMessage);
                 }
-                
+
                 vm.onCloseWarning = function(){
                     vm.openIncompatibleBrowserModal = false;
-                } 
+                }
             }
 
             vm.paneManager = wvPaneManager;
@@ -822,18 +822,16 @@
                 var isIE = (uaParser.getBrowser().name === 'IE');
                 var isEdge = (uaParser.getBrowser().name === 'Edge');
                 console.log("ua parser", uaParser.getBrowser());
-                if(isFirefox || isIE || isEdge){
-                    $body.css('width', '8.5in');
-                    $body.css('height', '11in');
-                    // console.log('html size', $html.width(), $html.height());
-                }
+                $body.css('width', '8.5in');
+                $body.css('height', '11in');
+                // console.log('html size', $html.width(), $html.height());
 
                 if(isIE){
                     window.alert($translate.instant('GENERAL_PARAGRAPHS.INCOMPATIBLE_PRINT_BROWSER'));
                 }
 
                 console.log('body size', $body.width(), $body.height());
-                
+
                 var panes = vm.paneManager.getAllPanes();
                 var $splitpane = $("wv-splitpane");
                 var splitpaneSize = {width: $splitpane.width(), height: $splitpane.height()}
@@ -841,7 +839,7 @@
                     x: vm.tools.layout.x,
                     y: vm.tools.layout.y
                 }
-        
+
                 for(var i = 0; i < panes.length; i++){
                     var $pane = panes[i];
                     var viewport = vm.viewports[$pane.$$hashKey];
@@ -892,7 +890,7 @@
 
                         }
                     }
-                    
+
                     paneSize.canvasFinalRatio = paneSize.canvasFinalWidth / paneSize.canvasFinalHeight;
                     console.log('paneSizes:', paneSize, 'splitpaneSize:', splitpaneSize, "panesCount:", panesCount);
                     // viewport.resizeCanvas(paneSize.canvasFinalWidth, paneSize.canvasFinalHeight);
@@ -901,9 +899,9 @@
                     $canvas.width(paneSize.canvasFinalWidth);
                     $canvas.height(paneSize.canvasFinalHeight);
                 }
-            
+
             };
-        
+
             function afterPrint(){
                 console.log("afterprint");
                 var $body = $('body');

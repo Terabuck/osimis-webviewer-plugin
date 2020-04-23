@@ -9,6 +9,7 @@ Fixes:
 * fix automatic windowing of files without windowing tags and RescaleSlope != 1
 * include window.location.search arguments in study download link
 * fix IE11 not forwarding auth-token from window.location.search to authorization plugin
+* fix "black image" when printing from Safari 13.1
 
 Version 1.3.1
 ========================
