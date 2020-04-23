@@ -31,7 +31,7 @@ RUN mkdir /src
 RUN mkdir /build
 RUN mkdir /frontend
 
-RUN hg clone -r Orthanc-1.5.0 https://bitbucket.org/sjodogne/orthanc /orthanc
+RUN hg clone -r Orthanc-1.5.0 https://hg.orthanc-server.com/orthanc /orthanc
 
 COPY . /src
 

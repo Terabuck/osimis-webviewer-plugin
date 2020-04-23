@@ -116,8 +116,8 @@ endif()
 if (ORTHANC_FRAMEWORK_SOURCE STREQUAL "archive" OR
     ORTHANC_FRAMEWORK_SOURCE STREQUAL "web")
   if ("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
-    find_program(ORTHANC_FRAMEWORK_7ZIP 7z 
-      PATHS 
+    find_program(ORTHANC_FRAMEWORK_7ZIP 7z
+      PATHS
       "$ENV{ProgramFiles}/7-Zip"
       "$ENV{ProgramW6432}/7-Zip"
       )
@@ -144,15 +144,15 @@ if (ORTHANC_FRAMEWORK_SOURCE STREQUAL "path")
   if (NOT DEFINED ORTHANC_FRAMEWORK_ROOT)
     message(FATAL_ERROR "The variable ORTHANC_FRAMEWORK_ROOT must provide the path to the sources of Orthanc")
   endif()
-  
+
   if (NOT EXISTS ${ORTHANC_FRAMEWORK_ROOT})
     message(FATAL_ERROR "Non-existing directory: ${ORTHANC_FRAMEWORK_ROOT}")
   endif()
-  
+
   if (NOT EXISTS ${ORTHANC_FRAMEWORK_ROOT}/Resources/CMake/OrthancFrameworkParameters.cmake)
     message(FATAL_ERROR "Directory not containing the source code of Orthanc: ${ORTHANC_FRAMEWORK_ROOT}")
   endif()
-  
+
   set(ORTHANC_ROOT ${ORTHANC_FRAMEWORK_ROOT})
 endif()
 
@@ -175,14 +175,14 @@ if (ORTHANC_FRAMEWORK_SOURCE STREQUAL "hg")
       COMMAND ${ORTHANC_FRAMEWORK_HG} pull
       WORKING_DIRECTORY ${ORTHANC_ROOT}
       RESULT_VARIABLE Failure
-      )    
+      )
   else()
     message("Forking the Orthanc source repository using Mercurial")
     execute_process(
-      COMMAND ${ORTHANC_FRAMEWORK_HG} clone "https://bitbucket.org/sjodogne/orthanc"
+      COMMAND ${ORTHANC_FRAMEWORK_HG} clone "https://hg.orthanc-server.com/orthanc"
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
       RESULT_VARIABLE Failure
-      )    
+      )
   endif()
 
   if (Failure OR NOT EXISTS ${ORTHANC_ROOT})
@@ -241,14 +241,14 @@ if (ORTHANC_FRAMEWORK_SOURCE STREQUAL "web")
     message("Downloading: ${ORTHANC_FRAMEWORK_URL}")
 
     file(DOWNLOAD
-      "${ORTHANC_FRAMEWORK_URL}" "${ORTHANC_FRAMEWORK_ARCHIVE}" 
+      "${ORTHANC_FRAMEWORK_URL}" "${ORTHANC_FRAMEWORK_ARCHIVE}"
       SHOW_PROGRESS EXPECTED_MD5 "${ORTHANC_FRAMEWORK_MD5}"
       TIMEOUT 60
       INACTIVITY_TIMEOUT 60
       )
   else()
     message("Using local copy of: ${ORTHANC_FRAMEWORK_URL}")
-  endif()  
+  endif()
 endif()
 
 
@@ -284,7 +284,7 @@ if (ORTHANC_FRAMEWORK_SOURCE STREQUAL "archive" OR
     if (NOT ORTHANC_FRAMEWORK_ARCHIVE MATCHES ".tar.gz$")
       message(FATAL_ERROR "Archive should have the \".tar.gz\" extension: ${ORTHANC_FRAMEWORK_ARCHIVE}")
     endif()
-    
+
     message("Uncompressing: ${ORTHANC_FRAMEWORK_ARCHIVE}")
 
     if ("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
@@ -297,7 +297,7 @@ if (ORTHANC_FRAMEWORK_SOURCE STREQUAL "archive" OR
         RESULT_VARIABLE Failure
         OUTPUT_QUIET
         )
-      
+
       if (Failure)
         message(FATAL_ERROR "Error while running the uncompression tool")
       endif()
@@ -319,7 +319,7 @@ if (ORTHANC_FRAMEWORK_SOURCE STREQUAL "archive" OR
         RESULT_VARIABLE Failure
         )
     endif()
-   
+
     if (Failure)
       message(FATAL_ERROR "Error while running the uncompression tool")
     endif()
