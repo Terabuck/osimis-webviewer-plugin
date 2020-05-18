@@ -1,64 +1,64 @@
 {
 	"WebViewer" : {
-  
+
 		//////////////////// WebViewer basic configuration ///////////////////////
 		// this section is common to both the WebViewer basic and the pro version
 		//////////////////////////////////////////////////////////////////////////
-	 
+
 		// note: all documented values are the default ones, if you plan to use the
 		// default values, you may omit the settings
-	 
-	 
+
+
 		// Show the `download study` button in the frontend.
 		// You may want to disable this feature if you disable access to
 		// the underlying REST route for authentication reasons.
 		"StudyDownloadEnabled": true,
-	 
+
 		// Display MPEG-4 DICOM video (non-bd only) within the frontend. You
 		// may disable this feature if you disable access to the underlying
 		// REST route for authentication reasons.
 		"VideoDisplayEnabled": true,
-	 
+
 		// Store image annotations made by users as Orthanc Attachment 9999 and
 		// retrieve them automatically each time the viewer is opened.
 		"AnnotationStorageEnabled": false,
-	 
+
 		// This option displays a button on each viewport. When the user clicks
 		// on the button, a new DICOM series is created with the image of the
 		// viewport, including the annotations. You must ensure your server allows
 		// large requests.
 		"KeyImageCaptureEnabled": false,
-	 
+
 		// Enables/disables print button
 		"PrintEnabled": true,
-	 
+
 		// Enables/disables button to hide/show overlay texts
 		"ToggleOverlayTextButtonEnabled": false,
 		"DisplayOverlayText": true,
-	 
+
 		// Enables/disables button to download current image as jpeg (introduced in v 1.3.0)
 		"DownloadAsJpegEnabled": false,
-	 
+
 		// Enables/disables button to toggle synchronized browsing (introduced in v 1.3.0)
 		"SynchronizedBrowsingEnabled": true,
-	 
+
 		// Enables/disables button to toggle reference lines (introduced in v 1.3.0)
 		"ReferenceLinesEnabled": true,
-	 
+
 		// Enables/disables button to select the cross hair tool (introduced in v 1.3.0)
 		"CrossHairEnabled": true,
-	 
+
 		////// Custom command button (introduced in v 1.2.0)
 		// Enables/disables the custom command button
 		"CustomCommandEnabled": false,
-	 
+
 		// Defines the tooltip that appears when hovering the custom button
 		"CustomCommandIconLabel": "my custom command",
-	 
+
 		// Defines the HTML class of the custom button (this should be a class that is already
 		// loaded by the viewer: mainly Font-awesome or Glyhpicon
 		"CustomCommandIconClass": "fas fa-file-export",
-	 
+
 		// Defines a lua code that is executed each time the user presses the custom button.
 		// In this context, a variable 'instanceId' is defined wich contains the orthanc id
 		// of the instance currently being displayed in the active viewport.
@@ -70,26 +70,26 @@
 		// Here is a sample to store the currently displayed instance on disk (the disk
 		// of the Orthanc Server) and call a system command on it
 		// "CustomCommandLuaCode": "print('executing custom command on instance ' .. instanceId) \n local dicomFileContent = RestApiGet('/instances/' .. instanceId .. '/file') \n local outFile = assert(io.open('/tmp/' .. instanceId .. '.dcm', 'wb')) \n outFile:write(dicomFileContent) \n outFile:close() \n os.execute('dcmdump /tmp/' .. instanceId .. '.dcm') \n print('custom command completed')",
-	 
+
 		// Display a breadcrumb with the patient name/study description on top of the interface (this setting has been removed in version 1.3.1)
 		// "ShowStudyInformationBreadcrumb": false,
-	 
+
 		// Display a 'no report' icon in the series list when the study
 		// does not contain any series with embedded pdf files.
 		"ShowNoReportIconInSeriesList": false,
-	 
+
 		// Reduce the Timeline height when there's a single image in a series
 		"ReduceTimelineHeightOnSingleFrameSeries": false,
-	 
+
 		// Layout all toolbar buttons on the same line or organize them
 		// hierarchically
 		// Allowed values: "flat", "tree"
 		"ToolbarLayoutMode": "flat",
-	 
+
 		// Use small/large buttons in the toolbar
 		// Allowed values: "small", "large"
 		"ToolbarButtonSize": "small",
-	 
+
 		// This option allows you to define windowing presets.
 		// For each preset, you must provide a name, the window width
 		// and window center
@@ -101,10 +101,10 @@
 			{"Name": "Ct Chest", "WindowCenter": 40, "WindowWidth": 400},
 			{"Name": "Ct Angio", "WindowCenter": 300, "WindowWidth": 600}
 		],
-	 
+
 		// Defines how dates are displayed in the UI (introduced in version 1.3.1)
 		"DateFormat" : "YYYYMMDD",
-	 
+
 		// This option defines how the windowing tool behaves when the mouse
 		// is moved (increase/decrease window-width or window-center)
 		"WindowingBehaviour" : {
@@ -113,12 +113,12 @@
 			"up": "decrease-wc",
 			"down": "increase-wc"
 		},
-	 
+
 		// Select the default selected tool in toolbar
 		// Allowed values: layout, zoom, pan, invert, windowing, magnify, rotateLeft, rotateRight, hflip, vflip
 		// lengthMeasure, angleMeasure, pixelProbe, ellipticalRoi, rectangleRoi, arrowAnnotate, keyImageCapture
 		"DefaultSelectedTool": "zoom",
-	 
+
 		// Enables/Disables the combined tool.
 		// The combined tool allows you to change the windowing, zoom and pan without
 		// changing tools.  The behaviour of the combined tool is defined in CombinedToolBehaviour
@@ -131,14 +131,14 @@
 			"twoTouchPan": "pan",
 			"threeTouchPan": null
 		},
-	 
+
 		// Defines the behaviour of the mouse
 		// Allowed action values: nextImage, previousImage, zoomIn, zoomOut
 		"MouseWheelBehaviour": {
 			"down": "nextImage",
 			"up": "previousImage"
 		},
-	 
+
 		// Defines the keyboard shortcuts
 		// Allowed functions values:
 		// nextStudy, previousStudy, nextSeries, previousSeries, nextImage, previousImage,
@@ -197,15 +197,15 @@
 		// Select the study island display mode
 		// Allowed values: grid, list, oneCol
 		"DefaultStudyIslandsDisplayMode": "grid",
-	 
+
 		// Select the language
 		// Allowed values: en, fr, nl, de
 		"DefaultLanguage": "en",
-	 
+
 		// Displays all studies from patient or a single study
 		// Introduced in version 1.2
 		"OpenAllPatientStudies": true,
-	 
+
 		// Defines a list of series that will not be displayed if all the DICOM
 		// tags matches the filter.
 		// Note: you can define multiple filters
@@ -216,7 +216,7 @@
 		//     "Modality" : "SEG"
 		//   }
 		// },
-	 
+
 		// Defines a list of series that will not be displayed if all the metadata
 		// of the middle instance matches the filter.
 		// Note: you can define multiple filters
@@ -227,61 +227,80 @@
 		//     "isDeactivated" : "true"
 		//   }
 		// },
-	 
+
 		///////////////
 		// Performance
 		///////////////
-	 
-	 
-		// Store low/high quality images in a short term cache (on disk)
+
+
+		// Store low/high quality images in a short term cache (on disk and in a SQlite DB)
 		"ShortTermCacheEnabled": true,
-	 
+
 		// Path where the short term cache is stored
 		// Default value: in the WebViewerCache subfolder of the folder defined by
 		// OrthancStorageDirectory
 		// "ShortTermCachePath": "/OrthancStorage/WebViewerCache",
-	 
+
 		// Maximum size of the short term cache (in MB)
 		"ShortTermCacheSize": 1000,
-	 
+
 		// Start pre-computing the low/high quality images as soon as they are
 		// received in Orthanc.
 		"ShortTermCachePrefetchOnInstanceStored": false,
-	 
+
 		// Number of threads used by the short term cache to pre-compute the
 		// low/high quality images.
 		// Default: half the number of cores available
 		// "ShortTermCacheThreads": 4,
-	 
+
 		// Display cache debug logs (mainly for developers)
 		"ShortTermCacheDebugLogsEnabled": false,
-	 
+
 		// Preload high quality images on the frontend before the user actually
-		// needs them. 
+		// needs them.
 		"HighQualityImagePreloadingEnabled": true,
-	 
+
 		// Stores a subset of DicomTags and metadata that are commonly used by the viewer
 		// in the SQL database to speed up retrieval.  This consumes more space
 		// (around 500 bytes per instance).
 		"InstanceInfoCacheEnabled": false,
-	 
+
 		// Stores jpeg version of images in the SQL database to speed up retrieval.
 		// This cache is not limited in size and therefore consumes a lot of space
 		// (around 100KB-1MB per instance).  This feature is quite experimental and it is
 		// currently not recommended to use this cache.
 		"CacheEnabled": false,
-	 
-	 
+
+
+        // The Osimis Web Viewer is shipping a decoder of DICOM images using the GDCM library.
+        // In Orthanc 1.7.0, the support of GDCM has been included in a separate plugin.
+        // As a consequence, when the viewer 1.3.2+ is started in an Orthanc 1.7.0+, it now sets GdcmEnabled to false by default.
+
+        // EnableGdcm specified whether GDCM should be used to decode DICOM images, replacing the built-in decoder of Orthanc that
+        // internally uses DCMTK. This was notably necessary to deal with DICOM images encoded using JPEG2000, as this format is
+        // not readily supported by the core version of DCMTK. Before 1.3.2 and Orthanc 1.7.0, this option was set to true.
+        // As a complement to the EnableGdcm option, it is also possible to restrict the GDCM decoder to some specific transfer
+        // syntaxes using the RestrictTransferSyntaxes option.
+        // For instance, the following configuration would enable GDCM to decode JPEG 2000 images, while using DCMTK to decode the other transfer syntaxes:
+        // "EnableGdcm" : true,
+        // "RestrictTransferSyntaxes" : [
+        //     "1.2.840.10008.1.2.4.90",   // JPEG 2000 Image Compression (Lossless Only)
+        //     "1.2.840.10008.1.2.4.91",   // JPEG 2000 Image Compression
+        //     "1.2.840.10008.1.2.4.92",   // JPEG 2000 Part 2 Multicomponent Image Compression (Lossless Only)
+        //     "1.2.840.10008.1.2.4.93"    // JPEG 2000 Part 2 Multicomponent Image Compression
+        // ],
+
+
 		//////////////////// WebViewer Pro configuration ///////////////////////
 		// this section is specific for the WebViewer pro (CE marked version of the Osimis Webviewer)
 		//////////////////////////////////////////////////////////////////////////
-	 
-	 
+
+
 		// The license string to enable usage of WebViewer pro.  If not valid
 		// license is string is provided or if the license is expired,
 		// Orthanc will not start
 		"LicenseString": "XXXXXX____XXXXXX",
-	 
+
 		// Display the liveshare button so anyone can start a collaborative
 		// session. It requires the nodejs liveshare backend and the reverse proxy
 		// to be installed and configured (see the `reverse-proxy/` folder for
@@ -291,10 +310,10 @@
 		// note: the LiveShare will most likely be removed in version 1.4 so it is not recommended to
 		// enable this feature anymore
 		"LiveshareEnabled": false,
-	 
+
 		// Show CE Marking in top left corner of the interface
 		"ShowCEMarking": true,
-	 
+
 		// Sets the URL of the documentation
 		// You should set it to an empty string "" to disable the link to the documentation.
 		// Please note that it is not legal to remove/replace it without the approval of OSIMIS:

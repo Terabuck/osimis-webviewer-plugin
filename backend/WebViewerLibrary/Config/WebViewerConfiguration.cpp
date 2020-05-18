@@ -5,6 +5,7 @@
 #include <Core/OrthancException.h>
 #include <boost/thread.hpp>
 #include <algorithm>
+#include <Plugins/Samples/Common/OrthancPluginCppWrapper.h>
 
 #include "ViewerToolbox.h"
 
@@ -108,7 +109,9 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   keyboardShortcuts["enter"] = "loadSeriesInPane";
 
   instanceInfoCacheEnabled = OrthancPlugins::GetBoolValue(wvConfig, "InstanceInfoCacheEnabled", false);
-  gdcmEnabled = OrthancPlugins::GetBoolValue(wvConfig, "GdcmEnabled", true);
+
+  bool hasGdcmPlugin = OrthancPlugins::CheckMinimalOrthancVersion(1, 7, 0);
+  gdcmEnabled = OrthancPlugins::GetBoolValue(wvConfig, "GdcmEnabled", !hasGdcmPlugin); // now that the GDCM plugin is available (Orthanc 1.7.0)
   // By default, use GDCM for everything.
   restrictTransferSyntaxes = false;
 

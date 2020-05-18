@@ -57,6 +57,7 @@ include_directories(${ORTHANC_ROOT})
 
 add_definitions(
   -DORTHANC_ENABLE_LOGGING_PLUGIN=1
+  -DHAS_ORTHANC_EXCEPTION=0
   )
 
 # create an intermediary WebViewerLibrary to avoid source recompilation
@@ -65,6 +66,7 @@ add_library(WebViewerLibrary
   STATIC
 
   ${ORTHANC_CORE_SOURCES}
+  ${ORTHANC_ROOT}/Plugins/Samples/Common/OrthancPluginCppWrapper.cpp
 
   # The following files depend on GDCM
   ${VIEWER_LIBRARY_DIR}/SeriesInformationAdapter.cpp

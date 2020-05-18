@@ -2,6 +2,7 @@ Changes:
 -------
 
 * Added support for spanish translations (es)
+* GdcmEnabled is now false by default if the plugin is started in Orthanc 1.7.0 (we assume that the new GDCM plugin is enabled)
 
 Fixes:
 -----
