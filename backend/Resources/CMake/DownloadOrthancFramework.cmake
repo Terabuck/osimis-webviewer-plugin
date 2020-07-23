@@ -19,7 +19,7 @@
 # you do not wish to do so, delete this exception statement from your
 # version. If you delete this exception statement from all source files
 # in the program, then also delete it here.
-# 
+#
 # This program is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
@@ -106,7 +106,7 @@ endif()
 
 if (ORTHANC_FRAMEWORK_SOURCE STREQUAL "hg")
   find_program(ORTHANC_FRAMEWORK_HG hg)
-  
+
   if (${ORTHANC_FRAMEWORK_HG} MATCHES "ORTHANC_FRAMEWORK_HG-NOTFOUND")
     message(FATAL_ERROR "Please install Mercurial")
   endif()

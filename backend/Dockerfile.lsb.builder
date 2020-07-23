@@ -1,15 +1,15 @@
 # FROM ubuntu:18.04 as cpp-builder
-# 
+#
 # RUN apt-get -y clean && apt-get -y update
 # RUN DEBIAN_FRONTEND=noninteractive apt-get -y install wget nano build-essential unzip cmake mercurial uuid-dev libcurl4-openssl-dev liblua5.1-0-dev libgtest-dev libpng-dev libsqlite3-dev libssl-dev libjpeg-dev zlib1g-dev libdcmtk2-dev libboost-all-dev libwrap0-dev libcharls-dev libjsoncpp-dev libpugixml-dev alien g++-4.8 lsb && apt-get clean && rm -rf /var/lib/apt/lists/*
-# 
+#
 # # install LSB-SDK
 # RUN mkdir /Downloads
 # WORKDIR /Downloads
 # RUN wget https://ftp.linuxbase.org/pub/lsb/bundles/released-5.0.0/sdk/lsb-sdk-5.0.0-3.x86_64.tar.gz
 # RUN tar xvf lsb-sdk-5.0.0-3.x86_64.tar.gz
 # WORKDIR /Downloads/lsb-sdk/
-# 
+#
 # # instead of running ./install.sh that requires some input from the user, we have exploded the script:
 # RUN alien -ick lsb-build-base-5.0.5-3.x86_64.rpm
 # RUN alien -ick lsb-build-c++-5.0.0-1.x86_64.rpm
