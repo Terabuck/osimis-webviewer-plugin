@@ -164,12 +164,12 @@ lock(resource: 'webviewer', inversePrecedence: false) {
                     int maxPort = 40000
                     int demoPort = random.nextInt(maxPort - minPort + 1) + minPort;
 
-                    // Build demo
-                    sh 'scripts/ci/setEnv.sh ${BRANCH_NAME}'
-                    sh "demo/scripts/buildDocker.sh"
-
                     // Load docker registry (required by docker-compose)
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-jenkinsosimis') {
+                        // Build demo
+                        sh 'scripts/ci/setEnv.sh ${BRANCH_NAME}'
+                        sh "demo/scripts/buildDocker.sh"
+
                         // Set docker-compose project name
                         def dockerProject = "wvb_demo_${BRANCH_NAME}"
 
