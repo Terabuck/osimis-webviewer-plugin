@@ -96,6 +96,12 @@ public:
   std::string customCommandIconClass;
   std::string customCommandIconLabel;
 
+
+  std::string documentationUrl;
+  std::string showInfoPopupAtStartup;
+  bool showInfoPopupButtonEnabled;
+  bool alwaysShowNotForDiagnosticUsageDisclaimer;
+
   WebViewerConfiguration(OrthancPluginContext* context);
   /**
    * Retrieve a specific set of options for the frontend.

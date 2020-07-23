@@ -83,6 +83,7 @@
             "RECTANGLE_ROI": "roi rectangulaire",
             "ROTATE_LEFT": "rotation sur la gauche",
             "ROTATE_RIGHT": "rotation sur la droite",
+            "SHOW_INFO_POPUP": "à propos",
             "SPLIT_PANE_CONFIG_LEGEND_PARAGRAPH": "Changer la mise en page des viewports.",
             "SYNCHRONIZED_BROWSING" : "Navigation syncrhonisée",
             "TOGGLE_LAYOUT_TEXT" : "Annotations textuelles",

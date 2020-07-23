@@ -398,6 +398,21 @@
         wv-on-keyimagenote-created="vm.toolbox.createKeyImageNote($note)"
     ></wv-keyimagenote-button>
 
+    <!-- Info button -->
+    <label
+        ng-switch-when="showInfoPopup"
+        ng-if="vm.toolbox.buttons.hasOwnProperty('showInfoPopup')"
+        class="wvButton--underline"
+        data-title="{{ 'COMPONENTS.TOOLBOX.SHOW_INFO_POPUP' | translate | wvCapitalize }}"
+        data-placement="{{ vm.toolbox.position === 'top' ? 'bottom':'left' }}"
+        data-container="body"
+        ng-class="{'wvLargeButton': vm.toolbox.buttonsSize == 'large'}"
+        bs-tooltip
+    >
+      <i class="fas fa-question-circle"></i>
+      <input type="button" ng-disabled="vm.toolbox.readonly" ng-click="vm.toolbox.onActionClicked({$action: 'showInfoPopup'})" style="position: absolute; left:0; top:0; bottom:2px; right:0; opacity:0;"/>
+    </label>
+
     <!-- Custom command button -->
     <label
         ng-switch-when="customCommand"

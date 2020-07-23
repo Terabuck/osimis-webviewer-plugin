@@ -292,14 +292,9 @@
 
 
 		//////////////////// WebViewer Pro configuration ///////////////////////
-		// this section is specific for the WebViewer pro (CE marked version of the Osimis Webviewer)
+		// this section is specific for the WebViewer pro
 		//////////////////////////////////////////////////////////////////////////
 
-
-		// The license string to enable usage of WebViewer pro.  If not valid
-		// license is string is provided or if the license is expired,
-		// Orthanc will not start
-		"LicenseString": "XXXXXX____XXXXXX",
 
 		// Display the liveshare button so anyone can start a collaborative
 		// session. It requires the nodejs liveshare backend and the reverse proxy
@@ -311,16 +306,20 @@
 		// enable this feature anymore
 		"LiveshareEnabled": false,
 
-		// Show CE Marking in top left corner of the interface
-		"ShowCEMarking": true,
-
 		// Sets the URL of the documentation
 		// You should set it to an empty string "" to disable the link to the documentation.
-		// Please note that it is not legal to remove/replace it without the approval of OSIMIS:
-		// a medical device must be delivered with its official Instructions for Use.
-		// If you replace it (i.e, to provide a translation in your own language), there is minimal legal requirements that must be fulfilled
-		// (legal manufacturer (i.e. Osimis) address. Product name… must remain visible.). OSIMIS must approve the modified instructions for use.
-		// Default: "images/Osimis Web Viewer Pro Documentation.pdf"
-		// "DocumentationUrl": "http://example.com/my-documentation.pdf",
+		// Default: "images/Osimis Web Viewer Documentation.pdf"
+        // "DocumentationUrl": "http://example.com/my-documentation.pdf",
+
+        // display the info panel at startup
+        // allowed values: "always", "never", "user"
+        // with "user", the user can decide to show or not the popup
+        "ShowInfoPopupAtStartup": "user",
+
+        // add a ? button to show the info popup
+        "ShowInfoPopupButtonEnabled" : true,
+
+        // display a "not for diagnostic usage" disclaimer in the study island
+        "AlwaysShowNotForDiagnosticUsageDisclaimer": false
 	}
 }

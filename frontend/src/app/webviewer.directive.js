@@ -159,6 +159,7 @@
                 studyDownloadEnabled: '=?wvStudyDownloadEnabled',
                 videoDisplayEnabled: '=?wvVideoDisplayEnabled',
                 keyImageCaptureEnabled: '=?wvKeyImageCaptureEnabled',
+                showInfoPopupButtonEnabled: '=?wvShowInfoPopupButtonEnabled',
                 downloadAsJpegEnabled: '=?wvDownloadAsJpegEnabled',
                 combinedToolEnabled: '=?wvCombinedToolEnabled',
                 showNoReportIconInSeriesList: '=?wvShowNoReportIconInSeriesList',
@@ -246,6 +247,8 @@
             vm.leftHandlesEnabled = typeof vm.leftHandlesEnabled !== 'undefined' ? vm.leftHandlesEnabled : true;
             vm.noticeEnabled = typeof vm.noticeEnabled !== 'undefined' ? vm.noticeEnabled : false;
             vm.noticeText = typeof vm.noticeText !== 'undefined' ? vm.noticeText : undefined;
+            vm.infoPopupIsStartup = true;
+            vm.infoPopupEnabled = true;
             vm.readonly = typeof vm.readonly !== 'undefined' ? vm.readonly : false;
             vm.wvViewerController = wvViewerController;
             vm.tools = typeof vm.tools !== 'undefined' ? vm.tools : {
@@ -280,6 +283,9 @@
 
             if (vm.keyImageCaptureEnabled) { // activate
                 vm.tools.keyImageCapture = false;
+            }
+            if (vm.showInfoPopupButtonEnabled) { // activate
+                vm.tools.showInfoPopup = false;
             }
             if (vm.downloadAsJpegEnabled) { // activate
                 vm.tools.downloadAsJpeg = false;
@@ -372,6 +378,7 @@
                     {type: "button", tool: "toggleOverlayText"},
                     {type: "button", tool: "toggleOverlayIcons"},
                     {type: "button", tool: "customCommand"},
+                    {type: "button", tool: "showInfoPopup"},
                 ]
             }
             vm.viewports = {};
@@ -382,6 +389,7 @@
             vm.keyImageCaptureEnabled = typeof vm.keyImageCaptureEnabled !== 'undefined' ? vm.keyImageCaptureEnabled : false;
             vm.downloadAsJpegEnabled = typeof vm.downloadAsJpegEnabled !== 'undefined' ? vm.downloadAsJpegEnabled : false;
             vm.combinedToolEnabled = typeof vm.combinedToolEnabled !== 'undefined' ? vm.combinedToolEnabled : false;
+            vm.showInfoPopupButtonEnabled = typeof vm.showInfoPopupButtonEnabled !== 'undefined' ? vm.showInfoPopupButtonEnabled : false;
             vm.studyIslandsDisplayMode = vm.wvViewerController.getStudyIslandDisplayMode(__webViewerConfig.defaultStudyIslandsDisplayMode || "grid");
 
             if (!__webViewerConfig.toggleOverlayIconsButtonEnabled) {
@@ -525,56 +533,65 @@
                 if (this.readonly) {
                     return;
                 }
-                if (!selectedPane.csViewport) {
-                    return;
-                }
+                if (selectedPane.csViewport) {
+                    switch (action) {
+                        case 'invert':
+                            selectedPane.invertColor();
+                            break;
+                        case 'vflip':
+                            selectedPane.flipVertical();
+                            break;
+                        case 'hflip':
+                            selectedPane.flipHorizontal();
+                            break;
+                        case 'rotateLeft':
+                            selectedPane.rotateLeft();
+                            break;
+                        case 'rotateRight':
+                            selectedPane.rotateRight();
+                            break;
+                        case 'toggleSynchro':
+                            vm.synchronizer.enable(!vm.synchronizer.isEnabled());
+                            break;
+                        case 'toggleReferenceLines':
+                            vm.referenceLines.enable(!vm.referenceLines.isEnabled());
+                            break;
+                        case 'toggleOverlayText':
+                            vm.wvViewerController.toggleOverlayText();
+                            break;
+                        case 'toggleOverlayIcons':
+                            vm.wvViewerController.toggleOverlayIcons();
+                            break;
+                        case 'previousSeries':
+                            vm.wvViewerController.previousSeries();
+                            break;
+                        case 'nextSeries':
+                            vm.wvViewerController.nextSeries();
+                            break;
+                        case 'print':
+                            window.print();
+                            break;
+                        case 'downloadAsJpeg':
+                            selectedPane.downloadAsJpeg(wvImageManager);
+                            break;
+                        case 'customCommand':
+                            vm.wvViewerController.executeCustomCommand();
+                            break;
+                        default:
+                            throw new Error('Unknown toolbar action.');
+                        }
+                    } else {
+                        switch (action) {
+                            case 'showInfoPopup':
+                                vm.infoPopupIsStartup = false;
+                                vm.infoPopupEnabled = true;
+                                break;
+                            default:
+                                throw new Error('Unknown toolbar action.');
+                            }
 
-                switch (action) {
-                case 'invert':
-                    selectedPane.invertColor();
-                    break;
-                case 'vflip':
-                    selectedPane.flipVertical();
-                    break;
-                case 'hflip':
-                    selectedPane.flipHorizontal();
-                    break;
-                case 'rotateLeft':
-                    selectedPane.rotateLeft();
-                    break;
-                case 'rotateRight':
-                    selectedPane.rotateRight();
-                    break;
-                case 'toggleSynchro':
-                    vm.synchronizer.enable(!vm.synchronizer.isEnabled());
-                    break;
-                case 'toggleReferenceLines':
-                    vm.referenceLines.enable(!vm.referenceLines.isEnabled());
-                    break;
-                case 'toggleOverlayText':
-                    vm.wvViewerController.toggleOverlayText();
-                    break;
-                case 'toggleOverlayIcons':
-                    vm.wvViewerController.toggleOverlayIcons();
-                    break;
-                case 'previousSeries':
-                    vm.wvViewerController.previousSeries();
-                    break;
-                case 'nextSeries':
-                    vm.wvViewerController.nextSeries();
-                    break;
-                case 'print':
-                    window.print();
-                    break;
-                case 'downloadAsJpeg':
-                    selectedPane.downloadAsJpeg(wvImageManager);
-                    break;
-                case 'customCommand':
-                    vm.wvViewerController.executeCustomCommand();
-                    break;
-                default:
-                    throw new Error('Unknown toolbar action.');
-                }
+                    }
+
             };
             // Apply viewport change when a windowing preset has been
             // selected (from the toolbar).
@@ -915,7 +932,7 @@
                 $(".wv-cornerstone-enabled-image canvas").css('height', 'auto');
                 $(window).trigger('resize');  // to force screen and canvas recalculation
             }
-        
+
             window.addEventListener("beforeprint", function(event){
                 beforePrint(event)
             })
@@ -930,7 +947,7 @@
            window.addEventListener("afterprint", function(){
                 afterPrint();
             });$
-        
+
             vm.cancelPrintMode = function(){
                 afterPrint();
             }

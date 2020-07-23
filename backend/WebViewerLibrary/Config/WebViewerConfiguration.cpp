@@ -280,6 +280,10 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
   customCommandIconClass = OrthancPlugins::GetStringValue(wvConfig, "CustomCommandIconClass", "fa fa-external-link-square-alt");
   customCommandIconLabel = OrthancPlugins::GetStringValue(wvConfig, "CustomCommandIconLabel", "custom action");
   dateFormat = OrthancPlugins::GetStringValue(wvConfig, "DateFormat", std::string("YYYYMMDD"));
+  documentationUrl = OrthancPlugins::GetStringValue(wvConfig, "DocumentationUrl", "images/Osimis Web Viewer Documentation.pdf");
+  showInfoPopupAtStartup = OrthancPlugins::GetStringValue(wvConfig, "ShowInfoPopupAtStartup", "user");
+  showInfoPopupButtonEnabled = OrthancPlugins::GetBoolValue(wvConfig, "ShowInfoPopupButtonEnabled", true);
+  alwaysShowNotForDiagnosticUsageDisclaimer = OrthancPlugins::GetBoolValue(wvConfig, "AlwaysShowNotForDiagnosticUsageDisclaimer", false);
 
   if (showStudyInformationBreadcrumb)
   {
@@ -476,6 +480,17 @@ void WebViewerConfiguration::_parseFile(const Json::Value& wvConfig)
 
   }
 
+  {// validate keyboard shortcuts
+    std::set<std::string> infoPopupAllowedValues;
+    infoPopupAllowedValues.insert("always");
+    infoPopupAllowedValues.insert("never");
+    infoPopupAllowedValues.insert("user");
+
+    if (infoPopupAllowedValues.find(showInfoPopupAtStartup) == infoPopupAllowedValues.end()) {
+        OrthancPluginLogError(_context, (std::string("ShowInfoPopupAtStartup invalid value: ") + showInfoPopupAtStartup).c_str());
+        throw Orthanc::OrthancException(Orthanc::ErrorCode_BadFileFormat);
+    }
+  }
 
 }
 
@@ -585,6 +600,11 @@ Json::Value WebViewerConfiguration::getFrontendConfig() const {
   if (customOverlayProviderUrl.length() > 0) {
     config["customOverlayProviderUrl"] = customOverlayProviderUrl;
   }
+
+  config["documentationUrl"] = documentationUrl;
+  config["showInfoPopupAtStartup"] = showInfoPopupAtStartup;
+  config["showInfoPopupButtonEnabled"] = showInfoPopupButtonEnabled;
+  config["alwaysShowNotForDiagnosticUsageDisclaimer"] = alwaysShowNotForDiagnosticUsageDisclaimer;
 
   return config;
 }

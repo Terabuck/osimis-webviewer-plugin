@@ -2,7 +2,7 @@
 <html ng-app="webviewer" class="wv-html">
 <head>
     <script>
-        window.oldPrint = window.print;     
+        window.oldPrint = window.print;
     </script>
     <style>
         /* This helps the ng-show/ng-hide animations start at the right place. */
@@ -62,6 +62,8 @@
         wv-notice-enabled="vm.enableNotice"
         wv-notice-text="vm.noticeText"
 
+        wv-info-popup-enabled="true"
+
         wv-windowing-presets="vm.windowingPresets"
         wv-video-display-enabled="vm.videoDisplayEnabled"
         wv-annotationstorage-enabled="vm.annotationStorageEnabled"
@@ -69,13 +71,14 @@
         wv-selected-series-items="vm.selectedSeriesItems"
         wv-study-download-enabled="vm.studyDownloadEnabled"
         wv-key-image-capture-enabled="vm.keyImageCaptureEnabled"
+        wv-show-info-popup-button-enabled="vm.showInfoPopupButtonEnabled"
         wv-download-as-jpeg-enabled="vm.downloadAsJpegEnabled"
         wv-combined-tool-enabled="vm.combinedToolEnabled"
 
         wv-study-islands-display-mode="vm.studyIslandsDisplayMode"
 
         wv-show-no-report-icon-in-series-list="vm.showNoReportIconInSeriesList"
-        wv-display-disclaimer="true"
+        wv-display-disclaimer="vm.displayDisclaimer"
         wv-reduce-timeline-height-on-single-frame-series="vm.reduceTimelineHeightOnSingleFrameSeries"
     >
     </wv-webviewer>
@@ -141,7 +144,7 @@
                         vm.pickableStudyIds = studyIds;
                     });
             } else {
-                vm.pickableStudyIds = [orthancStudyId];    
+                vm.pickableStudyIds = [orthancStudyId];
             }
         }
         // Display & convert orthanc series id (from url parameter) into
@@ -176,7 +179,7 @@
                                             vm.pickableStudyIds = studyIds;
                                         });
                                 } else {
-                                    vm.pickableStudyIds = [study.id];    
+                                    vm.pickableStudyIds = [study.id];
                                 }
                             });
                     }
@@ -209,7 +212,7 @@
                     });
             }
         }
-        
+
 
         // Configure the user interface depending on the user angent/browser.
         var userInterfacePolicy = new osimis.UserAgentBasedInterfacePolicy();
@@ -245,6 +248,8 @@
         vm.videoDisplayEnabled = __webViewerConfig.videoDisplayEnabled;
         vm.annotationStorageEnabled = __webViewerConfig.annotationStorageEnabled;
         vm.keyImageCaptureEnabled = __webViewerConfig.keyImageCaptureEnabled;
+        vm.showInfoPopupButtonEnabled = __webViewerConfig.showInfoPopupButtonEnabled;
+        vm.displayDisclaimer = __webViewerConfig.alwaysShowNotForDiagnosticUsageDisclaimer;
         vm.downloadAsJpegEnabled = __webViewerConfig.downloadAsJpegEnabled;
         vm.combinedToolEnabled = __webViewerConfig.combinedToolEnabled;
         vm.showNoReportIconInSeriesList = __webViewerConfig.showNoReportIconInSeriesList;

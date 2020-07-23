@@ -6,7 +6,7 @@
             <p class="mn mb10" style="color:#000">
             {{ 'GENERAL_PARAGRAPHS.INCOMPATIBLE_BROWSER' | translate }}
             </h5>
-        </span> 
+        </span>
     </div>
     <div class="text-right mb10 mr10">
         <button class="btn btn-primary" ng-click="vm.onCloseWarning()">OK</button>
@@ -18,6 +18,13 @@
 <p>{{ 'GENERAL_PARAGRAPHS.SCREEN_TOO_SMALL' | translate | wvCapitalize }}</p>
 </div>
 </div>
+<wv-info-popup
+    ng-if="vm.infoPopupEnabled"
+    class="wvPrintExclude"
+    wv-show="vm.infoPopupEnabled"
+    wv-is-startup="vm.infoPopupIsStartup"
+    >
+</wv-info-popup>
 <wv-layout
     wv-topleft-enabled="$isTopLeftEnabled"
     wv-topright-enabled="$isTopRightEnabled"
@@ -311,7 +318,7 @@
         <wv-splitpane
             wv-readonly="vm.readonly"
             class="wvPrintFullPage"
-            
+
             ng-class="{
                 'wvLayout__splitpane--toolbarAtTop': vm.toolbarEnabled && vm.buttonsSize == 'small' && vm.toolbarPosition === 'top',
                 'wvLayout__splitpane--toolbarAtRight': vm.toolbarEnabled && vm.buttonsSize == 'small' && vm.toolbarPosition === 'right',
@@ -325,7 +332,7 @@
 
                 wv-on-item-dropped="!vm.readonly && vm.onItemDroppedToPane($position.x, $position.y, $data);"
              >
-            
+
                 <!--
                 PDF Report
                 -->
@@ -347,7 +354,7 @@
                 -->
                 <wv-viewport
                     ng-if="!!$pane.seriesId"
-                    
+
                     vp-series-id="$pane.seriesId" wv-size="{width: 1.0, height: 1.0}" wv-lossless="true"
                     wv-series="$pane.series" wv-image="$image"
                     wv-droppable-series-ext="!vm.readonly && vm.serieslistEnabled"

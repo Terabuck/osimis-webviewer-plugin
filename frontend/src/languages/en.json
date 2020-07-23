@@ -86,6 +86,7 @@
             "REFERENCE_LINES" : "Reference lines",
             "ROTATE_LEFT": "rotate to the left",
             "ROTATE_RIGHT": "rotate to the right",
+            "SHOW_INFO_POPUP": "about",
             "SPLIT_PANE_CONFIG_LEGEND_PARAGRAPH": "Change the viewport layout.",
             "SYNCHRONIZED_BROWSING" : "Synchronized browsing",
             "TOGGLE_LAYOUT_TEXT" : "Toggle layout text",

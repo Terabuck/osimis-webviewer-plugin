@@ -1,6 +1,11 @@
 Changes:
 -------
 
+* Removed the "Not for diagnostic usage" disclaimer message.  The option "AlwaysShowNotForDiagnosticUsageDisclaimer" allows you to re-enable it.
+* Added an info popup that displays the Osimis logo, the orthanc and viewer versions, a link to a documentation and a "Not for diagnostic usage" information.
+  The option "ShowInfoPopupAtStartup" allows you to define when it should be displayed ("always", "never", "user")
+  The option "ShowInfoPopupButtonEnabled" allows you to include a button to display that popup at any-time
+* Added a "DocumentationUrl" to provide your custom version of the documentation
 * Added support for spanish translations (es)
 * GdcmEnabled is now false by default if the plugin is started in Orthanc 1.7.0 (we assume that the new GDCM plugin is enabled)
 
