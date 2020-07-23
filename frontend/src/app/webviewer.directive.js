@@ -577,6 +577,10 @@
                         case 'customCommand':
                             vm.wvViewerController.executeCustomCommand();
                             break;
+                        case 'showInfoPopup':
+                            vm.infoPopupIsStartup = false;
+                            vm.infoPopupEnabled = true;
+                            break;
                         default:
                             throw new Error('Unknown toolbar action.');
                         }
