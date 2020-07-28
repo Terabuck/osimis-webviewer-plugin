@@ -7,6 +7,12 @@
     },
     "GENERAL_PARAGRAPHS": {
         "DISCLAIMER_PARAGRAPH": "Ne pas utiliser pour un diagnostique.",
+        "USAGE_TITLE": "Utilisation",
+        "USAGE_LONG": "L'utilisation du Osimis Web Viewer est prévue<br> pour les patients qui visualisent leurs examens<br>pour la recherche et pour le contrôle qualité.",
+        "DOCUMENTATION_TITLE": "Documentation",
+        "DOCUMENTATION_LINK": "Manuel utilisateur",
+        "VERSIONS_TITLE": "Versions",
+        "SHOW_INFO_POPUP_AT_STARTUP": "Afficher ce message au démarrage",
         "SCREEN_TOO_SMALL": "Votre écran est trop petit pour utiliser le viewer.",
         "INCOMPATIBLE_BROWSER": "Votre navigateur n'est pas supporté.  Le comportement du viewer sera altéré. Utilisez un autre navigateur si vous voulez émettre un diagnostique.",
         "INCOMPATIBLE_PRINT_BROWSER": "Votre navigateur ne supporte pas toutes les fonctionalités d’impression. utilisez un autre navigateur si vous souhaitez effectuer une impression."
