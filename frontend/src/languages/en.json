@@ -7,6 +7,12 @@
     },
     "GENERAL_PARAGRAPHS": {
         "DISCLAIMER_PARAGRAPH": "Not for diagnostic usage.",
+        "USAGE_TITLE": "Usage",
+        "USAGE_LONG": "Osimis Web Viewer is intended for<br>patients reviewing their images,<br>for research and for quality assurance.",
+        "DOCUMENTATION_TITLE": "Documentation",
+        "DOCUMENTATION_LINK": "User Manual",
+        "VERSIONS_TITLE": "Versions",
+        "SHOW_INFO_POPUP_AT_STARTUP": "Show this info panel at startup",
         "SCREEN_TOO_SMALL": "Your screen is to small to run the viewer correctly",
         "INCOMPATIBLE_BROWSER": "You browser is not supported.  You might expect inconsistent behaviours and shall not use the viewer to produce a diagnostic.",
         "INCOMPATIBLE_PRINT_BROWSER": "You browser does not have a correct print support. You might expect inconsistent behaviours."
