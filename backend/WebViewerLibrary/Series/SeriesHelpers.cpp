@@ -139,7 +139,7 @@ public:
     {
       try
       {
-        indexInSeries_ = boost::lexical_cast<unsigned int>(instanceInfoInSeries["MainDicomTags"]["InstanceNumber"].asString());
+        indexInSeries_ = boost::lexical_cast<unsigned int>(Orthanc::Toolbox::StripSpaces(instanceInfoInSeries["MainDicomTags"]["InstanceNumber"].asString()));
         hasIndexInSeries_ = true;
       }
       catch (boost::bad_lexical_cast&)
@@ -151,7 +151,7 @@ public:
     {
       try
       {
-        indexInSeries_ = boost::lexical_cast<unsigned int>(instanceInfoInSeries["MainDicomTags"]["ImageIndex"].asString());
+        indexInSeries_ = boost::lexical_cast<unsigned int>(Orthanc::Toolbox::StripSpaces(instanceInfoInSeries["MainDicomTags"]["ImageIndex"].asString()));
         hasIndexInSeries_ = true;
       }
       catch (boost::bad_lexical_cast&)

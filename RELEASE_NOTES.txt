@@ -1,7 +1,12 @@
+Note: this project is in reduced maintenant mode.  It will soon be replaced by the StoneViewer.
+
+Fixes:
+-----
+
+* PRO-357: can't display studies with spaces in SeriesNumber and InstanceNumber
+
 Version 1.4.0
 ========================
-
-Note: this is most likely that latest release of the OsimisViewer since it will soon be replaced by the StoneViewer.
 
 Changes:
 -------

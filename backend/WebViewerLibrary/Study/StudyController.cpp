@@ -145,7 +145,7 @@ int StudyController::ProcessStudyInfoRequest(OrthancPluginContext* context)
         const std::string& seriesId = studyInfoSeries[i]["ID"].asString();
         if (studyInfoSeries[i]["MainDicomTags"].isMember("SeriesNumber"))
         {
-          const std::string& seriesNumberString = studyInfoSeries[i]["MainDicomTags"]["SeriesNumber"].asString();
+          std::string seriesNumberString = Orthanc::Toolbox::StripSpaces(studyInfoSeries[i]["MainDicomTags"]["SeriesNumber"].asString());
           if (Orthanc::Toolbox::IsInteger(seriesNumberString))
           {
             int seriesNumberInt = boost::lexical_cast<int>(seriesNumberString);
