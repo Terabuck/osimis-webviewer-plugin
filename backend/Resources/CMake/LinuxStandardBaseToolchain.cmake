@@ -1,11 +1,19 @@
-# LSB_CC=gcc-4.8 LSB_CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=../Resources/LinuxStandardBaseToolchain.cmake -DUSE_LEGACY_JSONCPP=ON
+#
+# Full build, as used on the BuildBot CIS:
+#
+#   $ LSB_CC=gcc-4.8 LSB_CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=../Resources/LinuxStandardBaseToolchain.cmake -DUSE_LEGACY_JSONCPP=ON -DUSE_LEGACY_LIBICU=ON -DBOOST_LOCALE_BACKEND=icu -DENABLE_PKCS11=ON -G Ninja
+#
+# Or, more lightweight version (without libp11 and ICU):
+#
+#   $ LSB_CC=gcc-4.8 LSB_CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=../Resources/LinuxStandardBaseToolchain.cmake -DUSE_LEGACY_JSONCPP=ON -G Ninja
+#
 
 INCLUDE(CMakeForceCompiler)
 
-SET(LSB_PATH $ENV{LSB_PATH})
-SET(LSB_CC $ENV{LSB_CC})
-SET(LSB_CXX $ENV{LSB_CXX})
-SET(LSB_TARGET_VERSION "4.0")
+SET(LSB_PATH $ENV{LSB_PATH} CACHE STRING "")
+SET(LSB_CC $ENV{LSB_CC} CACHE STRING "")
+SET(LSB_CXX $ENV{LSB_CXX} CACHE STRING "")
+SET(LSB_TARGET_VERSION "4.0" CACHE STRING "")
 
 IF ("${LSB_PATH}" STREQUAL "")
   SET(LSB_PATH "/opt/lsb")
@@ -31,7 +39,12 @@ SET(CMAKE_SYSTEM_PROCESSOR ${LSB_TARGET_PROCESSOR})
 
 # which compilers to use for C and C++
 SET(CMAKE_C_COMPILER ${LSB_PATH}/bin/lsbcc)
-CMAKE_FORCE_CXX_COMPILER(${LSB_PATH}/bin/lsbc++ GNU)
+
+if (${CMAKE_VERSION} VERSION_LESS "3.6.0") 
+  CMAKE_FORCE_CXX_COMPILER(${LSB_PATH}/bin/lsbc++ GNU)
+else()
+  SET(CMAKE_CXX_COMPILER ${LSB_PATH}/bin/lsbc++)
+endif()
 
 # here is the target environment located
 SET(CMAKE_FIND_ROOT_PATH ${LSB_PATH})
@@ -63,3 +76,4 @@ if (NOT "${LSB_CC}" STREQUAL "")
   SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --lsb-cc=${LSB_CC}")
   SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --lsb-cc=${LSB_CC}")
 endif()
+

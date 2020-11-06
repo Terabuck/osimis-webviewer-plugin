@@ -1,7 +1,7 @@
 # Orthanc - A Lightweight, RESTful DICOM Store
 # Copyright (C) 2012-2016 Sebastien Jodogne, Medical Physics
 # Department, University Hospital of Liege, Belgium
-# Copyright (C) 2017-2018 Osimis S.A., Belgium
+# Copyright (C) 2017-2020 Osimis S.A., Belgium
 #
 # This program is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,7 +19,7 @@
 # you do not wish to do so, delete this exception statement from your
 # version. If you delete this exception statement from all source files
 # in the program, then also delete it here.
-#
+# 
 # This program is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
@@ -66,6 +66,9 @@ if (ORTHANC_FRAMEWORK_SOURCE STREQUAL "hg" OR
   if (NOT DEFINED ORTHANC_FRAMEWORK_BRANCH)
     if (ORTHANC_FRAMEWORK_VERSION STREQUAL "mainline")
       set(ORTHANC_FRAMEWORK_BRANCH "default")
+      set(ORTHANC_FRAMEWORK_MAJOR 999)
+      set(ORTHANC_FRAMEWORK_MINOR 999)
+      set(ORTHANC_FRAMEWORK_REVISION 999)
 
     else()
       set(ORTHANC_FRAMEWORK_BRANCH "Orthanc-${ORTHANC_FRAMEWORK_VERSION}")
@@ -93,9 +96,47 @@ if (ORTHANC_FRAMEWORK_SOURCE STREQUAL "hg" OR
         set(ORTHANC_FRAMEWORK_MD5 "d1ee84927dcf668e60eb5868d24b9394")
       elseif (ORTHANC_FRAMEWORK_VERSION STREQUAL "1.5.0")
         set(ORTHANC_FRAMEWORK_MD5 "4429d8d9dea4ff6648df80ec3c64d79e")
+      elseif (ORTHANC_FRAMEWORK_VERSION STREQUAL "1.5.1")
+        set(ORTHANC_FRAMEWORK_MD5 "099671538865e5da96208b37494d6718")
+      elseif (ORTHANC_FRAMEWORK_VERSION STREQUAL "1.5.2")
+        set(ORTHANC_FRAMEWORK_MD5 "8867050f3e9a1ce6157c1ea7a9433b1b")
+      elseif (ORTHANC_FRAMEWORK_VERSION STREQUAL "1.5.3")
+        set(ORTHANC_FRAMEWORK_MD5 "bf2f5ed1adb8b0fc5f10d278e68e1dfe")
+      elseif (ORTHANC_FRAMEWORK_VERSION STREQUAL "1.5.4")
+        set(ORTHANC_FRAMEWORK_MD5 "404baef5d4c43e7c5d9410edda8ef5a5")
+      elseif (ORTHANC_FRAMEWORK_VERSION STREQUAL "1.5.5")
+        set(ORTHANC_FRAMEWORK_MD5 "cfc437e0687ae4bd725fd93dc1f08bc4")
+      elseif (ORTHANC_FRAMEWORK_VERSION STREQUAL "1.5.6")
+        set(ORTHANC_FRAMEWORK_MD5 "3c29de1e289b5472342947168f0105c0")
+      elseif (ORTHANC_FRAMEWORK_VERSION STREQUAL "1.5.7")
+        set(ORTHANC_FRAMEWORK_MD5 "e1b76f01116d9b5d4ac8cc39980560e3")
+      elseif (ORTHANC_FRAMEWORK_VERSION STREQUAL "1.5.8")
+        set(ORTHANC_FRAMEWORK_MD5 "82323e8c49a667f658a3639ea4dbc336")
+      elseif (ORTHANC_FRAMEWORK_VERSION STREQUAL "1.6.0")
+        set(ORTHANC_FRAMEWORK_MD5 "eab428d6e53f61e847fa360bb17ebe25")
+      elseif (ORTHANC_FRAMEWORK_VERSION STREQUAL "1.6.1")
+        set(ORTHANC_FRAMEWORK_MD5 "3971f5de96ba71dc9d3f3690afeaa7c0")
+      elseif (ORTHANC_FRAMEWORK_VERSION STREQUAL "1.7.0")
+        set(ORTHANC_FRAMEWORK_MD5 "ce5f689e852b01d3672bd3d2f952a5ef")
+
+      # Below this point are development snapshots that were used to
+      # release some plugin, before an official release of the Orthanc
+      # framework was available. Here is the command to be used to
+      # generate a proper archive:
+      #
+      #   $ hg archive /tmp/Orthanc-`hg id -i | sed 's/\+//'`.tar.gz
+      #
+      elseif (ORTHANC_FRAMEWORK_VERSION STREQUAL "ae0e3fd609df")
+        # DICOMweb 1.1 (framework pre-1.6.0)
+        set(ORTHANC_FRAMEWORK_MD5 "7e09e9b530a2f527854f0b782d7e0645")
       endif()
     endif()
   endif()
+else()
+  message("Using the Orthanc framework from a path of the filesystem. Assuming mainline version.")
+  set(ORTHANC_FRAMEWORK_MAJOR 999)
+  set(ORTHANC_FRAMEWORK_MINOR 999)
+  set(ORTHANC_FRAMEWORK_REVISION 999)
 endif()
 
 
@@ -106,7 +147,7 @@ endif()
 
 if (ORTHANC_FRAMEWORK_SOURCE STREQUAL "hg")
   find_program(ORTHANC_FRAMEWORK_HG hg)
-
+  
   if (${ORTHANC_FRAMEWORK_HG} MATCHES "ORTHANC_FRAMEWORK_HG-NOTFOUND")
     message(FATAL_ERROR "Please install Mercurial")
   endif()
@@ -116,8 +157,8 @@ endif()
 if (ORTHANC_FRAMEWORK_SOURCE STREQUAL "archive" OR
     ORTHANC_FRAMEWORK_SOURCE STREQUAL "web")
   if ("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
-    find_program(ORTHANC_FRAMEWORK_7ZIP 7z
-      PATHS
+    find_program(ORTHANC_FRAMEWORK_7ZIP 7z 
+      PATHS 
       "$ENV{ProgramFiles}/7-Zip"
       "$ENV{ProgramW6432}/7-Zip"
       )
@@ -144,15 +185,15 @@ if (ORTHANC_FRAMEWORK_SOURCE STREQUAL "path")
   if (NOT DEFINED ORTHANC_FRAMEWORK_ROOT)
     message(FATAL_ERROR "The variable ORTHANC_FRAMEWORK_ROOT must provide the path to the sources of Orthanc")
   endif()
-
+  
   if (NOT EXISTS ${ORTHANC_FRAMEWORK_ROOT})
     message(FATAL_ERROR "Non-existing directory: ${ORTHANC_FRAMEWORK_ROOT}")
   endif()
-
+  
   if (NOT EXISTS ${ORTHANC_FRAMEWORK_ROOT}/Resources/CMake/OrthancFrameworkParameters.cmake)
     message(FATAL_ERROR "Directory not containing the source code of Orthanc: ${ORTHANC_FRAMEWORK_ROOT}")
   endif()
-
+  
   set(ORTHANC_ROOT ${ORTHANC_FRAMEWORK_ROOT})
 endif()
 
@@ -175,14 +216,14 @@ if (ORTHANC_FRAMEWORK_SOURCE STREQUAL "hg")
       COMMAND ${ORTHANC_FRAMEWORK_HG} pull
       WORKING_DIRECTORY ${ORTHANC_ROOT}
       RESULT_VARIABLE Failure
-      )
+      )    
   else()
     message("Forking the Orthanc source repository using Mercurial")
     execute_process(
-      COMMAND ${ORTHANC_FRAMEWORK_HG} clone "https://hg.orthanc-server.com/orthanc"
+      COMMAND ${ORTHANC_FRAMEWORK_HG} clone "https://hg.orthanc-server.com/orthanc/"
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
       RESULT_VARIABLE Failure
-      )
+      )    
   endif()
 
   if (Failure OR NOT EXISTS ${ORTHANC_ROOT})
@@ -227,8 +268,7 @@ if (ORTHANC_FRAMEWORK_SOURCE STREQUAL "web")
   else()
     # Default case: Download from the official Web site
     set(ORTHANC_FRAMEMORK_FILENAME Orthanc-${ORTHANC_FRAMEWORK_VERSION}.tar.gz)
-    #set(ORTHANC_FRAMEWORK_URL "http://www.orthanc-server.com/downloads/get.php?path=/orthanc/${ORTHANC_FRAMEMORK_FILENAME}")
-    set(ORTHANC_FRAMEWORK_URL "http://www.orthanc-server.com/downloads/third-party/orthanc-framework/${ORTHANC_FRAMEMORK_FILENAME}")
+    set(ORTHANC_FRAMEWORK_URL "http://orthanc.osimis.io/ThirdPartyDownloads/orthanc-framework/${ORTHANC_FRAMEMORK_FILENAME}")
   endif()
 
   set(ORTHANC_FRAMEWORK_ARCHIVE "${CMAKE_SOURCE_DIR}/ThirdPartyDownloads/${ORTHANC_FRAMEMORK_FILENAME}")
@@ -241,14 +281,14 @@ if (ORTHANC_FRAMEWORK_SOURCE STREQUAL "web")
     message("Downloading: ${ORTHANC_FRAMEWORK_URL}")
 
     file(DOWNLOAD
-      "${ORTHANC_FRAMEWORK_URL}" "${ORTHANC_FRAMEWORK_ARCHIVE}"
+      "${ORTHANC_FRAMEWORK_URL}" "${ORTHANC_FRAMEWORK_ARCHIVE}" 
       SHOW_PROGRESS EXPECTED_MD5 "${ORTHANC_FRAMEWORK_MD5}"
       TIMEOUT 60
       INACTIVITY_TIMEOUT 60
       )
   else()
     message("Using local copy of: ${ORTHANC_FRAMEWORK_URL}")
-  endif()
+  endif()  
 endif()
 
 
@@ -284,7 +324,7 @@ if (ORTHANC_FRAMEWORK_SOURCE STREQUAL "archive" OR
     if (NOT ORTHANC_FRAMEWORK_ARCHIVE MATCHES ".tar.gz$")
       message(FATAL_ERROR "Archive should have the \".tar.gz\" extension: ${ORTHANC_FRAMEWORK_ARCHIVE}")
     endif()
-
+    
     message("Uncompressing: ${ORTHANC_FRAMEWORK_ARCHIVE}")
 
     if ("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
@@ -297,7 +337,7 @@ if (ORTHANC_FRAMEWORK_SOURCE STREQUAL "archive" OR
         RESULT_VARIABLE Failure
         OUTPUT_QUIET
         )
-
+      
       if (Failure)
         message(FATAL_ERROR "Error while running the uncompression tool")
       endif()
@@ -319,7 +359,7 @@ if (ORTHANC_FRAMEWORK_SOURCE STREQUAL "archive" OR
         RESULT_VARIABLE Failure
         )
     endif()
-
+   
     if (Failure)
       message(FATAL_ERROR "Error while running the uncompression tool")
     endif()
