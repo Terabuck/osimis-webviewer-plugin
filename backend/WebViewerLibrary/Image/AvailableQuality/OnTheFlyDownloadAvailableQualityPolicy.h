@@ -10,6 +10,9 @@
  * compressions which would be thrown away after transfer.
  *
  */
+
+#include <stdint.h>
+
 class OnTheFlyDownloadAvailableQualityPolicy : public IAvailableQualityPolicy
 {
 private:
