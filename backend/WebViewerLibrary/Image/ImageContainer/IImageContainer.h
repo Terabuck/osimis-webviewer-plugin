@@ -1,7 +1,7 @@
 #ifndef I_IMAGE_CONTAINER_H
 #define I_IMAGE_CONTAINER_H
 
-#include <boost/cstdint.hpp> // for uint32_t
+#include <stdint.h> // for uint32_t
 
 /** IImageContainer [@Entity]
  *

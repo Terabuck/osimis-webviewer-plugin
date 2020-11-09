@@ -1,7 +1,7 @@
 #ifndef KLVWRITER_H
 #define KLVWRITER_H
 
-#include <boost/cstdint.hpp> // for uint32_t
+#include <stdint.h> // for uint32_t
 #include <boost/tuple/tuple.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 #include <string>

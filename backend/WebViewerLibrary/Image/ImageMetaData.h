@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <boost/cstdint.hpp> // for uint32_t
+#include <stdint.h> // for uint32_t
 #include <json/writer.h> // for Json::Value
 
 #include <Core/DicomFormat/DicomMap.h>
