@@ -12,7 +12,8 @@ $ git checkout 1.4.0
 $ mkdir backend/build
 $ cd backend/build/
 $ cmake .. -DCMAKE_BUILD_TYPE=Debug -DSTANDALONE_BUILD=ON \
-        -DVIEWER_VERSION_FULL=1.4.0 -DJS_CLIENT_PATH=`pwd`/frontend-build \
+        -DVIEWER_VERSION_FULL=1.4.0-0-g1.4.0 \
+        -DJS_CLIENT_PATH=`pwd`/frontend-build \
         -DORTHANC_FRAMEWORK_VERSION=1.6.1 -DORTHANC_FRAMEWORK_SOURCE=web
 $ make
 
@@ -24,8 +25,11 @@ IMPORTANT:
    separate project after 1.6.1. Make sure to set
    "-DORTHANC_FRAMEWORK_VERSION=1.6.1" for this reason.
 
-2- The instructions above do *not* build the front-end (CSS and
-   JavaScript) whose source code can be found in
+2- The instructions above do *not* build the front-end part (CSS and
+   JavaScript), whose source code can be found in
    "../frontend". Precompiled front-end will automatically be
    downloaded from:
    http://orthanc.osimis.io/public/osimisWebViewer/1.4.0.zip
+
+   The "1.4.0.zip" is derived as what follows "-g" in the CMake option
+   "VIEWER_VERSION_FULL".
