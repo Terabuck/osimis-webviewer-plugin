@@ -3,6 +3,8 @@ Note: this project is in reduced maintenant mode.  It will soon be replaced by t
 Fixes:
 -----
 
+* LSD-479: when a series contain images with multiple resolutions, we should use a different zoom
+           level for each resolution.
 * PRO-370: info popup always appears at startup (cookie not working)
 * PRO-357: can't display studies with spaces in SeriesNumber and InstanceNumber
 

@@ -1,3 +1,44 @@
+// some series contain a first image that is completely different from others
+// wrt to resolution and pixel spacing.
+// therefore, if we zoom-to-fit on the first image, the whole series displays
+// with the wrong zoom factor -> we try to maintain a scale factor
+// for each "scale signature" (combination of resolution + pixel spacing)
+function getImageScaleSignature(image) {
+    var resX = parseInt(image.instanceInfos.TagsSubset["Columns"]);
+    var resY = parseInt(image.instanceInfos.TagsSubset["Rows"]);
+    var spacingX = 1;
+    var spacingY = 1;
+    if (image.instanceInfos.TagsSubset["PixelSpacing"] != undefined) {
+        spacingX = parseFloat(image.instanceInfos.TagsSubset["PixelSpacing"].split("\\")[0]);
+        spacingY = parseFloat(image.instanceInfos.TagsSubset["PixelSpacing"].split("\\")[1]);
+    }
+    return { resX: resX, resY: resY, spacingX: spacingX, spacingY: spacingY };
+}
+
+function areScaleSignaturesCloseTo(signature1, signature2) {
+
+    if ((signature1.resX != signature2.resX) ||
+    (signature1.resY != signature2.resY)) {
+        return false;
+    }
+    var ratioSpacingX = signature1.spacingX / signature2.spacingX;
+    var ratioSpacingY = signature1.spacingY / signature2.spacingY;
+
+    if (ratioSpacingX > 1.1 || ratioSpacingX < 0.9 || ratioSpacingY > 1.1 || ratioSpacingY < 0.9) {
+        return false;
+    }
+    return true;
+}
+
+function getIndexOfScaleSignature(scaleFactors, signature) {
+    for (var i=0; i < scaleFactors.length; i++) {
+        if (areScaleSignaturesCloseTo(scaleFactors[i].signature, signature)) {
+            return i;
+        }
+    }
+    return undefined;
+}
+
 /**
  * @ngdoc object
  * @memberOf osimis
@@ -98,6 +139,8 @@
         // moment and cornerstone#setViewport requires the image to be set).
         this._viewportData = undefined;
 
+        // Store the scale (zoom) factor for each scale signature (resolution + pixelspacing)
+        this._scaleFactors = [];
         // Trigger onImageChanging prior to image drawing
         // but after the viewport data is updated
         // Used for instance by tools to set the canvas image annotations prior to the drawing
@@ -232,6 +275,18 @@
         var canvas = this._canvas;
         var _this = this;
 
+        if (this.getImage() != null && this._viewportData != undefined) {
+            var scaleSignature = getImageScaleSignature(this.getImage());
+            // console.log("old scale signature: ", scaleSignature, " current scale: ", this._viewportData.scale);
+            var i = getIndexOfScaleSignature(this.scaleFactors, scaleSignature);
+            if (i != undefined) {
+                // update scaling (zoom)
+                this.scaleFactors[i].scale = this._viewportData.scale;
+            } else {
+                this.scaleFactors.push({signature: scaleSignature, scale: this._viewportData.scale});
+            }
+        }
+
         this._windowingMode = "image"; // each time we load a new series, we get back to the image by image windowing
 
         resetViewport = resetViewport || false;
@@ -326,6 +381,23 @@
             }
 
             csViewportData.changeResolution(newResolution);
+
+            // when changing image, use the scale (zoom) that is appropriate for this scale signature
+            var scaleSignature = getImageScaleSignature(image);
+            var iScale = getIndexOfScaleSignature(_this.scaleFactors, scaleSignature);
+
+            if (iScale !== undefined) { // reuse previous scale
+                _this._viewportData.scale = _this.scaleFactors[iScale].scale;
+            } else { // zoom-to-fit
+                var verticalScale = _this._canvasHeight / image.instanceInfos.TagsSubset["Rows"];
+                var horizontalScale = _this._canvasWidth / image.instanceInfos.TagsSubset["Columns"];
+                if(horizontalScale < verticalScale) {
+                  _this._viewportData.scale = horizontalScale;
+                }
+                else {
+                    _this._viewportData.scale = verticalScale;
+                }
+            }
 
             // Adapt annotations' resolution for now (even if the following
             // syntax says otherwise). It means an annotation must only be
@@ -670,6 +742,8 @@
         this.onParametersResetting.trigger(viewportData);
 
         // Method's user has to call .draw to avoid dual image redrawing.
+
+        this.scaleFactors = [];
     };
 
     /**
