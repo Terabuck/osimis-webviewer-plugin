@@ -46,7 +46,9 @@
 
         // When close button is clicked on by the user
         this.close = function() {
-            $cookies.put('showInfoPopupAtStartupUserPref', _this.showInfoPopupAtStartupUserPref, {'expires': time() + 10 * 365 * 24 * 3600});
+            var expiration = new Date();
+            expiration.setTime(expiration.getTime() + 10 * 365 * 24 * 3600 * 1000); // 10 years from now
+            $cookies.put('showInfoPopupAtStartupUserPref', _this.showInfoPopupAtStartupUserPref, {'expires': expiration});
             _this.show = false;
         };
 
