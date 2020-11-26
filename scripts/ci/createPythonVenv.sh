@@ -22,6 +22,12 @@ elif [[ $pythonVersion == *"3.5"* ]]; then
 elif [[ $pythonVersion == *"3.6"* ]]; then
   echo "using python version 3.6 ($pythonVersion)"
   pathToPythonPath=env/lib/python3.6/site-packages/path.pth
+elif [[ $pythonVersion == *"3.7"* ]]; then
+  echo "using python version 3.7 ($pythonVersion)"
+  pathToPythonPath=env/lib/python3.7/site-packages/path.pth
+elif [[ $pythonVersion == *"3.8"* ]]; then
+  echo "using python version 3.8 ($pythonVersion)"
+  pathToPythonPath=env/lib/python3.8/site-packages/path.pth
 fi
 
 #add the current dir to the python path (the path where we started the script from .. you should start it from the pythonToolbox directory, not the script directory)

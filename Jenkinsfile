@@ -51,7 +51,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
 
     // Init environment
     stage('Retrieve: sources') {
-        node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+        node('builder && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             // Clean up workspace first on non development branches
             if (!isUserDevBranch) {
                 deleteDir()
@@ -70,14 +70,14 @@ lock(resource: 'webviewer', inversePrecedence: false) {
 
     // Build frontend
     stage('Build: js') {
-        node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+        node('builder && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             sh 'scripts/ci/ciBuildFrontend.sh'
         }}}
     }
 
     // Publish temporary frontend so we can embed it within orthanc plugin
     stage('Publish: js -> AWS (commitId)') {
-        node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+        node('builder && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
                 sh 'scripts/ci/ciPushFrontend.sh tagWithCommitId'
             }
@@ -133,7 +133,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
     if (userInput['buildDocker']) {
         buildMap.put('docker', {
             stage('Build: LSB') {
-                node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+                node('builder && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
                         sh 'scripts/ci/ciBuildLsb.sh'
                     }
@@ -148,7 +148,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
     // Deploy docker image
     if (userInput['buildDocker']) {
         stage('Deploy: docker demo') {
-            node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+            node('builder && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
                     Random random = new Random();
 
@@ -240,7 +240,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
 
     // Publish js code for in-lify integration (until we use iframe) & wvp usage as a library
     stage('Publish: js -> AWS (release)') {
-        node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+        node('builder && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
                 sh 'scripts/ci/ciPushFrontend.sh tagWithReleaseTag'
             }
@@ -249,7 +249,7 @@ lock(resource: 'webviewer', inversePrecedence: false) {
 
     // Clean up
     stage('Clean up') {
-        node('master && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
+        node('builder && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
             sh 'scripts/ci/ciLogDockerState.sh postbuild'
             sh 'scripts/ci/ciCleanup.sh'
         }}}
