@@ -1,4 +1,7 @@
-Note: this project is in reduced maintenant mode.  It will soon be replaced by the StoneViewer.
+Note: this project is in reduced maintenance mode.  It will soon be replaced by the StoneViewer.
+
+Version 1.4.1
+========================
 
 Fixes:
 -----

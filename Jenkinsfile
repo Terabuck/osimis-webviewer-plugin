@@ -135,7 +135,8 @@ lock(resource: 'webviewer', inversePrecedence: false) {
             stage('Build: LSB') {
                 node('builder && docker') { dir(path: workspacePath) { wrap([$class: 'AnsiColorBuildWrapper']) {
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-orthanc.osimis.io']]) {
-                        sh 'scripts/ci/ciBuildLsb.sh'
+                        sh 'scripts/ci/ciBuildLsb.sh tagWithCommitId'
+                        sh 'scripts/ci/ciBuildLsb.sh tagWithReleaseTag'
                     }
                 }}}
             }
