@@ -78,6 +78,7 @@ function getIndexOfScaleSignature(scaleFactors, signature) {
         // Params
         this._enabledElement = domElement;
         isDiagnosisViewport = (typeof isDiagnosisViewport !== 'undefined') ? isDiagnosisViewport : true;
+        this._isDiagnosisViewport = isDiagnosisViewport;
 
         // Fit image to the viewport by default
         this._fitImageToViewport = true;
@@ -275,15 +276,17 @@ function getIndexOfScaleSignature(scaleFactors, signature) {
         var canvas = this._canvas;
         var _this = this;
 
-        if (this.getImage() != null && this._viewportData != undefined) {
-            var scaleSignature = getImageScaleSignature(this.getImage());
-            // console.log("old scale signature: ", scaleSignature, " current scale: ", this._viewportData.scale);
-            var i = getIndexOfScaleSignature(this.scaleFactors, scaleSignature);
-            if (i != undefined) {
-                // update scaling (zoom)
-                this.scaleFactors[i].scale = this._viewportData.scale;
-            } else {
-                this.scaleFactors.push({signature: scaleSignature, scale: this._viewportData.scale});
+        if (_this._isDiagnosisViewport) {
+            if (this.getImage() != null && this._viewportData != undefined) {
+                var scaleSignature = getImageScaleSignature(this.getImage());
+                // console.log("old scale signature: ", scaleSignature, " current scale: ", this._viewportData.scale);
+                var i = getIndexOfScaleSignature(this.scaleFactors, scaleSignature);
+                if (i != undefined) {
+                    // update scaling (zoom)
+                    this.scaleFactors[i].scale = this._viewportData.scale;
+                } else {
+                    this.scaleFactors.push({signature: scaleSignature, scale: this._viewportData.scale});
+                }
             }
         }
 
@@ -382,20 +385,22 @@ function getIndexOfScaleSignature(scaleFactors, signature) {
 
             csViewportData.changeResolution(newResolution);
 
-            // when changing image, use the scale (zoom) that is appropriate for this scale signature
-            var scaleSignature = getImageScaleSignature(image);
-            var iScale = getIndexOfScaleSignature(_this.scaleFactors, scaleSignature);
+            if (_this._isDiagnosisViewport) {
+                // when changing image, use the scale (zoom) that is appropriate for this scale signature
+                var scaleSignature = getImageScaleSignature(image);
+                var iScale = getIndexOfScaleSignature(_this.scaleFactors, scaleSignature);
 
-            if (iScale !== undefined) { // reuse previous scale
-                _this._viewportData.scale = _this.scaleFactors[iScale].scale;
-            } else { // zoom-to-fit
-                var verticalScale = _this._canvasHeight / image.instanceInfos.TagsSubset["Rows"];
-                var horizontalScale = _this._canvasWidth / image.instanceInfos.TagsSubset["Columns"];
-                if(horizontalScale < verticalScale) {
-                  _this._viewportData.scale = horizontalScale;
-                }
-                else {
-                    _this._viewportData.scale = verticalScale;
+                if (iScale !== undefined) { // reuse previous scale
+                    _this._viewportData.scale = _this.scaleFactors[iScale].scale;
+                } else { // zoom-to-fit
+                    var verticalScale = _this._canvasHeight / image.instanceInfos.TagsSubset["Rows"];
+                    var horizontalScale = _this._canvasWidth / image.instanceInfos.TagsSubset["Columns"];
+                    if(horizontalScale < verticalScale) {
+                    _this._viewportData.scale = horizontalScale;
+                    }
+                    else {
+                        _this._viewportData.scale = verticalScale;
+                    }
                 }
             }
 
