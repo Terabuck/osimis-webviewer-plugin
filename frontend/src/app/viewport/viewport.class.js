@@ -141,7 +141,9 @@ function getIndexOfScaleSignature(scaleFactors, signature) {
         this._viewportData = undefined;
 
         // Store the scale (zoom) factor for each scale signature (resolution + pixelspacing)
+        // the scaling that is saved is the scaling applied to the viewport (if the full resolution image is displayed)
         this._scaleFactors = [];
+
         // Trigger onImageChanging prior to image drawing
         // but after the viewport data is updated
         // Used for instance by tools to set the canvas image annotations prior to the drawing
@@ -276,16 +278,19 @@ function getIndexOfScaleSignature(scaleFactors, signature) {
         var canvas = this._canvas;
         var _this = this;
 
+        // keep track of current scaling
         if (_this._isDiagnosisViewport) {
-            if (this.getImage() != null && this._viewportData != undefined) {
-                var scaleSignature = getImageScaleSignature(this.getImage());
-                // console.log("old scale signature: ", scaleSignature, " current scale: ", this._viewportData.scale);
+            if (this._displayedImage != null && this._viewportData != undefined) {
+                var scaleSignature = getImageScaleSignature(this._displayedImage);
+                var resolutionRatio = this._displayedCornerstoneImageObject.width / this._displayedImage.instanceInfos.TagsSubset["Columns"];
+                var fullResolutionViewportScale = this._viewportData.scale * resolutionRatio;
+                // console.log("keep track, resolution ratio = ", resolutionRatio, " saved scaling = ", fullResolutionViewportScale, "viewport scaling = ", this._viewportData.scale)
                 var i = getIndexOfScaleSignature(this.scaleFactors, scaleSignature);
                 if (i != undefined) {
                     // update scaling (zoom)
-                    this.scaleFactors[i].scale = this._viewportData.scale;
+                    this.scaleFactors[i].scale = fullResolutionViewportScale;
                 } else {
-                    this.scaleFactors.push({signature: scaleSignature, scale: this._viewportData.scale});
+                    this.scaleFactors.push({signature: scaleSignature, scale: fullResolutionViewportScale});
                 }
             }
         }
@@ -389,18 +394,27 @@ function getIndexOfScaleSignature(scaleFactors, signature) {
                 // when changing image, use the scale (zoom) that is appropriate for this scale signature
                 var scaleSignature = getImageScaleSignature(image);
                 var iScale = getIndexOfScaleSignature(_this.scaleFactors, scaleSignature);
+                var resolutionRatio = newResolution.width / image.instanceInfos.TagsSubset["Columns"];
 
                 if (iScale !== undefined) { // reuse previous scale
-                    _this._viewportData.scale = _this.scaleFactors[iScale].scale;
+                    var fullResolutionViewportScale = _this.scaleFactors[iScale].scale;
+                    // console.log("reuse, resolution ratio = ", resolutionRatio, "saved scaling = ", fullResolutionViewportScale, " future viewport scaling = ", _this.scaleFactors[iScale].scale / resolutionRatio);
+                    if (_firstLoadingResolution) {
+                        _this._viewportData.scale = _this.scaleFactors[iScale].scale  / resolutionRatio;
+                    } else { // we might have zoomed the viewport in between
+                    }
                 } else { // zoom-to-fit
                     var verticalScale = _this._canvasHeight / image.instanceInfos.TagsSubset["Rows"];
                     var horizontalScale = _this._canvasWidth / image.instanceInfos.TagsSubset["Columns"];
+
                     if(horizontalScale < verticalScale) {
-                    _this._viewportData.scale = horizontalScale;
+                        var fullResolutionViewportScale = horizontalScale;
+                    } else {
+                        var fullResolutionViewportScale = verticalScale;
                     }
-                    else {
-                        _this._viewportData.scale = verticalScale;
-                    }
+                    // console.log("zoom-to-fit, resolution ratio = ", resolutionRatio, ", saved scaling = ", fullResolutionViewportScale, " future viewport scaling = ", fullResolutionViewportScale / resolutionRatio);
+                    _this._viewportData.scale = fullResolutionViewportScale / resolutionRatio;
+                    _this.scaleFactors.push({signature: scaleSignature, scale: fullResolutionViewportScale});
                 }
             }
 

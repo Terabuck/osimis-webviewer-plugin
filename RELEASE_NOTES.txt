@@ -3,8 +3,7 @@ Note: this project is in reduced maintenance mode.  You should swith to the new 
 Fixes:
 -----
 
-* LSD-479: when a series contain images with multiple resolutions, we should use a different zoom
-           level for each resolution.
+* LSD-479: cont: fix thumbnails that are too small.
 
 
 Version 1.4.1
