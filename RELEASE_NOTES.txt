@@ -1,5 +1,8 @@
 Note: this project is in reduced maintenance mode.  You should swith to the new Stone Web Viewer.
 
+Version 1.4.2
+========================
+
 Fixes:
 -----
 
