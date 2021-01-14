@@ -24,15 +24,15 @@
   "devDependencies": {
     "sinon": "1.17.7",
     "bardjs": "0.1.10",
-    "angular-mocks": "1.7.0"
+    "angular-mocks": "1.7.9"
   },
   "dependencies": {
     "jquery": "2.2.4",
-    "angular": "1.7.0",
-    "angular-animate": "1.7.0",
-    "angular-resource": "1.7.0",
-    "angular-sanitize": "1.7.0",
-    "angular-cookies": "1.7.0",
+    "angular": "1.7.9",
+    "angular-animate": "1.7.9",
+    "angular-resource": "1.7.9",
+    "angular-sanitize": "1.7.9",
+    "angular-cookies": "1.7.9",
     "bootstrap": "3.3.7",
     "lodash": "4.17.10",
     "open-sans": "./local_dependencies/open-sans/",
