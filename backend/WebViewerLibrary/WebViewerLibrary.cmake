@@ -130,6 +130,8 @@ endif()
 
 target_compile_definitions(WebViewerLibrary PUBLIC -DORTHANC_SANDBOXED=0 -DORTHANC_DEFAULT_DICOM_ENCODING=Encoding_Latin1)
 
+target_compile_definitions(WebViewerLibrary PUBLIC -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET} -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES})
+
 # bind WebViewerLibrary to WebViewerDependencies so any executable/library embedding
 # WebViewerLibrary.a also embed WebViewerDependencies.
 add_dependencies(WebViewerLibrary WebViewerDependencies)

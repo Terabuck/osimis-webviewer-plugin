@@ -34,6 +34,8 @@ add_library(WebViewerDependencies
   ${ORTHANC_ROOT}/Plugins/Samples/GdcmDecoder/OrthancImageWrapper.cpp
 )
 
+target_compile_definitions(WebViewerDependencies PUBLIC -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET} -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES})
+
 # bind WebViewerDependencies to GDCM so any executable/library embedding
 # WebViewerDependencies.a also embed GDCM.
 if (STATIC_BUILD OR NOT USE_SYSTEM_GDCM)
