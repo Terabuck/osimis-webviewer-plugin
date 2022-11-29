@@ -1,4 +1,5 @@
 # Osimis Web Viewer
+(Imported repo from https://bitbucket.org/osimis/osimis-webviewer-plugin/src/master/)
 
 The [Osimis'](htpp://www.osimis.io/) Web Viewer provides medical image 
 visualization straight from the browser.
